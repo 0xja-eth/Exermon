@@ -1,0 +1,5 @@
+.idea
+.sql
+settings.py
+db.sqlite3
+__pycache__/
