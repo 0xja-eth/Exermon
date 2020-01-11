@@ -1,9 +1,11 @@
 from django.db import models
+from utils.model_utils import CharacterImageUpload, Common as ModelUtils
 from enum import Enum
 
 import datetime
 
 # Create your models here.
+
 
 # ===================================================
 #  登陆信息表
@@ -24,6 +26,7 @@ class LoginInfo(models.Model):
 	# 登陆IP
 	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
 
+
 # ===================================================
 #  密码更改记录表
 # ===================================================
@@ -43,6 +46,7 @@ class PasswordRecord(models.Model):
 	# 发生IP
 	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
 
+
 # ===================================================
 #  玩家性别枚举
 # ===================================================
@@ -51,6 +55,44 @@ class PlayerGenders(Enum):
 	Male = 1  # 男
 	Female = 2  # 女
 	Unknown = 3  # 不明
+
+
+# ===================================================
+#  人物表
+# ===================================================
+class Character(models.Model):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "人物"
+
+	PLAYER_GENDERS = [
+		(PlayerGenders.Unset.value, '未设置'),
+		(PlayerGenders.Male.value, '男'),
+		(PlayerGenders.Female.value, '女'),
+		(PlayerGenders.Unknown.value, '不明'),
+	]
+
+	# 名称
+	name = models.CharField(max_length=12, verbose_name="名称")
+
+	# 描述
+	description = models.CharField(max_length=128, verbose_name="描述")
+
+	# 性别
+	gender = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GENDERS, verbose_name="性别")
+
+	# 半身像
+	bust = models.ImageField(upload_to=CharacterImageUpload('bust'),
+							 verbose_name="半身像")
+
+	# 头像
+	face = models.ImageField(upload_to=CharacterImageUpload('face'),
+							 verbose_name="头像")
+
+	# 战斗图
+	battle = models.ImageField(upload_to=CharacterImageUpload('battle'),
+							   verbose_name="战斗图")
 
 
 # ===================================================
@@ -119,13 +161,6 @@ class Player(models.Model):
 
 	SUCCESSFUL_LOGOUT_MSG = '您已成功退出登录！'
 
-	PLAYER_GENDERS = [
-		(PlayerGenders.Unset.value, '未设置'),
-		(PlayerGenders.Male.value, '男'),
-		(PlayerGenders.Female.value, '女'),
-		(PlayerGenders.Unknown.value, '不明'),
-	]
-
 	PLAYER_GRADES = [
 		(PlayerGrades.Unset.value, '未设置'),
 		(PlayerGrades.Before.value, '初中及以下'),
@@ -166,17 +201,20 @@ class Player(models.Model):
 	# 名字
 	name = models.CharField(blank=True, null=True, max_length=12, verbose_name="昵称")
 
-	# 性别
-	gender = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GENDERS, verbose_name="性别")
+	# 人物
+	character = models.ForeignKey('Character', on_delete=models.CASCADE,
+								  blank=True, null=True, verbose_name="人物")
 
 	# 年级
-	grade = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GRADES, verbose_name="年级")
+	grade = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GRADES,
+											 verbose_name="年级")
 
 	# 注册时间
 	create_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
 
 	# 刷新时间
-	last_refresh_time = models.DateTimeField(blank=True, null=True, verbose_name="刷新时间")
+	last_refresh_time = models.DateTimeField(blank=True, null=True,
+											 verbose_name="刷新时间")
 
 	# 状态
 	status = models.PositiveSmallIntegerField(default=0, choices=PLAYER_STATUSES, verbose_name="账号状态")
@@ -221,6 +259,26 @@ class Player(models.Model):
 
 		return player
 
+	# 是否是异常状态
+	def isAbnormalState(self):
+		return self.isBanned() or self.isFrozen()
+
+	# 是否在线
+	def isOnline(self):
+		return self.status == PlayerStatus.OnLine.value
+
+	# 是否在线
+	def isOffline(self):
+		return self.status != PlayerStatus.OnLine.value
+
+	# 是否封禁
+	def isBanned(self):
+		return self.status == PlayerStatus.Banned.value
+
+	# 是否冻结
+	def isFrozen(self):
+		return self.status == PlayerStatus.Frozen.value
+
 	# 登陆
 	def login(self, consumer):
 
@@ -259,25 +317,22 @@ class Player(models.Model):
 		self.password = pw
 		self.save()
 
-	# 是否是异常状态
-	def isAbnormalState(self):
-		return self.isBanned() or self.isFrozen()
+	# 创建角色
+	def create(self, name, character, grade):
+		self.name = name
+		self.character = character
+		self.grade = grade
 
-	# 是否在线
-	def isOnline(self):
-		return self.status == PlayerStatus.OnLine.value
+		self._createContainers()
 
-	# 是否在线
-	def isOffline(self):
-		return self.status != PlayerStatus.OnLine.value
+		self.save()
 
-	# 是否封禁
-	def isBanned(self):
-		return self.status == PlayerStatus.Banned.value
+	# 创建角色相关的容器
+	def _createContainers(self):
+		from item_module.models import HumanPack
+		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool
 
-	# 是否冻结
-	def isFrozen(self):
-		return self.status == PlayerStatus.Frozen.value
-
-
-
+		HumanPack._create(self)
+		ExerHub._create(self)
+		ExerFragPack._create(self)
+		ExerGiftPool._create(self)

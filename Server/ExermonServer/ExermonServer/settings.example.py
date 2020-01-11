@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'player_module',
     #'item_module',
-    #'pet_module',
+    #'exermon_module',
     'game_module',
     'question_module',
     'werkzeug_debugger_runserver',

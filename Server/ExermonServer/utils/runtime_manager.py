@@ -124,6 +124,28 @@ class RuntimeManager:
 	async def update(cls):
 		while True:
 			# 对于每一个 event_processors 内的函数都进行操作
+
+			# 测试
+			p1 = Player.objects.get(id=1)
+			p2 = Player.objects.get(id=2)
+			hp1 = p1.humanpack
+			hp2 = p2.humanpack
+
+			item = HumanItem.objects.all()[0]
+			item.max_count = 16
+			item.save()
+
+			hp1.gainItems(item)
+			hp2.gainItems(item, 15)
+			hp1.gainItems(item, 20)
+			items = hp1.lostItems(item, 8)
+			hp1.transferItems(hp2, item, 8)
+
+			# es = p.exerslot
+			# egp = p.exergiftpool
+			# peg = egp.contItems()[0].targetContItem()
+			# es.setGift(subject_id=1, player_gift=peg)
+
 			for method in cls.event_processors:
 				try: await method()
 				except: traceback.print_exc()
@@ -136,6 +158,10 @@ class RuntimeManager:
 
 		future = cls.update()
 		loop.run_until_complete(future)
+
+from exermon_module.models import *
+from item_module.models import *
+from player_module.models import *
 
 # 创建一个事件循环thread_loop
 thread_loop = asyncio.new_event_loop()

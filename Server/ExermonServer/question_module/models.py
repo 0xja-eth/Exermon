@@ -6,31 +6,6 @@ import os, base64
 from enum import Enum
 
 
-# Create your models here.
-# ===================================================
-#  科目表
-# ===================================================
-class Subject(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "科目"
-
-	# 科目名
-	name = models.CharField(max_length=4, verbose_name="名称")
-
-	# 科目分值
-	max_score = models.PositiveSmallIntegerField(default=100, verbose_name="分值")
-
-	def __str__(self):
-		return self.name
-
-	def convertToDict(self):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'max_score': self.max_score
-		}
-
-
 # ===================================================
 #  题目等级表
 # ===================================================
@@ -250,7 +225,7 @@ class Question(models.Model):
 	score = models.PositiveSmallIntegerField(default=DEFAULT_SCORE, verbose_name="分值")
 
 	# 科目
-	subject = models.ForeignKey('Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
+	subject = models.ForeignKey('game_module.Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
 
 	# 创建时间
 	create_time = models.DateTimeField(auto_now_add=True, verbose_name="收录时间")

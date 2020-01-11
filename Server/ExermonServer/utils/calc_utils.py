@@ -1,30 +1,31 @@
 import math
 
-# ================================
-# 宠物等级计算类
-# ================================
-class PetLevelCalc:
 
-	# 品质等级表
-	QualityLevelTable = None
+# ================================
+# 艾瑟萌等级计算类
+# ================================
+class ExermonLevelCalc:
 
-	# 初始化，计算所有品质的等级表
+	# 星级等级表
+	StarLevelTable = None
+
+	# 初始化，计算所有星级的等级表
 	@classmethod
 	def init(cls):
-		from pet_module.models import PetQuality
+		from exermon_module.models import ExerStar
 		from .view_utils import Common
 
-		cls.QualityLevelTable = {}
-		qualities = Common.getObjects(PetQuality)
+		cls.StarLevelTable = {}
+		stars = Common.getObjects(ExerStar)
 
-		for q in qualities:
-			cls.QualityLevelTable[q] = cls._generateTable(q)
+		for s in stars:
+			cls.StarLevelTable[s] = cls._generateTable(s)
 
-	# 生成某个品质的等级表
+	# 生成某个星级的等级表
 	@classmethod
 	def _generateTable(cls, q):
-		# from pet_module.models import PetQuality
-		# q: PetQuality
+		# from exermon_module.models import PetStar
+		# q: PetStar
 		res = []
 
 		_max = q.max_level
@@ -38,7 +39,7 @@ class PetLevelCalc:
 
 		return res
 
-	# 极端表格函数
+	# 计算表格函数
 	@classmethod
 	def _calcTable(cls, x, a, b, c):
 		return a/3*x*x*x+(a+b)/2*x*x+(a+b*3+c*6)/6*x
@@ -49,10 +50,10 @@ class PetLevelCalc:
 
 		if level >= q.max_level: return -1
 
-		if cls.QualityLevelTable is None:
+		if cls.StarLevelTable is None:
 			cls.init()
 
-		data = cls.QualityLevelTable[q]
+		data = cls.StarLevelTable[q]
 		return data[level]-data[level-1]
 
 	# 获取累计经验
@@ -61,16 +62,16 @@ class PetLevelCalc:
 
 		if level > q.max_level: level = q.max_level
 
-		if cls.QualityLevelTable is None:
+		if cls.StarLevelTable is None:
 			cls.init()
 
-		return cls.QualityLevelTable[q][level-1]+exp
+		return cls.StarLevelTable[q][level-1]+exp
 
 
 # ================================
-# 宠物属性计算类
+# 艾瑟萌属性计算类
 # ================================
-class PetParamCalc:
+class ExermonParamCalc:
 
 	STD_RATE = 1.01
 
@@ -81,9 +82,9 @@ class PetParamCalc:
 
 
 # ================================
-# 宠物槽等级计算类
+# 艾瑟萌槽等级计算类
 # ================================
-class PetSlotLevelCalc:
+class ExermonSlotLevelCalc:
 
 	D = 300
 	X = 0.75

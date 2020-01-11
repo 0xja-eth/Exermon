@@ -54,6 +54,16 @@ class ErrorType(Enum):
 	InvalidGender = 142  # 非法的性别
 	InvalidGrade = 143  # 非法的年级
 
+	# ItemCommon
+	ItemNotExist = 200  # 物品不存在
+	ContainerNotExist = 201  # 容器不存在
+	ContItemNotExist = 202  # 容器物品不存在
+
+	# Gain/LostItem
+	ItemIncorrect = 210  # 物品类型不正确
+	ContainerFull = 211  # 容器已满
+	ItemNotEnough = 212  # 物品数量不足
+	SlotCanNotChange = 213 #  槽无法变更
 
 class ErrorException(Exception):
 
@@ -98,6 +108,18 @@ class ErrorException(Exception):
 		ErrorType.InvalidName: "非法的昵称格式！",
 		ErrorType.InvalidGender: "非法的性别！",
 		ErrorType.InvalidGrade: "非法的年级！",
+
+		# ItemCommon
+		ErrorType.ItemNotExist: "物品不存在！",
+		ErrorType.ContainerNotExist: "容器不存在！",
+		ErrorType.ContItemNotExist: "容器物品不存在！",
+
+		# Gain/LostItem
+		ErrorType.ItemIncorrect: "物品类型不正确！",
+		ErrorType.ContainerFull: "容器已满！",
+		ErrorType.ItemNotEnough: "物品数量不足！",
+		ErrorType.SlotCanNotChange: "槽无法变更！",
+
 	}
 
 	def __init__(self, error_type: ErrorType):

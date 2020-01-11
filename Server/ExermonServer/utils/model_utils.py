@@ -28,10 +28,42 @@ class ImageUpload:
 class SystemImageUpload(ImageUpload):
 
 	SYSTEM_DIR = 'system'
+	IMAGE_DIR = ''
 
-	def __init__(self, _dir):
+	def __init__(self, _dir=None):
+		if _dir is None: _dir = self.IMAGE_DIR
 		_dir = os.path.join(self.SYSTEM_DIR, _dir)
-		ImageUpload.__init__(self, _dir)
+		super().__init__(_dir)
+
+# ===================================================
+#  人物图片
+# ===================================================
+@deconstructible
+class CharacterImageUpload(SystemImageUpload):
+
+	IMAGE_DIR = 'character'
+
+	BUST_DIR = 'character/bust'
+	FACE_DIR = 'character/face'
+	BATTLE_DIR = 'character/battle'
+
+	def __init__(self, type):
+		_dir = None
+		if type == 'bust': _dir = self.BUST_DIR
+		if type == 'face': _dir = self.FACE_DIR
+		if type == 'battle': _dir = self.BATTLE_DIR
+
+		super().__init__(_dir)
+
+	def generateFileName(self, instance, filename):
+
+		# 文件拓展名
+		ext = os.path.splitext(filename)[1]
+
+		# 定义文件名
+		filename = "character_%d" % instance.id
+
+		return filename+ext
 
 # ===================================================
 #  物品图标
@@ -39,18 +71,45 @@ class SystemImageUpload(ImageUpload):
 @deconstructible
 class ItemIconUpload(SystemImageUpload):
 
-	ITEM_ICON_DIR = 'item/icon'
-
-	def __init__(self, _dir=ITEM_ICON_DIR):
-		SystemImageUpload.__init__(self, _dir)
+	IMAGE_DIR = 'item/icon'
 
 	def generateFileName(self, instance, filename):
 
 		# 文件拓展名
 		ext = os.path.splitext(filename)[1]
 
-		# 定义文件名,用户id_年月日时分秒_随机数
+		# 定义文件名
 		filename = "item_%d" % instance.id
+
+		return filename+ext
+
+# ===================================================
+#  艾瑟萌图片
+# ===================================================
+@deconstructible
+class ExermonImageUpload(SystemImageUpload):
+
+	IMAGE_DIR = 'exermon'
+
+	FULL_DIR = 'exermon/full'
+	ICON_DIR = 'exermon/icon'
+	BATTLE_DIR = 'exermon/battle'
+
+	def __init__(self, type):
+		_dir = None
+		if type == 'full': _dir = self.FULL_DIR
+		if type == 'icon': _dir = self.ICON_DIR
+		if type == 'battle': _dir = self.BATTLE_DIR
+
+		super().__init__(_dir)
+
+	def generateFileName(self, instance, filename):
+
+		# 文件拓展名
+		ext = os.path.splitext(filename)[1]
+
+		# 定义文件名
+		filename = "exermon_%d" % instance.id
 
 		return filename+ext
 
@@ -58,19 +117,28 @@ class ItemIconUpload(SystemImageUpload):
 #  技能图标
 # ===================================================
 @deconstructible
-class SkillIconUpload(SystemImageUpload):
+class SkillImageUpload(SystemImageUpload):
 
-	SKILL_ICON_DIR = 'skill/icon'
+	IMAGE_DIR = 'exermon/skill'
 
-	def __init__(self, _dir=SKILL_ICON_DIR):
-		SystemImageUpload.__init__(self, _dir)
+	ICON_DIR = 'exermon/skill/icon'
+	ANI_DIR = 'exermon/skill/ani'
+	EFFECT_DIR = 'exermon/skill/effect'
+
+	def __init__(self, type):
+		_dir = None
+		if type == 'icon': _dir = self.ICON_DIR
+		if type == 'ani': _dir = self.ANI_DIR
+		if type == 'effect': _dir = self.EFFECT_DIR
+
+		super().__init__(_dir)
 
 	def generateFileName(self, instance, filename):
 
 		# 文件拓展名
 		ext = os.path.splitext(filename)[1]
 
-		# 定义文件名,用户id_年月日时分秒_随机数
+		# 定义文件名
 		filename = "skill_%d" % instance.id
 
 		return filename+ext
@@ -82,9 +150,18 @@ class SkillIconUpload(SystemImageUpload):
 class Common:
 
 	@classmethod
+	def preventNone(cls, judge, value=None, obj=None, func=None, empty=0):
+		if judge is None: return empty
+		if value is not None: return value
+		return func(obj)
+
+	@classmethod
 	def timeToStr(cls, time, empty=''):
-		if not time: return empty
-		return time.strftime('%Y-%m-%d %H:%M:%S')
+		# if time is None: return empty
+		# return time.strftime('%Y-%m-%d %H:%M:%S')
+		return cls.preventNone(
+			time, obj=time, func=lambda t: t.strftime
+			('%Y-%m-%d %H:%M:%S'), empty=empty)
 
 	@classmethod
 	def objectToId(cls, object, empty=0):

@@ -84,7 +84,7 @@ class Common:
 			else:
 				raise ErrorException(error)
 
-		# 如果是获取 字典 数据（通过 converToDict）：
+		# 如果是获取 字典 数据（通过 convertToDict）：
 		if return_type == 'dict':
 			object = cls.getObject(obj_type, error, objects,
 								   'object', include_deleted, **args)
