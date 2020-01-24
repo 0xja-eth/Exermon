@@ -132,4 +132,3 @@ class Common:
 	@classmethod
 	def ensureVersion(cls, main, sub):
 		ViewUtils.ensureObjectExist(GameVersion, ErrorType.ErrorVersion, main_version=main, sub_version=sub)
-

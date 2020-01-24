@@ -1,5 +1,9 @@
 from django.db import models
+from django.conf import settings
+from item_module.models import *
 from utils.model_utils import CharacterImageUpload, Common as ModelUtils
+from utils.exception import ErrorType, ErrorException
+import os, base64
 from enum import Enum
 
 import datetime
@@ -93,6 +97,49 @@ class Character(models.Model):
 	# 战斗图
 	battle = models.ImageField(upload_to=CharacterImageUpload('battle'),
 							   verbose_name="战斗图")
+
+	# 获取完整路径
+	def getExactlyPath(self):
+		base = settings.STATIC_URL
+		bust = os.path.join(base, str(self.bust))
+		face = os.path.join(base, str(self.face))
+		battle = os.path.join(base, str(self.battle))
+		if os.path.exists(bust) and \
+				os.path.exists(face) and \
+				os.path.exists(battle):
+			return bust, face, battle
+		else:
+			raise ErrorException(ErrorType.PictureFileNotFound)
+
+	# 获取视频base64编码
+	def convertToBase64(self):
+
+		bust, face, battle = self.getExactlyPath()
+
+		with open(bust, 'rb') as f:
+			bust_data = base64.b64encode(f.read()).decode()
+
+		with open(face, 'rb') as f:
+			face_data = base64.b64encode(f.read()).decode()
+
+		with open(battle, 'rb') as f:
+			battle_data = base64.b64encode(f.read()).decode()
+
+		return bust_data, face_data, battle_data
+
+	def convertToDict(self, type=None):
+
+		bust_data, face_data, battle_data = self.convertToBase64()
+
+		return {
+			'id': self.id,
+			'name': self.name,
+			'description': self.description,
+			'gender': self.gender,
+			'bust': bust_data,
+			'face': face_data,
+			'battle': battle_data,
+		}
 
 
 # ===================================================
@@ -222,6 +269,21 @@ class Player(models.Model):
 	# 账号类型
 	type = models.PositiveSmallIntegerField(default=0, choices=PLAYER_TYPES, verbose_name="账号类型")
 
+	# 生日
+	birth = models.DateField(blank=True, null=True, verbose_name="生日")
+
+	# 学校
+	school = models.CharField(blank=True, null=True, max_length=12, verbose_name="学校")
+
+	# 地区
+	city = models.CharField(blank=True, null=True, max_length=12, verbose_name="地区")
+
+	# 联系方式
+	contact = models.CharField(blank=True, null=True, max_length=24, verbose_name="联系方式")
+
+	# 个人介绍
+	description = models.CharField(blank=True, null=True, max_length=128, verbose_name="个人介绍")
+
 	# 删除标志
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
@@ -234,17 +296,53 @@ class Player(models.Model):
 	def __str__(self):
 		return self.username
 
+	def _packContainerIndices(self):
+		return {
+			'humanpack_id': self.humanpack.id,
+			'exerpack_id': self.exerpack.id,
+			'exergiftpool_id': self.exergiftpool.id,
+			'exerhub_id': self.exerhub.id,
+			# 'quessugarpack_id': self.quessugarpack.id,
+		}
+
+	def _slotContainerIndices(self):
+		return {
+			'exerslot_id': self.exerslot.id,
+			'humanequipslot_id': self.humanequipslot.id,
+		}
+
 	def convertToDict(self, type=None):
 
-		if type == "login":
+		create_time = ModelUtils.timeToStr(self.create_time)
+		birth = ModelUtils.dateToStr(self.birth)
 
-			return {
-
-			}
-
-		return {
-
+		base = {
+			'id': self.id,
+			'name': self.name,
+			'character_id': self.character_id,
+			'grade': self.grade,
+			'status': self.status,
+			'type': self.type,
+			'create_time': create_time,
+			'birth': birth,
+			'school': self.school,
+			'city': self.city,
+			'contact': self.contact,
+			'description': self.description,
+			'pack_containers': self._packContainerIndices(),
+			'slot_containers': self._slotContainerIndices(),
 		}
+
+		# 其他玩家
+		if type == "others": pass
+
+		# 当前玩家
+		if type == "current":
+			base['username'] = self.username
+			base['phone'] = self.phone
+			base['email'] = self.email
+
+		return base
 
 	# 注册（类方法）
 	@classmethod
@@ -318,21 +416,302 @@ class Player(models.Model):
 		self.save()
 
 	# 创建角色
-	def create(self, name, character, grade):
+	def create(self, name, grade, cid):
 		self.name = name
-		self.character = character
 		self.grade = grade
-
-		self._createContainers()
+		self.character_id = cid
 
 		self.save()
 
+		self._createContainers()
+
+	# 创建艾瑟萌槽
+	def createExermons(self, exers, enames):
+		from exermon_module.models import ExerSlot, PlayerExermon
+
+		player_exers = []
+
+		for i in range(len(exers)):
+
+			player_exers.append(self._createPlayerExer(exers[i], enames[i]))
+
+		ExerSlot.create(player=self, player_exers=player_exers)
+
+		for player_exer in player_exers:
+			player_exer.save()
+
+	def createGifts(self, gifts):
+
+		for i in range(len(gifts)):
+
+			player_gift = self._createPlayerGift(gifts[i])
+			self.exerslot.equipSlot(index=i+1, equip_index=2,
+									equip_item=player_gift)
+			player_gift.save()
+
+	def _createPlayerExer(self, exer, name):
+		from exermon_module.models import PlayerExermon
+
+		player_exer = PlayerExermon()
+		player_exer.item = exer
+		player_exer.nickname = name
+		player_exer.save()
+		player_exer.afterCreated()
+
+		return player_exer
+
+	def _createPlayerGift(self, gift):
+		from exermon_module.models import PlayerExerGift
+
+		player_gift = PlayerExerGift()
+		player_gift.item = gift
+		player_gift.save()
+		player_gift.afterCreated()
+
+		return player_gift
+
 	# 创建角色相关的容器
 	def _createContainers(self):
-		from item_module.models import HumanPack
-		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool
+		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
 
-		HumanPack._create(self)
-		ExerHub._create(self)
-		ExerFragPack._create(self)
-		ExerGiftPool._create(self)
+		if self.humanpack is None:
+			HumanPack.create(player=self)
+
+		if self.exerpack is None:
+			ExerPack.create(player=self)
+
+		if self.exerhub is None:
+			ExerHub.create(player=self)
+
+		if self.exerfragpack is None:
+			ExerFragPack.create(player=self)
+
+		if self.exergiftpool is None:
+			ExerGiftPool.create(player=self)
+
+
+# ===================================================
+#  人类物品表
+# ===================================================
+class HumanItem(UsableItem):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类物品"
+
+	# 道具类型
+	TYPE = ItemType.HumanItem
+
+	# 对应的容器项类
+	@classmethod
+	def contItemClass(cls): return HumanPackItem
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		return res
+
+
+# ===================================================
+#  人类装备
+# ===================================================
+class HumanEquip(EquipableItem):
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备"
+
+	# 道具类型
+	TYPE = ItemType.HumanEquip
+
+	# 装备类型
+	e_type = models.ForeignKey("game_module.HumanEquipType",
+							   on_delete=models.CASCADE, verbose_name="装备类型")
+
+	# 对应的容器项类
+	@classmethod
+	def contItemClass(cls): return HumanPackEquip
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		res['e_type'] = self.e_type
+
+		return res
+
+
+# ===================================================
+#  人类背包
+# ===================================================
+class HumanPack(PackContainer):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类背包"
+
+	# 容器类型
+	TYPE = ContainerType.HumanPack
+
+	# 默认容量
+	DEFAULT_CAPACITY = 64
+
+	# 玩家
+	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
+
+	# 所接受的容器项类
+	@classmethod
+	def acceptedContItemClass(cls): return HumanPackItem
+
+	# 获取容器容量（0为无限）
+	@classmethod
+	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
+
+	# 创建一个背包（创建角色时候执行）
+	@classmethod
+	def _create(cls, player):
+		pack: cls = super()._create()
+		pack.player = player
+		return pack
+
+	# 持有玩家
+	def ownerPlayer(self): return self.player
+
+
+# ===================================================
+#  人类背包物品
+# ===================================================
+class HumanPackItem(PackContItem):
+	class Meta:
+		verbose_name = verbose_name_plural = "人类背包物品"
+
+	# 容器项类型
+	TYPE = ContItemType.HumanPackItem
+
+	# 所接受的物品类
+	@classmethod
+	def acceptedItemClass(cls): return HumanItem, HumanEquip
+
+
+# ===================================================
+#  人类背包装备
+# ===================================================
+class HumanPackEquip(HumanPackItem):
+	class Meta:
+		verbose_name = verbose_name_plural = "人类背包装备"
+
+	# 容器项类型
+	TYPE = ContItemType.HumanPackEquip
+
+	# 所接受的物品类
+	@classmethod
+	def acceptedItemClass(cls): return HumanEquip
+
+
+# ===================================================
+#  人类装备槽
+# ===================================================
+class HumanEquipSlot(SlotContainer):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备槽"
+
+	# 容器类型
+	TYPE = ContainerType.HumanEquipSlot
+
+	# 玩家
+	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
+
+	# # 人类背包
+	# human_pack = models.ForeignKey('HumanPack', on_delete=models.CASCADE, verbose_name="人类背包")
+
+	# 所接受的槽项类
+	@classmethod
+	def acceptedSlotItemClass(cls): return HumanEquipSlotItem
+
+	# 所接受的容器项类
+	@classmethod
+	def acceptedContItemClass(cls): return HumanPackEquip
+
+	# 默认容器容量（0为无限）
+	@classmethod
+	def defaultCapacity(cls): return HumanEquipType.count()
+
+	# 创建一个槽（创建角色时候执行）
+	@classmethod
+	def _create(cls, player):
+		slot: cls = super()._create()
+		slot.player = player
+		slot.equip_container1 = player.humanpack
+		return slot
+
+	# 保证装备类型与槽一致
+	def ensureEquipType(self, slot_item, equip):
+		if slot_item.e_type_id != equip.targetItem().e_type_id:
+			raise ErrorException(ErrorType.IncorrectEquipType)
+
+		return True
+
+	# 保证满足装备条件
+	def ensureEquipCondition(self, slot_item, equip_item):
+		super().ensureEquipCondition(slot_item, equip_item)
+
+		self.ensureEquipType(slot_item, equip_item)
+
+		return True
+
+	# 持有玩家
+	def ownerPlayer(self): return self.player
+
+
+# ===================================================
+#  人类装备槽项
+# ===================================================
+class HumanEquipSlotItem(SlotContItem):
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备槽项"
+
+	# 容器项类型
+	TYPE = ContItemType.HumanEquipSlotItem
+
+	# 人类背包装备
+	# pack_equip = models.OneToOneField('HumanPackEquip', on_delete=models.CASCADE,
+	# 							 verbose_name="人类背包装备")
+
+	# 装备槽类型
+	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
+							   verbose_name="装备槽类型")
+
+	# 所接受的装备项类
+	@classmethod
+	def acceptedEquipItemClass(cls): return HumanPackEquip, ()
+
+	# 所接受的装备项属性名（2个）
+	@classmethod
+	def acceptedEquipItemAttr(cls): return 'pack_equip', '_'
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		res['e_type_id'] = self.e_type_id
+
+		return res
+
+	# 配置索引
+	def setupIndex(self, index, **kwargs):
+		super().setupIndex(index, **kwargs)
+		self.e_type_id = index
+
+	# 获取属性值
+	def param(self, param_id=None, attr=None):
+		return self.pack_equip.param(param_id, attr)
+
+	# # 装备
+	# def equip(self, pack_equip=None, **kwargs):
+	# 	self.pack_equip: HumanPackEquip = pack_equip
+	# 	self.pack_equip.transfer(self.container)
+	#
+	# # 卸下
+	# def dequip(self, **kwargs):
+	# 	self.pack_equip.remove()
+	# 	pack_equip = self.pack_equip
+	# 	self.pack_equip = None
+	# 	return pack_equip

@@ -12,7 +12,6 @@ class WebscoketCloseCode(Enum):
 
 
 class ErrorType(Enum):
-
 	# Common
 	UnknownError = -1  # 未知错误
 	Success = 0  # 成功，无错误
@@ -21,8 +20,11 @@ class ErrorType(Enum):
 	InvalidRoute = 3  # 非法路由
 	PermissionDenied = 4  # 无权操作
 	NoCurVersion = 5  # 未设置当前版本
-	RequestUpdate = 6  # 版本不一致
+	RequestUpdate = 6  # 需要更新
 	ErrorVersion = 7  # 错误的游戏版本
+	InvalidUserOper = 10  # 无效的用户操作
+	SubjectNotExist = 20  # 科目不存在
+	BaseParamNotExist = 21  # 属性不存在
 
 	# PlayerCommon
 	PlayerNotExist = 100  # 玩家不存在
@@ -54,22 +56,44 @@ class ErrorType(Enum):
 	InvalidGender = 142  # 非法的性别
 	InvalidGrade = 143  # 非法的年级
 
+	# CharacterCommon
+	CharacterNotExist = 150  # 形象不存在
+
 	# ItemCommon
 	ItemNotExist = 200  # 物品不存在
 	ContainerNotExist = 201  # 容器不存在
-	ContItemNotExist = 202  # 容器物品不存在
+	ContItemNotExist = 202  # 容器项不存在
+	ContainerNotOwner = 203  # 该容器不属于当前玩家
+	ContItemNotHold = 204  # 容器中不存在该容器项
+	IncorrectItemType = 210  # 物品类型不正确
+	IncorrectContainerType = 211  # 容器类型不正确
+	IncorrectContItemType = 212  # 容器项类型不正确
 
 	# Gain/LostItem
-	ItemIncorrect = 210  # 物品类型不正确
-	ContainerFull = 211  # 容器已满
-	ItemNotEnough = 212  # 物品数量不足
-	SlotCanNotChange = 213 #  槽无法变更
+	CapacityInsufficient = 220  # 容器剩余容量不足
+	QuantityInsufficient = 221  # 物品数量不足
+
+	# Equip/DequipEquip
+	IncorrectEquipType = 230  # 装备类型不正确
+
+	# ExermonCommon
+	ExermonNotExist = 300  # 艾瑟萌不存在
+	ExerGiftNotExist = 301  # 艾瑟萌天赋不存在
+	InvalidExermonCount = 302  # 非法的艾瑟萌数量
+	InvalidExermonName = 303  # 非法的艾瑟萌昵称
+	InvalidExermonSubject = 304  # 非法的艾瑟萌科目
+	InvalidExermonType = 305  # 非法的艾瑟萌类型
+	InvalidExerGiftType = 306  # 非法的艾瑟萌天赋类型
+
+	# ExerSlot
+	IncorrectSubject = 310  # 科目不正确
+
 
 class ErrorException(Exception):
 
 	ERROR_DICT = {
 		# Common
-		ErrorType.UnknownError: "未知错误！",
+		ErrorType.UnknownError: "服务器发生错误，请联系管理员！",
 		ErrorType.Success: "",
 		ErrorType.InvalidRequest: "非法的请求方法！",
 		ErrorType.ParameterError: "参数错误！",
@@ -78,6 +102,9 @@ class ErrorException(Exception):
 		ErrorType.NoCurVersion: "未设置当前版本，请联系管理员！",
 		ErrorType.RequestUpdate: "当前客户端版本过旧，请更新游戏！",
 		ErrorType.ErrorVersion: "错误的客户端版本，请更新游戏！",
+		ErrorType.InvalidUserOper: "无效的用户操作！",
+		ErrorType.SubjectNotExist: "科目不存在！",
+		ErrorType.BaseParamNotExist: "属性不存在！",
 
 		# PlayerCommon
 		ErrorType.PlayerNotExist: "玩家不存在！",
@@ -109,16 +136,37 @@ class ErrorException(Exception):
 		ErrorType.InvalidGender: "非法的性别！",
 		ErrorType.InvalidGrade: "非法的年级！",
 
+		# CharacterCommon
+		ErrorType.CharacterNotExist: "形象不存在！",
+
 		# ItemCommon
 		ErrorType.ItemNotExist: "物品不存在！",
 		ErrorType.ContainerNotExist: "容器不存在！",
-		ErrorType.ContItemNotExist: "容器物品不存在！",
+		ErrorType.ContItemNotExist: "容器项不存在！",
+		ErrorType.ContainerNotOwner: "该容器不属于当前玩家！",
+		ErrorType.ContItemNotHold: "玩家未获得此物品！",
+		ErrorType.IncorrectItemType: "物品类型不正确！",
+		ErrorType.IncorrectContainerType: "容器类型不正确！",
+		ErrorType.IncorrectContItemType: "物品类型不正确！",
 
 		# Gain/LostItem
-		ErrorType.ItemIncorrect: "物品类型不正确！",
-		ErrorType.ContainerFull: "容器已满！",
-		ErrorType.ItemNotEnough: "物品数量不足！",
-		ErrorType.SlotCanNotChange: "槽无法变更！",
+		ErrorType.CapacityInsufficient: "容器剩余容量不足！",
+		ErrorType.QuantityInsufficient: "物品数量不足或未拥有此物品！",
+
+		# Equip/DequipEquip
+		ErrorType.IncorrectEquipType: "装备类型不正确！",
+
+		# ExermonCommon
+		ErrorType.ExermonNotExist: "艾瑟萌不存在！",
+		ErrorType.ExerGiftNotExist: "艾瑟萌天赋不存在！",
+		ErrorType.InvalidExermonCount: "非法的艾瑟萌数量！",
+		ErrorType.InvalidExermonName: "非法的艾瑟萌昵称格式！",
+		ErrorType.InvalidExermonSubject: "非法的艾瑟萌科目！",
+		ErrorType.InvalidExermonType: "非法的艾瑟萌类型！",
+		ErrorType.InvalidExerGiftType: "非法的艾瑟萌天赋类型！",
+
+		# ExerSlot
+		ErrorType.IncorrectSubject: "艾瑟萌科目与艾瑟萌槽科目不一致！",
 
 	}
 

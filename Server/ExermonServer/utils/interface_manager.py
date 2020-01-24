@@ -8,6 +8,7 @@ import json, datetime, traceback
 # 接口管理器：处理接口的检查、调用
 # ===============================
 
+
 # ===============================
 # 处理 HTTP 接口（主要用于内部调用）
 # ===============================
@@ -132,6 +133,14 @@ class WebSocket:
 			data = Common.getRequestDict(data['data'], params)
 			print('getRequestDict: ' + str(data))
 
+			if 'uid' in data:
+				player = consumer.getPlayer()
+				if player is None or player.id != data['uid']:
+					raise ErrorException(ErrorType.InvalidUserOper)
+
+				data.pop('uid')
+				data['player'] = player
+
 			# 执行
 			res['data'] = await method(consumer, **data)
 
@@ -221,10 +230,9 @@ class WebSocket:
 	@classmethod
 	async def processDisconnect(cls, consumer, close_code):
 
-		online_info = consumer.online_info
+		player = consumer.getPlayer()
 
-		if online_info:
-			player = online_info.player
+		if player is not None:
 			data = cls._generateDisconnectRequestData(player)
 
 			print("processDisconnect: "+str(player))
@@ -241,7 +249,7 @@ class WebSocket:
 
 		return {
 			'route': DISCONNECT_ROUTE,
-			'data': {'pid': player.id, 'auth': settings.AUTH_KEY},
+			'data': {'uid': player.id, 'auth': settings.AUTH_KEY},
 			'index': -1
 		}
 

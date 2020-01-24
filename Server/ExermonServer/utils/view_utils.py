@@ -34,6 +34,12 @@ class Common:
 			try: enum_type(id)
 			except: raise ErrorException(error)
 
+	# 确保类型正确
+	@classmethod
+	def ensureObjectType(cls, obj, type, error):
+		if not isinstance(obj, type):
+			raise ErrorException(error)
+
 	# 确保某模型数据对象存在
 	@classmethod
 	def ensureObjectExist(cls, obj_type, error, objects=None,

@@ -1,5 +1,6 @@
-from  utils.exception import ErrorException, ErrorType
+from utils.exception import ErrorException, ErrorType
 import datetime, random
+
 
 # =======================
 # 验证码数据类
@@ -24,6 +25,7 @@ class CodeDatum:
     def generateCode(self):
         max_ = pow(10, self.CODE_LENGTH)
         return str(random.randint(max_ / 10, max_ - 1))
+
 
 # =======================
 # 验证码管理类，管理验证码数据，处理验证码发送
@@ -59,15 +61,15 @@ class CodeManager:
         key = cls.getKey(un, email, type)
         if key in cls.code_data:
             cls.code_data.pop(key)
-        else:
-            raise ErrorException(ErrorType.InvalidCode)
 
-    # 确保验证码正确，否则抛出异常：ErrorType.InvalidCode
+    # 确保验证码正确，否则抛出异常：ErrorType.IncorrectCode
     @classmethod
     def ensureCode(cls, un, email, code, type):
-        if cls.getKey(un, email, type) in cls.code_data:
-            return cls.code_data[cls.getKey(un, email, type)]==code
-        else:
+        key = cls.getKey(un, email, type)
+        if key not in cls.code_data:
+            raise ErrorException(ErrorType.IncorrectCode)
+
+        if cls.code_data[key] != code:
             raise ErrorException(ErrorType.IncorrectCode)
 
     # 扫描 Code，如果过期就删去

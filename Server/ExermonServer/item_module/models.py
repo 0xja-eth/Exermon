@@ -8,7 +8,99 @@ from utils.exception import ErrorType, ErrorException
 from enum import Enum
 import jsonfield, os, math
 
-# region 物品
+
+# ===================================================
+#  物品类型枚举
+# ===================================================
+class ItemType(Enum):
+	Unset = 0  # 未设置
+
+	# ===！！！！不能轻易修改序号！！！！===
+	# LimitedItem 1~100
+	# UsableItem
+	HumanItem = 1  # 人类物品
+	ExerItem = 2  # 艾瑟萌物品
+
+	# EquipableItem
+	HumanEquip = 11  # 人类装备
+	ExerEquip = 12  # 艾瑟萌装备
+
+	# InfiniteItem 101+
+	QuesSugar = 101  # 题目糖
+
+	Exermon = 201  # 艾瑟萌
+	ExerSkill = 202  # 艾瑟萌技能
+	ExerGift = 203  # 艾瑟萌天赋
+	ExerFrag = 204  # 艾瑟萌碎片
+
+
+# ===================================================
+#  容器类型枚举
+# ===================================================
+class ContainerType(Enum):
+	Unset = 0  # 未设置
+
+	# ===！！！！不能轻易修改序号！！！！===
+	# Pack 1~100
+	# 可转移
+	HumanPack = 1  # 人类背包
+	ExerPack = 2  # 艾瑟萌背包
+
+	# 可转移，可叠加
+	ExerFragPack = 11  # 艾瑟萌碎片背包
+
+	# 可转移，可叠加
+	QuesSugarPack = 21  # 题目糖背包
+
+	# Slot 101~200
+	# 可转移
+	HumanEquipSlot = 101  # 人类装备槽
+	ExerEquipSlot = 102  # 艾瑟萌装备槽
+
+	# 可转移
+	ExerSlot = 111  # 艾瑟萌槽
+
+	# 可转移
+	ExerSkillSlot = 121  # 艾瑟萌技能槽
+
+	# Others 201+
+	# 可转移
+	ExerGiftPool = 201  # 艾瑟萌天赋池
+	# 可转移
+	ExerHub = 202  # 艾瑟萌仓库
+
+
+# ===================================================
+#  容器物品枚举
+# ===================================================
+class ContItemType(Enum):
+	Unset = 0  # 未设置
+
+	# ===！！！！不能轻易修改序号！！！！===
+	# Pack 1~100
+	HumanPackItem = 1  # 人类背包物品
+	ExerPackItem = 2  # 艾瑟萌背包物品
+	HumanPackEquip = 3  # 人类背包装备
+	ExerPackEquip = 4  # 艾瑟萌背包装备
+
+	# 可叠加
+	ExerFragPackItem = 11  # 艾瑟萌碎片背包物品
+
+	# 可叠加
+	QuesSugarPackItem = 21  # 题目糖背包物品
+
+	# Slot 101~200
+	HumanEquipSlotItem = 101  # 人类装备槽项
+	ExerEquipSlotItem = 102  # 艾瑟萌装备槽项
+
+	ExerSlotItem = 111  # 艾瑟萌槽项
+
+	ExerSkillSlotItem = 121  # 艾瑟萌技能槽物品
+
+	# Others 201+
+	PlayerExerGift = 201  # 玩家艾瑟萌天赋关系
+
+	PlayerExermon = 202  # 玩家艾瑟萌关系
 
 
 # ===================================================
@@ -43,29 +135,7 @@ class Currency(models.Model):
 		}
 
 
-# ===================================================
-#  物品类型枚举
-# ===================================================
-class ItemType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# LimitedItem 1~100
-	# UsableItem
-	HumanItem = 1  # 人类物品
-	ExerItem = 2  # 艾瑟萌物品
-
-	# EquipableItem
-	HumanEquip = 11  # 人类装备
-	ExerEquip = 12  # 艾瑟萌装备
-
-	# InfiniteItem 101+
-	QuesSugar = 101  # 题目糖
-
-	Exermon = 201  # 艾瑟萌
-	ExerSkill = 202  # 艾瑟萌技能
-	ExerGift = 203  # 艾瑟萌天赋
-	ExerFrag = 204  # 艾瑟萌碎片
+# region 物品
 
 
 # ===================================================
@@ -97,35 +167,33 @@ class BaseItem(models.Model):
 		(ItemType.ExerFrag.value, '艾瑟萌碎片'),
 	]
 
+	# 道具类型
+	TYPE = ItemType.Unset
+
 	# 名称
 	name = models.CharField(max_length=24, verbose_name="名称")
 
 	# 描述
 	description = models.CharField(max_length=128, verbose_name="描述")
 
-	# 物品标识类型
+	# 物品 标识类型
 	type = models.PositiveSmallIntegerField(default=ItemType.Unset.value,
 											choices=TYPES, verbose_name="物品类型")
 
-	# 物品类型
-	@classmethod
-	def itemType(cls): return ItemType.Unset
+	# region 配置项
 
-	# 对应的容器物品类型（枚举）
+	# 对应的容器项类
 	@classmethod
-	def contItemType(cls): return ContItemType.Unset
+	def contItemClass(cls): return BaseContItem
 
-	# 对应的容器物品类型
-	@classmethod
-	def contItemClass(cls):
-		type = cls.contItemType()
-		if type == ContItemType.Unset: return BaseContItem
-		return eval(type.name)
+	# endregion
+
+	# region 类型配置
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		if self.type == ItemType.Unset.value:
-			self.type = self.itemType().value
+			self.type = self.TYPE.value
 
 	def __str__(self):
 		type_name = self.getTypeName()
@@ -141,7 +209,12 @@ class BaseItem(models.Model):
 		return self.TYPES[0][1]
 
 	# 获取目标的物品
-	def targetItem(self):
+	# noinspection PyUnresolvedReferences
+	def target(self):
+
+		from exermon_module.models import Exermon, ExerGift, \
+			ExerFrag, ExerSkill, ExerEquip, ExerItem
+		from player_module.models import HumanItem, HumanEquip
 
 		target = BaseItem
 
@@ -163,16 +236,18 @@ class BaseItem(models.Model):
 			'type': self.type
 		}
 
+	# 转化为 dict
+	def convertToDict(self, **kwargs):
+		return self.target()._convertToDict(**kwargs)
+
+	# endregion
+
 	# 最大叠加数量（为0则不限）
 	def _maxCount(self): return 1
 
-	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		return self.targetItem()._convertToDict(**kwargs)
-
 	# 最大叠加数量（为0则不限）
 	def maxCount(self):
-		return self.targetItem()._maxCount()
+		return self.target()._maxCount()
 
 
 # ===================================================
@@ -195,14 +270,18 @@ class LimitedItem(BaseItem):
 		# abstract = True
 		verbose_name = verbose_name_plural = "有限物品"
 
-	# 购入价格（为0则不可购买）
-	buy_price = models.OneToOneField("ItemPrice", on_delete=models.CASCADE, default=0, verbose_name="购入价格")
+	# 购入价格（为 None 则不可购买）
+	buy_price = models.OneToOneField("ItemPrice", on_delete=models.CASCADE,
+									 null=True, verbose_name="购入价格")
 
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
 
 	# 是否可丢弃
 	discardable = models.BooleanField(default=True, verbose_name="可丢弃")
+
+	# 能否交易
+	tradable = models.BooleanField(default=True, verbose_name="能否交易")
 
 	# 物品图标
 	icon = models.ImageField(upload_to=ItemIconUpload(), verbose_name="图标")
@@ -263,9 +342,6 @@ class UsableItem(LimitedItem):
 	# 冻结回合
 	freeze = models.PositiveSmallIntegerField(default=0, verbose_name="冻结回合")
 
-	# 能否交易
-	tradable = models.BooleanField(default=True, verbose_name="能否交易")
-
 	# 物品类型
 	i_type = models.ForeignKey("game_module.UsableItemType",
 							   on_delete=models.CASCADE, verbose_name="物品类型")
@@ -290,57 +366,6 @@ class UsableItem(LimitedItem):
 	# 获取所有的效果
 	def effects(self):
 		return self.itemeffect_set.all()
-
-
-# ===================================================
-#  人类物品表
-# ===================================================
-class HumanItem(UsableItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类物品"
-
-	# 道具类型
-	@classmethod
-	def itemType(cls): return ItemType.HumanItem
-
-	# 对应的容器物品类型（枚举）
-	@classmethod
-	def contItemType(cls): return ContItemType.HumanPackItem
-
-	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
-
-		return res
-
-
-# ===================================================
-#  艾瑟萌物品表
-# ===================================================
-class ExerItem(UsableItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌物品"
-
-	# 使用几率（*100）
-	rate = models.PositiveSmallIntegerField(default=0, verbose_name="使用几率")
-
-	# 道具类型
-	@classmethod
-	def itemType(cls): return ItemType.ExerItem
-
-	# 对应的容器物品类型（枚举）
-	@classmethod
-	def contItemType(cls): return ContItemType.ExerPackItem
-
-	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
-
-		res['rate'] = self.rate
-
-		return res
 
 
 # ===================================================
@@ -383,33 +408,22 @@ class EquipableItem(LimitedItem):
 	def params(self):
 		return self.equipparam_set.all()
 
+	# 用于获取属性值
+	def __getattr__(self, item):
+		return self.param(attr=item)
 
-# ===================================================
-#  艾瑟萌装备
-# ===================================================
-class ExerEquip(EquipableItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌装备"
+	# 获取属性值
+	def param(self, param_id=None, attr=None):
+		param = None
+		if param_id is not None:
+			param = self.params().filter(param_id=param_id)
+		if attr is not None:
+			param = self.params().filter(param__attr=attr)
 
-	# 装备类型
-	e_type = models.ForeignKey("game_module.ExerEquipType",
-							   on_delete=models.CASCADE, verbose_name="装备类型")
+		if param is None or not param.exist(): return None
 
-	# 道具类型
-	@classmethod
-	def itemType(cls): return ItemType.ExerEquip
+		return param.first().getValue()
 
-	# 对应的容器物品类型（枚举）
-	@classmethod
-	def contItemType(cls): return ContItemType.ExerPackEquip
-
-	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
-
-		res['e_type'] = self.e_type
-
-		return res
 
 #
 # # ===================================================
@@ -430,42 +444,6 @@ class ExerEquip(EquipableItem):
 # endregion
 
 # region 容器
-
-
-# ===================================================
-#  容器类型枚举
-# ===================================================
-class ContainerType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# Pack 1~100
-	# 可转移
-	HumanPack = 1  # 人类背包
-	ExerPack = 2  # 艾瑟萌背包
-
-	# 可转移，可叠加
-	ExerFragPack = 11  # 艾瑟萌碎片背包
-
-	# 可转移，可叠加
-	QuesSugarPack = 21  # 题目糖背包
-
-	# Slot 101~200
-	# 可转移
-	HumanEquipSlot = 101  # 人类装备槽
-	ExerEquipSlot = 102  # 艾瑟萌装备槽
-
-	# 可转移
-	ExerSlot = 111  # 艾瑟萌槽
-
-	# 可转移
-	ExerSkillSlot = 121  # 艾瑟萌技能槽
-
-	# Others 201+
-	# 可转移
-	ExerGiftPool = 201  # 艾瑟萌天赋池
-	# 可转移
-	ExerHub = 202  # 艾瑟萌仓库
 
 
 # ===================================================
@@ -500,6 +478,9 @@ class BaseContainer(models.Model):
 		(ContainerType.ExerHub.value, '艾瑟萌仓库'),
 	]
 
+	# 容器类型
+	TYPE = ContainerType.Unset
+
 	# 玩家
 	# player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE,
 	#						   verbose_name="玩家")
@@ -512,35 +493,19 @@ class BaseContainer(models.Model):
 	# {'args': **kwargs, 'res': 容器项[]}
 	cache_cont_items = None
 
-	accepted_classes = None
+	# region 配置项
 
-	# 容器类型
+	# 所接受的容器项类
 	@classmethod
-	def containerType(cls): return ContainerType.Unset
+	def acceptedContItemClass(cls): return BaseContItem
 
-	# 所接受容器项的基类
+	# 默认容器容量（0为无限）
 	@classmethod
-	def baseContItemClass(cls): return BaseContItem
+	def defaultCapacity(cls): return 0
 
-	# 所接受物品的基类
-	@classmethod
-	def baseItemClass(cls): return BaseItem
+	# endregion
 
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptTypes(cls): return []
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptClasses(cls):
-		if cls.accepted_classes is None:
-			a_types = cls.acceptTypes()
-			a_classes = []
-			for type_ in a_types:
-				a_classes.append(type_.name)
-			cls.accepted_classes = a_classes
-
-		return cls.accepted_classes
+	# region 创建函数
 
 	# 创建实例
 	@classmethod
@@ -555,10 +520,14 @@ class BaseContainer(models.Model):
 		container = cls()
 		return container
 
+	# endregion
+
+	# region 类型配置
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		if self.type == ContainerType.Unset.value:
-			self.type = self.containerType().value
+			self.type = self.TYPE.value
 
 	def __str__(self):
 		type_name = self.getTypeName()
@@ -573,8 +542,14 @@ class BaseContainer(models.Model):
 
 		return self.TYPES[0][1]
 
-	# 获取目标的物品
-	def targetContainer(self):
+	# 获取目标的容器
+	# noinspection PyUnresolvedReferences
+	def target(self):
+
+		from exermon_module.models import ExerHub, \
+			ExerGiftPool, ExerFragPack, ExerPack, \
+			ExerSlot, ExerSkillSlot, ExerEquipSlot
+		from player_module.models import HumanPack, HumanEquipSlot
 
 		target = BaseItem
 
@@ -587,32 +562,47 @@ class BaseContainer(models.Model):
 		return ViewUtils.getObject(target, ErrorType.ContainerNotExist,
 								   return_type='object', id=self.id)
 
+	# 转化容器项为 dict
+	def _convertItemsToDict(self):
+		return ModelUtils.objectsToDict(self.contItems())
+
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
+
+		type = None
+
+		if 'type' in kwargs: type = kwargs['type']
+
+		if type == 'items':
+			return {
+				'items': self._convertItemsToDict()
+			}
+
 		return {
 			'id': self.id,
 			'type': self.type
 		}
 
 	def convertToDict(self, **kwargs):
-		return self.targetContainer()._convertToDict(**kwargs)
+		return self.target()._convertToDict(**kwargs)
 
-	# 获取物品对应的容器项
+	# endregion
+
+	# 持有玩家
+	def ownerPlayer(self): pass
+
+	# 获取对应的容器项（创建容器项时候调用）
 	def contItemClass(self, **kwargs):
-		return self.baseContItemClass()
+		return self.acceptedContItemClass()
 
 	# 获取容器容量（0为无限）
-	def getCapacity(self): return 0
+	def getCapacity(self): return self.defaultCapacity()
 
 	# 物品类型是否接受
-	def isItemAcceptable(self, item=None, cont_item=None, **kwargs):
-		if isinstance(item, self.baseItemClass()):
-			item = item.targetItem()
-			return type(item).__name__ in self.acceptClasses()
-
-		if isinstance(cont_item, self.baseContItemClass()):
-			cont_item = cont_item.targetContItem()
-			return type(cont_item).__name__ in self.acceptClasses()
+	def isItemAcceptable(self, cont_item=None, **kwargs):
+		if cont_item is not None:
+			# cont_item = cont_item.target()
+			return isinstance(cont_item, self.acceptedContItemClass())
 
 		return False
 
@@ -633,7 +623,24 @@ class BaseContainer(models.Model):
 	# 获取所有的容器物品关系
 	def _contItems(self, **kwargs):
 		cla = self.contItemClass(**kwargs)
+
+		if 'item' in kwargs and kwargs['item'] is not None:
+			kwargs['item_id'] = kwargs['item'].id
+			kwargs.pop('item')
+
 		return ViewUtils.getObjects(cla, container_id=self.id, **kwargs)
+
+	# 以人类可理解的形式展示该容器
+	def show(self, name):
+		self.clearCache()
+		cont_items = self.contItems()
+
+		print("%s(%s) ======================" % (name, self))
+		print("Capacity: %d" % self.getCapacity())
+		print("Used: %d" % self.contItemCnt())
+		print("ContItems:")
+		for cont_item in cont_items:
+			print(cont_item)
 
 	# 清空缓存
 	def clearCache(self):
@@ -647,44 +654,61 @@ class BaseContainer(models.Model):
 	def itemCnt(self, **kwargs):
 		return self.contItemCnt(**kwargs)
 
-	# 背包是否存在指定物品或任意物品指定数量
+	# 容器是否存在指定物品或任意物品指定数量
 	def hasItem(self, count, **kwargs):
 		return self.itemCnt(**kwargs) >= count
 
+	# 获取一个容器项
+	def getContItem(self, **kwargs):
+		cont_items = self.contItems(**kwargs)
+		if cont_items.exists():
+			return cont_items.first().target()
+
+		return None
+
 	# 创建一个容器项
-	def _createContItem(self, cla=None, cont_item=None, save=False, **kwargs):
+	# cla: 直接提供一个容器项类型
+	# cont_item: 从提供的已有容器项中复制
+	# save: 创建后是否立刻 save
+	def _createContItem(self, cla=None, cont_item=None, **kwargs):
+		# 如果没有提供 cla
 		if cla is None:
+			# 如果有提供已有容器项，直接求出 cla
 			if cont_item is not None: cla = type(cont_item)
+			# 否则，计算出 cla
 			else: cla = self.contItemClass(**kwargs)
 
+		# 创建新容器项
 		new_cont_item = cla()
 		new_cont_item.create(self, **kwargs)
 
+		# 如果有参照的容器项，调用复制函数
 		if cont_item is not None:
 			new_cont_item.copy(cont_item)
 
-		if save: new_cont_item.save()
+		# 如果需要立刻 save，调用 save()
+		# if save: new_cont_item.save()
 
 		return new_cont_item
 
 	# 确保物品类型可接受
-	def ensureItemAcceptable(self, cont_item=None, item=None, **kwargs):
-		if not self.isItemAcceptable(cont_item=cont_item, item=item, **kwargs):
-			raise ErrorException(ErrorType.ItemIncorrect)
+	def ensureItemAcceptable(self, **kwargs):
+		if not self.isItemAcceptable(**kwargs):
+			raise ErrorException(ErrorType.IncorrectItemType)
 
 		return True
 
 	# 准备转移
-	def prepareTransfer(self, **kwargs)->dict:
+	def prepareTransfer(self, **kwargs) -> dict:
 		return kwargs
 
 	# 接受转移
 	def acceptTransfer(self, **kwargs):
-		self.ensureItemAcceptable(**kwargs)
+		pass  # self.ensureItemAcceptable(**kwargs)
 
 	# 转移物品（从 self 转移到 container）
 	def transfer(self, container, **kwargs):
-		container = container.targetContainer()
+		container = container.target()
 		container.acceptTransfer(**self.prepareTransfer(**kwargs))
 
 
@@ -694,8 +718,21 @@ class BaseContainer(models.Model):
 class SlotContainer(BaseContainer):
 
 	class Meta:
-		abstract = True
 		verbose_name = verbose_name_plural = "槽类容器"
+
+	# 装备容器1
+	equip_container1 = models.ForeignKey('PackContainer', null=True, blank=True, related_name='equip_container1',
+									   on_delete=models.CASCADE, verbose_name="装备容器1")
+
+	# 装备容器2
+	equip_container2 = models.ForeignKey('PackContainer', null=True, blank=True, related_name='equip_container2',
+									   on_delete=models.CASCADE, verbose_name="装备容器2")
+
+	target_equip_container1 = target_equip_container2 = None
+
+	# 默认容器容量（0为无限）
+	@classmethod
+	def defaultCapacity(cls): return 1
 
 	# 创建实例
 	@classmethod
@@ -705,24 +742,45 @@ class SlotContainer(BaseContainer):
 		container.createSlots(**kwargs)
 		return container
 
-	# 所接受容器项的基类
+	# 所接受的槽项类（用于 contItemClass ）
 	@classmethod
-	def baseContItemClass(cls): return SlotContItem
+	def acceptedSlotItemClass(cls): return SlotContItem
 
-	# 获取容器容量（0为无限）
-	def getCapacity(self): return 1
+	# 所接受的容器项类
+	@classmethod
+	def acceptedContItemClass(cls): return PackContItem
+
+	# 目标装备项1
+	def targetEquipContainer1(self):
+		if self.target_equip_container1 is None:
+			if self.equip_container1 is None:
+				self.target_equip_container1 = None
+
+			self.target_equip_container1 = self.equip_container1.target()
+
+		return self.target_equip_container1
+
+	# 目标装备项2
+	def targetEquipContainer2(self):
+		if self.target_equip_container2 is None:
+			if self.equip_container2 is None:
+				self.target_equip_container2 = None
+
+			self.target_equip_container2 = self.equip_container2.target()
+
+		return self.target_equip_container2
+
+	# 获取对应的容器项（创建容器项时候调用）
+	def contItemClass(self, **kwargs):
+		return self.acceptedSlotItemClass()
 
 	# 物品类型是否接受
-	def isItemAcceptable(self, item=None, cont_item=None, **kwargs):
-		if isinstance(cont_item, self.baseContItemClass()):
-			cont_item = cont_item.targetContItem()
-			return type(cont_item).__name__ in self.acceptClasses()
+	def isItemAcceptable(self, slot_item=None, cont_item=None, **kwargs):
+		if slot_item is not None:
+			# slot_item = slot_item.target()
+			return isinstance(slot_item, self.acceptedSlotItemClass())
 
-		return False
-
-	# 获取物品对应的容器项
-	def contItemClass(self, **kwargs):
-		return SlotContItem
+		return super().isItemAcceptable(cont_item=cont_item)
 
 	# 创建一组槽
 	def createSlots(self, **kwargs):
@@ -731,25 +789,103 @@ class SlotContainer(BaseContainer):
 		cnt = self.getCapacity()
 
 		for i in range(cnt):
-			slot = self._createSlot(cla, i+1, **kwargs)
+			slot = self._createSlot(cla, i, **kwargs)
 			slot.save()
+			slot.afterCreated(**kwargs)
 
 		# cla.objects.bulk_create(slot_items)
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
-		slot_item: SlotContItem = self._createContItem(
-			cla, None, False, **kwargs)
-		slot_item.setupIndex(index)
+		slot_item: SlotContItem = self._createContItem(cla, **kwargs)
+		slot_item.setupIndex(index+1, **kwargs)
 		return slot_item
 
-	# 获取一个槽项
-	def getSlotItem(self, **kwargs):
-		slot_items = self.contItems(**kwargs)
-		if slot_items.exists():
-			return slot_items.first().targetContItem()
+	# 保证满足装备条件
+	def ensureEquipCondition(self, slot_item, equip_item):
+		self.ensureItemAcceptable(cont_item=equip_item)
 
-		return None
+		return True
+
+	# 保证满足装备卸下条件
+	def ensureDequipCondition(self, slot_item, type=None, index=None):
+		return True
+
+	# 设置装备（装备/卸下）
+	def setEquip(self, slot_item=None, equip_item=None, type=None, index=None, **kwargs):
+
+		# 计算槽项
+		if slot_item is None:
+			slot_item: SlotContItem = self.getContItem(**kwargs)
+
+		# 计算索引
+		if index is None:
+			index = slot_item.getEquipItemIndex(equip_item=equip_item, type=type)
+
+		# 找出容器
+		container = None
+
+		if index == 1: container = self.targetEquipContainer1()
+		if index == 2: container = self.targetEquipContainer2()
+
+		if container is None: return
+
+		self.transfer(container, slot_item=slot_item, index=index)
+
+		if equip_item is not None:
+			container.transfer(self, slot_item=slot_item, cont_item=equip_item)
+
+	# 槽装备（强制装备）
+	def equipSlot(self, slot_item=None, equip_index=None, equip_item=None, **kwargs):
+
+		if slot_item is None:
+			slot_item = self.getContItem(**kwargs)
+
+		if slot_item is None:
+			return None
+		else:
+			slot_item: SlotContItem = slot_item
+			self.ensureEquipCondition(slot_item, equip_item)
+
+			self.clearCache()
+			slot_item.equip(index=equip_index, equip_item=equip_item)
+			slot_item.save()
+
+			if equip_item is not None:
+				equip_item.save()
+
+	# 槽卸下（强制卸下）
+	def dequipSlot(self, slot_item=None, type=None, index=None, **kwargs):
+
+		if slot_item is None:
+			slot_item = self.getContItem(**kwargs)
+
+		if slot_item is None:
+			return None
+		else:
+			slot_item: SlotContItem = slot_item
+			self.ensureDequipCondition(slot_item, type, index)
+
+			self.clearCache()
+			equip_item = slot_item.dequip(type, index)
+			slot_item.save()
+
+			if equip_item is not None:
+				equip_item.save()
+
+			return equip_item
+
+	# 接受转移
+	def acceptTransfer(self, slot_item=None, cont_item=None, **kwargs):
+		self.equipSlot(slot_item, cont_item, **kwargs)
+
+	# 准备转移
+	def prepareTransfer(self, slot_item=None, type=None, index=None, **kwargs) -> dict:
+		res = kwargs
+
+		res['cont_item'] = self.dequipSlot(slot_item, type, index, **kwargs)
+
+		return res
 
 
 # ===================================================
@@ -758,7 +894,6 @@ class SlotContainer(BaseContainer):
 class PackContainer(BaseContainer):
 
 	class Meta:
-		abstract = True
 		verbose_name = verbose_name_plural = "背包类容器"
 
 	# 容量（为0则不限）
@@ -775,21 +910,39 @@ class PackContainer(BaseContainer):
 		container.capacity = cls.defaultCapacity()
 		return container
 
-	# 容器项基类
+	# 所接受的容器项类（单个，基类）
 	@classmethod
-	def baseContItemClass(cls): return PackContItem
+	def acceptedContItemClass(cls): return PackContItem
+
+	# 所接受的物品类
+	@classmethod
+	def acceptedItemClass(cls):
+		return cls.acceptedContItemClass().acceptedItemClass()
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		res['capacity'] = self.capacity
+
+		return res
 
 	# 物品类型是否接受
-	def isItemAcceptable(self, item=None, cont_item=None, **kwargs):
-		if isinstance(cont_item, self.baseContItemClass()):
-			return self.isItemAcceptable(item=cont_item.targetItem())
+	def isItemAcceptable(self, cont_item=None, item=None, **kwargs):
+		if item is not None:
+			return isinstance(item, self.acceptedItemClass())
 
-		return super().isItemAcceptable(item=item)
+		if cont_item is not None:
+			return isinstance(cont_item, self.acceptedContItemClass())
 
-	# 获取物品对应的容器项
-	def contItemClass(self, item: BaseItem=None, **kwargs):
+		return False
+
+	# 获取物品对应的容器项（创建容器项时候调用）
+	def contItemClass(self, item: BaseItem = None, **kwargs):
+		# 如果未提供参考的物品，返回一个默认容器项类型
 		if item is None: return super().contItemClass(**kwargs)
-		return item.contItemClass()
+		# 否则，返回该物品的对应容器项类型
+		return item.target().contItemClass()
 
 	# 获取容器容量（0为无限）
 	def getCapacity(self): return self.capacity
@@ -809,17 +962,18 @@ class PackContainer(BaseContainer):
 		return not self.isCapacityAvailable(1)
 
 	# region EnsureFuncs
+
 	# 确保容器容量可用（格子数）
 	def ensureCapacityAvailable(self, count=1):
 		if not self.isCapacityAvailable(count):
-			raise ErrorException(ErrorType.ContainerFull)
+			raise ErrorException(ErrorType.CapacityInsufficient)
 
 		return True
 
 	# 确保持有特定数量的物品（格子数）
 	def ensureHasItem(self, count, **kwargs):
 		if not self.hasItem(count, **kwargs):
-			raise ErrorException(ErrorType.ItemNotEnough)
+			raise ErrorException(ErrorType.QuantityInsufficient)
 
 		return True
 
@@ -883,6 +1037,11 @@ class PackContainer(BaseContainer):
 
 		return delta_cnt
 
+	# 确保包含容器项
+	def ensureContItemContained(self, cont_item):
+		if cont_item.container_id != self.id:
+			raise ErrorException(ErrorType.QuantityInsufficient)
+
 	# 是否可以失去指定数量的指定物品
 	def ensureLostItemsEnable(self, item: BaseItem, count=1):
 		if count == 0: return True
@@ -902,9 +1061,7 @@ class PackContainer(BaseContainer):
 	# 确保可以失去指定容器项
 	def ensureLostContItemEnable(self, cont_item):
 		self.ensureItemAcceptable(cont_item=cont_item)
-		if cont_item.targetContainer() != self:
-			raise ErrorException(ErrorType.ItemNotEnough)
-		return True
+		self.ensureContItemContained(cont_item)
 
 	# 确保可以获得指定一组容器项
 	def ensureGainContItemsEnable(self, cont_items):
@@ -922,21 +1079,23 @@ class PackContainer(BaseContainer):
 	# region Gain/LoseImpls
 
 	# 创建一个容器项
-	def _createContItem(self, cla=None, cont_item=None, save=False,
+	def _createContItem(self, cla=None, cont_item=None,
 						item=None, count=0, **kwargs):
 		cont_item: PackContItem = super()._createContItem(
-			cla, cont_item, False, item=item, **kwargs)
+			cla, cont_item, item=item, **kwargs)
+
+		# 置入 count 个物品
 		count = cont_item.enter(count)
 
-		if save: cont_item.save()
+		# if save: cont_item.save()
 
 		return cont_item, count
 
-	# 增加物品
-	def _increaseItems(self, item: BaseItem, count=1, **kwargs):
+	# 增加物品（返回修改过的容器项数组）
+	def _increaseItems(self, item: BaseItem, count=1, ensure=True, **kwargs):
 		# 初始化返回的数据
-		old_items = []
-		new_items = []
+		old_items = []  # 旧的物品项数据
+		new_items = []  # 新的物品项数据
 
 		# 获取容器项的类型和最大叠加数量
 		cla = self.contItemClass(item)
@@ -945,51 +1104,74 @@ class PackContainer(BaseContainer):
 		# 如果物品是可以叠加的
 		if max_cnt > 1 or max_cnt == 0:
 			# 获取当前未满叠加数量的容器项
-			ori_items = self.contItems(item_id=item.id).filter(count__lt=max_cnt)
+			ori_items = self.contItems(item=item)
+
+			if max_cnt > 1:
+				ori_items = ori_items.filter(count__lt=max_cnt)
 
 			# 从已有的容器项中增加
 			for cont_item in ori_items:
-				cont_item = cont_item.targetContItem()
+				# cont_item = cont_item.target()
 				count = cont_item.enter(count)
 				old_items.append(cont_item)
 
 			# 批量更新
-			cla.objects.bulk_update(old_items, ['count'])
+			# cla.objects.bulk_update(old_items, ['count'])
+
+		# 保证还能继续增加物品
+		if ensure:
+			if max_cnt > 0:
+				self.ensureCapacityAvailable(math.ceil(count / max_cnt))
+			else:
+				self.ensureCapacityAvailable()
 
 		# 创建新的容器项
 		while count > 0:
+
 			cont_item, count = self._createContItem(
-				cla, None, False, item, count, **kwargs)
-			cont_item.save()
+				cla, None, item, count, **kwargs)
+			# cont_item.save()
 			new_items.append(cont_item)
 
 		# 批量创建
 		# cla.objects.bulk_create(new_items)
 
 		# 返回有修改过的项
-		return old_items+new_items
+		return old_items, new_items
 
-	# 减少物品
-	def _decreaseItems(self, item: BaseItem, count=1):
-		old_items = []
-		cla = self.contItemClass(item)
+	# 减少物品（返回修改过的容器项数组）
+	def _decreaseItems(self, item: BaseItem, count=1, ensure=True):
+		# 初始化返回的数据
+		old_items = []  # 旧的物品项数据
+		new_items = []  # 新的物品项数据
 
 		# 获取该物品当前所有容器项
+		# cla = self.contItemClass(item)
 		ori_items = self.contItems(item_id=item.id)
 
 		# 从已有的容器项中移除
 		for cont_item in ori_items:
-			cont_item = cont_item.targetContItem()
+			# cont_item = cont_item.target()
 			# 分解物品，返回分解出来的物品和还需要分解的数目
-			split_item, count = self.splitItem(cont_item, count)
+			split_item, count = self._splitItem(cont_item, count, False)
 			split_item.remove()
-			old_items.append(split_item)
+
+			# 记录修改过的容器项
+			new_items.append(split_item)
+			if split_item != cont_item:
+				old_items.append(cont_item)
+
 			if count <= 0: break
 
-		# 更新删除的物品
-		cla.objects.bulk_update(old_items, ['count', 'container'])
+		# 如果还有剩余，抛出数量不足异常
+		if ensure and count > 0:
+			raise ErrorException(ErrorType.QuantityInsufficient)
 
-		return old_items
+		# 更新删除的物品
+		# cla.objects.bulk_update(old_items, ['count', 'container'])
+
+		# 返回有修改过的项
+		return old_items, new_items
 
 	# endregion
 
@@ -997,7 +1179,7 @@ class PackContainer(BaseContainer):
 
 	# 拆分一个物品（BaseContItem）
 	# 返回：拆分后的 BaseContItem, 剩余数量
-	def splitItem(self, cont_item, count):
+	def _splitItem(self, cont_item, count, save=True):
 		ori_cnt = cont_item.count
 
 		# 要拆分的数量大于等于持有数量，直接返回
@@ -1005,429 +1187,216 @@ class PackContainer(BaseContainer):
 
 		# 移出 count 个物品
 		cont_item.leave(count)
-		cont_item.save()
+
+		if save: cont_item.save()
 
 		# 新建一个容器项，并返回
-		return self._createContItem(None, cont_item, True, None, count)
+		return self._createContItem(None, cont_item,
+									cont_item.targetItem(), count)
+
+	# 拆分一个物品（BaseContItem）
+	# 返回：拆分后的 BaseContItem, 剩余数量
+	def splitItem(self, cont_item, count, save=True):
+
+		self.ensureContItemContained(cont_item)
+
+		return self._splitItem(cont_item, count, save)
+
+	# 组合一个物品（BaseContItem）
+	# 返回：组合后的 BaseContItem, 剩余数量
+	def mergeItem(self, cont_items, save=True):
+
+		for cont_item in cont_items:
+			self.ensureContItemContained(cont_item)
+
+		return self._mergeItem(cont_items, save)
+
+	# 组合一个物品（BaseContItem）
+	# 返回：组合后的 BaseContItem, 剩余数量
+	def _mergeItem(self, cont_items, save=True):
+
+		l = 0
+		cnt = len(cont_items)
+
+		l_cont_item: PackContItem = cont_items[l]
+		l += 1
+
+		for i in range(cnt):
+			cont_item: PackContItem = cont_items[i]
+
+			if cont_item == l_cont_item: continue
+
+			if l_cont_item.isFull():
+				l_cont_item = cont_items[l]
+				l += 1
+
+			l_cont_item.merge(cont_item)
+
+		if save:
+			for i in range(l): cont_items[i].save()
+			for i in range(cnt-l): cont_items[l+i].delete()
+
+		return cont_items[:l]
 
 	# 获得物品
-	def gainItems(self, item: BaseItem, count=1):
-		if count == 0: return []
-		if count < 0: return self.lostItems(item, -count)
+	def gainItems(self, item: BaseItem, count=1, save=True, combine_return=True):
+		if count == 0:
+			if combine_return: return []
+			return [], []
 
-		self.ensureGainItemsEnable(item, count)
+		if count < 0:
+			return self.lostItems(item, -count, save, combine_return)
 
-		return self._increaseItems(item, count)
+		item = item.target()
+
+		# self.ensureGainItemsEnable(item, count)
+
+		old_items, new_items = self._increaseItems(item, count)
+
+		if save:
+			cla = self.contItemClass(item)
+			cla.objects.bulk_update(old_items, ['count'])
+			for new_item in new_items:
+				new_item.save()
+				new_item.afterCreated()
+
+		self.clearCache()
+
+		if combine_return: return old_items+new_items
+
+		return old_items, new_items
 
 	# 失去物品
-	def lostItems(self, item: BaseItem, count=1):
-		if count == 0: return []
-		if count < 0: return self.gainItems(item, -count)
+	def lostItems(self, item: BaseItem, count=1, save=True, combine_return=True):
+		if count == 0:
+			if combine_return: return []
+			return [], []
 
-		self.ensureLostItemsEnable(item, count)
+		if count < 0:
+			return self.gainItems(item, -count, save, combine_return)
 
-		return self._decreaseItems(item, count)
+		# self.ensureLostItemsEnable(item, count)
+
+		old_items, new_items = self._decreaseItems(item, count)
+
+		if save:
+			cla = self.contItemClass(item)
+			cla.objects.bulk_update(old_items, ['count', 'container'])
+			for new_item in new_items: new_item.save()
+
+		self.clearCache()
+
+		if combine_return: return old_items+new_items
+
+		return old_items, new_items
 
 	# 获得一个容器项
-	def gainContItem(self, cont_item, ensured=False, **kwargs):
-		if not ensured:
-			self.ensureGainContItemEnable(cont_item)
+	def gainContItem(self, cont_item, save=True, **kwargs):
+		# if not ensured:
+		self.ensureGainContItemEnable(cont_item)
 
 		cont_item.transfer(self, **kwargs)
-		cont_item.save()
+
+		if save: cont_item.save()
+
+		self.clearCache()
 
 		return cont_item
 
-	# 失去一个容器项
-	def lostContItem(self, cont_item, ensured=False):
-		if not ensured:
-			self.ensureLostContItemEnable(cont_item)
+	# 失去一个容器项（count 为 None 则失去整个容器项）
+	def lostContItem(self, cont_item, count=None, save=True):
+		# if not ensured:
+		self.ensureLostContItemEnable(cont_item)
 
-		cont_item.remove()
-		cont_item.save()
+		if count is None:
+			cont_item.remove()
+		else:
+			cont_item, _ = self._splitItem(cont_item, count)
+
+		if save: cont_item.save()
+
+		self.clearCache()
 
 		return cont_item
 
 	# 获得多个容器项
-	def gainContItems(self, cont_items):
-		self.ensureGainContItemsEnable(cont_items)
+	def gainContItems(self, cont_items, save=True, **kwargs):
+
+		new_cont_items = []
 
 		for cont_item in cont_items:
-			self.gainContItem(cont_item, True)
+			new_cont_items.append(self.gainContItem(
+				cont_item, False, **kwargs))
+
+		if save:
+			for cont_item in new_cont_items: cont_item.save()
 
 		return cont_items
 
 	# 失去多个容器项
-	def lostContItems(self, cont_items):
-		self.ensureLostContItemsEnable(cont_items)
+	def lostContItems(self, cont_items, counts=None, save=True):
 
-		for cont_item in cont_items:
-			self.lostContItem(cont_item, True)
+		new_cont_items = []
+
+		for i in range(len(cont_items)):
+			count = None
+			cont_item = cont_items[i]
+			if counts is not None and i<len(counts):
+				count = counts[i]
+
+			new_cont_items.append(self.lostContItem(
+				cont_item, count, False))
+
+		if save:
+			for cont_item in new_cont_items: cont_item.save()
 
 		return cont_items
 
 	# endregion
+
+	# region TransferAPIs
 
 	# 转移物品（从 self 转移到 container）
 	def transferItems(self, container, item: BaseItem, count=1):
 		self.transfer(container, item=item, count=count)
 
 	# 转移容器项（从 self 转移到 container）
-	def transferContItem(self, container, cont_item):
-		self.transfer(container, cont_item=cont_item)
+	def transferContItem(self, container, cont_item, count=None):
+		self.transfer(container, cont_item=cont_item, count=count)
 
 	# 转移多个容器项（从 self 转移到 container）
-	def transferContItems(self, container, cont_items):
-		self.transfer(container, cont_items=cont_items)
+	def transferContItems(self, container, cont_items, counts=None):
+		self.transfer(container, cont_items=cont_items, counts=counts)
 
 	# 准备转移
 	def prepareTransfer(self, cont_item=None, cont_items=None,
-						item=None, count=1, **kwargs) -> dict:
+						item=None, count=None, counts=None, **kwargs) -> dict:
 		res = kwargs
 
 		if item is not None:
-			res['cont_items'] = self.lostItems(item, count)
+			_, res['cont_items'] = self.lostItems(item, count, True, False)
 		elif cont_item is not None:
-			res['cont_item'] = self.lostContItem(cont_item)
+			res['cont_item'] = self.lostContItem(cont_item, count, False)
 		elif cont_items is not None:
-			res['cont_items'] = self.lostContItems(cont_items)
+			res['cont_items'] = self.lostContItems(cont_items, counts, False)
 
 		return res
 
 	# 接受转移
 	def acceptTransfer(self, cont_items=None, cont_item=None, **kwargs):
+
 		if cont_item is not None:
 			self.gainContItem(cont_item)
 		if cont_items is not None:
 			self.gainContItems(cont_items)
 
+	# endregion
 
-# ===================================================
-#  人类背包
-# ===================================================
-class HumanPack(PackContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包"
-
-	# 默认容量
-	DEFAULT_CAPACITY = 64
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 容器类型
-	@classmethod
-	def containerType(cls): return ContainerType.HumanPack
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptTypes(cls):
-		return [ItemType.HumanItem, ItemType.HumanEquip]
-
-	# 获取容器容量（0为无限）
-	@classmethod
-	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
-
-	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
-
-
-# ===================================================
-#  艾瑟萌背包
-# ===================================================
-class ExerPack(PackContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌背包"
-
-	# 默认容量
-	DEFAULT_CAPACITY = 32
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 容器类型
-	@classmethod
-	def containerType(cls): return ContainerType.ExermonPack
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptTypes(cls):
-		return [ItemType.Exermon, ItemType.ExerEquip]
-
-	# 获取容器容量（0为无限）
-	@classmethod
-	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
-
-	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
-
-
-# ===================================================
-#  人类装备槽
-# ===================================================
-class HumanEquipSlot(SlotContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备槽"
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 人类背包
-	human_pack = models.ForeignKey('HumanPack', on_delete=models.CASCADE, verbose_name="人类背包")
-
-	# 容器类型
-	@classmethod
-	def containerType(cls): return ContainerType.HumanEquipSlot
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptTypes(cls):
-		return [ContItemType.HumanPackEquip]
-
-	# 容器接受物品基类
-	@classmethod
-	def baseContItemClass(cls): return HumanPackEquip
-
-	# 获取物品对应的容器项
-	def contItemClass(self, **kwargs): return HumanEquipSlotItem
-
-	# 获取容器容量（0为无限）
-	def getCapacity(self): return HumanEquipType.count()
-
-	# 创建一个槽（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		slot: cls = super()._create()
-		slot.player = player
-		slot.human_pack = player.humanpack
-		return slot
-
-	# 保证满足装备条件
-	def ensureEquipCondition(self, pack_equip):
-		self.ensureItemAcceptable(cont_item=pack_equip)
-
-		return True
-
-	# 保证满足装备卸下条件
-	def ensureDequipCondition(self, slot_item):
-		return True
-
-	# 获取一个槽项
-	def getSlotItem(self, e_type_id=None, e_type=None, **kwargs):
-		if e_type_id is not None:
-			return super().getSlotItem(e_type_id=e_type_id, **kwargs)
-		elif e_type is not None:
-			return super().getSlotItem(e_type=e_type, **kwargs)
-
-		return None
-
-	# 更换装备
-	def setEquip(self, e_type=None, e_type_id=None, slot_item=None, pack_equip=None):
-		self.transfer(self.human_pack, e_type=e_type,
-					  e_type_id=e_type_id, slot_item=slot_item)
-
-		if pack_equip is not None:
-			self.human_pack.transfer(self, e_type=e_type, e_type_id=e_type_id,
-									slot_item=slot_item, cont_item=pack_equip)
-
-	# 槽装备（强制装备）
-	def equipSlot(self, e_type_id=None, e_type=None, slot_item=None, pack_equip=None):
-
-		if slot_item is None:
-			slot_item = self.getSlotItem(e_type_id=e_type_id, e_type=e_type)
-
-		if slot_item is None:
-			return None
-		else:
-			slot_item: HumanEquipSlotItem = slot_item
-
-			self.ensureEquipCondition(pack_equip)
-			slot_item.equip(pack_equip)
-
-	# 槽卸下（强制卸下）
-	def dequipSlot(self, e_type_id=None, e_type=None, slot_item=None):
-
-		if slot_item is None:
-			slot_item = self.getSlotItem(e_type_id=e_type_id, e_type=e_type)
-
-		if slot_item is None:
-			return None
-		else:
-			self.ensureDequipCondition(slot_item)
-			return slot_item.dequip()
-
-	# 接受转移
-	def acceptTransfer(self, e_type_id=None, e_type=None, slot_item=None, cont_item=None, **kwargs):
-
-		if cont_item is not None:
-			self.equipSlot(e_type_id, e_type, slot_item, cont_item)
-
-	# 准备转移
-	def prepareTransfer(self, e_type_id=None, e_type=None, slot_item=None, **kwargs) -> dict:
-		res = kwargs
-
-		res['cont_item'] = self.dequipSlot(e_type_id, e_type, slot_item)
-
-		return res
-
-
-# ===================================================
-#  艾瑟萌装备槽
-#  有 ExermonEquipType.Count 个固定的槽
-# ===================================================
-class ExerEquipSlot(SlotContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌装备槽"
-
-	# 艾瑟萌
-	exermon = models.OneToOneField('exermon_module.ExerSlotItem',
-								   on_delete=models.CASCADE, verbose_name="艾瑟萌")
-
-	# 艾瑟萌背包
-	exer_pack = models.ForeignKey('ExerPack', on_delete=models.CASCADE, verbose_name="艾瑟萌背包")
-
-	# 容器类型
-	@classmethod
-	def containerType(cls): return ContainerType.ExerEquipSlot
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def acceptTypes(cls): return [ContItemType.ExerPackEquip]
-
-	# 容器接受物品类型（数组）
-	@classmethod
-	def baseContItemClass(cls): return ExerPackEquip
-
-	# 获取物品对应的容器项
-	def contItemClass(self, **kwargs): return ExerEquipSlotItem
-
-	# 获取容器容量（0为无限）
-	def getCapacity(self): return ExerEquipType.count()
-
-	# 创建一个槽（创建角色时候执行）
-	@classmethod
-	def _create(cls, exermon):
-		slot: cls = super()._create()
-		slot.exermon = exermon
-		slot.exer_pack = exermon.player.exerpack
-		return slot
-
-	# 保证满足装备条件
-	def ensureEquipCondition(self, pack_equip):
-		self.ensureItemAcceptable(cont_item=pack_equip)
-
-		return True
-
-	# 保证满足装备卸下条件
-	def ensureDequipCondition(self, slot_item):
-		return True
-
-	# 获取一个槽项
-	def getSlotItem(self, e_type_id=None, e_type=None, **kwargs):
-		if e_type_id is not None:
-			return super().getSlotItem(e_type_id=e_type_id, **kwargs)
-		elif e_type is not None:
-			return super().getSlotItem(e_type=e_type, **kwargs)
-
-		return None
-
-	# 更换装备
-	def setEquip(self, e_type=None, e_type_id=None, slot_item=None, pack_equip=None):
-		self.transfer(self.exer_pack, e_type=e_type,
-			e_type_id=e_type_id, slot_item=slot_item)
-
-		if pack_equip is not None:
-			self.exer_pack.transfer(self, e_type=e_type, e_type_id=e_type_id,
-				slot_item=slot_item, cont_item=pack_equip)
-
-	# 槽装备（强制装备）
-	def equipSlot(self, e_type_id=None, e_type=None, slot_item=None, pack_equip=None):
-
-		if slot_item is None:
-			slot_item = self.getSlotItem(e_type_id=e_type_id, e_type=e_type)
-
-		if slot_item is None:
-			return None
-		else:
-			slot_item: ExerEquipSlotItem = slot_item
-			self.ensureEquipCondition(pack_equip)
-			slot_item.equip(pack_equip)
-
-	# 槽卸下（强制卸下）
-	def dequipSlot(self, e_type_id=None, e_type=None, slot_item=None):
-
-		if slot_item is None:
-			slot_item = self.getSlotItem(e_type_id=e_type_id, e_type=e_type)
-
-		if slot_item is None:
-			return None
-		else:
-			slot_item: ExerEquipSlotItem = slot_item
-			self.ensureDequipCondition(slot_item)
-			return slot_item.dequip()
-
-	# 接受转移
-	def acceptTransfer(self, e_type_id=None, e_type=None, slot_item=None, cont_item=None, **kwargs):
-
-		if cont_item is not None:
-			self.equipSlot(e_type_id, e_type, slot_item, cont_item)
-
-	# 准备转移
-	def prepareTransfer(self, e_type_id=None, e_type=None, slot_item=None, **kwargs)->dict:
-		res = kwargs
-
-		res['cont_item'] = self.dequipSlot(e_type_id, e_type, slot_item)
-
-		return res
+	"""占位"""
 
 # endregion
 
 # region 物品-容器
-
-
-# ===================================================
-#  容器物品枚举
-# ===================================================
-class ContItemType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# Pack 1~100
-	HumanPackItem = 1  # 人类背包物品
-	ExerPackItem = 2  # 艾瑟萌背包物品
-	HumanPackEquip = 3  # 人类背包装备
-	ExerPackEquip = 4  # 艾瑟萌背包装备
-
-	# 可叠加
-	ExerFragPackItem = 11  # 艾瑟萌碎片背包物品
-
-	# 可叠加
-	QuesSugarPackItem = 21  # 题目糖背包物品
-
-	# Slot 101~200
-	HumanEquipSlotItem = 101  # 人类装备槽项
-	ExerEquipSlotItem = 102  # 艾瑟萌装备槽项
-
-	ExerSlotItem = 111  # 艾瑟萌槽项
-
-	ExerSkillSlotItem = 121  # 艾瑟萌技能槽物品
-
-	# Others 201+
-	PlayerExerGift = 201  # 玩家艾瑟萌天赋关系
-
-	PlayerExermon = 202  # 玩家艾瑟萌关系
 
 
 # ===================================================
@@ -1460,8 +1429,11 @@ class BaseContItem(models.Model):
 
 		# Others
 		(ContItemType.PlayerExerGift.value, '艾瑟萌天赋池项'),
-		(ContItemType.PlayerExermon.value, '艾瑟萌槽项'),
+		(ContItemType.PlayerExermon.value, '艾瑟萌仓库项'),
 	]
+
+	# 容器项类型
+	TYPE = ContItemType.Unset
 
 	# 容器
 	container = models.ForeignKey('BaseContainer', on_delete=models.CASCADE,
@@ -1471,14 +1443,12 @@ class BaseContItem(models.Model):
 	type = models.PositiveSmallIntegerField(default=ContItemType.Unset.value,
 											choices=TYPES, verbose_name="容器类型")
 
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.Unset
+	# region 类型配置
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		if self.type == ContItemType.Unset.value:
-			self.type = self.contItemType().value
+			self.type = self.TYPE.value
 
 	def __str__(self):
 		type_name = self.getTypeName()
@@ -1494,7 +1464,15 @@ class BaseContItem(models.Model):
 		return self.TYPES[0][1]
 
 	# 获取目标的物品
-	def targetContItem(self):
+	# noinspection PyUnresolvedReferences
+	def target(self):
+
+		from exermon_module.models import ExerSlotItem, \
+			ExerEquipSlotItem, ExerPackItem, ExerPackEquip, \
+			PlayerExerGift, PlayerExermon, ExerFragPackItem, \
+			ExerSkillSlotItem
+		from player_module.models import HumanPackItem, \
+			HumanPackEquip, HumanEquipSlotItem
 
 		target = BaseContItem
 
@@ -1504,42 +1482,75 @@ class BaseContItem(models.Model):
 
 		if type(self) == target: return self
 
-		# if self.type == ContainerType.HumanPack.value: target = HumanPack
-		# if self.type == ContainerType.ExermonPack.value: target = HumanPack
-		# if self.type == ContainerType.ExermonFragmentPack.value: target = HumanPack
-		# if self.type == ContainerType.QuestionSugarPack.value: target = HumanPack
-		# if self.type == ContainerType.HumanEquipSlot.value: target = HumanPack
-		# if self.type == ContainerType.ExermonEquipSlot.value: target = HumanPack
-		# if self.type == ContainerType.ExerSlot.value: target = ExerSlot
-		# if self.type == ContainerType.ExermonGiftPool.value: target = HumanPack
-		# if self.type == ContainerType.ExermonWarehouse.value: target = HumanPack
-
 		return ViewUtils.getObject(target, ErrorType.ContItemNotExist,
 								   return_type='object', id=self.id)
 
 	# 获取目标容器
 	def targetContainer(self):
 		if self.container is None: return None
-		return self.container.targetContainer()
+		return self.container.target()
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		return {
+			'id': self.id,
+			'type': self.type
+		}
+
+	def convertToDict(self, **kwargs):
+		return self.target()._convertToDict(**kwargs)
+
+	# endregion
+
+	# 物品类型是否接受
+	def isItemAcceptable(self, **kwargs): return True
+
+	# 比较容器项
+	def isEqual(self, cont_item):
+		return type(self) == type(cont_item)
+
+	# 确保物品类型可接受
+	def ensureItemAcceptable(self, **kwargs):
+		if not self.isItemAcceptable(**kwargs):
+			raise ErrorException(ErrorType.IncorrectItemType)
+
+		return True
+
+	# 确保容器项可复制
+	def ensureContItemCopyable(self, cont_item):
+		if type(self) != type(cont_item):
+			raise ErrorException(ErrorType.IncorrectItemType)
+
+	# 确保容器项相等
+	def ensureContItemEqual(self, cont_item):
+		if not self.isEqual(cont_item):
+			raise ErrorException(ErrorType.IncorrectContItemType)
 
 	# 最大叠加数量
 	def maxCount(self): return 1
 
-	# 创建容器项
+	# 创建容器项（包含移动）
 	def create(self, container: BaseContainer, **kwargs):
+		self.ensureItemAcceptable(**kwargs)
 		self.transfer(container, **kwargs)
 
-	# 赋值容器项
+	# 复制容器项
 	def copy(self, cont_item):
-		pass
+		self.ensureContItemCopyable(cont_item)
 
-	# 移动容器项
+	# 移动容器项（移动到指定的 container）
 	def transfer(self, container: BaseContainer, **kwargs):
 		self.container = container
 
-	# 移除容器项
+	# 移除容器项（从当前容器中移除）
 	def remove(self):
 		self.container = None
+
+	# 创建之后调用
+	def afterCreated(self, **kwargs): pass
+
+	# 刷新
+	def refresh(self): pass
 
 
 # ===================================================
@@ -1549,20 +1560,143 @@ class SlotContItem(BaseContItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "槽类容器项"
 
+	# 槽编号
+	index = models.PositiveSmallIntegerField(default=0, verbose_name="槽编号")
+
+	# 装备项1
+	equip_item1 = models.OneToOneField('PackContItem', null=True, blank=True, related_name='equip_item1',
+									   on_delete=models.CASCADE, verbose_name="装备项1")
+
+	# 装备项2
+	equip_item2 = models.OneToOneField('PackContItem', null=True, blank=True, related_name='equip_item2',
+									   on_delete=models.CASCADE, verbose_name="装备项2")
+
+	target_equip_item1 = target_equip_item2 = None
+
+	# region 配置项
+
+	# 所接受的装备项类（2个）
+	@classmethod
+	def acceptedEquipItemClass(cls): return PackContItem, ()
+
+	# 所接受的装备项属性名（2个）
+	@classmethod
+	def acceptedEquipItemAttr(cls): return 'equip1', 'equip2'
+
+	# endregion
+
+	def __str__(self):
+		return '%s (%d: %s, %s)' % (
+			super().__str__(), self.index,
+			self.targetEquipItem1(), self.targetEquipItem2())
+
+	# 用于获取属性值
+	def __getattr__(self, item):
+		attr1, attr2 = self.acceptedEquipItemAttr()
+
+		if item == attr1:
+			return self.targetEquipItem1()
+		if item == attr2:
+			return self.targetEquipItem2()
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		c1, c2 = self.acceptedEquipItemClass()
+		attr1, attr2 = self.acceptedEquipItemAttr()
+
+		res['index'] = self.index
+		if c1: res[attr1] = self.targetEquipItem1().convertToDict()
+		if c2: res[attr2] = self.targetEquipItem2().convertToDict()
+
+		return res
+
+	# 目标装备项1
+	def targetEquipItem1(self):
+		if self.target_equip_item1 is None:
+			if self.equip_item1 is None:
+				self.target_equip_item1 = None
+
+			self.target_equip_item1 = self.equip_item1.target()
+
+		return self.target_equip_item1
+
+	# 目标装备项2
+	def targetEquipItem2(self):
+		if self.target_equip_item2 is None:
+			if self.equip_item2 is None:
+				self.target_equip_item2 = None
+
+			self.target_equip_item2 = self.equip_item2.target()
+
+		return self.target_equip_item2
+
+	# 比较容器项
+	def isEqual(self, cont_item): return False
+
+	# 获取装备项索引
+	def getEquipItemIndex(self, equip_item=None, type=None):
+		c1, c2 = self.acceptedEquipItemClass()
+
+		if equip_item is not None:
+			if isinstance(equip_item, c1): return 1
+			if isinstance(equip_item, c2): return 2
+
+			# raise ErrorException(ErrorType.IncorrectItemType)
+		if type is not None:
+			if c1 == type: return 1
+			if c2 == type: return 2
+
+		return None
+
 	# 最大叠加数量
 	def maxCount(self): return 1
 
+	# 复制容器项（不可复制）
+	def copy(self, cont_item): pass
+
 	# 配置索引
-	def setupIndex(self, index):
-		pass
+	def setupIndex(self, index, **kwargs):
+		self.index = index
 
 	# 装备
-	def equip(self, **kwargs):
-		pass
+	def equip(self, index=None, equip_item=None, **kwargs):
+		if index is None:
+			index = self.getEquipItemIndex(equip_item=equip_item)
+
+		if index is None: return
+
+		if equip_item is not None:
+			equip_item.transfer(self.container)
+			self.refresh()
+
+		if index == 1: self.equip_item1 = equip_item
+		if index == 2: self.equip_item2 = equip_item
+
+		return equip_item
 
 	# 卸下
-	def dequip(self, **kwargs):
-		pass
+	def dequip(self, type=None, index=None, **kwargs):
+
+		if type is not None:
+			return self.dequip(index=self.getEquipItemIndex(type=type))
+
+		equip_item = None
+
+		if index is not None:
+			if index == 1:
+				equip_item = self.targetEquipItem1()
+				self.equip_item1 = None
+			if index == 2:
+				equip_item = self.targetEquipItem2()
+				self.equip_item2 = None
+
+		if equip_item is not None:
+			equip_item.remove()
+			self.refresh()
+
+		return equip_item
 
 
 # ===================================================
@@ -1578,26 +1712,74 @@ class PackContItem(BaseContItem):
 	# 叠加数量
 	count = models.PositiveSmallIntegerField(default=0, verbose_name="叠加数量")
 
+	# region 配置项
+
+	# 所接受的物品类
+	@classmethod
+	def acceptedItemClass(cls): return BaseItem
+
+	# endregion
+
+	def __str__(self):
+		return '%s (%s :%d)' % (
+			super().__str__(), self.targetItem(), self.count)
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		res['item_id'] = self.item_id
+		res['count'] = self.count
+
+		return res
+
 	# 最大叠加数量
 	def maxCount(self):
 		if self.item is not None:
 			return self.item.maxCount()
+
 		return 1
 
 	# 目标物品
 	def targetItem(self):
 		if self.item is None: return None
-		return self.item.targetItem()
+
+		return self.item.target()
+
+	# 物品类型是否接受
+	def isItemAcceptable(self, item=None, **kwargs):
+		if item is not None:
+			return isinstance(item, self.acceptedItemClass())
+
+		return False
+
+	# 比较容器项
+	def isEqual(self, cont_item):
+		return super().isEqual(cont_item) and self.item_id == cont_item.item_id
+
+	# 是否已满
+	def isFull(self):
+		return self.count >= self.maxCount()
 
 	# 创建容器项
 	def create(self, container: BaseContainer, item=None, **kwargs):
+		super().create(container, item=item, **kwargs)
 		self.item = item
-		super().create(container, **kwargs)
 
-	# 赋值容器项
+	# 复制容器项
 	def copy(self, cont_item):
 		super().copy(cont_item)
 		self.item = cont_item.item
+
+	# 组合
+	def merge(self, cont_item):
+		self.ensureContItemEqual(cont_item)
+
+		count = self.enter(cont_item.count)
+		cont_item.count = count
+
+		# if cont_item.count <= 0:
+		#	cont_item.remove()
 
 	# 加入容器（返回剩余无法添加的数量）
 	def enter(self, count=0):
@@ -1624,133 +1806,14 @@ class PackContItem(BaseContItem):
 
 		self.count -= count
 
+		# 如果数量为 0
 		if self.count <= 0:
+			self.remove()
 			delta = -self.count
 			self.count = max(0, self.count)
-			self.remove()
 			return max(0, delta)  # 返回剩余无法删除的数量
 
 		return 0
-
-
-# ===================================================
-#  人类背包物品
-# ===================================================
-class HumanPackItem(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包物品"
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.HumanPackItem
-
-
-# ===================================================
-#  人类背包装备
-# ===================================================
-class HumanPackEquip(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包装备"
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.HumanPackEquip
-
-
-# ===================================================
-#  艾瑟萌背包物品
-# ===================================================
-class ExerPackItem(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌背包物品"
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.ExerPackItem
-
-
-# ===================================================
-#  艾瑟萌背包装备
-# ===================================================
-class ExerPackEquip(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌背包装备"
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.ExerPackEquip
-
-
-# ===================================================
-#  艾瑟萌装备槽项
-# ===================================================
-class ExerEquipSlotItem(SlotContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌装备槽项"
-
-	# 艾瑟萌背包装备
-	pack_equip = models.OneToOneField('ExerPackEquip', on_delete=models.CASCADE,
-								 verbose_name="艾瑟萌背包装备")
-
-	# 装备槽类型
-	e_type = models.ForeignKey('game_module.ExerEquipType', on_delete=models.CASCADE,
-							   verbose_name="装备槽类型")
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.ExerEquipSlotItem
-
-	# 配置索引
-	def setupIndex(self, index):
-		self.e_type_id = index
-
-	# 装备
-	def equip(self, pack_equip=None, **kwargs):
-		self.pack_equip = pack_equip
-		self.pack_equip.transfer(self.container)
-
-	# 卸下
-	def dequip(self, **kwargs):
-		self.pack_equip.remove()
-		pack_equip = self.pack_equip
-		self.pack_equip = None
-		return pack_equip
-
-
-# ===================================================
-#  人类装备槽项
-# ===================================================
-class HumanEquipSlotItem(SlotContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备槽项"
-
-	# 人类背包装备
-	pack_equip = models.OneToOneField('HumanPackEquip', on_delete=models.CASCADE,
-								 verbose_name="人类背包装备")
-
-	# 装备槽类型
-	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
-							   verbose_name="装备槽类型")
-
-	# 容器类型
-	@classmethod
-	def contItemType(cls): return ContItemType.HumanEquipSlotItem
-
-	# 配置索引
-	def setupIndex(self, index):
-		self.e_type_id = index
-
-	# 装备
-	def equip(self, pack_equip=None):
-		self.pack_equip: ExerPackEquip = pack_equip
-		self.pack_equip.transfer(self.container)
-
-	# 卸下
-	def dequip(self):
-		self.pack_equip.remove()
-		pack_equip = self.pack_equip
-		self.pack_equip = None
-		return pack_equip
 
 
 # endregion
@@ -1814,5 +1877,3 @@ class ItemEffect(models.Model):
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
 
 # endregion
-
-from exermon_module.models import *

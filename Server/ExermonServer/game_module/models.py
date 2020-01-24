@@ -3,6 +3,7 @@ from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType
+import jsonfield
 
 # Create your models here.
 
@@ -68,92 +69,6 @@ class GameVersion(models.Model):
 			'update_note': self.update_note,
 			'description': self.description
 		}
-
-
-# ===================================================
-# 基本属性表
-# ===================================================
-class BaseParam(models.Model):
-
-	# MHP = 1  # 体力值
-	# MMP = 2  # 精力值
-	# ATK = 3  # 攻击力
-	# DEF = 4  # 防御力
-	# EVA = 5  # 回避率（*10000）
-	# CRI = 6  # 暴击率（*10000）
-
-	class Meta:
-
-		verbose_name = verbose_name_plural = "基本属性"
-
-	# 全局变量，BaseParam 所有实例
-	Params = None
-
-	# 全局变量，BaseParam 数
-	Count = None
-
-	# 显示名称
-	name = models.CharField(max_length=8, verbose_name="显示名称")
-
-	# 程序属性名
-	attr = models.CharField(max_length=8, verbose_name="程序属性名")
-
-	# 最大值（为 None 时无限制）
-	max_value = models.PositiveIntegerField(null=True, blank=True, verbose_name="最大值")
-
-	# 最小值
-	min_value = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
-
-	# 默认值
-	default = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
-
-	# 属性比例值
-	scale = models.PositiveSmallIntegerField(default=1, verbose_name="属性比例值")
-
-	# 描述
-	description = models.CharField(max_length=64, verbose_name="描述")
-
-	def convertToDict(self):
-
-		return {
-			'id': self.id,
-			'name': self.name,
-			'attr': self.attr,
-			'max_value': self.max_value,
-			'min_value': self.min_value,
-			'default': self.default,
-			'scale': self.scale,
-			'description': self.description
-		}
-
-	@classmethod
-	def load(cls):
-
-		cls.Params = ViewUtils.getObjects(cls)
-		cls.Count = len(list(cls.Params))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, index=None, attr=None):
-
-		if cls.Params is None: cls.load()
-
-		if index is not None:
-			return ViewUtils.getObject(cls, ErrorType.UnknownError,
-									   objects=cls.Params, id=index)
-		if attr is not None:
-			return ViewUtils.getObject(cls, ErrorType.UnknownError,
-									   objects=cls.Params, attr=attr)
-		return cls.Params
-
-	@classmethod
-	def getAttr(cls, index):
-		return cls.get(index).attr
-
-	@classmethod
-	def count(cls):
-
-		if cls.Count is None: cls.load()
-		return cls.Count
 
 
 # ===================================================
@@ -313,9 +228,173 @@ class ParamRateRange(ParamValueRange):
 
 
 # ===================================================
+# 集合型游戏术语
+# ===================================================
+class GameGroupTerm(models.Model):
+
+	class Meta:
+
+		abstract = True
+		verbose_name = verbose_name_plural = "人类装备类型"
+
+	NOT_EXIST_ERROR = ErrorType.UnknownError
+
+	# 全局变量，ExermonEquipType 所有实例
+	Objects = None
+
+	# 全局变量，ExermonEquipType 数
+	Count = None
+
+	# 所属术语
+	term = models.ForeignKey('GameTerm', on_delete=models.CASCADE, verbose_name="所属术语")
+
+	# 名称
+	name = models.CharField(max_length=8, verbose_name="名称")
+
+	# 描述
+	description = models.CharField(max_length=64, verbose_name="描述")
+
+	def __str__(self):
+		return self.name
+
+	def convertToDict(self):
+
+		return {
+			'id': self.id,
+			'name': self.name,
+			'description': self.description
+		}
+
+	@classmethod
+	def load(cls):
+
+		cls.Objects = ViewUtils.getObjects(cls, term__activated=True)
+		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
+
+	# 获取单个
+	@classmethod
+	def get(cls, **kwargs):
+
+		if cls.Objects is None: cls.load()
+
+		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
+								objects=cls.Objects, **kwargs)
+
+	# 确保存在
+	@classmethod
+	def ensure(cls, **kwargs):
+
+		if cls.Objects is None: cls.load()
+
+		return ViewUtils.ensureObjectExist(cls, cls.NOT_EXIST_ERROR,
+										   objects=cls.Objects, **kwargs)
+
+	# 获取多个
+	@classmethod
+	def objs(cls, **kwargs):
+
+		if cls.Objects is None: cls.load()
+
+		return ViewUtils.getObjects(cls, cls.Objects, **kwargs)
+
+	@classmethod
+	def count(cls):
+
+		if cls.Count is None: cls.load()
+		return cls.Count
+
+
+# ===================================================
+#  科目表
+# ===================================================
+class Subject(GameGroupTerm):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "科目"
+
+	NOT_EXIST_ERROR = ErrorType.SubjectNotExist
+
+	# 选科最大数目
+	MAX_SELECTED = 6
+
+	# 科目分值
+	max_score = models.PositiveSmallIntegerField(default=100, verbose_name="分值")
+
+	# 必选科目
+	force = models.BooleanField(default=False, verbose_name="必选科目")
+
+	def convertToDict(self):
+		res = super().convertToDict()
+
+		res['max_score'] = self.max_score
+		res['force'] = self.force
+
+		return res
+
+
+# ===================================================
+# 基本属性表
+# ===================================================
+class BaseParam(GameGroupTerm):
+
+	# MHP = 1  # 体力值
+	# MMP = 2  # 精力值
+	# ATK = 3  # 攻击力
+	# DEF = 4  # 防御力
+	# EVA = 5  # 回避率（*10000）
+	# CRI = 6  # 暴击率（*10000）
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "基本属性"
+
+	NOT_EXIST_ERROR = ErrorType.BaseParamNotExist
+
+	# 程序属性名
+	attr = models.CharField(max_length=8, verbose_name="程序属性名")
+
+	# 最大值（为 None 时无限制）
+	max_value = models.PositiveIntegerField(null=True, blank=True, verbose_name="最大值")
+
+	# 最小值
+	min_value = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
+
+	# 默认值
+	default = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
+
+	# 属性比例值
+	scale = models.PositiveSmallIntegerField(default=1, verbose_name="属性比例值")
+
+	def convertToDict(self):
+		res = super().convertToDict()
+
+		res['attr'] = self.attr
+		res['max_value'] = self.max_value
+		res['min_value'] = self.min_value
+		res['default'] = self.default
+		res['scale'] = self.scale
+
+		return res
+
+	# clamp 属性值
+	def clamp(self, val):
+
+		min_ = self.min_value
+		max_ = self.max_value
+		if min_ is not None: val = max(min_, val)
+		if max_ is not None: val = min(max_, val)
+
+		return val
+
+	@classmethod
+	def getAttr(cls, id):
+		return cls.get(id=id).attr
+
+
+# ===================================================
 # 可用物品类型
 # ===================================================
-class UsableItemType(models.Model):
+class UsableItemType(GameGroupTerm):
 
 	# Supply = 1  # 补给道具
 	# Reinforce = 2  # 强化道具
@@ -329,53 +408,11 @@ class UsableItemType(models.Model):
 
 		verbose_name = verbose_name_plural = "可用物品类型"
 
-	# 全局变量，UsableItemType 所有实例
-	Types = None
-
-	# 全局变量，UsableItemType 数
-	Count = None
-
-	# 名称
-	name = models.CharField(max_length=8, verbose_name="名称")
-
-	# 描述
-	description = models.CharField(max_length=64, verbose_name="描述")
-
-	def convertToDict(self):
-
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description
-		}
-
-	@classmethod
-	def load(cls):
-
-		cls.Types = ViewUtils.getObjects(cls)
-		cls.Count = len(list(cls.Types))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, index=None):
-
-		if cls.Types is None: cls.load()
-
-		if index is None: return cls.Types
-
-		return ViewUtils.getObject(cls, ErrorType.UnknownError,
-								objects=cls.Types, id=index)
-
-	@classmethod
-	def count(cls):
-
-		if cls.Count is None: cls.load()
-		return cls.Count
-
 
 # ===================================================
 # 人类装备类型
 # ===================================================
-class HumanEquipType(models.Model):
+class HumanEquipType(GameGroupTerm):
 
 	# Weapon = 1  # 武器
 	# Head = 2  # 头部
@@ -387,53 +424,11 @@ class HumanEquipType(models.Model):
 
 		verbose_name = verbose_name_plural = "人类装备类型"
 
-	# 全局变量，ExermonEquipType 所有实例
-	Types = None
-
-	# 全局变量，ExermonEquipType 数
-	Count = None
-
-	# 名称
-	name = models.CharField(max_length=8, verbose_name="名称")
-
-	# 描述
-	description = models.CharField(max_length=64, verbose_name="描述")
-
-	def convertToDict(self):
-
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description
-		}
-
-	@classmethod
-	def load(cls):
-
-		cls.Types = ViewUtils.getObjects(cls)
-		cls.Count = len(list(cls.Types))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, index=None):
-
-		if cls.Types is None: cls.load()
-
-		if index is None: return cls.Types
-
-		return ViewUtils.getObject(cls, ErrorType.UnknownError,
-								objects=cls.Types, id=index)
-
-	@classmethod
-	def count(cls):
-
-		if cls.Count is None: cls.load()
-		return cls.Count
-
 
 # ===================================================
 # 艾瑟萌装备类型
 # ===================================================
-class ExerEquipType(models.Model):
+class ExerEquipType(GameGroupTerm):
 
 	# Weapon = 1  # 武器
 	# Head = 2  # 头部
@@ -445,99 +440,122 @@ class ExerEquipType(models.Model):
 
 		verbose_name = verbose_name_plural = "艾瑟萌装备类型"
 
-	# 全局变量，ExermonEquipType 所有实例
-	Types = None
 
-	# 全局变量，ExermonEquipType 数
-	Count = None
+# ===================================================
+#  艾瑟萌基础属性范围表
+# ===================================================
+class ExerParamBaseRange(ParamValueRange):
 
-	# 名称
-	name = models.CharField(max_length=8, verbose_name="名称")
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌基础属性范围"
 
-	# 描述
-	description = models.CharField(max_length=64, verbose_name="描述")
+	# 艾瑟萌星级
+	star = models.ForeignKey("ExerStar", on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
+
+
+# ===================================================
+#  艾瑟萌属性成长率范围表
+# ===================================================
+class ExerParamRateRange(ParamRateRange):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌属性成长率范围"
+
+	# 艾瑟萌星级
+	star = models.ForeignKey("ExerStar", on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
+
+
+# ===================================================
+#  艾瑟萌星级表
+# ===================================================
+class ExerStar(GameGroupTerm):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "艾瑟萌星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
+
+	# 最大等级
+	max_level = models.PositiveSmallIntegerField(default=0, verbose_name="最大等级")
+
+	# 等级经验计算因子
+	# {'a', 'b', 'c'}
+	level_exp_factors = jsonfield.JSONField(default={}, verbose_name="等级经验计算因子")
+
+	def __str__(self):
+		return self.name
+
+	# 转换属性为 dict
+	def _convertParamsToDict(self):
+
+		data = dict()
+
+		data['bases'] = ModelUtils.objectsToDict(self.paramBaseRanges())
+		data['rates'] = ModelUtils.objectsToDict(self.paramRateRanges())
+
+		return data
 
 	def convertToDict(self):
 
 		return {
 			'id': self.id,
 			'name': self.name,
-			'description': self.description
+			'color': self.color,
+			'max_level': self.max_level,
+			'level_exp_factors': self.level_exp_factors,
+			'param_ranges': self._convertParamsToDict(),
 		}
 
-	@classmethod
-	def load(cls):
+	# 获取所有的属性基本值
+	def paramBaseRanges(self):
+		return self.exerparambaserange_set.all()
 
-		cls.Types = ViewUtils.getObjects(cls)
-		cls.Count = len(list(cls.Types))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, index=None):
-
-		if cls.Types is None: cls.load()
-
-		if index is None: return cls.Types
-
-		return ViewUtils.getObject(cls, ErrorType.UnknownError,
-								objects=cls.Types, id=index)
-
-	@classmethod
-	def count(cls):
-
-		if cls.Count is None: cls.load()
-		return cls.Count
+	# 获取所有的属性成长率
+	def paramRateRanges(self):
+		return self.exerparamraterange_set.all()
 
 
 # ===================================================
-#  科目表
+#  艾瑟萌天赋属性成长加成率范围表
 # ===================================================
-class Subject(models.Model):
+class ExerGiftParamRateRange(ParamRateRange):
+
 	class Meta:
-		verbose_name = verbose_name_plural = "科目"
+		verbose_name = verbose_name_plural = "艾瑟萌天赋属性成长加成率范围"
 
-	# 全局变量，ExermonEquipType 所有实例
-	Subjects = None
+	# 艾瑟萌星级
+	star = models.ForeignKey("ExerGiftStar", on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
 
-	# 全局变量，ExermonEquipType 数
-	Count = None
 
-	# 科目名
-	name = models.CharField(max_length=4, verbose_name="名称")
+# ===================================================
+#  艾瑟萌天赋星级表
+# ===================================================
+class ExerGiftStar(GameGroupTerm):
 
-	# 科目分值
-	max_score = models.PositiveSmallIntegerField(default=100, verbose_name="分值")
+	class Meta:
+
+		verbose_name = verbose_name_plural = "艾瑟萌天赋星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
 
 	def __str__(self):
 		return self.name
 
 	def convertToDict(self):
+
 		return {
 			'id': self.id,
 			'name': self.name,
-			'max_score': self.max_score
+			'color': self.color,
+			'param_ranges': ModelUtils.objectsToDict(self.paramRateRanges()),
 		}
 
-	@classmethod
-	def load(cls):
-
-		cls.Subjects = ViewUtils.getObjects(cls)
-		cls.Count = len(list(cls.Subjects))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, index=None):
-
-		if cls.Subjects is None: cls.load()
-
-		if index is None: return cls.Subjects
-
-		return ViewUtils.getObject(cls, ErrorType.UnknownError,
-								objects=cls.Subjects, id=index)
-
-	@classmethod
-	def count(cls):
-
-		if cls.Count is None: cls.load()
-		return cls.Count
+	# 获取所有的属性成长率
+	def paramRateRanges(self):
+		return self.exergiftparamraterange_set.all()
 
 
 # ===================================================
@@ -598,7 +616,5 @@ class GameTerm(models.Model):
 
 
 # 初始化
-try:
-	GameTerm.load()
-except ProgrammingError:
-	print("仍未建立数据库")
+try: GameTerm.load()
+except: print("仍未建立数据库")

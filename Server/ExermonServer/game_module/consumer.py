@@ -37,6 +37,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		self.online_info = online_info
 
+	# 获取对应的玩家
+	def getPlayer(self):
+
+		if self.online_info is None: return None
+
+		return self.online_info.player
+
 	# 连接操作
 	# 连接服务器（内部调用）
 	async def connect(self):

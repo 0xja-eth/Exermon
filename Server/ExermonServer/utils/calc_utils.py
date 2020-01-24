@@ -73,12 +73,13 @@ class ExermonLevelCalc:
 # ================================
 class ExermonParamCalc:
 
-	STD_RATE = 1.01
+	S = 1.005
+	R = 233
 
 	# 计算属性
 	@classmethod
 	def calc(cls, base, rate, level):
-		return base*pow((rate/100+1)*cls.STD_RATE, level-1)
+		return base*pow((rate/cls.R+1)*cls.S, level-1)
 
 
 # ================================
@@ -86,27 +87,30 @@ class ExermonParamCalc:
 # ================================
 class ExermonSlotLevelCalc:
 
-	D = 300
-	X = 0.75
-	M = 3
+	T = 500
+	A = 0.66
+
+	TP = 500
+	AP = 0.7
+	D = 3
 
 	# 计算等级
 	@classmethod
 	def calcLevel(cls, exp):
-		return math.floor(pow(exp/cls.D, cls.X))+1
+		return math.floor(pow(exp/cls.T, cls.A))+1
 
 	# 计算下一级经验
 	@classmethod
 	def calcNext(cls, level):
-		return pow(level,1/cls.X)*cls.D
+		return math.ceil(pow(level, 1/cls.A)*cls.T)
 
 	# 计算玩家等级
 	@classmethod
 	def calcPlayerLevel(cls, exp):
-		return math.floor(pow(exp/cls.D/cls.M, cls.X))+1
+		return math.floor(pow(exp/cls.TP/cls.D, cls.AP))+1
 
 	# 计算玩家下一级经验
 	@classmethod
 	def calcPlayerNext(cls, level):
-		return pow(level,1/cls.X)*cls.D*cls.M
+		return math.ceil(pow(level, 1/cls.AP)*cls.TP*cls.D)
 

@@ -160,8 +160,14 @@ class Common:
 		# if time is None: return empty
 		# return time.strftime('%Y-%m-%d %H:%M:%S')
 		return cls.preventNone(
-			time, obj=time, func=lambda t: t.strftime
-			('%Y-%m-%d %H:%M:%S'), empty=empty)
+			time, obj=time, func=lambda t: t.strftime('%Y-%m-%d %H:%M:%S'), empty=empty)
+
+	@classmethod
+	def dateToStr(cls, time, empty=''):
+		# if time is None: return empty
+		# return time.strftime('%Y-%m-%d')
+		return cls.preventNone(
+			time, obj=time, func=lambda t: t.strftime('%Y-%m-%d'), empty=empty)
 
 	@classmethod
 	def objectToId(cls, object, empty=0):

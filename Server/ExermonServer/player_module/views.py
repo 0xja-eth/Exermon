@@ -82,24 +82,24 @@ class Service:
 
 	# 登出（客户端调用）（登出 ≠ 断开连接）
 	@classmethod
-	async def logout(cls, consumer, pid: int):
+	async def logout(cls, consumer, player: Player):
 		# 返回数据：无
 
 		# 获取对应的 Player（程序会自动校验并报错）
-		player = Common.getPlayer(id=pid)
+		# player = Common.getPlayer(id=pid)
 
 		cls._doLogout(consumer, player)
 
 	# 断开连接（内部调用，因 Consumer 断开而断开连接时调用，即调用时 Consumer 已断开）
 	@classmethod
-	async def disconnect(cls, consumer, pid: int, auth: str):
+	async def disconnect(cls, consumer, player: Player, auth: str):
 		# 返回数据：无
 		ViewUtils.ensureAuth(auth)
 
 		print('disconnect')
 
 		# 获取另一个在线的玩家
-		online_player: OnlinePlayer = Common.getOnlinePlayer(pid)
+		online_player: OnlinePlayer = Common.getOnlinePlayer(player.id)
 		if online_player is None: return
 
 		# 如果另一个玩家的 Consumer 是参数中的 Consumer，执行登出操作
@@ -210,6 +210,74 @@ class Service:
 		value = hashlib.sha1(value.encode()).hexdigest()
 		return value
 
+	# 选择玩家形象
+	@classmethod
+	async def createCharacter(cls, consumer, player: Player, grade: int, name: str, cid: int):
+		# 返回数据：无
+
+		Check.ensureNameFormat(name)
+		Check.ensureGradeFormat(grade)
+		Common.ensureCharacterExist(id=cid)
+
+		player.create(name, grade, cid)
+
+	# 选择艾瑟萌
+	@classmethod
+	async def createExermons(cls, consumer, player: Player, eids: list, enames: list):
+		# 返回数据：无
+		from exermon_module.views import Common as ExermonCommon, Check as ExermonCheck
+
+		ExermonCheck.ensureExermonCount(eids)
+		ExermonCheck.ensureExermonCount(enames)
+
+		for name in enames:
+			ExermonCheck.ensureExermonNameFormat(name)
+
+		exers = ExermonCommon.getExermons(eids)
+
+		ExermonCommon.ensureExermonSubject(exers)
+		ExermonCommon.ensureExermonType(exers)
+
+		player.createExermons(exers, enames)
+
+	# 选择艾瑟萌天赋
+	@classmethod
+	async def createGifts(cls, consumer, player: Player, gids: list):
+		# 返回数据：无
+		from exermon_module.views import Common as ExermonCommon, Check as ExermonCheck
+
+		ExermonCheck.ensureExermonCount(gids)
+
+		gifts = ExermonCommon.getExermons(gids)
+
+		ExermonCommon.ensureExerGiftType(gifts)
+
+		player.createGifts(gifts)
+
+	# 获取玩家基本信息
+	@classmethod
+	async def getBasic(cls, consumer, player: Player, get_uid: int):
+		# 返回数据：
+		# player: 玩家基本数据 => 根据用户返回当前玩家基本数据/其他玩家基本数据
+		if player.id == get_uid:
+			type = "current"
+			target_player = player
+		else:
+			type = "others"
+			target_player = Common.getPlayer(id=get_uid)
+
+		return target_player.convertToDict(type=type)
+
+	# 艾瑟萌装备槽装备
+	@classmethod
+	async def equipSlotEquip(cls, consumer, player: Player, cid: int, eid: int, eeid: int):
+		# 返回数据：无
+		from item_module.views import Service as ItemService
+
+		HumanEquipType.ensure(id=eid)
+
+		ItemService.slotContainerEquip(player, cid, eeid, e_type_id=eid)
+
 
 # =======================
 # 用户校验类，封装用户业务数据格式校验的函数
@@ -235,11 +303,6 @@ class Check:
 	def ensureNameFormat(cls, val: str):
 		ViewUtils.ensureRegexp(val, Player.NAME_REG, ErrorType.InvalidName)
 
-	# 校验性别格式
-	@classmethod
-	def ensureGenderFormat(cls, val: int):
-		ViewUtils.ensureEnumData(val, PlayerGenders, ErrorType.InvalidGender, True)
-
 	# 校验年级格式
 	@classmethod
 	def ensureGradeFormat(cls, val: int):
@@ -262,10 +325,20 @@ class Common:
 
 		return ViewUtils.getObject(Player, error, return_type=return_type, **args)
 
+	# 获取形象
+	@classmethod
+	def getCharacter(cls, return_type='object', error: ErrorType = ErrorType.CharacterNotExist, **args) -> Player:
+		return ViewUtils.getObject(Character, error, return_type=return_type, **args)
+
 	# 确保玩家存在
 	@classmethod
 	def ensurePlayerExist(cls, error: ErrorType = ErrorType.PlayerNotExist, **args):
 		return ViewUtils.ensureObjectExist(Player, error, **args)
+
+	# 确保形象存在
+	@classmethod
+	def ensureCharacterExist(cls, error: ErrorType = ErrorType.CharacterNotExist, **args):
+		return ViewUtils.ensureObjectExist(Character, error, **args)
 
 	# 确保用户名存在（登陆可用）
 	@classmethod
