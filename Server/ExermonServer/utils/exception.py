@@ -20,8 +20,9 @@ class ErrorType(Enum):
 	InvalidRoute = 3  # 非法路由
 	PermissionDenied = 4  # 无权操作
 	NoCurVersion = 5  # 未设置当前版本
-	RequestUpdate = 6  # 需要更新
-	ErrorVersion = 7  # 错误的游戏版本
+	NoCurConfigure = 6  # 当前版本无配置
+	RequestUpdate = 7  # 需要更新
+	ErrorVersion = 8  # 错误的游戏版本
 	InvalidUserOper = 10  # 无效的用户操作
 	SubjectNotExist = 20  # 科目不存在
 	BaseParamNotExist = 21  # 属性不存在
@@ -100,6 +101,7 @@ class ErrorException(Exception):
 		ErrorType.InvalidRoute: "非法的请求路由！",
 		ErrorType.PermissionDenied: "无权操作！",
 		ErrorType.NoCurVersion: "未设置当前版本，请联系管理员！",
+		ErrorType.NoCurConfigure: "当前版本无游戏配置，请联系管理员！",
 		ErrorType.RequestUpdate: "当前客户端版本过旧，请更新游戏！",
 		ErrorType.ErrorVersion: "错误的客户端版本，请更新游戏！",
 		ErrorType.InvalidUserOper: "无效的用户操作！",

@@ -12,7 +12,7 @@ class ExermonLevelCalc:
 	# 初始化，计算所有星级的等级表
 	@classmethod
 	def init(cls):
-		from exermon_module.models import ExerStar
+		from game_module.models import ExerStar
 		from .view_utils import Common
 
 		cls.StarLevelTable = {}

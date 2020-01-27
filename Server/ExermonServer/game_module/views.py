@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from .models import *
-from player_module.models import Player
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, ErrorException
 
@@ -33,7 +32,8 @@ class Service:
 	@classmethod
 	def _generateStaticData(cls, updated):
 
-		data = cls._generateVersionData()
+		cur_version = Common.getCurVersion()
+		data = cls._generateVersionData(cur_version)
 
 		if updated:
 			data = cls._generateMainData(data)
@@ -42,41 +42,50 @@ class Service:
 
 	# 生成版本数据
 	@classmethod
-	def _generateVersionData(cls):
+	def _generateVersionData(cls, cur_version):
 
-		cur_version = Common.getCurVersion()
 		last_versions = Common.getLastVersions(cur_version, 'dict')
 
 		return {
 			'cur_version': cur_version.convertToDict(),
-			'last_versions': last_versions
+			'last_versions': last_versions,
+		}
+
+	# 生成资源数据
+	@classmethod
+	def _generateResourceData(cls):
+		from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, ExerEquip
+		from player_module.models import Character, HumanItem, HumanEquip
+
+		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
+		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
+		exer_skills = ModelUtils.objectsToDict(ExerSkill.objects.all())
+		exer_gifts = ModelUtils.objectsToDict(ExerGift.objects.all())
+		exer_items = ModelUtils.objectsToDict(ExerItem.objects.all())
+		exer_equips = ModelUtils.objectsToDict(ExerEquip.objects.all())
+		human_items = ModelUtils.objectsToDict(HumanItem.objects.all())
+		human_equips = ModelUtils.objectsToDict(HumanEquip.objects.all())
+		characters = ModelUtils.objectsToDict(Character.objects.all())
+
+		return {
+			'exermons': exermons,
+			'exer_frags': exer_frags,
+			'exer_skills': exer_skills,
+			'exer_gifts': exer_gifts,
+			'exer_items': exer_items,
+			'exer_equips': exer_equips,
+			'human_items': human_items,
+			'human_equips': human_equips,
+			'characters': characters
 		}
 
 	# 生成主体数据
 	@classmethod
-	def _generateMainData(cls, data={}):
+	def _generateMainData(cls, data, cur_version: GameVersion):
+		configure = cur_version.configure
 
-		data = cls._generateGameTermsData(data)
-		data = cls._generatePlayerStaticData(data)
-
-		return data
-
-	# 生成游戏核心静态数据
-	@classmethod
-	def _generateGameTermsData(cls, data={}):
-
-		data['base_params'] = ViewUtils.getObjects(BaseParam, return_type='dict')
-
-		return data
-
-	# 生成玩家模块静态数据
-	@classmethod
-	def _generatePlayerStaticData(cls, data={}):
-
-		data['player_genders'] = Player.PLAYER_GENDERS
-		data['player_grades'] = Player.PLAYER_GRADES
-		data['player_statuses'] = Player.PLAYER_STATUSES
-		data['player_types'] = Player.PLAYER_TYPES
+		data['configure'] = configure.convertToDict()
+		data['data'] = cls._generateResourceData()
 
 		return data
 
@@ -110,8 +119,8 @@ class Common:
 
 	# 获取当前版本
 	@classmethod
-	def getCurVersion(cls, return_type='object') -> GameVersion:
-		return ViewUtils.getObject(GameVersion, ErrorType.NoCurVersion, return_type=return_type, is_used=True)
+	def getCurVersion(cls) -> GameVersion:
+		return GameVersion.get()
 
 	# 获取当前版本
 	@classmethod

@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'xadmin',
+    'crispy_forms',
+    'reversion',
+
     'game_module',
     'player_module',
     'item_module',

@@ -12,49 +12,9 @@ import datetime
 
 
 # ===================================================
-#  登陆信息表
-# ===================================================
-class LoginInfo(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "登录记录"
-
-	# 登陆玩家
-	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 登陆时间
-	time = models.DateTimeField(auto_now_add=True, verbose_name="登陆时间")
-
-	# 登出时间
-	logout = models.DateTimeField(null=True, verbose_name="登出时间")
-
-	# 登陆IP
-	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
-
-
-# ===================================================
-#  密码更改记录表
-# ===================================================
-class PasswordRecord(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "改密记录"
-
-	# 登陆玩家
-	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 发生时间
-	time = models.DateTimeField(auto_now_add=True, verbose_name="时间")
-
-	# 密码（ACCESS TOKEN）
-	password = models.CharField(max_length=64, verbose_name="新密码")
-
-	# 发生IP
-	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
-
-
-# ===================================================
 #  玩家性别枚举
 # ===================================================
-class PlayerGenders(Enum):
+class CharacterGenders(Enum):
 	Unset = 0  # 未设置
 	Male = 1  # 男
 	Female = 2  # 女
@@ -70,33 +30,41 @@ class Character(models.Model):
 
 		verbose_name = verbose_name_plural = "人物"
 
-	PLAYER_GENDERS = [
-		(PlayerGenders.Unset.value, '未设置'),
-		(PlayerGenders.Male.value, '男'),
-		(PlayerGenders.Female.value, '女'),
-		(PlayerGenders.Unknown.value, '不明'),
+	CHARACTER_GENDERS = [
+		(CharacterGenders.Unset.value, '未设置'),
+		(CharacterGenders.Male.value, '男'),
+		(CharacterGenders.Female.value, '女'),
+		(CharacterGenders.Unknown.value, '不明'),
 	]
 
 	# 名称
 	name = models.CharField(max_length=12, verbose_name="名称")
 
 	# 描述
-	description = models.CharField(max_length=128, verbose_name="描述")
+	description = models.CharField(max_length=128, blank=True, verbose_name="描述")
 
 	# 性别
-	gender = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GENDERS, verbose_name="性别")
+	gender = models.PositiveSmallIntegerField(default=0, choices=CHARACTER_GENDERS, verbose_name="性别")
 
 	# 半身像
-	bust = models.ImageField(upload_to=CharacterImageUpload('bust'),
+	bust = models.ImageField(upload_to=CharacterImageUpload('bust'), null=True, blank=True,
 							 verbose_name="半身像")
 
 	# 头像
-	face = models.ImageField(upload_to=CharacterImageUpload('face'),
+	face = models.ImageField(upload_to=CharacterImageUpload('face'), null=True, blank=True,
 							 verbose_name="头像")
 
 	# 战斗图
-	battle = models.ImageField(upload_to=CharacterImageUpload('battle'),
+	battle = models.ImageField(upload_to=CharacterImageUpload('battle'), null=True, blank=True,
 							   verbose_name="战斗图")
+
+	# 转化为字符串
+	def __str__(self):
+		return "%d. %s(%s)" % (self.id, self.name, self.genderText())
+
+	# 性别文本
+	def genderText(self):
+		return self.CHARACTER_GENDERS[self.gender][1]
 
 	# 获取完整路径
 	def getExactlyPath(self):
@@ -140,6 +108,46 @@ class Character(models.Model):
 			'face': face_data,
 			'battle': battle_data,
 		}
+
+
+# ===================================================
+#  登陆信息表
+# ===================================================
+class LoginInfo(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = "登录记录"
+
+	# 登陆玩家
+	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
+
+	# 登陆时间
+	time = models.DateTimeField(auto_now_add=True, verbose_name="登陆时间")
+
+	# 登出时间
+	logout = models.DateTimeField(null=True, verbose_name="登出时间")
+
+	# 登陆IP
+	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
+
+
+# ===================================================
+#  密码更改记录表
+# ===================================================
+class PasswordRecord(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = "改密记录"
+
+	# 登陆玩家
+	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
+
+	# 发生时间
+	time = models.DateTimeField(auto_now_add=True, verbose_name="时间")
+
+	# 密码（ACCESS TOKEN）
+	password = models.CharField(max_length=64, verbose_name="新密码")
+
+	# 发生IP
+	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
 
 
 # ===================================================
@@ -294,7 +302,7 @@ class Player(models.Model):
 	cur_login_info = None
 
 	def __str__(self):
-		return self.username
+		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
 	def _packContainerIndices(self):
 		return {

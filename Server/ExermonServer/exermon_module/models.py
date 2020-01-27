@@ -74,56 +74,48 @@ class Exermon(BaseItem):
 	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE, verbose_name="科目")
 
 	# 全身像
-	full = models.ImageField(upload_to=ExermonImageUpload('full'),
+	full = models.ImageField(upload_to=ExermonImageUpload('full'), null=True, blank=True,
 							 verbose_name="全身像")
 
 	# 缩略图
-	icon = models.ImageField(upload_to=ExermonImageUpload('icon'),
+	icon = models.ImageField(upload_to=ExermonImageUpload('icon'), null=True, blank=True,
 							 verbose_name="缩略图")
 
 	# 战斗图
-	battle = models.ImageField(upload_to=ExermonImageUpload('battle'),
+	battle = models.ImageField(upload_to=ExermonImageUpload('battle'), null=True, blank=True,
 							   verbose_name="战斗图")
 
 	# 艾瑟萌类型
 	e_type = models.PositiveSmallIntegerField(default=ExermonType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌类型")
 
-	# # 体力值成长（*100）
-	# mhp_rate = models.PositiveSmallIntegerField(default=100, verbose_name="体力成长")
-	#
-	# # 精力值成长（*100）
-	# mmp_rate = models.PositiveSmallIntegerField(default=100, verbose_name="精力成长")
-	#
-	# # 攻击成长（*100）
-	# atk_rate = models.PositiveSmallIntegerField(default=100, verbose_name="攻击成长")
-	#
-	# # 防御成长（*100）
-	# def_rate = models.PositiveSmallIntegerField(default=100, verbose_name="防御成长")
-	#
-	# # 回避率成长（*100）
-	# eva_rate = models.PositiveSmallIntegerField(default=100, verbose_name="回避率成长")
-	#
-	# # 反击率成长（*100）
-	# cri_rate = models.PositiveSmallIntegerField(default=100, verbose_name="反击率成长")
-	#
-	# # 基础体力值
-	# mhp_base = models.PositiveSmallIntegerField(default=100, verbose_name="基础体力")
-	#
-	# # 基础精力值
-	# mmp_base = models.PositiveSmallIntegerField(default=100, verbose_name="基础精力")
-	#
-	# # 基础攻击
-	# atk_base = models.PositiveSmallIntegerField(default=10, verbose_name="基础攻击")
-	#
-	# # 基础防御
-	# def_base = models.PositiveSmallIntegerField(default=10, verbose_name="基础防御")
-	#
-	# # 基础回避率（*10000）
-	# eva_base = models.PositiveSmallIntegerField(default=100, verbose_name="基础回避")
-	#
-	# # 基础反击率（*10000）
-	# cri_base = models.PositiveSmallIntegerField(default=100, verbose_name="基础反击")
+	# 管理界面用：显示属性基础值
+	def adminParamBases(self):
+		from django.utils.html import format_html
+
+		params = self.paramBases()
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	adminParamBases.short_description = "属性基础值"
+
+	# 管理界面用：显示属性成长率
+	def adminParamRates(self):
+		from django.utils.html import format_html
+
+		params = self.paramRates()
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	adminParamRates.short_description = "属性成长率"
 
 	# 对应的容器项类
 	@classmethod
@@ -138,6 +130,8 @@ class Exermon(BaseItem):
 
 		if type == 'rate':
 			return self.paramRate(attr=item[:3])
+
+		return super().__getattr__(item)
 
 	# 转换属性为 dict
 	def _convertParamsToDict(self):
@@ -321,29 +315,26 @@ class ExerGift(BaseItem):
 	# 艾瑟萌星级
 	star = models.ForeignKey('game_module.ExerGiftStar', on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
 
-	# 标志颜色（#ABCDEF）
-	color = models.CharField(max_length=7, null=False, default='#FFFFFF', verbose_name="标志颜色")
+	# # 标志颜色（#ABCDEF）
+	# color = models.CharField(max_length=7, null=False, default='#FFFFFF', verbose_name="标志颜色")
 
 	# 艾瑟萌天赋类型
 	g_type = models.PositiveSmallIntegerField(default=ExerGiftType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌天赋类型")
-	# # 体力值成长（*100）
-	# mhp_rate = models.PositiveSmallIntegerField(default=100, verbose_name="体力成长")
-	#
-	# # 精力值成长（*100）
-	# mmp_rate = models.PositiveSmallIntegerField(default=100, verbose_name="精力成长")
-	#
-	# # 攻击成长（*100）
-	# atk_rate = models.PositiveSmallIntegerField(default=100, verbose_name="攻击成长")
-	#
-	# # 防御成长（*100）
-	# def_rate = models.PositiveSmallIntegerField(default=100, verbose_name="防御成长")
-	#
-	# # 回避率成长（*100）
-	# eva_rate = models.PositiveSmallIntegerField(default=100, verbose_name="回避率成长")
-	#
-	# # 反击率成长（*100）
-	# cri_rate = models.PositiveSmallIntegerField(default=100, verbose_name="反击率成长")
+
+	# 管理界面用：显示属性成长率
+	def adminParamRates(self):
+		from django.utils.html import format_html
+
+		params = self.paramRates()
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	adminParamRates.short_description = "属性成长率"
 
 	# 对应的容器项类
 	@classmethod
@@ -355,6 +346,8 @@ class ExerGift(BaseItem):
 
 		if type == 'rate':
 			return self.paramRate(attr=item[:3])
+
+		return super().__getattr__(item)
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
@@ -520,6 +513,8 @@ class PlayerExermon(PackContItem):
 
 		if type == 'rate':
 			return self.paramRate(attr=item[:3])
+
+		return super().__getattr__(item)
 
 	# 获取所有属性
 	def paramVals(self):
@@ -780,6 +775,7 @@ class ExerSlotItem(SlotContItem):
 		res['level'] = level
 		res['next'] = next
 		res['params'] = self._convertParamsToDict()
+		res['exerequipslot_id'] = self.exerequipslot.id
 
 		return res
 
@@ -976,7 +972,7 @@ class ExerSkill(BaseItem):
 
 	class Meta:
 
-		verbose_name = verbose_name_plural = "有限物品"
+		verbose_name = verbose_name_plural = "艾瑟萌技能"
 
 	TARGET_TYPES = [
 		(TargetType.Empty.value, '无'),
@@ -1046,13 +1042,16 @@ class ExerSkill(BaseItem):
 	plus_formula = models.CharField(default="", max_length=256, null=True, blank=True, verbose_name="附加公式")
 
 	# 技能图标
-	icon = models.ImageField(upload_to=SkillImageUpload('icon'), verbose_name="图标")
+	icon = models.ImageField(upload_to=SkillImageUpload('icon'),
+							 null=True, blank=True, verbose_name="图标")
 
 	# 技能动画
-	ani = models.ImageField(upload_to=SkillImageUpload('ani'), verbose_name="技能动画")
+	ani = models.ImageField(upload_to=SkillImageUpload('ani'),
+							 null=True, blank=True, verbose_name="技能动画")
 
 	# 击中动画
-	target_ani = models.ImageField(upload_to=SkillImageUpload('effect'), verbose_name="击中动画")
+	target_ani = models.ImageField(upload_to=SkillImageUpload('effect'),
+							 null=True, blank=True, verbose_name="击中动画")
 
 	# 对应的容器项类
 	@classmethod

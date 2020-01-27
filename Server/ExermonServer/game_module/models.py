@@ -2,8 +2,8 @@ from django.db import models
 from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorType
-import jsonfield
+from utils.exception import ErrorException, ErrorType
+import jsonfield, traceback
 
 # Create your models here.
 
@@ -17,11 +17,14 @@ class GameVersion(models.Model):
 
 		verbose_name = verbose_name_plural = "游戏版本"
 
+	# 当前版本的 GameVersion 实例
+	Version = None
+
 	# 主版本号（检查更新）
-	main_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="版本号")
+	main_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="主版本号")
 
 	# 副版本号（建议更新）
-	sub_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="版本号")
+	sub_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="副版本号")
 
 	# 更新时间
 	update_time = models.DateTimeField(auto_now_add=True, verbose_name="更新时间")
@@ -31,6 +34,9 @@ class GameVersion(models.Model):
 
 	# 附加描述
 	description = models.CharField(default='', max_length=64, blank=True, verbose_name="附加描述")
+
+	# 游戏配置
+	configure = models.ForeignKey('GameConfigure', on_delete=models.CASCADE, verbose_name="游戏配置")
 
 	# 是否启用
 	is_used = models.BooleanField(default=True, verbose_name="启用")
@@ -49,6 +55,20 @@ class GameVersion(models.Model):
 		version.description = desc
 
 		version.activate()
+
+		cls.Version = version
+
+	@classmethod
+	def load(cls):
+
+		cls.Version: GameVersion = ViewUtils.getObject(
+			GameVersion, ErrorType.NoCurVersion, return_type='object', is_used=True)
+
+	@classmethod
+	def get(cls):
+		if cls.Version is None: cls.load()
+
+		return cls.Version
 
 	# 激活本版本
 	def activate(self):
@@ -86,6 +106,10 @@ class ParamValue(models.Model):
 
 	# 属性值/属性率
 	value = models.IntegerField(default=0, verbose_name="属性值")
+
+	def __str__(self):
+		val = self.getValue()
+		return "%s: %s" % (self.param.name, val)
 
 	# 比例
 	def scale(self):
@@ -191,6 +215,10 @@ class ParamValueRange(models.Model):
 	# 最大值
 	max_value = models.IntegerField(default=0, verbose_name="最大值")
 
+	def __str__(self):
+		min_val, max_val = self.getValue()
+		return "%s: %s ~ %s" % (self.param.name, min_val, max_val)
+
 	# 比例
 	def scale(self):
 		return self.param.scale
@@ -228,14 +256,13 @@ class ParamRateRange(ParamValueRange):
 
 
 # ===================================================
-# 集合型游戏术语
+# 集合型配置
 # ===================================================
-class GameGroupTerm(models.Model):
+class GroupConfigure(models.Model):
 
 	class Meta:
-
 		abstract = True
-		verbose_name = verbose_name_plural = "人类装备类型"
+		verbose_name = verbose_name_plural = "集合型配置"
 
 	NOT_EXIST_ERROR = ErrorType.UnknownError
 
@@ -245,14 +272,14 @@ class GameGroupTerm(models.Model):
 	# 全局变量，ExermonEquipType 数
 	Count = None
 
-	# 所属术语
-	term = models.ForeignKey('GameTerm', on_delete=models.CASCADE, verbose_name="所属术语")
+	# 所属配置
+	configure = models.ForeignKey('GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
 
 	# 名称
 	name = models.CharField(max_length=8, verbose_name="名称")
 
 	# 描述
-	description = models.CharField(max_length=64, verbose_name="描述")
+	description = models.CharField(max_length=64, blank=True, verbose_name="描述")
 
 	def __str__(self):
 		return self.name
@@ -268,7 +295,12 @@ class GameGroupTerm(models.Model):
 	@classmethod
 	def load(cls):
 
-		cls.Objects = ViewUtils.getObjects(cls, term__activated=True)
+		configure: GameConfigure = GameConfigure.get()
+
+		if configure is None:
+			raise ErrorException(ErrorType.NoCurConfigure)
+
+		cls.Objects = ViewUtils.getObjects(cls, configure=configure)
 		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
 
 	# 获取单个
@@ -307,7 +339,7 @@ class GameGroupTerm(models.Model):
 # ===================================================
 #  科目表
 # ===================================================
-class Subject(GameGroupTerm):
+class Subject(GroupConfigure):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "科目"
@@ -335,7 +367,7 @@ class Subject(GameGroupTerm):
 # ===================================================
 # 基本属性表
 # ===================================================
-class BaseParam(GameGroupTerm):
+class BaseParam(GroupConfigure):
 
 	# MHP = 1  # 体力值
 	# MMP = 2  # 精力值
@@ -360,7 +392,7 @@ class BaseParam(GameGroupTerm):
 	min_value = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
 
 	# 默认值
-	default = models.PositiveSmallIntegerField(default=0, verbose_name="最小值")
+	default = models.PositiveSmallIntegerField(default=0, verbose_name="默认值")
 
 	# 属性比例值
 	scale = models.PositiveSmallIntegerField(default=1, verbose_name="属性比例值")
@@ -394,7 +426,7 @@ class BaseParam(GameGroupTerm):
 # ===================================================
 # 可用物品类型
 # ===================================================
-class UsableItemType(GameGroupTerm):
+class UsableItemType(GroupConfigure):
 
 	# Supply = 1  # 补给道具
 	# Reinforce = 2  # 强化道具
@@ -412,7 +444,7 @@ class UsableItemType(GameGroupTerm):
 # ===================================================
 # 人类装备类型
 # ===================================================
-class HumanEquipType(GameGroupTerm):
+class HumanEquipType(GroupConfigure):
 
 	# Weapon = 1  # 武器
 	# Head = 2  # 头部
@@ -428,7 +460,7 @@ class HumanEquipType(GameGroupTerm):
 # ===================================================
 # 艾瑟萌装备类型
 # ===================================================
-class ExerEquipType(GameGroupTerm):
+class ExerEquipType(GroupConfigure):
 
 	# Weapon = 1  # 武器
 	# Head = 2  # 头部
@@ -468,7 +500,7 @@ class ExerParamRateRange(ParamRateRange):
 # ===================================================
 #  艾瑟萌星级表
 # ===================================================
-class ExerStar(GameGroupTerm):
+class ExerStar(GroupConfigure):
 
 	class Meta:
 
@@ -486,6 +518,58 @@ class ExerStar(GameGroupTerm):
 
 	def __str__(self):
 		return self.name
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
+
+	# 管理界面用：显示经验计算因子
+	def adminLevelExpFactors(self):
+		from django.utils.html import format_html
+
+		a = self.level_exp_factors['a']
+		b = self.level_exp_factors['b']
+		c = self.level_exp_factors['c']
+		res = "A: %s<br>B: %s<br>C: %s" % (a, b, c)
+
+		return format_html(res)
+
+	adminLevelExpFactors.short_description = "等级经验计算因子"
+
+	# 管理界面用：显示属性限制范围
+	def adminParamBaseRanges(self):
+		from django.utils.html import format_html
+
+		base_ranges = self.paramBaseRanges()
+
+		res = ''
+		for r in base_ranges:
+			res += str(r) + "<br>"
+
+		return format_html(res)
+
+	adminParamBaseRanges.short_description = "属性基础值范围"
+
+	# 管理界面用：显示属性限制范围
+	def adminParamRateRanges(self):
+		from django.utils.html import format_html
+
+		rate_ranges = self.paramRateRanges()
+
+		res = ''
+		for r in rate_ranges:
+			res += str(r) + "<br>"
+		res += "</span>"
+
+		return format_html(res)
+
+	adminParamRateRanges.short_description = "属性成长率范围"
 
 	# 转换属性为 dict
 	def _convertParamsToDict(self):
@@ -532,7 +616,7 @@ class ExerGiftParamRateRange(ParamRateRange):
 # ===================================================
 #  艾瑟萌天赋星级表
 # ===================================================
-class ExerGiftStar(GameGroupTerm):
+class ExerGiftStar(GroupConfigure):
 
 	class Meta:
 
@@ -543,6 +627,16 @@ class ExerGiftStar(GameGroupTerm):
 
 	def __str__(self):
 		return self.name
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
 
 	def convertToDict(self):
 
@@ -559,16 +653,16 @@ class ExerGiftStar(GameGroupTerm):
 
 
 # ===================================================
-# 游戏用语表
+# 游戏配置表
 # ===================================================
-class GameTerm(models.Model):
+class GameConfigure(models.Model):
 
 	class Meta:
 
-		verbose_name = verbose_name_plural = "游戏用语"
+		verbose_name = verbose_name_plural = "游戏配置"
 
-	# 全局变量，GameTerm实例
-	Term = None
+	# 全局变量，GameConfigure 实例
+	Configure = None
 
 	# 游戏名
 	name = models.CharField(default='艾瑟萌学院', max_length=12, verbose_name="游戏名")
@@ -586,9 +680,24 @@ class GameTerm(models.Model):
 	bound_ticket = models.CharField(default='绑定点券', max_length=6, verbose_name="绑定点券")
 
 	# 激活
-	activated = models.BooleanField(default=True, verbose_name="激活")
+	# activated = models.BooleanField(default=True, verbose_name="激活")
+
+	GROUP_CONFIGURES = [BaseParam, Subject, ExerStar, ExerGiftStar,
+						UsableItemType, HumanEquipType, ExerEquipType]
+
+	def __str__(self):
+		return "%d. %s 配置" % (self.id, self.name)
 
 	def convertToDict(self):
+		from player_module.models import Character, Player
+
+		subjects = ModelUtils.objectsToDict(self.subject_set.all())
+		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
+		usable_item_types = ModelUtils.objectsToDict(self.usableitemtype_set.all())
+		human_equip_types = ModelUtils.objectsToDict(self.humanequiptype_set.all())
+		exer_equip_types = ModelUtils.objectsToDict(self.exerequiptype_set.all())
+		exer_stars = ModelUtils.objectsToDict(self.exerstar_set.all())
+		exer_gift_stars = ModelUtils.objectsToDict(self.exergiftstar_set.all())
 
 		return {
 			'name': self.name,
@@ -596,25 +705,48 @@ class GameTerm(models.Model):
 			'gold': self.gold,
 			'ticket': self.ticket,
 			'bound_ticket': self.bound_ticket,
-		}
 
+			'character_genders': Character.CHARACTER_GENDERS,
+			'player_grades': Player.PLAYER_GRADES,
+			'player_statuses': Player.PLAYER_STATUSES,
+			'player_types': Player.PLAYER_TYPES,
+
+			'subjects': subjects,
+			'base_params': base_params,
+			'usable_item_types': usable_item_types,
+			'human_equip_types': human_equip_types,
+			'exer_equip_types': exer_equip_types,
+			'exer_stars': exer_stars,
+			'exer_gift_stars': exer_gift_stars
+		}
 
 	@classmethod
 	def load(cls):
 
-		BaseParam.load()
-		Subject.load()
-		BaseParam.load()
-		cls.Term = ViewUtils.getObject(cls, ErrorType.UnknownError, activated=True)
+		# 获取当前版本
+		version: GameVersion = GameVersion.get()
+
+		if version is None:
+			raise ErrorException(ErrorType.NoCurVersion)
+
+		cls.Configure = version.configure
+
+		for conf in cls.GROUP_CONFIGURES:
+			conf.load()
 
 	@classmethod
 	def get(cls):
 
-		if cls.Term is None: cls.load()
+		if cls.Configure is None: cls.load()
 
-		return cls.Term
+		return cls.Configure
 
 
 # 初始化
-try: GameTerm.load()
-except: print("仍未建立数据库")
+try:
+	GameConfigure.load()
+
+except:
+	# 打印错误路径
+	traceback.print_exc()
+	print("仍未建立数据库")

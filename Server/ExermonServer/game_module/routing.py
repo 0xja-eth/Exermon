@@ -167,7 +167,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		['cid', 'int'],
 		['contitem_ids', 'int[]'],
 	],
-		Item.packContainerGroup,  # 处理函数
+		Item.packContainerMerge,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 艾瑟萌槽装备

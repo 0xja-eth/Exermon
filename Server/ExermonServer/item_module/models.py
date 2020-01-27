@@ -1,13 +1,14 @@
 from django.db import models
 from django.db.models import Sum, F
 from django.conf import settings
-from game_module.models import ParamValue, GameTerm, ExerEquipType, HumanEquipType
+from game_module.models import ParamValue, GameConfigure, ExerEquipType, HumanEquipType
 from utils.model_utils import ItemIconUpload, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, ErrorException
 from enum import Enum
 import jsonfield, os, math
 
+# region 基本物品
 
 # ===================================================
 #  物品类型枚举
@@ -121,7 +122,7 @@ class Currency(models.Model):
 	bound_ticket = models.PositiveIntegerField(default=0, verbose_name="金币")
 
 	def __str__(self):
-		term: GameTerm = GameTerm.get()
+		term: GameConfigure = GameConfigure.get()
 		return '%s：%d %s：%d %s：%d' % (
 			term.gold, self.gold,
 			term.ticket, self.ticket,
@@ -174,7 +175,7 @@ class BaseItem(models.Model):
 	name = models.CharField(max_length=24, verbose_name="名称")
 
 	# 描述
-	description = models.CharField(max_length=128, verbose_name="描述")
+	description = models.CharField(max_length=128, blank=True, verbose_name="描述")
 
 	# 物品 标识类型
 	type = models.PositiveSmallIntegerField(default=ItemType.Unset.value,
@@ -227,6 +228,8 @@ class BaseItem(models.Model):
 		return ViewUtils.getObject(target, ErrorType.ItemNotExist,
 								   return_type='object', id=self.id)
 
+	target.short_description = "目标物品"
+
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
 		return {
@@ -257,8 +260,12 @@ class ItemPrice(Currency):
 	class Meta:
 		verbose_name = verbose_name_plural = "物品价格"
 
-	def __str__(self):
-		return '%s：%s' % (self.limiteditem, super().__str__())
+	# 对应物品
+	item = models.OneToOneField("LimitedItem", on_delete=models.CASCADE,
+									 null=True, verbose_name="物品")
+
+	# def __str__(self):
+	# 	return '%s：%s' % (self.limiteditem, super().__str__())
 
 
 # ===================================================
@@ -270,10 +277,6 @@ class LimitedItem(BaseItem):
 		# abstract = True
 		verbose_name = verbose_name_plural = "有限物品"
 
-	# 购入价格（为 None 则不可购买）
-	buy_price = models.OneToOneField("ItemPrice", on_delete=models.CASCADE,
-									 null=True, verbose_name="购入价格")
-
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
 
@@ -281,10 +284,17 @@ class LimitedItem(BaseItem):
 	discardable = models.BooleanField(default=True, verbose_name="可丢弃")
 
 	# 能否交易
-	tradable = models.BooleanField(default=True, verbose_name="能否交易")
+	tradable = models.BooleanField(default=True, verbose_name="可交易")
 
 	# 物品图标
-	icon = models.ImageField(upload_to=ItemIconUpload(), verbose_name="图标")
+	icon = models.ImageField(upload_to=ItemIconUpload(),
+							 null=True, blank=True, verbose_name="图标")
+
+	# 管理界面用：显示购入价格
+	def adminBuyPrice(self):
+		return self.itemprice
+
+	adminBuyPrice.short_description = "购入价格"
 
 	# 获取完整路径
 	def getExactlyIconPath(self):
@@ -308,7 +318,11 @@ class LimitedItem(BaseItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		res['buy_price'] = self.buy_price.convertToDict()
+		buy_price = None
+		if self.itemprice is not None:
+			buy_price = self.itemprice.convertToDict()
+
+		res['buy_price'] = buy_price
 		res['sell_price'] = self.sell_price
 		res['discardable'] = self.discardable
 		res['icon'] = self.convertIconToBase64()
@@ -408,9 +422,11 @@ class EquipableItem(LimitedItem):
 	def params(self):
 		return self.equipparam_set.all()
 
-	# 用于获取属性值
-	def __getattr__(self, item):
-		return self.param(attr=item)
+	# # 用于获取属性值
+	# def __getattr__(self, item):
+	# 	param = self.param(attr=item)
+	# 	if param is None: return super().__getattr__(item)
+	# 	return param
 
 	# 获取属性值
 	def param(self, param_id=None, attr=None):
@@ -755,8 +771,8 @@ class SlotContainer(BaseContainer):
 		if self.target_equip_container1 is None:
 			if self.equip_container1 is None:
 				self.target_equip_container1 = None
-
-			self.target_equip_container1 = self.equip_container1.target()
+			else:
+				self.target_equip_container1 = self.equip_container1.target()
 
 		return self.target_equip_container1
 
@@ -765,8 +781,8 @@ class SlotContainer(BaseContainer):
 		if self.target_equip_container2 is None:
 			if self.equip_container2 is None:
 				self.target_equip_container2 = None
-
-			self.target_equip_container2 = self.equip_container2.target()
+			else:
+				self.target_equip_container2 = self.equip_container2.target()
 
 		return self.target_equip_container2
 
@@ -1400,11 +1416,11 @@ class PackContainer(BaseContainer):
 
 
 # ===================================================
-#  基本容器物品表
+#  基本容器项表
 # ===================================================
 class BaseContItem(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = "基本容器物品"
+		verbose_name = verbose_name_plural = "基本容器项"
 
 	TYPES = [
 		(ContItemType.Unset.value, '未知容器物品'),
@@ -1599,6 +1615,8 @@ class SlotContItem(BaseContItem):
 		if item == attr2:
 			return self.targetEquipItem2()
 
+		return super().__getattr__(item)
+
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
@@ -1617,8 +1635,8 @@ class SlotContItem(BaseContItem):
 		if self.target_equip_item1 is None:
 			if self.equip_item1 is None:
 				self.target_equip_item1 = None
-
-			self.target_equip_item1 = self.equip_item1.target()
+			else:
+				self.target_equip_item1 = self.equip_item1.target()
 
 		return self.target_equip_item1
 
@@ -1627,8 +1645,8 @@ class SlotContItem(BaseContItem):
 		if self.target_equip_item2 is None:
 			if self.equip_item2 is None:
 				self.target_equip_item2 = None
-
-			self.target_equip_item2 = self.equip_item2.target()
+			else:
+				self.target_equip_item2 = self.equip_item2.target()
 
 		return self.target_equip_item2
 
@@ -1815,6 +1833,8 @@ class PackContItem(BaseContItem):
 
 		return 0
 
+
+# endregion
 
 # endregion
 
