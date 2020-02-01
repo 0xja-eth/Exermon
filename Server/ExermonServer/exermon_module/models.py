@@ -359,7 +359,7 @@ class ExerGift(BaseItem):
 		res = super()._convertToDict(**kwargs)
 
 		res['star_id'] = self.star_id
-		res['color'] = self.color
+		# res['color'] = self.color
 		res['g_type'] = self.g_type
 		res['params'] = ModelUtils.objectsToDict(self.paramRates())
 

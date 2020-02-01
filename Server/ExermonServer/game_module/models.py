@@ -21,7 +21,7 @@ class GameVersion(models.Model):
 	Version = None
 
 	# 主版本号（检查更新）
-	main_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="主版本号")
+	main_version = models.CharField(null=False, blank=False, max_length=16, verbose_name="主版本号")
 
 	# 副版本号（建议更新）
 	sub_version = models.CharField(unique=True, null=False, blank=False, max_length=16, verbose_name="副版本号")

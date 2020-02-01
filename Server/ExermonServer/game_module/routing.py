@@ -74,7 +74,8 @@ WEBSOCKET_METHOD_ROUTER = {
 	],
 	# 断开连接（内部调用）
 	'player/player/disconnect': [[
-		['uid', 'int']
+		['uid', 'int'],
+		['auth', 'str']
 	],
 		Player.disconnect,  # 处理函数
 		ChannelLayerTag.NoLayer  # 是否需要响应
