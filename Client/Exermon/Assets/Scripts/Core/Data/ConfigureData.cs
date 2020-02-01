@@ -16,14 +16,14 @@ public class ConfigureData : BaseData {
     /// <summary>
     /// 设置项
     /// </summary>
-    public static string rememberPassword { get; set; } = null; // 记住密码
-    public static string rememberUsername { get; set; } = null; // 记住账号
-    public static bool autoLogin { get; set; } = false; // 自动登录
+    public string rememberPassword { get; set; } = null; // 记住密码
+    public string rememberUsername { get; set; } = null; // 记住账号
+    public bool autoLogin { get; set; } = false; // 自动登录
 
     /// <summary>
-    /// 构造函数
+    /// 是否需要ID
     /// </summary>
-    public ConfigureData() { idEnable = false; }
+    protected override bool idEnable() { return false; }
 
     /// <summary>
     /// 数据加载

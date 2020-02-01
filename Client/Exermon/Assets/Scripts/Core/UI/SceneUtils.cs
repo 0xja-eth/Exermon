@@ -409,6 +409,16 @@ public static class SceneUtils {
     public static Image image(GameObject obj) {
         return get<Image>(obj);
     }
+    // 取代 GameUtils.get<Animation>(t) 的写法：
+    // GameUtils.image(t)
+    public static Animation ani(Transform t) {
+        return get<Animation>(t);
+    }
+    // 取代 GameUtils.get<Animation>(obj) 的写法：
+    // GameUtils.image(obj)
+    public static Animation ani(GameObject obj) {
+        return get<Animation>(obj);
+    }
 
     #endregion
 
@@ -525,9 +535,21 @@ public static class SceneUtils {
         float[] c = { 0, 0, 0, 1 };
         str = str.ToUpperInvariant();
         string reg = @"[0-9A-F][0-9A-F]";
-        foreach (Match match in Regex.Matches(str, reg)) 
+        foreach (Match match in Regex.Matches(str, reg))
             c[index++] = Convert.ToInt32(match.Value, 16) / 255.0f;
         return new Color(c[0], c[1], c[2], c[3]);
+    }
+
+    /// <summary>
+    /// 十六进制字符串转颜色
+    /// </summary>
+    /// <param name="str">十六进制字符串，形如“#ABCDEF”</param>
+    /// <returns>颜色</returns>
+    public static string color2Str(Color c) {
+        var r = (int)(c.r * 255);
+        var g = (int)(c.g * 255);
+        var b = (int)(c.b * 255);
+        return string.Format("#{0:X}{1:X}{2:X}", r, g, b);
     }
 
     #endregion

@@ -97,16 +97,16 @@ class Character(models.Model):
 
 	def convertToDict(self, type=None):
 
-		bust_data, face_data, battle_data = self.convertToBase64()
+		# bust_data, face_data, battle_data = self.convertToBase64()
 
 		return {
 			'id': self.id,
 			'name': self.name,
 			'description': self.description,
 			'gender': self.gender,
-			'bust': bust_data,
-			'face': face_data,
-			'battle': battle_data,
+			# 'bust': bust_data,
+			# 'face': face_data,
+			# 'battle': battle_data,
 		}
 
 
@@ -167,10 +167,17 @@ class PlayerGrades(Enum):
 #  玩家状态枚举
 # ===================================================
 class PlayerStatus(Enum):
-	OffLine = 0  # 离线
-	OnLine = 1  # 在线
-	Banned = 2  # 封禁
-	Frozen = 3  # 冻结
+
+	# 已注册，未创建角色
+	Uncreated = 0  # 未创建
+	CharacterCreated = 1  # 已创建人物
+	ExermonsCreated = 2  # 已选择艾瑟萌
+	GiftsCreated = 3  # 已选择天赋
+
+	# 已完全创建角色
+	Normal = 10  # 正常
+	Banned = 20  # 封禁
+	Frozen = 30  # 冻结
 	Other = -1  # 其他
 
 
@@ -203,8 +210,10 @@ class Player(models.Model):
 
 	NAME_REG = r'^.{1,8}$'
 
-	DEFAULT_MAX_PRESSURE = 150  # 默认压力最大值
-	DEFAULT_PRESSURE_RATE = 6  # 默认压力衰减率（每小时衰减数）
+	SCHOOL_LEN = 24
+	CITY_LEN = 24
+	CONTACT_LEN = 24
+	DESC_LEN = 128
 
 	WEAPON_CORRECT_RATE = 75  # 武器库正确率
 	MIN_COMP_WEAPON_COUNT = 18  # 最少对战武器题目数
@@ -217,7 +226,7 @@ class Player(models.Model):
 	SUCCESSFUL_LOGOUT_MSG = '您已成功退出登录！'
 
 	PLAYER_GRADES = [
-		(PlayerGrades.Unset.value, '未设置'),
+		(PlayerGrades.Unset.value, '不详'),
 		(PlayerGrades.Before.value, '初中及以下'),
 		(PlayerGrades.One.value, '高一'),
 		(PlayerGrades.Two.value, '高二'),
@@ -227,8 +236,12 @@ class Player(models.Model):
 	]
 
 	PLAYER_STATUSES = [
-		(PlayerStatus.OffLine.value, '离线'),
-		(PlayerStatus.OnLine.value, '在线'),
+		(PlayerStatus.Uncreated.value, '未创建'),
+		(PlayerStatus.CharacterCreated.value, '已创建人物'),
+		(PlayerStatus.ExermonsCreated.value, '已选择艾瑟萌'),
+		(PlayerStatus.GiftsCreated.value, '已选择天赋'),
+
+		(PlayerStatus.Normal.value, '正常'),
 		(PlayerStatus.Banned.value, '封禁'),
 		(PlayerStatus.Frozen.value, '冻结'),
 		(PlayerStatus.Other.value, '其他')
@@ -261,8 +274,8 @@ class Player(models.Model):
 								  blank=True, null=True, verbose_name="人物")
 
 	# 年级
-	grade = models.PositiveSmallIntegerField(default=0, choices=PLAYER_GRADES,
-											 verbose_name="年级")
+	grade = models.PositiveSmallIntegerField(default=PlayerGrades.Unset.value,
+											 choices=PLAYER_GRADES, verbose_name="年级")
 
 	# 注册时间
 	create_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
@@ -272,19 +285,24 @@ class Player(models.Model):
 											 verbose_name="刷新时间")
 
 	# 状态
-	status = models.PositiveSmallIntegerField(default=0, choices=PLAYER_STATUSES, verbose_name="账号状态")
+	status = models.PositiveSmallIntegerField(default=PlayerStatus.Uncreated.value,
+											  choices=PLAYER_STATUSES, verbose_name="账号状态")
 
 	# 账号类型
-	type = models.PositiveSmallIntegerField(default=0, choices=PLAYER_TYPES, verbose_name="账号类型")
+	type = models.PositiveSmallIntegerField(default=PlayerStatus.Normal.value,
+											choices=PLAYER_TYPES, verbose_name="账号类型")
+
+	# 在线
+	online = models.BooleanField(default=False, verbose_name="在线")
 
 	# 生日
 	birth = models.DateField(blank=True, null=True, verbose_name="生日")
 
 	# 学校
-	school = models.CharField(blank=True, null=True, max_length=12, verbose_name="学校")
+	school = models.CharField(blank=True, null=True, max_length=24, verbose_name="学校")
 
 	# 地区
-	city = models.CharField(blank=True, null=True, max_length=12, verbose_name="地区")
+	city = models.CharField(blank=True, null=True, max_length=24, verbose_name="地区")
 
 	# 联系方式
 	contact = models.CharField(blank=True, null=True, max_length=24, verbose_name="联系方式")
@@ -304,19 +322,76 @@ class Player(models.Model):
 	def __str__(self):
 		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
+	# 获取人类背包
+	def humanPack(self):
+		try: return self.humanpack
+		except HumanPack.DoesNotExist: return None
+
+	# 获取艾瑟萌背包
+	def exerPack(self):
+		from exermon_module.models import ExerPack
+		try: return self.exerpack
+		except ExerPack.DoesNotExist: return None
+
+	# 获取艾瑟萌碎片背包
+	def exerFragPack(self):
+		from exermon_module.models import ExerFragPack
+		try: return self.exerfragpack
+		except ExerFragPack.DoesNotExist: return None
+
+	# 获取艾瑟萌天赋池
+	def exerGiftPool(self):
+		from exermon_module.models import ExerGiftPool
+		try: return self.exergiftpool
+		except ExerGiftPool.DoesNotExist: return None
+
+	# 获取艾瑟萌仓库
+	def exerHub(self):
+		from exermon_module.models import ExerHub
+		try: return self.exerhub
+		except ExerHub.DoesNotExist: return None
+
+	# 获取艾瑟萌槽
+	def exerSlot(self):
+		from exermon_module.models import ExerSlot
+		try: return self.exerslot
+		except ExerSlot.DoesNotExist: return None
+
+	# 获取装备槽
+	def humanEquipSlot(self):
+		try: return self.humanequipslot
+		except HumanEquipSlot.DoesNotExist: return None
+
 	def _packContainerIndices(self):
+		humanpack_id = ModelUtils.preventNone(
+			self.humanPack(), func=lambda p: p.id)
+		exerpack_id = ModelUtils.preventNone(
+			self.exerPack(), func=lambda p: p.id)
+		exerfragpack_id = ModelUtils.preventNone(
+			self.exerFragPack(), func=lambda p: p.id)
+		exergiftpool_id = ModelUtils.preventNone(
+			self.exerGiftPool(), func=lambda p: p.id)
+		exerhub_id = ModelUtils.preventNone(
+			self.exerHub(), func=lambda p: p.id)
+
 		return {
-			'humanpack_id': self.humanpack.id,
-			'exerpack_id': self.exerpack.id,
-			'exergiftpool_id': self.exergiftpool.id,
-			'exerhub_id': self.exerhub.id,
+			'humanpack_id': humanpack_id,
+			'exerpack_id': exerpack_id,
+			'exerfragpack_id': exerfragpack_id,
+			'exergiftpool_id': exergiftpool_id,
+			'exerhub_id': exerhub_id,
 			# 'quessugarpack_id': self.quessugarpack.id,
 		}
 
 	def _slotContainerIndices(self):
+		exerslot_id = ModelUtils.preventNone(
+			self.exerSlot(), func=lambda p: p.id)
+		humanequipslot_id = ModelUtils.preventNone(
+			self.humanEquipSlot(), func=lambda p: p.id)
+
 		return {
-			'exerslot_id': self.exerslot.id,
-			'humanequipslot_id': self.humanequipslot.id,
+			'exerslot_id': exerslot_id,
+			'humanequipslot_id': humanequipslot_id,
 		}
 
 	def convertToDict(self, type=None):
@@ -331,6 +406,7 @@ class Player(models.Model):
 			'grade': self.grade,
 			'status': self.status,
 			'type': self.type,
+			'online': self.online,
 			'create_time': create_time,
 			'birth': birth,
 			'school': self.school,
@@ -370,12 +446,16 @@ class Player(models.Model):
 		return self.isBanned() or self.isFrozen()
 
 	# 是否在线
-	def isOnline(self):
-		return self.status == PlayerStatus.OnLine.value
+	def isCreated(self):
+		return self.status >= PlayerStatus.OffLine.value
 
 	# 是否在线
+	def isOnline(self):
+		return self.online
+
+	# 是否离线
 	def isOffline(self):
-		return self.status != PlayerStatus.OnLine.value
+		return not self.online
 
 	# 是否封禁
 	def isBanned(self):
@@ -393,7 +473,7 @@ class Player(models.Model):
 		login.ip_address = consumer.ip_address
 		login.save()
 
-		self.status = PlayerStatus.OnLine.value
+		self.online = True
 		self.save()
 
 		self.cur_login_info = login
@@ -406,7 +486,7 @@ class Player(models.Model):
 		self.cur_login_info.logout = datetime.datetime.now()
 		self.cur_login_info.save()
 
-		self.status = PlayerStatus.OffLine.value
+		self.online = False
 		self.save()
 
 		self.cur_login_info = None
@@ -425,9 +505,11 @@ class Player(models.Model):
 
 	# 创建角色
 	def create(self, name, grade, cid):
+
 		self.name = name
 		self.grade = grade
 		self.character_id = cid
+		self.status = PlayerStatus.CharacterCreated.value
 
 		self.save()
 
@@ -448,6 +530,9 @@ class Player(models.Model):
 		for player_exer in player_exers:
 			player_exer.save()
 
+		self.status = PlayerStatus.ExermonsCreated.value
+		self.save()
+
 	def createGifts(self, gifts):
 
 		for i in range(len(gifts)):
@@ -456,6 +541,20 @@ class Player(models.Model):
 			self.exerslot.equipSlot(index=i+1, equip_index=2,
 									equip_item=player_gift)
 			player_gift.save()
+
+		self.status = PlayerStatus.GiftsCreated.value
+		self.save()
+
+	def createInfos(self, birth, school, city, contact, description):
+
+		self.birth = birth
+		self.school = school
+		self.city = city
+		self.contact = contact
+		self.description = description
+
+		self.status = PlayerStatus.Normal.value
+		self.save()
 
 	def _createPlayerExer(self, exer, name):
 		from exermon_module.models import PlayerExermon
@@ -482,19 +581,19 @@ class Player(models.Model):
 	def _createContainers(self):
 		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
 
-		if self.humanpack is None:
+		if self.humanPack() is None:
 			HumanPack.create(player=self)
 
-		if self.exerpack is None:
+		if self.exerPack() is None:
 			ExerPack.create(player=self)
 
-		if self.exerhub is None:
+		if self.exerHub() is None:
 			ExerHub.create(player=self)
 
-		if self.exerfragpack is None:
+		if self.exerFragPack() is None:
 			ExerFragPack.create(player=self)
 
-		if self.exergiftpool is None:
+		if self.exerGiftPool() is None:
 			ExerGiftPool.create(player=self)
 
 
@@ -699,7 +798,7 @@ class HumanEquipSlotItem(SlotContItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		res['e_type_id'] = self.e_type_id
+		res['e_type'] = self.e_type_id
 
 		return res
 

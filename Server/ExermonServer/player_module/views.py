@@ -6,7 +6,7 @@ from utils.view_utils import Common as ViewUtils
 from utils.runtime_manager import RuntimeManager
 from utils.exception import WebscoketCloseCode
 
-import hashlib, smtplib
+import hashlib, smtplib, datetime
 
 
 # =======================
@@ -119,7 +119,7 @@ class Service:
 		# 添加在线玩家
 		Common.addOnlinePlayer(player, consumer)
 
-		return player.convertToDict()
+		return {'player': player.convertToDict()}
 
 	# 实际执行发送验证码操作
 	@classmethod
@@ -254,6 +254,27 @@ class Service:
 
 		player.createGifts(gifts)
 
+	# 完善个人信息
+	@classmethod
+	async def createInfo(cls, consumer, player: Player, birth=None, school=None,
+						 city=None, contact=None, description=None):
+		# 返回数据：无
+		from utils.interface_manager import Common as InterfaceCommon
+
+		if birth:
+			birth = InterfaceCommon.convertDataType(birth, 'date')
+			Check.ensureBirthFormat(birth)
+
+		if school: Check.ensureSchoolFormat(school)
+
+		if city: Check.ensureCityFormat(city)
+
+		if contact: Check.ensureContactFormat(contact)
+
+		if description: Check.ensureDescriptionFormat(description)
+
+		player.createInfos(birth, school, city, contact, description)
+
 	# 获取玩家基本信息
 	@classmethod
 	async def getBasic(cls, consumer, player: Player, get_uid: int):
@@ -266,7 +287,7 @@ class Service:
 			type = "others"
 			target_player = Common.getPlayer(id=get_uid)
 
-		return target_player.convertToDict(type=type)
+		return {'player': target_player.convertToDict(type=type)}
 
 	# 艾瑟萌装备槽装备
 	@classmethod
@@ -307,6 +328,38 @@ class Check:
 	@classmethod
 	def ensureGradeFormat(cls, val: int):
 		ViewUtils.ensureEnumData(val, PlayerGrades, ErrorType.InvalidGrade, True)
+
+	# 校验年级格式
+	@classmethod
+	def ensureBirthFormat(cls, val: datetime.date):
+		now = datetime.datetime.now()
+		min_date = datetime.date(1900, 1, 1)
+		if val < min_date or val > now:
+			raise ErrorException(ErrorType.InvalidBirth)
+
+	# 校验学校格式
+	@classmethod
+	def ensureSchoolFormat(cls, val: int):
+		if len(val) > Player.SCHOOL_LEN:
+			raise ErrorException(ErrorType.InvalidSchool)
+
+	# 校验居住地格式
+	@classmethod
+	def ensureCityFormat(cls, val: int):
+		if len(val) > Player.CITY_LEN:
+			raise ErrorException(ErrorType.InvalidCity)
+
+	# 校验联系方式格式
+	@classmethod
+	def ensureContactFormat(cls, val: int):
+		if len(val) > Player.CONTACT_LEN:
+			raise ErrorException(ErrorType.InvalidContact)
+
+	# 校验个人介绍格式
+	@classmethod
+	def ensureDescriptionFormat(cls, val: int):
+		if len(val) > Player.DESC_LEN:
+			raise ErrorException(ErrorType.InvalidDescription)
 
 
 # =======================

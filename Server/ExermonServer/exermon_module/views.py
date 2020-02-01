@@ -46,7 +46,8 @@ class Check:
 	# 校验名字格式
 	@classmethod
 	def ensureExermonNameFormat(cls, val: str):
-		ViewUtils.ensureRegexp(val, Exermon.NAME_REG, ErrorType.InvalidExermonName)
+		if len(val) > Exermon.NAME_LEN:
+			raise ErrorException(ErrorType.InvalidExermonName)
 
 
 # =======================
@@ -70,7 +71,7 @@ class Common:
 	@classmethod
 	def getExermons(cls, ids, return_type='object', error: ErrorType = ErrorType.ExermonNotExist) -> Exermon:
 
-		res = ViewUtils.getObjects(Exermon, error, return_type=return_type, id__in=ids)
+		res = ViewUtils.getObjects(Exermon, return_type=return_type, id__in=ids)
 
 		if res.count() != len(ids): raise ErrorException(error)
 
@@ -80,7 +81,7 @@ class Common:
 	@classmethod
 	def getExerGifts(cls, ids, return_type='object', error: ErrorType = ErrorType.ExerGiftNotExist) -> ExerGift:
 
-		res = ViewUtils.getObjects(ExerGift, error, return_type=return_type, id__in=ids)
+		res = ViewUtils.getObjects(ExerGift, return_type=return_type, id__in=ids)
 
 		if res.count() != len(ids): raise ErrorException(error)
 
@@ -106,9 +107,9 @@ class Common:
 			if sid in sbjs:
 				raise ErrorException(ErrorType.InvalidExermonSubject)
 
-			sbjs[sid] = True
+			sbjs.append(sid)
 
-		force_sbjs = Subject.get(force=True)
+		force_sbjs = Subject.objs(force=True)
 
 		for sbj in force_sbjs:
 			if sbj.id not in sbjs:

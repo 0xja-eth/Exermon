@@ -55,7 +55,7 @@ class Exermon(BaseItem):
 
 		verbose_name = verbose_name_plural = "艾瑟萌"
 
-	NAME_REG = r'^.{1,6}$'
+	NAME_LEN = 8
 
 	TYPES = [
 		(ExermonType.Initial.value, '初始艾瑟萌'),
@@ -66,6 +66,9 @@ class Exermon(BaseItem):
 
 	# 道具类型
 	TYPE = ItemType.Exermon
+
+	# 品种
+	animal = models.CharField(max_length=24, verbose_name="品种")
 
 	# 艾瑟萌星级
 	star = models.ForeignKey('game_module.ExerStar', on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
@@ -147,6 +150,7 @@ class Exermon(BaseItem):
 	def _convertToDict(self):
 		res = super()._convertToDict()
 
+		res['animal'] = self.animal
 		res['star_id'] = self.star_id
 		res['subject_id'] = self.subject_id
 		res['e_type'] = self.e_type
@@ -222,7 +226,8 @@ class ExerFrag(BaseItem):
 
 		res = super()._convertToDict(**kwargs)
 
-		res['exermon_id'] = self.o_exermon_id
+		res['eid'] = self.o_exermon_id
+		res['sell_price'] = self.sell_price
 		res['count'] = self.count
 
 		return res
@@ -480,6 +485,10 @@ class PlayerExermon(PackContItem):
 		container: ExerHub = container.target()
 		super().transfer(container, **kwargs)
 		self.player = container.player
+
+	# 艾瑟萌
+	def exermon(self):
+		return self.targetItem()
 
 	# endregion
 
@@ -764,18 +773,26 @@ class ExerSlotItem(SlotContItem):
 
 		return data
 
+	# 获取装备槽
+	def exerEquipSlot(self):
+		try: return self.exerequipslot
+		except ExerEquipSlot.DoesNotExist: return None
+
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
 		level, next = self.slotLevel()
 
+		exerequipslot_id = ModelUtils.preventNone(
+			self.exerEquipSlot(), func=lambda p: p.id)
+
 		res['subject_id'] = self.subject_id
 		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
 		res['params'] = self._convertParamsToDict()
-		res['exerequipslot_id'] = self.exerequipslot.id
+		res['exerequipslot_id'] = exerequipslot_id
 
 		return res
 
@@ -925,20 +942,14 @@ class ExerSlotItem(SlotContItem):
 
 
 # ===================================================
-#  技能效果表
+#  技能使用效果表
 # ===================================================
-class SkillEffect(models.Model):
+class SkillEffect(Effect):
 	class Meta:
 		verbose_name = verbose_name_plural = "技能使用效果"
 
 	# 物品
 	item = models.ForeignKey('ExerSkill', on_delete=models.CASCADE, verbose_name="物品")
-
-	# 效果编号
-	code = models.PositiveSmallIntegerField(default=0, choices=ItemEffect.CODES, verbose_name="效果编号")
-
-	# 效果参数
-	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
 
 
 # ===================================================
@@ -1024,7 +1035,7 @@ class ExerSkill(BaseItem):
 	max_use_count = models.PositiveSmallIntegerField(default=0, null=True, blank=True, verbose_name="最大使用次数")
 
 	# 目标
-	target = models.PositiveSmallIntegerField(default=TargetType.Enemy.value, choices=TARGET_TYPES,
+	target_type = models.PositiveSmallIntegerField(default=TargetType.Enemy.value, choices=TARGET_TYPES,
 											  null=True, blank=True, verbose_name="目标")
 
 	# 命中类型
@@ -1050,8 +1061,22 @@ class ExerSkill(BaseItem):
 							 null=True, blank=True, verbose_name="技能动画")
 
 	# 击中动画
-	target_ani = models.ImageField(upload_to=SkillImageUpload('effect'),
+	target_ani = models.ImageField(upload_to=SkillImageUpload('target'),
 							 null=True, blank=True, verbose_name="击中动画")
+
+	# 后台管理：显示使用效果
+	def adminEffects(self):
+		from django.utils.html import format_html
+
+		effects = self.effects()
+
+		res = ''
+		for e in effects:
+			res += e.describe() + "<br>"
+
+		return format_html(res)
+
+	adminEffects.short_description = "使用效果"
 
 	# 对应的容器项类
 	@classmethod
@@ -1089,7 +1114,9 @@ class ExerSkill(BaseItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		icon_data, ani_data, target_ani_data = self.convertToBase64()
+		# icon_data, ani_data, target_ani_data = self.convertToBase64()
+
+		effects = ModelUtils.objectsToDict(self.effects())
 
 		res['eid'] = self.o_exermon_id
 		res['passive'] = self.passive
@@ -1100,16 +1127,21 @@ class ExerSkill(BaseItem):
 		# res['timing'] = self.timing
 		res['freeze'] = self.freeze
 		res['max_use_count'] = self.max_use_count
-		res['target'] = self.target
+		res['target'] = self.target_type
 		res['hit_type'] = self.hit_type
 		res['atk_rate'] = self.atk_rate
 		res['def_rate'] = self.def_rate
 		res['plus_formula'] = self.plus_formula
-		res['icon'] = icon_data
-		res['ani'] = ani_data
-		res['target_ani'] = target_ani_data
+		res['effects'] = effects
+		# res['icon'] = icon_data
+		# res['ani'] = ani_data
+		# res['target_ani'] = target_ani_data
 
 		return res
+
+	# 获取所有的效果
+	def effects(self):
+		return self.skilleffect_set.all()
 
 
 # ===================================================
@@ -1450,7 +1482,7 @@ class ExerEquipSlotItem(SlotContItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		res['e_type_id'] = self.e_type_id
+		res['e_type'] = self.e_type_id
 
 		return res
 

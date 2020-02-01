@@ -40,6 +40,13 @@ public class BaseView : BaseComponent {
     /// 每次打开时初始化（子类中重载）
     /// </summary>
     protected virtual void initializeEvery() { }
+
+    /// <summary>
+    /// 配置组件
+    /// </summary>
+    public virtual void configure() {
+        initialize();
+    }
     
     #endregion
 

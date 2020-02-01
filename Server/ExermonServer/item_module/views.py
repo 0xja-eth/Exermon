@@ -21,7 +21,7 @@ class Service:
 
 		Common.ensureContainerOwner(container, player)
 
-		return container.convertToDict(type='item')
+		return {'container': container.convertToDict(type='item')}
 
 	# 获取背包类容器项数据
 	@classmethod
@@ -34,7 +34,7 @@ class Service:
 
 		Common.ensureContainerOwner(container, player)
 
-		return container.convertToDict(type='item')
+		return {'container': container.convertToDict(type='item')}
 
 	# 背包类容器获得物品
 	@classmethod

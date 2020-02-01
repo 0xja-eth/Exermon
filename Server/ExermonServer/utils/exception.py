@@ -26,6 +26,7 @@ class ErrorType(Enum):
 	InvalidUserOper = 10  # 无效的用户操作
 	SubjectNotExist = 20  # 科目不存在
 	BaseParamNotExist = 21  # 属性不存在
+	DatabaseError = 30  # 数据库错误
 
 	# PlayerCommon
 	PlayerNotExist = 100  # 玩家不存在
@@ -56,6 +57,11 @@ class ErrorType(Enum):
 	InvalidName = 141  # 非法的昵称
 	InvalidGender = 142  # 非法的性别
 	InvalidGrade = 143  # 非法的年级
+	InvalidBirth = 144  # 非法的出生日期
+	InvalidSchool = 145  # 非法的学校名称
+	InvalidCity = 146  # 非法的居住地
+	InvalidContact = 147  # 非法的联系方式
+	InvalidDescription = 148  # 非法的个人介绍
 
 	# CharacterCommon
 	CharacterNotExist = 150  # 形象不存在
@@ -107,6 +113,7 @@ class ErrorException(Exception):
 		ErrorType.InvalidUserOper: "无效的用户操作！",
 		ErrorType.SubjectNotExist: "科目不存在！",
 		ErrorType.BaseParamNotExist: "属性不存在！",
+		ErrorType.DatabaseError: "数据库错误！",
 
 		# PlayerCommon
 		ErrorType.PlayerNotExist: "玩家不存在！",
@@ -137,6 +144,11 @@ class ErrorException(Exception):
 		ErrorType.InvalidName: "非法的昵称格式！",
 		ErrorType.InvalidGender: "非法的性别！",
 		ErrorType.InvalidGrade: "非法的年级！",
+		ErrorType.InvalidBirth: "非法的出生日期！",
+		ErrorType.InvalidSchool: "非法的学校名称！",
+		ErrorType.InvalidCity: "非法的居住地！",
+		ErrorType.InvalidContact: "非法的联系方式！",
+		ErrorType.InvalidDescription: "非法的个人介绍！",
 
 		# CharacterCommon
 		ErrorType.CharacterNotExist: "形象不存在！",

@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 输入项域
+/// 文本输入域
 /// </summary>
-public class InputItemField : BaseView {
+public class TextInputField : BaseView {
 
     /// <summary>
     /// 检查函数类型

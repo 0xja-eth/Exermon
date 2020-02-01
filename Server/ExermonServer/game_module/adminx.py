@@ -65,14 +65,14 @@ class ExerGiftParamRateRangesInline(ParamsInline):
 
 @xadmin.sites.register(Subject)
 class SubjectAdmin(object):
-	list_display = ['id', 'name', 'max_score', 'force', 'configure']
+	list_display = ['id', 'name', 'max_score', 'force', 'adminColor', 'configure']
 
 	list_editable = ['name', 'max_score', 'force', 'configure']
 
 
 @xadmin.sites.register(BaseParam)
 class BaseParamAdmin(object):
-	list_display = ['id', 'name', 'description', 'attr', 'configure']
+	list_display = ['id', 'name', 'description', 'attr', 'adminColor', 'configure']
 
 	list_editable = ['name', 'description', 'attr', 'configure']
 

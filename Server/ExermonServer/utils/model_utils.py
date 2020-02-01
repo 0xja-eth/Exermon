@@ -123,13 +123,13 @@ class SkillImageUpload(SystemImageUpload):
 
 	ICON_DIR = 'exermon/skill/icon'
 	ANI_DIR = 'exermon/skill/ani'
-	EFFECT_DIR = 'exermon/skill/effect'
+	EFFECT_DIR = 'exermon/skill/target'
 
 	def __init__(self, type):
 		_dir = None
 		if type == 'icon': _dir = self.ICON_DIR
 		if type == 'ani': _dir = self.ANI_DIR
-		if type == 'effect': _dir = self.EFFECT_DIR
+		if type == 'target': _dir = self.EFFECT_DIR
 
 		super().__init__(_dir)
 
@@ -153,21 +153,20 @@ class Common:
 	def preventNone(cls, judge, value=None, obj=None, func=None, empty=0):
 		if judge is None: return empty
 		if value is not None: return value
+		if obj is None: obj = judge
 		return func(obj)
 
 	@classmethod
 	def timeToStr(cls, time, empty=''):
 		# if time is None: return empty
 		# return time.strftime('%Y-%m-%d %H:%M:%S')
-		return cls.preventNone(
-			time, obj=time, func=lambda t: t.strftime('%Y-%m-%d %H:%M:%S'), empty=empty)
+		return cls.preventNone(time, func=lambda t: t.strftime('%Y-%m-%d %H:%M:%S'), empty=empty)
 
 	@classmethod
 	def dateToStr(cls, time, empty=''):
 		# if time is None: return empty
 		# return time.strftime('%Y-%m-%d')
-		return cls.preventNone(
-			time, obj=time, func=lambda t: t.strftime('%Y-%m-%d'), empty=empty)
+		return cls.preventNone(time, func=lambda t: t.strftime('%Y-%m-%d'), empty=empty)
 
 	@classmethod
 	def objectToId(cls, object, empty=0):

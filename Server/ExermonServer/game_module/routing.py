@@ -106,6 +106,18 @@ WEBSOCKET_METHOD_ROUTER = {
 		Player.createGifts,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 完善个人信息
+	'player/create/info': [[
+		['uid', 'int'],
+		['birth', 'date'],
+		['school', 'str'],
+		['city', 'str'],
+		['contact', 'str'],
+		['description', 'str'],
+	],
+		Player.createInfo,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 获取玩家基本信息
 	'player/get/basic': [[
 		['uid', 'int'],

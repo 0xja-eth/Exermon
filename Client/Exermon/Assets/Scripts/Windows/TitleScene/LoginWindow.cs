@@ -53,7 +53,7 @@ public class LoginWindow : BaseWindow {
     /// <summary>
     /// 内部组件声明
     /// </summary>
-    InputItemField usernameInput, emailInput, passwordInput, codeInput;
+    TextInputField usernameInput, emailInput, passwordInput, codeInput;
     Text forgetBtnText;
 
     /// <summary>
@@ -77,6 +77,7 @@ public class LoginWindow : BaseWindow {
     /// 外部系统引用
     /// </summary>
     GameSystem gameSys = null;
+    ExermonGameSystem exermonSys = null;
     PlayerService playerSer = null;
 
     #region 初始化
@@ -87,6 +88,7 @@ public class LoginWindow : BaseWindow {
     protected override void initializeOnce() {
         base.initializeOnce();
         if (gameSys == null) gameSys = GameSystem.get();
+        if (exermonSys == null) exermonSys = ExermonGameSystem.get();
         if (playerSer == null) playerSer = PlayerService.get();
         scene = (TitleScene)SceneUtils.getSceneObject("Scene");
         initializeInputItemFields();
@@ -105,10 +107,10 @@ public class LoginWindow : BaseWindow {
     /// 初始化输入域
     /// </summary>
     void initializeInputItemFields() {
-        if (username) usernameInput = SceneUtils.find<InputItemField>(username, "InputField");
-        if (password) passwordInput = SceneUtils.find<InputItemField>(password, "InputField");
-        if (email) emailInput = SceneUtils.find<InputItemField>(email, "InputField");
-        if (code) codeInput = SceneUtils.find<InputItemField>(code, "InputField");
+        if (username) usernameInput = SceneUtils.find<TextInputField>(username, "InputField");
+        if (password) passwordInput = SceneUtils.find<TextInputField>(password, "InputField");
+        if (email) emailInput = SceneUtils.find<TextInputField>(email, "InputField");
+        if (code) codeInput = SceneUtils.find<TextInputField>(code, "InputField");
     }
 
     /// <summary>
@@ -270,7 +272,10 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     /// <param name="res">返回结果</param>
     void onLoginSuccess() {
-        gameSys.requestAlert("成功登陆！", null);
+        var config = exermonSys.configure;
+        config.rememberUsername = usernameInput.getText();
+        config.rememberPassword = passwordInput.getText();
+        scene.startGame();
     }
 
     /// <summary>
@@ -468,7 +473,12 @@ public class LoginWindow : BaseWindow {
     /// 处理自动补全项（记住密码）
     /// </summary>
     void autoComplete() {
-
+        var config = exermonSys.configure;
+        if(config.rememberUsername.Length > 0 &&
+            config.rememberPassword.Length > 0) {
+            usernameInput.setText(config.rememberUsername);
+            passwordInput.setText(config.rememberPassword);
+        }
     }
 
     #endregion

@@ -34,11 +34,11 @@ class PlayerAdmin(object):
 
 	list_display = ['id', 'username', 'password', 'phone', 'email', 'name',
 					'character', 'grade', 'create_time', 'last_refresh_time',
-					'status', 'type', 'birth', 'school', 'city', 'contact',
+					'status', 'type', 'online', 'birth', 'school', 'city', 'contact',
 					'description', 'is_deleted']
 
-	list_editable = ['username', 'phone', 'email', 'name', 'grade', 'birth',
-					 'school', 'city', 'contact', 'description']
+	list_editable = ['username', 'phone', 'email', 'name', 'character', 'grade', 'birth',
+					 'school', 'city', 'contact', 'description', 'status', 'type', 'online']
 
 
 @xadmin.sites.register(HumanItem)

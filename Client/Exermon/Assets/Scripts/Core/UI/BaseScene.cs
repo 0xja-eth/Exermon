@@ -16,14 +16,18 @@ public class BaseScene : BaseComponent {
     public AlertWindow alertWindow;
     public LoadingWindow loadingWindow;
 
-    public string sceneName = "";
-
     /// <summary>
     /// 初始化标志
     /// </summary>
     public bool initialized { get; protected set; } = false;
 
     #region 初始化
+
+    /// <summary>
+    /// 场景名
+    /// </summary>
+    /// <returns>场景名</returns>
+    public virtual string sceneName() { return ""; }
 
     /// <summary>
     /// 初始化
@@ -40,7 +44,7 @@ public class BaseScene : BaseComponent {
     /// 初始化
     /// </summary>
     void initializeSceneUtils() {
-        SceneUtils.initialize(sceneName, alertWindow, loadingWindow);
+        SceneUtils.initialize(sceneName(), alertWindow, loadingWindow);
     }
 
     /// <summary>

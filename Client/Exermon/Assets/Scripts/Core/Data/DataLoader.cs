@@ -11,6 +11,11 @@ using LitJson;
 public static class DataLoader {
 
     /// <summary>
+    /// 更新时间格式
+    /// </summary>
+    public const string DateFormat = "yyyy-MM-dd";
+
+    /// <summary>
     /// 判断JsonData是否包含键
     /// </summary>
     /// <param name="json">要判断的JsonData</param>
@@ -146,7 +151,11 @@ public static class DataLoader {
     /// <param name="json">数据</param>
     /// <returns>加载的字符串</returns>
     public static DateTime loadDateTime(JsonData json) {
-        return json == null ? default : Convert.ToDateTime((string)json);
+        try {
+            return Convert.ToDateTime((string)json);
+        } catch {
+            return default;
+        }
     }
     /// <param name="key">键</param>
     public static DateTime loadDateTime(JsonData json, string key) {
@@ -362,11 +371,11 @@ public static class DataLoader {
     #region 转化为JsonData
 
     /// <summary>
-    /// 转化整型数组
+    /// 转化泛型数组
     /// </summary>
     /// <param name="data">整型数组</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertIntArray(int[] data) {
+    public static JsonData convertArray<T>(T[] data) {
         var json = new JsonData();
         json.SetJsonType(JsonType.Array);
         foreach (var d in data) json.Add(d);
@@ -374,26 +383,26 @@ public static class DataLoader {
     }
 
     /// <summary>
-    /// 转化2D整型数组
+    /// 转化泛型2D数组
     /// </summary>
     /// <param name="data">2D整型数组</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertInt2DArray(int[][] data) {
+    public static JsonData convert2DArray<T>(T[][] data) {
         var json = new JsonData();
         json.SetJsonType(JsonType.Array);
-        foreach (var d in data) json.Add(convertIntArray(d));
+        foreach (var d in data) json.Add(convertArray(d));
         return json;
     }
 
     /// <summary>
-    /// 转化3D整型数组
+    /// 转化泛型3D数组
     /// </summary>
     /// <param name="data">3D整型数组</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertInt3DArray(int[][][] data) {
+    public static JsonData convert3DArray<T>(T[][][] data) {
         var json = new JsonData();
         json.SetJsonType(JsonType.Array);
-        foreach (var d in data) json.Add(convertInt2DArray(d));
+        foreach (var d in data) json.Add(convert2DArray(d));
         return json;
     }
 
@@ -405,6 +414,25 @@ public static class DataLoader {
     public static JsonData convertDateTime(DateTime data) {
         if (data == null) return "";
         return data.ToString();
+    }
+
+    /// <summary>
+    /// 转化日期时间
+    /// </summary>
+    /// <param name="data">日期时间</param>
+    /// <returns>转化后的JsonData</returns>
+    public static JsonData convertDate(DateTime data) {
+        if (data == null) return "";
+        return data.ToString(DateFormat);
+    }
+
+    /// <summary>
+    /// 加载颜色
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的颜色</returns>
+    public static JsonData convertColor(Color c) {
+        return SceneUtils.color2Str(c);
     }
 
     /// <summary>

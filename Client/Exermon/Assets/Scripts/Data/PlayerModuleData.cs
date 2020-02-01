@@ -9,6 +9,144 @@ using UnityEngine.SceneManagement;
 using LitJson;
 using UnityEditor;
 
+/// <summary>
+/// 形象数据
+/// </summary>
+public class Character : BaseData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public string name { get; private set; }
+    public int gender { get; private set; }
+    public string description { get; private set; }
+
+    public Texture2D bust { get; private set; }
+    public Texture2D face { get; private set; }
+    public Texture2D battle { get; private set; }
+
+    /// <summary>
+    /// 获取性别文本
+    /// </summary>
+    /// <returns>性别文本</returns>
+    public string genderText() {
+        return DataService.get().characterGender(gender).Item2;
+    }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        name = DataLoader.loadString(json, "name");
+        gender = DataLoader.loadInt(json, "gender");
+        description = DataLoader.loadString(json, "description");
+
+        bust = AssetLoader.loadCharacterBust(getID());
+        face = AssetLoader.loadCharacterFace(getID());
+        battle = AssetLoader.loadCharacterBattle(getID());
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["name"] = name;
+        json["gender"] = gender;
+        json["description"] = description;
+
+        return json;
+    }
+}
+
+/// <summary>
+/// 背包类容器索引数据		
+/// </summary>
+public class PackContainerIndices : BaseData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public int humanPackId { get; private set; }
+    public int exerPackId { get; private set; }
+    public int exerFragPackId { get; private set; }
+    public int exerGiftPoolId { get; private set; }
+    public int exerHubId { get; private set; }
+    public int quesSugarPackId { get; private set; }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        humanPackId = DataLoader.loadInt(json, "humanpack_id");
+        exerPackId = DataLoader.loadInt(json, "exerpack_id");
+        exerFragPackId = DataLoader.loadInt(json, "exerfragpack_id");
+        exerGiftPoolId = DataLoader.loadInt(json, "exergiftpool_id");
+        exerHubId = DataLoader.loadInt(json, "exerhub_id");
+        quesSugarPackId = DataLoader.loadInt(json, "quessugarpack_id");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["humanpack_id"] = humanPackId;
+        json["exerpack_id"] = exerPackId;
+        json["exerfragpack_id"] = exerFragPackId;
+        json["exergiftpool_id"] = exerGiftPoolId;
+        json["exerhub_id"] = exerHubId;
+        json["quessugarpack_id"] = quesSugarPackId;
+
+        return json;
+    }
+}
+
+/// <summary>
+/// 槽类容器索引数据		
+/// </summary>
+public class SlotContainerIndices : BaseData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public int exerSlotId { get; private set; }
+    public int humanEquipSlotId { get; private set; }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        exerSlotId = DataLoader.loadInt(json, "exerslot_id");
+        humanEquipSlotId = DataLoader.loadInt(json, "humanequipslot_id");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["exerslot_id"] = exerSlotId;
+        json["humanequipslot_id"] = humanEquipSlotId;
+
+        return json;
+    }
+}
 
 /// <summary>
 /// 玩家数据
@@ -16,15 +154,44 @@ using UnityEditor;
 public class Player : BaseData {
 
     /// <summary>
+    /// 状态枚举
+    /// </summary>
+    public enum Status {
+        // 已注册，未创建角色
+        Uncreated = 0,  // 未创建
+        CharacterCreated = 1,  // 已创建人物
+        ExermonsCreated = 2,  // 已选择艾瑟萌
+        GiftsCreated = 3,  // 已选择天赋
+
+        // 已完全创建角色
+        Normal = 10,  // 正常
+        Banned = 20,  // 封禁
+        Frozen = 30,  // 冻结
+        Other = -1  // 其他
+    }
+
+    /// <summary>
     /// 属性
     /// </summary>
     public string username { get; private set; }
     public string password { get; private set; }
+    public string phone { get; private set; }
+    public string email { get; private set; }
     public string name { get; private set; }
-    public int genderId { get; private set; }
-    public int gradeId { get; private set; }
-    public int typeId { get; private set; }
+    public int characterId { get; private set; }
+    public int grade { get; private set; }
+    public int status { get; private set; }
+    public int type { get; private set; }
+    public bool online { get; private set; }
     public DateTime createTime { get; private set; }
+    public DateTime birth { get; private set; }
+    public string school { get; private set; }
+    public string city { get; private set; }
+    public string contact { get; private set; }
+    public string description { get; private set; }
+
+    public PackContainerIndices packContainers { get; private set; }
+    public SlotContainerIndices slotContainers { get; private set; }
 
     /// <summary>
     /// 设置密码
@@ -35,20 +202,154 @@ public class Player : BaseData {
     }
 
     /// <summary>
+    /// 创建角色
+    /// </summary>
+    /// <param name="name">昵称</param>
+    /// <param name="grade">年级ID</param>
+    /// <param name="cid">人物ID</param>
+    public void createCharacter(string name, int grade, int cid) {
+        this.name = name;
+        this.grade = grade;
+        this.characterId = cid;
+        status = (int)Status.CharacterCreated;
+    }
+
+    /// <summary>
+    /// 选择艾瑟萌
+    /// </summary>
+    /// <param name="eids">艾瑟萌ID</param>
+    /// <param name="enames">艾瑟萌昵称</param>
+    public void createExermons(int[] eids, string[] enames) {
+        status = (int)Status.ExermonsCreated;
+    }
+
+    /// <summary>
+    /// 选择天赋
+    /// </summary>
+    /// <param name="gids">艾瑟萌天赋ID</param>
+    public void createGifts(int[] gids) {
+        status = (int)Status.GiftsCreated;
+    }
+
+    /// <summary>
+    /// 补全信息
+    /// </summary>
+    /// <param name="birth">出生日期</param>
+    /// <param name="school">学校名称</param>
+    /// <param name="city">居住地</param>
+    /// <param name="contact">联系方式</param>
+    /// <param name="description">个人介绍</param>
+    public void createInfo(DateTime birth, string school,
+        string city, string contact, string description) {
+        this.birth = birth;
+        this.school = school;
+        this.city = city;
+        this.contact = contact;
+        this.description = description;
+        status = (int)Status.Normal;
+    }
+
+    /// <summary>
+    /// 获取人物
+    /// </summary>
+    /// <returns>人物</returns>
+    public Character character() {
+        return DataService.get().character(characterId);
+    }
+
+    /// <summary>
+    /// 获取年级文本
+    /// </summary>
+    /// <returns>年级文本</returns>
+    public string gradeText() {
+        return DataService.get().playerGrade(grade).Item2;
+    }
+
+    /// <summary>
+    /// 获取状态文本
+    /// </summary>
+    /// <returns>状态文本</returns>
+    public string statusText() {
+        return DataService.get().playerStatus(status).Item2;
+    }
+
+    /// <summary>
+    /// 获取状态枚举
+    /// </summary>
+    /// <returns>状态枚举</returns>
+    public Status statusEnum() {
+        return (Status)status;
+    }
+
+    /// <summary>
+    /// 获取类型文本
+    /// </summary>
+    /// <returns>类型文本</returns>
+    public string typeText() {
+        return DataService.get().playerType(type).Item2;
+    }
+
+    /// <summary>
+    /// 玩家是否已完全创建
+    /// </summary>
+    /// <returns>是否已创建</returns>
+    public bool isCreated() {
+        return status >= (int)Status.Normal;
+    }
+
+    /// <summary>
+    /// 玩家人物是否已创建
+    /// </summary>
+    /// <returns>是否已创建</returns>
+    public bool isCharacterCreated() {
+        return status >= (int)Status.CharacterCreated;
+    }
+
+    /// <summary>
+    /// 玩家艾瑟萌是否已选择
+    /// </summary>
+    /// <returns>是否已选择</returns>
+    public bool isExermonsCreated() {
+        return status >= (int)Status.ExermonsCreated;
+    }
+
+    /// <summary>
+    /// 玩家天赋是否已选择
+    /// </summary>
+    /// <returns>是否已选择</returns>
+    public bool isGiftsCreated() {
+        return status >= (int)Status.GiftsCreated;
+    }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
-    /// <param name="idEnable">是否可用ID字段</param>
     public override void load(JsonData json) {
         base.load(json);
 
         username = DataLoader.loadString(json, "username");
+        phone = DataLoader.loadString(json, "phone");
+        email = DataLoader.loadString(json, "email");
         name = DataLoader.loadString(json, "name");
-        genderId = DataLoader.loadInt(json, "gender_id");
-        gradeId = DataLoader.loadInt(json, "grade_id");
-        typeId = DataLoader.loadInt(json, "type_id");
+        characterId = DataLoader.loadInt(json, "character_id");
+        grade = DataLoader.loadInt(json, "grade");
+        status = DataLoader.loadInt(json, "status");
+        type = DataLoader.loadInt(json, "type");
+        online = DataLoader.loadBool(json, "online");
 
         createTime = DataLoader.loadDateTime(json, "create_time");
+        birth = DataLoader.loadDateTime(json, "birth");
+
+        school = DataLoader.loadString(json, "school");
+        city = DataLoader.loadString(json, "city");
+        contact = DataLoader.loadString(json, "contact");
+        description = DataLoader.loadString(json, "description");
+
+        packContainers = DataLoader.loadData
+            <PackContainerIndices>(json, "pack_containers");
+        slotContainers = DataLoader.loadData
+            <SlotContainerIndices>(json, "slot_containers");
     }
 
     /// <summary>
@@ -60,12 +361,139 @@ public class Player : BaseData {
 
         json["username"] = username;
         json["password"] = password;
+        json["phone"] = phone;
+        json["email"] = email;
         json["name"] = name;
-        json["gender_id"] = genderId;
-        json["grade_id"] = gradeId;
-        json["type_id"] = typeId;
+        json["character_id"] = characterId;
+        json["grade"] = grade;
+        json["status"] = status;
+        json["type"] = type;
+        json["online"] = online;
+
         json["create_time"] = DataLoader.convertDateTime(createTime);
+        json["birth"] = DataLoader.convertDate(birth);
+
+        json["school"] = school;
+        json["city"] = city;
+        json["contact"] = contact;
+        json["description"] = description;
+
+        json["pack_containers"] = DataLoader.convertData(packContainers);
+        json["slot_containers"] = DataLoader.convertData(slotContainers);
 
         return json;
     }
 }
+
+/// <summary>
+/// 人类物品
+/// </summary>
+public class HumanItem : UsableItem { }
+
+/// <summary>
+/// 人类装备
+/// </summary>
+public class HumanEquip : EquipableItem {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public int eType { get; private set; }
+
+    /// <summary>
+    /// 获取装备类型
+    /// </summary>
+    /// <returns>装备类型</returns>
+    public TypeData equipType() {
+        return DataService.get().humanEquipType(eType);
+    }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        eType = DataLoader.loadInt(json, "e_type");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["e_type"] = eType;
+
+        return json;
+    }
+
+}
+
+/*
+/// <summary>
+/// 人类背包物品
+/// </summary>
+public class HumanPackItem : PackContItem {}
+*/
+
+/// <summary>
+/// 人类背包装备
+/// </summary>
+public class HumanPackEquip : PackContItem {}
+
+/// <summary>
+/// 人类装备槽项
+/// </summary>
+public class HumanEquipSlotItem : SlotContItem {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public HumanPackEquip packEquip { get; private set; }
+    public int eType { get; private set; }
+
+    /// <summary>
+    /// 获取装备类型
+    /// </summary>
+    /// <returns>装备类型</returns>
+    public TypeData equipType() {
+        return DataService.get().humanEquipType(eType);
+    }
+
+    /// <summary>
+    /// 获取装备类型
+    /// </summary>
+    /// <returns>装备类型</returns>
+    public HumanEquip equip() {
+        return (HumanEquip)packEquip.item();
+    }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        packEquip = DataLoader.loadData<HumanPackEquip>(json, "pack_equip");
+        eType = DataLoader.loadInt(json, "e_type");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["pack_equip"] = DataLoader.convertData(packEquip);
+        json["e_type"] = eType;
+
+        return json;
+    }
+}
+
+

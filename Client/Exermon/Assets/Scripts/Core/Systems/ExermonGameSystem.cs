@@ -19,12 +19,13 @@ public class ExermonGameSystem : BaseSystem<ExermonGameSystem> {
     /// <summary>
     /// 游戏配置（设置）
     /// </summary>
-    public ConfigureData configure;
+    public ConfigureData configure { get; private set; } = new ConfigureData();
 
     /// <summary>
     /// 外部系统
     /// </summary>
     GameSystem gameSys;
+    StorageSystem storageSys;
     PlayerService playerSer;
 
     /// <summary>
@@ -33,6 +34,7 @@ public class ExermonGameSystem : BaseSystem<ExermonGameSystem> {
     protected override void initializeSystems() {
         base.initializeSystems();
         gameSys = GameSystem.get();
+        storageSys = StorageSystem.get();
         playerSer = PlayerService.get();
         gameSys.reconnectedCallback = onReconnected;
     }
@@ -43,10 +45,10 @@ public class ExermonGameSystem : BaseSystem<ExermonGameSystem> {
     /// 开始游戏（根据用户是否创建角色自动分配实际执行的操作）
     /// </summary>
     public void startGame() {
-        //logined = true;
-        //var player = UserSystem.player;
-        //if (player.isCreated() && player.isSelected()) loadGame();
-        //else newGame();
+        storageSys.save();
+        var player = playerSer.player;
+        if (player.isCreated()) loadGame();
+        else newGame();
     }
 
     /// <summary>
@@ -69,9 +71,7 @@ public class ExermonGameSystem : BaseSystem<ExermonGameSystem> {
     /// 游戏登出
     /// </summary>
     public void logoutGame() {
-        //CacheSystem.save();
-        //playerSer.logout();
-        //NetworkSystem.disconnect();
+        playerSer.logout();
     }
 
     /// <summary>

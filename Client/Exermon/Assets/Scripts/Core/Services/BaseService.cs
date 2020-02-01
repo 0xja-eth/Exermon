@@ -90,6 +90,16 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
         addOperDict(key.GetHashCode(), oper, route);
     }
 
+    /// <summary>
+    /// 获取指定名称的接口路由
+    /// </summary>
+    /// <param name="name">接口名</param>
+    /// <returns>路由</returns>
+    protected string getRoute(string name) {
+        var type = typeof(NetworkSystem.Interfaces);
+        return (string)type.GetField(name).GetValue(null);
+    }
+
     #endregion
 
     #region 请求控制
@@ -101,10 +111,11 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     /// <param name="data">数据</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
+    /// <param name="uid">是否需要携带玩家信息</param>
     protected void sendRequest(Enum key, JsonData data,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null,
-        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat) {
-        sendRequest(key.GetHashCode(), data, onSuccess, onError, waitFormat, failFormat);
+        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat, bool uid = false) {
+        sendRequest(key.GetHashCode(), data, onSuccess, onError, waitFormat, failFormat, uid);
     }
 
     /// <summary>
@@ -117,11 +128,11 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     /// <param name="onError">失败回调</param>
     protected void sendRequest(int key, JsonData data,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null,
-        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat) {
+        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat, bool uid = false) {
         if (operDict.ContainsKey(key)) {
             var tuple = operDict[key];
             sendRequest(tuple.Item2, data, tuple.Item1, 
-                onSuccess, onError, waitFormat, failFormat);
+                onSuccess, onError, waitFormat, failFormat, uid);
         } else Debug.LogError("未找到操作键 " + key + "，请检查操作字典");
     }
 
@@ -136,9 +147,9 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     /// <param name="onError">失败回调</param>
     protected void sendRequest(string route, JsonData data, string oper,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null,
-        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat) {
+        string waitFormat = WaitTextFormat, string failFormat = FailTextFormat, bool uid = false) {
         sendRequest(route, data, string.Format(waitFormat, oper), 
-            string.Format(failFormat, oper), onSuccess, onError);
+            string.Format(failFormat, oper), onSuccess, onError, uid);
     }
 
     /// <summary>
@@ -151,10 +162,10 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
     protected void sendRequest(string route, JsonData data, string waitText, string failText,
-        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null, bool uid = false) {
 
         NetworkSystem.RequestObject.ErrorAction _onError = generateOnErrorFunc(failText,
-            () => sendRequest(route, data, waitText, failText, 
+            () => sendRequest(route, data, waitText, failText,
                 onSuccess, onError), onError);
         /*
         (status, errmsg) => {
@@ -169,6 +180,7 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
             gameSys.requestAlert(text, btns, actions);
         };
         */
+        if (uid) data["uid"] = getPlayerID(); // 添加玩家信息
         networkSys.setupRequest(route, data, onSuccess, _onError, true, waitText);
     }
 
@@ -189,6 +201,27 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
             };
             gameSys.requestAlert(text, btns, actions);
         };
+    }
+
+    #endregion
+
+    #region 其他静态函数
+
+    /// <summary>
+    /// 获取当前玩家实例
+    /// </summary>
+    /// <returns>玩家实例</returns>
+    public static Player getPlayer() {
+        return PlayerService.get().player;
+    }
+
+    /// <summary>
+    /// 获取当前玩家ID
+    /// </summary>
+    /// <returns>玩家ID</returns>
+    public static int getPlayerID() {
+        var player = getPlayer();
+        return player == null ? -1 : player.getID();
     }
 
     #endregion

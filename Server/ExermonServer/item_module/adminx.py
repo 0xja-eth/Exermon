@@ -36,6 +36,13 @@ class SlotContItemsInline(object):
 	style = "accordion"
 
 
+class ItemEffectsInline(object):
+
+	model = ItemEffect
+	extra = 1
+	style = "table"
+
+
 @xadmin.sites.register(ItemPrice)
 class ItemPriceAdmin(object):
 
@@ -82,7 +89,7 @@ class UsableItemAdmin(LimitedItemAdmin):
 
 	list_display = LimitedItemAdmin().list_display + \
 				   ['max_count', 'battle_use', 'menu_use', 'adventure_use',
-					'consumable', 'freeze', 'i_type']
+					'consumable', 'freeze', 'i_type', 'adminEffects']
 
 	list_editable = LimitedItemAdmin().list_display + \
 					['max_count', 'battle_use', 'menu_use', 'adventure_use',
@@ -92,6 +99,8 @@ class UsableItemAdmin(LimitedItemAdmin):
 						 'adventure_use', 'consumable', 'freeze', 'i_type')]
 
 	form_layout = LimitedItemAdmin().form_layout + field_set
+
+	inlines = LimitedItemAdmin().inlines + [ItemEffectsInline]
 
 
 @xadmin.sites.register(EquipParam)
@@ -197,3 +206,15 @@ class SlotContItemAdmin(BaseContItemAdmin):
 	field_set = [Fieldset('槽类容器项属性', 'index', 'equip_item1', 'equip_item2')]
 
 	form_layout = BaseContItemAdmin().form_layout + field_set
+
+
+class EffectAdmin(object):
+
+	list_display = ['id', 'item', 'code', 'params']
+
+	list_editable = ['code', 'params']
+
+
+@xadmin.sites.register(ItemEffect)
+class ItemEffectAdmin(EffectAdmin):
+	pass

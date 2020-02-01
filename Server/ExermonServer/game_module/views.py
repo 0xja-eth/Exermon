@@ -26,7 +26,7 @@ class Service:
 		# 返回数据：
 		# data: 动态数据 => 系统动态数据
 
-		pass
+		return {'data': None}
 
 	# 生成静态数据
 	@classmethod
@@ -36,7 +36,7 @@ class Service:
 		data = cls._generateVersionData(cur_version)
 
 		if updated:
-			data = cls._generateMainData(data)
+			data = cls._generateMainData(data, cur_version)
 
 		return data
 

@@ -10,6 +10,7 @@ import jsonfield, os, math
 
 # region 基本物品
 
+
 # ===================================================
 #  物品类型枚举
 # ===================================================
@@ -201,6 +202,9 @@ class BaseItem(models.Model):
 
 		return '%d %s（%s）' % (self.id, self.name, type_name)
 
+	def __getattr__(self, item):
+		raise AttributeError(item)
+
 	# 获取类型名称
 	def getTypeName(self):
 		for type in self.TYPES:
@@ -325,7 +329,7 @@ class LimitedItem(BaseItem):
 		res['buy_price'] = buy_price
 		res['sell_price'] = self.sell_price
 		res['discardable'] = self.discardable
-		res['icon'] = self.convertIconToBase64()
+		# res['icon'] = self.convertIconToBase64()
 
 		return res
 
@@ -360,9 +364,25 @@ class UsableItem(LimitedItem):
 	i_type = models.ForeignKey("game_module.UsableItemType",
 							   on_delete=models.CASCADE, verbose_name="物品类型")
 
+	# 后台管理：显示使用效果
+	def adminEffects(self):
+		from django.utils.html import format_html
+
+		effects = self.effects()
+
+		res = ''
+		for e in effects:
+			res += e.describe() + "<br>"
+
+		return format_html(res)
+
+	adminEffects.short_description = "使用效果"
+
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
+
+		effects = ModelUtils.objectsToDict(self.effects())
 
 		res['max_count'] = self.max_count
 		res['consumable'] = self.consumable
@@ -370,7 +390,8 @@ class UsableItem(LimitedItem):
 		res['menu_use'] = self.menu_use
 		res['adventure_use'] = self.adventure_use
 		res['freeze'] = self.freeze
-		res['i_type_id'] = self.i_type_id
+		res['i_type'] = self.i_type_id
+		res['effects'] = effects
 
 		return res
 
@@ -550,6 +571,9 @@ class BaseContainer(models.Model):
 
 		return '%d %s' % (self.id, type_name)
 
+	def __getattr__(self, item):
+		raise AttributeError(item)
+
 	# 获取类型名称
 	def getTypeName(self):
 		for type in self.TYPES:
@@ -587,17 +611,17 @@ class BaseContainer(models.Model):
 
 		type = None
 
-		if 'type' in kwargs: type = kwargs['type']
-
-		if type == 'items':
-			return {
-				'items': self._convertItemsToDict()
-			}
-
-		return {
+		res = {
 			'id': self.id,
 			'type': self.type
 		}
+
+		if 'type' in kwargs: type = kwargs['type']
+
+		if type == 'items':
+			res['items'] = self._convertItemsToDict()
+
+		return res
 
 	def convertToDict(self, **kwargs):
 		return self.target()._convertToDict(**kwargs)
@@ -1471,6 +1495,9 @@ class BaseContItem(models.Model):
 
 		return '%d %s' % (self.id, type_name)
 
+	def __getattr__(self, item):
+		raise AttributeError(item)
+
 	# 获取类型名称
 	def getTypeName(self):
 		for type in self.TYPES:
@@ -1868,32 +1895,193 @@ class Trait(models.Model):
 	# 特性参数
 	params = jsonfield.JSONField(default=[], verbose_name="特性参数")
 
+	# 转化为字典
+	def convertToDict(self):
+
+		return {
+			'code': self.code,
+			'params': self.params
+		}
+
 
 # ===================================================
 #  使用效果编号枚举
 # ===================================================
 class ItemEffectCode(Enum):
-	Unset = 0  # 未设置
+	Unset = 0  # 空
+
+	RecoverHP = 10  # 回复体力值
+	RecoverMP = 11  # 回复精力值
+	AddParam = 20  # 增加能力值
+	TempAddParam = 21  # 临时增加能力值
+	BattleAddParam = 22  # 战斗中增加能力值
+
+	GainItem = 30  # 获得物品
+	GainGold = 31  # 获得金币
+	GainBoundTicket = 32  # 获得绑定点券
+	GainExermonExp = 40  # 指定艾瑟萌获得经验
+	GainExerSlotItemExp = 41  # 指定艾瑟萌槽项获得经验
+	GainPlayerExp = 42  # 玩家获得经验
+
+	Eval = 99  # 执行程序
 
 
 # ===================================================
-#  使用效果表（包括艾瑟萌技能）
+#  使用效果表
 # ===================================================
-class ItemEffect(models.Model):
+class Effect(models.Model):
+
 	class Meta:
-		verbose_name = verbose_name_plural = "物品使用效果"
+		abstract = True
+		verbose_name = verbose_name_plural = "使用效果"
 
 	CODES = [
-		(ItemEffectCode.Unset.value, '无效果'),
-	]
+		(ItemEffectCode.Unset.value, '空'),
 
-	# 物品
-	item = models.ForeignKey('UsableItem', on_delete=models.CASCADE, verbose_name="物品")
+		(ItemEffectCode.RecoverHP.value, '回复体力值'),
+		(ItemEffectCode.RecoverMP.value, '回复精力值'),
+		(ItemEffectCode.AddParam.value, '增加能力值'),
+		(ItemEffectCode.TempAddParam.value, '临时增加能力值'),
+		(ItemEffectCode.BattleAddParam.value, '战斗中增加能力值'),
+
+		(ItemEffectCode.GainItem.value, '获得物品'),
+		(ItemEffectCode.GainGold.value, '获得金币'),
+		(ItemEffectCode.GainBoundTicket.value, '获得绑定点券'),
+		(ItemEffectCode.GainExermonExp.value, '指定艾瑟萌获得经验'),
+		(ItemEffectCode.GainExerSlotItemExp.value, '指定艾瑟萌槽项获得经验'),
+		(ItemEffectCode.GainPlayerExp.value, '玩家获得经验'),
+
+		(ItemEffectCode.Eval.value, '执行程序'),
+	]
 
 	# 效果编号
 	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
 
 	# 效果参数
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	def __str__(self):
+		return self.describe()
+
+	def describe(self):
+		from game_module.models import BaseParam, GameConfigure, Subject
+
+		if not isinstance(self.params, list):
+			raise ErrorException(ErrorType.DatabaseError)
+
+		conf: GameConfigure = GameConfigure.get()
+		code = ItemEffectCode(self.code)
+		params = tuple(self.params)
+		p_len = len(params)
+
+		if code == ItemEffectCode.Unset: return '无效果'
+
+		if code == ItemEffectCode.RecoverHP or \
+			code == ItemEffectCode.RecoverMP:
+			name = "体力值" if code == ItemEffectCode.RecoverHP else "精力值"
+
+			a = params[0]
+			if p_len < 2:  # 如果只有 a 参数
+				return "%s 回复 %s 点" % (name, a)
+
+			b = params[1]
+			if a == 0: return "%s 回复 %s %%" % (name, b)
+			return "%s 回复 %s 点，%s%%" % (name, a, b)
+
+		if code == ItemEffectCode.AddParam:
+			p, a = params[0], params[1]
+			name = BaseParam.get(id=p).name
+
+			if p_len < 3:  # 如果只有 a 参数
+				return "属性 %s 增加 %s 点" % (name, a)
+
+			b = params[2]
+			if a == 0: return "属性 %s 增加 %s %%" % (name, b)
+			return "属性 %s 增加 %s 点，%s%%" % (name, a, b)
+
+		if code == ItemEffectCode.TempAddParam or \
+			code == ItemEffectCode.BattleAddParam:
+			p, t, a = params[0], params[1], params[2]
+			name = BaseParam.get(id=p).name
+			time = "秒" if code == ItemEffectCode.TempAddParam else "回合"
+
+			if p_len < 4:  # 如果只有 a 参数
+				return "属性 %s 增加 %s 点，持续 %s %s" % (name, a, t, time)
+
+			b = params[3]
+			if a == 0: return "属性 %s 增加%s%%，持续 %s %s" % (name, b, t, time)
+			return "属性 %s 增加 %s 点，%s%%，持续 %s %s" % (name, a, b, t, time)
+
+		if code == ItemEffectCode.GainItem:
+			from .views import Common
+
+			i, m = params[0], params[1]
+			name = Common.getItem(id=i).name
+
+			if p_len < 3:  # 如果只有 m 参数
+				return "物品 %s 增加 %s 个" % (name, m)
+
+			n = params[2]
+			return "物品 %s 增加 %s~%s 个" % (name, m, n)
+
+		if code == ItemEffectCode.GainGold or \
+			code == ItemEffectCode.GainBoundTicket:
+
+			m = params[0]
+			name = conf.gold if code == ItemEffectCode.GainGold else conf.bound_ticket
+
+			if p_len < 2:  # 如果只有 m 参数
+				return "%s 增加 %s" % (name, m)
+
+			n = params[1]
+			return "%s 增加 %s~%s" % (name, m, n)
+
+		if code == ItemEffectCode.GainExermonExp or \
+			code == ItemEffectCode.GainExerSlotItemExp:
+
+			s, m = params[0], params[1]
+			name = Subject.get(id=s).name
+			exer = "艾瑟萌" if code == ItemEffectCode.GainExermonExp else "艾瑟萌槽"
+
+			if p_len < 3:  # 如果只有 m 参数
+				return "%s %s经验值增加 %s" % (name, exer, m)
+
+			n = params[2]
+			return "%s %s经验值增加 %s~%s" % (name, exer, m, n)
+
+		if code == ItemEffectCode.GainPlayerExp:
+
+			m = params[0]
+
+			if p_len < 2:  # 如果只有 m 参数
+				return "玩家经验值增加 %s" % (m)
+
+			n = params[1]
+			return "玩家经验值增加 %s~%s" % (m, n)
+
+		if code == ItemEffectCode.Eval:
+			return "执行程序：%s" % params[0]
+
+	# 转化为字典
+	def convertToDict(self):
+
+		return {
+			'code': self.code,
+			'params': self.params,
+			'description': self.describe()
+		}
+
+
+# ===================================================
+#  物品使用效果表
+# ===================================================
+class ItemEffect(Effect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "物品使用效果"
+
+	# 物品
+	item = models.ForeignKey('UsableItem', on_delete=models.CASCADE, verbose_name="物品")
+
 
 # endregion

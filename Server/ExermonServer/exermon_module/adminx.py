@@ -2,8 +2,8 @@ from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
 from game_module.adminx import ParamsInline
 from item_module.adminx import BaseItemAdmin, \
-	UsableItemAdmin, EquipableItemAdmin, PackContainerAdmin, \
-	SlotContainerAdmin, PackContItemAdmin, SlotContItemAdmin
+	PackContainerAdmin, SlotContainerAdmin, PackContItemAdmin, \
+	SlotContItemAdmin, EffectAdmin
 from .models import *
 import xadmin
 
@@ -42,15 +42,22 @@ class ExerEquipSlotInline(object):
 	style = "one"
 
 
+class SkillEffectsInline(object):
+
+	model = SkillEffect
+	extra = 1
+	style = "table"
+
+
 @xadmin.sites.register(Exermon)
 class ExermonAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin().list_display + \
-				   ['star', 'subject', 'adminParamBases', 'adminParamRates',
-					'e_type']
+				   ['animal', 'star', 'subject', 'adminParamBases',
+					'adminParamRates', 'e_type']
 
 	list_editable = BaseItemAdmin().list_editable + \
-					['star', 'subject', 'e_type']
+					['animal', 'star', 'subject', 'e_type']
 
 	field_set = [Fieldset('艾瑟萌属性', 'star', 'subject', 'full', 'icon',
 						  'battle', 'e_type')]
@@ -96,14 +103,12 @@ class ExerSkillAdmin(BaseItemAdmin):
 	list_display = BaseItemAdmin().list_display + \
 				   ['o_exermon', 'passive', 'next_skill', 'need_count',
 					'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
-					'hit_type', 'atk_rate', 'def_rate', 'plus_formula',
-					'icon', 'ani', 'target_ani']
+					'hit_type', 'atk_rate', 'def_rate', 'plus_formula', 'adminEffects']
 
 	list_editable = BaseItemAdmin().list_editable + \
 					['o_exermon', 'passive', 'next_skill', 'need_count',
 					 'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
-					 'hit_type', 'atk_rate', 'def_rate', 'plus_formula',
-					 'icon', 'ani', 'target_ani']
+					 'hit_type', 'atk_rate', 'def_rate', 'plus_formula']
 
 	field_set = [Fieldset('艾瑟萌技能属性', 'o_exermon', 'passive', 'next_skill', 'need_count',
 						  'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
@@ -111,6 +116,8 @@ class ExerSkillAdmin(BaseItemAdmin):
 						  'icon', 'ani', 'target_ani')]
 
 	form_layout = BaseItemAdmin().form_layout + field_set
+
+	inlines = [SkillEffectsInline]
 
 
 @xadmin.sites.register(ExerHub)
@@ -244,4 +251,9 @@ class ExerFragPackItemAdmin(PackContItemAdmin):
 
 @xadmin.sites.register(PlayerExerGift)
 class PlayerExerGiftAdmin(PackContItemAdmin):
+	pass
+
+
+@xadmin.sites.register(SkillEffect)
+class SkillEffectAdmin(EffectAdmin):
 	pass

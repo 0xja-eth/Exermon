@@ -28,13 +28,33 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         /// <summary>
         /// 路由配置
         /// </summary>
-        public const string LoadStaticDataRoute = "game/data/static";
-        public const string LoadDynamicDataRoute = "game/data/dynamic";
+        public const string LoadStaticData = "game/data/static";
+        public const string LoadDynamicData = "game/data/dynamic";
 
-        public const string PlayerRegisterRoute = "player/player/register";
-        public const string PlayerLoginRoute = "player/player/login";
-        public const string PlayerForgetRoute = "player/player/forget";
-        public const string PlayerCodeRoute = "player/player/code";
+        public const string PlayerRegister = "player/player/register";
+        public const string PlayerLogin = "player/player/login";
+        public const string PlayerForget = "player/player/forget";
+        public const string PlayerCode = "player/player/code";
+
+        public const string PlayerLogout = "player/player/logout";
+        public const string PlayerGetBasic = "player/get/basic";
+
+        public const string PlayerCreateCharacter = "player/create/character";
+        public const string PlayerCreateExermons = "player/create/exermons";
+        public const string PlayerCreateGifts = "player/create/gifts";
+        public const string PlayerCreateInfo = "player/create/info";
+
+        public const string PlayerEquipSlotEquip = "player/equipslot/equip";
+
+        public const string ItemGetPack = "item/packcontainer/get";
+        public const string ItemGetSlot = "item/slotcontainer/get";
+        public const string ItemGainItem = "item/packcontainer/gain";
+        public const string ItemTransferItem = "item/packcontainer/transfer";
+        public const string ItemSplitItem = "item/packcontainer/split";
+        public const string ItemMergeItem = "item/packcontainer/merge";
+
+        public const string ExermonExerSlotEquip = "exermon/exerslot/equip";
+        public const string ExermonEquipSlotEquip = "exermon/equipslot/equip";
 
     }
 

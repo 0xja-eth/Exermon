@@ -87,7 +87,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
     /// <summary>
     /// 外部系统
     /// </summary>
-    DataServicce dataSer;
+    DataService dataSer;
     GameSystem gameSys;
     ExermonGameSystem exermonSys;
 
@@ -100,7 +100,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
         base.initializeSystems();
         gameSys = GameSystem.get();
         exermonSys = ExermonGameSystem.get();
-        dataSer = DataServicce.get();
+        dataSer = DataService.get();
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
     /// <param name="path">文件路径（包括文件名）</param>
     /// <returns>读取的数据（字符串）</returns>
     public void loadObjectFromFile<T>(ref T data, string path) where T : BaseData, new() {
-        Debug.Log("Loading " + data + " into " + path);
+        Debug.Log("Loading " + data + " from " + path);
         var json = loadJsonFromFile(path);
         DataLoader.loadData(ref data, json);
     }

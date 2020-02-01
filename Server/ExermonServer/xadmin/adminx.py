@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import xadmin
+from xadmin import views
 from .models import UserSettings, Log
 from xadmin.layout import *
 
@@ -30,3 +31,10 @@ class LogAdmin(object):
     model_icon = 'fa fa-cog'
 
 xadmin.site.register(Log, LogAdmin)
+
+class GlobalSetting(object):
+
+    site_title = '艾瑟萌学院后台管理'
+    site_footer = 'Exermon'
+
+xadmin.site.register(views.CommAdminView, GlobalSetting)

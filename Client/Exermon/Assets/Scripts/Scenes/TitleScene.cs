@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 描述
+/// 标题场景
 /// </summary>
 public class TitleScene : BaseScene {
     
@@ -37,6 +37,14 @@ public class TitleScene : BaseScene {
     ExermonGameSystem exermonSys;
 
     #region 初始化
+
+    /// <summary>
+    /// 场景名
+    /// </summary>
+    /// <returns>场景名</returns>
+    public override string sceneName() {
+        return SceneUtils.GameScene.TitleScene;
+    }
 
     /// <summary>
     /// 初始化外部系统
@@ -102,6 +110,17 @@ public class TitleScene : BaseScene {
     void updateLoading() {
         if (gameSys.isLoaded() && !loginWindow.shown)
             loginWindow.startWindow();
+    }
+
+    #endregion
+
+    #region 流程控制
+
+    /// <summary>
+    /// 登陆成功回调
+    /// </summary>
+    public void startGame() {
+        exermonSys.startGame();
     }
 
     #endregion

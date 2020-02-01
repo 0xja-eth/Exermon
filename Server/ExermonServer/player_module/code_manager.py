@@ -69,7 +69,7 @@ class CodeManager:
         if key not in cls.code_data:
             raise ErrorException(ErrorType.IncorrectCode)
 
-        if cls.code_data[key] != code:
+        if cls.code_data[key].code != code:
             raise ErrorException(ErrorType.IncorrectCode)
 
     # 扫描 Code，如果过期就删去

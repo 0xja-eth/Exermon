@@ -11,7 +11,7 @@ public class ScrollList : BaseView {
     /// <summary>
     /// 项目内容
     /// </summary>
-    public interface IItemContent {
+    public interface ScrollListItemContent {
 
         /// <summary>
         /// 设置项目
@@ -48,7 +48,7 @@ public class ScrollList : BaseView {
     List<int> selection = new List<int>(); // 选择情况
     int curIndex = -1; // 当前选中
 
-    IItemContent helpContent; // 帮助内容组件
+    ScrollListItemContent helpContent; // 帮助内容组件
 
     /// <summary>
     /// 选项是否改变
@@ -80,7 +80,7 @@ public class ScrollList : BaseView {
     /// <summary>
     /// 启动视窗
     /// </summary>
-    public virtual void startView(IItemContent content) {
+    public virtual void startView(ScrollListItemContent content) {
         helpContent = content;
         base.startView();
     }

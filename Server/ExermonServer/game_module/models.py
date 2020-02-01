@@ -309,8 +309,8 @@ class GroupConfigure(models.Model):
 
 		if cls.Objects is None: cls.load()
 
-		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
-								objects=cls.Objects, **kwargs)
+		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR, return_type='object',
+								   objects=cls.Objects, **kwargs)
 
 	# 确保存在
 	@classmethod
@@ -349,15 +349,29 @@ class Subject(GroupConfigure):
 	# 选科最大数目
 	MAX_SELECTED = 6
 
+	# 科目颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="科目颜色")
+
 	# 科目分值
 	max_score = models.PositiveSmallIntegerField(default=100, verbose_name="分值")
 
 	# 必选科目
 	force = models.BooleanField(default=False, verbose_name="必选科目")
 
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "科目颜色"
+
 	def convertToDict(self):
 		res = super().convertToDict()
 
+		res['color'] = self.color
 		res['max_score'] = self.max_score
 		res['force'] = self.force
 
@@ -382,6 +396,9 @@ class BaseParam(GroupConfigure):
 
 	NOT_EXIST_ERROR = ErrorType.BaseParamNotExist
 
+	# 属性颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="属性颜色")
+
 	# 程序属性名
 	attr = models.CharField(max_length=8, verbose_name="程序属性名")
 
@@ -397,9 +414,20 @@ class BaseParam(GroupConfigure):
 	# 属性比例值
 	scale = models.PositiveSmallIntegerField(default=1, verbose_name="属性比例值")
 
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "属性颜色"
+
 	def convertToDict(self):
 		res = super().convertToDict()
 
+		res['color'] = self.color
 		res['attr'] = self.attr
 		res['max_value'] = self.max_value
 		res['min_value'] = self.min_value
@@ -690,6 +718,7 @@ class GameConfigure(models.Model):
 
 	def convertToDict(self):
 		from player_module.models import Character, Player
+		from exermon_module.models import Exermon, ExerSkill
 
 		subjects = ModelUtils.objectsToDict(self.subject_set.all())
 		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
@@ -706,11 +735,21 @@ class GameConfigure(models.Model):
 			'ticket': self.ticket,
 			'bound_ticket': self.bound_ticket,
 
+			# 配置量
+			'max_subject': Subject.MAX_SELECTED,
+
+			# player_module
 			'character_genders': Character.CHARACTER_GENDERS,
 			'player_grades': Player.PLAYER_GRADES,
 			'player_statuses': Player.PLAYER_STATUSES,
 			'player_types': Player.PLAYER_TYPES,
 
+			# exermon_module
+			'exermon_types': Exermon.TYPES,
+			'exerskill_target_types': ExerSkill.TARGET_TYPES,
+			'exerskill_hit_types': ExerSkill.HIT_TYPES,
+
+			# 组合配置
 			'subjects': subjects,
 			'base_params': base_params,
 			'usable_item_types': usable_item_types,

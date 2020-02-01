@@ -212,7 +212,7 @@ public class GameSystem : BaseSystem<GameSystem> {
     /// </summary>
     NetworkSystem networkSys;
     StorageSystem storageSys;
-    DataServicce dataSer;
+    DataService dataSer;
 
     #region 初始化
 
@@ -237,7 +237,7 @@ public class GameSystem : BaseSystem<GameSystem> {
         base.initializeSystems();
         storageSys = StorageSystem.get();
         networkSys = NetworkSystem.get();
-        dataSer = DataServicce.get();
+        dataSer = DataService.get();
     }
 
     #endregion
