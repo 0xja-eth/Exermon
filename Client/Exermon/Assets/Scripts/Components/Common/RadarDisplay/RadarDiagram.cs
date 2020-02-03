@@ -145,7 +145,7 @@ public class RadarDiagram : BaseView {
     /// <summary>
     /// 清除视窗
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         clearWeights();
         clearNames();
     }

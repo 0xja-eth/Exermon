@@ -525,13 +525,18 @@ class Player(models.Model):
 
 			player_exers.append(self._createPlayerExer(exers[i], enames[i]))
 
-		ExerSlot.create(player=self, player_exers=player_exers)
+		if self.exerSlot():
+			self.exerSlot().delete()
+
+		exer_slot = ExerSlot.create(player=self, player_exers=player_exers)
 
 		for player_exer in player_exers:
 			player_exer.save()
 
 		self.status = PlayerStatus.ExermonsCreated.value
 		self.save()
+
+		return exer_slot
 
 	def createGifts(self, gifts):
 

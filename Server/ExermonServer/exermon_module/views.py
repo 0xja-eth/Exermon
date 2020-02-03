@@ -69,23 +69,41 @@ class Common:
 
 	# 获取多个艾瑟萌
 	@classmethod
-	def getExermons(cls, ids, return_type='object', error: ErrorType = ErrorType.ExermonNotExist) -> Exermon:
+	def getExermons(cls, ids, error: ErrorType = ErrorType.ExermonNotExist) -> Exermon:
 
-		res = ViewUtils.getObjects(Exermon, return_type=return_type, id__in=ids)
+		unique_ids = list(set(ids))
 
-		if res.count() != len(ids): raise ErrorException(error)
+		res = ViewUtils.getObjects(Exermon, id__in=ids)
 
-		return res
+		if res.count() != len(unique_ids): raise ErrorException(error)
+
+		# 如果本身给的 ids 没有重复，直接返回
+		if len(unique_ids) == len(ids): return res
+
+		# 否则，需要按顺序抽取
+		real_res = []
+		for id in ids: real_res.append(res.get(id=id))
+
+		return real_res
 
 	# 获取多个艾瑟萌天赋
 	@classmethod
-	def getExerGifts(cls, ids, return_type='object', error: ErrorType = ErrorType.ExerGiftNotExist) -> ExerGift:
+	def getExerGifts(cls, ids, error: ErrorType = ErrorType.ExerGiftNotExist) -> ExerGift:
 
-		res = ViewUtils.getObjects(ExerGift, return_type=return_type, id__in=ids)
+		unique_ids = list(set(ids))
 
-		if res.count() != len(ids): raise ErrorException(error)
+		res = ViewUtils.getObjects(ExerGift, id__in=unique_ids)
 
-		return res
+		if res.count() != len(unique_ids): raise ErrorException(error)
+
+		# 如果本身给的 ids 没有重复，直接返回
+		if len(unique_ids) == len(ids): return res
+
+		# 否则，需要按顺序抽取
+		real_res = []
+		for id in ids: real_res.append(res.get(id=id))
+
+		return real_res
 
 	# 确保艾瑟萌存在
 	@classmethod
@@ -133,8 +151,8 @@ class Common:
 	def ensureExerGiftType(cls, gifts=None, gift=None, g_type=ExerGiftType.Initial):
 
 		if gift is not None:
-			if gift.g_type != g_type:
-				raise ErrorException(ErrorType.InvalidExermonType)
+			if gift.g_type != g_type.value:
+				raise ErrorException(ErrorType.InvalidExerGiftType)
 
 		if gifts is not None:
 			for gift in gifts:

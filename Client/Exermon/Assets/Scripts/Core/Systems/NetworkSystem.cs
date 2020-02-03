@@ -395,9 +395,9 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
             }
         } catch (GameException e) {
             handleProcessError(e.code, e.message, e.action);
-        } catch (Exception e) {
+        } /*catch (Exception e) {
             handleProcessError((int)GameException.Type.SystemError, "系统错误："+e);
-        }
+        }*/
     }
 
     /// <summary>

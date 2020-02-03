@@ -38,6 +38,7 @@ public class StartScene : BaseScene {
     /// </summary>
     GameSystem gameSys;
     PlayerService playerSer;
+    ExermonService exermonSer;
     ExermonGameSystem exermonSys;
 
     Step step;
@@ -60,6 +61,7 @@ public class StartScene : BaseScene {
         gameSys = GameSystem.get();
         exermonSys = ExermonGameSystem.get();
         playerSer = PlayerService.get();
+        exermonSer = ExermonService.get();
     }
 
     protected override void initializeOthers() {
@@ -153,7 +155,7 @@ public class StartScene : BaseScene {
     /// 开始天赋选择窗口
     /// </summary>
     void startGiftsWindow() {
-        giftsWindow.startWindow();
+        exermonSer.loadExerSlot(onSuccess: giftsWindow.startWindow);
     }
 
     /// <summary>

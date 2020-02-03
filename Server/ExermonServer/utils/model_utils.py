@@ -150,7 +150,7 @@ class SkillImageUpload(SystemImageUpload):
 class Common:
 
 	@classmethod
-	def preventNone(cls, judge, value=None, obj=None, func=None, empty=0):
+	def preventNone(cls, judge, value=None, obj=None, func=None, empty=None):
 		if judge is None: return empty
 		if value is not None: return value
 		if obj is None: obj = judge

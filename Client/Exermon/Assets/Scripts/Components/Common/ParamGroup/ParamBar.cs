@@ -9,6 +9,8 @@ using UnityEngine.UI;
 /// </summary>
 public class ParamBar : BaseView {
 
+    #region 辅助类型定义
+
     /// <summary>
     /// 能转化为 ParamConfigInfo[] 的接口
     /// </summary>
@@ -46,7 +48,8 @@ public class ParamBar : BaseView {
     /// 属性值信息
     /// </summary>
     public struct ParamValueInfo {
-        public float value, max, rate;
+        public float value, max;
+        public float? rate;
     }
 
     /// <summary>
@@ -54,9 +57,12 @@ public class ParamBar : BaseView {
     /// </summary>
     protected struct ParamInfo {
         public string name;
-        public float value, max, rate;
+        public float value, max;
+        public float? rate;
         public Color? color;
     }
+
+    #endregion
 
     /// <summary>
     /// 常量定义
@@ -67,16 +73,13 @@ public class ParamBar : BaseView {
     /// <summary>
     /// 外部组设置
     /// </summary>
-
-    [SerializeField]
-    public AnimationCurve animationCurve;  // 动画曲线
-
     public Text name, value, rate;
     public GameObject bar;
 
     /// <summary>
     /// 外部变量设置
     /// </summary>
+    public string nameFormat = "{0}"; // 名称格式
     public string valueFormat = "{0}/{1}"; // 值格式（0为当前值，1为最大值）
     public bool animated = true; // 是否有动画效果
 
@@ -87,10 +90,7 @@ public class ParamBar : BaseView {
     Animation barAni;
     RectTransform barRt;
     ParamInfo info = new ParamInfo();
-
-    float realRate = 0;
-    Color? realColor = null;
-
+    
     #region 初始化
 
     /// <summary>
@@ -121,37 +121,6 @@ public class ParamBar : BaseView {
 
     #endregion
 
-    #region 界面控制
-
-    /// <summary>
-    /// 绘制文本
-    /// </summary>
-    void drawTexts() {
-        name.text = info.name;
-        value.text = string.Format(valueFormat,
-            info.value, info.max, paramRate());
-        rate.text = SceneUtils.double2Str(info.rate);
-    }
-
-    /// <summary>
-    /// 绘制条
-    /// </summary>
-    void drawBar() {
-        if(info.color != null)
-            barImg.color = (Color)info.color;
-    }
-
-    /// <summary>
-    /// 刷新视窗（clear后重绘）
-    /// </summary>
-    public override void refresh() {
-        base.refresh();
-        drawTexts();
-        drawBar();
-    }
-
-    #endregion
-
     #region 数据控制
 
     /// <summary>
@@ -178,14 +147,10 @@ public class ParamBar : BaseView {
     /// <param name="force">强制</param>
     public void setValue(float value, float? max = null,
         float? rate = null, bool force = false) {
-        info.value = value;
+        info.value = value; info.rate = rate;
         if (max != null) info.max = (float)max;
-        if (rate != null) info.rate = (float)rate;
-        float oriRate = barRt.localScale.x;
-        float targetRate = paramRate();
-        if (animated && !force) setupAnimation(oriRate, targetRate);
-        else barRt.localScale = new Vector3(targetRate, 1, 1);
-        refresh();
+
+        onValueChanged(force);
     }
     /// <param name="info">属性信息</param>
     public void setValue(ParamValueInfo info, bool force = false) {
@@ -208,7 +173,66 @@ public class ParamBar : BaseView {
         return info.value / info.max;
     }
 
+    /// <summary>
+    /// 值改变回调
+    /// </summary>
+    void onValueChanged(bool force) {
+        requestRefresh();
+
+        float oriRate = barRt.localScale.x;
+        float targetRate = paramRate();
+
+        if (animated && !force)
+            setupAnimation(oriRate, targetRate);
+        else drawBarValue(targetRate);
+    }
+
     #endregion
+
+    #region 界面绘制
+
+    /// <summary>
+    /// 绘制条值（强制）
+    /// </summary>
+    void drawBarValue(float targetRate) {
+        barRt.localScale = new Vector3(targetRate, 1, 1);
+    }
+
+    /// <summary>
+    /// 绘制文本
+    /// </summary>
+    void drawTexts() {
+        name.text = string.Format(nameFormat, info.name);
+        value.text = string.Format(valueFormat, info.value, 
+            info.max, paramRate());
+        if(rate && info.rate != null)
+            rate.text = SceneUtils.double2Str((float)info.rate);
+    }
+
+    /// <summary>
+    /// 绘制条颜色
+    /// </summary>
+    void drawBarColor() {
+        if (info.color != null)
+            barImg.color = (Color)info.color;
+    }
+
+    /// <summary>
+    /// 刷新视窗
+    /// </summary>
+    protected override void refresh() {
+        base.refresh();
+        drawTexts();
+        drawBarColor();
+    }
+
+    /// <summary>
+    /// 清除视窗
+    /// </summary>
+    protected override void clear() {
+        base.clear();
+        clearValue();
+    }
 
     #region 动画控制
 
@@ -231,7 +255,6 @@ public class ParamBar : BaseView {
     AnimationClip generateAnimationClip(float oriRate, float targetRate) {
         var clip = new AnimationClip(); clip.legacy = true;
         var curve = generateAnimationCurve(oriRate, targetRate);
-        animationCurve = curve;
         clip.SetCurve("", typeof(Transform), "m_LocalScale.x", curve);
         clip.name = AniClipName;
 
@@ -258,4 +281,5 @@ public class ParamBar : BaseView {
 
     #endregion
 
+    #endregion
 }

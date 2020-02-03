@@ -70,9 +70,9 @@ public class LoadingWindow : BaseWindow {
     #region 界面控制
 
     /// <summary>
-    /// 刷新窗口（clear后重绘）
+    /// 刷新窗口
     /// </summary>
-    public override void refresh() {
+    protected override void refresh() {
         base.refresh();
         gameObject.SetActive(true);
         textArea.SetActive(text.Length > 0);
@@ -93,7 +93,7 @@ public class LoadingWindow : BaseWindow {
     /// <summary>
     /// 清除窗口
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         base.clear();
         setProgress(-1);
         loadingText.text = "";

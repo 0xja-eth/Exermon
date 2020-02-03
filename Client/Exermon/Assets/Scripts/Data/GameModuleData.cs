@@ -231,6 +231,25 @@ public class BaseParam : TypeData, ParamBar.ParamConfigInfoConvertable {
     }
 
     /// <summary>
+    /// 是否百分比属性
+    /// </summary>
+    /// <returns></returns>
+    public bool isPercent() {
+        return scale == 10000;
+    }
+
+    /// <summary>
+    /// 限制最大最小值
+    /// </summary>
+    /// <param name="val">原始值</param>
+    /// <returns>限制值</returns>
+    public double clamp(double val) {
+        val = Math.Max(minValue, val);
+        if (maxValue > 0) val = Math.Min(maxValue, val);
+        return val;
+    }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>

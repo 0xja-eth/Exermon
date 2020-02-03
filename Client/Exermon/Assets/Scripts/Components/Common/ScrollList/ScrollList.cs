@@ -251,7 +251,7 @@ public class ScrollList : BaseView {
     /// <summary>
     /// 清空
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         deselect();
         clearSelection();
         clearListItems();

@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 半身像项
+/// 人物显示项
 /// </summary>
-public class BustItem : BaseView {
+public class CharacterDisplay : ItemDisplay<Character> {
 
     /// <summary>
     /// 常量定义
@@ -22,11 +22,9 @@ public class BustItem : BaseView {
     /// <summary>
     /// 内部变量声明
     /// </summary>
-    BustGroup group;
-    Character character;
     RectTransform rectTransform;
 
-    int index, posIndex;
+    int posIndex;
     float realIndex; 
 
     #region 初始化
@@ -38,15 +36,6 @@ public class BustItem : BaseView {
         rectTransform = transform as RectTransform;
     }
 
-    /// <summary>
-    /// 配置组件
-    /// </summary>
-    public void configure(BustGroup group, int index) {
-        this.index = index;
-        this.group = group;
-        base.configure();
-    }
-
     #endregion
 
     #region 更新控制
@@ -55,6 +44,7 @@ public class BustItem : BaseView {
     /// 更新
     /// </summary>
     protected override void update() {
+        base.update();
         updateAnimation();
     }
 
@@ -93,19 +83,19 @@ public class BustItem : BaseView {
     /// </summary>
     void updateMoving() {
         var pos = rectTransform.anchoredPosition;
-        pos.x = group.calcX(realIndex);
+        pos.x = getContainer().calcX(realIndex);
         rectTransform.anchoredPosition = pos;
     }
     void updateScaling() {
-        var s = group.calcScale(realIndex);
+        var s = getContainer().calcScale(realIndex);
         rectTransform.localScale = new Vector3(s, s, 1);
     }
     void updateFading() {
-        var f = group.calcFade(realIndex);
+        var f = getContainer().calcFade(realIndex);
         image.color = new Color(f, f, f, 1);
     }
     void updateSiblingIndex() {
-        var cnt = group.characterCount();
+        var cnt = getContainer().itemDisplaysCount();
         int index = (int)Mathf.Round(realIndex);
         index = (index % cnt + cnt) % cnt;
         transform.SetSiblingIndex(cnt - index - 1);
@@ -121,65 +111,14 @@ public class BustItem : BaseView {
 
     #endregion
 
-    /*
-    #region 启动/结束控制
-
-    /// <summary>
-    /// 启动视窗
-    /// </summary>
-    public void startView(Character character) {
-        this.character = character;
-        base.startView();
-    }
-
-    #endregion
-    */
-
-    #region 界面控制
-
-    /// <summary>
-    /// 绘制半身像
-    /// </summary>
-    void drawBust() {
-        if (character == null) return;
-        var bust = character.bust;
-        var rect = new Rect(0, 0, bust.width, bust.height);
-        image.overrideSprite = Sprite.Create(
-            bust, rect, new Vector2(0.5f, 0.5f));
-        image.overrideSprite.name = bust.name;
-        SceneUtils.setRectWidth(rectTransform, bust.width);
-        SceneUtils.setRectHeight(rectTransform, bust.height);
-    }
-
-    /// <summary>
-    /// 刷新视窗（clear后重绘）
-    /// </summary>
-    public override void refresh() {
-        base.refresh();
-        drawBust();
-    }
-    
-    #endregion
-
     #region 数据控制
 
     /// <summary>
-    /// 设置人物
+    /// 获取容器
     /// </summary>
-    /// <param name="character">人物</param>
-    public void setCharacter(Character character) {
-        if(this.character != character) {
-            this.character = character;
-            refresh();
-        }
-    }
-
-    /// <summary>
-    /// 获取人物
-    /// </summary>
-    /// <returns>人物</returns>
-    public Character getCharacter() {
-        return character;
+    /// <returns></returns>
+    public new CharacterContainer getContainer() {
+        return container as CharacterContainer;
     }
 
     /// <summary>
@@ -194,13 +133,30 @@ public class BustItem : BaseView {
         }
     }
 
+    #endregion
+
+    #region 界面控制
+
     /// <summary>
-    /// 是否选中
+    /// 绘制物品
     /// </summary>
-    /// <returns>是否选中</returns>
-    public bool isSelected() {
-        var cnt = group.characterCount();
-        return posIndex % cnt == 0;
+    protected override void drawExactlyItem(Character character) {
+        var bust = character.bust;
+        var rect = new Rect(0, 0, bust.width, bust.height);
+        image.overrideSprite = Sprite.Create(
+            bust, rect, new Vector2(0.5f, 0.5f));
+        image.overrideSprite.name = bust.name;
+        SceneUtils.setRectWidth(rectTransform, bust.width);
+        SceneUtils.setRectHeight(rectTransform, bust.height);
+    }
+
+    /// <summary>
+    /// 清除物品
+    /// </summary>
+    protected override void clearItem() {
+        image.overrideSprite = null;
+        SceneUtils.setRectWidth(rectTransform, 0);
+        SceneUtils.setRectHeight(rectTransform, 0);
     }
 
     #endregion

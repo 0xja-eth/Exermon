@@ -279,7 +279,7 @@ public static class DataLoader {
     /// <param name="data">数据容器</param>
     /// <param name="json">数据</param>
     public static T loadData<T>(JsonData json) where T : BaseData, new() {
-        //if (data == null) data = new T(); data.load(json);
+        if (json == null) return null;
         T data = new T(); data.load(json); return data;
     }
     /// <param name="key">键</param>
@@ -289,7 +289,9 @@ public static class DataLoader {
     }
     /// <remarks>传引用模式</remarks>
     public static void loadData<T>(ref T data, JsonData json) where T : BaseData, new() {
-        if (data == null) data = new T(); data.load(json);
+        if (json == null) { data = null; return; }
+        if (data == null) data = new T();
+        data.load(json);
     }
     public static void loadData<T>(ref T data, JsonData json, string key) where T : BaseData, new() {
         if (contains(json, key)) loadData(ref data, json[key]);

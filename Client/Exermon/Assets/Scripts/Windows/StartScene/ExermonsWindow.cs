@@ -25,7 +25,7 @@ public class ExermonsWindow : BaseWindow {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public ExerCardGroup exerCardGroup; // 艾瑟萌集
+    public ExermonsContainer exermons; // 艾瑟萌集
 
     /// <summary>
     /// 场景组件引用
@@ -61,7 +61,7 @@ public class ExermonsWindow : BaseWindow {
         var initExers = new List<Exermon>();
         foreach (var exer in exermons)
             if (exer.eType == 1) initExers.Add(exer);
-        exerCardGroup.configure(initExers.ToArray());
+        this.exermons.configure(initExers);
     }
 
     #endregion
@@ -99,7 +99,7 @@ public class ExermonsWindow : BaseWindow {
     /// <returns>文本</returns>
     string generateSelectedSubjectsText() {
         var subjects = new List<string>();
-        var results = exerCardGroup.getResult();
+        var results = exermons.getResult();
         foreach (var res in results) subjects.Add(res.subject().name);
         return string.Join(" ", subjects);
     }
@@ -110,7 +110,7 @@ public class ExermonsWindow : BaseWindow {
     void doCreate() {
         int[] eids; string[] enames;
 
-        exerCardGroup.getResult(out eids, out enames);
+        exermons.getResult(out eids, out enames);
 
         playerSer.createExermons(eids, enames, onCreateSuccess);
     }
@@ -129,7 +129,7 @@ public class ExermonsWindow : BaseWindow {
     /// 检查是否可以登陆
     /// </summary>
     bool check() {
-        return exerCardGroup.check();
+        return exermons.checkSelection();
     }
 
     #endregion

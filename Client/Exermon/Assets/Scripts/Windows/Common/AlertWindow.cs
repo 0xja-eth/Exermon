@@ -133,8 +133,10 @@ public class AlertWindow : BaseWindow {
     /// <summary>
     /// 刷新窗口
     /// </summary>
-    override public void refresh() {
-        base.refresh(); setText(text); drawButtons();
+    protected override void refresh() {
+        base.refresh();
+        clear(); setText(text);
+        drawButtons();
     }
 
     /// <summary>
@@ -184,7 +186,7 @@ public class AlertWindow : BaseWindow {
     /// <summary>
     /// 清除窗口
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         base.clear(); setText(""); clearButtons();
     }
 

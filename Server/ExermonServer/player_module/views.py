@@ -224,7 +224,8 @@ class Service:
 	# 选择艾瑟萌
 	@classmethod
 	async def createExermons(cls, consumer, player: Player, eids: list, enames: list):
-		# 返回数据：无
+		# 返回数据：
+		# id: int => 玩家艾瑟萌槽ID
 		from exermon_module.views import Common as ExermonCommon, Check as ExermonCheck
 
 		ExermonCheck.ensureExermonCount(eids)
@@ -238,7 +239,7 @@ class Service:
 		ExermonCommon.ensureExermonSubject(exers)
 		ExermonCommon.ensureExermonType(exers)
 
-		player.createExermons(exers, enames)
+		return {'id': player.createExermons(exers, enames).id}
 
 	# 选择艾瑟萌天赋
 	@classmethod
@@ -248,7 +249,7 @@ class Service:
 
 		ExermonCheck.ensureExermonCount(gids)
 
-		gifts = ExermonCommon.getExermons(gids)
+		gifts = ExermonCommon.getExerGifts(gids)
 
 		ExermonCommon.ensureExerGiftType(gifts)
 

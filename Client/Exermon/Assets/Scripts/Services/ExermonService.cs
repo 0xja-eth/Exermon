@@ -23,7 +23,20 @@ public class ExermonService : BaseService<ExermonService> {
         ExerSlotEquip, EquipSlotEquip
     }
 
+    /// <summary>
+    /// 外部系统
+    /// </summary>
+    ItemService itemSer;
+
     #region 初始化
+
+    /// <summary>
+    /// 初始化外部系统
+    /// </summary>
+    protected override void initializeSystems() {
+        base.initializeSystems();
+        itemSer = ItemService.get();
+    }
 
     /// <summary>
     /// 初始化操作字典
@@ -67,6 +80,42 @@ public class ExermonService : BaseService<ExermonService> {
         JsonData data = new JsonData();
         data["eid"] = eid; data["heid"] = heid; data["cid"] = cid;
         sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌槽
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadExerSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.slotContainers.loadExerSlot(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.slotContainers.exerSlotId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取人物装备槽
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadHumanEquipSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.slotContainers.loadHumanEquipSlot(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.slotContainers.humanEquipSlotId;
+        itemSer.getSlot(cid, _onSuccess, onError);
     }
 
     #endregion

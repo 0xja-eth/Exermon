@@ -8,12 +8,12 @@ using UnityEngine.UI;
 /// <summary>
 /// 属性条组
 /// </summary>
-public class ParamGroup : BaseView {
+public class ParamBarsGroup : BaseView {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public Transform paramView;
+    public Transform container;
 
     /// <summary>
     /// 外部变量设置
@@ -24,7 +24,7 @@ public class ParamGroup : BaseView {
     /// <summary>
     /// 内部变量声明
     /// </summary>
-    ParamBar[] bars;
+    ParamBar[] bars = new ParamBar[0];
 
     #region 初始化
 
@@ -42,7 +42,7 @@ public class ParamGroup : BaseView {
         bars = new ParamBar[count];
         for (int i = 1; i <= count; i++) {
             var name = string.Format(nameFormat, i);
-            bars[i-1] = SceneUtils.find<ParamBar>(paramView, name);
+            bars[i-1] = SceneUtils.find<ParamBar>(container, name);
         }
     }
 
@@ -112,6 +112,7 @@ public class ParamGroup : BaseView {
     /// </summary>
     /// <param name="info">属性信息</param>
     public void setValue(int index, ParamBar.ParamValueInfo info, bool force = false) {
+        if (index >= bars.Length) return;
         bars[index].setValue(info, force);
     }
     /// <param name="index">索引</param>
@@ -121,6 +122,7 @@ public class ParamGroup : BaseView {
     /// <param name="force">强制</param>
     public void setValue(int index, float value, float? max = null,
         float? rate = null, bool force = false) {
+        if (index >= bars.Length) return;
         bars[index].setValue(value, max, rate, force);
     }
 
@@ -135,6 +137,7 @@ public class ParamGroup : BaseView {
     /// 清除值
     /// </summary>
     public void clearValue(int index) {
+        if (index >= bars.Length) return;
         bars[index].clearValue();
     }
 

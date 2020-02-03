@@ -155,7 +155,7 @@ public class TextInputField : BaseView {
     /// <summary>
     /// 清空状态
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         setText("", false);
         setExplainerText("");
         clearStatus();

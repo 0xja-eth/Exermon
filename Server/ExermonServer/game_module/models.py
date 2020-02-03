@@ -147,7 +147,7 @@ class ParamValue(models.Model):
 			value = min(max_, value)
 		return value
 
-	# Scale 值
+	# Scale 值（
 	def _scaleValue(self, value, reverse=False):
 		if reverse: return value / self.scale()
 		return value * self.scale()

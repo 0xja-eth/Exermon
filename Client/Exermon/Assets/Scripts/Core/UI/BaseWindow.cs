@@ -160,7 +160,7 @@ public class BaseWindow : BaseView {
     #region 界面控制
     /*
     /// <summary>
-    /// 刷新窗口（clear后重绘）
+    /// 刷新窗口
     /// </summary>
     public new virtual void refresh() {
         clear(); Debug.Log(name + " refresh");

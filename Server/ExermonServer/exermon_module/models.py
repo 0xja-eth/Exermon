@@ -176,9 +176,9 @@ class Exermon(BaseItem):
 		if param_id is not None:
 			param = self.paramBases().filter(param_id=param_id)
 		if attr is not None:
-			param = self.paramRates().filter(param__attr=attr)
+			param = self.paramBases().filter(param__attr=attr)
 
-		if param is None or not param.exist(): return None
+		if param is None or not param.exists(): return 0
 
 		return param.first().getValue()
 
@@ -186,11 +186,11 @@ class Exermon(BaseItem):
 	def paramRate(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.param_rates.filter(param_id=param_id)
+			param = self.paramRates().filter(param_id=param_id)
 		if attr is not None:
-			param = self.param_rates.filter(param__attr=attr)
+			param = self.paramRates().filter(param__attr=attr)
 
-		if param is None or not param.exist(): return None
+		if param is None or not param.exists(): return 0
 
 		return param.first().getValue()
 
@@ -377,7 +377,7 @@ class ExerGift(BaseItem):
 		if attr is not None:
 			param = self.paramRates().filter(param__attr=attr)
 
-		if param is None or not param.exist(): return None
+		if param is None or not param.exists(): return None
 
 		return param.first().getValue()
 
@@ -492,12 +492,18 @@ class PlayerExermon(PackContItem):
 
 	# endregion
 
+	# 获取艾瑟萌技能槽
+	def exerSkillSlot(self):
+		try: return self.exerskillslot
+		except ExerSkillSlot.DoesNotExist: return None
+
 	# 转换属性为 dict
 	def _convertParamsToDict(self):
 
 		data = dict()
 
-		data['vals'] = ModelUtils.objectsToDict(self.paramVals())
+		data['values'] = ModelUtils.objectsToDict(self.paramVals())
+		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
 
 		return data
 
@@ -505,11 +511,14 @@ class PlayerExermon(PackContItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
+		exerskillslot = ModelUtils.preventNone(
+			self.exerSkillSlot(), func=lambda p: p.convertToDict())
+
 		res['nickname'] = self.nickname
 		res['exp'] = self.exp
 		res['level'] = self.level
 		res['params'] = self._convertParamsToDict()
-		res['exerskillslot_id'] = self.exerskillslot.id
+		res['exerskillslot'] = exerskillslot
 
 		return res
 
@@ -531,9 +540,8 @@ class PlayerExermon(PackContItem):
 		params = BaseParam.objs()
 
 		for param in params:
-			val = ParamValue()
-			val.param = param
-			val.value = self.paramVal(param_id=param.id)
+			val = ExerParamBase(param=param)
+			val.setValue(self.paramVal(param_id=param.id), False)
 			vals.append(val)
 
 		return vals
@@ -545,12 +553,26 @@ class PlayerExermon(PackContItem):
 		if exermon is None: return 0
 		return exermon.paramBase(param_id, attr)
 
+	# 艾瑟萌基础属性
+	def paramBases(self):
+		exermon = self.exermon()
+
+		if exermon is None: return []
+		return exermon.paramBases()
+
 	# 获取属性成长值
 	def paramRate(self, param_id=None, attr=None):
 		exermon = self.exermon()
 
 		if exermon is None: return 0
 		return exermon.paramRate(param_id, attr)
+
+	# 获取属性成长值
+	def paramRates(self):
+		exermon = self.exermon()
+
+		if exermon is None: return []
+		return exermon.paramRates()
 
 	# 获取属性当前值
 	def paramVal(self, param_id=None, attr=None):
@@ -769,7 +791,8 @@ class ExerSlotItem(SlotContItem):
 
 		data = dict()
 
-		data['vals'] = ModelUtils.objectsToDict(self.paramVals())
+		data['values'] = ModelUtils.objectsToDict(self.paramVals())
+		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
 
 		return data
 
@@ -784,15 +807,15 @@ class ExerSlotItem(SlotContItem):
 
 		level, next = self.slotLevel()
 
-		exerequipslot_id = ModelUtils.preventNone(
-			self.exerEquipSlot(), func=lambda p: p.id)
+		exerequipslot = ModelUtils.preventNone(
+			self.exerEquipSlot(), func=lambda p: p.convertToDict())
 
 		res['subject_id'] = self.subject_id
 		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
 		res['params'] = self._convertParamsToDict()
-		res['exerequipslot_id'] = exerequipslot_id
+		res['exerequipslot'] = exerequipslot
 
 		return res
 
@@ -825,9 +848,8 @@ class ExerSlotItem(SlotContItem):
 		params = BaseParam.objs()
 
 		for param in params:
-			val = ParamValue()
-			val.param = param
-			val.value = self.paramVal(param_id=param.id)
+			val = ExerParamBase(param=param)
+			val.setValue(self.paramVal(param_id=param.id), False)
 			vals.append(val)
 
 		return vals
@@ -835,79 +857,93 @@ class ExerSlotItem(SlotContItem):
 	# 艾瑟萌实际属性值（RPV）
 	def paramVal(self, param_id=None, attr=None):
 		id = None
-		if param_id is not None: id = param_id
 		if attr is not None: id = attr
+		if param_id is not None: id = param_id
 
 		if id is None: return 0
 
 		if self.cached_params is None or id not in self.cached_params:
 
-			bpv = self.baseParamVal(param_id, attr)
-			ppv = self.plusParamVal(param_id, attr)
-			rr = self.realRate(param_id, attr)
-			apv = self.appendParamVal(param_id, attr)
+			if self.cached_params is None:
+				self.cached_params = {}
 
-			self.cached_params[id] = self.adjustParamVal(
-				(bpv+ppv)*rr+apv, param_id, attr)
+			from utils.calc_utils import ExerSlotItemParamCalc
+
+			self.cached_params[id] = ExerSlotItemParamCalc.\
+				calc(self, param_id=param_id, attr=attr)
 
 		return self.cached_params[id]
 
-	# 艾瑟萌基础属性
+	# 属性基础值
 	def paramBase(self, param_id=None, attr=None):
 		player_exer: PlayerExermon = self.player_exer
 
 		if player_exer is None: return 0
 		return player_exer.paramBase(param_id, attr)
 
-	# 获取属性成长值
-	def paramRate(self, param_id=None, attr=None):
+	# 所有属性基础值
+	def paramBases(self):
 		player_exer: PlayerExermon = self.player_exer
-		player_gift: PlayerExerGift = self.player_gift
 
-		if player_exer is None: return 0
-		base = player_exer.paramRate(param_id, attr)
+		if player_exer is None: return []
+		return player_exer.paramBases()
 
-		if player_gift is None: rate = 1
-		else: rate = player_gift.paramRate(param_id, attr)
+	# 所有属性成长值
+	def paramRate(self, param_id=None, attr=None):
 
-		return base*rate
+		from utils.calc_utils import ExerSlotItemParamRateCalc
 
-	# 艾瑟萌基本属性值（BPV）
-	def baseParamVal(self, param_id=None, attr=None):
-		from utils.calc_utils import ExermonParamCalc
+		return ExerSlotItemParamRateCalc.\
+			calc(self, param_id=param_id, attr=attr)
 
-		base = self.paramBase(param_id, attr)
-		rate = self.paramRate(param_id, attr)
-		return ExermonParamCalc.calc(base, rate, self.exermon().level)
+	# 所有属性成长值
+	def paramRates(self):
+		vals = []
+		params = BaseParam.objs()
 
-	# 艾瑟萌附加属性值（PPV）
-	def plusParamVal(self, param_id=None, attr=None):
-		return self.exerequipslot.param(param_id, attr)
+		for param in params:
+			val = ExerParamRate(param=param)
+			val.setValue(self.paramRate(param_id=param.id), False)
+			vals.append(val)
 
-	# 实际加成率（RR）
-	def realRate(self, param_id=None, attr=None):
-		return self.baseRate(param_id, attr)*self.plusRate(param_id, attr)
+		return vals
 
-	# 基础加成率（BR）
-	def baseRate(self, param_id=None, attr=None): return 1
-
-	# 附加加成率（PR）
-	def plusRate(self, param_id=None, attr=None): return 1
-
-	# 追加属性值（APV）
-	def appendParamVal(self, param_id=None, attr=None): return 0
-
-	# 调整属性值
-	def adjustParamVal(self, val, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param: BaseParam = BaseParam.get(id=param_id)
-		if attr is not None:
-			param: BaseParam = BaseParam.get(attr=attr)
-
-		if param is None: return val
-
-		return param.clamp(val)
+	# # 艾瑟萌基本属性值（BPV）
+	# def baseParamVal(self, param_id=None, attr=None):
+	# 	from utils.calc_utils import ExermonParamCalc
+	#
+	# 	base = self.paramBase(param_id, attr)
+	# 	rate = self.paramRate(param_id, attr)
+	# 	return ExermonParamCalc.calc(base, rate, self.exermonLevel())
+	#
+	# # 艾瑟萌附加属性值（PPV）
+	# def plusParamVal(self, param_id=None, attr=None):
+	# 	return self.exerEquipSlot().param(param_id, attr)
+	#
+	# # 实际加成率（RR）
+	# def realRate(self, param_id=None, attr=None):
+	# 	return self.baseRate(param_id, attr)*self.plusRate(param_id, attr)
+	#
+	# # 基础加成率（BR）
+	# def baseRate(self, param_id=None, attr=None): return 1
+	#
+	# # 附加加成率（PR）
+	# def plusRate(self, param_id=None, attr=None): return 1
+	#
+	# # 追加属性值（APV）
+	# def appendParamVal(self, param_id=None, attr=None): return 0
+	#
+	# # 调整属性值
+	# def adjustParamVal(self, val, param_id=None, attr=None):
+	# 	param = None
+	# 	if param_id is not None:
+	# 		param: BaseParam = BaseParam.get(id=param_id)
+	# 	if attr is not None:
+	# 		param: BaseParam = BaseParam.get(attr=attr)
+	#
+	# 	if param is None: return val
+	#
+	# 	return param.clamp(val)
 
 	# endregion
 
@@ -929,7 +965,7 @@ class ExerSlotItem(SlotContItem):
 
 	# 艾瑟萌等级
 	def exermonLevel(self):
-		return self.exermon().level
+		return self.player_exer.level
 
 	# 增加槽经验
 	def changeExp(self, exp):
@@ -1493,5 +1529,6 @@ class ExerEquipSlotItem(SlotContItem):
 
 	# 获取属性值
 	def param(self, param_id=None, attr=None):
+		if self.pack_equip is None: return 0
 		return self.pack_equip.param(param_id, attr)
 

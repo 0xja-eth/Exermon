@@ -281,6 +281,17 @@ public class EquipableItem : LimitedItem {
     public ParamData[] params_ { get; private set; }
 
     /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        foreach (var param in params_)
+            if (param.paramId == paramId) return param;
+        return new ParamData(paramId);
+    }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
@@ -346,6 +357,17 @@ public class BaseContItem : BaseData {
     public int type { get; private set; }
 
     /// <summary>
+    /// 构造函数
+    /// </summary>
+    public BaseContItem() { }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="type">类型</param>
+    public BaseContItem(Type type) { this.type = (int)type; }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
@@ -389,7 +411,7 @@ public class PackContItem : BaseContItem {
     /// </summary>
     /// <returns></returns>
     protected virtual GetFunc getFunc() {
-        var type = (Type)(this.type);
+        var type = (Type)this.type;
         var data = DataService.get();
         switch (type) {
             case Type.HumanPackItem: return data.humanItem;
@@ -412,6 +434,22 @@ public class PackContItem : BaseContItem {
         var func = getFunc();
         if (func == null) return null;
         return func(itemId);
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public PackContItem() { }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <param name="itemId">物品ID</param>
+    /// <param name="count">数量</param>
+    public PackContItem(Type type, int itemId=0, int count=1) : base(type) {
+        this.itemId = itemId;
+        this.count = count;
     }
 
     /// <summary>
@@ -481,6 +519,7 @@ public class BaseContainer : BaseData {
     /// 属性
     /// </summary>
     public int type { get; private set; }
+    public int capacity { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -490,6 +529,7 @@ public class BaseContainer : BaseData {
         base.load(json);
 
         type = DataLoader.loadInt(json, "type");
+        capacity = DataLoader.loadInt(json, "capacity");
     }
 
     /// <summary>
@@ -508,13 +548,12 @@ public class BaseContainer : BaseData {
 /// <summary>
 /// 背包类容器数据
 /// </summary>
-public class PackContainer : BaseContainer {
+public class PackContainer<T> : BaseContainer where T : PackContItem, new() {
 
     /// <summary>
     /// 属性
     /// </summary>
-    public int capacity { get; private set; }
-    public List<PackContItem> items { get; private set; }
+    public List<T> items { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -523,8 +562,7 @@ public class PackContainer : BaseContainer {
     public override void load(JsonData json) {
         base.load(json);
 
-        capacity = DataLoader.loadInt(json, "capacity");
-        items = DataLoader.loadDataList<PackContItem>(json, "items");
+        items = DataLoader.loadDataList<T>(json, "items");
     }
 
     /// <summary>
@@ -544,12 +582,12 @@ public class PackContainer : BaseContainer {
 /// <summary>
 /// 背包类容器数据
 /// </summary>
-public class SlotContainer : BaseContainer {
+public class SlotContainer<T> : BaseContainer where T : SlotContItem, new() {
 
     /// <summary>
     /// 属性
     /// </summary>
-    public List<SlotContItem> items { get; private set; }
+    public List<T> items { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -558,7 +596,7 @@ public class SlotContainer : BaseContainer {
     public override void load(JsonData json) {
         base.load(json);
         
-        items = DataLoader.loadDataList<SlotContItem>(json, "items");
+        items = DataLoader.loadDataList<T>(json, "items");
     }
 
     /// <summary>

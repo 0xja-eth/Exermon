@@ -64,7 +64,7 @@ public class LoginWindow : BaseWindow {
         get { return _type; }
         set {
             if (_type == value) return;
-            _type = value; refresh();
+            _type = value; requestRefresh();
         }
     } 
 
@@ -326,9 +326,9 @@ public class LoginWindow : BaseWindow {
     #region 界面控制
 
     /// <summary>
-    /// 刷新视窗（clear后重绘）
+    /// 刷新视窗
     /// </summary>
-    public override void refresh() {
+    protected override void refresh() {
         base.refresh();
         switch(type) {
             case Type.Welcome: refreshWelcome(); break;
@@ -463,7 +463,7 @@ public class LoginWindow : BaseWindow {
     /// <summary>
     /// 清除视窗
     /// </summary>
-    public override void clear() {
+    protected override void clear() {
         typeText.text = "";
         clearAllInputFields();
         clearAllButtons();

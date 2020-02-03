@@ -73,6 +73,11 @@ class ExermonLevelCalc:
 # ================================
 class ExermonParamCalc:
 
+	# 基本属性值(BPV)	EPB*((实际属性成长率/R+1)*S)^(L-1)
+
+	# 艾瑟萌战斗力计算公式
+	# 战斗力(BV)			round((MHP+MMP*2+ATK*6*C*(1+CRI/100)+DEF*4)*(1+EVA/50))
+
 	S = 1.005
 	R = 233
 
@@ -114,3 +119,139 @@ class ExermonSlotLevelCalc:
 	def calcPlayerNext(cls, level):
 		return math.ceil(pow(level, 1/cls.AP)*cls.TP*cls.D)
 
+
+# ================================
+# 艾瑟萌槽项属性成长率计算类
+# ================================
+class ExerSlotItemParamRateCalc:
+
+	# 计算属性
+	@classmethod
+	def calc(cls, exerslot_item, **kwargs):
+		if exerslot_item is None: return 0
+
+		player_exer = exerslot_item.player_exer
+		if player_exer is None: return 0
+		epr = player_exer.paramRate(**kwargs)
+
+		player_gift = exerslot_item.player_gift
+		if player_gift is None: return epr
+		gprr = player_gift.paramRate(**kwargs)
+
+		return epr*gprr
+
+
+# ================================
+# 艾瑟萌槽项属性计算类
+# ================================
+class ExerSlotItemParamCalc:
+
+	# 艾瑟萌属性值计算公式
+	# 实际属性值(RPV)	(基本属性值+附加属性值)*实际加成率+追加属性值
+	# 基本属性值(BPV)	EPB*((实际属性成长率/R+1)*S)^(L-1)
+	# 实际属性成长率(RPR)	EPR*GPRR
+	# 附加属性值(PPV)	EPPV+SPPV
+	# 实际加成率(RR)		基础加成率*附加加成率
+	# 基础加成率(BR)		1
+	# 附加加成率(PR)		GPR*SPR（对战时还包括题目糖属性加成率）
+	# 追加属性值(APV)	SAPV
+
+	# 艾瑟萌战斗力计算公式
+	# 战斗力(BV)			round((MHP+MMP*2+ATK*6*C*(1+CRI/100)+DEF*4)*(1+EVA/50))
+
+	# 计算属性
+	@classmethod
+	def calc(cls, exerslot_item, **kwargs):
+		calc_obj = cls(exerslot_item, **kwargs)
+		return calc_obj.value
+
+	def __init__(self, exerslot_item, **kwargs):
+		from exermon_module.models import Exermon, ExerSlotItem, \
+			PlayerExermon, PlayerExerGift, ExerEquipSlot
+		self.value = 0
+
+		self.exerslot_item: ExerSlotItem = exerslot_item
+		if exerslot_item is None: return
+
+		self.player_exer: PlayerExermon = self.exerslot_item.player_exer
+		if self.player_exer is None: return
+
+		self.exermon: Exermon = self.player_exer.exermon()
+		if self.exermon is None: return
+
+		self.player_gift: PlayerExerGift = self.exerslot_item.player_gift
+		self.exerequip_slot: ExerEquipSlot = self.exerslot_item.exerEquipSlot()
+
+		self.kwargs = kwargs
+
+		self.value = self._calc()
+
+	# 计算 RPV = (基本属性值+附加属性值)*实际加成率+追加属性值
+	def _calc(self):
+
+		bpv = self._calcBaseParamValue()
+		ppv = self._calcPlusParamValue()
+		rr = self._calcRealRate()
+		apv = self._calcAppendParamValue()
+
+		val = (bpv+ppv)*rr+apv
+		return self._adjustParamValue(val)
+
+	# 计算 BPV = EPB*((实际属性成长率/R+1)*S)^(L-1)
+	def _calcBaseParamValue(self):
+
+		epb = self.player_exer.paramBase(**self.kwargs)
+		rpr = self._calcRealParamRate()
+
+		return ExermonParamCalc.calc(epb, rpr, self.player_exer.level)
+
+	# 计算 RPR = EPR*GPRR
+	def _calcRealParamRate(self):
+
+		return ExerSlotItemParamRateCalc.calc(self.exerslot_item, **self.kwargs)
+
+	# 计算 PPV = EPPV+SPPV
+	def _calcPlusParamValue(self):
+		return self._calcEquipPlusParamValue() + \
+			   self._calcStatusPlusParamValue()
+
+	# 计算 EPPV 装备附加值
+	def _calcEquipPlusParamValue(self):
+		if self.exerequip_slot is None: return 0
+		return self.exerequip_slot.param(**self.kwargs)
+
+	# 计算 SPPV 状态附加值
+	def _calcStatusPlusParamValue(self): return 0
+
+	# 计算 RR = 基础加成率*附加加成率
+	def _calcRealRate(self):
+		return self._calcBaseRate()*self._calcPlusRate()
+
+	# 计算 BR
+	def _calcBaseRate(self): return 1
+
+	# 计算 PR = GPR*SPR（对战时还包括题目糖属性加成率）
+	def _calcPlusRate(self): return 1
+
+	# 计算 APV
+	def _calcAppendParamValue(self): return 0
+
+	# 调整值
+	def _adjustParamValue(self, val):
+		param = self._getParam()
+
+		if param is None: return val
+
+		return param.clamp(val)
+
+	# 获取属性实例
+	def _getParam(self):
+		from game_module.models import BaseParam
+
+		if 'param_id' in self.kwargs:
+			return BaseParam.get(id=self.kwargs['param_id'])
+
+		if 'attr' in self.kwargs:
+			return BaseParam.get(attr=self.kwargs['attr'])
+
+		return None

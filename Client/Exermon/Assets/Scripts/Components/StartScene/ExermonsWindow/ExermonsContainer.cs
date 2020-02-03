@@ -1,0 +1,130 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// 艾瑟萌卡片容器
+/// </summary>
+public class ExermonsContainer : ItemContainer<Exermon> {
+
+    /// <summary>
+    /// 常量设置
+    /// </summary>
+
+    /// <summary>
+    /// 外部组件设置
+    /// </summary>
+    public ExermonDetail detail; // 帮助界面
+
+    /// <summary>
+    /// 外部变量设置
+    /// </summary>
+    public bool inStartScene = false; // 是否在开始场景中
+
+    /// <summary>
+    /// 内部变量声明
+    /// </summary>
+    string[] enames; // 每一个艾瑟萌的昵称
+
+    #region 数据控制
+
+    /// <summary>
+    /// 获取物品帮助组件
+    /// </summary>
+    /// <returns>帮助组件</returns>
+    protected override ItemInfo<Exermon> getItemDetail() {
+        return detail;
+    }
+
+    /// <summary>
+    /// 最大选中数量
+    /// </summary>
+    /// <returns>最大选中数</returns>
+    public override int maxCheckCount() {
+        return DataService.get().staticData.configure.maxSubject;
+    }
+
+    #region 昵称控制
+
+    /// <summary>
+    /// 配置艾瑟萌名称
+    /// </summary>
+    void setupEnames() {
+        var cnt = itemsCount();
+        enames = new string[cnt];
+        for (int i = 0; i < cnt; i++) enames[i] = "";
+    }
+
+    /// <summary>
+    /// 更改昵称
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <param name="name">名称</param>
+    public void changeNickname(int index, string name) {
+        enames[index] = name;
+    }
+
+    /// <summary>
+    /// 获取昵称
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>昵称</returns>
+    public string getNickname(int index) {
+        return enames[index];
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 物品变更回调
+    /// </summary>
+    protected override void onItemsChanged() {
+        base.onItemsChanged();
+        setupEnames();
+    }
+
+    /// <summary>
+    /// 校验选择数目
+    /// </summary>
+    /// <returns>选择数目是否正确</returns>
+    public bool checkSelection() {
+        return checkedIndices.Count == maxCheckCount();
+    }
+
+    /// <summary>
+    /// 获取选择结果
+    /// </summary>
+    /// <param name="eids">选择的艾瑟萌ID数组</param>
+    /// <param name="enames">选择的艾瑟萌昵称数组</param>
+    /// <returns>选中数目</returns>
+    public int getResult(out int[] eids, out string[] enames) {
+        var cnt = checkedIndices.Count;
+        eids = new int[cnt];
+        enames = new string[cnt];
+        for (int i = 0; i < cnt; ++i) {
+            var index = checkedIndices[i];
+            eids[i] = items[index].getID();
+            enames[i] = this.enames[index];
+        }
+        return cnt;
+    }
+
+    /// <summary>
+    /// 获取选择结果
+    /// </summary>
+    /// <returns>选择的所有艾瑟萌</returns>
+    public Exermon[] getResult() {
+        var cnt = checkedIndices.Count;
+        var items = new Exermon[cnt];
+        for (int i = 0; i < cnt; ++i) {
+            var index = checkedIndices[i];
+            items[i] = this.items[index];
+        }
+        return items;
+    }
+
+    #endregion
+    
+}

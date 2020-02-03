@@ -150,13 +150,14 @@ public class ScrollListItem : BaseView {
     /// <param name="item">项文本</param>
     /// <param name="tag">项标签</param>
     public void setItem(string item, string tag) {
-        itemText = item; itemTag = tag; refresh();
+        itemText = item; itemTag = tag;
+        requestRefresh();
     }
 
     /// <summary>
     /// 刷新
     /// </summary>
-    public override void refresh() {
+    protected override void refresh() {
         index = list.getListItemId(itemText, itemTag);
         text.text = generateItemText();
     }

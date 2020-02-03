@@ -457,7 +457,7 @@ class EquipableItem(LimitedItem):
 		if attr is not None:
 			param = self.params().filter(param__attr=attr)
 
-		if param is None or not param.exist(): return None
+		if param is None or not param.exists(): return None
 
 		return param.first().getValue()
 
@@ -613,7 +613,8 @@ class BaseContainer(models.Model):
 
 		res = {
 			'id': self.id,
-			'type': self.type
+			'type': self.type,
+			'capacity': self.getCapacity(),
 		}
 
 		if 'type' in kwargs: type = kwargs['type']
@@ -958,14 +959,6 @@ class PackContainer(BaseContainer):
 	@classmethod
 	def acceptedItemClass(cls):
 		return cls.acceptedContItemClass().acceptedItemClass()
-
-	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
-
-		res['capacity'] = self.capacity
-
-		return res
 
 	# 物品类型是否接受
 	def isItemAcceptable(self, cont_item=None, item=None, **kwargs):
@@ -1651,9 +1644,17 @@ class SlotContItem(BaseContItem):
 		c1, c2 = self.acceptedEquipItemClass()
 		attr1, attr2 = self.acceptedEquipItemAttr()
 
+		equip_item1 = ModelUtils.preventNone(
+			self.targetEquipItem1(), func=lambda p: p.convertToDict()
+		)
+		equip_item2 = ModelUtils.preventNone(
+			self.targetEquipItem2(), func=lambda p: p.convertToDict()
+		)
+
 		res['index'] = self.index
-		if c1: res[attr1] = self.targetEquipItem1().convertToDict()
-		if c2: res[attr2] = self.targetEquipItem2().convertToDict()
+
+		if c1: res[attr1] = equip_item1
+		if c2: res[attr2] = equip_item2
 
 		return res
 

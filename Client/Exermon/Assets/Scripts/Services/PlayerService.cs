@@ -55,7 +55,22 @@ public class PlayerService : BaseService<PlayerService> {
     /// </summary>
     public Player player { get; private set; } = null;
 
+    /// <summary>
+    /// 外部系统
+    /// </summary>
+    ItemService itemSer;
+    ExermonService exerSer;
+
     #region 初始化
+
+    /// <summary>
+    /// 初始化外部系统
+    /// </summary>
+    protected override void initializeSystems() {
+        base.initializeSystems();
+        itemSer = ItemService.get();
+        exerSer = ExermonService.get();
+    }
 
     /// <summary>
     /// 初始化状态字典
@@ -277,7 +292,7 @@ public class PlayerService : BaseService<PlayerService> {
         UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateExermonsSuccessFunc(eids, enames, onSuccess);
+            generateCreateExermonsSuccessFunc(onSuccess);
 
         JsonData data = new JsonData();
         data["eids"] = DataLoader.convertArray(eids);
@@ -290,10 +305,10 @@ public class PlayerService : BaseService<PlayerService> {
     /// </summary>
     /// <param name="onSuccess">成功回调</param>
     NetworkSystem.RequestObject.SuccessAction
-        generateCreateExermonsSuccessFunc(int[] eids, 
-        string[] enames, UnityAction onSuccess) {
+        generateCreateExermonsSuccessFunc(UnityAction onSuccess) {
         return (res) => {
-            player.createExermons(eids, enames);
+            var id = DataLoader.loadInt(res, "id");
+            player.createExermons(id);
             if (onSuccess != null) onSuccess.Invoke();
         };
     }

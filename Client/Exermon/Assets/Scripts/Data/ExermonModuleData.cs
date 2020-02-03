@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 using LitJson;
 using UnityEditor;
+using System.Linq;
 
 /// <summary>
 /// 艾瑟萌数据
@@ -48,7 +49,7 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
             var rate = rateParams[i];
             info.max = (float)star().baseRanges[i].maxValue;
             info.value = (float)base_.value;
-            if(i >= 4) {
+            if (base_.param().isPercent()) { // 如果是百分数属性
                 info.max *= 100; info.value *= 100;
             }
             info.rate = (float)rate.value;
@@ -99,6 +100,28 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
     }
 
     /// <summary>
+    /// 获取属性基础值
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramBase(int paramId) {
+        foreach (var param in baseParams)
+            if (param.paramId == paramId) return param;
+        return new ParamData(paramId);
+    }
+
+    /// <summary>
+    /// 获取属性成长率
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramRate(int paramId) {
+        foreach (var param in rateParams)
+            if (param.paramId == paramId) return param;
+        return new ParamData(paramId);
+    }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
@@ -131,6 +154,7 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
         json["star_id"] = starId;
         json["subject_id"] = subjectId;
         json["e_type"] = eType;
+
         json["params"] = new JsonData();
         json["params"]["bases"] = DataLoader.convertDataArray(baseParams);
         json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
@@ -142,7 +166,7 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
 /// <summary>
 /// 艾瑟萌碎片数据
 /// </summary>
-public class ExerGift : BaseItem {
+public class ExerGift : BaseItem, ParamBar.ParamValueInfosConvertable {
 
     /// <summary>
     /// 属性
@@ -152,11 +176,39 @@ public class ExerGift : BaseItem {
     public ParamData[] params_ { get; private set; }
 
     /// <summary>
+    /// 转化为属性信息集
+    /// </summary>
+    /// <returns>属性信息集</returns>
+    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+        var count = params_.Length;
+        var infos = new ParamBar.ParamValueInfo[count];
+        for (int i = 0; i < count; i++) {
+            var info = new ParamBar.ParamValueInfo();
+            var base_ = params_[i];
+            info.max = (float)star().paramRanges[i].maxValue;
+            info.value = (float)base_.value;
+            infos[i] = info;
+        }
+        return infos;
+    }
+
+    /// <summary>
     /// 获取艾瑟萌天赋星级
     /// </summary>
     /// <returns>艾瑟萌天赋星级</returns>
     public ExerGiftStar star() {
         return DataService.get().exerGiftStar(starId);
+    }
+
+    /// <summary>
+    /// 获取属性成长加成率
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramRate(int paramId) {
+        foreach (var param in params_)
+            if (param.paramId == paramId) return param;
+        return new ParamData(paramId);
     }
 
     /// <summary>
@@ -429,22 +481,51 @@ public class ExerEquip : EquipableItem {
     }
 }
 
-/*
 /// <summary>
 /// 艾瑟萌背包物品
 /// </summary>
-public class ExerPackItem : PackContItem {}
-*/
+public class ExerPackItem : PackContItem { }
 
 /// <summary>
 /// 艾瑟萌背包装备
 /// </summary>
-public class ExerPackEquip : PackContItem {}
+public class ExerPackEquip : ExerPackItem {
+
+    /// <summary>
+    /// 获取装备实例
+    /// </summary>
+    /// <returns>装备</returns>
+    public ExerEquip equip() {
+        return item() as ExerEquip;
+    }
+
+    /// <summary>
+    /// 获取装备的所有属性
+    /// </summary>
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        var equip = this.equip();
+        if (equip == null) return new ParamData[0];
+        return equip.params_;
+    }
+
+    /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        var equip = this.equip();
+        if (equip == null) return new ParamData(paramId);
+        return equip.getParam(paramId);
+    }
+
+}
 
 /// <summary>
 /// 艾瑟萌
 /// </summary>
-public class PlayerExermon : PackContItem {
+public class PlayerExermon : PackContItem, ParamBar.ParamValueInfosConvertable {
 
     /// <summary>
     /// 属性
@@ -452,7 +533,41 @@ public class PlayerExermon : PackContItem {
     public string nickname { get; private set; }
     public int exp { get; private set; }
     public int level { get; private set; }
-    public int exerSkillSlotId { get; private set; }
+
+    public SlotContainer<ExerSkillSlotItem> exerSkillSlot { get; private set; }
+
+    public ParamData[] paramValues { get; private set; }
+    public ParamData[] rateParams { get; private set; }
+
+    /// <summary>
+    /// 转化为属性信息集
+    /// </summary>
+    /// <returns>属性信息集</returns>
+    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+        var count = paramValues.Length;
+        var infos = new ParamBar.ParamValueInfo[count];
+        for (int i = 0; i < count; i++) {
+            var info = new ParamBar.ParamValueInfo();
+            var base_ = paramValues[i];
+            var rate = rateParams[i];
+            info.max = (float)exermon().star().baseRanges[i].maxValue;
+            info.value = (float)base_.value;
+            if (base_.param().isPercent()) { // 如果是百分数属性
+                info.max *= 100; info.value *= 100;
+            }
+            info.rate = (float)rate.value;
+            infos[i] = info;
+        }
+        return infos;
+    }
+
+    /// <summary>
+    /// 获取艾瑟萌
+    /// </summary>
+    /// <returns></returns>
+    public Exermon exermon() {
+        return item() as Exermon;
+    }
 
     /// <summary>
     /// 获取名称
@@ -461,6 +576,57 @@ public class PlayerExermon : PackContItem {
     public string name() {
         return nickname.Length > 0 ? nickname : item().name;
     }
+
+    /// <summary>
+    /// 获取属性基础值
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramBase(int paramId) {
+        return exermon().paramBase(paramId);
+    }
+
+    /// <summary>
+    /// 获取属性成长率
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramRate(int paramId) {
+        return exermon().paramRate(paramId);
+    }
+
+    /// <summary>
+    /// 获取实际属性值
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramValue(int paramId) {
+        var base_ = paramBase(paramId).value;
+        var rate = paramRate(paramId).value;
+        var value = CalcService.ExermonParamCalc.calc(base_, rate, level);
+        value = Math.Round(value);
+        return new ParamData(paramId, value);
+    }
+
+    /// <summary>
+    /// 重新计算属性
+    /// </summary>
+    public void recomputeParams() {
+        foreach(var param in paramValues) 
+            param.setValue(paramBase(param.paramId).value);
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public PlayerExermon() : base(Type.PlayerExermon) { }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="itemId">物品ID</param>
+    /// <param name="count">数量</param>
+    public PlayerExermon(int itemId) : base(Type.PlayerExermon, itemId) { }
 
     /// <summary>
     /// 数据加载
@@ -472,7 +638,14 @@ public class PlayerExermon : PackContItem {
         nickname = DataLoader.loadString(json, "nickname");
         exp = DataLoader.loadInt(json, "exp");
         level = DataLoader.loadInt(json, "level");
-        exerSkillSlotId = DataLoader.loadInt(json, "exerskillslot_id");
+
+        exerSkillSlot = DataLoader.loadData<SlotContainer
+            <ExerSkillSlotItem>>(json, "exerskillslot");
+
+        var paramRanges = DataLoader.loadJsonData(json, "params");
+
+        paramValues = DataLoader.loadDataArray<ParamData>(paramRanges, "values");
+        rateParams = DataLoader.loadDataArray<ParamData>(paramRanges, "rates");
     }
 
     /// <summary>
@@ -485,7 +658,11 @@ public class PlayerExermon : PackContItem {
         json["nickname"] = nickname;
         json["exp"] = exp;
         json["level"] = level;
-        json["exerskillslot_id"] = exerSkillSlotId;
+        json["exerskillslot"] = DataLoader.convertData(exerSkillSlot);
+
+        json["params"] = new JsonData();
+        json["params"]["values"] = DataLoader.convertDataArray(paramValues);
+        json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
 
         return json;
     }
@@ -515,7 +692,26 @@ public class ExerEquipSlotItem : SlotContItem {
     /// </summary>
     /// <returns>装备类型</returns>
     public ExerEquip equip() {
-        return (ExerEquip)packEquip.item();
+        return packEquip.equip();
+    }
+
+    /// <summary>
+    /// 获取装备的所有属性
+    /// </summary>
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        if (packEquip == null) return new ParamData[0];
+        return packEquip.getParams();
+    }
+
+    /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        if (packEquip == null) return new ParamData(paramId);
+        return packEquip.getParam(paramId);
     }
 
     /// <summary>
@@ -546,7 +742,7 @@ public class ExerEquipSlotItem : SlotContItem {
 /// <summary>
 /// 艾瑟萌装备槽项
 /// </summary>
-public class ExerSlotItem : SlotContItem {
+public class ExerSlotItem : SlotContItem, ParamBar.ParamValueInfosConvertable {
 
     /// <summary>
     /// 属性
@@ -556,7 +752,33 @@ public class ExerSlotItem : SlotContItem {
     public int subjectId { get; private set; }
     public int exp { get; private set; }
     public int level { get; private set; }
-    public int exerEquipSlotId { get; private set; }
+
+    public ExerEquipSlot exerEquipSlot { get; private set; }
+
+    public ParamData[] paramValues { get; private set; }
+    public ParamData[] rateParams { get; private set; }
+
+    /// <summary>
+    /// 转化为属性信息集
+    /// </summary>
+    /// <returns>属性信息集</returns>
+    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+        var count = paramValues.Length;
+        var infos = new ParamBar.ParamValueInfo[count];
+        for (int i = 0; i < count; i++) {
+            var info = new ParamBar.ParamValueInfo();
+            var base_ = paramValues[i];
+            var rate = rateParams[i];
+            info.max = (float)exermon().star().baseRanges[i].maxValue;
+            info.value = (float)base_.value;
+            if (base_.param().isPercent()) { // 如果是百分数属性
+                info.max *= 100; info.value *= 100;
+            }
+            info.rate = (float)rate.value;
+            infos[i] = info;
+        }
+        return infos;
+    }
 
     /// <summary>
     /// 获取科目
@@ -569,9 +791,10 @@ public class ExerSlotItem : SlotContItem {
     /// <summary>
     /// 获取艾瑟萌
     /// </summary>
-    /// <returns>艾瑟萌</returns>
+    /// <returns></returns>
     public Exermon exermon() {
-        return (Exermon)playerExer.item();
+        if (playerExer == null) return null;
+        return playerExer.exermon();
     }
 
     /// <summary>
@@ -579,7 +802,65 @@ public class ExerSlotItem : SlotContItem {
     /// </summary>
     /// <returns>艾瑟萌天赋</returns>
     public ExerGift exerGift() {
-        return (ExerGift)playerGift.item();
+        if (playerGift == null) return null;
+        return playerGift.item() as ExerGift;
+    }
+
+    /// <summary>
+    /// 设置艾瑟萌
+    /// </summary>
+    /// <param name="exermon">艾瑟萌</param>
+    public void setExermon(Exermon exermon) {
+        playerExer = new PlayerExermon(exermon.getID());
+        recomputeParams();
+    }
+
+    /// <summary>
+    /// 设置艾瑟萌天赋
+    /// </summary>
+    /// <param name="exerGift">艾瑟萌天赋</param>
+    public void setExerGift(ExerGift exerGift) {
+        playerGift = new PackContItem(Type.PlayerExerGift, exerGift.getID());
+        recomputeParams();
+    }
+
+    /// <summary>
+    /// 获取属性基础值
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramBase(int paramId) {
+        return playerExer.paramBase(paramId);
+    }
+
+    /// <summary>
+    /// 获取属性成长率
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramRate(int paramId) {
+        var value = CalcService.ExerSlotItemParamRateCalc.calc(this, paramId);
+        return new ParamData(paramId, value);
+    }
+
+    /// <summary>
+    /// 获取实际属性值
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData paramValue(int paramId) {
+        var value = CalcService.ExerSlotItemParamCalc.calc(this, paramId);
+        return new ParamData(paramId, value);
+    }
+
+    /// <summary>
+    /// 重新计算属性
+    /// </summary>
+    public void recomputeParams() {
+        foreach (var param in paramValues)
+            param.setValue(paramBase(param.paramId).value);
+        foreach (var param in rateParams)
+            param.setValue(paramRate(param.paramId).value);
     }
 
     /// <summary>
@@ -591,10 +872,17 @@ public class ExerSlotItem : SlotContItem {
 
         playerExer = DataLoader.loadData<PlayerExermon>(json, "player_exer");
         playerGift = DataLoader.loadData<PackContItem>(json, "player_gift");
+
         subjectId = DataLoader.loadInt(json, "subject_id");
         exp = DataLoader.loadInt(json, "exp");
         level = DataLoader.loadInt(json, "level");
-        exerEquipSlotId = DataLoader.loadInt(json, "exerequipslot_id");
+
+        exerEquipSlot = DataLoader.loadData<ExerEquipSlot>(json, "exerequipslot");
+
+        var paramRanges = DataLoader.loadJsonData(json, "params");
+
+        paramValues = DataLoader.loadDataArray<ParamData>(paramRanges, "values");
+        rateParams = DataLoader.loadDataArray<ParamData>(paramRanges, "rates");
     }
 
     /// <summary>
@@ -606,10 +894,15 @@ public class ExerSlotItem : SlotContItem {
 
         json["player_exer"] = DataLoader.convertData(playerExer);
         json["player_gift"] = DataLoader.convertData(playerGift);
+
         json["subject_id"] = subjectId;
         json["exp"] = exp;
         json["level"] = level;
-        json["exerequipslot_id"] = exerEquipSlotId;
+        json["exerequipslot"] = DataLoader.convertData(exerEquipSlot);
+
+        json["params"] = new JsonData();
+        json["params"]["values"] = DataLoader.convertDataArray(paramValues);
+        json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
 
         return json;
     }
@@ -657,4 +950,57 @@ public class ExerSkillSlotItem : SlotContItem {
 
         return json;
     }
+}
+
+/// <summary>
+/// 艾瑟萌装备槽
+/// </summary>
+public class ExerEquipSlot : SlotContainer<ExerEquipSlotItem> {
+
+    /// <summary>
+    /// 获取装备项
+    /// </summary>
+    /// <param name="eType">装备类型</param>
+    /// <returns>装备项数据</returns>
+    public ExerEquipSlotItem getEquipSlotItem(int eType) {
+        foreach(var item in items) 
+            if (item.eType == eType) return item;
+        return null;
+    }
+
+    /// <summary>
+    /// 获取装备的所有属性
+    /// </summary>
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        var params_ = new Dictionary<int, ParamData>();
+
+        foreach (var item in items) {
+            var itemParams = item.getParams();
+            foreach(var param in itemParams) {
+                var pid = param.paramId;
+                if (params_.ContainsKey(pid))
+                    params_[pid].addValue(param.value);
+                else 
+                    params_[pid] = new ParamData(pid, param.value);
+            }
+        }
+
+        return params_.Values.ToArray();
+    }
+
+    /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        var param = new ParamData(paramId, 0);
+
+        foreach (var item in items) 
+            param.addValue(item.getParam(paramId).value);
+
+        return param;
+    }
+
 }

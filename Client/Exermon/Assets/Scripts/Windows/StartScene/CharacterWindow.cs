@@ -23,7 +23,7 @@ public class CharacterWindow : BaseWindow {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public BustGroup bustGroup; // 人物集
+    public CharacterContainer bustGroup; // 人物集
     public TextInputField nameInput; // 名称
     public DropdownField gradeInput; // 年级
 
@@ -93,7 +93,7 @@ public class CharacterWindow : BaseWindow {
     void doCreate() {
         var name = nameInput.getText();
         var grade = gradeInput.getValue().Item1;
-        var cid = bustGroup.currentCharacter().getID();
+        var cid = bustGroup.selectedItem().getID();
 
         playerSer.createCharacter(name, grade, cid, onCreateSuccess);
     }

@@ -85,11 +85,53 @@ public class ParamData : BaseData {
     public double value { get; private set; } // 真实值
 
     /// <summary>
+    /// 是否需要ID
+    /// </summary>
+    protected override bool idEnable() { return false; }
+
+    /// <summary>
     /// 获取基本属性
     /// </summary>
     /// <returns>基本属性</returns>
     public BaseParam param() {
         return DataService.get().baseParam(paramId);
+    }
+
+    /// <summary>
+    /// 设置值
+    /// </summary>
+    /// <param name="val">值</param>
+    public void setValue(double val) {
+        value = val;
+    }
+
+    /// <summary>
+    /// 增加值
+    /// </summary>
+    /// <param name="val">值</param>
+    public void addValue(double val) {
+        value += val;
+    }
+
+    /// <summary>
+    /// 乘值
+    /// </summary>
+    /// <param name="val">值</param>
+    public void timesValue(double val) {
+        value *= val;
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public ParamData() { }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public ParamData(int paramId, double value = 0) {
+        this.paramId = paramId;
+        this.value = value;
     }
 
     /// <summary>
@@ -125,6 +167,11 @@ public class ParamRangeData : BaseData {
     public int paramId { get; private set; }
     public double minValue { get; private set; } // 真实值
     public double maxValue { get; private set; } // 真实值
+
+    /// <summary>
+    /// 是否需要ID
+    /// </summary>
+    protected override bool idEnable() { return false; }
 
     /// <summary>
     /// 获取基本属性

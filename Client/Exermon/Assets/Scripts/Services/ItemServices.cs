@@ -9,7 +9,7 @@ using LitJson;
 /// <summary>
 /// 物品服务
 /// </summary>
-public class ItemServices : BaseService<ItemServices> {
+public class ItemService : BaseService<ItemService> {
 
     /// <summary>
     /// 操作文本设定
