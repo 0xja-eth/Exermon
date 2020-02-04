@@ -110,11 +110,11 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 完善个人信息
 	'player/create/info': [[
 		['uid', 'int'],
-		['birth', 'date'],
-		['school', 'str'],
-		['city', 'str'],
-		['contact', 'str'],
-		['description', 'str'],
+		['birth', 'var'],
+		['school', 'var'],
+		['city', 'var'],
+		['contact', 'var'],
+		['description', 'var'],
 	],
 		Player.createInfo,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应

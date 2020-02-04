@@ -18,7 +18,7 @@ public class GiftsWindow : BaseWindow {
     const string InvalidSelectionAlertText = "请为每个艾瑟萌都装备上天赋！";
     const string ConfirmText = "游戏开始后将清空余下天赋，确认当前的选择吗？";
 
-    const string CreateSuccessText = "选择艾瑟萌天赋完毕！";
+    const string CreateSuccessText = "装备艾瑟萌天赋成功！";
 
     /// <summary>
     /// 外部组件设置

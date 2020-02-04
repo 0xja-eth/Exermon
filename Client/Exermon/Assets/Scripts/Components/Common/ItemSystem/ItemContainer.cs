@@ -17,7 +17,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public Transform containerObj; // 容器物体
+    public Transform container; // 容器物体
     // public ItemInfo<T> detail; // 帮助界面
 
     /// <summary>
@@ -531,7 +531,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// <returns>ItemDisplay</returns>
     ItemDisplay<T> getOrCreateItemDisplay(int index) {
         if (index < itemDisplays.Count) return itemDisplays[index];
-        var obj = Instantiate(itemPrefab, containerObj);
+        var obj = Instantiate(itemPrefab, container);
         var item = SceneUtils.get<ItemDisplay<T>>(obj);
         obj.name = itemPrefab.name + (index + 1);
         onItemDisplayCreated(item, index);
