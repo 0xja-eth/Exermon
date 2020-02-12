@@ -8,43 +8,31 @@ using UnityEngine.UI;
 /// <summary>
 /// 日期选择域
 /// </summary>
-public class DateTimeField : BaseView {
-
-    /// <summary>
-    /// 值变更回调函数类型
-    /// </summary>
-    public delegate string onChangeFunc(DateTime dateTime);
+public class DateTimeField : BaseInputField<DateTime> {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public Text valueText;
     public Transform pickersParent;
-    public GameObject pickersContaienr;
+    public DateTimePickersPlane pickersPlane;
     public DateTimePicker[] pickers;
 
     /// <summary>
     /// 外部变量设置
     /// </summary>
-    public DateTime defaultDateTime = DateTime.Now;
+    public DateTime defaultDateTime = new DateTime(2000, 1, 1);
     public DateTime minDateTime = new DateTime(1900, 1, 1);
     public DateTime maxDateTime = DateTime.Now;
 
-    public string dateFormat = "yyyy 年 MM 月 dd 日";
+    public string dateFormat = DataLoader.DisplayDateFormat;
 
     /// <summary>
     /// 内部变量声明
     /// </summary>
-    DateTime dateTime;
-
     DateTimePicker year, month, day, hour, minute, second;
 
     Transform oriParent;
-
-    /// <summary>
-    /// 内部变量声明
-    /// </summary>
-    public onChangeFunc onChange { get; set; }
 
     #region 初始化
 
@@ -67,7 +55,7 @@ public class DateTimeField : BaseView {
         minute = getPicker(DateTimePicker.Type.Minute);
         second = getPicker(DateTimePicker.Type.Second);
 
-        dateTime = defaultDateTime;
+        value = defaultDateTime;
         updatePickersRange();
 
         foreach (var picker in pickers) 
@@ -81,23 +69,9 @@ public class DateTimeField : BaseView {
     /// <summary>
     /// 值变更回调
     /// </summary>
-    public void onValueChanged(bool emit=true) {
-        Debug.Log("onValueChanged: " + dateTime);
-        requestRefresh();
-        updatePickersRange();
-        if(emit) onChange?.Invoke(getValue());
-    }
-
-    #endregion
-
-    #region 启动/结束控制
-
-    /// <summary>
-    /// 启动视窗
-    /// </summary>
-    public void startView(DateTime dateTime) {
-        base.startView();
-        setValue(dateTime);
+    public override void onValueChanged(bool check = true, bool emit = true) {
+        base.onValueChanged(check, emit);
+        if (emit) updatePickersRange();
     }
 
     #endregion
@@ -120,27 +94,19 @@ public class DateTimeField : BaseView {
     /// </summary>
     /// <returns>选择中</returns>
     bool isSelecting() {
-        return pickersContaienr.activeSelf;
+        return pickersPlane.shown;
     }
 
     /// <summary>
-    /// 获取当前值
-    /// </summary>
-    /// <returns>当前值</returns>
-    public DateTime getValue() {
-        return dateTime;
-    }
-
-    /// <summary>
-    /// 设置当前值
+    /// 赋值
     /// </summary>
     /// <param name="value">值</param>
-    public void setValue(DateTime dateTime, bool emit = true) {
-        if (this.dateTime == dateTime) return;
-        this.dateTime = dateTime;
-        if (this.dateTime > maxDateTime) this.dateTime = maxDateTime;
-        if (this.dateTime < minDateTime) this.dateTime = minDateTime;
-        onValueChanged(emit);
+    protected override bool assignValue(DateTime dateTime) {
+        if (value == dateTime) return false;
+        value = dateTime;
+        if (value > maxDateTime) value = maxDateTime;
+        if (value < minDateTime) value = minDateTime;
+        return true;
     }
 
     /// <summary>
@@ -150,17 +116,17 @@ public class DateTimeField : BaseView {
         Debug.Log(type + " updateValue: " + delta);
         switch (type) {
             case DateTimePicker.Type.Year:
-                setValue(dateTime.AddYears(delta), false); break;
+                setValue(value.AddYears(delta), false, false); break;
             case DateTimePicker.Type.Month:
-                setValue(dateTime.AddMonths(delta), false); break;
+                setValue(value.AddMonths(delta), false, false); break;
             case DateTimePicker.Type.Day:
-                setValue(dateTime.AddDays(delta), false); break;
+                setValue(value.AddDays(delta), false, false); break;
             case DateTimePicker.Type.Hour:
-                setValue(dateTime.AddHours(delta), false); break;
+                setValue(value.AddHours(delta), false, false); break;
             case DateTimePicker.Type.Minute:
-                setValue(dateTime.AddMinutes(delta), false); break;
+                setValue(value.AddMinutes(delta), false, false); break;
             case DateTimePicker.Type.Second:
-                setValue(dateTime.AddSeconds(delta), false); break;
+                setValue(value.AddSeconds(delta), false, false); break;
         }
     }
 
@@ -170,8 +136,8 @@ public class DateTimeField : BaseView {
     void updatePickersRange() {
         var min = minDateTime;
         var max = maxDateTime;
-        var year = dateTime.Year;
-        var month = dateTime.Month;
+        var year = value.Year;
+        var month = value.Month;
         var minMonth = (year == min.Year) ? min.Month : 1;
         var maxMonth = (year == max.Year) ? max.Month : 12;
         var minDay = (year == min.Year && month == min.Month) ? min.Day : 1;
@@ -195,14 +161,23 @@ public class DateTimeField : BaseView {
     /// </summary>
     void refreshPickers() {
         foreach(var picker in pickers) 
-            picker.setValue(dateTime, true);
+            picker.setValue(value, true);
     }
 
     /// <summary>
-    /// 绘制时间文本
+    /// 绘制值
     /// </summary>
-    void drawDateTime() {
+    /// <param name="text">值</param>
+    protected override void drawValue(DateTime dateTime) {
         valueText.text = dateTime.ToString(dateFormat);
+    }
+
+    /// <summary>
+    /// 清除值
+    /// </summary>
+    protected override void clearValue() {
+        value = default;
+        valueText.text = "";
     }
 
     /// <summary>
@@ -210,8 +185,7 @@ public class DateTimeField : BaseView {
     /// </summary>
     protected override void refresh() {
         base.refresh();
-        drawDateTime();
-        if (pickersContaienr.activeSelf)
+        if (pickersPlane.shown)
             refreshPickers();
     }
 
@@ -223,9 +197,9 @@ public class DateTimeField : BaseView {
     /// 开始选择
     /// </summary>
     public void startSelect() {
-        pickersContaienr.SetActive(true);
-        oriParent = pickersContaienr.transform.parent;
-        pickersContaienr.transform.SetParent(pickersParent);
+        pickersPlane.startWindow();
+        oriParent = pickersPlane.transform.parent;
+        pickersPlane.transform.SetParent(pickersParent);
         refreshPickers();
     }
 
@@ -233,8 +207,8 @@ public class DateTimeField : BaseView {
     /// 结束选择
     /// </summary>
     public void endSelect() {
-        pickersContaienr.SetActive(false);
-        pickersContaienr.transform.SetParent(oriParent);
+        pickersPlane.terminateWindow();
+        pickersPlane.transform.SetParent(oriParent);
         onValueChanged();
     }
 

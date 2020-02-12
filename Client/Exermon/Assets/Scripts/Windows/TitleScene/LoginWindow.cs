@@ -215,8 +215,8 @@ public class LoginWindow : BaseWindow {
     /// 执行登陆
     /// </summary>
     void doLogin() {
-        var un = usernameInput.getText();
-        var pw = passwordInput.getText();
+        var un = usernameInput.getValue();
+        var pw = passwordInput.getValue();
 
         playerSer.login(un, pw, onLoginSuccess);
     }
@@ -225,10 +225,10 @@ public class LoginWindow : BaseWindow {
     /// 执行注册
     /// </summary>
     void doRegister() {
-        var un = usernameInput.getText();
-        var pw = passwordInput.getText();
-        var email = emailInput.getText();
-        var code = codeInput.getText();
+        var un = usernameInput.getValue();
+        var pw = passwordInput.getValue();
+        var email = emailInput.getValue();
+        var code = codeInput.getValue();
 
         playerSer.register(un, pw, email, code, onRegisterSuccess);
     }
@@ -237,10 +237,10 @@ public class LoginWindow : BaseWindow {
     /// 执行重置密码
     /// </summary>
     void doForget() {
-        var un = usernameInput.getText();
-        var pw = passwordInput.getText();
-        var email = emailInput.getText();
-        var code = codeInput.getText();
+        var un = usernameInput.getValue();
+        var pw = passwordInput.getValue();
+        var email = emailInput.getValue();
+        var code = codeInput.getValue();
 
         playerSer.forget(un, pw, email, code, onRegisterSuccess);
     }
@@ -249,8 +249,8 @@ public class LoginWindow : BaseWindow {
     /// 执行验证码发送
     /// </summary>
     void doSend() {
-        var un = usernameInput.getText();
-        var email = emailInput.getText();
+        var un = usernameInput.getValue();
+        var email = emailInput.getValue();
         var type = "";
         if (this.type == Type.Register) type = "register";
         if (this.type == Type.Forget) type = "forget";
@@ -273,8 +273,8 @@ public class LoginWindow : BaseWindow {
     /// <param name="res">返回结果</param>
     void onLoginSuccess() {
         var config = exermonSys.configure;
-        config.rememberUsername = usernameInput.getText();
-        config.rememberPassword = passwordInput.getText();
+        config.rememberUsername = usernameInput.getValue();
+        config.rememberPassword = passwordInput.getValue();
         scene.startGame();
     }
 
@@ -476,8 +476,8 @@ public class LoginWindow : BaseWindow {
         var config = exermonSys.configure;
         if(config.rememberUsername.Length > 0 &&
             config.rememberPassword.Length > 0) {
-            usernameInput.setText(config.rememberUsername);
-            passwordInput.setText(config.rememberPassword);
+            usernameInput.setValue(config.rememberUsername);
+            passwordInput.setValue(config.rememberPassword);
         }
     }
 

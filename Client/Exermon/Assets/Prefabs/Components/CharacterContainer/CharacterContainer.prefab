@@ -572,10 +572,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5638a9eeb0f86d844a06b3196df2bba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  containerObj: {fileID: 1831371949246832961}
+  container: {fileID: 1831371949246832961}
+  subViewNameFormat: 
+  subViewPrefab: {fileID: 8771686992127864567, guid: b009f7171db32414dbc4db96c0552939,
+    type: 3}
   maxCheck: 0
   defaultCapacity: 0
-  itemPrefab: {fileID: 8771686992127864567, guid: b009f7171db32414dbc4db96c0552939,
-    type: 3}
   name: {fileID: 1831371948639012198}
   description: {fileID: 1831371950176891876}

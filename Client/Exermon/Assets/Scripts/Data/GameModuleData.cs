@@ -77,7 +77,7 @@ public class GameStaticData : BaseData {
     /// <param name="ver">版本对象</param>
     /// <returns>更新日志文本</returns>
     string generateUpdateNote(GameVersionData ver) {
-        string time = ver.updateTime.ToString(DataLoader.DateFormat);
+        string time = ver.updateTime.ToString(DataLoader.SystemDateFormat);
         return string.Format(GameVersionData.UpdateNoteFormat, ver.mainVersion,
             ver.subVersion, time, ver.updateNote, ver.description);
     }
@@ -164,7 +164,7 @@ public class GameDynamicData : BaseData {
 /// <summary>
 /// 科目数据
 /// </summary>
-public class Subject : TypeData {
+public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
 
     /// <summary>
     /// 强制选择数量
@@ -177,6 +177,15 @@ public class Subject : TypeData {
     public Color color { get; private set; }
     public int maxScore { get; private set; }
     public bool force { get; private set; }
+
+    /// <summary>
+    /// 转化为属性信息
+    /// </summary>
+    /// <returns>属性信息</returns>
+    public JsonData convertToDisplayData(string type = "") {
+        Debug.Log("BaseParam.convertToDisplayData: " + toJson().ToJson());
+        return toJson();
+    }
 
     /// <summary>
     /// 数据加载
@@ -207,7 +216,7 @@ public class Subject : TypeData {
 /// <summary>
 /// 基本能力数据
 /// </summary>
-public class BaseParam : TypeData, ParamBar.ParamConfigInfoConvertable {
+public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
 
     /// <summary>
     /// 属性
@@ -223,11 +232,9 @@ public class BaseParam : TypeData, ParamBar.ParamConfigInfoConvertable {
     /// 转化为属性信息
     /// </summary>
     /// <returns>属性信息</returns>
-    public ParamBar.ParamConfigInfo convertToParamInfo() {
-        var info = new ParamBar.ParamConfigInfo();
-        info.name = name; info.color = color;
-        info.max = maxValue;
-        return info;
+    public JsonData convertToDisplayData(string type = "") {
+        Debug.Log("BaseParam.convertToDisplayData: " + toJson().ToJson());
+        return toJson();
     }
 
     /// <summary>

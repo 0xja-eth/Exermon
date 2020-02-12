@@ -57,6 +57,9 @@ public class TitleScene : BaseScene {
         gameSys.start();
     }
 
+    /// <summary>
+    /// 初始化其他
+    /// </summary>
     protected override void initializeOthers() {
         base.initializeOthers();
         SceneUtils.depositSceneObject("Scene", this);

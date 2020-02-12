@@ -15,7 +15,7 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     public Image full;
     public ExerGiftCard gift; // 天赋卡片（装备的）
     public Text name, subject, description;
-    public ParamBarsGroup paramsView;
+    public ParamDisplaysGroup paramsView;
 
     #region 初始化
 
@@ -101,7 +101,7 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// </summary>
     /// <param name="exermon">物品</param>
     void drawParamsView(ExerSlotItem item) {
-        paramsView.setValues(item);
+        paramsView.setValues(item, "growth");
     }
 
     /// <summary>

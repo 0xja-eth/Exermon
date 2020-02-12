@@ -8,7 +8,9 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 日期选择器
 /// </summary>
-public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDragHandler {
+public class DateTimePicker : BaseView, 
+    IPointerEnterHandler, IPointerExitHandler,
+    IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     /// <summary>
     /// 日期类型
@@ -28,7 +30,9 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
     public Type type; // 日期类型
     public int itemCount = 2; // 备选数量（上下对称）
 
-    public int threshold = 5; // 灵敏度
+    public int threshold = 15; // 灵敏度
+
+    public int fontSize = 18; // 每个数值的字体大小
 
     public Color currentTextColor = new Color(1, 1, 1); // 当前项的文本颜色
     public Color minTextColor = new Color(0.2f, 0.2f, 0.2f); // 最远项的文本颜色
@@ -45,9 +49,11 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
 
     Text[] items; // 项数组
 
-    Vector3 lastDragPos;
+    Vector2 lastDragPos;
 
     int value, minValue = 1, maxValue = 12; // 当前值/最大值/最小值
+
+    bool enter = false;
 
     #region 初始化
 
@@ -72,6 +78,7 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
             var rate = 1 - dist / itemCount;
             text.color = minTextColor + 
                 (currentTextColor - minTextColor) * rate;
+            text.fontSize = fontSize;
             items[i] = text;
         }
     }
@@ -82,6 +89,28 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
     public void configure(DateTimeField field) {
         this.field = field;
         base.configure();
+    }
+
+    #endregion
+
+    #region 更新控制
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    protected override void update() {
+        base.update();
+        updateScroll();
+    }
+
+    /// <summary>
+    /// 更新滚轮事件
+    /// </summary>
+    void updateScroll() {
+        if (!enter) return;
+        var delta = Input.GetAxis("Mouse ScrollWheel");
+        if (delta < 0) nextValue();
+        else if (delta > 0) prevValue();
     }
 
     #endregion
@@ -153,28 +182,7 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
                 setValue(dateTime.Second, force); break;
         }
     }
-    /*
-    /// <summary>
-    /// 更新日期
-    /// </summary>
-    /// <param name="dateTime">日期</param>
-    public void updateDate(ref DateTime dateTime) {
-        switch (type) {
-            case Type.Year:
-                dateTime.AddYears(value); break;
-            case Type.Month:
-                dateTime.AddMonths(value); break;
-            case Type.Day:
-                dateTime.AddDays(value); break;
-            case Type.Hour:
-                dateTime.AddHours(value); break;
-            case Type.Minute:
-                dateTime.AddMinutes(value); break;
-            case Type.Second:
-                dateTime.AddSeconds(value); break;
-        }
-    }
-    */
+
     /// <summary>
     /// 值改变回调
     /// </summary>
@@ -183,17 +191,19 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
     }
 
     /// <summary>
-    /// 上一个值
-    /// </summary>
-    public void prevValue() {
-        setValue(value - 1);
-    }
-
-    /// <summary>
     /// 下一个值
     /// </summary>
     public void nextValue() {
         setValue(value + 1);
+        field?.updateValue(1, type);
+    }
+
+    /// <summary>
+    /// 上一个值
+    /// </summary>
+    public void prevValue() {
+        setValue(value - 1);
+        field?.updateValue(-1, type);
     }
 
     #endregion
@@ -233,6 +243,22 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
     #region 事件控制
 
     /// <summary>
+    /// 指针进入回调
+    /// </summary>
+    /// <param name="eventData"></param>
+    public void OnPointerEnter(PointerEventData eventData) {
+        enter = true;
+    }
+
+    /// <summary>
+    /// 指针退出回调
+    /// </summary>
+    /// <param name="eventData"></param>
+    public void OnPointerExit(PointerEventData eventData) {
+        enter = false;
+    }
+
+    /// <summary>
     /// 开始拖拽事件
     /// </summary>
     /// <param name="eventData">事件数据</param>
@@ -257,9 +283,6 @@ public class DateTimePicker : BaseView, IBeginDragHandler, IDragHandler, IEndDra
         if(Math.Abs(delta) >= threshold) {
             if (delta > 0) nextValue();
             else prevValue();
-
-            if (field) field.updateValue(
-                delta > 0 ? 1 : -1, type);
             lastDragPos = eventData.position;
         }
     }

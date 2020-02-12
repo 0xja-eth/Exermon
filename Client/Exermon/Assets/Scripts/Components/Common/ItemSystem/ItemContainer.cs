@@ -8,16 +8,11 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 物品容器
 /// </summary>
-public class ItemContainer<T> : BaseView where T: class {
+public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
 
     /// <summary>
     /// 常量设置
     /// </summary>
-
-    /// <summary>
-    /// 外部组件设置
-    /// </summary>
-    public Transform container; // 容器物体
     // public ItemInfo<T> detail; // 帮助界面
 
     /// <summary>
@@ -27,15 +22,8 @@ public class ItemContainer<T> : BaseView where T: class {
     public int defaultCapacity = 0; // 默认容量
 
     /// <summary>
-    /// 预制件设置
-    /// </summary>
-    public GameObject itemPrefab; // 物品预制件
-
-    /// <summary>
     /// 内部变量声明
     /// </summary>
-    protected List<ItemDisplay<T>> itemDisplays = 
-        new List<ItemDisplay<T>>(); // 物品显示组件列表
     protected List<T> items = new List<T>(); // 物品列表
 
     protected List<int> checkedIndices = new List<int>(); // 已选中索引
@@ -43,7 +31,7 @@ public class ItemContainer<T> : BaseView where T: class {
     protected int selectedIndex = -1; // 选择的索引
 
     #region 初始化
-
+    
     /// <summary>
     /// 配置
     /// </summary>
@@ -54,14 +42,10 @@ public class ItemContainer<T> : BaseView where T: class {
     }
     /// <param name="items">物品集</param>
     public void configure(T[] items) {
-        configure();
-        setItems(items);
-        select(0);
+        configure(); setItems(items); select(0);
     }
     public void configure(List<T> items) {
-        configure();
-        setItems(items);
-        select(0);
+        configure(); setItems(items); select(0);
     }
 
     /// <summary>
@@ -77,7 +61,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     void configureItemDisplays() {
         for (int i = 0; i < itemDisplaysCount(); ++i)
-            createItemDisplay(null, i);
+            createSubView(null, i);
     }
 
     #endregion
@@ -127,7 +111,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <returns></returns>
     public int itemDisplaysCount() {
-        return Math.Max(maxItemDisplaysCount(), itemDisplays.Count);
+        return Math.Max(maxItemDisplaysCount(), subViews.Count);
     }
 
     /// <summary>
@@ -167,7 +151,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// <param name="item">物品</param>
     /// <returns>物品显示项</returns>
     public ItemDisplay<T> getItemDisplay(T item) {
-        return itemDisplays.Find((item_) => item_.getItem() == item);
+        return subViews.Find((item_) => item_.getItem() == item);
     }
 
     /// <summary>
@@ -249,17 +233,13 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <returns>物品显示项数组</returns>
     public ItemDisplay<T>[] getItemDisplays() {
-        return itemDisplays.ToArray();
+        return subViews.ToArray();
     }
 
     /// <summary>
     /// 物品变更回调
     /// </summary>
     protected virtual void onItemsChanged() {
-        Debug.Log("== onItemsChanged ==");
-        Debug.Log("itemsCount: " + itemsCount());
-        Debug.Log("maxItemDisplaysCount: " + maxItemDisplaysCount());
-        Debug.Log("itemDisplaysCount: " + itemDisplaysCount());
         refreshItemDisplays();
         processForceCheckItems();
         requestRefresh();
@@ -272,7 +252,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <param name="i">索引</param>
     /// <returns>循环索引</returns>
-    protected int getWrappedIndex(int i) {
+    protected int getLoopedIndex(int i) {
         var cnt = itemDisplaysCount();
         return (i % cnt + cnt) % cnt;
     }
@@ -303,7 +283,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// <returns>选择项</returns>
     public ItemDisplay<T> selectedItemDisplay() {
         if (selectedIndex == -1) return null;
-        return itemDisplays[selectedIndex];
+        return subViews[selectedIndex];
     }
 
     /// <summary>
@@ -320,11 +300,11 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <param name="index">索引</param>
     public virtual void select(int index) {
-        Debug.Log("select: " + index);
+        //Debug.Log("select: " + index);
 
-        index = getWrappedIndex(index);
+        index = getLoopedIndex(index);
 
-        var item = itemDisplays[index];
+        var item = subViews[index];
         if (!item.isSelectable()) return;
         if (selectedIndex == index) return;
 
@@ -359,7 +339,7 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     void processForceCheckItems() {
         for (int i = 0; i < itemDisplaysCount(); i++)
-            if (itemDisplays[i].isForceChecked()) check(i);
+            if (subViews[i].isForceChecked()) check(i);
     }
 
     /// <summary>
@@ -396,7 +376,7 @@ public class ItemContainer<T> : BaseView where T: class {
         var items = new ItemDisplay<T>[cnt];
         for (int i = 0; i < cnt; ++i) {
             var index = checkedIndices[i];
-            items[i] = itemDisplays[index];
+            items[i] = subViews[index];
         }
         return items;
     }
@@ -420,16 +400,16 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <param name="index">索引</param>
     public virtual void check(int index) {
-        Debug.Log("check: " + index);
+        //Debug.Log("check: " + index);
 
-        index = getWrappedIndex(index);
+        index = getLoopedIndex(index);
 
-        var item = itemDisplays[index];
+        var item = subViews[index];
         if (!item.isCheckable()) return;
         if (isChecked(index)) return;
 
         var cnt = checkedIndices.Count;
-        Debug.Log("cnt: " + cnt + ", max: " + maxCheckCount());
+        //Debug.Log("cnt: " + cnt + ", max: " + maxCheckCount());
         if (maxCheckCount() > 0 && cnt >= maxCheckCount())
             if (!removeFirstCheckIndex())
                 return; // 如果不能移除，则不继续执行
@@ -444,7 +424,7 @@ public class ItemContainer<T> : BaseView where T: class {
     bool removeFirstCheckIndex() {
         for (int i = 0; i < checkedIndices.Count; ++i) {
             var index = checkedIndices[i];
-            if (itemDisplays[index].isUncheckable()) {
+            if (subViews[index].isUncheckable()) {
                 checkedIndices.RemoveAt(i);
                 return true;
             }
@@ -457,11 +437,11 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <param name="index">索引</param>
     public virtual void uncheck(int index) {
-        Debug.Log("uncheck: " + index);
+        //Debug.Log("uncheck: " + index);
 
-        index = getWrappedIndex(index);
+        index = getLoopedIndex(index);
 
-        var item = itemDisplays[index];
+        var item = subViews[index];
         if (!item.isUncheckable()) return;
         if (!isChecked(index)) return;
 
@@ -474,10 +454,10 @@ public class ItemContainer<T> : BaseView where T: class {
     /// </summary>
     /// <param name="index">索引</param>
     public void toggle(int index) {
-        Debug.Log("toggle: " + index);
-        Debug.Log("Checked: " + string.Join(",", checkedIndices));
+        //Debug.Log("toggle: " + index);
+        //Debug.Log("Checked: " + string.Join(",", checkedIndices));
 
-        index = getWrappedIndex(index);
+        index = getLoopedIndex(index);
         if (isChecked(index)) uncheck(index);
         else check(index);
     }
@@ -512,62 +492,38 @@ public class ItemContainer<T> : BaseView where T: class {
         for (int i = 0; i < itemDisplaysCount(); i++) 
             if (i < maxItemDisplaysCount()) {
                 T item = (i < itemsCount() ? items[i] : null);
-                createItemDisplay(item, i);
-            } else destroyItemDisplay(i);
+                createSubView(item, i);
+            } else destroySubView(i);
     }
 
     /// <summary>
     /// 创建物品显示组件
     /// </summary>
     /// <param name="item">物品</param>
-    void createItemDisplay(T item, int index) {
-        var display = getOrCreateItemDisplay(index);
-        display.startView(item);
+    void createSubView(T item, int index) {
+        createSubView(index).startView(item);
     }
-
+    /*
     /// <summary>
     /// 获取或者创建一个 ItemDisplay
     /// </summary>
     /// <returns>ItemDisplay</returns>
     ItemDisplay<T> getOrCreateItemDisplay(int index) {
-        if (index < itemDisplays.Count) return itemDisplays[index];
+        if (index < subViews.Count) return subViews[index];
         var obj = Instantiate(itemPrefab, container);
         var item = SceneUtils.get<ItemDisplay<T>>(obj);
-        obj.name = itemPrefab.name + (index + 1);
+        obj.name = string.Format(itemNameFormat, index);
         onItemDisplayCreated(item, index);
-        itemDisplays.Add(item);
         return item;
     }
-
+    */
     /// <summary>
     /// ItemDisplay 创建回调
     /// </summary>
     /// <param name="item">ItemDisplay</param>
-    protected virtual void onItemDisplayCreated(ItemDisplay<T> item, int index) {
-        item.configure(this, index);
-    }
-
-    /// <summary>
-    /// 释放一个 ItemDisplay
-    /// </summary>
-    /// <param name="index"></param>
-    void destroyItemDisplay(int index) {
-        if (index < itemDisplays.Count) {
-            Debug.Log("destroyItemDisplay: " + index + ": " + itemDisplays[index]);
-            Destroy(itemDisplays[index].gameObject);
-            itemDisplays.RemoveAt(index);
-        }
-    }
-
-    /// <summary>
-    /// 刷新所有物品显示项
-    /// </summary>
-    void refreshItems() {
-        for(int i = 0; i < itemDisplays.Count; ++i) {
-            var display = itemDisplays[i];
-            var item = i < itemsCount() ? items[i] : null;
-            display.requestRefresh(true);// (item, true);
-        }
+    protected override void onSubViewCreated(ItemDisplay<T> sub, int index) {
+        sub.configure(this, index);
+        base.onSubViewCreated(sub, index);
     }
 
     #endregion
@@ -609,15 +565,7 @@ public class ItemContainer<T> : BaseView where T: class {
     }
 
     #endregion
-
-    /// <summary>
-    /// 刷新视窗
-    /// </summary>
-    protected override void refresh() {
-        base.refresh();
-        refreshItems();
-    }
-
+    
     /// <summary>
     /// 清除描述
     /// </summary>

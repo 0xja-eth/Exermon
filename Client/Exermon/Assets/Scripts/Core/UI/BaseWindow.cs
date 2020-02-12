@@ -26,6 +26,9 @@ public class BaseWindow : BaseView {
 
     public new Animation animation; // 动画组件
 
+    /// <summary>
+    /// 外部变量设置
+    /// </summary>
     public string showWindowAniText = "ShowWindow"; // 显示窗口动画名
     public string hideWindowAniText = "HideWindow"; // 隐藏窗口动画名
 

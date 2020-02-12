@@ -22,12 +22,15 @@ public class ValidateService : BaseService<ValidateService> {
     static readonly Regex CodeReg = new Regex(@"^\d{6}$");
 
     static readonly int[] NameLen = new int[] { 1, 8 };
-    static readonly int[] ExerNameLen = new int[] { 0, 8 };
+
+    /*
+    static readonly int[] ExerNameLen = new int[] { 0, 4 };
 
     static readonly int[] SchoolLen = new int[] { 0, 24 };
     static readonly int[] CityLen = new int[] { 0, 24 };
     static readonly int[] ContactLen = new int[] { 0, 24 };
     static readonly int[] DescLen = new int[] { 0, 128 };
+    */
 
     /// <summary>
     /// 提示文本设定
@@ -160,6 +163,7 @@ public class ValidateService : BaseService<ValidateService> {
         return check(value, NameLen) ? "" : NameTips;
     }
 
+    /*
     /// <summary>
     /// 检查艾瑟萌昵称
     /// </summary>
@@ -204,6 +208,7 @@ public class ValidateService : BaseService<ValidateService> {
     public static string checkDescription(string value) {
         return check(value, DescLen) ? "" : DescTips;
     }
+    */
 
     #endregion
 

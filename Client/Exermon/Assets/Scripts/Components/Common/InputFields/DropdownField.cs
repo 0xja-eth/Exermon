@@ -7,30 +7,46 @@ using UnityEngine.UI;
 /// <summary>
 /// 下拉列表域
 /// </summary>
-public class DropdownField : BaseView {
-
-    /// <summary>
-    /// 值变更回调函数类型
-    /// </summary>
-    public delegate string onChangeFunc(int index);
+public class DropdownField : BaseInputField<Tuple<int, string>> {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public Dropdown drowdown;
+    public Dropdown dropdown;
 
     /// <summary>
     /// 内部变量声明
     /// </summary>
-    Tuple<int, string>[] options;
-
-    /// <summary>
-    /// 内部变量声明
-    /// </summary>
-    public onChangeFunc onChange { get; set; }
+    Tuple<int, string>[] options = new Tuple<int, string>[0];
 
     #region 初始化
-    
+
+    /// <summary>
+    /// 初次打开时初始化（子类中重载）
+    /// </summary>
+    protected override void initializeOnce() {
+        processPresetedOptions();
+        dropdown?.onValueChanged.AddListener(
+            (index) => {
+                Debug.Log("Listener: " + index);
+                value = options[index];
+                onValueChanged();
+            });
+    }
+
+    /// <summary>
+    /// 处理预先设置好的选项
+    /// </summary>
+    void processPresetedOptions() {
+        if (options.Length > 0) return;
+        var cnt = dropdown.options.Count;
+        options = new Tuple<int, string>[cnt];
+        for(int i = 0; i < cnt; i++) {
+            var option = dropdown.options[i];
+            options[i] = new Tuple<int, string>(i, option.text);
+        }
+    }
+
     /// <summary>
     /// 配置组件
     /// </summary>
@@ -46,6 +62,7 @@ public class DropdownField : BaseView {
     void createOptions() {
         foreach (var opt in options)
             createOption(opt.Item2);
+        value = options[0];
     }
 
     /// <summary>
@@ -53,28 +70,16 @@ public class DropdownField : BaseView {
     /// </summary>
     /// <param name="opt">选项文本</param>
     void createOption(string opt) {
-        drowdown.options.Add(new Dropdown.OptionData(opt));
+        dropdown.options.Add(new Dropdown.OptionData(opt));
     }
 
     /// <summary>
     /// 清除所有选项
     /// </summary>
     void clearOptions() {
-        drowdown.ClearOptions();
+        dropdown.ClearOptions();
     }
-
-    #endregion
-
-    #region 回调控制
-
-    /// <summary>
-    /// 值变更回调
-    /// </summary>
-    public void onValueChanged() {
-        Debug.Log("onValueChanged: " + getIndex());
-        onChange?.Invoke(getIndex());
-    }
-
+    
     #endregion
 
     #region 启动/结束控制
@@ -82,7 +87,7 @@ public class DropdownField : BaseView {
     /// <summary>
     /// 启动视窗
     /// </summary>
-    public void startView(int index=0) {
+    public void startView(int index = 0) {
         base.startView();
         setIndex(index);
     }
@@ -96,37 +101,71 @@ public class DropdownField : BaseView {
     /// </summary>
     /// <returns>索引</returns>
     public int getIndex() {
-        return drowdown.value;
+        return dropdown.value;
     }
 
     /// <summary>
     /// 设置当前索引
     /// </summary>
-    /// <param name="value">索引</param>
-    public void setIndex(int index) {
-        drowdown.value = index;
+    /// <param name="index">索引</param>
+    public void setIndex(int index, bool check = true, bool emit = true) {
+        setValue(options[index], check, emit);
     }
 
     /// <summary>
     /// 获取选中项
     /// </summary>
     /// <returns>项</returns>
-    public Tuple<int, string> getValue() {
-        return options[getIndex()];
+    public string getValueText() {
+        return getValue().Item2;
+    }
+
+    /// <summary>
+    /// 获取选中项
+    /// </summary>
+    /// <returns>项</returns>
+    public int getValueId() {
+        return getValue().Item1;
     }
 
     /// <summary>
     /// 设置选中项
     /// </summary>
     /// <returns>项</returns>
-    public void setValue(int id) {
+    public void setValue(int id, bool check = true, bool emit = true) {
         for (int i = 0; i < options.Length; i++)
             if (options[i].Item1 == id) {
-                setIndex(i); break;
+                setValue(options[i], check, emit); break;
             }
-        setIndex(-1);
+        base.setValue(null, check, emit);
+    }
+
+    /// <summary>
+    /// 设置选中项
+    /// </summary>
+    /// <returns>项</returns>
+    public void setValue(string text, bool check = true, bool emit = true) {
+        for (int i = 0; i < options.Length; i++)
+            if (options[i].Item2 == text) {
+                setValue(options[i], check, emit); break;
+            }
+        base.setValue(null, check, emit);
+    }
+    
+    #endregion
+
+    #region 界面绘制
+
+    /// <summary>
+    /// 绘制值
+    /// </summary>
+    /// <param name="text">值</param>
+    protected override void drawValue(Tuple<int, string> value) {
+        Debug.Log("drawValue: " + value);
+        dropdown.itemText.text = value.Item2;
+        Debug.Log("drowdown.value = " + dropdown.value + 
+            "\ndrowdown.itemText.text = " + dropdown.itemText.text);
     }
 
     #endregion
-    
 }

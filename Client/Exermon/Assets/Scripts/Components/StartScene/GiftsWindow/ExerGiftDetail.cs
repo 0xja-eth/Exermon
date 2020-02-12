@@ -13,14 +13,13 @@ public class ExerGiftDetail : ItemInfo<ExerGift> {
     /// 常量设置
     /// </summary>
     const string EmptyGiftText = "空";
-    const string ParamNameFormat = "{0}成长率加成";
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public Image frame, background; // 边框、背景
     public Text name, description;
-    public ParamBarsGroup paramsView;
+    public ParamDisplaysGroup paramsView;
 
     #region 初始化
 
@@ -37,7 +36,6 @@ public class ExerGiftDetail : ItemInfo<ExerGift> {
     void setupParamsView() {
         var params_ = DataService.get().staticData.configure.baseParams;
         paramsView.configure(params_);
-        paramsView.nameFormat = ParamNameFormat;
     }
 
     #endregion

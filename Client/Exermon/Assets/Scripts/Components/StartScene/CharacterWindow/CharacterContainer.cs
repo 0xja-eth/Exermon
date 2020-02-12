@@ -75,7 +75,7 @@ public class CharacterContainer : ItemContainer<Character> {
     /// <returns>最接近的位置索引</returns>
     int clacNearestPosIndex(int index) {
         var cnt = itemDisplaysCount();
-        var pIndex = getWrappedIndex(posIndex);
+        var pIndex = getLoopedIndex(posIndex);
         if (pIndex > index) {
             var d1 = pIndex - index;
             var d2 = index + cnt - pIndex;
@@ -191,7 +191,7 @@ public class CharacterContainer : ItemContainer<Character> {
     public void refreshPosition(bool force = false) {
         var cnt = itemDisplaysCount();
         for (int i = 0; i < cnt; i++) {
-            var item = itemDisplays[i] as CharacterDisplay;
+            var item = subViews[i] as CharacterDisplay;
             var posIndex = i - this.posIndex;
             item.setPosIndex(posIndex, force);
         }
@@ -206,7 +206,7 @@ public class CharacterContainer : ItemContainer<Character> {
     /// </summary>
     /// <returns>是否移动</returns>
     public bool isMoving() {
-        foreach (var display in itemDisplays)
+        foreach (var display in subViews)
             if (((CharacterDisplay)display).isMoving()) return true;
         return false;
     }

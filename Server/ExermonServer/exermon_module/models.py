@@ -55,7 +55,7 @@ class Exermon(BaseItem):
 
 		verbose_name = verbose_name_plural = "艾瑟萌"
 
-	NAME_LEN = 8
+	NAME_LEN = 4
 
 	TYPES = [
 		(ExermonType.Initial.value, '初始艾瑟萌'),

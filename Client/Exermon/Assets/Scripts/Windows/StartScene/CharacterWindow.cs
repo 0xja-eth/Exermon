@@ -91,8 +91,8 @@ public class CharacterWindow : BaseWindow {
     /// 执行创建
     /// </summary>
     void doCreate() {
-        var name = nameInput.getText();
-        var grade = gradeInput.getValue().Item1;
+        var name = nameInput.getValue();
+        var grade = gradeInput.getValueId();
         var cid = bustGroup.selectedItem().getID();
 
         playerSer.createCharacter(name, grade, cid, onCreateSuccess);

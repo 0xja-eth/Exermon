@@ -21,7 +21,7 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// </summary>
     public Image full;
     public Text name, subject, description, star, type, animal;
-    public ParamBarsGroup paramsView;
+    public ParamDisplaysGroup paramsView;
     public TextInputField nicknameInput;
 
     #region 初始化
@@ -30,7 +30,7 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// 初次打开时初始化（子类中重载）
     /// </summary>
     protected override void initializeOnce() {
-        nicknameInput.check = ValidateService.checkExerName;
+        nicknameInput.onChanged = onNicknameChanged;
         setupParamsView();
     }
 
@@ -110,7 +110,7 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// </summary>
     void completeNicknameText() {
         var container = getContainer();
-        nicknameInput.setText(container.getNickname(index));
+        nicknameInput.setValue(container.getNickname(index));
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// 清空昵称输入
     /// </summary>
     void clearNicknameText() {
-        nicknameInput.setText("", false);
+        nicknameInput.setValue("", false);
     }
 
     /// <summary>
@@ -159,8 +159,8 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// <summary>
     /// 昵称改变回调事件
     /// </summary>
-    public void onNicknameChanged() {
-        getContainer().changeNickname(index, nicknameInput.getText());
+    public void onNicknameChanged(string value) {
+        getContainer().changeNickname(index, value);
     }
 
     #endregion

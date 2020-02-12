@@ -64,6 +64,9 @@ public class StartScene : BaseScene {
         exermonSer = ExermonService.get();
     }
 
+    /// <summary>
+    /// 初始化其他
+    /// </summary>
     protected override void initializeOthers() {
         base.initializeOthers();
         SceneUtils.depositSceneObject("Scene", this);
@@ -141,7 +144,6 @@ public class StartScene : BaseScene {
     /// </summary>
     void startCharacterWindow() {
         characterWindow.startWindow();
-        //exermonsWindow.startWindow();
     }
 
     /// <summary>
@@ -185,8 +187,8 @@ public class StartScene : BaseScene {
     public void closeWindows() {
         characterWindow.terminateWindow();
         exermonsWindow.terminateWindow();
-        //giftsWindow.terminateWindow();
-        //infoWindow.terminateWindow();
+        giftsWindow.terminateWindow();
+        infoWindow.terminateWindow();
     }
 
     #endregion

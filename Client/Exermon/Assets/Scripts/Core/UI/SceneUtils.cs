@@ -351,12 +351,12 @@ public static class SceneUtils {
     // 取代 t.GetComponent<T> 的写法：
     // GameUtils.get<T>(obj)
     public static T get<T> (Transform t){
-		return t.GetComponent<T>();
+		return t == null ? default : t.GetComponent<T>();
     }
     // 取代 obj.GetComponent<T> 的写法：
     // GameUtils.get<T>(obj)
     public static T get<T> (GameObject obj){
-		return obj.GetComponent<T>();
+		return obj == null ? default : obj.GetComponent<T>();
     }
     // 取代 parent.Find(obj).GetComponent<T> 的写法：
     // GameUtils.find<T>(obj)
@@ -594,9 +594,9 @@ public static class SceneUtils {
     /// <param name="text">文本</param>
     /// <returns>调整后的文本</returns>
     public static string adjustText(string text) {
-        text = Regex.Replace(text, @"(?<=<.*?) (?=.*?>)", TextExtend.SpaceIdentifier);
-        text = text.Replace(" ", TextExtend.SpaceEncode);
-        text = text.Replace(TextExtend.SpaceIdentifier, " ");
+        text = Regex.Replace(text, @"(?<=<.*?) (?=.*?>)", QuestionText.SpaceIdentifier);
+        text = text.Replace(" ", QuestionText.SpaceEncode);
+        text = text.Replace(QuestionText.SpaceIdentifier, " ");
         return text.ToString();
     }
 

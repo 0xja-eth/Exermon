@@ -146,7 +146,7 @@ public class SlotItemDisplay<T, E> : ItemDisplay<T>, IDropHandler
     protected virtual void processItemDrop(
         DraggableItemDisplay<E> display) {
         Debug.Log(name + " processItemDrop: " + display);
-        if (display != null) {
+        if (display != null && display.isDraggable()) {
             var container = display.getContainer();
             var item = display.getItem();
             container.transferItem(this, item);

@@ -83,6 +83,78 @@ public class ExermonService : BaseService<ExermonService> {
     }
 
     /// <summary>
+    /// 读取艾瑟萌背包
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadExerPack(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.packContainers.loadExerPack(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.packContainers.exerPackId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌碎片背包
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadExerFragPack(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.packContainers.loadExerFragPack(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.packContainers.exerFragPackId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌天赋池
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadExerGiftPool(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.packContainers.loadExerGiftPool(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.packContainers.exerGiftPoolId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌仓库
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadExerHub(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.packContainers.loadExerHub(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.packContainers.exerHubId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
     /// 读取艾瑟萌槽
     /// </summary>
     /// <param name="cid">容器ID</param>
@@ -100,23 +172,6 @@ public class ExermonService : BaseService<ExermonService> {
         itemSer.getSlot(cid, _onSuccess, onError);
     }
 
-    /// <summary>
-    /// 读取人物装备槽
-    /// </summary>
-    /// <param name="cid">容器ID</param>
-    /// <param name="onSuccess">成功回调</param>
-    /// <param name="onError">失败回调</param>
-    public void loadHumanEquipSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
-        Player player = getPlayer();
-
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.slotContainers.loadHumanEquipSlot(res);
-            if (onSuccess != null) onSuccess.Invoke();
-        };
-
-        if (cid == 0) cid = player.slotContainers.humanEquipSlotId;
-        itemSer.getSlot(cid, _onSuccess, onError);
-    }
-
+    
     #endregion
 }

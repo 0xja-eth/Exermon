@@ -13,7 +13,7 @@ using System.Linq;
 /// <summary>
 /// 艾瑟萌数据
 /// </summary>
-public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
+public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
     /// 属性
@@ -36,27 +36,74 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
     public List<ExerSkill> exerSkills { get; private set; } = new List<ExerSkill>();
     public ExerFrag exerFrag { get; private set; } = null;
 
+    #region 属性显示数据生成
+
     /// <summary>
     /// 转化为属性信息集
     /// </summary>
+    /// <param name="type">类型</param>
     /// <returns>属性信息集</returns>
-    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+    public JsonData[] convertToDisplayDataArray(string type = "") {
         var count = baseParams.Length;
-        var infos = new ParamBar.ParamValueInfo[count];
+        var data = new JsonData[count];
         for (int i = 0; i < count; i++) {
-            var info = new ParamBar.ParamValueInfo();
-            var base_ = baseParams[i];
-            var rate = rateParams[i];
-            info.max = (float)star().baseRanges[i].maxValue;
-            info.value = (float)base_.value;
-            if (base_.param().isPercent()) { // 如果是百分数属性
-                info.max *= 100; info.value *= 100;
-            }
-            info.rate = (float)rate.value;
-            infos[i] = info;
+            data[i] = convertParamToDisplayData(i, type);
+            Debug.Log("Exermon.convertToDisplayDataArray["+i+"]: " + data[i].ToJson());
         }
-        return infos;
+        return data;
     }
+
+    /// <summary>
+    /// 转化一个属性为属性信息
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <param name="type">类型</param>
+    /// <returns>属性信息</returns>
+    JsonData convertParamToDisplayData(int index, string type = "") {
+        switch (type.ToLower()) {
+            case "growth": return convertGrowth(index);
+            default: return convertBasic(index);
+        }
+    }
+
+    /// <summary>
+    /// 转化基础属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertBasic(int index) {
+        var json = new JsonData();
+        var base_ = baseParams[index];
+        var rate = rateParams[index];
+        var max = star().baseRanges[index].maxValue;
+        var value = base_.value;
+        if (base_.param().isPercent()) { // 如果是百分数属性
+            max *= 100; value *= 100;
+        }
+        json["max"] = max;
+        json["value"] = value;
+        json["rate"] = value / max;
+        json["growth"] = rate.value;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化成长率属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertGrowth(int index) {
+        var json = new JsonData();
+        var rate = rateParams[index];
+        var max = star().rateRanges[index].maxValue;
+        var value = rate.value;
+        json["max"] = max;
+        json["value"] = value;
+        json["rate"] = value / max;
+        return json;
+    }
+
+    #endregion
 
     /// <summary>
     /// 获取艾瑟萌星级
@@ -166,7 +213,7 @@ public class Exermon : BaseItem, ParamBar.ParamValueInfosConvertable {
 /// <summary>
 /// 艾瑟萌碎片数据
 /// </summary>
-public class ExerGift : BaseItem, ParamBar.ParamValueInfosConvertable {
+public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
     /// 属性
@@ -179,17 +226,20 @@ public class ExerGift : BaseItem, ParamBar.ParamValueInfosConvertable {
     /// 转化为属性信息集
     /// </summary>
     /// <returns>属性信息集</returns>
-    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+    public JsonData[] convertToDisplayDataArray(string type = "") {
         var count = params_.Length;
-        var infos = new ParamBar.ParamValueInfo[count];
+        var data = new JsonData[count];
         for (int i = 0; i < count; i++) {
-            var info = new ParamBar.ParamValueInfo();
+            var json = new JsonData();
             var base_ = params_[i];
-            info.max = (float)star().paramRanges[i].maxValue;
-            info.value = (float)base_.value;
-            infos[i] = info;
+            var max = (float)star().paramRanges[i].maxValue;
+            var value = (float)base_.value;
+            json["max"] = max;
+            json["value"] = value;
+            json["rate"] = value / max;
+            data[i] = json;
         }
-        return infos;
+        return data;
     }
 
     /// <summary>
@@ -525,7 +575,7 @@ public class ExerPackEquip : ExerPackItem {
 /// <summary>
 /// 艾瑟萌
 /// </summary>
-public class PlayerExermon : PackContItem, ParamBar.ParamValueInfosConvertable {
+public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
     /// 属性
@@ -539,27 +589,68 @@ public class PlayerExermon : PackContItem, ParamBar.ParamValueInfosConvertable {
     public ParamData[] paramValues { get; private set; }
     public ParamData[] rateParams { get; private set; }
 
+    #region 属性显示数据生成
+
     /// <summary>
     /// 转化为属性信息集
     /// </summary>
+    /// <param name="type">类型</param>
     /// <returns>属性信息集</returns>
-    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+    public JsonData[] convertToDisplayDataArray(string type = "") {
         var count = paramValues.Length;
-        var infos = new ParamBar.ParamValueInfo[count];
-        for (int i = 0; i < count; i++) {
-            var info = new ParamBar.ParamValueInfo();
-            var base_ = paramValues[i];
-            var rate = rateParams[i];
-            info.max = (float)exermon().star().baseRanges[i].maxValue;
-            info.value = (float)base_.value;
-            if (base_.param().isPercent()) { // 如果是百分数属性
-                info.max *= 100; info.value *= 100;
-            }
-            info.rate = (float)rate.value;
-            infos[i] = info;
-        }
-        return infos;
+        var data = new JsonData[count];
+        for (int i = 0; i < count; i++)
+            data[i] = convertParamToDisplayData(i, type);
+        return data;
     }
+
+    /// <summary>
+    /// 转化一个属性为属性信息
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <param name="type">类型</param>
+    /// <returns>属性信息</returns>
+    JsonData convertParamToDisplayData(int index, string type = "") {
+        switch (type.ToLower()) {
+            case "growth": return convertGrowth(index);
+            default: return convertBasic(index);
+        }
+    }
+    
+    /// <summary>
+    /// 转化基础属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertBasic(int index) {
+        var json = new JsonData();
+        var base_ = paramValues[index];
+        var rate = rateParams[index];
+        var value = base_.value;
+        if (base_.param().isPercent()) // 如果是百分数属性
+           value *= 100;
+        json["value"] = value;
+        json["growth"] = rate.value;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化成长率属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertGrowth(int index) {
+        var json = new JsonData();
+        var rate = rateParams[index];
+        var max = exermon().star().rateRanges[index].maxValue;
+        var value = rate.value;
+        json["max"] = max;
+        json["value"] = value;
+        json["rate"] = value / max;
+        return json;
+    }
+
+    #endregion
 
     /// <summary>
     /// 获取艾瑟萌
@@ -742,7 +833,9 @@ public class ExerEquipSlotItem : SlotContItem {
 /// <summary>
 /// 艾瑟萌装备槽项
 /// </summary>
-public class ExerSlotItem : SlotContItem, ParamBar.ParamValueInfosConvertable {
+public class ExerSlotItem : SlotContItem, 
+    // ParamDisplay.DisplayDataConvertable,
+    ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
     /// 属性
@@ -758,27 +851,80 @@ public class ExerSlotItem : SlotContItem, ParamBar.ParamValueInfosConvertable {
     public ParamData[] paramValues { get; private set; }
     public ParamData[] rateParams { get; private set; }
 
+    #region 属性显示数据生成
+    /*
+    /// <summary>
+    /// 转化为属性信息
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <returns>属性信息</returns>
+    public JsonData convertToDisplayData(string type = "") {
+        return toJson();
+    }
+    */
     /// <summary>
     /// 转化为属性信息集
     /// </summary>
+    /// <param name="type">类型</param>
     /// <returns>属性信息集</returns>
-    public ParamBar.ParamValueInfo[] convertToParamInfos() {
+    public JsonData[] convertToDisplayDataArray(string type = "") {
         var count = paramValues.Length;
-        var infos = new ParamBar.ParamValueInfo[count];
-        for (int i = 0; i < count; i++) {
-            var info = new ParamBar.ParamValueInfo();
-            var base_ = paramValues[i];
-            var rate = rateParams[i];
-            info.max = (float)exermon().star().baseRanges[i].maxValue;
-            info.value = (float)base_.value;
-            if (base_.param().isPercent()) { // 如果是百分数属性
-                info.max *= 100; info.value *= 100;
-            }
-            info.rate = (float)rate.value;
-            infos[i] = info;
-        }
-        return infos;
+        var data = new JsonData[count];
+        for (int i = 0; i < count; i++) 
+            data[i] = convertParamToDisplayData(i, type);
+        return data;
     }
+
+    /// <summary>
+    /// 转化一个属性为属性信息
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <param name="type">类型</param>
+    /// <returns>属性信息</returns>
+    JsonData convertParamToDisplayData(int index, string type = "") {
+        switch (type.ToLower()) {
+            case "growth": return convertGrowth(index);
+            default: return convertBasic(index);
+        }
+    }
+
+    /// <summary>
+    /// 转化基础属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertBasic(int index) {
+        var json = new JsonData();
+        var base_ = paramValues[index];
+        var rate = rateParams[index];
+        var value = base_.value;
+        if (base_.param().isPercent()) // 如果是百分数属性
+            value *= 100;
+        json["value"] = value;
+        json["growth"] = rate.value;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化成长率属性
+    /// </summary>
+    /// <param name="index">索引</param>
+    /// <returns>属性信息集</returns>
+    JsonData convertGrowth(int index) {
+        var json = new JsonData();
+        var value = rateParams[index].value;
+        var ori = playerExer.rateParams[index].value;
+        var max = exermon().star().rateRanges[index].maxValue;
+        var delta = value - ori;
+        var deltaRate = delta / value;
+        json["max"] = max;
+        json["value"] = value;
+        json["rate"] = value / max;
+        json["delta_rate"] = deltaRate;
+        return json;
+    }
+
+    #endregion
 
     /// <summary>
     /// 获取科目

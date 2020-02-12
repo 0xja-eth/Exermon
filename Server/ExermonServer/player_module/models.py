@@ -295,6 +295,9 @@ class Player(models.Model):
 	# 在线
 	online = models.BooleanField(default=False, verbose_name="在线")
 
+	# 经验
+	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
+
 	# 生日
 	birth = models.DateField(blank=True, null=True, verbose_name="生日")
 
@@ -399,6 +402,8 @@ class Player(models.Model):
 		create_time = ModelUtils.timeToStr(self.create_time)
 		birth = ModelUtils.dateToStr(self.birth)
 
+		level, next = self.level()
+
 		base = {
 			'id': self.id,
 			'name': self.name,
@@ -407,6 +412,9 @@ class Player(models.Model):
 			'status': self.status,
 			'type': self.type,
 			'online': self.online,
+			'exp': self.exp,
+			'level': level,
+			'next': next,
 			'create_time': create_time,
 			'birth': birth,
 			'school': self.school,
@@ -517,7 +525,7 @@ class Player(models.Model):
 
 	# 创建艾瑟萌槽
 	def createExermons(self, exers, enames):
-		from exermon_module.models import ExerSlot, PlayerExermon
+		from exermon_module.models import ExerSlot
 
 		player_exers = []
 
@@ -601,6 +609,14 @@ class Player(models.Model):
 		if self.exerGiftPool() is None:
 			ExerGiftPool.create(player=self)
 
+	# 等级（本等级, 下一级所需经验）
+	def level(self):
+		from utils.calc_utils import ExermonSlotLevelCalc
+
+		level = ExermonSlotLevelCalc.calcPlayerLevel(self.exp)
+		next = ExermonSlotLevelCalc.calcPlayerNext(level)
+
+		return level, next
 
 # ===================================================
 #  人类物品表

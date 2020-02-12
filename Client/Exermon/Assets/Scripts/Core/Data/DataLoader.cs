@@ -13,7 +13,13 @@ public static class DataLoader {
     /// <summary>
     /// 更新时间格式
     /// </summary>
-    public const string DateFormat = "yyyy-MM-dd";
+    // 系统内部存储的日期格式
+    public const string SystemDateFormat = "yyyy-MM-dd"; 
+    public const string SystemDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+    // 显示的日期格式
+    public const string DisplayDateFormat = "yyyy 年 MM 月 dd 日";
+    public const string DisplayDateTimeFormat = "yyyy 年 MM 月 dd 日 HH:mm:ss";
 
     /// <summary>
     /// 判断JsonData是否包含键
@@ -137,6 +143,7 @@ public static class DataLoader {
     /// <param name="json">数据</param>
     /// <returns>加载的颜色</returns>
     public static Color loadColor(JsonData json) {
+        if(json == null) return default;
         return SceneUtils.str2Color(loadString(json));
     }
     /// <param name="key">键</param>
@@ -415,7 +422,7 @@ public static class DataLoader {
     /// <returns>转化后的JsonData</returns>
     public static JsonData convertDateTime(DateTime data) {
         if (data == null) return "";
-        return data.ToString();
+        return data.ToString(SystemDateTimeFormat);
     }
 
     /// <summary>
@@ -425,7 +432,7 @@ public static class DataLoader {
     /// <returns>转化后的JsonData</returns>
     public static JsonData convertDate(DateTime data) {
         if (data == null) return "";
-        return data.ToString(DateFormat);
+        return data.ToString(SystemDateFormat);
     }
 
     /// <summary>
@@ -523,6 +530,63 @@ public static class DataLoader {
         if (data == null) return json;
         foreach (var d in data) json.Add(convertData(d));
         return json;
+    }
+
+    #endregion
+
+    #region 其他工具
+
+    /// <summary>
+    /// 下划线命名法转化为小驼峰命名法
+    /// </summary>
+    /// <param name="str">待转化字符串</param>
+    /// <param name="spliter">下划线字符</param>
+    /// <returns>转化结果</returns>
+    public static string underline2LowerHump(string str, char spliter = '_') {
+        string res = ""; bool flag = false;
+        for (int i = 0; i < str.Length; i++) {
+            if (str[i] == spliter) flag = true;
+            else if (flag) {
+                res += char.ToUpper(str[i]);
+                flag = false;
+            } else res += str[i];
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 下划线命名法转化为大驼峰命名法
+    /// </summary>
+    /// <param name="str">待转化字符串</param>
+    /// <param name="spliter">下划线字符</param>
+    /// <returns>转化结果</returns>
+    public static string underline2UpperHump(string str, char spliter = '_') {
+        string res = ""; bool flag = true;
+        for (int i = 0; i < str.Length; i++) {
+            if (str[i] == spliter) flag = true;
+            else if (flag) {
+                res += char.ToUpper(str[i]);
+                flag = false;
+            } else res += str[i];
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 驼峰命名法转化为下划线命名法
+    /// </summary>
+    /// <param name="str">待转化字符串</param>
+    /// <param name="spliter">下划线字符</param>
+    /// <returns>转化结果</returns>
+    public static string hump2Underline(string str, char spliter = '_') {
+        string res = ""; 
+        for (int i = 0; i < str.Length; i++) {
+            if (i > 0 && char.IsUpper(str[i])) {
+                res += spliter;
+                res += char.ToLower(str[i]);
+            } else res += str[i];
+        }
+        return res;
     }
 
     #endregion

@@ -63,10 +63,10 @@ public class InfoWindow : BaseWindow {
     /// </summary>
     void doCreate() {
         var birth = birthInput.getValue();
-        var school = schoolInput.getText();
-        var city = cityInput.getText();
-        var contact = contactInput.getText();
-        var description = descriptionInput.getText();
+        var school = schoolInput.getValue();
+        var city = cityInput.getValue();
+        var contact = contactInput.getValue();
+        var description = descriptionInput.getValue();
 
         playerSer.createInfo(birth, school, city,
             contact, description, onCreateSuccess);

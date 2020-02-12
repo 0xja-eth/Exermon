@@ -55,8 +55,8 @@ public class ExerGiftsContainer : ItemContainer<ExerGift> {
     /// ItemDisplay 创建回调
     /// </summary>
     /// <param name="item">ItemDisplay</param>
-    protected override void onItemDisplayCreated(ItemDisplay<ExerGift> item, int index) {
-        base.onItemDisplayCreated(item, index);
+    protected override void onSubViewCreated(ItemDisplay<ExerGift> item, int index) {
+        base.onSubViewCreated(item, index);
         if (!inStartScene) return;
         var giftCard = item as ExerGiftCard;
         giftCard.draggingParent = draggingParent;

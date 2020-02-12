@@ -67,7 +67,7 @@ public class Character : BaseData {
 /// <summary>
 /// 玩家数据
 /// </summary>
-public class Player : BaseData {
+public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
 
     /// <summary>
     /// 背包类容器数据		
@@ -101,6 +101,38 @@ public class Player : BaseData {
         /// <param name="json">数据</param>
         public void loadHumanPack(JsonData json) {
             humanPack = DataLoader.loadData<PackContainer<HumanPackEquip>>(json);
+        }
+
+        /// <summary>
+        /// 读取艾瑟萌背包
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadExerPack(JsonData json) {
+            exerPack = DataLoader.loadData<PackContainer<ExerPackEquip>>(json);
+        }
+
+        /// <summary>
+        /// 读取艾瑟萌碎片背包
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadExerFragPack(JsonData json) {
+            exerFragPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
+        }
+
+        /// <summary>
+        /// 读取艾瑟萌天赋池
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadExerGiftPool(JsonData json) {
+            exerGiftPool = DataLoader.loadData<PackContainer<PackContItem>>(json);
+        }
+
+        /// <summary>
+        /// 读取艾瑟萌仓库
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadExerHub(JsonData json) {
+            exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json);
         }
 
         /// <summary>
@@ -226,6 +258,9 @@ public class Player : BaseData {
     public int status { get; private set; }
     public int type { get; private set; }
     public bool online { get; private set; }
+    public int exp { get; private set; }
+    public int level { get; private set; }
+    public int next { get; private set; }
     public DateTime createTime { get; private set; }
     public DateTime birth { get; private set; }
     public string school { get; private set; }
@@ -235,6 +270,30 @@ public class Player : BaseData {
 
     public PackContainerInfo packContainers { get; private set; }
     public SlotContainerInfo slotContainers { get; private set; }
+
+    /// <summary>
+    /// 转化为属性信息集
+    /// </summary>
+    /// <returns>属性信息集</returns>
+    public JsonData convertToDisplayData(string type = "") {
+        switch (type.ToLower()) {
+            case "exp": return convertExp();
+            default: return toJson();
+        }
+    }
+
+    /// <summary>
+    /// 转化经验信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData convertExp() {
+        var json = new JsonData();
+        json["exp"] = exp;
+        json["next"] = next;
+        json["level"] = level;
+        json["rate"] = exp / next;
+        return json;
+    }
 
     /// <summary>
     /// 设置密码
@@ -365,6 +424,14 @@ public class Player : BaseData {
     }
 
     /// <summary>
+    /// 读取基础信息
+    /// </summary>
+    /// <param name="json">数据</param>
+    public void loadBasic(JsonData json) {
+        load(json);
+    }
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
@@ -380,6 +447,10 @@ public class Player : BaseData {
         status = DataLoader.loadInt(json, "status");
         type = DataLoader.loadInt(json, "type");
         online = DataLoader.loadBool(json, "online");
+
+        exp = DataLoader.loadInt(json, "exp");
+        level = DataLoader.loadInt(json, "level");
+        next = DataLoader.loadInt(json, "next");
 
         createTime = DataLoader.loadDateTime(json, "create_time");
         birth = DataLoader.loadDateTime(json, "birth");
@@ -412,6 +483,10 @@ public class Player : BaseData {
         json["status"] = status;
         json["type"] = type;
         json["online"] = online;
+
+        json["exp"] = exp;
+        json["level"] = level;
+        json["next"] = next;
 
         json["create_time"] = DataLoader.convertDateTime(createTime);
         json["birth"] = DataLoader.convertDate(birth);

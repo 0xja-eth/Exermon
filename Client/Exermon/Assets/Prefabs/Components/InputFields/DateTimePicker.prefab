@@ -221,7 +221,8 @@ MonoBehaviour:
   container: {fileID: 6493679601216751456}
   type: 0
   itemCount: 2
-  threshold: 10
+  threshold: 15
+  fontSize: 22
   currentTextColor: {r: 1, g: 1, b: 1, a: 1}
   minTextColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   itemPerfab: {fileID: 8719628292817150828, guid: d271cc1bb5201cd44ac4a4ae693bc272,

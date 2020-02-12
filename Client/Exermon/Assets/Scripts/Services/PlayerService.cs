@@ -402,5 +402,55 @@ public class PlayerService : BaseService<PlayerService> {
         sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
     }
 
+    /// <summary>
+    /// 获取玩家自身基础信息数据
+    /// </summary>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.loadBasic(DataLoader.loadJsonData(res, "player"));
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        getBasic(player.getID(), _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取人物背包
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadHumanPack(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.packContainers.loadHumanPack(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.packContainers.humanPackId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 读取人物装备槽
+    /// </summary>
+    /// <param name="cid">容器ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void loadHumanEquipSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+        Player player = getPlayer();
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.slotContainers.loadHumanEquipSlot(res);
+            if (onSuccess != null) onSuccess.Invoke();
+        };
+
+        if (cid == 0) cid = player.slotContainers.humanEquipSlotId;
+        itemSer.getSlot(cid, _onSuccess, onError);
+    }
+
     #endregion
 }
