@@ -12,6 +12,10 @@ using UnityEditor;
 /// 游戏数据父类
 /// </summary>
 public class BaseData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
     int id; // ID（只读）
     public int getID() { return id; }
 

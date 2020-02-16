@@ -29,9 +29,7 @@ public class DateTimePicker : BaseView,
     /// </summary>
     public Type type; // 日期类型
     public int itemCount = 2; // 备选数量（上下对称）
-
     public int threshold = 15; // 灵敏度
-
     public int fontSize = 18; // 每个数值的字体大小
 
     public Color currentTextColor = new Color(1, 1, 1); // 当前项的文本颜色

@@ -681,6 +681,92 @@ class ExerGiftStar(GroupConfigure):
 
 
 # ===================================================
+#  物品星级表
+# ===================================================
+class ItemStar(GroupConfigure):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "物品星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
+
+	def __str__(self):
+		return self.name
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
+
+	def convertToDict(self):
+
+		return {
+			'id': self.id,
+			'name': self.name,
+			'color': self.color,
+		}
+
+
+# ===================================================
+#  题目星级表
+# ===================================================
+class QuestionStar(GroupConfigure):
+	class Meta:
+		verbose_name = verbose_name_plural = "题目星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
+
+	# 等级要求
+	level = models.PositiveSmallIntegerField(default=0, verbose_name="等级要求")
+
+	# 等级权重（用于生成分数）
+	weight = models.PositiveSmallIntegerField(default=0, verbose_name="等级权重")
+
+	# 基础经验奖励
+	exp_incr = models.PositiveSmallIntegerField(default=0, verbose_name="基础经验奖励")
+
+	# 基础金币奖励
+	gold_incr = models.PositiveSmallIntegerField(default=0, verbose_name="基础金币奖励")
+
+	# 等级标准时间（单位：分钟）
+	std_time = models.PositiveSmallIntegerField(default=0, verbose_name="标准时间（分）")
+
+	# 等级最短时间（单位：秒）
+	min_time = models.PositiveSmallIntegerField(default=0, verbose_name="最短时间（秒）")
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
+
+	def convertToDict(self):
+		return {
+			'id': self.id,
+			'name': self.name,
+			'color': self.color,
+			'level': self.level,
+			'weight': self.weight,
+			'exp_incr': self.exp_incr,
+			'gold_incr': self.gold_incr,
+			'std_time': self.std_time,
+			'min_time': self.min_time
+		}
+
+
+# ===================================================
 # 游戏配置表
 # ===================================================
 class GameConfigure(models.Model):
@@ -719,6 +805,8 @@ class GameConfigure(models.Model):
 	def convertToDict(self):
 		from player_module.models import Character, Player
 		from exermon_module.models import Exermon, ExerSkill
+		from question_module.models import Question, QuesReport
+		from record_module.models import QuestionRecord
 
 		subjects = ModelUtils.objectsToDict(self.subject_set.all())
 		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
@@ -740,14 +828,22 @@ class GameConfigure(models.Model):
 
 			# player_module
 			'character_genders': Character.CHARACTER_GENDERS,
-			'player_grades': Player.PLAYER_GRADES,
-			'player_statuses': Player.PLAYER_STATUSES,
-			'player_types': Player.PLAYER_TYPES,
+			'player_grades': Player.GRADES,
+			'player_statuses': Player.STATUSES,
+			'player_types': Player.TYPES,
 
 			# exermon_module
 			'exermon_types': Exermon.TYPES,
 			'exerskill_target_types': ExerSkill.TARGET_TYPES,
 			'exerskill_hit_types': ExerSkill.HIT_TYPES,
+
+			# question_module
+			'question_types': Question.TYPES,
+			'question_statuses': Question.STATUSES,
+			'qeusreport_types': QuesReport.TYPES,
+
+			# record_module
+			'record_source': QuestionRecord.SOURCES,
 
 			# 组合配置
 			'subjects': subjects,

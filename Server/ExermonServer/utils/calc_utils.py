@@ -1,4 +1,15 @@
-import math
+import math, random
+
+
+# ================================
+# 通用计算
+# ================================
+class Common:
+
+	# Sigmoid 函数
+	@classmethod
+	def sigmoid(cls, x):
+		return 1/(1+math.exp(-x))
 
 
 # ================================
@@ -255,3 +266,321 @@ class ExerSlotItemParamCalc:
 			return BaseParam.get(attr=self.kwargs['attr'])
 
 		return None
+
+
+# ================================
+# 刷题（单题）收益计算类
+# ================================
+class QuestionSetSingleRewardCalc:
+
+	@classmethod
+	def calc(cls, player_ques, ques_rec):
+		calc_obj = cls(player_ques, ques_rec)
+		return calc_obj
+
+	def __init__(self, player_ques, ques_rec):
+		from player_module.models import Player
+		from question_module.models import Question
+		from record_module.models import QuestionRecord, PlayerQuestion
+		from exermon_module.models import ExerSlot, ExerSlotItem
+
+		self.exer_exp_incr = 0
+		self.exerslot_exp_incr = 0
+		self.gold_incr = 0
+
+		self.player_ques: PlayerQuestion = player_ques
+		self.ques_rec: QuestionRecord = ques_rec
+
+		self.player: Player = self.ques_rec.player
+
+		self.question: Question = self.player_ques.question
+
+		self.corr = self.player_ques.correct()
+
+		subject_id = self.question.subject_id
+		exerslot: ExerSlot = self.player.exerSlot()
+
+		if exerslot is None: return
+
+		self.exerslot_item: ExerSlotItem = \
+			exerslot.getContItem(subject_id=subject_id)
+
+		if self.exerslot_item is None: return
+
+		self.exer_exp_incr, self.exerslot_exp_incr = self._calcExerExpIncr()
+		self.gold_incr = self._calcGoldIncr()
+
+	# 计算艾瑟萌经验值收益
+	def _calcExerExpIncr(self):
+		raise NotImplementedError
+
+	# 计算金币收益
+	def _calcGoldIncr(self):
+		raise NotImplementedError
+
+
+# ================================
+# 刷题（单题）收益计算类
+# ================================
+class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
+
+	# 单道题目奖励计算公式
+	# 艾瑟萌经验奖励(EER)
+	# round(基础经验奖励 * 次数修正 * 艾瑟萌等级修正 * 经验结果修正 * 经验波动修正)
+
+	# 艾瑟萌槽经验奖励(ESER)
+	# round(基础经验奖励 * 次数修正 * 艾瑟萌槽等级修正 * 经验结果修正 * 经验波动修正)
+
+	# 金币奖励(GR)
+	# round(基础金币奖励 * 金币结果修正 * 金币波动修正)
+
+	# 基础经验奖励(BER)
+	# BE
+
+	# 次数修正(CR)
+	# A ^ (C / K1)
+
+	# 艾瑟萌等级修正(ELR)
+	# 艾瑟萌等级差 > 0 ? 艾瑟萌等级惩罚 : 艾瑟萌等级奖励
+
+	# 艾瑟萌等级差(DEL)
+	# EL - L - QL
+
+	# 艾瑟萌等级奖励
+	# 1 - 艾瑟萌等级差 / (L + QL)
+
+	# 艾瑟萌等级惩罚
+	# (1-sigmoid(sqrt(艾瑟萌等级差)/K2))*2
+
+	# 艾瑟萌槽等级修正(ESLR)
+	# 艾瑟萌槽等级差 > 0 ? 艾瑟萌槽等级惩罚 : 艾瑟萌槽等级奖励
+
+	# 艾瑟萌槽等级差(DESL)
+	# ESL - L - QL
+
+	# 艾瑟萌槽等级奖励
+	# 1 - 艾瑟萌槽等级差 / (L + QL)
+
+	# 艾瑟萌槽等级惩罚
+	# (1-sigmoid(sqrt(艾瑟萌槽等级差)/K2))*2
+
+	# 经验结果修正(ERR)
+	# CORRECT ? 1 : W
+
+	# 经验波动修正(EFR)
+	# 1 + rand(EF * 2) - EF
+
+	# 基础金币奖励(BGR)
+	# BG
+
+	# 金币结果修正(GRR)
+	# CORRECT
+
+	# 金币波动修正(GFR)
+	# 1 + rand(GF * 2) - GF
+
+	K1 = 5
+	K2 = 20
+
+	A = 0.7
+
+	EF = 5  # 5%
+	GF = 10  # 10%
+	W = 0.1
+
+	# 计算艾瑟萌经验值收益
+	def _calcExerExpIncr(self):
+		base = self.question.expIncr()
+		count = self.ques_rec.count
+		ques_level = self.question.sumLevel()
+		exer_level = self.exerslot_item.exermonLevel()
+		exerslot_level = self.exerslot_item.slotLevel()
+
+		cr = self._applyCount(count)
+		elr = self._applyLevel(exer_level, ques_level)
+		eslr = self._applyLevel(exerslot_level, ques_level)
+		err = self._applyExpResult(self.corr)
+		efr = self._applyExpFloat()
+
+		eer = round(base*cr*elr*err*efr)
+		eser = round(base*cr*eslr*err*efr)
+
+		return eer, eser
+
+	# 次数修正
+	def _applyCount(self, count):
+		return pow(self.A, count/self.K1)
+
+	# 艾瑟萌等级修正
+	def _applyLevel(self, el, ql):
+		delta = el-ql
+		return self._levelReward(delta, ql) \
+			if delta > 0 else self._levelPunish(delta)
+
+	# 艾瑟萌等级惩罚
+	def _levelPunish(self, delta):
+		return (1-Common.sigmoid(math.sqrt(delta)/self.K2))*2
+
+	# 艾瑟萌等级奖励
+	def _levelReward(self, delta, ql):
+		return 1-delta/ql
+
+	# 结果修正
+	def _applyExpResult(self, corr):
+		return 1 if corr else self.W
+
+	# 经验浮动修正
+	def _applyExpFloat(self):
+		return 1+random.randint(-self.EF, self.EF)/100.0
+
+	# 计算金币收益
+	def _calcGoldIncr(self):
+		base = self.question.goldIncr()
+		grr = self._applyGoldResult(self.corr)
+		gfr = self._applyGoldFloat()
+
+		return round(base*grr*gfr)
+
+	# 结果修正
+	def _applyGoldResult(self, corr):
+		return 1 if corr else 0
+
+	# 经验浮动修正
+	def _applyGoldFloat(self):
+		return 1+random.randint(-self.GF, self.GF)/100.0
+
+
+# ================================
+# 题目集（结算）收益计算类
+# ================================
+class QuestionSetResultRewardCalc:
+
+	@classmethod
+	def calc(cls, player_queses):
+		calc_obj = cls(player_queses)
+		return calc_obj
+
+	def __init__(self, player_queses):
+
+		self.exer_exp_incr = 0
+		self.exerslot_exp_incr = 0
+		self.gold_incr = 0
+
+		self.exer_exp_incrs = {}
+		self.exerslot_exp_incrs = {}
+
+		self.player_queses = player_queses
+
+		self.exer_exp_incrs, self.exerslot_exp_incrs, \
+			self.exer_exp_incr, self.exerslot_exp_incr, \
+			self.gold_incr = self._calcSumReward()
+
+	# 计算总收益
+	def _calcSumReward(self):
+		raise NotImplementedError
+
+
+# ================================
+# 刷题（结算）收益计算类
+# ================================
+class ExerciseResultRewardCalc(QuestionSetResultRewardCalc):
+
+	# 刷题结算奖励计算公式
+	# 艾瑟萌经验奖励(EER)
+	# round(∑单道题目艾瑟萌经验奖励 * 艾瑟萌经验奖励加成)
+
+	# 艾瑟萌槽经验奖励(ESER)
+	# round(∑单道题目艾瑟萌槽经验奖励 * 艾瑟萌槽经验奖励加成)
+
+	# 金币奖励(GR)
+	# round(∑单道题目金币奖励 * 金币奖励加成)
+
+	# 艾瑟萌经验奖励加成(EERP)
+	# 正确率加成 * 艾瑟萌经验附加加成
+
+	# 艾瑟萌槽经验奖励加成(ESERP)
+	# 正确率加成 * 艾瑟萌槽经验附加加成
+
+	# 金币奖励加成(GRP)
+	# 正确率加成 * 金币附加加成
+
+	# 正确率加成(CRP)
+	# 1 + 正确率 / 2 - B
+
+	# 艾瑟萌经验附加加成
+	# EEIP * EIP
+
+	# 艾瑟萌槽经验附加加成
+	# ESEIP * EIP
+
+	# 金币附加加成
+	# GIP
+
+	B = 0.15
+
+	# 计算总收益
+	def _calcSumReward(self):
+
+		eers = {}
+		esers = {}
+		eer = eser = gr = 0
+		corr_cnt = 0
+
+		for player_ques in self.player_queses:
+			subject_id = player_ques.question.subject_id
+
+			if subject_id not in eers: eers[subject_id] = 0
+			if subject_id not in esers: esers[subject_id] = 0
+
+			corr_cnt += int(player_ques.correct())
+
+			eers[subject_id] += player_ques.exp_incr
+			esers[subject_id] += player_ques.slot_exp_incr
+
+			eer += player_ques.exp_incr
+			eser += player_ques.slot_exp_incr
+			gr += player_ques.gold_incr
+
+		corr_rate = corr_cnt / len(self.player_queses)
+
+		exer_rate = self._exerExpRewardRate(corr_rate)
+		slot_rate = self._exerSlotExpRewardRate(corr_rate)
+
+		for sid in eers: eers[sid] *= exer_rate
+		for sid in esers: esers[sid] *= slot_rate
+
+		eer *= exer_rate
+		eser *= slot_rate
+
+		gr *= self._goldRewardRate(corr_rate)
+
+		return eers, esers, eer, eser, gr
+
+	# 艾瑟萌经验奖励加成
+	def _exerExpRewardRate(self, corr_rate):
+		return self._corrRatePlus(corr_rate)*self._exerExpPlusRate()
+
+	# 艾瑟萌槽经验奖励加成
+	def _exerSlotExpRewardRate(self, corr_rate):
+		return self._corrRatePlus(corr_rate)*self._exerSlotExpPlusRate()
+
+	# 金币奖励加成
+	def _goldRewardRate(self, corr_rate):
+		return self._corrRatePlus(corr_rate)*self._goldPlusRate()
+
+	# 正确率加成
+	def _corrRatePlus(self, corr_rate):
+		return 1+corr_rate/2-self.B
+
+	# 艾瑟萌经验附加加成
+	def _exerExpPlusRate(self):
+		return 1
+
+	# 艾瑟萌槽经验附加加成
+	def _exerSlotExpPlusRate(self):
+		return 1
+
+	# 金币附加加成
+	def _goldPlusRate(self):
+		return 1
+

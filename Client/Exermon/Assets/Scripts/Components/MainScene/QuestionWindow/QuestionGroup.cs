@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+/*
 /// <summary>
 /// 题目组
 /// </summary>
@@ -21,3 +21,4 @@ public class QuestionGroup : BaseView {
             LayoutRebuilder.ForceRebuildLayoutImmediate(l);
     }
 }
+*/

@@ -95,6 +95,14 @@ class ErrorType(Enum):
 	# ExerSlot
 	IncorrectSubject = 310  # 科目不正确
 
+	# QuestionCommon
+	QuestionNotExist = 400  # 题目不存在
+	QuesSugarNotExist = 401  # 题目糖不存在
+
+	# QuestionSet
+	QuestionNotStarted = 410  # 本题还没开始作答
+	InvalidTimeSpan = 411  # 作答时间有误
+
 
 class ErrorException(Exception):
 
@@ -181,6 +189,14 @@ class ErrorException(Exception):
 
 		# ExerSlot
 		ErrorType.IncorrectSubject: "艾瑟萌科目与艾瑟萌槽科目不一致！",
+
+		# QuestionCommon
+		ErrorType.QuestionNotExist: "题目不存在！",
+		ErrorType.QuesSugarNotExist: "题目糖不存在！",
+
+		# QuestionSet
+		ErrorType.QuestionNotStarted: "本题还没开始作答！",
+		ErrorType.InvalidTimeSpan: "作答时间有误！",
 
 	}
 

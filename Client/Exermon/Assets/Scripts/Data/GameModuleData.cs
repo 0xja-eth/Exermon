@@ -287,6 +287,21 @@ public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
 }
 
 /// <summary>
+/// 可用物品类型数据
+/// </summary>
+public class UsableItemType : TypeData { }
+
+/// <summary>
+/// 人类装备类型数据
+/// </summary>
+public class HumanEquipType : TypeData { }
+
+/// <summary>
+/// 艾瑟萌装备类型数据
+/// </summary>
+public class ExerEquipType : TypeData { }
+
+/// <summary>
 /// 艾瑟萌星级数据
 /// </summary>
 public class ExerStar : TypeData {
@@ -360,6 +375,37 @@ public class ExerGiftStar : TypeData {
         var json = base.toJson();
         json["color"] = DataLoader.convertColor(color);
         json["param_ranges"] = DataLoader.convertDataArray(paramRanges);
+
+        return json;
+    }
+}
+
+/// <summary>
+/// 物品星级数据
+/// </summary>
+public class ItemStar : TypeData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public Color color { get; private set; }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+        color = DataLoader.loadColor(json, "color");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+        json["color"] = DataLoader.convertColor(color);
 
         return json;
     }
@@ -448,11 +494,12 @@ public class GameConfigure : BaseData {
     /// </summary>
     public Subject[] subjects { get; private set; }
     public BaseParam[] baseParams { get; private set; }
-    public TypeData[] usableItemTypes { get; private set; }
-    public TypeData[] humanEquipTypes { get; private set; }
-    public TypeData[] exerEquipTypes { get; private set; }
+    public UsableItemType[] usableItemTypes { get; private set; }
+    public HumanEquipType[] humanEquipTypes { get; private set; }
+    public ExerEquipType[] exerEquipTypes { get; private set; }
     public ExerStar[] exerStars { get; private set; }
     public ExerGiftStar[] exerGiftStars { get; private set; }
+    public ItemStar[] itemStars { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -479,11 +526,12 @@ public class GameConfigure : BaseData {
 
         subjects = DataLoader.loadDataArray<Subject>(json, "subjects");
         baseParams = DataLoader.loadDataArray<BaseParam>(json, "base_params");
-        usableItemTypes = DataLoader.loadDataArray<TypeData>(json, "usable_item_types");
-        humanEquipTypes = DataLoader.loadDataArray<TypeData>(json, "human_equip_types");
-        exerEquipTypes = DataLoader.loadDataArray<TypeData>(json, "exer_equip_types");
+        usableItemTypes = DataLoader.loadDataArray<UsableItemType>(json, "usable_item_types");
+        humanEquipTypes = DataLoader.loadDataArray<HumanEquipType>(json, "human_equip_types");
+        exerEquipTypes = DataLoader.loadDataArray<ExerEquipType>(json, "exer_equip_types");
         exerStars = DataLoader.loadDataArray<ExerStar>(json, "exer_stars");
         exerGiftStars = DataLoader.loadDataArray<ExerGiftStar>(json, "exer_gift_stars");
+        itemStars = DataLoader.loadDataArray<ItemStar>(json, "item_stars");
     }
 
     /// <summary>
@@ -516,6 +564,7 @@ public class GameConfigure : BaseData {
         json["exer_equip_types"] = DataLoader.convertDataArray(exerEquipTypes);
         json["exer_stars"] = DataLoader.convertDataArray(exerStars);
         json["exer_gift_stars"] = DataLoader.convertDataArray(exerGiftStars);
+        json["item_stars"] = DataLoader.convertDataArray(itemStars);
 
         return json;
     }

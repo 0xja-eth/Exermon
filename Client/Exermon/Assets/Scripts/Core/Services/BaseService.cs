@@ -16,17 +16,6 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     public const string WaitTextFormat = "{0}中...";
     public const string FailTextFormat = "{0}失败：\n{{0}}";
 
-    /*
-    /// <summary>
-    /// 单例函数
-    /// </summary>
-    protected static T _self;
-    public static T get() {
-        if (_self == null) _self = new T();
-        return _self;
-    }
-    */
-
     /// <summary>
     /// 操作字典 (key, (oper, route))
     /// </summary>
@@ -37,16 +26,6 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
     /// </summary>
     NetworkSystem networkSys;
     protected GameSystem gameSys;
-
-    /*
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    protected BaseService() {
-        if (_self != null) throw new MultCaseException();
-        initializeOperDict();
-    }
-    */
 
     #region 操作字典
 
@@ -167,19 +146,6 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
         NetworkSystem.RequestObject.ErrorAction _onError = generateOnErrorFunc(failText,
             () => sendRequest(route, data, waitText, failText,
                 onSuccess, onError), onError);
-        /*
-        (status, errmsg) => {
-            var text = string.Format(failText, errmsg);
-            var btns = AlertWindow.RetryOrCancel;
-            var actions = new UnityAction[] {
-                null,
-                () => sendRequest(route, data, 
-                    failText, waitText, onSuccess, unaccept),
-                unaccept
-            };
-            gameSys.requestAlert(text, btns, actions);
-        };
-        */
         if (uid) data["uid"] = getPlayerID(); // 添加玩家信息
         networkSys.setupRequest(route, data, onSuccess, _onError, true, waitText);
     }

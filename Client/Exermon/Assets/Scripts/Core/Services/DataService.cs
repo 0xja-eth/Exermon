@@ -192,6 +192,19 @@ public class DataService : BaseService<DataService> {
     /// <summary>
     /// 获取数据
     /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="collection">数据集合</param>
+    /// <param name="id">ID</param>
+    /// <returns>目标数据</returns>
+    public static BaseData get(BaseData[] collection, int id) {
+        foreach (var element in collection)
+            if (element.getID() == id) return element;
+        return default;
+    }
+
+    /// <summary>
+    /// 获取数据
+    /// </summary>
     /// <param name="collection">数据集合</param>
     /// <param name="id">ID</param>
     /// <returns>目标数据</returns>
@@ -199,18 +212,6 @@ public class DataService : BaseService<DataService> {
         foreach (var element in collection)
             if (element.Item1 == id) return element;
         return default;
-    }
-
-    /// <summary>
-    /// 获取数据索引
-    /// </summary>
-    /// <param name="collection">数据集合</param>
-    /// <param name="id">ID</param>
-    /// <returns>目标数据索引</returns>
-    public static int getIndex(Tuple<int, string>[] collection, int id) {
-        for (int i = 0; i < collection.Length; ++i)
-            if (collection[i].Item1 == id) return i;
-        return -1;
     }
 
     /// <summary>
@@ -226,6 +227,61 @@ public class DataService : BaseService<DataService> {
         return -1;
     }
 
+    /// <summary>
+    /// 获取数据索引
+    /// </summary>
+    /// <param name="collection">数据集合</param>
+    /// <param name="id">ID</param>
+    /// <returns>目标数据索引</returns>
+    public static int getIndex(Tuple<int, string>[] collection, int id) {
+        for (int i = 0; i < collection.Length; ++i)
+            if (collection[i].Item1 == id) return i;
+        return -1;
+    }
+
+    /// <summary>
+    /// 获取静态/动态数据（不能获取组合术语数据）
+    /// </summary>
+    /// <typeparam name="attrName">数据名称</typeparam>
+    /// <param name="id">索引</param>
+    /// <param name="dataType">数据类型（0：数据库数据，1：配置数据，2：动态数据）</param>
+    /// <returns>数据</returns>
+    public BaseData get(string attrName, int id, int dataType = 0) {
+        object obj;
+        switch (dataType) {
+            case 0: obj = staticData.data; break;
+            case 1: obj = staticData.configure; break;
+            case 2: obj = dynamicData; break;
+            default: return null;
+        }
+
+        return get((BaseData[])obj.GetType().GetProperty(attrName).GetValue(obj), id);
+    }
+    /// <param name="type">数据类型</param>
+    public BaseData get(Type type, int id, int dataType = 0) {
+        var attrType = type.ToString();
+        var attrName = char.ToLower(attrType[0]).ToString();
+        attrName += attrType.Substring(1) + "s";
+        return get(attrName, id, dataType);
+    }
+    /// <typeparam name="T">数据类型</typeparam>
+    public T get<T>(int id, int dataType = 0) where T : BaseData {
+        return (T)get(typeof(T), id, dataType);
+    }
+    /*
+    /// <summary>
+    /// 获取组合术语数据
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="attrName">数据名称</param>
+    /// <param name="id">索引</param>
+    /// <returns>术语数据</returns>
+    public Tuple<int, string> get(string attrName, int id) {
+        var type = staticData.configure.GetType();
+        return get((Tuple<int, string>[])type.
+            GetProperty(attrName).GetValue(staticData.configure), id);
+    }
+    */
     /// <summary>
     /// 组合术语
     /// </summary>
@@ -260,13 +316,13 @@ public class DataService : BaseService<DataService> {
     public BaseParam baseParam(int id) {
         return get(staticData.configure.baseParams, id);
     }
-    public TypeData usableItemType(int id) {
+    public UsableItemType usableItemType(int id) {
         return get(staticData.configure.usableItemTypes, id);
     }
-    public TypeData humanEquipType(int id) {
+    public HumanEquipType humanEquipType(int id) {
         return get(staticData.configure.humanEquipTypes, id);
     }
-    public TypeData exerEquipType(int id) {
+    public ExerEquipType exerEquipType(int id) {
         return get(staticData.configure.exerEquipTypes, id);
     }
     public ExerStar exerStar(int id) {
@@ -274,6 +330,9 @@ public class DataService : BaseService<DataService> {
     }
     public ExerGiftStar exerGiftStar(int id) {
         return get(staticData.configure.exerGiftStars, id);
+    }
+    public ItemStar itemStar(int id) {
+        return get(staticData.configure.itemStars, id);
     }
 
     /// <summary>
@@ -310,7 +369,7 @@ public class DataService : BaseService<DataService> {
         return null;
         // return get(staticData.data.quesSugars, id);
     }
-
+    
     #endregion
 
     #region 回调控制

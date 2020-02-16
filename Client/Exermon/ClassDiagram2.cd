@@ -1,66 +1,112 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="AlertWindow" Collapsed="true">
-    <Position X="5.5" Y="21.75" Width="1.5" />
+    <Position X="39.25" Y="15.5" Width="1.5" />
+    <InheritanceLine Type="BaseWindow" FixedToPoint="true">
+      <Path>
+        <Point X="37.75" Y="16.5" />
+        <Point X="37.75" Y="15.875" />
+        <Point X="39.25" Y="15.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>REABAECJUAFAgChgAQCkAQCIAACgGIAoICARCACEAEA=</HashCode>
       <FileName>Assets\Scripts\Windows\Common\AlertWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="AnimationUtils" Collapsed="true">
+    <Position X="110.25" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="AnimationUtils.TempAnimation" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\UI\AnimationUtils.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\AnimationUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="AssetLoader" Collapsed="true">
-    <Position X="81.25" Y="0.5" Width="1.5" />
+    <Position X="112" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gACRAACABACABAAIAACQAAIoIIIgAAIACAAIBgAAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\AssetLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseComponent" Collapsed="true">
-    <Position X="38.25" Y="12.5" Width="1.5" />
+    <Position X="38" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAACAAAAAgAAAAAgAAAAAAAAAAAAAAQAAEAEA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\BaseComponent.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseContainer" Collapsed="true">
-    <Position X="17.25" Y="1.75" Width="1.5" />
+    <Position X="24.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAIAAAAAAAAhAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseContItem" Collapsed="true">
-    <Position X="32" Y="1.75" Width="2" />
+    <Position X="40.5" Y="1.75" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Enum Name="BaseContItem.Type" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Data\ItemModuleData.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAhAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseData" Collapsed="true">
-    <Position X="39.75" Y="0.5" Width="1.5" />
+    <Position X="24.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAACAgAAAAAAAAAAgAAAAAAAAAAAAAgA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\BaseData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="BaseInputField" Collapsed="true">
-    <Position X="36.5" Y="15.25" Width="1.5" />
+  <Class Name="BaseInputField&lt;T&gt;" Collapsed="true">
+    <Position X="31.25" Y="11.25" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="BaseInputField&lt;T&gt;.checkFunc" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="BaseInputField&lt;T&gt;.onChangeFunc" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BECBgEAAAABIICAAAAaAAAIwBAAAQmABAAiBAAAgAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseItem" Collapsed="true">
-    <Position X="56.75" Y="1.75" Width="1.5" />
+    <Position X="60.75" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAIAAAAAAAAAAlAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseParam" Collapsed="true">
-    <Position X="7.25" Y="3.25" Width="1.5" />
+    <Position X="18" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAARAAAAIAAASAAAAAIAAACAAAgACCQAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
@@ -68,21 +114,28 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="BaseScene" Collapsed="true">
-    <Position X="1.75" Y="14" Width="1.5" />
+    <Position X="41.75" Y="9.25" Width="1.5" />
+    <InheritanceLine Type="BaseComponent" FixedFromPoint="true">
+      <Path>
+        <Point X="39.5" Y="8.875" />
+        <Point X="42.125" Y="8.875" />
+        <Point X="42.125" Y="9.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>BAAAAAAAABAKAAAAAIAAAAAAABAAAEAAAAAgQAAEAAA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\BaseScene.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="BaseService&lt;T&gt;" Collapsed="true">
-    <Position X="32.75" Y="33.5" Width="1.5" />
+  <Class Name="BaseService&lt;T&gt;">
+    <Position X="19.75" Y="23.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAgAAAACAAQQEAAIBAAEAAAAQAgFACAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Services\BaseService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseSystem&lt;T&gt;">
-    <Position X="29" Y="26.5" Width="2" />
+    <Position X="16.75" Y="23.5" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -98,15 +151,22 @@
       <FileName>Assets\Scripts\Core\Systems\BaseSystem.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="BaseView" Collapsed="true">
-    <Position X="40.75" Y="14" Width="1.5" />
+  <Class Name="BaseView">
+    <Position X="33.75" Y="9.25" Width="2" />
+    <InheritanceLine Type="BaseComponent" FixedFromPoint="true">
+      <Path>
+        <Point X="38" Y="8.875" />
+        <Point X="34.75" Y="8.875" />
+        <Point X="34.75" Y="9.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEAAIEGAQBAAIAAAAQGAABEQSAAEAAAAgAAEQAAEAQA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\BaseView.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseWindow">
-    <Position X="12.75" Y="15.25" Width="2" />
+    <Position X="36.75" Y="16.5" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -117,28 +177,35 @@
         </TypeIdentifier>
       </Enum>
     </NestedTypes>
+    <InheritanceLine Type="BaseView" FixedToPoint="true">
+      <Path>
+        <Point X="34.75" Y="14.827" />
+        <Point X="34.75" Y="16.875" />
+        <Point X="36.75" Y="16.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>QAEAAAAAAAgAAAAQAAQEAYEAAAAAKAAEAAQEAAAEKAA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\BaseWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CalcService">
-    <Position X="25" Y="34.75" Width="2.5" />
+  <Class Name="CalcService" Collapsed="true">
+    <Position X="23" Y="24" Width="2.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Class Name="CalcService.ExermonParamCalc" Collapsed="true">
+      <Class Name="CalcService.ExermonParamCalc">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
-      <Class Name="CalcService.ExerSlotItemParamRateCalc" Collapsed="true">
+      <Class Name="CalcService.ExerSlotItemParamCalc">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
-      <Class Name="CalcService.ExerSlotItemParamCalc" Collapsed="true">
+      <Class Name="CalcService.ExerSlotItemParamRateCalc">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -150,49 +217,78 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Character" Collapsed="true">
-    <Position X="2.75" Y="1.75" Width="1.5" />
+    <Position X="20.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAIAAAAIAAAAAAIAAAgAAAAAwkAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CharacterContainer" Collapsed="true">
-    <Position X="49.75" Y="16.75" Width="2" />
+    <Position X="29" Y="14.5" Width="2" />
+    <InheritanceLine Type="ItemContainer&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="30" Y="13.927" />
+        <Point X="30" Y="14.227" />
+        <Point X="28.7" Y="14.227" />
+        <Point X="28.7" Y="14.875" />
+        <Point X="29" Y="14.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AIgEAABAAFASIAAAIACAAAAAgAAEEABAEIAFkAAUAAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\CharacterWindow\CharacterContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CharacterDisplay" Collapsed="true">
-    <Position X="59.75" Y="18.25" Width="1.75" />
+    <Position X="34.5" Y="20.25" Width="1.75" />
+    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.125" Y="19.177" />
+        <Point X="34.125" Y="20.589" />
+        <Point X="34.5" Y="20.589" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAQEACAAAAIRACEEIACAAIAgEAAAAAQAAAABAAAEhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\CharacterWindow\CharacterDisplay.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CharacterWindow" Collapsed="true">
-    <Position X="15.5" Y="21.75" Width="1.75" />
+    <Position X="39.25" Y="18.5" Width="1.75" />
+    <InheritanceLine Type="BaseWindow" FixedToPoint="true">
+      <Path>
+        <Point X="38.75" Y="18.812" />
+        <Point X="39.25" Y="18.812" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>IAAAAwAAAAAIFAAgAASAAIAAAAAAAAACAABABEgAAAg=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\CharacterWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="ClockDisplay" Collapsed="true">
+    <Position X="36.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAGAAAAAAAEAAAgAAAAAAAAAAABAAAAIqAUAEAIA=</HashCode>
+      <FileName>Assets\Scripts\Components\MainScene\ClockDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="ConfigureData" Collapsed="true">
-    <Position X="46.5" Y="1.75" Width="1.5" />
+    <Position X="75.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAgAAQAAAAAAAgAAAAAABAAAAIAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\ConfigureData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="DataLoader" Collapsed="true">
-    <Position X="83" Y="0.5" Width="1.5" />
+    <Position X="113.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ABAAADFAhAAAAAgAEgBAANtAJEFgByAUAAEAIwAAwAE=</HashCode>
       <FileName>Assets\Scripts\Core\Data\DataLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="DataService">
-    <Position X="33.75" Y="34.75" Width="2" />
+    <Position X="19.75" Y="28.25" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -213,55 +309,79 @@
       <FileName>Assets\Scripts\Core\Services\DataService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DateTimeField">
-    <Position X="36.25" Y="16.75" Width="2" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
+  <Class Name="DateTimeField" Collapsed="true">
+    <Position X="28.75" Y="10.25" Width="2" />
+    <InheritanceLine Type="BaseInputField&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="32.25" Y="11.25" />
+        <Point X="32.25" Y="10.625" />
+        <Point X="30.75" Y="10.625" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>BAAkAEEAAAAAIAAAAgSAgQmAggQACJEAACCjAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\DateTimeField.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DateTimePlane">
-    <Position X="75.75" Y="15.25" Width="1.75" />
+  <Class Name="DateTimePicker" Collapsed="true">
+    <Position X="29" Y="9.25" Width="1.75" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="DateTimePlane.Type" Collapsed="true">
+      <Enum Name="DateTimePicker.Type" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAJAAAAAAAAIAAAAAgAAAABAAEAQEEBAA=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\InputFields\DateTimePlane.cs</FileName>
-      <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</NewMemberFileName>
+      <HashCode>BACACFAgCAABAAICACrIEAAASCAhgCAABAIRQQQEAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DateTimePickersPlane" Collapsed="true">
+    <Position X="36.75" Y="14.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAABAAAAAAAAAAAAAAgAAAABAAAAQAEAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\InputFields\DateTimePickersPlane.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="DraggableItemDisplay&lt;T&gt;" Collapsed="true">
-    <Position X="68" Y="18.25" Width="2.25" />
+    <Position X="28.5" Y="20.25" Width="2.25" />
+    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true">
+      <Path>
+        <Point X="34.125" Y="19.177" />
+        <Point X="34.125" Y="19.848" />
+        <Point X="29.625" Y="19.848" />
+        <Point X="29.625" Y="20.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAEAAAAAAAAgUIAABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\DraggableItemDisplay.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="DropdownField">
-    <Position X="39" Y="16.75" Width="1.75" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
+  <Class Name="DropdownField" Collapsed="true">
+    <Position X="28.25" Y="11.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>BEABAAAAAEAAIAgAAAKAEAADQACIAAAAAAAAAQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\DropdownField.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="DroppableItemContainer&lt;T&gt;" Collapsed="true">
-    <Position X="43.75" Y="16.75" Width="2.5" />
+    <Position X="26" Y="13.25" Width="2.5" />
+    <InheritanceLine Type="ItemContainer&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="29" Y="13.562" />
+        <Point X="28.76" Y="13.562" />
+        <Point X="28.76" Y="13.562" />
+        <Point X="28.5" Y="13.562" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\DroppableItemContainer.cs</FileName>
@@ -269,59 +389,57 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="EffectData" Collapsed="true">
-    <Position X="0.5" Y="1.75" Width="1.5" />
+    <Position X="31.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAIAAAAAAIAAAAAAAIAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EquipableItem" Collapsed="true">
-    <Position X="59" Y="4.75" Width="1.5" />
+    <Position X="65" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAIAAAAAAAAAAAAAAAAAgAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ExampleWheelController" Collapsed="true">
-    <Position X="84.75" Y="0.5" Width="1.5" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AAQAAAAAACAAAAAAAAAAAAIAAAAAAAQAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\DownloadedAssets\Sun_Temple\PostProcessing\Utilities\CustomMotionTexture\ExampleWheelController.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="ExerEquip" Collapsed="true">
-    <Position X="57.75" Y="6" Width="1.5" />
+    <Position X="66" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAABAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerEquipSlot" Collapsed="true">
-    <Position X="16.5" Y="4.75" Width="2.25" />
+    <Position X="25.25" Y="4.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerEquipSlotItem" Collapsed="true">
-    <Position X="34.75" Y="5" Width="1.75" />
+    <Position X="38.5" Y="4.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAIAAABAAAAAAAAAQAAAgAAAAAIAAIAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerFrag" Collapsed="true">
-    <Position X="51" Y="3.25" Width="1.5" />
+    <Position X="63" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAABIAAAAAABAAAAAAAAAAgAAACAAAAAAAQAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerGift" Collapsed="true">
-    <Position X="53.25" Y="3.25" Width="1.5" />
+    <Position X="65" Y="3" Width="1.5" />
+    <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="61.5" Y="3.677" />
+        <Point X="61.5" Y="4.125" />
+        <Point X="65.75" Y="4.125" />
+        <Point X="65.75" Y="3.677" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAEAIAAAAIAAAAAAAAAAABAAAACgAAAAAAQAAAAAAAQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
@@ -329,42 +447,67 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ExerGiftCard" Collapsed="true">
-    <Position X="68" Y="19.75" Width="2.25" />
+    <Position X="28.5" Y="21.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAgAAEAAAAAAAAAQAAgAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerGiftDetail" Collapsed="true">
-    <Position X="71" Y="16.75" Width="1.5" />
+    <Position X="29.25" Y="18.5" Width="1.5" />
+    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.5" Y="17.177" />
+        <Point X="32.5" Y="18.264" />
+        <Point X="29.938" Y="18.264" />
+        <Point X="29.938" Y="18.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAQAAAAAEAIACAAAAAgAAEAAAAAAAAAQAIoAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftDetail.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerGiftsContainer" Collapsed="true">
-    <Position X="55" Y="16.75" Width="1.75" />
+    <Position X="26.5" Y="14.5" Width="1.75" />
+    <InheritanceLine Type="ItemContainer&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="30" Y="13.927" />
+        <Point X="30" Y="14.227" />
+        <Point X="28.7" Y="14.227" />
+        <Point X="28.7" Y="14.875" />
+        <Point X="28.25" Y="14.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAEABAAEAAAAAAAQAAAAAACAAAAAAAIgBAgAEA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerGiftStar" Collapsed="true">
-    <Position X="11.75" Y="3.25" Width="1.5" />
+    <Position X="11.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAEAAAAAAAAAAAAAAgAACAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerItem" Collapsed="true">
-    <Position X="62.25" Y="6" Width="1.5" />
+    <Position X="59.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAIAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Exermon" Collapsed="true">
-    <Position X="48.75" Y="3.25" Width="1.5" />
+    <Position X="63" Y="3" Width="1.5" />
+    <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="61.5" Y="3.677" />
+        <Point X="61.5" Y="4.125" />
+        <Point X="63.75" Y="4.125" />
+        <Point X="63.75" Y="3.677" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAQIABCIIAAAAAACAAAABCREAiiEQBQAQAAAAAAAIQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
@@ -372,28 +515,45 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ExermonDetail" Collapsed="true">
-    <Position X="57.5" Y="16.75" Width="1.5" />
+    <Position X="31.25" Y="18.5" Width="1.5" />
+    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.5" Y="17.177" />
+        <Point X="32.5" Y="18.264" />
+        <Point X="31.938" Y="18.264" />
+        <Point X="31.938" Y="18.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>CAQAIEAKQAAAAAEAIACAIBCAIACnAAAgIBAQAAAIhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\ExermonDetail.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ExermonGameSystem" Collapsed="true">
-    <Position X="18.25" Y="33.5" Width="2.5" />
+  <Class Name="ExermonGameSystem">
+    <Position X="11.25" Y="23.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAABAEAAAADAAAAgAQAABAECCAAAAAAAABQA=</HashCode>
       <FileName>Assets\Scripts\Core\Systems\ExermonGameSystem.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExermonsContainer" Collapsed="true">
-    <Position X="52.5" Y="16.75" Width="1.75" />
+    <Position X="29" Y="15.5" Width="2" />
+    <InheritanceLine Type="ItemContainer&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="30" Y="13.927" />
+        <Point X="30" Y="14.227" />
+        <Point X="28.7" Y="14.227" />
+        <Point X="28.7" Y="15.812" />
+        <Point X="29" Y="15.812" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAQAAAAABAAAAAAAAAIABAgAAAAUAABAAAIAAAgBAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\ExermonsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExermonService">
-    <Position X="31" Y="34.75" Width="2" />
+    <Position X="27.25" Y="28.25" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -410,49 +570,63 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ExermonsWindow" Collapsed="true">
-    <Position X="18" Y="21.75" Width="1.75" />
+    <Position X="39.25" Y="19.5" Width="1.75" />
+    <InheritanceLine Type="BaseWindow" FixedToPoint="true">
+      <Path>
+        <Point X="38.75" Y="19.812" />
+        <Point X="39.25" Y="19.812" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>ISAAAwAAAAAIECAgAACAAIAAAAAAAAACAABQAAgABAg=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\ExermonsWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerPackEquip" Collapsed="true">
-    <Position X="27.5" Y="6.5" Width="1.5" />
+    <Position X="48" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerPackItem" Collapsed="true">
-    <Position X="27.5" Y="5" Width="1.5" />
+    <Position X="48" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerSkill" Collapsed="true">
-    <Position X="55.5" Y="3.25" Width="1.5" />
+    <Position X="65" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>YAAAAGAACIAAAAAAIAAAAAgEQBAkAAACAQAAAgCQEAg=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerSkillSlotItem" Collapsed="true">
-    <Position X="37.25" Y="5" Width="1.5" />
+    <Position X="41" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAIAAAAAAAAAAAAABAEAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerSlotDetail" Collapsed="true">
-    <Position X="73.25" Y="16.75" Width="1.75" />
+    <Position X="29" Y="17.25" Width="2" />
+    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.5" Y="17.177" />
+        <Point X="32.5" Y="18.264" />
+        <Point X="29.938" Y="18.264" />
+        <Point X="29.938" Y="17.927" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAIAAKQAAAAAEAIACAAACAIAAWAAAgAAAQAAAIhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerSlotDetail.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerSlotItem" Collapsed="true">
-    <Position X="39.5" Y="5" Width="1.5" />
+    <Position X="33.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAQIQACIIEAAAAAAAAAAASCEAkiAABQAIAAAEAQAgQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
@@ -460,81 +634,98 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ExerSlotsContainer" Collapsed="true">
-    <Position X="47" Y="16.75" Width="2" />
+    <Position X="26.25" Y="15.5" Width="2" />
+    <InheritanceLine Type="ItemContainer&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="30" Y="13.927" />
+        <Point X="30" Y="14.227" />
+        <Point X="28.7" Y="14.227" />
+        <Point X="28.7" Y="15.812" />
+        <Point X="28.25" Y="15.812" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAIAAAAABAAAAAAAABAAAAIgEAgAEA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerSlotsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExerStar" Collapsed="true">
-    <Position X="5" Y="3.25" Width="1.5" />
+    <Position X="13.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAEAAQAAAAAAAgAACAAAAAQAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FontAdjustHandler" Collapsed="true">
-    <Position X="86.5" Y="0.5" Width="1.5" />
+  <Class Name="FragmentData" Collapsed="true">
+    <Position X="115.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="FragmentData.MatchInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Struct>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQCIAAAAQEAAEAAoAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\SystemExtend\TextExtend.cs</FileName>
+      <HashCode>gAIAAAAggAEAAAQgAIIAAAAAABEAAAEKQIAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameConfigure" Collapsed="true">
-    <Position X="22.75" Y="1.75" Width="1.5" />
+    <Position X="50.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QIAAQQAAAIIAAgAAgAAAAAgAAAAsGABAAAQAIBIAAAg=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameDatabase" Collapsed="true">
-    <Position X="41.75" Y="1.75" Width="1.5" />
+    <Position X="52.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAABAEIAAACAAIAAAAAAAAAAhAAAAAEAAAEAAAIA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameDynamicData" Collapsed="true">
-    <Position X="44" Y="1.75" Width="1.75" />
+    <Position X="54.75" Y="1.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIABAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameException" Collapsed="true">
-    <Position X="81.25" Y="1.5" Width="1.5" />
+    <Position X="110.25" Y="1.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Enum Name="GameException.Type" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\Data\GameException.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAABAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAgAAgACA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\GameException.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameStaticData" Collapsed="true">
-    <Position X="66.75" Y="1.75" Width="1.5" />
+    <Position X="77.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAJIAAAAABgAAACABAQEAggAAAAAAQAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="GameSystem">
-    <Position X="21.5" Y="33.5" Width="2.75" />
+  <Class Name="GameSystem" Collapsed="true">
+    <Position X="11" Y="30.25" Width="2.75" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="GameSystem.State" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
       <Class Name="GameSystem.AlertRequest" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="GameSystem.LoadingRequest" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -544,7 +735,7 @@
           <Compartment Name="Nested Types" Collapsed="false" />
         </Compartments>
         <NestedTypes>
-          <Enum Name="GameSystem.ChangeSceneRequest.Type" Collapsed="true">
+          <Enum Name="GameSystem.ChangeSceneRequest.Type">
             <TypeIdentifier>
               <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
             </TypeIdentifier>
@@ -554,6 +745,16 @@
           <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
+      <Class Name="GameSystem.LoadingRequest">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Enum Name="GameSystem.State">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AohAIgQAACAIAAEhygAACYQAJgABAECABgADBBMhBAo=</HashCode>
@@ -561,91 +762,125 @@
     </TypeIdentifier>
   </Class>
   <Class Name="GameVersionData" Collapsed="true">
-    <Position X="73.5" Y="1.75" Width="1.75" />
+    <Position X="82" Y="1.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAECAIAAAAAAIAgABAAAAAAgAQAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GiftsWindow" Collapsed="true">
-    <Position X="20.5" Y="21.75" Width="1.5" />
+    <Position X="39.25" Y="20.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IQAAAwAAAAAIGAAgAACAAIAAABACAAACAABAAEoABAg=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\GiftsWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="GroupView&lt;T&gt;" Collapsed="true">
+    <Position X="31.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JEgACEAAACABAQAAgACAQAAAAAAAEAACACoAAAAQAQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\GroupView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="HumanEquip" Collapsed="true">
-    <Position X="60" Y="6" Width="1.5" />
+    <Position X="64" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAABAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanEquipSlot" Collapsed="true">
-    <Position X="19.5" Y="4.75" Width="2.5" />
+    <Position X="22" Y="4.75" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanEquipSlotItem" Collapsed="true">
-    <Position X="32" Y="5" Width="2" />
+    <Position X="35.75" Y="4.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAIAAABAAAAAAAAAQAAAgAAAAAAAAIAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanItem" Collapsed="true">
-    <Position X="64.5" Y="6" Width="1.5" />
+    <Position X="61.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanPackEquip" Collapsed="true">
-    <Position X="25" Y="6.5" Width="1.75" />
+    <Position X="45.5" Y="6.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanPackItem" Collapsed="true">
-    <Position X="25.25" Y="5" Width="1.5" />
+    <Position X="45.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InfoWindow" Collapsed="true">
-    <Position X="13.25" Y="21.75" Width="1.5" />
+    <Position X="39.25" Y="21.5" Width="1.5" />
+    <InheritanceLine Type="BaseWindow" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="38.75" Y="21.875" />
+        <Point X="39.25" Y="21.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>IAAAAgAgAAAQEIAAAACAgIAAAAAAAACCAABAAAgAAAA=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\InfoWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InitExermonCard" Collapsed="true">
-    <Position X="62.25" Y="18.25" Width="1.75" />
+    <Position X="34.5" Y="21.5" Width="1.75" />
+    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.125" Y="19.177" />
+        <Point X="34.125" Y="21.875" />
+        <Point X="34.5" Y="21.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAACAAAAEAAAAQQAAAAAAhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\InitExermonCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InitExerSlotDisplay" Collapsed="true">
-    <Position X="64.75" Y="19.75" Width="2.5" />
+    <Position X="31.25" Y="21.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAEABAAAAACAAAAUAAAIAQAAAAAAlAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\InitExerSlotDisplay.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ItemContainer&lt;T&gt;" Collapsed="true">
-    <Position X="49.25" Y="15.25" Width="1.75" />
+    <Position X="29" Y="13.25" Width="2" />
+    <InheritanceLine Type="GroupView&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="31.75" Y="13.562" />
+        <Point X="31" Y="13.562" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>REhEoAAwiQAIsARMAAqgYBAgQgICkEBEAAI4ihAwAQA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ItemDisplay&lt;T&gt;" Collapsed="true">
-    <Position X="64.25" Y="16.75" Width="1.5" />
+    <Position X="33.25" Y="18.5" Width="1.75" />
+    <InheritanceLine Type="ItemInfo&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.5" Y="17.177" />
+        <Point X="32.5" Y="18.264" />
+        <Point X="34.125" Y="18.264" />
+        <Point X="34.125" Y="18.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEAAoEBegiAIoAgSAAEAIRIAwIZgAARA1AHQAQAAJCI=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemDisplay.cs</FileName>
@@ -653,21 +888,28 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ItemInfo&lt;T&gt;" Collapsed="true">
-    <Position X="65.5" Y="15.25" Width="1.5" />
+    <Position X="31.75" Y="16.5" Width="1.5" />
+    <InheritanceLine Type="BaseView" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.75" Y="14.827" />
+        <Point X="34.75" Y="16.875" />
+        <Point X="33.25" Y="16.875" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>BEAAAFAEQAAAIAEQAAQIAABAQAAAAAAAAAAAAAABgAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ItemPrice" Collapsed="true">
-    <Position X="78.75" Y="1.75" Width="1.5" />
+  <Class Name="ItemPrice">
+    <Position X="4" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAIIAAAAAgAAAAAAAAAAgAABAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ItemService">
-    <Position X="36.5" Y="34.75" Width="1.75" />
+    <Position X="25.25" Y="28.25" Width="1.75" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -684,21 +926,21 @@
     </TypeIdentifier>
   </Class>
   <Class Name="LimitedItem" Collapsed="true">
-    <Position X="61.25" Y="3.25" Width="1.5" />
+    <Position X="60.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAABIAAAAAAAAAAAAAAAAAgAAAAAQGAAAAAgAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LoadingWindow" Collapsed="true">
-    <Position X="7.75" Y="21.75" Width="1.5" />
+    <Position X="39.25" Y="16.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AUAAAEBQAAAAgAIAAACEAAAAAAAAAAAIAAQAgIAEAAA=</HashCode>
       <FileName>Assets\Scripts\Windows\Common\LoadingWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LoginWindow">
-    <Position X="10" Y="21.75" Width="2.5" />
+  <Class Name="LoginWindow" Collapsed="true">
+    <Position X="39.25" Y="17.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -714,12 +956,32 @@
       <FileName>Assets\Scripts\Windows\TitleScene\LoginWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="NetworkSystem">
-    <Position X="15" Y="33.5" Width="2.5" />
+  <Class Name="MainScene">
+    <Position X="43.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEwAAAACEAAgAIAAAAAAAAAAAEQCAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\MainScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MapDisplay" Collapsed="true">
+    <Position X="36.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAABAAAABKAAAMAADIEAAAiAAAICAACFIAAJgHogA=</HashCode>
+      <FileName>Assets\Scripts\Components\MainScene\MapDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="NetworkSystem" Collapsed="true">
+    <Position X="11.25" Y="27.75" Width="2.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
+      <Class Name="NetworkSystem.EmitDataHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
       <Class Name="NetworkSystem.Interfaces" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
@@ -730,12 +992,12 @@
           <Compartment Name="Nested Types" Collapsed="false" />
         </Compartments>
         <NestedTypes>
-          <Delegate Name="NetworkSystem.RequestObject.SuccessAction" Collapsed="true">
+          <Delegate Name="NetworkSystem.RequestObject.ErrorAction" Collapsed="true">
             <TypeIdentifier>
               <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
             </TypeIdentifier>
           </Delegate>
-          <Delegate Name="NetworkSystem.RequestObject.ErrorAction" Collapsed="true">
+          <Delegate Name="NetworkSystem.RequestObject.SuccessAction" Collapsed="true">
             <TypeIdentifier>
               <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
             </TypeIdentifier>
@@ -750,12 +1012,7 @@
           <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
-      <Class Name="NetworkSystem.EmitDataHandler" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Enum Name="NetworkSystem.State" Collapsed="true">
+      <Enum Name="NetworkSystem.State">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -767,82 +1024,86 @@
     </TypeIdentifier>
   </Class>
   <Class Name="PackContainer&lt;T&gt;" Collapsed="true">
-    <Position X="14" Y="3.25" Width="1.75" />
+    <Position X="25.25" Y="3.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PackContItem" Collapsed="true">
-    <Position X="27.25" Y="3.5" Width="2" />
+    <Position X="45.5" Y="3.25" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Delegate Name="PackContItem.GetFunc" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Data\ItemModuleData.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAABAAAAAICAAAAABAQAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ParamBar">
-    <Position X="28" Y="15.25" Width="2.5" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <NestedTypes>
-      <Interface Name="ParamBar.ParamConfigInfoConvertable" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
-      <Interface Name="ParamBar.ParamValueInfosConvertable" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
-      <Struct Name="ParamBar.ParamConfigInfo" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Struct Name="ParamBar.ParamValueInfo" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Struct Name="ParamBar.ParamInfo" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>AEgMiEEAAgAABEAABAaAAQABQAAEACQAQAABACAAAAw=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ParamGroup\ParamBar.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="ParamBarsGroup" Collapsed="true">
-    <Position X="41.5" Y="15.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>BAAIAgABAAAAABAABBaAAAAAwAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ParamGroup\ParamBarsGroup.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="ParamData" Collapsed="true">
-    <Position X="69" Y="1.75" Width="1.5" />
+    <Position X="79.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIACAAAAgAIAAAEAAAAgACAAAIAAAAgAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\BaseData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ParamRangeData" Collapsed="true">
-    <Position X="71.25" Y="1.75" Width="1.5" />
+  <Class Name="ParamDisplay" Collapsed="true">
+    <Position X="31.75" Y="15.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Interface Name="ParamDisplay.DisplayDataArrayConvertable" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Interface>
+      <Interface Name="ParamDisplay.DisplayDataConvertable" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Interface>
+      <Struct Name="ParamDisplay.DisplayItem" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <InheritanceLine Type="BaseView" FixedToPoint="true">
+      <Path>
+        <Point X="34.75" Y="14.827" />
+        <Point X="34.75" Y="15.813" />
+        <Point X="33.25" Y="15.813" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AEgQAUAIIgAAABAUAUaAgCAAQQgCASgQAAAAAYAAQAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamDisplaysGroup" Collapsed="true">
+    <Position X="31.5" Y="14.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAA4AAAAAwAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplaysGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamRangeData">
+    <Position X="6.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIACAAAAgAAIAAAAAAAgACAAAAAAAAgAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\BaseData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Player">
-    <Position X="76" Y="1.75" Width="2" />
+    <Position X="8.5" Y="1.75" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -870,7 +1131,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PlayerExermon" Collapsed="true">
-    <Position X="29.75" Y="5" Width="1.5" />
+    <Position X="43.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAIAACIIAAAAAAAAAAAAQCEAkkAABQAAAAAAAQAwQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
@@ -878,7 +1139,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PlayerService">
-    <Position X="39" Y="34.75" Width="3" />
+    <Position X="22" Y="28.25" Width="3" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -900,14 +1161,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="PolygonEdges" Collapsed="true">
-    <Position X="83" Y="1.5" Width="1.5" />
+    <Position X="112" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\RadarDisplay\PolygonImage.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PolygonImage" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="84.75" Y="1.5" Width="1.5" />
+    <Position X="113.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IESAABAAAUDQACkAAIAAAAAEAEBAQgAAQAAAAAAAAAM=</HashCode>
       <FileName>Assets\Scripts\Components\Common\RadarDisplay\PolygonImage.cs</FileName>
@@ -915,98 +1176,138 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="QuadImageHandler" Collapsed="true">
-    <Position X="86.5" Y="1.5" Width="1.5" />
+    <Position X="5" Y="15" Width="1.75" />
     <TypeIdentifier>
       <HashCode>kEACISEAAAAAAkIAJAEAEAAABAAAIBAAAAACAAAAABA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="QuestionText" Collapsed="true">
+    <Position X="115.5" Y="1.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="QuestionText.TexturePool" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AGCYAIAAgUDQggAACAAAACAAAEAEBEBAEAIRAQAIMBA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QuestionTextParser" Collapsed="true">
+    <Position X="110.25" Y="2.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="QuestionTextParser.CharData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="QuestionTextParser.LineData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AEIASAGhgIEAAQEABENAACQCQAAAAABUCIAAAAECAKA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="RadarDiagram" Collapsed="true">
-    <Position X="22.75" Y="15.25" Width="1.5" />
+    <Position X="36.75" Y="13.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEEAAAIAAAAEIBQAAAKgAAAABAAAAIAgAAAgQAAFgAo=</HashCode>
       <FileName>Assets\Scripts\Components\Common\RadarDisplay\RadarDiagram.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SceneUtils" Collapsed="true">
-    <Position X="81.25" Y="2.5" Width="1.5" />
+    <Position X="112" Y="2.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Class Name="SceneUtils.GameScene" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\UI\SceneUtils.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>BCAAACTBEgIIgB08ASEAaggAkJABABCaagACAgAEUDA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\SceneUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ScrollList">
-    <Position X="25" Y="15.25" Width="2.25" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <NestedTypes>
-      <Interface Name="ScrollList.ScrollListItemContent" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ScrollList\ScrollList.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
-    </NestedTypes>
+  <Class Name="SizeTextHandler" Collapsed="true">
+    <Position X="1.5" Y="15" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AEQKoAAQAIEpKQCRAgCAQFAQQAIBCAFAAABwAQEAIAM=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ScrollList\ScrollList.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="ScrollListItem">
-    <Position X="31.25" Y="15.25" Width="1.75" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <NestedTypes>
-      <Delegate Name="ScrollListItem.onClick" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ScrollList\ScrollListItem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Delegate>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>AARAAkBEAIQAIAEAAACAAQDAEIBCgAAIBAAQAgIFAAA=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ScrollList\ScrollListItem.cs</FileName>
+      <HashCode>AAAAIAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SlotContainer&lt;T&gt;" Collapsed="true">
-    <Position X="18.5" Y="3.25" Width="1.75" />
+    <Position X="22.5" Y="3.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SlotContItem" Collapsed="true">
-    <Position X="35.75" Y="3.5" Width="1.5" />
+    <Position X="37.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAgAAAAAAAAAAABAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SlotItemDisplay&lt;T, E&gt;" Collapsed="true">
-    <Position X="65" Y="18.25" Width="2" />
+    <Position X="31.25" Y="20.25" Width="2.5" />
+    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.125" Y="19.177" />
+        <Point X="34.125" Y="19.848" />
+        <Point X="32.5" Y="19.848" />
+        <Point X="32.5" Y="20.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEAgAEIgCAAAAAAQBAADAAAAAAAAAAAIAAAQIAAAUAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\SlotItemDisplay.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="MainScene">
-    <Position X="2.75" Y="15.25" Width="2" />
+  <Class Name="StartScene">
+    <Position X="41.5" Y="10.5" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
+    <NestedTypes>
+      <Enum Name="StartScene.Step">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Scenes\StartScene.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAEwAAAACEAAgAIAAAAAAAAAAAEQCAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Scenes\MainScene.cs</FileName>
-      <NewMemberFileName>Assets\Scripts\Scenes\StartScene.cs</NewMemberFileName>
+      <HashCode>IEAAAkwCAEACUAAwAIAAAAAAAAAgAEQGACBAABAEhAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\StartScene.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="StorageSystem">
-    <Position X="42.75" Y="33.5" Width="2" />
+  <Class Name="StatusDisplay" Collapsed="true">
+    <Position X="36.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABCAAAAAAAAAAAABAAAAAAgAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\MainScene\StatusDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StorageSystem" Collapsed="true">
+    <Position X="11.75" Y="29" Width="2" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -1023,56 +1324,86 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Subject" Collapsed="true">
-    <Position X="9.5" Y="3.25" Width="1.5" />
+    <Position X="15.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAgAAAAACIAAAAAAAAAAAAAAAAAgAACQCAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="TextExtend" Collapsed="true">
-    <Position X="83" Y="2.5" Width="1.5" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
+  <Class Name="SubTextHandler" Collapsed="true">
+    <Position X="0.5" Y="16.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACMDwLAgCDE3AIAMIAACBFwBECGAAABAACBAIQAEAg=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\SystemExtend\TextExtend.cs</FileName>
+      <HashCode>AAAAACAAAAAAAAAAAIAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="TextInputField">
-    <Position X="33.75" Y="16.75" Width="1.75" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
+  <Class Name="SupTextHandler" Collapsed="true">
+    <Position X="2.75" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAIAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestSystem" Collapsed="true">
+    <Position X="9" Y="28.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAgAAGAAAAgAAIAAAAAACAAAAAAAAEAAAAAAIACAAAA=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\TestSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextHandler" Collapsed="true">
+    <Position X="2.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEECISAQAEIAAAAAAAUAAAgAAAAAAAAEAAoCABAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextInputField" Collapsed="true">
+    <Position X="29" Y="12.25" Width="1.75" />
+    <InheritanceLine Type="BaseInputField&lt;T&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="32.25" Y="11.927" />
+        <Point X="32.25" Y="12.625" />
+        <Point X="30.75" Y="12.625" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>BAACAAAEAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\TextInputField.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="TitleScene" Collapsed="true">
-    <Position X="0.5" Y="15.25" Width="1.5" />
+  <Class Name="TitleScene">
+    <Position X="39.25" Y="10.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAIBAAYAAAACABAgAKAAAAAAAAADAEQCAgAAAAAEAAA=</HashCode>
       <FileName>Assets\Scripts\Scenes\TitleScene.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TypeData" Collapsed="true">
-    <Position X="8.5" Y="1.75" Width="1.5" />
+    <Position X="14.75" Y="1.75" Width="1.5" />
+    <InheritanceLine Type="BaseData" FixedFromPoint="true">
+      <Path>
+        <Point X="25.25" Y="1.048" />
+        <Point X="25.25" Y="1.375" />
+        <Point X="15.5" Y="1.375" />
+        <Point X="15.5" Y="1.75" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAIAAAAAAAAAAkAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\BaseData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UsableItem" Collapsed="true">
-    <Position X="63.5" Y="4.75" Width="1.5" />
+    <Position X="60.75" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAIQAAIAAAAAAAAAAAAAEAAAgAAgAAAACAgEAAIA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ValidateService" Collapsed="true">
-    <Position X="28.25" Y="34.75" Width="2" />
+    <Position X="23" Y="25.25" Width="2" />
     <TypeIdentifier>
       <HashCode>0AIAUAAAAAgIABiAABAAAAAMIAIgAQACAAAQAAVQAAA=</HashCode>
       <FileName>Assets\Scripts\Services\ValidateService.cs</FileName>

@@ -144,6 +144,25 @@ class SkillImageUpload(SystemImageUpload):
 		return filename+ext
 
 
+# ===================================================
+#  题目图片
+# ===================================================
+@deconstructible
+class QuestionImageUpload(SystemImageUpload):
+
+	IMAGE_DIR = 'question/picture'
+
+	def generateFileName(self, instance, filename):
+
+		# 文件拓展名
+		ext = os.path.splitext(filename)[1]
+
+		# 定义文件名
+		filename = "question_%d" % instance.id
+
+		return filename+ext
+
+
 # ============================================
 # 公用类：处理模型函数的共有业务逻辑
 # ============================================
@@ -204,7 +223,16 @@ class Common:
 	def objectsToDict(cls, objects, **args):
 		result = []
 
+		if objects is None: return []
 		for obj in objects:
 			result.append(obj.convertToDict(**args))
 
 		return result
+
+	# 物体转化为字典
+	@classmethod
+	def objectToDict(cls, object, **args):
+
+		if object is None: return {}
+		return object.convertToDict(**args)
+

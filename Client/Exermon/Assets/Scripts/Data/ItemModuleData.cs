@@ -227,7 +227,7 @@ public class UsableItem : LimitedItem {
     /// 获取物品类型
     /// </summary>
     /// <returns>物品类型</returns>
-    public TypeData itemType() {
+    public UsableItemType itemType() {
         return DataService.get().usableItemType(iType);
     }
 
@@ -407,21 +407,22 @@ public class PackContItem : BaseContItem {
     protected delegate BaseItem GetFunc(int id);
 
     /// <summary>
-    /// 获取查找物品函数
+    /// 获取物品类型
     /// </summary>
     /// <returns></returns>
-    protected virtual GetFunc getFunc() {
+    protected virtual System.Type getItemType() {
         var type = (Type)this.type;
         var data = DataService.get();
+
         switch (type) {
-            case Type.HumanPackItem: return data.humanItem;
-            case Type.ExerPackItem: return data.humanEquip;
-            case Type.HumanPackEquip: return data.exerItem;
-            case Type.ExerPackEquip: return data.exerEquip;
-            case Type.PlayerExermon: return data.exermon;
-            case Type.ExerFragPackItem: return data.exerFrag;
-            case Type.PlayerExerGift: return data.exerGift;
-            case Type.QuesSugarPackItem: return data.quesSugar;
+            case Type.HumanPackItem: return typeof(HumanItem);
+            case Type.ExerPackItem: return typeof(ExerItem);
+            case Type.HumanPackEquip: return typeof(HumanEquip);
+            case Type.ExerPackEquip: return typeof(ExerEquip);
+            case Type.PlayerExermon: return typeof(Exermon);
+            case Type.ExerFragPackItem: return typeof(ExerFrag);
+            case Type.PlayerExerGift: return typeof(ExerGift);
+            //case Type.QuesSugarPackItem: return typeof(ExerGift);
             default: return null;
         }
     }
@@ -431,9 +432,9 @@ public class PackContItem : BaseContItem {
     /// </summary>
     /// <returns></returns>
     public virtual BaseItem item() {
-        var func = getFunc();
-        if (func == null) return null;
-        return func(itemId);
+        var type = getItemType();
+        if (type == null) return null;
+        return (BaseItem)DataService.get().get(type, itemId);
     }
 
     /// <summary>

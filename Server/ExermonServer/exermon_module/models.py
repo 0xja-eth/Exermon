@@ -511,8 +511,7 @@ class PlayerExermon(PackContItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		exerskillslot = ModelUtils.preventNone(
-			self.exerSkillSlot(), func=lambda p: p.convertToDict())
+		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot())
 
 		res['nickname'] = self.nickname
 		res['exp'] = self.exp
@@ -603,12 +602,12 @@ class PlayerExermon(PackContItem):
 		if level > self.level and event:
 			self._onUpgrade()
 
-		self.level = level
 		self.exp = 0
+		self.level = level
 		self.refresh()
 
 	# 更改经验
-	def changeExp(self, val):
+	def gainExp(self, val):
 		self.exp += val
 		self.refresh()
 
@@ -616,6 +615,7 @@ class PlayerExermon(PackContItem):
 	def refresh(self):
 
 		self.refreshLevel()
+		self.save()
 
 	# 刷新等级
 	def refreshLevel(self):
@@ -743,6 +743,18 @@ class ExerSlot(SlotContainer):
 	# 持有玩家
 	def ownerPlayer(self): return self.player
 
+	# 获得经验
+	def gainExp(self, slot_exps, exer_exps):
+
+		for sid in slot_exps:
+			slot_exp = slot_exps[sid]
+			exer_exp = exer_exps[sid]
+
+			slot_item: ExerSlotItem = self.getContItem(subject_id=sid)
+			if slot_item is None: continue
+
+			slot_item.gainExp(slot_exp, exer_exp)
+
 
 # ===================================================
 #  艾瑟萌槽项表
@@ -805,10 +817,9 @@ class ExerSlotItem(SlotContItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		level, next = self.slotLevel()
+		level, next = self.slotLevel(True)
 
-		exerequipslot = ModelUtils.preventNone(
-			self.exerEquipSlot(), func=lambda p: p.convertToDict())
+		exerequipslot = ModelUtils.objectToDict(self.exerEquipSlot())
 
 		res['subject_id'] = self.subject_id
 		res['exp'] = self.exp
@@ -955,26 +966,26 @@ class ExerSlotItem(SlotContItem):
 		self.clearCache()
 
 	# 槽等级（本等级, 下一级所需经验）
-	def slotLevel(self):
+	def slotLevel(self, calc_next=False):
 		from utils.calc_utils import ExermonSlotLevelCalc
 
 		level = ExermonSlotLevelCalc.calcLevel(self.exp)
-		next = ExermonSlotLevelCalc.calcNext(level)
 
+		if not calc_next: return level
+
+		next = ExermonSlotLevelCalc.calcNext(level)
 		return level, next
 
 	# 艾瑟萌等级
 	def exermonLevel(self):
 		return self.player_exer.level
 
-	# 增加槽经验
-	def changeExp(self, exp):
-		self.exp += exp
+	# 获得经验
+	def gainExp(self, slot_exp, exer_exp):
+		self.exp += slot_exp
+		self.player_exer.gainExp(exer_exp)
 		self.refresh()
-
-	# 增加艾瑟萌经验
-	def changeExerExp(self, exp):
-		self.player_exer.changeExp(exp)
+		self.save()
 
 
 # ===================================================

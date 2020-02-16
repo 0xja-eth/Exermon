@@ -12,7 +12,7 @@
 # from minigame_module.utils import getMiniGames
 # from exam_module.models import ExamSet
 # from player_module.models import Player, School
-# from question_module.models import QuestionReport, Question
+# from question_module.models import QuesReport, Question
 # from rank_module.models import GraduationRecord, GraduationSeason
 # from competition_module.models import BattleRecord, BattleRound
 # from competition_module.runtimes import BattleRecordInfo
@@ -41,7 +41,7 @@
 # 	data['player_types'] = Player.PLAYER_TYPES
 #
 # 	data['question_dtb_types'] = DTB_CHOICES
-# 	data['question_report_types'] = QuestionReport.TYPE_CHOICES
+# 	data['question_report_types'] = QuesReport.TYPE_CHOICES
 # 	data['question_types'] = Question.QUESTION_TYPES
 # 	data['question_statuses'] = Question.QUESTION_STATUSES
 #

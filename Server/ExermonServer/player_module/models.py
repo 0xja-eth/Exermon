@@ -192,6 +192,29 @@ class PlayerType(Enum):
 
 
 # ===================================================
+#  持有金钱表
+# ===================================================
+class PlayerMoney(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "玩家金钱"
+
+	# 默认金币
+	DEFAULT_GOLD = 500
+
+	# 对应玩家
+	player = models.OneToOneField("Player", on_delete=models.CASCADE,
+									 null=True, verbose_name="玩家")
+
+	# 获得金钱
+	def gain(self, gold=0, ticket=0, bound_ticket=0):
+		self.gold += gold
+		self.ticket += ticket
+		self.bound_ticket += bound_ticket
+		self.save()
+
+
+# ===================================================
 #  玩家表
 # ===================================================
 class Player(models.Model):
@@ -225,7 +248,7 @@ class Player(models.Model):
 
 	SUCCESSFUL_LOGOUT_MSG = '您已成功退出登录！'
 
-	PLAYER_GRADES = [
+	GRADES = [
 		(PlayerGrades.Unset.value, '不详'),
 		(PlayerGrades.Before.value, '初中及以下'),
 		(PlayerGrades.One.value, '高一'),
@@ -235,7 +258,7 @@ class Player(models.Model):
 		(PlayerGrades.After.value, '大学及以上')
 	]
 
-	PLAYER_STATUSES = [
+	STATUSES = [
 		(PlayerStatus.Uncreated.value, '未创建'),
 		(PlayerStatus.CharacterCreated.value, '已创建人物'),
 		(PlayerStatus.ExermonsCreated.value, '已选择艾瑟萌'),
@@ -247,7 +270,7 @@ class Player(models.Model):
 		(PlayerStatus.Other.value, '其他')
 	]
 
-	PLAYER_TYPES = [
+	TYPES = [
 		(PlayerType.Normal.value, '标准用户'),
 		(PlayerType.QQ.value, 'QQ用户'),
 		(PlayerType.Wechat.value, '微信用户'),
@@ -275,7 +298,7 @@ class Player(models.Model):
 
 	# 年级
 	grade = models.PositiveSmallIntegerField(default=PlayerGrades.Unset.value,
-											 choices=PLAYER_GRADES, verbose_name="年级")
+											 choices=GRADES, verbose_name="年级")
 
 	# 注册时间
 	create_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
@@ -286,11 +309,11 @@ class Player(models.Model):
 
 	# 状态
 	status = models.PositiveSmallIntegerField(default=PlayerStatus.Uncreated.value,
-											  choices=PLAYER_STATUSES, verbose_name="账号状态")
+											  choices=STATUSES, verbose_name="账号状态")
 
 	# 账号类型
 	type = models.PositiveSmallIntegerField(default=PlayerStatus.Normal.value,
-											choices=PLAYER_TYPES, verbose_name="账号类型")
+											choices=TYPES, verbose_name="账号类型")
 
 	# 在线
 	online = models.BooleanField(default=False, verbose_name="在线")
@@ -322,60 +345,104 @@ class Player(models.Model):
 	# 当前 LoginInfo
 	cur_login_info = None
 
+	# 当前刷题
+	cur_exercise = None
+
 	def __str__(self):
 		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
+	# region 容器管理
+
+	# 容器缓存
+	human_pack = None
+	exer_pack = None
+	exer_frag_pack = None
+	exer_gift_pool = None
+	exer_hub = None
+	ques_sugar_pack = None
+	exer_slot = None
+	human_equip_slot = None
+
 	# 获取人类背包
 	def humanPack(self):
-		try: return self.humanpack
-		except HumanPack.DoesNotExist: return None
+		if self.human_pack is None:
+			try: self.human_pack = self.humanpack
+			except HumanPack.DoesNotExist: return None
+		return self.human_pack
 
 	# 获取艾瑟萌背包
 	def exerPack(self):
 		from exermon_module.models import ExerPack
-		try: return self.exerpack
-		except ExerPack.DoesNotExist: return None
+		if self.exer_pack is None:
+			try: self.exer_pack = self.exerpack
+			except ExerPack.DoesNotExist: return None
+		return self.exer_pack
 
 	# 获取艾瑟萌碎片背包
 	def exerFragPack(self):
 		from exermon_module.models import ExerFragPack
-		try: return self.exerfragpack
-		except ExerFragPack.DoesNotExist: return None
+		if self.exer_frag_pack is None:
+			try: self.exer_frag_pack =  self.exerfragpack
+			except ExerFragPack.DoesNotExist: return None
+		return self.exer_frag_pack
 
 	# 获取艾瑟萌天赋池
 	def exerGiftPool(self):
 		from exermon_module.models import ExerGiftPool
-		try: return self.exergiftpool
-		except ExerGiftPool.DoesNotExist: return None
+		if self.exer_gift_pool is None:
+			try: self.exer_gift_pool = self.exergiftpool
+			except ExerGiftPool.DoesNotExist: return None
+		return self.exer_gift_pool
 
 	# 获取艾瑟萌仓库
 	def exerHub(self):
 		from exermon_module.models import ExerHub
-		try: return self.exerhub
-		except ExerHub.DoesNotExist: return None
+		if self.exer_hub is None:
+			try: self.exer_hub = self.exerhub
+			except ExerHub.DoesNotExist: return None
+		return self.exer_hub
+
+	# 获取题目糖背包
+	def quesSugarPack(self):
+		from question_module.models import QuesSugarPack
+		if self.ques_sugar_pack is None:
+			try: self.ques_sugar_pack = self.quessugarpack
+			except QuesSugarPack.DoesNotExist: return None
+		return self.ques_sugar_pack
 
 	# 获取艾瑟萌槽
 	def exerSlot(self):
 		from exermon_module.models import ExerSlot
-		try: return self.exerslot
-		except ExerSlot.DoesNotExist: return None
+		if self.exer_slot is None:
+			try: self.exer_slot = self.exerslot
+			except ExerSlot.DoesNotExist: return None
+		return self.exer_slot
 
 	# 获取装备槽
 	def humanEquipSlot(self):
-		try: return self.humanequipslot
-		except HumanEquipSlot.DoesNotExist: return None
+		if self.human_equip_slot is None:
+			try: self.human_equip_slot = self.humanequipslot
+			except HumanEquipSlot.DoesNotExist: return None
+		return self.human_equip_slot
+
+	# 获取装备槽
+	def playerMoney(self):
+		try: return self.playermoney
+		except PlayerMoney.DoesNotExist: return None
 
 	def _packContainerIndices(self):
-		humanpack_id = ModelUtils.preventNone(
-			self.humanPack(), func=lambda p: p.id)
-		exerpack_id = ModelUtils.preventNone(
-			self.exerPack(), func=lambda p: p.id)
-		exerfragpack_id = ModelUtils.preventNone(
-			self.exerFragPack(), func=lambda p: p.id)
-		exergiftpool_id = ModelUtils.preventNone(
-			self.exerGiftPool(), func=lambda p: p.id)
-		exerhub_id = ModelUtils.preventNone(
-			self.exerHub(), func=lambda p: p.id)
+
+		humanpack_id = ModelUtils.objectToId(self.humanPack(), None)
+
+		exerpack_id = ModelUtils.objectToId(self.exerPack(), None)
+
+		exerfragpack_id = ModelUtils.objectToId(self.exerFragPack(), None)
+
+		exergiftpool_id = ModelUtils.objectToId(self.exerGiftPool(), None)
+
+		exerhub_id = ModelUtils.objectToId(self.exerHub(), None)
+
+		quessugarpack_id = ModelUtils.objectToId(self.quesSugarPack(), None)
 
 		return {
 			'humanpack_id': humanpack_id,
@@ -383,14 +450,14 @@ class Player(models.Model):
 			'exerfragpack_id': exerfragpack_id,
 			'exergiftpool_id': exergiftpool_id,
 			'exerhub_id': exerhub_id,
-			# 'quessugarpack_id': self.quessugarpack.id,
+			'quessugarpack_id': quessugarpack_id,
 		}
 
 	def _slotContainerIndices(self):
-		exerslot_id = ModelUtils.preventNone(
-			self.exerSlot(), func=lambda p: p.id)
-		humanequipslot_id = ModelUtils.preventNone(
-			self.humanEquipSlot(), func=lambda p: p.id)
+
+		exerslot_id = ModelUtils.objectToId(self.exerSlot(), None)
+
+		humanequipslot_id = ModelUtils.objectToId(self.humanEquipSlot(), None)
 
 		return {
 			'exerslot_id': exerslot_id,
@@ -401,8 +468,9 @@ class Player(models.Model):
 
 		create_time = ModelUtils.timeToStr(self.create_time)
 		birth = ModelUtils.dateToStr(self.birth)
+		money = ModelUtils.objectToDict(self.playerMoney())
 
-		level, next = self.level()
+		level, next = self.level(True)
 
 		base = {
 			'id': self.id,
@@ -423,6 +491,7 @@ class Player(models.Model):
 			'description': self.description,
 			'pack_containers': self._packContainerIndices(),
 			'slot_containers': self._slotContainerIndices(),
+			'money': money
 		}
 
 		# 其他玩家
@@ -435,6 +504,8 @@ class Player(models.Model):
 			base['email'] = self.email
 
 		return base
+
+	# endregion
 
 	# 注册（类方法）
 	@classmethod
@@ -546,6 +617,7 @@ class Player(models.Model):
 
 		return exer_slot
 
+	# 创建艾瑟萌天赋
 	def createGifts(self, gifts):
 
 		for i in range(len(gifts)):
@@ -558,6 +630,7 @@ class Player(models.Model):
 		self.status = PlayerStatus.GiftsCreated.value
 		self.save()
 
+	# 补全人物信息
 	def createInfos(self, birth, school, city, contact, description):
 
 		self.birth = birth
@@ -569,7 +642,8 @@ class Player(models.Model):
 		self.status = PlayerStatus.Normal.value
 		self.save()
 
-	def _createPlayerExer(self, exer, name):
+	@classmethod
+	def _createPlayerExer(cls, exer, name):
 		from exermon_module.models import PlayerExermon
 
 		player_exer = PlayerExermon()
@@ -580,7 +654,8 @@ class Player(models.Model):
 
 		return player_exer
 
-	def _createPlayerGift(self, gift):
+	@classmethod
+	def _createPlayerGift(cls, gift):
 		from exermon_module.models import PlayerExerGift
 
 		player_gift = PlayerExerGift()
@@ -610,13 +685,41 @@ class Player(models.Model):
 			ExerGiftPool.create(player=self)
 
 	# 等级（本等级, 下一级所需经验）
-	def level(self):
+	def level(self, calc_next=False):
 		from utils.calc_utils import ExermonSlotLevelCalc
 
 		level = ExermonSlotLevelCalc.calcPlayerLevel(self.exp)
-		next = ExermonSlotLevelCalc.calcPlayerNext(level)
 
+		if not calc_next: return level
+
+		next = ExermonSlotLevelCalc.calcPlayerNext(level)
 		return level, next
+
+	# 获取题目记录
+	def questionRecords(self):
+		return self.questionrecord_set.all()
+
+	# 查询题目记录
+	def questionRecord(self, question_id):
+		res = self.questionRecords().filter(question_id=question_id)
+		if res.exists(): return res.first()
+		return None
+
+	# 获得金钱
+	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
+		money = self.playerMoney()
+		if money is None: return
+
+		money.gain(gold, ticket, bound_ticket)
+
+	# 获得经验
+	def gainExp(self, sum_exp, slot_exps, exer_exps):
+		exerslot = self.exerSlot()
+		if exerslot is None: return
+
+		self.exp += sum_exp
+		exerslot.gainExp(slot_exps, exer_exps)
+
 
 # ===================================================
 #  人类物品表

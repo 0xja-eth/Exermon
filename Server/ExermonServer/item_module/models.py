@@ -113,8 +113,11 @@ class Currency(models.Model):
 		abstract = True
 		verbose_name = verbose_name_plural = "货币"
 
+	# 默认金币
+	DEFAULT_GOLD = 0
+
 	# 金币
-	gold = models.PositiveIntegerField(default=0, verbose_name="金币")
+	gold = models.PositiveIntegerField(default=DEFAULT_GOLD, verbose_name="金币")
 
 	# 点券
 	ticket = models.PositiveIntegerField(default=0, verbose_name="点券")
@@ -281,6 +284,9 @@ class LimitedItem(BaseItem):
 		# abstract = True
 		verbose_name = verbose_name_plural = "有限物品"
 
+	# 物品星级
+	star = models.ForeignKey("game_module.ItemStar", on_delete=models.CASCADE, verbose_name="星级")
+
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
 
@@ -299,6 +305,11 @@ class LimitedItem(BaseItem):
 		return self.itemprice
 
 	adminBuyPrice.short_description = "购入价格"
+
+	# 获取购买价格
+	def buyPrice(self):
+		try: return self.itemprice
+		except ItemPrice.DoesNotExist: return None
 
 	# 获取完整路径
 	def getExactlyIconPath(self):
@@ -322,10 +333,9 @@ class LimitedItem(BaseItem):
 	def _convertToDict(self, **kwargs):
 		res = super()._convertToDict(**kwargs)
 
-		buy_price = None
-		if self.itemprice is not None:
-			buy_price = self.itemprice.convertToDict()
+		buy_price = ModelUtils.objectToDict(self.buyPrice())
 
+		res['star_id'] = self.star_id
 		res['buy_price'] = buy_price
 		res['sell_price'] = self.sell_price
 		res['discardable'] = self.discardable
@@ -526,7 +536,7 @@ class BaseContainer(models.Model):
 	type = models.PositiveSmallIntegerField(default=ContainerType.Unset.value,
 											choices=TYPES, verbose_name="容器类型")
 
-	# 缓存上一次调用获得的cont_items
+	# 缓存容器内的所有 cont_items
 	# {'args': **kwargs, 'res': 容器项[]}
 	cache_cont_items = None
 
@@ -1644,12 +1654,8 @@ class SlotContItem(BaseContItem):
 		c1, c2 = self.acceptedEquipItemClass()
 		attr1, attr2 = self.acceptedEquipItemAttr()
 
-		equip_item1 = ModelUtils.preventNone(
-			self.targetEquipItem1(), func=lambda p: p.convertToDict()
-		)
-		equip_item2 = ModelUtils.preventNone(
-			self.targetEquipItem2(), func=lambda p: p.convertToDict()
-		)
+		equip_item1 = ModelUtils.objectToDict(self.targetEquipItem1())
+		equip_item2 = ModelUtils.objectToDict(self.targetEquipItem2())
 
 		res['index'] = self.index
 

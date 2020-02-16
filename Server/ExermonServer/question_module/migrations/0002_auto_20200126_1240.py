@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='question',
             name='level',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='question_module.QuestionLevel', verbose_name='星级'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='game_module.models.QuestionStar', verbose_name='星级'),
         ),
         migrations.AddField(
             model_name='question',

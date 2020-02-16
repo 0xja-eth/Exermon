@@ -12,7 +12,7 @@ class EquipParamsInline(ParamsInline):
 	model = EquipParam
 
 
-class ItemPriceInline(ParamsInline):
+class ItemPriceInline(object):
 
 	model = ItemPrice
 	min_num = 1
