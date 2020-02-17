@@ -113,7 +113,7 @@ class FilterPlugin(BaseAdminPlugin):
                         # This is simply a field name, so use the default
                         # FieldListFilter class that has been registered for
                         # the type of the given field.
-                        field, field_list_filter_class = list_filter, filter_manager.create
+                        field, field_list_filter_class = list_filter, filter_manager._create
                     if not isinstance(field, models.Field):
                         field_path = field
                         field_parts = get_fields_from_path(

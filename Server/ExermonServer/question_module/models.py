@@ -341,13 +341,13 @@ class Question(models.Model):
 # ===================================================
 #  题目糖价格表
 # ===================================================
-class QuesSugarPrice(Currency):
-	class Meta:
-		verbose_name = verbose_name_plural = "题目糖价格"
-
-	# 对应题目糖
-	sugar = models.OneToOneField("QuesSugar", on_delete=models.CASCADE,
-									 null=True, verbose_name="题目糖")
+# class QuesSugarPrice(Currency):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "题目糖价格"
+#
+# 	# 对应题目糖
+# 	sugar = models.OneToOneField("QuesSugar", on_delete=models.CASCADE,
+# 									 null=True, verbose_name="题目糖")
 
 
 # ===================================================
@@ -386,6 +386,13 @@ class QuesSugar(BaseItem):
 	# 题目
 	question = models.ForeignKey("Question", on_delete=models.CASCADE, verbose_name="对应题目")
 
+	# 购买价格（None为不可购买）
+	buy_price = models.OneToOneField('item_module.Currency', null=True, blank=True,
+									 on_delete=models.CASCADE, verbose_name="购买价格")
+
+	# 出售价格（出售固定为金币，为0则不可出售）
+	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
+
 	# 获得概率（*100）
 	get_rate = models.PositiveSmallIntegerField(default=50, verbose_name="获得概率")
 
@@ -410,18 +417,21 @@ class QuesSugar(BaseItem):
 	def _convertToDict(self):
 		res = super()._convertToDict()
 
-		res['animal'] = self.animal
-		res['star_id'] = self.star_id
-		res['subject_id'] = self.subject_id
-		res['e_type'] = self.e_type
+		buy_price = ModelUtils.objectToDict(self.buy_price)
+
+		res['question_id'] = self.question
+		res['buy_price'] = buy_price
+		res['sell_price'] = self.sell_price
+		res['get_rate'] = self.get_rate
+		res['get_count'] = self.get_count
 		res['params'] = ModelUtils.objectsToDict(self.params())
 
 		return res
 
 	# 获取购买价格
-	def buyPrice(self):
-		try: return self.quessugarprice
-		except QuesSugarPrice.DoesNotExist: return None
+	# def buyPrice(self):
+	# 	try: return self.quessugarprice
+	# 	except QuesSugarPrice.DoesNotExist: return None
 
 	# 获取所有的属性成长率
 	def params(self):
@@ -455,19 +465,17 @@ class QuesSugarPack(PackContainer):
 	player = models.OneToOneField('player_module.Player',
 								  on_delete=models.CASCADE, verbose_name="玩家")
 
-	# 所接受的容器项类
+	# 所接受的容器项类（单个，基类）
 	@classmethod
-	def acceptedContItemClass(cls): return QuesSugarPackItem
+	def baseContItemClass(cls): return QuesSugarPackItem
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
+	def _create(self, player):
+		super()._create()
+		self.player = player
 
-	# 持有玩家
-	def ownerPlayer(self): return self.player
+	# 持有者
+	def owner(self): return self.player
 
 
 # ===================================================
@@ -479,6 +487,14 @@ class QuesSugarPackItem(PackContItem):
 
 	# 容器项类型
 	TYPE = ContItemType.QuesSugarPackItem
+
+	# 容器
+	container = models.ForeignKey('QuesSugarPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('QuesSugar', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
 
 	# 所接受的物品类
 	@classmethod

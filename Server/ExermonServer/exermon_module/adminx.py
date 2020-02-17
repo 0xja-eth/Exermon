@@ -1,25 +1,53 @@
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
 from game_module.adminx import ParamsInline
-from item_module.adminx import BaseItemAdmin, \
-	PackContainerAdmin, SlotContainerAdmin, PackContItemAdmin, \
-	SlotContItemAdmin, EffectAdmin
+from item_module.adminx import *
 from .models import *
 import xadmin
 
 # Register your models here.
 
 
-class ExerParamBasesInline(ParamsInline):
-	model = ExerParamBase
+class ExerParamBasesInline(ParamsInline): model = ExerParamBase
 
 
-class ExerParamRatesInline(ParamsInline):
-	model = ExerParamRate
+class ExerParamRatesInline(ParamsInline): model = ExerParamRate
 
 
-class GiftParamRatesInline(ParamsInline):
-	model = GiftParamRate
+class GiftParamRatesInline(ParamsInline): model = GiftParamRate
+
+
+class ExerItemEffectsInline(BaseEffectsInline): model = ExerItemEffect
+
+
+class ExerSkillEffectsInline(BaseEffectsInline): model = ExerSkillEffect
+
+
+class ExerEquipParamsInline(ParamsInline): model = ExerEquipParam
+
+
+class ExerEquipSlotItemsInline(BaseContItemsInline): model = ExerEquipSlotItem
+
+
+class PlayerExerGiftsInline(BaseContItemsInline): model = PlayerExerGift
+
+
+class ExerFragPackItemsInline(BaseContItemsInline): model = ExerFragPackItem
+
+
+class ExerSlotItemsInline(BaseContItemsInline): model = ExerSlotItem
+
+
+class ExerPackItemsInline(BaseContItemsInline): model = ExerPackItem
+
+
+class ExerPackEquipsInline(BaseContItemsInline): model = ExerPackEquip
+
+
+class PlayerExermonsInline(BaseContItemsInline): model = PlayerExermon
+
+
+class ExerSkillSlotItemsInline(BaseContItemsInline): model = ExerSkillSlotItem
 
 
 class ExerSkillsInline(object):
@@ -40,13 +68,6 @@ class ExerEquipSlotInline(object):
 	validate_min = 1
 	validate_max = 1
 	style = "one"
-
-
-class SkillEffectsInline(object):
-
-	model = SkillEffect
-	extra = 1
-	style = "table"
 
 
 @xadmin.sites.register(Exermon)
@@ -117,89 +138,124 @@ class ExerSkillAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin().form_layout + field_set
 
-	inlines = [SkillEffectsInline]
+	inlines = [ExerSkillEffectsInline]
+
+
+@xadmin.sites.register(ExerItem)
+class ExerItemAdmin(UsableItemAdmin):
+	effect_inlines = ExerItemEffectsInline
+
+
+@xadmin.sites.register(ExerEquip)
+class ExerEquipAdmin(EquipableItemAdmin):
+	param_inlines = ExerEquipParamsInline
 
 
 @xadmin.sites.register(ExerHub)
 class ExerHubAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌仓库属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	inlines = PlayerExermonsInline
 
 
 @xadmin.sites.register(ExerPack)
 class ExerPackAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌背包属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	inlines = [ExerPackItemsInline, ExerPackEquipsInline]
 
 
 @xadmin.sites.register(ExerSlot)
 class ExerSlotAdmin(SlotContainerAdmin):
 
-	list_display = SlotContainerAdmin().list_display + \
+	list_display = SlotContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌槽属性', 'player')]
 
-	form_layout = SlotContainerAdmin().form_layout + field_set
+	form_layout = SlotContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = ExerSlotItemsInline
 
 
 @xadmin.sites.register(ExerEquipSlot)
-class ExerSlotAdmin(SlotContainerAdmin):
+class ExerEquipSlotAdmin(SlotContainerAdmin):
 
-	list_display = SlotContainerAdmin().list_display + \
+	list_display = SlotContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌槽属性', 'player')]
 
-	form_layout = SlotContainerAdmin().form_layout + field_set
+	form_layout = SlotContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = ExerSlotItemsInline
 
 
 @xadmin.sites.register(ExerFragPack)
 class ExerFragPackAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌碎片背包属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = ExerFragPackItemsInline
 
 
 @xadmin.sites.register(ExerGiftPool)
 class ExerGiftPoolAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('艾瑟萌天赋池属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = PlayerExerGiftsInline
 
 
 @xadmin.sites.register(PlayerExermon)
 class PlayerExermonAdmin(PackContItemAdmin):
 
-	list_display = PackContItemAdmin().list_display + \
+	list_display = PackContItemAdmin.list_display + \
 				   ['player', 'nickname', 'exp', 'level']
 
-	list_editable = PackContItemAdmin().list_editable + \
+	list_editable = PackContItemAdmin.list_editable + \
 					['nickname', 'exp', 'level']
 
 	field_set = [Fieldset('玩家艾瑟萌属性', 'nickname', 'exp', 'level')]
 
-	exclude = PackContItemAdmin().exclude + ['player']
+	exclude = ['player']
 
-	form_layout = PackContItemAdmin().form_layout + field_set
+	form_layout = PackContItemAdmin.form_layout + field_set
+
+
+@xadmin.sites.register(ExerSkillSlot)
+class ExerSkillSlotAdmin(SlotContainerAdmin):
+
+	list_display = SlotContainerAdmin.list_display + \
+				   ['player_exer']
+
+	field_set = [Fieldset('艾瑟萌技能槽属性', 'player_exer')]
+
+	form_layout = SlotContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = ExerSkillSlotItemsInline
 
 
 @xadmin.sites.register(ExerPackItem)
@@ -215,17 +271,18 @@ class ExerPackEquipAdmin(PackContItemAdmin):
 @xadmin.sites.register(ExerSlotItem)
 class ExerSlotItemAdmin(SlotContItemAdmin):
 
-	list_display = SlotContItemAdmin().list_display + \
-				   ['player', 'subject', 'exp']
+	list_display = SlotContItemAdmin.list_display + \
+				   ['player', 'player_exer', 'player_gift', 'subject', 'exp']
 
-	list_editable = SlotContItemAdmin().list_editable + \
-					['subject', 'exp']
+	list_editable = SlotContItemAdmin.list_editable + \
+					['player_exer', 'player_gift', 'subject', 'exp']
 
-	field_set = [Fieldset('艾瑟萌槽项属性', 'subject', 'exp')]
+	field_set = [Fieldset('艾瑟萌槽项属性', 'player_exer', 'player_gift',
+						  'subject', 'exp')]
 
-	exclude = SlotContItemAdmin().exclude + ['player']
+	exclude = ['player']
 
-	form_layout = SlotContItemAdmin().form_layout + field_set
+	form_layout = SlotContItemAdmin.form_layout + field_set
 
 	inlines = [ExerEquipSlotInline]
 
@@ -233,15 +290,31 @@ class ExerSlotItemAdmin(SlotContItemAdmin):
 @xadmin.sites.register(ExerEquipSlotItem)
 class ExerEquipSlotItemAdmin(SlotContItemAdmin):
 
-	list_display = SlotContItemAdmin().list_display + \
-				   ['e_type']
+	list_display = SlotContItemAdmin.list_display + \
+				   ['pack_equip', 'e_type']
 
-	list_editable = SlotContItemAdmin().list_editable + \
-					['e_type']
+	list_editable = SlotContItemAdmin.list_editable + \
+					['pack_equip']
 
-	field_set = [Fieldset('艾瑟萌装备槽项', 'e_type')]
+	field_set = [Fieldset('艾瑟萌装备槽项', 'pack_equip')]
 
-	form_layout = SlotContItemAdmin().form_layout + field_set
+	exclude = ['e_type']
+
+	form_layout = SlotContItemAdmin.form_layout + field_set
+
+
+@xadmin.sites.register(ExerSkillSlotItem)
+class ExerSkillSlotItemAdmin(SlotContItemAdmin):
+
+	list_display = SlotContItemAdmin.list_display + \
+				   ['skill', 'use_count']
+
+	list_editable = SlotContItemAdmin.list_editable + \
+					['skill', 'use_count']
+
+	field_set = [Fieldset('艾瑟萌装备槽项', 'skill', 'use_count')]
+
+	form_layout = SlotContItemAdmin.form_layout + field_set
 
 
 @xadmin.sites.register(ExerFragPackItem)
@@ -254,6 +327,11 @@ class PlayerExerGiftAdmin(PackContItemAdmin):
 	pass
 
 
-@xadmin.sites.register(SkillEffect)
-class SkillEffectAdmin(EffectAdmin):
+@xadmin.sites.register(ExerItemEffect)
+class ExerItemEffectAdmin(BaseEffectAdmin):
+	pass
+
+
+@xadmin.sites.register(ExerSkillEffect)
+class ExerSkillEffectAdmin(BaseEffectAdmin):
 	pass

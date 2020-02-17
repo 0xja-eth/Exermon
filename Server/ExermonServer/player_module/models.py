@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from item_module.models import *
-from utils.model_utils import CharacterImageUpload, Common as ModelUtils
+from utils.model_utils import CacheableModel, \
+	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, ErrorException
 import os, base64
 from enum import Enum
@@ -217,7 +218,7 @@ class PlayerMoney(Currency):
 # ===================================================
 #  玩家表
 # ===================================================
-class Player(models.Model):
+class Player(CacheableModel):
 
 	class Meta:
 
@@ -276,6 +277,9 @@ class Player(models.Model):
 		(PlayerType.Wechat.value, '微信用户'),
 		(PlayerType.Other.value, '其他')
 	]
+
+	# 登录信息缓存键
+	LOGININFO_CACHE_KEY = 'login_info'
 
 	# 用户名（OPENID）
 	username = models.CharField(null=False, max_length=64, verbose_name="用户名")
@@ -353,96 +357,61 @@ class Player(models.Model):
 
 	# region 容器管理
 
-	# 容器缓存
-	human_pack = None
-	exer_pack = None
-	exer_frag_pack = None
-	exer_gift_pool = None
-	exer_hub = None
-	ques_sugar_pack = None
-	exer_slot = None
-	human_equip_slot = None
-
 	# 获取人类背包
 	def humanPack(self):
-		if self.human_pack is None:
-			try: self.human_pack = self.humanpack
-			except HumanPack.DoesNotExist: return None
-		return self.human_pack
+		return self.getOneToOneCache(HumanPack)
 
 	# 获取艾瑟萌背包
 	def exerPack(self):
 		from exermon_module.models import ExerPack
-		if self.exer_pack is None:
-			try: self.exer_pack = self.exerpack
-			except ExerPack.DoesNotExist: return None
-		return self.exer_pack
+		return self.getOneToOneCache(ExerPack)
 
 	# 获取艾瑟萌碎片背包
 	def exerFragPack(self):
 		from exermon_module.models import ExerFragPack
-		if self.exer_frag_pack is None:
-			try: self.exer_frag_pack =  self.exerfragpack
-			except ExerFragPack.DoesNotExist: return None
-		return self.exer_frag_pack
+		return self.getOneToOneCache(ExerFragPack)
 
 	# 获取艾瑟萌天赋池
 	def exerGiftPool(self):
 		from exermon_module.models import ExerGiftPool
-		if self.exer_gift_pool is None:
-			try: self.exer_gift_pool = self.exergiftpool
-			except ExerGiftPool.DoesNotExist: return None
-		return self.exer_gift_pool
+		return self.getOneToOneCache(ExerGiftPool)
 
 	# 获取艾瑟萌仓库
 	def exerHub(self):
 		from exermon_module.models import ExerHub
-		if self.exer_hub is None:
-			try: self.exer_hub = self.exerhub
-			except ExerHub.DoesNotExist: return None
-		return self.exer_hub
+		return self.getOneToOneCache(ExerHub)
 
 	# 获取题目糖背包
 	def quesSugarPack(self):
 		from question_module.models import QuesSugarPack
-		if self.ques_sugar_pack is None:
-			try: self.ques_sugar_pack = self.quessugarpack
-			except QuesSugarPack.DoesNotExist: return None
-		return self.ques_sugar_pack
+		return self.getOneToOneCache(QuesSugarPack)
 
 	# 获取艾瑟萌槽
 	def exerSlot(self):
 		from exermon_module.models import ExerSlot
-		if self.exer_slot is None:
-			try: self.exer_slot = self.exerslot
-			except ExerSlot.DoesNotExist: return None
-		return self.exer_slot
+		return self.getOneToOneCache(ExerSlot)
 
 	# 获取装备槽
 	def humanEquipSlot(self):
-		if self.human_equip_slot is None:
-			try: self.human_equip_slot = self.humanequipslot
-			except HumanEquipSlot.DoesNotExist: return None
-		return self.human_equip_slot
+		return self.getOneToOneCache(HumanEquipSlot)
 
-	# 获取装备槽
+	# 获取金钱
 	def playerMoney(self):
-		try: return self.playermoney
-		except PlayerMoney.DoesNotExist: return None
+		return self.getOneToOneCache(PlayerMoney)
 
 	def _packContainerIndices(self):
 
-		humanpack_id = ModelUtils.objectToId(self.humanPack(), None)
+		humanpack_id = ModelUtils.objectToId(self.humanPack())
 
-		exerpack_id = ModelUtils.objectToId(self.exerPack(), None)
+		exerpack_id = ModelUtils.objectToId(self.exerPack())
 
-		exerfragpack_id = ModelUtils.objectToId(self.exerFragPack(), None)
+		exerfragpack_id = ModelUtils.objectToId(self.exerFragPack())
 
-		exergiftpool_id = ModelUtils.objectToId(self.exerGiftPool(), None)
+		exergiftpool_id = ModelUtils.objectToId(self.exerGiftPool())
 
-		exerhub_id = ModelUtils.objectToId(self.exerHub(), None)
+		exerhub_id = ModelUtils.objectToId(self.exerHub())
 
-		quessugarpack_id = ModelUtils.objectToId(self.quesSugarPack(), None)
+		quessugarpack_id = ModelUtils.objectToId(self.quesSugarPack())
 
 		return {
 			'humanpack_id': humanpack_id,
@@ -455,9 +424,9 @@ class Player(models.Model):
 
 	def _slotContainerIndices(self):
 
-		exerslot_id = ModelUtils.objectToId(self.exerSlot(), None)
+		exerslot_id = ModelUtils.objectToId(self.exerSlot())
 
-		humanequipslot_id = ModelUtils.objectToId(self.humanEquipSlot(), None)
+		humanequipslot_id = ModelUtils.objectToId(self.humanEquipSlot())
 
 		return {
 			'exerslot_id': exerslot_id,
@@ -550,25 +519,31 @@ class Player(models.Model):
 		login = LoginInfo()
 		login.player = self
 		login.ip_address = consumer.ip_address
-		login.save()
 
 		self.online = True
 		self.save()
 
-		self.cur_login_info = login
+		self._setLoginInfo(login)
 
 	# 登出
 	def logout(self):
 
-		if self.cur_login_info is None: return
+		login_info = self._getLoginInfo()
 
-		self.cur_login_info.logout = datetime.datetime.now()
-		self.cur_login_info.save()
+		if login_info is None: return
+
+		login_info.logout = datetime.datetime.now()
 
 		self.online = False
 		self.save()
 
-		self.cur_login_info = None
+		self.clearCache()
+
+	def _setLoginInfo(self, login_info):
+		self.cache(self.LOGININFO_CACHE_KEY, login_info)
+
+	def _getLoginInfo(self):
+		return self.getCache(self.LOGININFO_CACHE_KEY)
 
 	# 重置密码
 	def resetPassword(self, consumer, pw):
@@ -604,8 +579,7 @@ class Player(models.Model):
 
 			player_exers.append(self._createPlayerExer(exers[i], enames[i]))
 
-		if self.exerSlot():
-			self.exerSlot().delete()
+		if self.exerSlot(): self.deleteCache(ExerSlot)
 
 		exer_slot = ExerSlot.create(player=self, player_exers=player_exers)
 
@@ -620,12 +594,17 @@ class Player(models.Model):
 	# 创建艾瑟萌天赋
 	def createGifts(self, gifts):
 
+		exerslot = self.exerSlot()
+
+		if exerslot is None:
+			self.status = PlayerStatus.CharacterCreated
+			raise ErrorException(ErrorType.ExerSlotNotExist)
+
 		for i in range(len(gifts)):
 
 			player_gift = self._createPlayerGift(gifts[i])
-			self.exerslot.equipSlot(index=i+1, equip_index=2,
-									equip_item=player_gift)
-			player_gift.save()
+			exerslot.setExerGiftForce(player_gift, slot_index=i+1)
+			# player_gift.save()
 
 		self.status = PlayerStatus.GiftsCreated.value
 		self.save()
@@ -646,11 +625,8 @@ class Player(models.Model):
 	def _createPlayerExer(cls, exer, name):
 		from exermon_module.models import PlayerExermon
 
-		player_exer = PlayerExermon()
-		player_exer.item = exer
+		player_exer = PlayerExermon.create(None, item=exer)
 		player_exer.nickname = name
-		player_exer.save()
-		player_exer.afterCreated()
 
 		return player_exer
 
@@ -658,12 +634,7 @@ class Player(models.Model):
 	def _createPlayerGift(cls, gift):
 		from exermon_module.models import PlayerExerGift
 
-		player_gift = PlayerExerGift()
-		player_gift.item = gift
-		player_gift.save()
-		player_gift.afterCreated()
-
-		return player_gift
+		return PlayerExerGift.create(None, item=gift)
 
 	# 创建角色相关的容器
 	def _createContainers(self):
@@ -705,6 +676,14 @@ class Player(models.Model):
 		if res.exists(): return res.first()
 		return None
 
+	# 设置当前刷题
+	def setExercise(self, exercise):
+		self.cache("exercise", exercise)
+
+	# 清除当前刷题
+	def clearExercise(self):
+		self.clearCache("exercise")
+
 	# 获得金钱
 	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
 		money = self.playerMoney()
@@ -719,6 +698,19 @@ class Player(models.Model):
 
 		self.exp += sum_exp
 		exerslot.gainExp(slot_exps, exer_exps)
+
+
+# ===================================================
+#  人类物品使用效果表
+# ===================================================
+class HumanItemEffect(BaseEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类物品使用效果"
+
+	# 物品
+	item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
+							 verbose_name="物品")
 
 
 # ===================================================
@@ -742,6 +734,30 @@ class HumanItem(UsableItem):
 
 		return res
 
+	# 获取所有的效果
+	def effects(self):
+		return self.humanitemeffect_set.all()
+
+
+# ===================================================
+#  人类装备属性值表
+# ===================================================
+class HumanEquipParam(ParamValue):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备属性值"
+
+	# 装备
+	equip = models.ForeignKey("HumanEquip", on_delete=models.CASCADE, verbose_name="装备")
+
+	# 最大值
+	def maxVal(self):
+		return None
+
+	# 最小值
+	def minVal(self):
+		return None
+
 
 # ===================================================
 #  人类装备
@@ -760,6 +776,10 @@ class HumanEquip(EquipableItem):
 	# 对应的容器项类
 	@classmethod
 	def contItemClass(cls): return HumanPackEquip
+
+	# 获取所有的属性基本值
+	def params(self):
+		return self.humanequipparam_set.all()
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
@@ -789,21 +809,19 @@ class HumanPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return HumanPackItem
+	def acceptedContItemClass(cls): return HumanPackItem, HumanPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
+	def _create(self, player):
+		super()._create()
+		self.player = player
 
-	# 持有玩家
-	def ownerPlayer(self): return self.player
+	# 持有者
+	def owner(self): return self.player
 
 
 # ===================================================
@@ -816,20 +834,36 @@ class HumanPackItem(PackContItem):
 	# 容器项类型
 	TYPE = ContItemType.HumanPackItem
 
+	# 容器
+	container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
+
 	# 所接受的物品类
 	@classmethod
-	def acceptedItemClass(cls): return HumanItem, HumanEquip
+	def acceptedItemClass(cls): return HumanItem
 
 
 # ===================================================
 #  人类背包装备
 # ===================================================
-class HumanPackEquip(HumanPackItem):
+class HumanPackEquip(PackContItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "人类背包装备"
 
 	# 容器项类型
 	TYPE = ContItemType.HumanPackEquip
+
+	# 容器
+	container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('HumanEquip', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
 
 	# 所接受的物品类
 	@classmethod
@@ -857,25 +891,25 @@ class HumanEquipSlot(SlotContainer):
 	@classmethod
 	def acceptedSlotItemClass(cls): return HumanEquipSlotItem
 
-	# 所接受的容器项类
+	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	@classmethod
-	def acceptedContItemClass(cls): return HumanPackEquip
+	def baseContItemClass(cls): return HumanPackEquip
 
 	# 默认容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return HumanEquipType.count()
 
 	# 创建一个槽（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		slot: cls = super()._create()
-		slot.player = player
-		slot.equip_container1 = player.humanpack
-		return slot
+	def _create(self, player):
+		super()._create()
+		self.player = player
+
+	def _equipContainer(self, index):
+		return self.player.humanPack()
 
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
-		if slot_item.e_type_id != equip.targetItem().e_type_id:
+		if slot_item.e_type_id != equip.item.e_type_id:
 			raise ErrorException(ErrorType.IncorrectEquipType)
 
 		return True
@@ -889,34 +923,35 @@ class HumanEquipSlot(SlotContainer):
 		return True
 
 	# 持有玩家
-	def ownerPlayer(self): return self.player
+	def owner(self): return self.player
 
 
 # ===================================================
 #  人类装备槽项
 # ===================================================
 class HumanEquipSlotItem(SlotContItem):
+
 	class Meta:
 		verbose_name = verbose_name_plural = "人类装备槽项"
 
 	# 容器项类型
 	TYPE = ContItemType.HumanEquipSlotItem
 
-	# 人类背包装备
-	# pack_equip = models.OneToOneField('HumanPackEquip', on_delete=models.CASCADE,
-	# 							 verbose_name="人类背包装备")
+	# 装备项
+	pack_equip = models.OneToOneField('HumanPackEquip', null=True, blank=True,
+									  on_delete=models.SET_NULL, verbose_name="装备")
 
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
 
-	# 所接受的装备项类
+	# 所接受的装备项类（可多个）
 	@classmethod
-	def acceptedEquipItemClass(cls): return HumanPackEquip, ()
+	def acceptedEquipItemClass(cls): return (HumanPackEquip, )
 
-	# 所接受的装备项属性名（2个）
+	# 所接受的装备项属性名（可多个）
 	@classmethod
-	def acceptedEquipItemAttr(cls): return 'pack_equip', '_'
+	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
@@ -925,6 +960,9 @@ class HumanEquipSlotItem(SlotContItem):
 		res['e_type'] = self.e_type_id
 
 		return res
+
+	# def _equipItem(self, index):
+	# 	if index == 0: return self.pack_equip
 
 	# 配置索引
 	def setupIndex(self, index, **kwargs):

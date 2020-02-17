@@ -1,6 +1,121 @@
+from django.db import models
 from django.conf import settings
 from django.utils.deconstruct import deconstructible
 import os
+
+
+# ===================================================
+#  缓存机制模型
+# ===================================================
+class CacheableModel(models.Model):
+
+	class Meta:
+		abstract = True
+
+	cached_dict = None
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.cached_dict = {}
+		self.delete_save = True
+
+	def __del__(self):
+		if self.delete_save:
+			self.save()
+
+	# 进行缓存
+	def cache(self, key, value):
+		self.cached_dict[key] = value
+
+	# 获取缓存
+	def getCache(self, key):
+		if key in self.cached_dict:
+			return self.cached_dict[key]
+		return None
+
+	# 获取或者设置（如果不存在）缓存
+	def getOrSetCache(self, key, func):
+		if key not in self.cached_dict:
+			self.cache(key, func())
+		return self.cached_dict[key]
+
+	# 获取一对一关系的缓存
+	def getOneToOneCache(self, cla, key=None):
+		try:
+			if key is None: key = cla
+			attr_name = cla.__name__.lower()
+			return self.getOrSetCache(key,
+				lambda: getattr(self, attr_name))
+		except cla.DoesNotExist: return None
+		except AttributeError: return None
+
+	# 获取外键关系的缓存
+	def getForeignKeyCache(self, cla, key=None):
+		try:
+			if key is None: key = cla
+			attr_name = cla.__name__.lower()+'_set'
+			return self.getOrSetCache(key,
+				lambda: list(getattr(self, attr_name).all()))
+		except AttributeError: return None
+
+	# 保存缓存
+	def saveCache(self, key=None):
+		if key is None:
+			self._saveCacheItem(self.cached_dict)
+
+		elif key in self.cached_dict:
+			self._saveCacheItem(self.cached_dict[key])
+
+	# 保存缓存项
+	def _saveCacheItem(self, item):
+		if isinstance(item, (list, tuple)):
+			for val in item: self._saveCacheItem(val)
+
+		elif isinstance(item, dict):
+			for key in item: self._saveCacheItem(item[key])
+
+		elif hasattr(item, '__iter__'):
+			for val in item: self._saveCacheItem(val)
+
+		elif isinstance(item, models.Model): item.save()
+
+	# 删除缓存
+	def deleteCache(self, key=None):
+		if key is None:
+			self._deleteCacheItem(self.cached_dict)
+
+		elif key in self.cached_dict:
+			self._deleteCacheItem(self.cached_dict[key])
+
+		self.clearCache(key, False)
+
+	# 删除缓存项
+	def _deleteCacheItem(self, item):
+		if isinstance(item, (list, tuple)):
+			for val in item: self._saveCacheItem(val)
+
+		elif isinstance(item, dict):
+			for key in item: self._saveCacheItem(item[key])
+
+		elif hasattr(item, '__iter__'):
+			for val in item: self._saveCacheItem(val)
+
+		elif isinstance(item, models.Model): item.delete()
+
+	# 清除缓存
+	def clearCache(self, key=None, save=True):
+		if save: self.saveCache(key)
+
+		if key is None:
+			self.cached_dict.clear()
+		elif key in self.cached_dict:
+			self.cached_dict.pop(key)
+
+	# 重载保存函数
+	def save(self, **kwargs):
+		super().save(**kwargs)
+		self.saveCache()
+
 
 # ===================================================
 #  图片上传处理（父类）
@@ -188,7 +303,7 @@ class Common:
 		return cls.preventNone(time, func=lambda t: t.strftime('%Y-%m-%d'), empty=empty)
 
 	@classmethod
-	def objectToId(cls, object, empty=0):
+	def objectToId(cls, object, empty=None):
 		if not object: return empty
 		return object.id
 
@@ -236,3 +351,32 @@ class Common:
 		if object is None: return {}
 		return object.convertToDict(**args)
 
+	# QuerySet式查询（通过list）
+	@classmethod
+	def query(cls, list, map=None, **kwargs):
+		res = []
+
+		for item in list:
+			flag = True
+			for key in kwargs:
+				val = kwargs[key]
+				flag = (hasattr(item, key) and getattr(item, key) == val)
+				if not flag: break
+
+			if flag:
+				if map: res.append(map(item))
+				else: res.append(item)
+
+		return res
+
+	# 过滤（通过list）
+	@classmethod
+	def filter(cls, list, cond=None, map=None):
+		res = []
+
+		for item in list:
+			if cond and cond(item):
+				if map: res.append(map(item))
+				else: res.append(item)
+
+		return res

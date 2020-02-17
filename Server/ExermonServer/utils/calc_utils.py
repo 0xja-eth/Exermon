@@ -303,7 +303,7 @@ class QuestionSetSingleRewardCalc:
 		if exerslot is None: return
 
 		self.exerslot_item: ExerSlotItem = \
-			exerslot.getContItem(subject_id=subject_id)
+			exerslot.contItem(subject_id=subject_id)
 
 		if self.exerslot_item is None: return
 

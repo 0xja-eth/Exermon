@@ -196,6 +196,261 @@ class Exermon(BaseItem):
 
 
 # ===================================================
+#  艾瑟萌仓库
+# ===================================================
+class ExerHub(PackContainer):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌仓库"
+
+	# 容器类型
+	TYPE = ContainerType.ExerHub
+
+	# 玩家
+	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
+
+	# 所接受的容器项类
+	@classmethod
+	def baseContItemClass(cls): return PlayerExermon
+
+	# 创建一个背包（创建角色时候执行）
+	def _create(self, player):
+		super()._create()
+		self.player = player
+
+	# 持有玩家
+	def owner(self): return self.player
+
+
+# ===================================================
+#  玩家艾瑟萌表
+# ===================================================
+class PlayerExermon(PackContItem):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "玩家艾瑟萌"
+
+	# 容器项类型
+	TYPE = ContItemType.PlayerExermon
+
+	# 艾瑟萌技能缓存键
+	EXERSKILL_CACHE_KEY = 'exerskill'
+
+	# 属性缓存键
+	PARAMS_CACHE_KEY = 'params'
+
+	# 容器
+	container = models.ForeignKey('ExerHub', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('Exermon', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
+
+	# 玩家
+	# player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE,
+	# 						   null=True, verbose_name="玩家")
+
+	# 艾瑟萌昵称
+	nickname = models.CharField(null=True, blank=True, max_length=4, verbose_name="艾瑟萌昵称")
+
+	# 经验值（相对）
+	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
+
+	# 等级
+	level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
+
+	# region 重写配置
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.cache(self.PARAMS_CACHE_KEY, {})
+
+	# 所接受的物品类
+	@classmethod
+	def acceptedItemClass(cls): return Exermon
+
+	# 创建之后调用
+	def afterCreated(self, **kwargs):
+		self.cache(self.EXERSKILL_CACHE_KEY,
+				   ExerSkillSlot.create(player_exer=self))
+
+	# 创建容器项
+	# def transfer(self, container, **kwargs):
+	# 	container: ExerHub = container.target()
+	# 	super().transfer(container, **kwargs)
+	# 	self.player = container.player
+
+	# 艾瑟萌
+	def exermon(self): return self.item
+
+	# endregion
+
+	# 获取艾瑟萌技能槽
+	def exerSkillSlot(self):
+		return self.getOneToOneCache(
+			ExerSkillSlot, self.EXERSKILL_CACHE_KEY)
+
+	# 转换属性为 dict
+	def _convertParamsToDict(self):
+
+		data = dict()
+
+		data['values'] = ModelUtils.objectsToDict(self.paramVals())
+		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
+
+		return data
+
+	# 转化为 dict
+	def _convertToDict(self, **kwargs):
+		res = super()._convertToDict(**kwargs)
+
+		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot())
+
+		res['nickname'] = self.nickname
+		res['exp'] = self.exp
+		res['level'] = self.level
+		res['params'] = self._convertParamsToDict()
+		res['exerskillslot'] = exerskillslot
+
+		return res
+
+	# 用于获取属性值
+	def __getattr__(self, item):
+		type = item[4:]
+
+		if type == 'base':
+			return self.paramBase(attr=item[:3])
+
+		if type == 'rate':
+			return self.paramRate(attr=item[:3])
+
+		return super().__getattr__(item)
+
+	# 获取所有属性
+	def paramVals(self):
+		vals = []
+		params = BaseParam.objs()
+
+		for param in params:
+			val = ExerParamBase(param=param)
+			val.setValue(self.paramVal(param_id=param.id), False)
+			vals.append(val)
+
+		return vals
+
+	# 获取属性当前值
+	def paramVal(self, param_id=None, attr=None):
+		key = attr or param_id
+		if key is None: return 0
+
+		from utils.calc_utils import ExermonParamCalc
+
+		cache = self.getCache(self.PARAMS_CACHE_KEY)
+
+		# 如果该属性没有缓存
+		if key not in cache:
+
+			base = self.paramBase(param_id, attr)
+			rate = self.paramRate(param_id, attr)
+			cache[key] = ExermonParamCalc.calc(base, rate, self.level)
+
+		return cache[key]
+
+	# 艾瑟萌基础属性
+	def paramBase(self, param_id=None, attr=None):
+		exermon = self.exermon()
+
+		if exermon is None: return 0
+		return exermon.paramBase(param_id, attr)
+
+	# 艾瑟萌基础属性
+	def paramBases(self):
+		exermon = self.exermon()
+
+		if exermon is None: return []
+		return exermon.paramBases()
+
+	# 获取属性成长值
+	def paramRate(self, param_id=None, attr=None):
+		exermon = self.exermon()
+
+		if exermon is None: return 0
+		return exermon.paramRate(param_id, attr)
+
+	# 获取属性成长值
+	def paramRates(self):
+		exermon = self.exermon()
+
+		if exermon is None: return []
+		return exermon.paramRates()
+
+	# 清除属性缓存
+	def _clearParamsCache(self):
+		self.cache(self.PARAMS_CACHE_KEY, {})
+
+	# 总经验
+	def sumExp(self):
+		from utils.calc_utils import ExermonLevelCalc
+		return ExermonLevelCalc.getSumExp(self.exermon().star, self.level, self.exp)
+
+	# 所剩经验
+	def deltaExp(self):
+		from utils.calc_utils import ExermonLevelCalc
+
+		delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, self.level)
+		if delta == -1: return -1
+
+		return max(delta-self.exp, 0)
+
+	# 更改等级
+	def changeLevel(self, level, event=True):
+		if level > self.level and event:
+			self._onUpgrade()
+
+		self.exp = 0
+		self.level = level
+		self.refresh()
+
+	# 更改经验
+	def gainExp(self, val):
+		self.exp += val
+		self.refresh()
+
+	# 刷新艾瑟萌
+	def refresh(self):
+		self._clearParamsCache()
+		self.refreshLevel()
+		# self.save()
+
+	# 刷新等级
+	def refreshLevel(self):
+		from utils.calc_utils import ExermonLevelCalc
+
+		exp = self.exp
+		level = self.level
+		delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
+
+		# 当可以升级的时候
+		while exp > delta:
+			level += 1  # 升级
+			exp -= delta  # 扣除所需的经验
+			# 更新所需经验值
+			delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
+
+		if level > self.level:
+
+			self.exp = exp
+			self.level = level
+
+			self._onUpgrade()
+
+	# 升级触发事件
+	def _onUpgrade(self):
+		pass
+
+
+# ===================================================
 #  艾瑟萌碎片表
 # ===================================================
 class ExerFrag(BaseItem):
@@ -252,17 +507,15 @@ class ExerFragPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return ExerFragPackItem
+	def baseContItemClass(cls): return ExerFragPackItem
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
+	def _create(self, player):
+		super()._create()
+		self.player = player
 
 	# 持有玩家
-	def ownerPlayer(self): return self.player
+	def owner(self): return self.player
 
 
 # ===================================================
@@ -274,6 +527,14 @@ class ExerFragPackItem(PackContItem):
 
 	# 容器项类型
 	TYPE = ContItemType.ExerFragPackItem
+
+	# 容器
+	container = models.ForeignKey('ExerFragPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('ExerFrag', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
 
 	# 所接受的物品类
 	@classmethod
@@ -398,17 +659,15 @@ class ExerGiftPool(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return PlayerExerGift
+	def baseContItemClass(cls): return PlayerExerGift
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pool: cls = super()._create()
-		pool.player = player
-		return pool
+	def _create(self, player):
+		super()._create()
+		self.player = player
 
 	# 持有玩家
-	def ownerPlayer(self): return self.player
+	def owner(self): return self.player
 
 
 # ===================================================
@@ -421,6 +680,14 @@ class PlayerExerGift(PackContItem):
 
 	# 容器项类型
 	TYPE = ContItemType.PlayerExerGift
+
+	# 容器
+	container = models.ForeignKey('ExerGiftPool', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('ExerGift', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
 
 	# 所接受的物品类
 	@classmethod
@@ -440,237 +707,7 @@ class PlayerExerGift(PackContItem):
 
 	# 获取属性成长值
 	def paramRate(self, param_id=None, attr=None):
-		return self.targetItem().paramRate(param_id, attr)
-
-
-# ===================================================
-#  玩家艾瑟萌表
-# ===================================================
-class PlayerExermon(PackContItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "玩家艾瑟萌"
-
-	# 容器项类型
-	TYPE = ContItemType.PlayerExermon
-
-	# 玩家
-	player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE,
-							   null=True, verbose_name="玩家")
-
-	# 艾瑟萌昵称
-	nickname = models.CharField(max_length=8, verbose_name="艾瑟萌昵称")
-
-	# 经验值（相对）
-	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
-
-	# 等级
-	level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
-
-	# region 重写配置
-
-	# 所接受的物品类
-	@classmethod
-	def acceptedItemClass(cls): return Exermon
-
-	# def __str__(self):
-	# 	return str(self.player)+'-'+str(self.item.target())
-
-	# 创建之后调用
-	def afterCreated(self, **kwargs):
-		ExerSkillSlot.create(player_exer=self)
-
-	# 创建容器项
-	def transfer(self, container, **kwargs):
-		container: ExerHub = container.target()
-		super().transfer(container, **kwargs)
-		self.player = container.player
-
-	# 艾瑟萌
-	def exermon(self):
-		return self.targetItem()
-
-	# endregion
-
-	# 获取艾瑟萌技能槽
-	def exerSkillSlot(self):
-		try: return self.exerskillslot
-		except ExerSkillSlot.DoesNotExist: return None
-
-	# 转换属性为 dict
-	def _convertParamsToDict(self):
-
-		data = dict()
-
-		data['values'] = ModelUtils.objectsToDict(self.paramVals())
-		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
-
-		return data
-
-	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
-
-		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot())
-
-		res['nickname'] = self.nickname
-		res['exp'] = self.exp
-		res['level'] = self.level
-		res['params'] = self._convertParamsToDict()
-		res['exerskillslot'] = exerskillslot
-
-		return res
-
-	# 用于获取属性值
-	def __getattr__(self, item):
-		type = item[4:]
-
-		if type == 'base':
-			return self.paramBase(attr=item[:3])
-
-		if type == 'rate':
-			return self.paramRate(attr=item[:3])
-
-		return super().__getattr__(item)
-
-	# 获取所有属性
-	def paramVals(self):
-		vals = []
-		params = BaseParam.objs()
-
-		for param in params:
-			val = ExerParamBase(param=param)
-			val.setValue(self.paramVal(param_id=param.id), False)
-			vals.append(val)
-
-		return vals
-
-	# 艾瑟萌基础属性
-	def paramBase(self, param_id=None, attr=None):
-		exermon = self.exermon()
-
-		if exermon is None: return 0
-		return exermon.paramBase(param_id, attr)
-
-	# 艾瑟萌基础属性
-	def paramBases(self):
-		exermon = self.exermon()
-
-		if exermon is None: return []
-		return exermon.paramBases()
-
-	# 获取属性成长值
-	def paramRate(self, param_id=None, attr=None):
-		exermon = self.exermon()
-
-		if exermon is None: return 0
-		return exermon.paramRate(param_id, attr)
-
-	# 获取属性成长值
-	def paramRates(self):
-		exermon = self.exermon()
-
-		if exermon is None: return []
-		return exermon.paramRates()
-
-	# 获取属性当前值
-	def paramVal(self, param_id=None, attr=None):
-		from utils.calc_utils import ExermonParamCalc
-
-		base = self.paramBase(param_id, attr)
-		rate = self.paramRate(param_id, attr)
-		value = ExermonParamCalc.calc(base, rate, self.level)
-
-		return value
-
-	# 总经验
-	def sumExp(self):
-		from utils.calc_utils import ExermonLevelCalc
-		return ExermonLevelCalc.getSumExp(self.exermon().star, self.level, self.exp)
-
-	# 所剩经验
-	def deltaExp(self):
-		from utils.calc_utils import ExermonLevelCalc
-
-		delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, self.level)
-		if delta == -1: return -1
-
-		return max(delta-self.exp, 0)
-
-	# 更改等级
-	def changeLevel(self, level, event=True):
-		if level > self.level and event:
-			self._onUpgrade()
-
-		self.exp = 0
-		self.level = level
-		self.refresh()
-
-	# 更改经验
-	def gainExp(self, val):
-		self.exp += val
-		self.refresh()
-
-	# 刷新艾瑟萌
-	def refresh(self):
-
-		self.refreshLevel()
-		self.save()
-
-	# 刷新等级
-	def refreshLevel(self):
-		from utils.calc_utils import ExermonLevelCalc
-
-		exp = self.exp
-		level = self.level
-		delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
-
-		# 当可以升级的时候
-		while exp > delta:
-			level += 1  # 升级
-			exp -= delta  # 扣除所需的经验
-			# 更新所需经验值
-			delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
-
-		if level > self.level:
-
-			self.exp = exp
-			self.level = level
-
-			self._onUpgrade()
-
-	# 升级触发事件
-	def _onUpgrade(self):
-		pass
-
-
-# ===================================================
-#  艾瑟萌仓库
-# ===================================================
-class ExerHub(PackContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌仓库"
-
-	# 容器类型
-	TYPE = ContainerType.ExerHub
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 所接受的容器项类
-	@classmethod
-	def acceptedContItemClass(cls): return PlayerExermon
-
-	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
-
-	# 持有玩家
-	def ownerPlayer(self): return self.player
+		return self.item.paramRate(param_id, attr)
 
 
 # ===================================================
@@ -700,29 +737,31 @@ class ExerSlot(SlotContainer):
 	@classmethod
 	def acceptedSlotItemClass(cls): return ExerSlotItem
 
-	# 所接受的容器项类
+	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	@classmethod
-	def acceptedContItemClass(cls): return PlayerExerGift, PlayerExermon
+	def baseContItemClass(cls): return PlayerExerGift, PlayerExermon
 
 	# 默认容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return Subject.MAX_SELECTED
 
 	# 创建一个艾瑟萌槽（选择艾瑟萌时候执行）
-	@classmethod
-	def _create(cls, player, player_exers):
-		slot: cls = super()._create()
-		slot.player = player
-		slot.equip_container1 = player.exerhub
-		slot.equip_container2 = player.exergiftpool
-		slot.init_exers = player_exers
+	def _create(self, player, player_exers):
+		super()._create()
+		self.player = player
+		self.init_exers = player_exers
 
-		return slot
+	def _equipContainer(self, index):
+		if index == 0: return self.player.exerHub()
+		if index == 1: return self.player.exerGiftPool()
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
 		return super()._createSlot(cla, index,
 			init_exer=self.init_exers[index], **kwargs)
+
+	# 持有玩家
+	def owner(self): return self.player
 
 	# 保证科目与槽一致
 	def ensureSubject(self, slot_item, exermon):
@@ -738,10 +777,16 @@ class ExerSlot(SlotContainer):
 		if isinstance(equip_item, PlayerExermon):
 			self.ensureSubject(slot_item, equip_item)
 
-		return True
+	# 设置艾瑟萌天赋（强制）
+	def setExerGiftForce(self, player_gift, subject_id=None, slot_index=None):
 
-	# 持有玩家
-	def ownerPlayer(self): return self.player
+		if subject_id is not None:
+			self._equipSlot(subject_id=subject_id,
+							equip_index=2, equip_item=player_gift)
+
+		if slot_index is not None:
+			self._equipSlot(index=slot_index,
+							equip_index=2, equip_item=player_gift)
 
 	# 获得经验
 	def gainExp(self, slot_exps, exer_exps):
@@ -750,7 +795,7 @@ class ExerSlot(SlotContainer):
 			slot_exp = slot_exps[sid]
 			exer_exp = exer_exps[sid]
 
-			slot_item: ExerSlotItem = self.getContItem(subject_id=sid)
+			slot_item: ExerSlotItem = self.contItem(subject_id=sid)
 			if slot_item is None: continue
 
 			slot_item.gainExp(slot_exp, exer_exp)
@@ -768,14 +813,22 @@ class ExerSlotItem(SlotContItem):
 	# 容器类型
 	TYPE = ContItemType.ExerSlotItem
 
+	# 装备槽缓存键
+	EQUIPSLOT_CACHE_KEY = 'equip_slot'
+
+	# 属性缓存键
+	PARAMS_CACHE_KEY = 'params'
+
 	# 玩家
 	player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
 
-	# 玩家艾瑟萌关系
-	# exermon = models.OneToOneField('PlayerExermon', null=True, blank=True, on_delete=models.CASCADE, verbose_name="玩家艾瑟萌")
+	# 装备的艾瑟萌（装备项）
+	player_exer = models.OneToOneField('PlayerExermon', null=True, blank=True,
+								   on_delete=models.SET_NULL, verbose_name="装备艾瑟萌")
 
-	# 装备的天赋
-	# gift = models.OneToOneField('PlayerExerGift', null=True, blank=True, on_delete=models.CASCADE, verbose_name="天赋")
+	# 装备的天赋（装备项）
+	player_gift = models.OneToOneField('PlayerExerGift', null=True, blank=True,
+								on_delete=models.SET_NULL, verbose_name="装备天赋")
 
 	# 科目
 	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE, verbose_name="科目")
@@ -794,9 +847,13 @@ class ExerSlotItem(SlotContItem):
 	@classmethod
 	def acceptedEquipItemAttr(cls): return 'player_exer', 'player_gift'
 
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	self.cached_params = {}
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.cache(self.PARAMS_CACHE_KEY, {})
+
+	# def _equipItem(self, index):
+	# 	if index == 0: return self.player_exer
+	# 	if index == 1: return self.player_gift
 
 	# 转换属性为 dict
 	def _convertParamsToDict(self):
@@ -808,10 +865,10 @@ class ExerSlotItem(SlotContItem):
 
 		return data
 
-	# 获取装备槽
+	# 获取艾瑟萌技能槽
 	def exerEquipSlot(self):
-		try: return self.exerequipslot
-		except ExerEquipSlot.DoesNotExist: return None
+		return self.getOneToOneCache(
+			ExerEquipSlot, self.EQUIPSLOT_CACHE_KEY)
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
@@ -830,6 +887,11 @@ class ExerSlotItem(SlotContItem):
 
 		return res
 
+	# 创建之后调用
+	def afterCreated(self, **kwargs):
+		self.cache(self.EQUIPSLOT_CACHE_KEY,
+				   ExerEquipSlot.create(exer_slot=self))
+
 	# 移动容器项
 	def transfer(self, container: ExerSlot, **kwargs):
 		super().transfer(container, **kwargs)
@@ -840,10 +902,6 @@ class ExerSlotItem(SlotContItem):
 		super().setupIndex(index, **kwargs)
 		self.subject = init_exer.exermon().subject
 		self.equip(1, init_exer)
-
-	# 创建之后调用
-	def afterCreated(self, **kwargs):
-		ExerEquipSlot.create(exer_slot=self)
 
 	# # 获取装备的艾瑟萌
 	# def exermon(self) -> PlayerExermon: return self.targetEquipItem1()
@@ -867,23 +925,19 @@ class ExerSlotItem(SlotContItem):
 
 	# 艾瑟萌实际属性值（RPV）
 	def paramVal(self, param_id=None, attr=None):
-		id = None
-		if attr is not None: id = attr
-		if param_id is not None: id = param_id
+		key = attr or param_id
+		if key is None: return 0
 
-		if id is None: return 0
+		cache = self.getCache(self.PARAMS_CACHE_KEY)
 
-		if self.cached_params is None or id not in self.cached_params:
-
-			if self.cached_params is None:
-				self.cached_params = {}
-
+		# 如果该属性没有缓存
+		if key not in cache:
 			from utils.calc_utils import ExerSlotItemParamCalc
 
-			self.cached_params[id] = ExerSlotItemParamCalc.\
+			cache[key] = ExerSlotItemParamCalc.\
 				calc(self, param_id=param_id, attr=attr)
 
-		return self.cached_params[id]
+		return cache[key]
 
 	# 属性基础值
 	def paramBase(self, param_id=None, attr=None):
@@ -959,11 +1013,12 @@ class ExerSlotItem(SlotContItem):
 	# endregion
 
 	# 清除属性缓存
-	def clearCache(self): self.cached_params = None
+	def _clearParamsCache(self):
+		self.cache(self.PARAMS_CACHE_KEY, {})
 
 	# 刷新艾瑟萌
 	def refresh(self):
-		self.clearCache()
+		self._clearParamsCache()
 
 	# 槽等级（本等级, 下一级所需经验）
 	def slotLevel(self, calc_next=False):
@@ -991,7 +1046,7 @@ class ExerSlotItem(SlotContItem):
 # ===================================================
 #  技能使用效果表
 # ===================================================
-class SkillEffect(Effect):
+class ExerSkillEffect(BaseEffect):
 	class Meta:
 		verbose_name = verbose_name_plural = "技能使用效果"
 
@@ -1215,6 +1270,10 @@ class ExerSkillSlot(SlotContainer):
 	@classmethod
 	def acceptedSlotItemClass(cls): return ExerSkillSlotItem
 
+	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
+	@classmethod
+	def baseContItemClass(cls): return None
+
 	# 所接受的容器项类
 	@classmethod
 	def acceptedContItemClass(cls): return ()
@@ -1224,12 +1283,13 @@ class ExerSkillSlot(SlotContainer):
 	def defaultCapacity(cls): return cls.MAX_SKILL_COUNT
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player_exer):
-		slot: cls = super()._create()
-		slot.player_exer = player_exer
-		slot.skills = player_exer.exermon().skills()
-		return slot
+	def _create(self, player_exer):
+		super()._create()
+		self.player_exer = player_exer
+		self.skills = player_exer.exermon().skills()
+
+	def _equipContainer(self, index):
+		return None
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
@@ -1238,8 +1298,11 @@ class ExerSkillSlot(SlotContainer):
 
 		return super()._createSlot(cla, index, skill=skill, **kwargs)
 
+	# 持有者
+	def owner(self): return self.player_exer
+
 	# 持有玩家
-	def ownerPlayer(self): return self.player_exer.player
+	def ownerPlayer(self): return self.owner().player
 
 
 # ===================================================
@@ -1255,7 +1318,7 @@ class ExerSkillSlotItem(SlotContItem):
 	TYPE = ContItemType.ExerSkillSlotItem
 
 	# 艾瑟萌
-	player_exer = models.ForeignKey('PlayerExermon', on_delete=models.CASCADE, verbose_name="艾瑟萌")
+	# player_exer = models.ForeignKey('PlayerExermon', on_delete=models.CASCADE, verbose_name="艾瑟萌")
 
 	# 技能
 	skill = models.ForeignKey('ExerSkill', on_delete=models.CASCADE,
@@ -1265,10 +1328,6 @@ class ExerSkillSlotItem(SlotContItem):
 	use_count = models.PositiveIntegerField(default=0, verbose_name="使用次数")
 
 	# region 配置项
-
-	# 所接受的装备项类（2个）
-	@classmethod
-	def acceptedEquipItemClass(cls): return (), ()
 
 	# endregion
 
@@ -1282,10 +1341,9 @@ class ExerSkillSlotItem(SlotContItem):
 		return res
 
 	# 移动容器项
-	def transfer(self, container, **kwargs):
-		container: ExerSkillSlot = container.target()
-		super().transfer(container, **kwargs)
-		self.player_exer = container.player_exer
+	# def transfer(self, container, **kwargs):
+	# 	super().transfer(container, **kwargs)
+	# 	self.player_exer = container.player_exer
 
 	# 配置索引
 	def setupIndex(self, index, skill=None, **kwargs):
@@ -1305,6 +1363,19 @@ class ExerSkillSlotItem(SlotContItem):
 			self.use_count += 1
 			if self.use_count >= skill.need_count:
 				self.setSkill(skill.next_skill)
+
+
+# ===================================================
+#  艾瑟萌物品使用效果表
+# ===================================================
+class ExerItemEffect(BaseEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌物品使用效果"
+
+	# 物品
+	item = models.ForeignKey('ExerItem', on_delete=models.CASCADE,
+							 verbose_name="物品")
 
 
 # ===================================================
@@ -1333,6 +1404,30 @@ class ExerItem(UsableItem):
 
 		return res
 
+	# 获取所有的效果
+	def effects(self):
+		return self.exeritemeffect_set.all()
+
+
+# ===================================================
+#  艾瑟萌装备属性值表
+# ===================================================
+class ExerEquipParam(ParamValue):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌装备属性值"
+
+	# 装备
+	equip = models.ForeignKey("ExerEquip", on_delete=models.CASCADE, verbose_name="装备")
+
+	# 最大值
+	def maxVal(self):
+		return None
+
+	# 最小值
+	def minVal(self):
+		return None
+
 
 # ===================================================
 #  艾瑟萌装备
@@ -1351,6 +1446,10 @@ class ExerEquip(EquipableItem):
 	# 对应的容器项类
 	@classmethod
 	def contItemClass(cls): return ExerPackEquip
+
+	# 获取所有的属性基本值
+	def params(self):
+		return self.exerequipparam_set.all()
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):
@@ -1380,21 +1479,19 @@ class ExerPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return ExerPackItem
+	def baseContItemClass(cls): return ExerPackItem, ExerPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
 
 	# 创建一个背包（创建角色时候执行）
-	@classmethod
-	def _create(cls, player):
-		pack: cls = super()._create()
-		pack.player = player
-		return pack
+	def _create(self, player):
+		super()._create()
+		self.player = player
 
 	# 持有玩家
-	def ownerPlayer(self): return self.player
+	def owner(self): return self.player
 
 
 # ===================================================
@@ -1407,20 +1504,36 @@ class ExerPackItem(PackContItem):
 	# 容器项类型
 	TYPE = ContItemType.ExerPackItem
 
+	# 容器
+	container = models.ForeignKey('ExerPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('ExerItem', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
+
 	# 所接受的物品类
 	@classmethod
-	def acceptedItemClass(cls): return ExerItem, ExerEquip
+	def acceptedItemClass(cls): return ExerItem
 
 
 # ===================================================
 #  艾瑟萌背包装备
 # ===================================================
-class ExerPackEquip(ExerPackItem):
+class ExerPackEquip(PackContItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌背包装备"
 
 	# 容器项类型
 	TYPE = ContItemType.ExerPackEquip
+
+	# 容器
+	container = models.ForeignKey('ExerPack', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
+	# 物品
+	item = models.ForeignKey('ExerEquip', on_delete=models.CASCADE,
+							 null=True, verbose_name="物品")
 
 	# 所接受的物品类
 	@classmethod
@@ -1428,7 +1541,7 @@ class ExerPackEquip(ExerPackItem):
 
 	# 获取属性值
 	def param(self, param_id=None, attr=None):
-		return self.targetItem().param(param_id, attr)
+		return self.item.param(param_id, attr)
 
 
 # ===================================================
@@ -1454,25 +1567,25 @@ class ExerEquipSlot(SlotContainer):
 	@classmethod
 	def acceptedSlotItemClass(cls): return ExerEquipSlotItem
 
-	# 所接受的容器项类
+	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	@classmethod
-	def acceptedContItemClass(cls): return ExerPackEquip
+	def baseContItemClass(cls): return ExerPackEquip
 
 	# 默认容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return ExerEquipType.count()
 
 	# 创建一个槽（创建角色时候执行）
-	@classmethod
-	def _create(cls, exer_slot: ExerSlotItem):
-		slot: cls = super()._create()
-		slot.exer_slot = exer_slot
-		slot.equip_container1 = exer_slot.player.exerpack
-		return slot
+	def _create(self, exer_slot: ExerSlotItem):
+		super()._create()
+		self.exer_slot = exer_slot
+
+	def _equipContainer(self, index):
+		return self.exer_slot.player.exerPack()
 
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
-		if slot_item.e_type_id != equip.targetItem().e_type_id:
+		if slot_item.e_type_id != equip.item.e_type_id:
 			raise ErrorException(ErrorType.IncorrectEquipType)
 
 		return True
@@ -1496,22 +1609,26 @@ class ExerEquipSlot(SlotContainer):
 		return sum
 
 	# 持有玩家
-	def ownerPlayer(self): return self.exer_slot.player
+	def owner(self): return self.exer_slot
+
+	# 持有玩家
+	def ownerPlayer(self): return self.owner().player
 
 
 # ===================================================
 #  艾瑟萌装备槽项
 # ===================================================
 class ExerEquipSlotItem(SlotContItem):
+
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备槽项"
 
 	# 容器项类型
 	TYPE = ContItemType.ExerEquipSlotItem
 
-	# 艾瑟萌背包装备
-	# pack_equip = models.OneToOneField('ExerPackEquip', on_delete=models.CASCADE,
-	# 							 verbose_name="艾瑟萌背包装备")
+	# 装备项
+	pack_equip = models.OneToOneField('ExerPackEquip', null=True, blank=True,
+									  on_delete=models.SET_NULL, verbose_name="装备")
 
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.ExerEquipType', on_delete=models.CASCADE,
@@ -1519,11 +1636,11 @@ class ExerEquipSlotItem(SlotContItem):
 
 	# 所接受的装备项类
 	@classmethod
-	def acceptedEquipItemClass(cls): return ExerPackEquip, ()
+	def acceptedEquipItemClass(cls): return (ExerPackEquip, )
 
 	# 所接受的装备项属性名（2个）
 	@classmethod
-	def acceptedEquipItemAttr(cls): return 'pack_equip', '_'
+	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
 	def _convertToDict(self, **kwargs):

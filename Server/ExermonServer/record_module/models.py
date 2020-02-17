@@ -1,5 +1,5 @@
 from django.db import models
-from utils.model_utils import Common as ModelUtils
+from utils.model_utils import CacheableModel, Common as ModelUtils
 from utils.exception import ErrorType, ErrorException
 from enum import Enum
 import jsonfield, datetime
@@ -121,17 +121,17 @@ class QuestionRecord(models.Model):
 		return record
 
 	# 更新已有记录
-	def updateRecord(self, player_question, collect=False):
+	def updateRecord(self, player_ques, collect=False):
 
-		timespan = player_question.timespan
+		timespan = player_ques.timespan
 
-		if player_question.correct():
+		if player_ques.correct():
 			if self.corr_time <= 0:
 				self.corr_time = timespan
 			self.correct += 1
 
 		if self.count <= 0:
-			self.source = player_question.source().value
+			self.source = player_ques.source().value
 
 			self.first_date = datetime.datetime.now()
 			self.first_time = timespan
@@ -139,8 +139,8 @@ class QuestionRecord(models.Model):
 		sum_time = self.avg_time*self.count+timespan
 		self.avg_time = round(sum_time/(self.count+1))
 
-		self.sum_exp += player_question.exp_incr
-		self.sum_gold += player_question.gold_incr
+		self.sum_exp += player_ques.exp_incr
+		self.sum_gold += player_ques.gold_incr
 
 		if collect: self.collected = True
 
@@ -157,10 +157,15 @@ class QuestionRecord(models.Model):
 # ===================================================
 #  玩家题目关系表
 # ===================================================
-class PlayerQuestion(models.Model):
+class PlayerQuestion(CacheableModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "玩家题目关系"
+
+	# 缓存键配置
+	STARTTIME_CACHE_KEY = 'start_time'
+	CORRECT_CACHE_KEY = 'correct'
+	SCORE_CACHE_KEY = 'score'
 
 	# 题目
 	question = models.ForeignKey('question_module.Question',
@@ -187,15 +192,8 @@ class PlayerQuestion(models.Model):
 	# 是否新题
 	is_new = models.BooleanField(default=False, verbose_name="新题标志")
 
-	# 缓存的开始时间
-	start_time = None
-
-	# 所属题目集
-	question_set = None
-
-	# 缓存正确判断和得分
-	_correct = None
-	_score = None
+	# 所属题目集（用于子类继承）
+	# question_set = None
 
 	def __str__(self):
 		return "%s %s" % (self.questionSet(), self.question)
@@ -210,6 +208,12 @@ class PlayerQuestion(models.Model):
 		return result
 
 	adminSelection.short_description = "选择情况"
+
+	# 用于admin显示
+	def adminAnswer(self):
+		return self.question.adminCorrectAnswer()
+
+	adminAnswer.short_description = "正确答案"
 
 	def convertToDict(self, type=None):
 
@@ -260,45 +264,47 @@ class PlayerQuestion(models.Model):
 
 	# 设置题目集
 	def setQuestionSet(self, question_set):
-		self.question_set = question_set
+		raise NotImplementedError
+		# self.question_set = question_set
 
 	# 获取题目集
 	def questionSet(self):
-		return self.question_set
+		raise NotImplementedError
+		# return self.question_set
 
 	# 是否正确
 	def correct(self):
-		if self._correct is None:
-			self._correct = self.question.calcCorrect(self.selection)
-		return self._correct
+		return self.getOrSetCache(self.CORRECT_CACHE_KEY,
+			lambda: self.question.calcCorrect(self.selection))
 
 	# 计算得分
 	def score(self):
-		if self._score is None:
-			self._score = self.question.calcScore(self.selection)
-		return self._score
+		return self.getOrSetCache(self.SCORE_CACHE_KEY,
+			lambda: self.question.calcScore(self.selection))
 
 	# 开始做题
 	def start(self):
-		self.start_time = datetime.datetime.now()
+		self.cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
 	# 作答
 	def answer(self, selection, record):
 
-		if self.start_time is None:
+		start_time = self.getCache(self.STARTTIME_CACHE_KEY)
+
+		if start_time is None:
 			raise ErrorException(ErrorType.QuestionNotStarted)
 
 		now = datetime.datetime.now()
-		if now <= self.start_time:
+		if now <= start_time:
 			raise ErrorException(ErrorType.InvalidTimeSpan)
 
-		self.timespan = (now - self.start_time).microseconds
+		self.timespan = (now - start_time).microseconds
 		self.selection = selection
 		self.answered = True
 
 		self._calcRewards(record)
 
-		self.save()
+		# self.save()
 
 	# 计算奖励
 	def _calcRewards(self, record):
@@ -354,13 +360,16 @@ class QuestionSetType(Enum):
 # ===================================================
 #  题目集记录表
 # ===================================================
-class QuestionSetRecord(models.Model):
+class QuestionSetRecord(CacheableModel):
 
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "题目集记录"
 
 	TYPE = QuestionSetType.Unset
+
+	# 题目缓存键
+	QUES_CACHE_KEY = 'player_ques'
 
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
@@ -380,13 +389,6 @@ class QuestionSetRecord(models.Model):
 
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
-
-	# 题目关系列表（缓存）
-	player_questions = None
-
-	# 统计数据（缓存）
-	total_data = None
-	sum_data = None
 
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
@@ -425,6 +427,11 @@ class QuestionSetRecord(models.Model):
 
 	# 获取所有题目关系
 	def playerQuestions(self):
+		return self.getOrSetCache(self.QUES_CACHE_KEY,
+			lambda: self._playerQuestions())
+
+	# 获取所有题目关系
+	def _playerQuestions(self):
 		raise NotImplementedError
 
 	# 获取题目关系
@@ -436,37 +443,19 @@ class QuestionSetRecord(models.Model):
 	# 获取缓存的题目关系
 	def cachedPlayerQuestion(self, question_id):
 
-		for player_ques in self.player_questions:
+		cache = self._getQuestionCache()
+		for player_ques in cache:
 			if player_ques.question_id == question_id:
 				return player_ques
 
 		return None
 
-	# 增加题目
-	def addQuestion(self, question_id):
-
-		player_ques = ExerciseQuestion.create(self, question_id)
-
-		if self.player_questions is None:
-			self.player_questions = []
-
-		self.player_questions.append(player_ques)
-
-	# 回答题目
-	def answerQuestion(self, question_id, selection, collect=False):
-
-		player_ques: PlayerQuestion = self.cachedPlayerQuestion(question_id)
-
-		rec = QuestionRecord.create(self.player, player_ques.question_id)
-
-		player_ques.answer(selection, rec)
-
-		rec.updateRecord(player_ques, collect)
-
 	# 开始一个题目集（生成题目）
 	def start(self, **kwargs):
 
-		self.player.cur_exercise = self
+		self._initQuestionCache()
+
+		self.player.setExercise(self)
 
 		self._generateQuestions(**kwargs)
 
@@ -479,24 +468,69 @@ class QuestionSetRecord(models.Model):
 
 		self.finished = True
 
+		self._applyResult(self._calcResult())
+
+		# self._saveQuestionCache()
+
+		# 会自动保存
+		self.player.clearExercise()
+
+	def _calcResult(self):
+
 		calc = self.rewardCalculator().calc(self.player_questions)
 
 		self.exp_incr = calc.exer_exp_incr
 		self.slot_exp_incr = calc.exerslot_exp_incr
 		self.gold_incr = calc.gold_incr
 
-		self.player
+		return calc
 
-		self.player.cur_exercise = None
+	def _applyResult(self, calc):
 
-		self._savePlayerQuestions()
-		self.save()
+		self.player.gainMoney(self.gold_incr)
+		self.player.gainExp(self.slot_exp_incr,
+							calc.exer_exp_incrs,
+							calc.exerslot_exp_incrs)
 
-	# 保存缓存中的题目关系
-	def _savePlayerQuestions(self):
+	# 增加题目
+	def addQuestion(self, question_id):
 
-		for player_ques in self.player_questions:
-			player_ques.save()
+		player_ques = ExerciseQuestion.create(self, question_id)
+
+		if self.player_questions is None:
+			self.player_questions = []
+
+		self._addQuestionToCache(player_ques)
+
+	# 回答题目
+	def answerQuestion(self, question_id, selection, collect=False):
+
+		# 从缓存中读取
+		player_ques: PlayerQuestion = self.cachedPlayerQuestion(question_id)
+
+		rec = QuestionRecord.create(self.player, player_ques.question_id)
+
+		player_ques.answer(selection, rec)
+
+		rec.updateRecord(player_ques, collect)
+
+	# 初始化题目缓存
+	def _initQuestionCache(self):
+		self.cache(self.QUES_CACHE_KEY, [])
+
+	# 获取题目缓存
+	def _getQuestionCache(self):
+		cache = self.getCache(self.QUES_CACHE_KEY)
+		if cache is None: return []
+		return cache
+
+	# 往缓存中添加题目
+	def _addQuestionToCache(self, player_ques):
+		self._getQuestionCache().append(player_ques)
+
+	# # 初始化题目缓存
+	# def _saveQuestionCache(self):
+	# 	self.saveCache(self.QUES_CACHE_KEY)
 
 	# region 统计数据
 
@@ -504,38 +538,34 @@ class QuestionSetRecord(models.Model):
 	def _totalData(self, key, func, player_queses=None):
 		if not self.finished: return []
 
-		if key in self.total_data:
-			return self.total_data[key]
+		return self.getOrSetCache('total_' + key,
+			lambda: self.__generTotalData(func, player_queses))
 
-		if self.total_data is None:
-			self.total_data = {}
-
-		self.total_data[key] = []
+	def __generTotalData(self, func, player_queses=None):
+		res = []
 
 		if player_queses is None:
 			player_queses = self.playerQuestions()
 
 		for data in player_queses:
-			self.total_data[key].append(func(data))
+			res.append(func(data))
 
-		return self.total_data[key]
+		return res
 
 	# 求和数据
 	def _sumData(self, key, func, player_queses=None):
 		if not self.finished: return -1
 
-		if key in self.sum_data:
-			return self.sum_data[key]
+		return self.getOrSetCache('sum_' + key,
+			lambda: self.__generSumData(func, player_queses))
 
-		if self.sum_data is None:
-			self.sum_data = {}
-
-		self.sum_data[key] = 0
+	def __generSumData(self, func, player_queses=None):
+		res = 0
 
 		data = func(player_queses)
-		for d in data: self.sum_data[key] += int(d)
+		for d in data: res += int(d)
 
-		return self.sum_data[key]
+		return res
 
 	# 全部选择
 	def selections(self, player_queses=None):
@@ -559,15 +589,15 @@ class QuestionSetRecord(models.Model):
 
 	# 总用时
 	def sumTimespan(self, player_queses=None):
-		return self._totalData('timespans', self.timespans, player_queses)
+		return self._sumData('timespans', self.timespans, player_queses)
 
 	# 总得分
 	def sumScore(self, player_queses=None):
-		return self._totalData('scores', self.scores, player_queses)
+		return self._sumData('scores', self.scores, player_queses)
 
 	# 正确数量
 	def corrCount(self, player_queses=None):
-		return self._totalData('correct', self.results, player_queses)
+		return self._sumData('correct', self.results, player_queses)
 
 	# 正确率
 	def corrRate(self, player_queses=None):
@@ -649,5 +679,5 @@ class ExerciseRecord(QuestionSetRecord):
 									   self.subject.name)
 
 	# 获取所有题目关系
-	def playerQuestions(self):
+	def _playerQuestions(self):
 		return self.exercisequestion_set.all()

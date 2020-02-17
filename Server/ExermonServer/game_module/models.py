@@ -875,13 +875,3 @@ class GameConfigure(models.Model):
 		if cls.Configure is None: cls.load()
 
 		return cls.Configure
-
-
-# 初始化
-try:
-	GameConfigure.load()
-
-except:
-	# 打印错误路径
-	traceback.print_exc()
-	print("仍未建立数据库")

@@ -79,21 +79,24 @@ class ErrorType(Enum):
 	# Gain/LostItem
 	CapacityInsufficient = 220  # 容器剩余容量不足
 	QuantityInsufficient = 221  # 物品数量不足
+	InvalidContItem = 222  # 无效容器项
 
 	# Equip/DequipEquip
 	IncorrectEquipType = 230  # 装备类型不正确
+	InvalidContainer = 231  # 无效容器
 
 	# ExermonCommon
 	ExermonNotExist = 300  # 艾瑟萌不存在
 	ExerGiftNotExist = 301  # 艾瑟萌天赋不存在
-	InvalidExermonCount = 302  # 非法的艾瑟萌数量
-	InvalidExermonName = 303  # 非法的艾瑟萌昵称
-	InvalidExermonSubject = 304  # 非法的艾瑟萌科目
-	InvalidExermonType = 305  # 非法的艾瑟萌类型
-	InvalidExerGiftType = 306  # 非法的艾瑟萌天赋类型
+	ExerSlotNotExist = 302  # 艾瑟萌槽不存在
+	InvalidExermonCount = 310  # 非法的艾瑟萌数量
+	InvalidExermonName = 311  # 非法的艾瑟萌昵称
+	InvalidExermonSubject = 312  # 非法的艾瑟萌科目
+	InvalidExermonType = 313  # 非法的艾瑟萌类型
+	InvalidExerGiftType = 314  # 非法的艾瑟萌天赋类型
 
 	# ExerSlot
-	IncorrectSubject = 310  # 科目不正确
+	IncorrectSubject = 320  # 科目不正确
 
 	# QuestionCommon
 	QuestionNotExist = 400  # 题目不存在
@@ -174,13 +177,16 @@ class ErrorException(Exception):
 		# Gain/LostItem
 		ErrorType.CapacityInsufficient: "容器剩余容量不足！",
 		ErrorType.QuantityInsufficient: "物品数量不足或未拥有此物品！",
+		ErrorType.InvalidContItem: "无法对此物品进行操作！",
 
 		# Equip/DequipEquip
 		ErrorType.IncorrectEquipType: "装备类型不正确！",
+		ErrorType.InvalidContainer: "找不到所属容器，无法进行装备操作！",
 
 		# ExermonCommon
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",
 		ErrorType.ExerGiftNotExist: "艾瑟萌天赋不存在！",
+		ErrorType.ExerSlotNotExist: "艾瑟萌槽未创建！",
 		ErrorType.InvalidExermonCount: "非法的艾瑟萌数量！",
 		ErrorType.InvalidExermonName: "非法的艾瑟萌昵称格式！",
 		ErrorType.InvalidExermonSubject: "非法的艾瑟萌科目！",

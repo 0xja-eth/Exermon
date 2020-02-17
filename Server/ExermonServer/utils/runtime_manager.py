@@ -451,7 +451,7 @@ class RuntimeManager:
 
 		print("获取艾瑟萌槽装备槽")
 
-		exer_slot_item = exer_slot1.getContItem(subject_id=1)
+		exer_slot_item = exer_slot1.contItem(subject_id=1)
 		equip_slot = exer_slot_item.exerequipslot
 		equip_slot.show("equip_slot")
 
@@ -506,3 +506,14 @@ thread_loop = asyncio.new_event_loop()
 t = threading.Thread(target=RuntimeManager.eventLoop, args=(thread_loop,))
 t.daemon = True
 t.start()
+
+# 初始化
+try:
+	from game_module.models import GameConfigure
+
+	GameConfigure.load()
+
+except:
+	# 打印错误路径
+	traceback.print_exc()
+	print("仍未建立数据库")

@@ -1,20 +1,21 @@
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
-from item_module.adminx import BaseItemAdmin, PackContainerAdmin, PackContItemAdmin
+from game_module.adminx import ParamsInline
+from item_module.adminx import *
 from .models import *
 import xadmin
 
 # Register your models here.
 
 
-class QuesSugarPriceInline(object):
-
-	model = QuesSugarPrice
-	min_num = 1
-	max_num = 1
-	validate_min = 1
-	validate_max = 1
-	style = "one"
+# class QuesSugarPriceInline(object):
+#
+# 	model = QuesSugarPrice
+# 	min_num = 1
+# 	max_num = 1
+# 	validate_min = 1
+# 	validate_max = 1
+# 	style = "one"
 
 
 class QuesChoicesInline(object):
@@ -29,12 +30,18 @@ class QuesPicturesInline(object):
 	style = "table"
 
 
-@xadmin.sites.register(QuesSugarPrice)
-class QuesSugarPriceAdmin(object):
+class QuesSugarParamsInline(ParamsInline): model = QuesSugarParam
 
-	list_display = ['id', 'sugar', 'gold', 'ticket', 'bound_ticket']
 
-	list_editable = ['sugar', 'gold', 'ticket', 'bound_ticket']
+class QuesSugarPackItemsInline(BaseContItemsInline): model = QuesSugarPackItem
+
+
+# @xadmin.sites.register(QuesSugarPrice)
+# class QuesSugarPriceAdmin(object):
+#
+# 	list_display = ['id', 'sugar', 'gold', 'ticket', 'bound_ticket']
+#
+# 	list_editable = ['sugar', 'gold', 'ticket', 'bound_ticket']
 
 
 @xadmin.sites.register(Question)
@@ -60,28 +67,33 @@ class QuesReportAdmin(object):
 @xadmin.sites.register(QuesSugar)
 class QuesSugarAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin().list_display + \
-				   ['question', 'get_rate', 'get_count']
+	list_display = BaseItemAdmin.list_display + \
+				   ['question', 'buy_price', 'sell_price',
+					'get_rate', 'get_count']
 
-	list_editable = BaseItemAdmin().list_editable + \
-				   ['question', 'get_rate', 'get_count']
+	list_editable = BaseItemAdmin.list_editable + \
+				   ['question', 'buy_price', 'sell_price',
+					'get_rate', 'get_count']
 
-	field_set = [Fieldset('题目糖属性', 'question', 'get_rate', 'get_count')]
+	field_set = [Fieldset('题目糖属性', 'question', 'buy_price',
+						  'sell_price', 'get_rate', 'get_count')]
 
-	form_layout = BaseItemAdmin().form_layout + field_set
+	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = [QuesSugarPriceInline]
+	inlines = [CurrencyInline, QuesSugarParamsInline]
 
 
 @xadmin.sites.register(QuesSugarPack)
 class QuesSugarPackAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('题目糖背包属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = QuesSugarPackItemsInline
 
 
 @xadmin.sites.register(QuesSugarPackItem)

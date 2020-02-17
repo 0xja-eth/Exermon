@@ -1,12 +1,31 @@
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
-from item_module.adminx import PackContItemsInline, \
-	UsableItemAdmin, EquipableItemAdmin, PackContainerAdmin, \
-	SlotContainerAdmin, PackContItemAdmin, SlotContItemAdmin
+from game_module.adminx import ParamsInline
+from item_module.adminx import *
 from .models import *
 import xadmin
 
 # Register your models here.
+
+
+class HumanItemEffectsInline(BaseEffectsInline):
+	model = HumanItemEffect
+
+
+class HumanEquipParamsInline(ParamsInline):
+	model = HumanEquipParam
+
+
+class HumanPackItemsInline(BaseContItemsInline):
+	model = HumanPackItem
+
+
+class HumanPackEquipsInline(BaseContItemsInline):
+	model = HumanPackEquip
+
+
+class HumanEquipSlotItemsInline(BaseContItemsInline):
+	model = HumanEquipSlotItem
 
 
 @xadmin.sites.register(LoginInfo)
@@ -44,23 +63,38 @@ class PlayerAdmin(object):
 
 @xadmin.sites.register(HumanItem)
 class HumanItemAdmin(UsableItemAdmin):
-	pass
+	effect_inlines = HumanItemEffectsInline
 
 
 @xadmin.sites.register(HumanEquip)
 class HumanEquipAdmin(EquipableItemAdmin):
-	pass
+	param_inlines = HumanEquipParamsInline
 
 
 @xadmin.sites.register(HumanPack)
 class HumanPackAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin().list_display + \
+	list_display = PackContainerAdmin.list_display + \
 				   ['player']
 
 	field_set = [Fieldset('人类背包属性', 'player')]
 
-	form_layout = PackContainerAdmin().form_layout + field_set
+	form_layout = PackContainerAdmin.form_layout + field_set
+
+	inlines = [HumanPackItemsInline, HumanPackEquipsInline]
+
+
+@xadmin.sites.register(HumanEquipSlot)
+class HumanEquipSlotAdmin(SlotContainerAdmin):
+
+	list_display = SlotContainerAdmin.list_display + \
+				   ['pack_equip', 'player']
+
+	field_set = [Fieldset('人类装备槽属性', 'pack_equip', 'player')]
+
+	form_layout = SlotContainerAdmin.form_layout + field_set
+
+	cont_item_inlines = HumanEquipSlotItemsInline
 
 
 @xadmin.sites.register(HumanPackItem)
@@ -73,24 +107,23 @@ class HumanPackEquipAdmin(PackContItemAdmin):
 	pass
 
 
-@xadmin.sites.register(HumanEquipSlot)
-class HumanEquipSlotAdmin(SlotContainerAdmin):
-
-	list_display = SlotContainerAdmin().list_display + \
-				   ['player']
-
-	field_set = [Fieldset('人类装备槽属性', 'player')]
-
-	form_layout = SlotContainerAdmin().form_layout + field_set
-
-
 @xadmin.sites.register(HumanEquipSlotItem)
 class HumanEquipSlotItemAdmin(SlotContItemAdmin):
 
-	list_display = SlotContItemAdmin().list_display + \
-				   ['e_type']
+	list_display = SlotContItemAdmin.list_display + \
+				   ['pack_equip', 'e_type']
 
-	field_set = [Fieldset('人类装备槽项属性', 'e_type')]
+	list_editable = SlotContItemAdmin.list_display + \
+				   ['pack_equip']
+
+	field_set = [Fieldset('人类装备槽项属性', 'pack_equip')]
+
+	exclude = ['e_type']
 
 	form_layout = SlotContItemAdmin().form_layout + field_set
+
+
+@xadmin.sites.register(HumanItemEffect)
+class HumanItemEffectAdmin(BaseEffectAdmin):
+	pass
 

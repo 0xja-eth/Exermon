@@ -33,9 +33,9 @@ def add_view_permissions(sender, **kwargs):
         # if it doesn't exist..
         if not Permission.objects.filter(content_type=content_type, codename=codename):
             # add it
-            Permission.objects.create(content_type=content_type,
-                                      codename=codename,
-                                      name="Can view %s" % content_type.name)
+            Permission.objects._create(content_type=content_type,
+									   codename=codename,
+									   name="Can view %s" % content_type.name)
             # print "Added view permission for %s" % content_type.name
 
 # check for all our view permissions after a syncdb
