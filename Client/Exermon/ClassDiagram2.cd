@@ -19,13 +19,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Struct Name="AnimationUtils.TempAnimation" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\UI\AnimationUtils.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\AnimationUtils.cs</FileName>
@@ -57,13 +50,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="BaseContItem.Type" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Data\ItemModuleData.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAhAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
@@ -72,7 +58,7 @@
   <Class Name="BaseData" Collapsed="true">
     <Position X="24.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAACAgAAAAAAAAAAgAAAAAAAAAAAAAgA=</HashCode>
+      <HashCode>AAAAAAAAAIAAgACEgAAAAAAAAAAgAAAAAAgAAAAAAgA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\BaseData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -81,18 +67,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Delegate Name="BaseInputField&lt;T&gt;.checkFunc" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Delegate>
-      <Delegate Name="BaseInputField&lt;T&gt;.onChangeFunc" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Delegate>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>BECBgEAAAABIICAAAAaAAAIwBAAAQmABAAiBAAAgAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</FileName>
@@ -194,23 +168,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="CalcService.ExermonParamCalc">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="CalcService.ExerSlotItemParamCalc">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="CalcService.ExerSlotItemParamRateCalc">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\CalcService.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Services\CalcService.cs</FileName>
@@ -305,7 +262,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>CIAYQCCQ0LBAAAAAAIABWJCAIIQMBEGQAAQAAOIQAIA=</HashCode>
+      <HashCode>CIAZQCCQ0LBAAAAAAIABWJCAIIQMBEGQAAQAAOIQAIA=</HashCode>
       <FileName>Assets\Scripts\Core\Services\DataService.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -328,13 +285,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="DateTimePicker.Type" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>BACACFAgCAABAAICACrIEAAASCAhgCAABAIRQQQEAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</FileName>
@@ -434,7 +384,7 @@
     <Position X="65" Y="3" Width="1.5" />
     <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="61.5" Y="3.677" />
+        <Point X="61.5" Y="3.548" />
         <Point X="61.5" Y="4.125" />
         <Point X="65.75" Y="4.125" />
         <Point X="65.75" Y="3.677" />
@@ -502,7 +452,7 @@
     <Position X="63" Y="3" Width="1.5" />
     <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="61.5" Y="3.677" />
+        <Point X="61.5" Y="3.548" />
         <Point X="61.5" Y="4.125" />
         <Point X="63.75" Y="4.125" />
         <Point X="63.75" Y="3.677" />
@@ -589,13 +539,6 @@
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ExerPackItem" Collapsed="true">
-    <Position X="48" Y="4.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="ExerSkill" Collapsed="true">
     <Position X="65" Y="4.5" Width="1.5" />
     <TypeIdentifier>
@@ -661,14 +604,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Struct Name="FragmentData.MatchInfo" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
-        </TypeIdentifier>
-        <Lollipop Position="0.2" />
-      </Struct>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>gAIAAAAggAEAAAQgAIIAAAAAABEAAAEKQIAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
@@ -677,7 +612,7 @@
   <Class Name="GameConfigure" Collapsed="true">
     <Position X="50.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QIAAQQAAAIIAAgAAgAAAAAgAAAAsGABAAAQAIBIAAAg=</HashCode>
+      <HashCode>QIABQQAAAIIAAgAAgAAAAAgAAAAsGABAAAQAIBIAAAg=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -700,13 +635,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="GameException.Type" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Data\GameException.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAABAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAgAAgACA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\GameException.cs</FileName>
@@ -724,38 +652,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="GameSystem.AlertRequest" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="GameSystem.ChangeSceneRequest">
-        <Compartments>
-          <Compartment Name="Nested Types" Collapsed="false" />
-        </Compartments>
-        <NestedTypes>
-          <Enum Name="GameSystem.ChangeSceneRequest.Type">
-            <TypeIdentifier>
-              <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-            </TypeIdentifier>
-          </Enum>
-        </NestedTypes>
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="GameSystem.LoadingRequest">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Enum Name="GameSystem.State">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\GameSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AohAIgQAACAIAAEhygAACYQAJgABAECABgADBBMhBAo=</HashCode>
       <FileName>Assets\Scripts\Core\Systems\GameSystem.cs</FileName>
@@ -813,14 +709,7 @@
   <Class Name="HumanPackEquip" Collapsed="true">
     <Position X="45.5" Y="6.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="HumanPackItem" Collapsed="true">
-    <Position X="45.75" Y="4.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -944,13 +833,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="LoginWindow.Type" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Windows\TitleScene\LoginWindow.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AMSDW0TBCAgQWcQgAQyABMlAIEQXCWEDAQoChiEEEQE=</HashCode>
       <FileName>Assets\Scripts\Windows\TitleScene\LoginWindow.cs</FileName>
@@ -976,48 +858,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="NetworkSystem.EmitDataHandler" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="NetworkSystem.Interfaces" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="NetworkSystem.RequestObject">
-        <Compartments>
-          <Compartment Name="Nested Types" Collapsed="false" />
-        </Compartments>
-        <NestedTypes>
-          <Delegate Name="NetworkSystem.RequestObject.ErrorAction" Collapsed="true">
-            <TypeIdentifier>
-              <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-            </TypeIdentifier>
-          </Delegate>
-          <Delegate Name="NetworkSystem.RequestObject.SuccessAction" Collapsed="true">
-            <TypeIdentifier>
-              <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-            </TypeIdentifier>
-          </Delegate>
-        </NestedTypes>
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="NetworkSystem.ResponseDataHandler" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Enum Name="NetworkSystem.State">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>QkAQYMAEAABAEBgUgAQCUJ0EAgABDEADEAECOAlEIIE=</HashCode>
       <FileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</FileName>
@@ -1035,15 +875,8 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Delegate Name="PackContItem.GetFunc" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Data\ItemModuleData.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Delegate>
-    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAABAAAAAICAAAAABAQAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAICAAAAABAQAAAAAAAAgAAAAAAAAAACAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -1059,23 +892,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Interface Name="ParamDisplay.DisplayDataArrayConvertable" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
-      <Interface Name="ParamDisplay.DisplayDataConvertable" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
-      <Struct Name="ParamDisplay.DisplayItem" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
     <InheritanceLine Type="BaseView" FixedToPoint="true">
       <Path>
         <Point X="34.75" Y="14.827" />
@@ -1187,13 +1003,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="QuestionText.TexturePool" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AGCYAIAAgUDQggAACAAAACAAAEAEBEBAEAIRAQAIMBA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
@@ -1204,18 +1013,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="QuestionTextParser.CharData" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="QuestionTextParser.LineData" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AEIASAGhgIEAAQEABENAACQCQAAAAABUCIAAAAECAKA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
@@ -1233,13 +1030,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="SceneUtils.GameScene" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\UI\SceneUtils.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>BCAAACTBEgIIgB08ASEAaggAkJABABCaagACAgAEUDA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\SceneUtils.cs</FileName>
@@ -1311,13 +1101,6 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="StorageSystem.StorageItem" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Core\Systems\StorageSystem.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAgAAQABMCgAAAxAYEgAAAAEAAQAEACAAQAEAAAAAg=</HashCode>
       <FileName>Assets\Scripts\Core\Systems\StorageSystem.cs</FileName>

@@ -89,6 +89,9 @@ class ErrorType(Enum):
 	ExermonNotExist = 300  # 艾瑟萌不存在
 	ExerGiftNotExist = 301  # 艾瑟萌天赋不存在
 	ExerSlotNotExist = 302  # 艾瑟萌槽不存在
+	PlayerExermonNotExist = 303  # 玩家艾瑟萌不存在
+	PlayerExerGiftNotExist = 304  # 玩家艾瑟萌天赋不存在
+
 	InvalidExermonCount = 310  # 非法的艾瑟萌数量
 	InvalidExermonName = 311  # 非法的艾瑟萌昵称
 	InvalidExermonSubject = 312  # 非法的艾瑟萌科目
@@ -167,7 +170,7 @@ class ErrorException(Exception):
 		# ItemCommon
 		ErrorType.ItemNotExist: "物品不存在！",
 		ErrorType.ContainerNotExist: "容器不存在！",
-		ErrorType.ContItemNotExist: "容器项不存在！",
+		ErrorType.ContItemNotExist: "物品不存在！",
 		ErrorType.ContainerNotOwner: "该容器不属于当前玩家！",
 		ErrorType.ContItemNotHold: "玩家未获得此物品！",
 		ErrorType.IncorrectItemType: "物品类型不正确！",
@@ -187,6 +190,9 @@ class ErrorException(Exception):
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",
 		ErrorType.ExerGiftNotExist: "艾瑟萌天赋不存在！",
 		ErrorType.ExerSlotNotExist: "艾瑟萌槽未创建！",
+		ErrorType.PlayerExermonNotExist: "尚未拥有该艾瑟萌！",
+		ErrorType.PlayerExerGiftNotExist: "尚未拥有该天赋！",
+
 		ErrorType.InvalidExermonCount: "非法的艾瑟萌数量！",
 		ErrorType.InvalidExermonName: "非法的艾瑟萌昵称格式！",
 		ErrorType.InvalidExermonSubject: "非法的艾瑟萌科目！",

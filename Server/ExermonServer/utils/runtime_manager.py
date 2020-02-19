@@ -40,11 +40,11 @@ class RuntimeManager:
 
 	# 添加元素
 	@classmethod
-	def add(cls, type, key, data=None, **args):
+	def add(cls, type, key, data=None, **kwargs):
 		object = cls.get(type)
 
 		if object is not None:
-			data = data or type(**args)
+			data = data or type(**kwargs)
 
 			object[key] = data
 			data.add()
@@ -244,8 +244,17 @@ class RuntimeManager:
 		# createRandomItem(ExerGift, 30)
 		# createRandomItem(ExerFrag, 40)
 
-		p1 = Player.objects.get(username="测试账号3")
-		p2 = Player.objects.get(username="测试账号4")
+		p: Player = Player.objects.all().first()
+
+		from player_module.views import Common
+
+		Common.addOnlinePlayer(p, None)
+
+		hp: HumanPack = p.humanPack()
+		ep: ExerPack = p.exerPack()
+		es: ExerSlot = p.exerSlot()
+		eh: ExerHub = p.exerHub()
+		egp: ExerGiftPool = p.exerGiftPool()
 
 		exermons = Exermon.objects.all()
 		human_items = HumanItem.objects.all()
@@ -253,6 +262,239 @@ class RuntimeManager:
 		exer_items = ExerItem.objects.all()
 		exer_equips = ExerEquip.objects.all()
 		exer_gifts = ExerGift.objects.all()
+
+		human_item1 = human_items[0]
+		human_item2 = human_items[1]
+		human_item3 = human_items[2]
+
+		exermon1 = exermons[1]
+		exermon2 = exermons[3]
+		exermon3 = exermons.last()
+
+		"========== 背包物品测试 =========="
+
+		# TestUtils.start('人类背包测试')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况')
+		#
+		# cont_item = hp.gainItems(human_item1, 50)[0]
+		# TestUtils.catch('hp.gainItems(human_item1, 50)')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# hp.gainItems(human_item2, 199)
+		# TestUtils.catch('hp.gainItems(human_item2, 199)')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# hp.gainItems(human_item1, 50)
+		# hp.gainItems(human_item3, 19)
+		# TestUtils.catch('hp.gainItems(human_item1, 50) & hp.gainItems(human_item3, 19)')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# hp.lostItems(human_item2, 101)
+		# TestUtils.catch('hp.lostItems(human_item2, 101)')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# cont_item2, _ = hp.splitItem(cont_item, 11)
+		# TestUtils.catch('hp.splitItem(cont_item, 11)')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# hp.mergeItem([cont_item, cont_item2])
+		# TestUtils.catch('hp.mergeItem([cont_item, cont_item2])')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# try:
+		# 	hp.lostItems(human_item1, 101)
+		# except ErrorException as exception:
+		# 	TestUtils.catch('抛出异常测试')
+		# 	traceback.print_exc()
+		#
+		# hp.clearCache()
+		# TestUtils.catch('清除缓存并储存容器情况')
+		#
+		# hp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# hp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# # 抛出异常
+		# TestUtils.end('人类背包测试结束')
+
+		# TestUtils.start('装备艾瑟萌测试')
+		#
+		# eh.show()
+		# TestUtils.catch('查看艾瑟萌仓库情况')
+
+		# player_exers3 = eh.gainItems(exermon3, 2)
+		# TestUtils.catch('eh.gainItems(exermon3, 2)')
+		#
+		# eh.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# eh.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# player_exers1 = eh.gainItems(exermon1, 5)
+		# TestUtils.catch('eh.gainItems(exermon1, 5)')
+		# player_exers2 = eh.gainItems(exermon2, 2)
+		# TestUtils.catch('eh.gainItems(exermon2, 2)')
+		#
+		# eh.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# eh.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+
+		# player_exer = eh.contItem(item=exermon3)
+		# # player_exers5 = eh.contItem(item=exermon2)
+		#
+		# es.show()
+		# TestUtils.catch('查看槽情况')
+		#
+		# es.setPlayerExer(player_exer)
+		# TestUtils.catch('es.setPlayerExer(player_exer)')
+		#
+		# eh.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# es.show()
+		# TestUtils.catch('查看槽情况（缓存）')
+		# es.show(db=True)
+		# TestUtils.catch('查看槽情况（数据库）')
+		#
+		# es.setPlayerExer(None, 2)
+		# TestUtils.catch('es.setPlayerExer(None, 2)')
+		#
+		# eh.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# es.show()
+		# TestUtils.catch('查看槽情况（缓存）')
+		# es.show(db=True)
+		# TestUtils.catch('查看槽情况（数据库）')
+		#
+		# player_gifts = egp.gainItems(exer_gifts[0], 10)
+		# TestUtils.catch('egp.gainItems(exer_gifts[0], 10)')
+		#
+		# egp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		#
+		# print('player_gifts: ' + str(player_gifts))
+		#
+		# es.setPlayerGift(player_gifts[1], 8)
+		# TestUtils.catch('es.setPlayerGift(player_gifts[1], 8)')
+		#
+		# egp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# egp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		# es.show()
+		# TestUtils.catch('查看槽情况（缓存）')
+		# es.show(db=True)
+		# TestUtils.catch('查看槽情况（数据库）')
+		#
+		# p.clearCache()
+		# TestUtils.catch('清除缓存并储存容器情况')
+		#
+		# es.show()
+		# TestUtils.catch('查看槽情况（缓存）')
+		# es.show(db=True)
+		# TestUtils.catch('查看槽情况（数据库）')
+		#
+		# eh.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# eh.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# egp.show()
+		# TestUtils.catch('查看容器情况（缓存）')
+		# egp.show(db=True)
+		# TestUtils.catch('查看容器情况（数据库）')
+		#
+		# TestUtils.end('装备艾瑟萌测试结束')
+
+		TestUtils.start('艾瑟萌装备槽测试')
+
+		exer_slot_item: ExerSlotItem = es.contItem(subject_id=2)
+		equip_slot: ExerEquipSlot = exer_slot_item.exerEquipSlot()
+
+		exer_equip1 = exer_equips.get(e_type_id=1)
+		exer_equip2 = exer_equips.get(e_type_id=2)
+		exer_equip3 = exer_equips.get(e_type_id=3)
+
+		pack_equip1 = ep.contItem(item=exer_equip1)
+		pack_equip2 = ep.contItem(item=exer_equip2)
+		pack_equip3 = ep.contItem(item=exer_equip3)
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		equip_slot.setPackEquip(pack_equip1)
+		TestUtils.catch('equip_slot.setPackEquip(pack_equip1)')
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		equip_slot.setPackEquip(pack_equip2)
+		equip_slot.setPackEquip(pack_equip3)
+		TestUtils.catch('equip_slot.setPackEquip(pack_equip2, pack_equip3)')
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		equip_slot.setPackEquip(pack_equip2)
+		TestUtils.catch('equip_slot.setPackEquip(pack_equip2)')
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		equip_slot.setPackEquip(None, 1)
+		TestUtils.catch('equip_slot.setPackEquip(None, 1)')
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		p.clearCache()
+		TestUtils.catch('清除缓存并储存容器情况')
+
+		equip_slot.show()
+		TestUtils.catch('查看背包情况')
+		ep.show()
+		TestUtils.catch('查看装备情况')
+
+		TestUtils.end('装备艾瑟萌测试结束')
+
+		temp = 2
 
 		"========== 背包物品测试 =========="
 
@@ -335,142 +577,142 @@ class RuntimeManager:
 
 		"========== 槽物品测试 =========="
 
-		sbj_exers = {}
-
-		for sbj in Subject.objs():
-			sbj_exers[sbj.id] = exermons.filter(subject=sbj)
-
-		# p1.createExermons([sbj_exers[1][0], sbj_exers[2][0], sbj_exers[3][0],
-		# 				   sbj_exers[4][0], sbj_exers[5][0], sbj_exers[6][0]],
-		# 				  ['', '', '', '', '', ''])
+		# sbj_exers = {}
 		#
-		# p2.createExermons([sbj_exers[1][0], sbj_exers[2][0], sbj_exers[3][0],
-		# 				   sbj_exers[5][0], sbj_exers[7][0], sbj_exers[9][1]],
-		# 				  ['', '', '', '', '', ''])
-
-		exer_slot1 = p1.exerslot
-		exer_slot2 = p2.exerslot
-
-		exer_slot1.show("exer_slot1")
-		exer_slot2.show("exer_slot2")
-
-		exer_pack1 = p1.exerpack
-		exer_pack2 = p2.exerpack
-
-		gift_pack1 = p1.exergiftpool
-		gift_pack2 = p2.exergiftpool
-
-		exer_hub1 = p1.exerhub
-		exer_hub2 = p2.exerhub
-
-		exer_equip1 = exer_equips[0]
-		exer_equip2 = exer_equips[1]
-		exer_equip3 = exer_equips[2]
-		exer_equip4 = exer_equips[3]
-
-		exer_gift1 = exer_gifts[0]
-		exer_gift2 = exer_gifts[1]
-		exer_gift3 = exer_gifts[3]
-
-		exermon1 = sbj_exers[1][1]
-		exermon2 = sbj_exers[2][1]
-
-		print("exer_equip1.e_type = %d" % exer_equip1.e_type_id)
-		print("exer_equip2.e_type = %d" % exer_equip2.e_type_id)
-		print("exer_equip3.e_type = %d" % exer_equip3.e_type_id)
-		print("exer_equip4.e_type = %d" % exer_equip4.e_type_id)
-
-		print("获取艾瑟萌")
-
-		exer_hub1.gainItems(exermon1, 3)
-		exer_hub1.gainItems(exermon2, 2)
-
-		exer_hub1.transferItems(exer_hub2, exermon1, 2)
-
-		exer_hub1.show("exer_hub1")
-		exer_hub2.show("exer_hub2")
-
-		print("获取艾瑟萌天赋")
-
-		gift_pack1.gainItems(exer_gift1, 3)
-		gift_pack1.gainItems(exer_gift2, 5)
-
-		gift_pack2.gainItems(exer_gift3, 5)
-
-		gift_pack2.transferItems(gift_pack1, exer_gift3, 2)
-
-		gift_pack1.show("gift_pack1")
-		gift_pack2.show("gift_pack2")
-
-		print("获取艾瑟萌装备")
-
-		exer_pack1.gainItems(exer_equip1, 3)
-		exer_pack1.gainItems(exer_equip2, 3)
-		exer_pack1.gainItems(exer_equip3, 3)
-		exer_pack1.gainItems(exer_equip4, 3)
-
-		exer_pack1.transferItems(exer_pack2, exer_equip1, 2)
-		exer_pack1.transferItems(exer_pack2, exer_equip2, 2)
-		exer_pack1.transferItems(exer_pack2, exer_equip3, 1)
-
-		exer_pack1.show("exer_pack1")
-		exer_pack2.show("exer_pack2")
-
-		print("装备天赋")
-
-		player_gift = gift_pack1.contItems(item=exer_gift3)[0]
-		exer_slot1.setEquip(equip_item=player_gift, index=2, subject_id=1)
-		exer_slot1.show("exer_slot1")
-		gift_pack1.show("gift_pack1")
-
-		print("更改天赋")
-
-		player_gift = gift_pack1.contItems(item=exer_gift2)[0]
-		exer_slot1.setEquip(equip_item=player_gift, index=2, subject_id=1)
-		exer_slot1.show("exer_slot1")
-		gift_pack1.show("gift_pack1")
-
-		print("更改艾瑟萌")
-
-		player_exer = exer_hub2.contItems(item=exermon1)[0]
-		exer_slot2.setEquip(equip_item=player_exer, index=1, subject_id=1)
-		exer_slot2.show("exer_slot2")
-		exer_hub2.show("exer_hub2")
-
-		print("卸下艾瑟萌")
-
-		exer_slot2.setEquip(equip_item=None, index=1, subject_id=1)
-		exer_slot2.show("exer_slot2")
-		exer_hub2.show("exer_hub2")
-
-		print("卸下天赋")
-
-		exer_slot1.setEquip(equip_item=None, index=2, subject_id=1)
-		exer_slot1.show("exer_slot1")
-		gift_pack1.show("gift_pack1")
-
-		print("获取艾瑟萌槽装备槽")
-
-		exer_slot_item = exer_slot1.contItem(subject_id=1)
-		equip_slot = exer_slot_item.exerequipslot
-		equip_slot.show("equip_slot")
-
-		print("装备艾瑟萌槽装备")
-
-		pack_equip = exer_pack1.contItems(item=exer_equip1)[0]
-		equip_slot.setEquip(equip_item=pack_equip, index=1,
-							e_type_id=exer_equip1.e_type_id)
-		equip_slot.show("equip_slot")
-		exer_pack1.show("exer_pack1")
-
-		print("卸下艾瑟萌槽装备")
-
-		equip_slot.setEquip(equip_item=None, index=1,
-							e_type_id=exer_equip1.e_type_id)
-		equip_slot.show("equip_slot")
-		exer_pack1.show("exer_pack1")
-
-		print("测试完毕")
+		# for sbj in Subject.objs():
+		# 	sbj_exers[sbj.id] = exermons.filter(subject=sbj)
+		#
+		# # p1.createExermons([sbj_exers[1][0], sbj_exers[2][0], sbj_exers[3][0],
+		# # 				   sbj_exers[4][0], sbj_exers[5][0], sbj_exers[6][0]],
+		# # 				  ['', '', '', '', '', ''])
+		# #
+		# # p2.createExermons([sbj_exers[1][0], sbj_exers[2][0], sbj_exers[3][0],
+		# # 				   sbj_exers[5][0], sbj_exers[7][0], sbj_exers[9][1]],
+		# # 				  ['', '', '', '', '', ''])
+		#
+		# exer_slot1 = p1.exerslot
+		# exer_slot2 = p2.exerslot
+		#
+		# exer_slot1.show("exer_slot1")
+		# exer_slot2.show("exer_slot2")
+		#
+		# exer_pack1 = p1.exerpack
+		# exer_pack2 = p2.exerpack
+		#
+		# gift_pack1 = p1.exergiftpool
+		# gift_pack2 = p2.exergiftpool
+		#
+		# exer_hub1 = p1.exerhub
+		# exer_hub2 = p2.exerhub
+		#
+		# exer_equip1 = exer_equips[0]
+		# exer_equip2 = exer_equips[1]
+		# exer_equip3 = exer_equips[2]
+		# exer_equip4 = exer_equips[3]
+		#
+		# exer_gift1 = exer_gifts[0]
+		# exer_gift2 = exer_gifts[1]
+		# exer_gift3 = exer_gifts[3]
+		#
+		# exermon1 = sbj_exers[1][1]
+		# exermon2 = sbj_exers[2][1]
+		#
+		# print("exer_equip1.e_type = %d" % exer_equip1.e_type_id)
+		# print("exer_equip2.e_type = %d" % exer_equip2.e_type_id)
+		# print("exer_equip3.e_type = %d" % exer_equip3.e_type_id)
+		# print("exer_equip4.e_type = %d" % exer_equip4.e_type_id)
+		#
+		# print("获取艾瑟萌")
+		#
+		# exer_hub1.gainItems(exermon1, 3)
+		# exer_hub1.gainItems(exermon2, 2)
+		#
+		# exer_hub1.transferItems(exer_hub2, exermon1, 2)
+		#
+		# exer_hub1.show("exer_hub1")
+		# exer_hub2.show("exer_hub2")
+		#
+		# print("获取艾瑟萌天赋")
+		#
+		# gift_pack1.gainItems(exer_gift1, 3)
+		# gift_pack1.gainItems(exer_gift2, 5)
+		#
+		# gift_pack2.gainItems(exer_gift3, 5)
+		#
+		# gift_pack2.transferItems(gift_pack1, exer_gift3, 2)
+		#
+		# gift_pack1.show("gift_pack1")
+		# gift_pack2.show("gift_pack2")
+		#
+		# print("获取艾瑟萌装备")
+		#
+		# exer_pack1.gainItems(exer_equip1, 3)
+		# exer_pack1.gainItems(exer_equip2, 3)
+		# exer_pack1.gainItems(exer_equip3, 3)
+		# exer_pack1.gainItems(exer_equip4, 3)
+		#
+		# exer_pack1.transferItems(exer_pack2, exer_equip1, 2)
+		# exer_pack1.transferItems(exer_pack2, exer_equip2, 2)
+		# exer_pack1.transferItems(exer_pack2, exer_equip3, 1)
+		#
+		# exer_pack1.show("exer_pack1")
+		# exer_pack2.show("exer_pack2")
+		#
+		# print("装备天赋")
+		#
+		# player_gift = gift_pack1.contItems(item=exer_gift3)[0]
+		# exer_slot1.setEquip(equip_item=player_gift, index=2, subject_id=1)
+		# exer_slot1.show("exer_slot1")
+		# gift_pack1.show("gift_pack1")
+		#
+		# print("更改天赋")
+		#
+		# player_gift = gift_pack1.contItems(item=exer_gift2)[0]
+		# exer_slot1.setEquip(equip_item=player_gift, index=2, subject_id=1)
+		# exer_slot1.show("exer_slot1")
+		# gift_pack1.show("gift_pack1")
+		#
+		# print("更改艾瑟萌")
+		#
+		# player_exer = exer_hub2.contItems(item=exermon1)[0]
+		# exer_slot2.setEquip(equip_item=player_exer, index=1, subject_id=1)
+		# exer_slot2.show("exer_slot2")
+		# exer_hub2.show("exer_hub2")
+		#
+		# print("卸下艾瑟萌")
+		#
+		# exer_slot2.setEquip(equip_item=None, index=1, subject_id=1)
+		# exer_slot2.show("exer_slot2")
+		# exer_hub2.show("exer_hub2")
+		#
+		# print("卸下天赋")
+		#
+		# exer_slot1.setEquip(equip_item=None, index=2, subject_id=1)
+		# exer_slot1.show("exer_slot1")
+		# gift_pack1.show("gift_pack1")
+		#
+		# print("获取艾瑟萌槽装备槽")
+		#
+		# exer_slot_item = exer_slot1.contItem(subject_id=1)
+		# equip_slot = exer_slot_item.exerequipslot
+		# equip_slot.show("equip_slot")
+		#
+		# print("装备艾瑟萌槽装备")
+		#
+		# pack_equip = exer_pack1.contItems(item=exer_equip1)[0]
+		# equip_slot.setEquip(equip_item=pack_equip, index=1,
+		# 					e_type_id=exer_equip1.e_type_id)
+		# equip_slot.show("equip_slot")
+		# exer_pack1.show("exer_pack1")
+		#
+		# print("卸下艾瑟萌槽装备")
+		#
+		# equip_slot.setEquip(equip_item=None, index=1,
+		# 					e_type_id=exer_equip1.e_type_id)
+		# equip_slot.show("equip_slot")
+		# exer_pack1.show("exer_pack1")
+		#
+		# print("测试完毕")
 
 	# 更新
 	@classmethod
@@ -499,6 +741,15 @@ from exermon_module.models import *
 from item_module.models import *
 from player_module.models import *
 
+# 初始化
+try:
+	from game_module.models import GameConfigure
+	GameConfigure.load()
+except:
+	# 打印错误路径
+	traceback.print_exc()
+	print("仍未建立数据库")
+
 # 创建一个事件循环thread_loop
 thread_loop = asyncio.new_event_loop()
 
@@ -506,14 +757,3 @@ thread_loop = asyncio.new_event_loop()
 t = threading.Thread(target=RuntimeManager.eventLoop, args=(thread_loop,))
 t.daemon = True
 t.start()
-
-# 初始化
-try:
-	from game_module.models import GameConfigure
-
-	GameConfigure.load()
-
-except:
-	# 打印错误路径
-	traceback.print_exc()
-	print("仍未建立数据库")

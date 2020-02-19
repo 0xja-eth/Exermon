@@ -11,10 +11,12 @@ class OnlinePlayer(RuntimeData):
 		self.consumer: GameConsumer = consumer
 
 	def add(self):
+		if self.consumer is None: return
 		self.consumer.setOnlineInfo(self)
 
 	def delete(self):
 		RuntimeData.delete(self)
+		if self.consumer is None: return
 		self.consumer.setOnlineInfo(None)
 
 

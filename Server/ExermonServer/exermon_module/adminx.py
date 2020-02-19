@@ -1,6 +1,6 @@
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
-from game_module.adminx import ParamsInline
+from game_module.adminx import ParamsInline, EquipParamsInline
 from item_module.adminx import *
 from .models import *
 import xadmin
@@ -23,7 +23,7 @@ class ExerItemEffectsInline(BaseEffectsInline): model = ExerItemEffect
 class ExerSkillEffectsInline(BaseEffectsInline): model = ExerSkillEffect
 
 
-class ExerEquipParamsInline(ParamsInline): model = ExerEquipParam
+class ExerEquipParamsInline(EquipParamsInline): model = ExerEquipParam
 
 
 class ExerEquipSlotItemsInline(BaseContItemsInline): model = ExerEquipSlotItem
@@ -60,30 +60,30 @@ class ExerSkillsInline(object):
 	fk_name = 'o_exermon'
 
 
-class ExerEquipSlotInline(object):
-
-	model = ExerEquipSlot
-	min_num = 1
-	max_num = 1
-	validate_min = 1
-	validate_max = 1
-	style = "one"
+# class ExerEquipSlotInline(object):
+#
+# 	model = ExerEquipSlot
+# 	min_num = 1
+# 	max_num = 1
+# 	validate_min = 1
+# 	validate_max = 1
+# 	style = "one"
 
 
 @xadmin.sites.register(Exermon)
 class ExermonAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin().list_display + \
+	list_display = BaseItemAdmin.list_display + \
 				   ['animal', 'star', 'subject', 'adminParamBases',
 					'adminParamRates', 'e_type']
 
-	list_editable = BaseItemAdmin().list_editable + \
+	list_editable = BaseItemAdmin.list_editable + \
 					['animal', 'star', 'subject', 'e_type']
 
 	field_set = [Fieldset('艾瑟萌属性', 'star', 'subject', 'full', 'icon',
 						  'battle', 'e_type')]
 
-	form_layout = BaseItemAdmin().form_layout + field_set
+	form_layout = BaseItemAdmin.form_layout + field_set
 
 	inlines = [ExerParamBasesInline, ExerParamRatesInline, ExerSkillsInline]
 
@@ -91,29 +91,29 @@ class ExermonAdmin(BaseItemAdmin):
 @xadmin.sites.register(ExerFrag)
 class ExerFragAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin().list_display + \
+	list_display = BaseItemAdmin.list_display + \
 				   ['o_exermon', 'count', 'sell_price']
 
-	list_editable = BaseItemAdmin().list_editable + \
+	list_editable = BaseItemAdmin.list_editable + \
 				   ['o_exermon', 'count', 'sell_price']
 
 	field_set = [Fieldset('艾瑟萌碎片属性', 'o_exermon', 'count', 'sell_price')]
 
-	form_layout = BaseItemAdmin().form_layout + field_set
+	form_layout = BaseItemAdmin.form_layout + field_set
 
 
 @xadmin.sites.register(ExerGift)
 class ExerGiftAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin().list_display + \
+	list_display = BaseItemAdmin.list_display + \
 				   ['star', 'adminParamRates', 'g_type']
 
-	list_editable = BaseItemAdmin().list_editable + \
+	list_editable = BaseItemAdmin.list_editable + \
 				   ['star', 'g_type']
 
 	field_set = [Fieldset('艾瑟萌天赋属性', 'star', 'g_type')]
 
-	form_layout = BaseItemAdmin().form_layout + field_set
+	form_layout = BaseItemAdmin.form_layout + field_set
 
 	inlines = [GiftParamRatesInline]
 
@@ -121,34 +121,34 @@ class ExerGiftAdmin(BaseItemAdmin):
 @xadmin.sites.register(ExerSkill)
 class ExerSkillAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin().list_display + \
+	list_display = BaseItemAdmin.list_display + \
 				   ['o_exermon', 'passive', 'next_skill', 'need_count',
-					'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
+					'mp_cost', 'rate', 'freeze', 'max_use_count', 'target_type',
 					'hit_type', 'atk_rate', 'def_rate', 'plus_formula', 'adminEffects']
 
-	list_editable = BaseItemAdmin().list_editable + \
+	list_editable = BaseItemAdmin.list_editable + \
 					['o_exermon', 'passive', 'next_skill', 'need_count',
-					 'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
+					 'mp_cost', 'rate', 'freeze', 'max_use_count', 'target_type',
 					 'hit_type', 'atk_rate', 'def_rate', 'plus_formula']
 
 	field_set = [Fieldset('艾瑟萌技能属性', 'o_exermon', 'passive', 'next_skill', 'need_count',
-						  'mp_cost', 'rate', 'freeze', 'max_use_count', 'target',
+						  'mp_cost', 'rate', 'freeze', 'max_use_count', 'target_type',
 						  'hit_type', 'atk_rate', 'def_rate', 'plus_formula',
 						  'icon', 'ani', 'target_ani')]
 
-	form_layout = BaseItemAdmin().form_layout + field_set
+	form_layout = BaseItemAdmin.form_layout + field_set
 
 	inlines = [ExerSkillEffectsInline]
 
 
 @xadmin.sites.register(ExerItem)
 class ExerItemAdmin(UsableItemAdmin):
-	effect_inlines = ExerItemEffectsInline
+	inlines = UsableItemAdmin.inlines + [ExerItemEffectsInline]
 
 
 @xadmin.sites.register(ExerEquip)
 class ExerEquipAdmin(EquipableItemAdmin):
-	param_inlines = ExerEquipParamsInline
+	inlines = EquipableItemAdmin.inlines + [ExerEquipParamsInline]
 
 
 @xadmin.sites.register(ExerHub)
@@ -161,7 +161,7 @@ class ExerHubAdmin(PackContainerAdmin):
 
 	form_layout = PackContainerAdmin.form_layout + field_set
 
-	inlines = PlayerExermonsInline
+	inlines = [PlayerExermonsInline]
 
 
 @xadmin.sites.register(ExerPack)
@@ -187,20 +187,20 @@ class ExerSlotAdmin(SlotContainerAdmin):
 
 	form_layout = SlotContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = ExerSlotItemsInline
+	inlines = [ExerSlotItemsInline]
 
 
 @xadmin.sites.register(ExerEquipSlot)
 class ExerEquipSlotAdmin(SlotContainerAdmin):
 
 	list_display = SlotContainerAdmin.list_display + \
-				   ['player']
+				   ['exer_slot']
 
-	field_set = [Fieldset('艾瑟萌槽属性', 'player')]
+	field_set = [Fieldset('艾瑟萌槽属性', 'exer_slot')]
 
 	form_layout = SlotContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = ExerSlotItemsInline
+	inlines = [ExerEquipSlotItemsInline]
 
 
 @xadmin.sites.register(ExerFragPack)
@@ -213,7 +213,7 @@ class ExerFragPackAdmin(PackContainerAdmin):
 
 	form_layout = PackContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = ExerFragPackItemsInline
+	inlines = [ExerFragPackItemsInline]
 
 
 @xadmin.sites.register(ExerGiftPool)
@@ -226,14 +226,14 @@ class ExerGiftPoolAdmin(PackContainerAdmin):
 
 	form_layout = PackContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = PlayerExerGiftsInline
+	inlines = [PlayerExerGiftsInline]
 
 
 @xadmin.sites.register(PlayerExermon)
 class PlayerExermonAdmin(PackContItemAdmin):
 
 	list_display = PackContItemAdmin.list_display + \
-				   ['player', 'nickname', 'exp', 'level']
+				   ['nickname', 'exp', 'level']
 
 	list_editable = PackContItemAdmin.list_editable + \
 					['nickname', 'exp', 'level']
@@ -255,7 +255,7 @@ class ExerSkillSlotAdmin(SlotContainerAdmin):
 
 	form_layout = SlotContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = ExerSkillSlotItemsInline
+	inlines = [ExerSkillSlotItemsInline]
 
 
 @xadmin.sites.register(ExerPackItem)
@@ -284,7 +284,7 @@ class ExerSlotItemAdmin(SlotContItemAdmin):
 
 	form_layout = SlotContItemAdmin.form_layout + field_set
 
-	inlines = [ExerEquipSlotInline]
+	# inlines = [ExerEquipSlotInline]
 
 
 @xadmin.sites.register(ExerEquipSlotItem)

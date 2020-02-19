@@ -80,7 +80,7 @@ class QuesSugarAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = [CurrencyInline, QuesSugarParamsInline]
+	inlines = [QuesSugarParamsInline]
 
 
 @xadmin.sites.register(QuesSugarPack)
@@ -93,7 +93,7 @@ class QuesSugarPackAdmin(PackContainerAdmin):
 
 	form_layout = PackContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = QuesSugarPackItemsInline
+	inlines = [QuesSugarPackItemsInline]
 
 
 @xadmin.sites.register(QuesSugarPackItem)

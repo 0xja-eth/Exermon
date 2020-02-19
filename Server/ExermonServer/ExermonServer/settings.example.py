@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'item_module',
     'exermon_module',
     'question_module',
+    'record_module',
     'werkzeug_debugger_runserver',
     'django_extensions',
     'channels',

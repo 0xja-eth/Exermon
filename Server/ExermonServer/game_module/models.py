@@ -266,10 +266,10 @@ class GroupConfigure(models.Model):
 
 	NOT_EXIST_ERROR = ErrorType.UnknownError
 
-	# 全局变量，ExermonEquipType 所有实例
+	# 全局变量，GroupConfigure 所有实例
 	Objects = None
 
-	# 全局变量，ExermonEquipType 数
+	# 全局变量，GroupConfigure 数
 	Count = None
 
 	# 所属配置

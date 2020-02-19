@@ -163,7 +163,7 @@ public class PlayerService : BaseService<PlayerService> {
         return (res) => {
             changeState(State.Logined);
             player = DataLoader.loadData<Player>(res, "player");
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
     }
 
@@ -225,7 +225,7 @@ public class PlayerService : BaseService<PlayerService> {
         return (res) => {
             player = null;
             changeState(State.Unlogin);
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
     }
 
@@ -277,7 +277,7 @@ public class PlayerService : BaseService<PlayerService> {
         int grade, int cid, UnityAction onSuccess) {
         return (res) => {
             player.createCharacter(name, grade, cid);
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
     }
 
@@ -307,9 +307,8 @@ public class PlayerService : BaseService<PlayerService> {
     NetworkSystem.RequestObject.SuccessAction
         generateCreateExermonsSuccessFunc(UnityAction onSuccess) {
         return (res) => {
-            var id = DataLoader.loadInt(res, "id");
-            player.createExermons(id);
-            if (onSuccess != null) onSuccess.Invoke();
+            player.createExermons(res);
+            onSuccess?.Invoke();
         };
     }
 
@@ -338,7 +337,7 @@ public class PlayerService : BaseService<PlayerService> {
         generateCreateGiftsSuccessFunc(int[] gids, UnityAction onSuccess) {
         return (res) => {
             player.createGifts(gids);
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
     }
 
@@ -383,7 +382,7 @@ public class PlayerService : BaseService<PlayerService> {
         string description, UnityAction onSuccess) {
         return (res) => {
             player.createInfo(birth, school, city, contact, description);
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
     }
 
@@ -398,7 +397,6 @@ public class PlayerService : BaseService<PlayerService> {
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
         data["eid"] = eid; data["heid"] = heid;
-        data["cid"] = player.slotContainers.humanEquipSlotId;
         sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
     }
 
@@ -410,7 +408,7 @@ public class PlayerService : BaseService<PlayerService> {
     public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             player.loadBasic(DataLoader.loadJsonData(res, "player"));
-            if (onSuccess != null) onSuccess.Invoke();
+            onSuccess?.Invoke();
         };
 
         getBasic(player.getID(), _onSuccess, onError);
@@ -423,15 +421,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
     public void loadHumanPack(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
-        Player player = getPlayer();
-
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.packContainers.loadHumanPack(res);
-            if (onSuccess != null) onSuccess.Invoke();
-        };
-
-        if (cid == 0) cid = player.packContainers.humanPackId;
-        itemSer.getSlot(cid, _onSuccess, onError);
+        itemSer.getPack(player.packContainers.humanPack, onSuccess, onError);
     }
 
     /// <summary>
@@ -440,16 +430,8 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadHumanEquipSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
-        Player player = getPlayer();
-
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.slotContainers.loadHumanEquipSlot(res);
-            if (onSuccess != null) onSuccess.Invoke();
-        };
-
-        if (cid == 0) cid = player.slotContainers.humanEquipSlotId;
-        itemSer.getSlot(cid, _onSuccess, onError);
+    public void loadHumanEquipSlot(UnityAction onSuccess = null, UnityAction onError = null) {
+        itemSer.getSlot(player.slotContainers.humanEquipSlot, onSuccess, onError);
     }
 
     #endregion

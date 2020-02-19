@@ -523,6 +523,11 @@ public class BaseContainer : BaseData {
     public int capacity { get; private set; }
 
     /// <summary>
+    /// 数据是否需要实时同步（在背包界面时需要实时同步）
+    /// </summary>
+    public bool realTime = false;
+
+    /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
@@ -555,7 +560,7 @@ public class PackContainer<T> : BaseContainer where T : PackContItem, new() {
     /// 属性
     /// </summary>
     public List<T> items { get; private set; }
-
+    
     /// <summary>
     /// 数据加载
     /// </summary>

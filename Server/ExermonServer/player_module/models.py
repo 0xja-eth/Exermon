@@ -401,36 +401,36 @@ class Player(CacheableModel):
 
 	def _packContainerIndices(self):
 
-		humanpack_id = ModelUtils.objectToId(self.humanPack())
+		humanpack = ModelUtils.objectToDict(self.humanPack())
 
-		exerpack_id = ModelUtils.objectToId(self.exerPack())
+		exerpack = ModelUtils.objectToDict(self.exerPack())
 
-		exerfragpack_id = ModelUtils.objectToId(self.exerFragPack())
+		exerfragpack = ModelUtils.objectToDict(self.exerFragPack())
 
-		exergiftpool_id = ModelUtils.objectToId(self.exerGiftPool())
+		exergiftpool = ModelUtils.objectToDict(self.exerGiftPool())
 
-		exerhub_id = ModelUtils.objectToId(self.exerHub())
+		exerhub = ModelUtils.objectToDict(self.exerHub())
 
-		quessugarpack_id = ModelUtils.objectToId(self.quesSugarPack())
+		quessugarpack = ModelUtils.objectToDict(self.quesSugarPack())
 
 		return {
-			'humanpack_id': humanpack_id,
-			'exerpack_id': exerpack_id,
-			'exerfragpack_id': exerfragpack_id,
-			'exergiftpool_id': exergiftpool_id,
-			'exerhub_id': exerhub_id,
-			'quessugarpack_id': quessugarpack_id,
+			'humanpack': humanpack,
+			'exerpack': exerpack,
+			'exerfragpack': exerfragpack,
+			'exergiftpool': exergiftpool,
+			'exerhub': exerhub,
+			'quessugarpack': quessugarpack,
 		}
 
 	def _slotContainerIndices(self):
 
-		exerslot_id = ModelUtils.objectToId(self.exerSlot())
+		exerslot = ModelUtils.objectToDict(self.exerSlot())
 
-		humanequipslot_id = ModelUtils.objectToId(self.humanEquipSlot())
+		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot())
 
 		return {
-			'exerslot_id': exerslot_id,
-			'humanequipslot_id': humanequipslot_id,
+			'exerslot': exerslot,
+			'humanequipslot': humanequipslot,
 		}
 
 	def convertToDict(self, type=None):
@@ -521,9 +521,12 @@ class Player(CacheableModel):
 		login.ip_address = consumer.ip_address
 
 		self.online = True
-		self.save()
-
 		self._setLoginInfo(login)
+
+		if self.status == PlayerStatus.CharacterCreated:
+			self._createContainers()
+
+		self.save()
 
 	# 登出
 	def logout(self):
@@ -583,10 +586,13 @@ class Player(CacheableModel):
 
 		exer_slot = ExerSlot.create(player=self, player_exers=player_exers)
 
-		for player_exer in player_exers:
-			player_exer.save()
+		# for player_exer in player_exers:
+		# 	player_exer.save()
+
+		self.cache(ExerSlot, exer_slot)
 
 		self.status = PlayerStatus.ExermonsCreated.value
+
 		self.save()
 
 		return exer_slot
@@ -603,7 +609,7 @@ class Player(CacheableModel):
 		for i in range(len(gifts)):
 
 			player_gift = self._createPlayerGift(gifts[i])
-			exerslot.setExerGiftForce(player_gift, slot_index=i+1)
+			exerslot.setPlayerGift(player_gift, slot_index=i+1, force=True)
 			# player_gift.save()
 
 		self.status = PlayerStatus.GiftsCreated.value
@@ -639,6 +645,7 @@ class Player(CacheableModel):
 	# 创建角色相关的容器
 	def _createContainers(self):
 		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
+		from question_module.models import QuesSugarPack
 
 		if self.humanPack() is None:
 			HumanPack.create(player=self)
@@ -654,6 +661,12 @@ class Player(CacheableModel):
 
 		if self.exerGiftPool() is None:
 			ExerGiftPool.create(player=self)
+
+		if self.humanEquipSlot() is None:
+			HumanEquipSlot.create(player=self)
+
+		if self.quesSugarPack() is None:
+			QuesSugarPack.create(player=self)
 
 	# 等级（本等级, 下一级所需经验）
 	def level(self, calc_next=False):
@@ -729,8 +742,8 @@ class HumanItem(UsableItem):
 	def contItemClass(cls): return HumanPackItem
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		return res
 
@@ -782,10 +795,10 @@ class HumanEquip(EquipableItem):
 		return self.humanequipparam_set.all()
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
-		res['e_type'] = self.e_type
+		res['e_type'] = self.e_type_id
 
 		return res
 
@@ -905,7 +918,7 @@ class HumanEquipSlot(SlotContainer):
 		self.player = player
 
 	def _equipContainer(self, index):
-		return self.player.humanPack()
+		return self.exactlyPlayer().humanPack()
 
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
@@ -922,6 +935,14 @@ class HumanEquipSlot(SlotContainer):
 
 		return True
 
+	# 设置艾瑟萌装备
+	def setPackEquip(self, pack_equip: HumanPackEquip = None, e_type_id=None, force=False):
+
+		if pack_equip is not None:
+			e_type_id = pack_equip.item.e_type_id
+
+		self.setEquip(equip_index=0, equip_item=pack_equip, e_type_id=e_type_id, force=force)
+
 	# 持有玩家
 	def owner(self): return self.player
 
@@ -936,6 +957,10 @@ class HumanEquipSlotItem(SlotContItem):
 
 	# 容器项类型
 	TYPE = ContItemType.HumanEquipSlotItem
+
+	# 容器
+	container = models.ForeignKey('HumanEquipSlot', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
 
 	# 装备项
 	pack_equip = models.OneToOneField('HumanPackEquip', null=True, blank=True,
@@ -954,8 +979,8 @@ class HumanEquipSlotItem(SlotContItem):
 	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['e_type'] = self.e_type_id
 

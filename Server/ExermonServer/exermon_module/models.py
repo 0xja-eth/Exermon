@@ -147,8 +147,8 @@ class Exermon(BaseItem):
 		return data
 
 	# 转化为 dict
-	def _convertToDict(self):
-		res = super()._convertToDict()
+	def convertToDict(self):
+		res = super().convertToDict()
 
 		res['animal'] = self.animal
 		res['star_id'] = self.star_id
@@ -302,8 +302,8 @@ class PlayerExermon(PackContItem):
 		return data
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot())
 
@@ -477,9 +477,9 @@ class ExerFrag(BaseItem):
 	def contItemClass(cls): return ExerFragPackItem
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
+	def convertToDict(self, **kwargs):
 
-		res = super()._convertToDict(**kwargs)
+		res = super().convertToDict(**kwargs)
 
 		res['eid'] = self.o_exermon_id
 		res['sell_price'] = self.sell_price
@@ -616,8 +616,8 @@ class ExerGift(BaseItem):
 		return super().__getattr__(item)
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['star_id'] = self.star_id
 		# res['color'] = self.color
@@ -739,7 +739,7 @@ class ExerSlot(SlotContainer):
 
 	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	@classmethod
-	def baseContItemClass(cls): return PlayerExerGift, PlayerExermon
+	def acceptedContItemClass(cls): return PlayerExerGift, PlayerExermon
 
 	# 默认容器容量（0为无限）
 	@classmethod
@@ -752,8 +752,8 @@ class ExerSlot(SlotContainer):
 		self.init_exers = player_exers
 
 	def _equipContainer(self, index):
-		if index == 0: return self.player.exerHub()
-		if index == 1: return self.player.exerGiftPool()
+		if index == 0: return self.exactlyPlayer().exerHub()
+		if index == 1: return self.exactlyPlayer().exerGiftPool()
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
@@ -777,16 +777,22 @@ class ExerSlot(SlotContainer):
 		if isinstance(equip_item, PlayerExermon):
 			self.ensureSubject(slot_item, equip_item)
 
-	# 设置艾瑟萌天赋（强制）
-	def setExerGiftForce(self, player_gift, subject_id=None, slot_index=None):
+	# 设置艾瑟萌
+	def setPlayerExer(self, player_exer: PlayerExermon = None, subject_id=None, force=False):
 
-		if subject_id is not None:
-			self._equipSlot(subject_id=subject_id,
-							equip_index=2, equip_item=player_gift)
+		if player_exer is not None:
+			subject_id = player_exer.exermon().subject_id
+
+		self.setEquip(equip_index=0, equip_item=player_exer, subject_id=subject_id, force=force)
+
+	# 设置艾瑟萌天赋
+	def setPlayerGift(self, player_gift: PlayerExerGift = None,
+					  subject_id=None, slot_index=None, force=False):
 
 		if slot_index is not None:
-			self._equipSlot(index=slot_index,
-							equip_index=2, equip_item=player_gift)
+			self.setEquip(equip_index=1, equip_item=player_gift, index=slot_index, force=force)
+		if subject_id is not None:
+			self.setEquip(equip_index=1, equip_item=player_gift, subject_id=subject_id, force=force)
 
 	# 获得经验
 	def gainExp(self, slot_exps, exer_exps):
@@ -818,6 +824,10 @@ class ExerSlotItem(SlotContItem):
 
 	# 属性缓存键
 	PARAMS_CACHE_KEY = 'params'
+
+	# 容器
+	container = models.ForeignKey('ExerSlot', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
 
 	# 玩家
 	player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
@@ -871,8 +881,8 @@ class ExerSlotItem(SlotContItem):
 			ExerEquipSlot, self.EQUIPSLOT_CACHE_KEY)
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		level, next = self.slotLevel(True)
 
@@ -901,7 +911,7 @@ class ExerSlotItem(SlotContItem):
 	def setupIndex(self, index, init_exer: PlayerExermon = None, **kwargs):
 		super().setupIndex(index, **kwargs)
 		self.subject = init_exer.exermon().subject
-		self.equip(1, init_exer)
+		self.equip(0, init_exer)
 
 	# # 获取装备的艾瑟萌
 	# def exermon(self) -> PlayerExermon: return self.targetEquipItem1()
@@ -1213,8 +1223,8 @@ class ExerSkill(BaseItem):
 		return icon_data, ani_data, target_ani_data
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		# icon_data, ani_data, target_ani_data = self.convertToBase64()
 
@@ -1317,6 +1327,10 @@ class ExerSkillSlotItem(SlotContItem):
 	# 容器项类型
 	TYPE = ContItemType.ExerSkillSlotItem
 
+	# 容器
+	container = models.ForeignKey('ExerSkillSlot', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
 	# 艾瑟萌
 	# player_exer = models.ForeignKey('PlayerExermon', on_delete=models.CASCADE, verbose_name="艾瑟萌")
 
@@ -1332,8 +1346,8 @@ class ExerSkillSlotItem(SlotContItem):
 	# endregion
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['skill_id'] = self.skill_id
 		res['use_count'] = self.use_count
@@ -1397,8 +1411,8 @@ class ExerItem(UsableItem):
 	def contItemClass(cls): return ExerPackItem
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['rate'] = self.rate
 
@@ -1452,10 +1466,10 @@ class ExerEquip(EquipableItem):
 		return self.exerequipparam_set.all()
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
-		res['e_type'] = self.e_type
+		res['e_type'] = self.e_type_id
 
 		return res
 
@@ -1479,7 +1493,7 @@ class ExerPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def baseContItemClass(cls): return ExerPackItem, ExerPackEquip
+	def acceptedContItemClass(cls): return ExerPackItem, ExerPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod
@@ -1581,7 +1595,7 @@ class ExerEquipSlot(SlotContainer):
 		self.exer_slot = exer_slot
 
 	def _equipContainer(self, index):
-		return self.exer_slot.player.exerPack()
+		return self.exactlyPlayer().exerPack()
 
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
@@ -1597,6 +1611,14 @@ class ExerEquipSlot(SlotContainer):
 		self.ensureEquipType(slot_item, equip_item)
 
 		return True
+
+	# 设置艾瑟萌装备
+	def setPackEquip(self, pack_equip: ExerPackEquip = None, e_type_id=None, force=False):
+
+		if pack_equip is not None:
+			e_type_id = pack_equip.item.e_type_id
+
+		self.setEquip(equip_index=0, equip_item=pack_equip, e_type_id=e_type_id, force=force)
 
 	# 获取属性值
 	def param(self, param_id=None, attr=None):
@@ -1626,6 +1648,10 @@ class ExerEquipSlotItem(SlotContItem):
 	# 容器项类型
 	TYPE = ContItemType.ExerEquipSlotItem
 
+	# 容器
+	container = models.ForeignKey('ExerEquipSlot', on_delete=models.CASCADE,
+							   null=True, verbose_name="容器")
+
 	# 装备项
 	pack_equip = models.OneToOneField('ExerPackEquip', null=True, blank=True,
 									  on_delete=models.SET_NULL, verbose_name="装备")
@@ -1643,8 +1669,8 @@ class ExerEquipSlotItem(SlotContItem):
 	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['e_type'] = self.e_type_id
 

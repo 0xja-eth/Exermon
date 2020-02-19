@@ -20,6 +20,11 @@ public class BaseData {
     public int getID() { return id; }
 
     /// <summary>
+    /// 原始数据
+    /// </summary>
+    JsonData rawData;
+
+    /// <summary>
     /// 是否需要ID
     /// </summary>
     protected virtual bool idEnable() { return true; }
@@ -29,6 +34,8 @@ public class BaseData {
     /// </summary>
     /// <param name="json">数据</param>
     public virtual void load(JsonData json) {
+        rawData = json;
+
         id = idEnable() ? DataLoader.loadInt(json, "id") : -1;
     }
 
@@ -41,6 +48,21 @@ public class BaseData {
         json.SetJsonType(JsonType.Object);
         if (idEnable()) json["id"] = id;
         return json;
+    }
+
+    /// <summary>
+    /// 获取原始数据
+    /// </summary>
+    /// <returns>JSON字符串</returns>
+    public string rawJson() { return rawData.ToJson(); }
+
+    /// <summary>
+    /// 类型转化
+    /// </summary>
+    /// <typeparam name="T">目标类型</typeparam>
+    /// <returns>目标类型对象</returns>
+    public T convert<T>() where T: BaseData, new() {
+        return DataLoader.loadData<T>(rawData);
     }
 }
 

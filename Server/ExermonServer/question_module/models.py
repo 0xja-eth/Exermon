@@ -414,8 +414,8 @@ class QuesSugar(BaseItem):
 	adminParams.short_description = "属性基础值"
 
 	# 转化为 dict
-	def _convertToDict(self):
-		res = super()._convertToDict()
+	def convertToDict(self):
+		res = super().convertToDict()
 
 		buy_price = ModelUtils.objectToDict(self.buy_price)
 

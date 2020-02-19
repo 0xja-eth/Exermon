@@ -239,7 +239,9 @@ class Service:
 		ExermonCommon.ensureExermonSubject(exers)
 		ExermonCommon.ensureExermonType(exers)
 
-		return {'id': player.createExermons(exers, enames).id}
+		exer_slot = player.createExermons(exers, enames)
+
+		return exer_slot.convertToDict()
 
 	# 选择艾瑟萌天赋
 	@classmethod
@@ -290,15 +292,19 @@ class Service:
 
 		return {'player': target_player.convertToDict(type=type)}
 
-	# 艾瑟萌装备槽装备
+	# 人类装备槽装备
 	@classmethod
-	async def equipSlotEquip(cls, consumer, player: Player, cid: int, eid: int, eeid: int):
+	async def equipSlotEquip(cls, consumer, player: Player, eid: int, heid: int):
 		# 返回数据：无
 		from item_module.views import Service as ItemService
 
 		HumanEquipType.ensure(id=eid)
 
-		ItemService.slotContainerEquip(player, cid, eeid, e_type_id=eid)
+		equip_slot = player.humanEquipSlot()
+
+		pack_equip = Common.getPackEquip(id=heid)
+
+		ItemService.slotContainerEquip(player, equip_slot, pack_equip, e_type_id=eid)
 
 
 # =======================
@@ -370,29 +376,37 @@ class Common:
 
 	# 获取玩家
 	@classmethod
-	def getPlayer(cls, return_type='object', error: ErrorType = ErrorType.PlayerNotExist, **args) -> Player:
+	def getPlayer(cls, return_type='object', error: ErrorType = ErrorType.PlayerNotExist, **kwargs) -> Player:
 
-		if 'id' in args and return_type == 'object':
+		if 'id' in kwargs and return_type == 'object':
 			# 首先在在线玩家中查找
-			online_player: OnlinePlayer = cls.getOnlinePlayer(args['id'])
+			online_player: OnlinePlayer = cls.getOnlinePlayer(kwargs['id'])
 			if online_player: return online_player.player
 
-		return ViewUtils.getObject(Player, error, return_type=return_type, **args)
+		return ViewUtils.getObject(Player, error, return_type=return_type, **kwargs)
 
 	# 获取形象
 	@classmethod
-	def getCharacter(cls, return_type='object', error: ErrorType = ErrorType.CharacterNotExist, **args) -> Player:
-		return ViewUtils.getObject(Character, error, return_type=return_type, **args)
+	def getCharacter(cls, return_type='object', error: ErrorType = ErrorType.CharacterNotExist,
+					 **kwargs) -> Character:
+		return ViewUtils.getObject(Character, error, return_type=return_type, **kwargs)
+
+	# 获取玩家持有装备
+	@classmethod
+	def getPackEquip(cls, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
+					 **kwargs) -> HumanPackEquip:
+
+		return ViewUtils.getObject(HumanPackEquip, error, return_type=return_type, **kwargs)
 
 	# 确保玩家存在
 	@classmethod
-	def ensurePlayerExist(cls, error: ErrorType = ErrorType.PlayerNotExist, **args):
-		return ViewUtils.ensureObjectExist(Player, error, **args)
+	def ensurePlayerExist(cls, error: ErrorType = ErrorType.PlayerNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(Player, error, **kwargs)
 
 	# 确保形象存在
 	@classmethod
-	def ensureCharacterExist(cls, error: ErrorType = ErrorType.CharacterNotExist, **args):
-		return ViewUtils.ensureObjectExist(Character, error, **args)
+	def ensureCharacterExist(cls, error: ErrorType = ErrorType.CharacterNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(Character, error, **kwargs)
 
 	# 确保用户名存在（登陆可用）
 	@classmethod
@@ -405,8 +419,8 @@ class Common:
 
 	# 确保玩家不存在
 	@classmethod
-	def ensurePlayerNotExist(cls, error: ErrorType=ErrorType.PlayerExist, **args):
-		return ViewUtils.ensureObjectNotExist(Player, error, **args)
+	def ensurePlayerNotExist(cls, error: ErrorType=ErrorType.PlayerExist, **kwargs):
+		return ViewUtils.ensureObjectNotExist(Player, error, **kwargs)
 
 	# 确保用户名不存在
 	@classmethod

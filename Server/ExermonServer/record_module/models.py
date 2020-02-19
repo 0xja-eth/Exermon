@@ -450,12 +450,24 @@ class QuestionSetRecord(CacheableModel):
 
 		return None
 
+	# 实际玩家（获取在线信息）
+	def exactlyPlayer(self):
+		from player_module.views import Common
+
+		player = self.player
+		# 如果获取不到实际的玩家，该对象释放时需要自动保存
+		player.delete_save = True
+
+		online_player = Common.getOnlinePlayer(player.id)
+
+		return online_player or player
+
 	# 开始一个题目集（生成题目）
 	def start(self, **kwargs):
 
 		self._initQuestionCache()
 
-		self.player.setExercise(self)
+		self.exactlyPlayer().setExercise(self)
 
 		self._generateQuestions(**kwargs)
 
@@ -473,7 +485,7 @@ class QuestionSetRecord(CacheableModel):
 		# self._saveQuestionCache()
 
 		# 会自动保存
-		self.player.clearExercise()
+		self.exactlyPlayer().clearExercise()
 
 	def _calcResult(self):
 
@@ -487,8 +499,8 @@ class QuestionSetRecord(CacheableModel):
 
 	def _applyResult(self, calc):
 
-		self.player.gainMoney(self.gold_incr)
-		self.player.gainExp(self.slot_exp_incr,
+		self.exactlyPlayer().gainMoney(self.gold_incr)
+		self.exactlyPlayer().gainExp(self.slot_exp_incr,
 							calc.exer_exp_incrs,
 							calc.exerslot_exp_incrs)
 
@@ -632,7 +644,6 @@ class ExerciseDistributionType(Enum):
 class ExerciseRecord(QuestionSetRecord):
 
 	class Meta:
-		abstract = True
 		verbose_name = verbose_name_plural = "刷题记录"
 
 	TYPE = QuestionSetType.Exercise
@@ -652,7 +663,7 @@ class ExerciseRecord(QuestionSetRecord):
 	NAME_STRING_FMT = "%s\n%s 刷题记录"
 
 	# 科目
-	subject = models.ForeignKey('question_module.Subject', default=1,
+	subject = models.ForeignKey('game_module.Subject', default=1,
 								on_delete=models.CASCADE, verbose_name="科目")
 
 	# 题量（用于生成题目）

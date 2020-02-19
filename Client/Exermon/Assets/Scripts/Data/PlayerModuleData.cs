@@ -77,30 +77,32 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
+        /*
         public int humanPackId { get; private set; }
         public int exerPackId { get; private set; }
         public int exerFragPackId { get; private set; }
         public int exerGiftPoolId { get; private set; }
         public int exerHubId { get; private set; }
         public int quesSugarPackId { get; private set; }
+        */
 
         /// <summary>
         /// 缓存属性
         /// </summary>
-        // 人类背包（为了兼容装备类型，模板类为 HumanPackEquip，使用时需要转化为 HumanPackItem）
-        public PackContainer<HumanPackEquip> humanPack { get; private set; }
-        public PackContainer<ExerPackEquip> exerPack { get; private set; }
+        public PackContainer<PackContItem> humanPack { get; private set; }
+        public PackContainer<PackContItem> exerPack { get; private set; }
         public PackContainer<PackContItem> exerFragPack { get; private set; }
         public PackContainer<PackContItem> exerGiftPool { get; private set; }
         public PackContainer<PlayerExermon> exerHub { get; private set; }
-        //public PackContainer<PackContItem> quesSugarPack { get; private set; }
+        public PackContainer<PackContItem> quesSugarPack { get; private set; }
 
+        /*
         /// <summary>
         /// 读取人类背包
         /// </summary>
         /// <param name="json">数据</param>
         public void loadHumanPack(JsonData json) {
-            humanPack = DataLoader.loadData<PackContainer<HumanPackEquip>>(json);
+            humanPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
         }
 
         /// <summary>
@@ -108,7 +110,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// </summary>
         /// <param name="json">数据</param>
         public void loadExerPack(JsonData json) {
-            exerPack = DataLoader.loadData<PackContainer<ExerPackEquip>>(json);
+            exerPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
         }
 
         /// <summary>
@@ -134,6 +136,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public void loadExerHub(JsonData json) {
             exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json);
         }
+        */
 
         /// <summary>
         /// 数据加载
@@ -142,12 +145,12 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override void load(JsonData json) {
             base.load(json);
 
-            humanPackId = DataLoader.loadInt(json, "humanpack_id");
-            exerPackId = DataLoader.loadInt(json, "exerpack_id");
-            exerFragPackId = DataLoader.loadInt(json, "exerfragpack_id");
-            exerGiftPoolId = DataLoader.loadInt(json, "exergiftpool_id");
-            exerHubId = DataLoader.loadInt(json, "exerhub_id");
-            quesSugarPackId = DataLoader.loadInt(json, "quessugarpack_id");
+            humanPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "humanpack");
+            exerPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "exerpack");
+            exerFragPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "exerfragpack");
+            exerGiftPool = DataLoader.loadData<PackContainer<PackContItem>>(json, "exergiftpool");
+            exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json, "exerhub");
+            quesSugarPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "quessugarpack");
         }
 
         /// <summary>
@@ -157,12 +160,12 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override JsonData toJson() {
             var json = base.toJson();
 
-            json["humanpack_id"] = humanPackId;
-            json["exerpack_id"] = exerPackId;
-            json["exerfragpack_id"] = exerFragPackId;
-            json["exergiftpool_id"] = exerGiftPoolId;
-            json["exerhub_id"] = exerHubId;
-            json["quessugarpack_id"] = quesSugarPackId;
+            json["humanpack"] = DataLoader.convertData(humanPack);
+            json["exerpack"] = DataLoader.convertData(exerPack);
+            json["exerfragpack"] = DataLoader.convertData(exerFragPack);
+            json["exergiftpool"] = DataLoader.convertData(exerGiftPool);
+            json["exerhub"] = DataLoader.convertData(exerHub);
+            json["quessugarpack"] = DataLoader.convertData(quesSugarPack);
 
             return json;
         }
@@ -176,8 +179,10 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
+        /*
         public int exerSlotId { get; set; }
         public int humanEquipSlotId { get; private set; }
+        */
 
         /// <summary>
         /// 缓存属性
@@ -185,6 +190,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public SlotContainer<ExerSlotItem> exerSlot { get; private set; }
         public HumanEquipSlot humanEquipSlot { get; private set; }
 
+        /*
         /// <summary>
         /// 读取艾瑟萌槽
         /// </summary>
@@ -202,6 +208,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
             humanEquipSlot = DataLoader.loadData
                 <HumanEquipSlot>(json, "container");
         }
+        */
 
         /// <summary>
         /// 数据加载
@@ -210,8 +217,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override void load(JsonData json) {
             base.load(json);
 
-            exerSlotId = DataLoader.loadInt(json, "exerslot_id");
-            humanEquipSlotId = DataLoader.loadInt(json, "humanequipslot_id");
+            exerSlot = DataLoader.loadData<SlotContainer<ExerSlotItem>>(json, "exerslot");
+            humanEquipSlot = DataLoader.loadData<HumanEquipSlot>(json, "humanequipslot");
         }
 
         /// <summary>
@@ -221,8 +228,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override JsonData toJson() {
             var json = base.toJson();
 
-            json["exerslot_id"] = exerSlotId;
-            json["humanequipslot_id"] = humanEquipSlotId;
+            json["exerslot"] = DataLoader.convertData(exerSlot); ;
+            json["humanequipslot"] = DataLoader.convertData(humanEquipSlot); ;
 
             return json;
         }
@@ -320,8 +327,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     /// 选择艾瑟萌
     /// </summary>
     /// <param name="cid">艾瑟萌槽容器ID</param>
-    public void createExermons(int esid) {
-        slotContainers.exerSlotId = esid;
+    public void createExermons(JsonData id) {
+        slotContainers.exerSlot.load(id);
         status = (int)Status.ExermonsCreated;
     }
 
@@ -553,22 +560,42 @@ public class HumanEquip : EquipableItem {
 /// <summary>
 /// 人类背包物品
 /// </summary>
-public class HumanPackItem : PackContItem { }
+//public class HumanPackItem : PackContItem { }
 
 /// <summary>
 /// 人类背包装备
 /// </summary>
-public class HumanPackEquip : HumanPackItem {
-    /*
-        /// <summary>
-        /// 获取目标的 ContItem 类型
-        /// </summary>
-        /// <returns></returns>
-        public HumanPackItem target() {
-            if (type == (int)Type.HumanPackItem) return this as HumanPackItem;
-            return this;
-        }
-    */
+public class HumanPackEquip : PackContItem {
+
+    /// <summary>
+    /// 获取装备实例
+    /// </summary>
+    /// <returns>装备</returns>
+    public HumanEquip equip() {
+        return item() as HumanEquip;
+    }
+
+    /// <summary>
+    /// 获取装备的所有属性
+    /// </summary>
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        var equip = this.equip();
+        if (equip == null) return new ParamData[0];
+        return equip.params_;
+    }
+
+    /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        var equip = this.equip();
+        if (equip == null) return new ParamData(paramId);
+        return equip.getParam(paramId);
+    }
+
 }
 
 /// <summary>

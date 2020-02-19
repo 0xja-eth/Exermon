@@ -56,10 +56,6 @@ class QuestionSetRecordAdmin(object):
 	list_editable = ['player', 'create_time', 'finished',
 					 'exp_incr', 'slot_exp_incr', 'gold_incr']
 
-	player_ques_inline = None
-
-	inlines = [player_ques_inline]
-
 
 @xadmin.sites.register(ExerciseRecord)
 class ExerciseRecordAdmin(QuestionSetRecordAdmin):
@@ -67,7 +63,7 @@ class ExerciseRecordAdmin(QuestionSetRecordAdmin):
 	list_display = QuestionSetRecordAdmin.list_display + \
 				   ['subject', 'count', 'dtb_type']
 
-	list_editable = BaseItemAdmin().list_editable + \
+	list_editable = BaseItemAdmin.list_editable + \
 				   ['subject', 'count', 'dtb_type']
 
-	player_ques_inline = ExerciseQuestionsInline
+	inlines = [ExerciseQuestionsInline]

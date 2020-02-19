@@ -244,18 +244,13 @@ class BaseItem(models.Model):
 	# target.short_description = "目标物品"
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
+	def convertToDict(self, **kwargs):
 		return {
 			'id': self.id,
 			'name': self.name,
 			'description': self.description,
-			# 'type': self.type
+			'type': self.TYPE.value
 		}
-
-	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		return self._convertToDict(**kwargs)
-		# return self.target()._convertToDict(**kwargs)
 
 	# endregion
 
@@ -313,10 +308,10 @@ class LimitedItem(BaseItem):
 							 null=True, blank=True, verbose_name="图标")
 
 	# 管理界面用：显示购入价格
-	def adminBuyPrice(self):
-		return self.itemprice
-
-	adminBuyPrice.short_description = "购入价格"
+	# def adminBuyPrice(self):
+	# 	return self.itemprice
+	#
+	# adminBuyPrice.short_description = "购入价格"
 
 	# 获取购买价格
 	# def buyPrice(self):
@@ -342,8 +337,8 @@ class LimitedItem(BaseItem):
 	# 	return data.decode()
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		buy_price = ModelUtils.objectToDict(self.buy_price)
 
@@ -402,8 +397,8 @@ class UsableItem(LimitedItem):
 	adminEffects.short_description = "使用效果"
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		effects = ModelUtils.objectsToDict(self.effects())
 
@@ -455,9 +450,23 @@ class EquipableItem(LimitedItem):
 		abstract = True
 		verbose_name = verbose_name_plural = "可装备物品"
 
+	# 管理界面用：显示属性基础值
+	def adminParams(self):
+		from django.utils.html import format_html
+
+		params = self.params()
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	adminParams.short_description = "增加属性值"
+
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['params'] = ModelUtils.objectsToDict(self.params())
 
@@ -551,6 +560,10 @@ class BaseContainer(CacheableModel):
 	@classmethod
 	def acceptedContItemClass(cls): return (cls.baseContItemClass(), )
 
+	# 用于数据库查询的类
+	@classmethod
+	def _databaseQueryClass(cls): return cls.acceptedContItemClass()
+
 	# 获取对应的容器项类（返回单个，创建容器项时候调用）
 	# 可以根据参数获取实际的容器项类
 	# 默认为基类，即 baseContItemClass
@@ -571,6 +584,7 @@ class BaseContainer(CacheableModel):
 	def create(cls, **kwargs):
 		container = cls()
 		container._create(**kwargs)
+		container.save()
 		return container
 
 	# 创建实例
@@ -588,7 +602,7 @@ class BaseContainer(CacheableModel):
 		self.cache(self.REMOVED_CACHE_KEY, [])
 
 	def __str__(self):
-		name = type(self).__name__
+		name = self._meta.verbose_name
 		return '%d %s(%s)' % (self.id, name, self.owner())
 
 	def __getattr__(self, item):
@@ -627,13 +641,13 @@ class BaseContainer(CacheableModel):
 		return ModelUtils.objectsToDict(self.contItems())
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
+	def convertToDict(self, **kwargs):
 
 		type = None
 
 		res = {
 			'id': self.id,
-			# 'type': self.type,
+			'type': self.TYPE.value,
 			'capacity': self.getCapacity(),
 		}
 
@@ -644,10 +658,13 @@ class BaseContainer(CacheableModel):
 
 		return res
 
-	def convertToDict(self, **kwargs):
-		return self._convertToDict(**kwargs)
-
 	# endregion
+
+	# admin 显示
+	def adminOwnerPlayer(self):
+		return str(self.ownerPlayer())
+
+	adminOwnerPlayer.short_description = "所属玩家"
 
 	# 持有者
 	def owner(self):
@@ -655,6 +672,19 @@ class BaseContainer(CacheableModel):
 
 	# 持有玩家
 	def ownerPlayer(self): return self.owner()
+
+	# 实际玩家（获取在线信息）
+	def exactlyPlayer(self):
+		from player_module.views import Common
+
+		player = self.ownerPlayer()
+		# 如果获取不到实际的玩家，该对象释放时需要自动保存
+		player.delete_save = True
+
+		online_player = Common.getOnlinePlayer(player.id)
+
+		if online_player is None: return player
+		return online_player.player
 
 	# 获取容器容量（0为无限）
 	def getCapacity(self): return self.defaultCapacity()
@@ -714,7 +744,7 @@ class BaseContainer(CacheableModel):
 
 			return list(res) if listed else res
 
-		clas = self.acceptedContItemClass()
+		clas = self._databaseQueryClass()
 
 		if listed:
 			res = []
@@ -737,13 +767,18 @@ class BaseContainer(CacheableModel):
 
 		print("%s(%s) ======================" % (name, self))
 		print("Capacity: %d" % self.getCapacity())
-		print("Used: %d" % self.contItemCnt(db))
-		if db: print("From Database:")
+		print("Used: %d" % self.contItemCnt(db=db, cla=cla))
 		print("ContItems:")
 
-		for cla in cont_items:
-			print(cla.__name__)
-			for cont_item in cont_items[cla]:
+		if db:
+			print("From Database:")
+			for cla in cont_items:
+				print(cla.__name__)
+				for cont_item in cont_items[cla]:
+					print(cont_item)
+		else:
+			print("From Cache:")
+			for cont_item in cont_items:
 				print(cont_item)
 
 	# 获取/生成缓存容器项
@@ -761,16 +796,16 @@ class BaseContainer(CacheableModel):
 		self.getCache(self.REMOVED_CACHE_KEY).append(cont_item)
 
 	# 获取指定物品数量或所有物品总数（占用格子数）
-	def contItemCnt(self, db=False, listed=False, cla=None, **kwargs):
-		return len(self.contItems(db=db, listed=listed, cla=cla, **kwargs))
+	def contItemCnt(self, db=False, cla=None, **kwargs):
+		return len(self.contItems(db=db, listed=True, cla=cla))
 
 	# 获取指定物品数量或所有物品总数（总数）
-	def itemCnt(self, db=False, listed=False, cla=None, **kwargs):
-		return self.contItemCnt(db=db, listed=listed, cla=cla, **kwargs)
+	def itemCnt(self, db=False, cla=None, **kwargs):
+		return self.contItemCnt(db=db, cla=cla, **kwargs)
 
 	# 容器是否存在指定物品或任意物品指定数量
-	def hasItem(self, count, db=False, listed=False, cla=None, **kwargs):
-		return self.itemCnt(db=db, listed=listed, cla=cla, **kwargs) >= count
+	def hasItem(self, count, db=False, cla=None, **kwargs):
+		return self.itemCnt(db=db, cla=cla, **kwargs) >= count
 
 	# 获取一个容器项
 	def contItem(self, db=False, listed=False, cla=None, **kwargs):
@@ -846,6 +881,7 @@ class BaseContainer(CacheableModel):
 class PackContainer(BaseContainer):
 
 	class Meta:
+		abstract = True
 		verbose_name = verbose_name_plural = "背包类容器"
 
 	# 容量（为0则不限）
@@ -900,9 +936,9 @@ class PackContainer(BaseContainer):
 	def getCapacity(self): return self.capacity
 
 	# 获取指定物品数量或所有物品总数（总数）
-	def itemCnt(self, **kwargs):
+	def itemCnt(self, db=False, cla=None, **kwargs):
 		cnt = 0
-		cont_items = self.contItems(**kwargs)
+		cont_items = self.contItems(db=db, listed=True, cla=cla, **kwargs)
 		for cont_item in cont_items:
 			cnt += cont_item.count
 		return cnt
@@ -1163,6 +1199,7 @@ class PackContainer(BaseContainer):
 
 			# 进行合成
 			l_cont_item.merge(cont_item)
+		l += 1
 
 		# if save:
 		for i in range(cnt-l):
@@ -1207,7 +1244,7 @@ class PackContainer(BaseContainer):
 
 		old_items, new_items = self._increaseItems(item, count, False)
 
-		for new_item in new_items: new_item.afterCreated()
+		# for new_item in new_items: new_item.afterCreated()
 
 		if combine_return: return old_items+new_items
 
@@ -1239,6 +1276,7 @@ class PackContainer(BaseContainer):
 		self.ensureGainContItemEnable(cont_item)
 
 		cont_item.transfer(self, **kwargs)
+
 		self._addCachedContItem(cont_item)
 
 		return cont_item
@@ -1252,7 +1290,7 @@ class PackContainer(BaseContainer):
 		if count is not None:
 			cont_item, _ = self._splitItem(cont_item, count)
 
-			self._removeContItem(cont_item)
+		self._removeContItem(cont_item)
 
 		return cont_item
 
@@ -1366,6 +1404,10 @@ class SlotContainer(BaseContainer):
 	@classmethod
 	def baseContItemClass(cls): return PackContItem
 
+	# 用于数据库查询的类
+	@classmethod
+	def _databaseQueryClass(cls): return (cls.acceptedSlotItemClass(), )
+
 	# def __init__(self, *args, **kwargs):
 	# 	super().__init__(*args, **kwargs)
 	# 	self.cache(self.CONTAINERS_CACHE_KEY, [])
@@ -1413,20 +1455,31 @@ class SlotContainer(BaseContainer):
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
-		slot_item: SlotContItem = self._createContItem(cla, **kwargs)
-		slot_item.setupIndex(index+1, **kwargs)
-		return slot_item
+		return self._createContItem(cla, index=index+1, **kwargs)
+		# slot_item: SlotContItem = self._createContItem(cla, **kwargs)
+		# slot_item.setupIndex(index+1, **kwargs)
+		# return slot_item
 
 	# 保证满足装备条件
 	def ensureEquipCondition(self, slot_item, equip_item):
 		self.ensureItemAcceptable(cont_item=equip_item)
 
 	# 保证满足装备卸下条件
-	def ensureDequipCondition(self, slot_item, type=None, index=None):
+	def ensureDequipCondition(self, slot_item, type=None, equip_index=None):
 		pass
 
 	# 设置装备（装备/卸下）
-	def setEquip(self, slot_item=None, equip_item=None, type=None, index=None, **kwargs):
+	def setEquip(self, slot_item=None, equip_item=None,
+				 type=None, equip_index=None, force=False, **kwargs):
+		# 强制装备（替换原有装备）
+		if force:
+			if equip_item is None:
+				self._dequipSlot(slot_item=slot_item, type=type,
+								 equip_index=equip_index, **kwargs)
+			else:
+				self._equipSlot(slot_item=slot_item, equip_item=equip_item,
+								 equip_index=equip_index, **kwargs)
+			return
 
 		if slot_item is not None:
 			self.ensureContItemContained(slot_item)
@@ -1435,18 +1488,26 @@ class SlotContainer(BaseContainer):
 		if slot_item is None:
 			slot_item: SlotContItem = self.contItem(**kwargs)
 
-		# 计算索引（装备1还是装备2）
-		if index is None:
-			index = slot_item.getEquipItemIndex(equip_item=equip_item, type_=type)
+		# 计算装备索引
+		if equip_index is None:
+			equip_index = slot_item.getEquipItemIndex(equip_item=equip_item, type_=type)
 
 		# 找出容器
-		container = self.equipContainer(index)
+		container: PackContainer = self.equipContainer(equip_index)
 
 		# 容器为空，操作错误
 		if container is None:
 			raise ErrorException(ErrorType.InvalidContainer)
 
-		self.transfer(container, slot_item=slot_item, index=index)
+		equiped_item = slot_item.equipItem(equip_index)
+
+		if equiped_item is None and equip_item is None: return
+		if equip_item is None:
+			# 如果要装备的装备为空，则相当于卸下，需要确保容器有位置
+			container.ensureCapacityAvailable()
+		# 其他情况下都不需要判断
+
+		self.transfer(container, slot_item=slot_item, index=equip_index)
 
 		# 装备不为空
 		if equip_item is not None:
@@ -1476,7 +1537,7 @@ class SlotContainer(BaseContainer):
 			# 	equip_item.save()
 
 	# 槽卸下（强制卸下）
-	def _dequipSlot(self, slot_item=None, type=None, index=None, **kwargs):
+	def _dequipSlot(self, slot_item=None, type=None, equip_index=None, **kwargs):
 
 		if slot_item is None:
 			slot_item = self.contItem(**kwargs)
@@ -1485,9 +1546,9 @@ class SlotContainer(BaseContainer):
 			return None
 		else:
 			slot_item: SlotContItem = slot_item
-			self.ensureDequipCondition(slot_item, type, index)
+			self.ensureDequipCondition(slot_item, type, equip_index)
 
-			equip_item = slot_item.dequip(type, index)
+			equip_item = slot_item.dequip(type, equip_index)
 
 			# slot_item.save()
 			#
@@ -1498,7 +1559,7 @@ class SlotContainer(BaseContainer):
 
 	# 接受转移
 	def acceptTransfer(self, slot_item=None, cont_item=None, **kwargs):
-		self._equipSlot(slot_item, cont_item, **kwargs)
+		self._equipSlot(slot_item, equip_item=cont_item, **kwargs)
 
 	# 准备转移
 	def prepareTransfer(self, slot_item=None, type=None, index=None, **kwargs) -> dict:
@@ -1570,8 +1631,9 @@ class BaseContItem(CacheableModel):
 	# 		self.type = self.TYPE.value
 
 	def __str__(self):
-		name = type(self).__name__
-		return '%d %s(%s)' % (self.id, name, self.container())
+		# name = type(self).__name__
+		name = self._meta.verbose_name
+		return '%d %s(%s)' % (self.id, name, self.container)
 
 		# type_name = self.getTypeName()
 		#
@@ -1616,14 +1678,11 @@ class BaseContItem(CacheableModel):
 		# return self.container.target()
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
+	def convertToDict(self, **kwargs):
 		return {
 			'id': self.id,
-			'type': self.TYPE
+			'type': self.TYPE.value
 		}
-
-	def convertToDict(self, **kwargs):
-		return self._convertToDict(**kwargs)
 
 	# endregion
 
@@ -1632,8 +1691,8 @@ class BaseContItem(CacheableModel):
 	def create(cls, container, **kwargs):
 		cont_item = cls()
 		cont_item._create(container, **kwargs)
+		cont_item.save(judge=False)
 		cont_item.afterCreated()
-
 		return cont_item
 
 	# 创建容器项（包含移动）
@@ -1686,8 +1745,8 @@ class BaseContItem(CacheableModel):
 	def refresh(self):
 		pass
 
-	def save(self, **kwargs):
-		if self.container is None:
+	def save(self, judge=True, **kwargs):
+		if judge and self.container is None:
 			self.delete_save = False
 			if self.id is not None: self.delete()
 		else: super().save(**kwargs)
@@ -1707,6 +1766,9 @@ class PackContItem(BaseContItem):
 	# 叠加数量
 	count = models.PositiveSmallIntegerField(default=0, verbose_name="叠加数量")
 
+	# 装备标志
+	equiped = models.BooleanField(default=False, verbose_name="是否装备中")
+
 	# region 配置项
 
 	# 所接受的物品类
@@ -1720,8 +1782,8 @@ class PackContItem(BaseContItem):
 			super().__str__(), self.item, self.count)
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		item_id = ModelUtils.objectToId(self.item)
 
@@ -1754,8 +1816,12 @@ class PackContItem(BaseContItem):
 
 	# 创建容器项
 	def _create(self, container: BaseContainer, item=None, **kwargs):
-		super()._create(container, item=item, **kwargs)
+		super()._create(container, **kwargs)
 		self.item = item
+
+	def transfer(self, container: BaseContainer, **kwargs):
+		super().transfer(container, **kwargs)
+		self.equiped = False
 
 	# 复制容器项
 	def copy(self, cont_item):
@@ -1805,6 +1871,22 @@ class PackContItem(BaseContItem):
 			return max(0, delta)  # 返回剩余无法删除的数量
 
 		return 0
+
+	# 装备容器项（设置 equip）
+	def equip(self):
+		self.container = None
+		self.equiped = True
+
+	# 卸下容器项
+	def dequip(self):
+		self.equiped = False
+
+	def save(self, judge=True, **kwargs):
+		# 容器为空且未装备
+		if judge and self.container is None and not self.equiped:
+			self.delete_save = False
+			if self.id is not None: self.delete()
+		else: super().save(False, **kwargs)
 
 
 # ===================================================
@@ -1883,14 +1965,19 @@ class SlotContItem(BaseContItem):
 			res[attrs[i]] = ModelUtils.objectToDict(self.equipItem(i))
 
 	# 转化为 dict
-	def _convertToDict(self, **kwargs):
-		res = super()._convertToDict(**kwargs)
+	def convertToDict(self, **kwargs):
+		res = super().convertToDict(**kwargs)
 
 		res['index'] = self.index
 
 		self._convertEquipToDict(res)
 
 		return res
+
+	# 创建容器项
+	def _create(self, container: BaseContainer, index=None, **kwargs):
+		super()._create(container, **kwargs)
+		self.setupIndex(index, **kwargs)
 
 	# 获取装备项
 	def equipItem(self, index):
@@ -1899,32 +1986,40 @@ class SlotContItem(BaseContItem):
 		return self.getOrSetCache(key,
 			lambda: self._equipItem(index))
 
-	# 设置装备项
-	def _setEquipItem(self, index, equip_item):
+	# 设置装备项缓存
+	def _setEquipItemCache(self, index, equip_item):
 		key = self.EQUIPS_CACHE_KEY % index
-
 		self.cache(key, equip_item)
 
+		self._setEquipItem(index, equip_item)
+
 	# 移除装备项
-	def _removeEquipItem(self, index):
+	def _removeEquipItemCache(self, index):
 		key = self.EQUIPS_CACHE_KEY % index
 		equip_item = self.equipItem(index)
 
 		if equip_item is not None:
-			equip_item.remove()
+			# equip_item.deequip()
 
 			self.getCache(self.REMOVED_CACHE_KEY).append(equip_item)
 			self.cache(key, None)
+
+		self._setEquipItem(index, None)
 
 		return equip_item
 
 	def _equipItem(self, index):
 		attr = self.acceptedEquipItemAttr()[index]
 
-		if hasattr(self, attr):
-			return getattr(self, attr)
+		if hasattr(self, attr): return getattr(self, attr)
 
 		return None
+
+	# 设置装备项
+	def _setEquipItem(self, index, equip_item):
+		attr = self.acceptedEquipItemAttr()[index]
+
+		setattr(self, attr, equip_item)
 
 	# 比较容器项
 	def isEqual(self, cont_item): return False
@@ -1959,10 +2054,10 @@ class SlotContItem(BaseContItem):
 		if index is None: return
 
 		if equip_item is not None:
-			equip_item.transfer(self.container)
-			self.refresh()
+			equip_item.equip()
 
-		self._setEquipItem(index, equip_item)
+		self._setEquipItemCache(index, equip_item)
+		self.refresh()
 
 		# if index == 1: self.equip_item1 = equip_item
 		# if index == 2: self.equip_item2 = equip_item
@@ -1978,7 +2073,7 @@ class SlotContItem(BaseContItem):
 		equip_item = None
 
 		if index is not None:
-			equip_item = self._removeEquipItem(index)
+			equip_item = self._removeEquipItemCache(index)
 			# self._setEquipItem(index, None)
 
 			# if index == 1:
@@ -1989,9 +2084,17 @@ class SlotContItem(BaseContItem):
 			# 	self.equip_item2 = None
 
 		if equip_item is not None:
+			equip_item.dequip()
+			# 如果装备原本为空，那么卸下也没有影响，故刷新放在判定里面
 			self.refresh()
 
 		return equip_item
+
+	# def save(self, judge=True, **kwargs):
+	# 	if judge and self.container is None:
+	# 		self.delete_save = False
+	# 		if self.id is not None: self.delete()
+	# 	else: super().save(**kwargs)
 
 # endregion
 
@@ -2095,6 +2198,11 @@ class BaseEffect(models.Model):
 
 	def __str__(self):
 		return self.describe()
+
+	def adminDescribe(self):
+		return self.describe()
+
+	adminDescribe.short_description = "描述"
 
 	def describe(self):
 		from game_module.models import BaseParam, GameConfigure, Subject

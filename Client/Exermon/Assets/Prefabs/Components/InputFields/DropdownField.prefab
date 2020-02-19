@@ -321,7 +321,7 @@ MonoBehaviour:
   explainer: {fileID: 0}
   correct: {fileID: 0}
   wrong: {fileID: 0}
-  drowdown: {fileID: 7667525660497383012}
+  dropdown: {fileID: 7667525660497383012}
 --- !u!1 &7667525659914487526
 GameObject:
   m_ObjectHideFlags: 0

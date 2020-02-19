@@ -11,15 +11,20 @@ from utils.exception import ErrorType, ErrorException
 # =======================
 class Service:
 
-	# 艾瑟萌槽装备
+	# 艾瑟萌槽装备（艾瑟萌/艾瑟萌天赋）
 	@classmethod
-	async def exerSlotEquip(cls, consumer, player: Player, cid: int, sid: int, peid: int, pgid: int):
+	async def exerSlotEquip(cls, consumer, player: Player, sid: int, peid: int, pgid: int):
 		# 返回数据：无
 		from item_module.views import Service as ItemService
 
 		Subject.ensure(id=sid)
 
-		ItemService.slotContainerEquip(player, cid, peid, pgid, subject_id=sid)
+		exer_slot = player.exerSlot()
+
+		player_exer = Common.getPlayerExer(id=peid)
+		player_gift = Common.getPlayerGift(id=pgid)
+
+		ItemService.slotContainerEquip(player, exer_slot, [player_exer, player_gift], subject_id=sid)
 
 	# 艾瑟萌装备槽装备
 	@classmethod
@@ -29,7 +34,11 @@ class Service:
 
 		ExerEquipType.ensure(id=eid)
 
-		ItemService.slotContainerEquip(player, cid, eeid, e_type_id=eid)
+		equip_slot = Common.getExerEquipSlot(id=cid)
+
+		pack_equip = Common.getPackEquip(id=eeid)
+
+		ItemService.slotContainerEquip(player, equip_slot, pack_equip, e_type_id=eid)
 
 
 # =======================
@@ -57,15 +66,45 @@ class Common:
 
 	# 获取艾瑟萌
 	@classmethod
-	def getExermon(cls, return_type='object', error: ErrorType = ErrorType.ExermonNotExist, **args) -> Exermon:
+	def getExermon(cls, return_type='object', error: ErrorType = ErrorType.ExermonNotExist,
+				   **kwargs) -> Exermon:
 
-		return ViewUtils.getObject(Exermon, error, return_type=return_type, **args)
+		return ViewUtils.getObject(Exermon, error, return_type=return_type, **kwargs)
 
 	# 获取艾瑟萌天赋
 	@classmethod
-	def getExerGift(cls, return_type='object', error: ErrorType = ErrorType.ExerGiftNotExist, **args) -> ExerGift:
+	def getExerGift(cls, return_type='object', error: ErrorType = ErrorType.ExerGiftNotExist,
+					**kwargs) -> ExerGift:
 
-		return ViewUtils.getObject(ExerGift, error, return_type=return_type, **args)
+		return ViewUtils.getObject(ExerGift, error, return_type=return_type, **kwargs)
+
+	# 获取艾瑟萌槽
+	@classmethod
+	def getExerEquipSlot(cls, return_type='object', error: ErrorType = ErrorType.ContainerNotExist,
+						 **kwargs) -> ExerEquipSlot:
+
+		return ViewUtils.getObject(ExerEquipSlot, error, return_type=return_type, **kwargs)
+
+	# 获取玩家艾瑟萌关系
+	@classmethod
+	def getPlayerExer(cls, return_type='object', error: ErrorType = ErrorType.PlayerExermonNotExist,
+					  **kwargs) -> PlayerExermon:
+
+		return ViewUtils.getObject(PlayerExermon, error, return_type=return_type, **kwargs)
+
+	# 获取玩家艾瑟萌天赋关系
+	@classmethod
+	def getPlayerGift(cls, return_type='object', error: ErrorType = ErrorType.PlayerExerGiftNotExist,
+					  **kwargs) -> PlayerExerGift:
+
+		return ViewUtils.getObject(PlayerExerGift, error, return_type=return_type, **kwargs)
+
+	# 获取玩家持有艾瑟萌装备
+	@classmethod
+	def getPackEquip(cls, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
+					 **kwargs) -> ExerPackEquip:
+
+		return ViewUtils.getObject(ExerPackEquip, error, return_type=return_type, **kwargs)
 
 	# 获取多个艾瑟萌
 	@classmethod
@@ -75,6 +114,7 @@ class Common:
 
 		res = ViewUtils.getObjects(Exermon, id__in=ids)
 
+		# 数量不一致，说明获取出现问题
 		if res.count() != len(unique_ids): raise ErrorException(error)
 
 		# 如果本身给的 ids 没有重复，直接返回
@@ -94,6 +134,7 @@ class Common:
 
 		res = ViewUtils.getObjects(ExerGift, id__in=unique_ids)
 
+		# 数量不一致，说明获取出现问题
 		if res.count() != len(unique_ids): raise ErrorException(error)
 
 		# 如果本身给的 ids 没有重复，直接返回
@@ -107,13 +148,13 @@ class Common:
 
 	# 确保艾瑟萌存在
 	@classmethod
-	def ensureExermonExist(cls, error: ErrorType = ErrorType.ExermonNotExist, **args):
-		return ViewUtils.ensureObjectExist(Exermon, error, **args)
+	def ensureExermonExist(cls, error: ErrorType = ErrorType.ExermonNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(Exermon, error, **kwargs)
 
 	# 确保艾瑟萌天赋存在
 	@classmethod
-	def ensureExerGiftExist(cls, error: ErrorType = ErrorType.ExerGiftNotExist, **args):
-		return ViewUtils.ensureObjectExist(ExerGift, error, **args)
+	def ensureExerGiftExist(cls, error: ErrorType = ErrorType.ExerGiftNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(ExerGift, error, **kwargs)
 
 	# 确保艾瑟萌科目合法
 	@classmethod

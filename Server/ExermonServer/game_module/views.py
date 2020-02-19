@@ -56,6 +56,7 @@ class Service:
 	def _generateResourceData(cls):
 		from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, ExerEquip
 		from player_module.models import Character, HumanItem, HumanEquip
+		from question_module.models import QuesSugar
 
 		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
 		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
@@ -65,6 +66,7 @@ class Service:
 		exer_equips = ModelUtils.objectsToDict(ExerEquip.objects.all())
 		human_items = ModelUtils.objectsToDict(HumanItem.objects.all())
 		human_equips = ModelUtils.objectsToDict(HumanEquip.objects.all())
+		ques_sugars = ModelUtils.objectsToDict(QuesSugar.objects.all())
 		characters = ModelUtils.objectsToDict(Character.objects.all())
 
 		return {
@@ -76,6 +78,7 @@ class Service:
 			'exer_equips': exer_equips,
 			'human_items': human_items,
 			'human_equips': human_equips,
+			'ques_sugars': ques_sugars,
 			'characters': characters
 		}
 

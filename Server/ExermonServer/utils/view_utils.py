@@ -43,30 +43,30 @@ class Common:
 	# 确保某模型数据对象存在
 	@classmethod
 	def ensureObjectExist(cls, obj_type, error, objects=None,
-						  include_deleted=False, **args):
-		if not cls.hasObjects(obj_type, objects, include_deleted, **args):
+						  include_deleted=False, **kwargs):
+		if not cls.hasObjects(obj_type, objects, include_deleted, **kwargs):
 			raise ErrorException(error)
 
 	# 确保某模型数据对象不存在
 	@classmethod
 	def ensureObjectNotExist(cls, obj_type, error, objects=None,
-							 include_deleted=False, **args):
-		if cls.hasObjects(obj_type, objects, include_deleted, **args):
+							 include_deleted=False, **kwargs):
+		if cls.hasObjects(obj_type, objects, include_deleted, **kwargs):
 			raise ErrorException(error)
 
 	# 是否存在某模型数据对象
 	@classmethod
 	def hasObjects(cls, obj_type, objects=None,
-				   include_deleted=False, **args):
+				   include_deleted=False, **kwargs):
 
 		if objects is None: objects = obj_type.objects.all()
 
 		# 实际上执行查询的部分：
 		try:
 			if not include_deleted and hasattr(obj_type, 'is_deleted'):
-				return objects.filter(is_deleted=False, **args).exists()
+				return objects.filter(is_deleted=False, **kwargs).exists()
 			else:
-				return objects.filter(**args).exists()
+				return objects.filter(**kwargs).exists()
 
 		except:
 			raise ErrorException(ErrorType.ParameterError)
@@ -74,7 +74,7 @@ class Common:
 	# 获取模型数据对象
 	@classmethod
 	def getObject(cls, obj_type, error, objects=None,
-				  return_type='QuerySet', include_deleted=False, **args):
+				  return_type='QuerySet', include_deleted=False, **kwargs):
 
 		if objects is None: objects = obj_type.objects.all()
 
@@ -82,7 +82,7 @@ class Common:
 		if return_type == 'object':
 
 			query_set = cls.getObject(obj_type, error, objects,
-									  'QuerySet', include_deleted, **args)
+									  'QuerySet', include_deleted, **kwargs)
 
 			if query_set.exists():
 				return query_set[0]
@@ -93,16 +93,16 @@ class Common:
 		# 如果是获取 字典 数据（通过 convertToDict）：
 		if return_type == 'dict':
 			object = cls.getObject(obj_type, error, objects,
-								   'object', include_deleted, **args)
+								   'object', include_deleted, **kwargs)
 
 			return object.convertToDict()
 
 		# 实际上执行查询的部分：
 		try:
 			if not include_deleted and hasattr(obj_type, 'is_deleted'):
-				return objects.filter(is_deleted=False, **args)
+				return objects.filter(is_deleted=False, **kwargs)
 			else:
-				return objects.filter(**args)
+				return objects.filter(**kwargs)
 
 		except:
 			raise ErrorException(ErrorType.ParameterError)
@@ -110,7 +110,7 @@ class Common:
 	# 获取模型数据对象集
 	@classmethod
 	def getObjects(cls, obj_type, objects=None, return_type='QuerySet',
-				   include_deleted=False, **args):
+				   include_deleted=False, **kwargs):
 
 		# 如果没有提供 objects，获取全部的objects：
 		if objects is None: objects = obj_type.objects.all()
@@ -122,7 +122,7 @@ class Common:
 			result = objects
 
 		# 执行查询：
-		result = result.filter(**args)
+		result = result.filter(**kwargs)
 
 		if return_type == 'dict':
 

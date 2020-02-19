@@ -17,11 +17,16 @@ class CacheableModel(models.Model):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.cached_dict = {}
-		self.delete_save = True
+		self.delete_save = False
+		self.saved = True
 
 	def __del__(self):
 		if self.delete_save:
 			self.save()
+
+	def __setattr__(self, key, value):
+		if key != 'saved': self.saved = False
+		super().__setattr__(key, value)
 
 	# 进行缓存
 	def cache(self, key, value):
@@ -113,7 +118,12 @@ class CacheableModel(models.Model):
 
 	# 重载保存函数
 	def save(self, **kwargs):
-		super().save(**kwargs)
+
+		if not self.saved:
+			super().save(**kwargs)
+			print(str(self)+" saved!")
+
+		self.saved = True
 		self.saveCache()
 
 
@@ -329,27 +339,27 @@ class Common:
 	# 通过 filter() 获取一个QuerySet的相关属性
 	# objects: QuerySet
 	@classmethod
-	def getObjectRelatedForFilter(cls, objects, key, unique=False, **args):
-		temp = objects.select_related(key).filter(**args)
+	def getObjectRelatedForFilter(cls, objects, key, unique=False, **kwargs):
+		temp = objects.select_related(key).filter(**kwargs)
 		return cls.getObjectRelated(temp, key, unique)
 
 	# 物体集转化为字典
 	@classmethod
-	def objectsToDict(cls, objects, **args):
+	def objectsToDict(cls, objects, **kwargs):
 		result = []
 
 		if objects is None: return []
 		for obj in objects:
-			result.append(obj.convertToDict(**args))
+			result.append(obj.convertToDict(**kwargs))
 
 		return result
 
 	# 物体转化为字典
 	@classmethod
-	def objectToDict(cls, object, **args):
+	def objectToDict(cls, object, **kwargs):
 
 		if object is None: return {}
-		return object.convertToDict(**args)
+		return object.convertToDict(**kwargs)
 
 	# QuerySet式查询（通过list）
 	@classmethod

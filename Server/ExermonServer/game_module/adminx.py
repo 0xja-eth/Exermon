@@ -16,6 +16,12 @@ class ParamsInline(object):
 	style = "table"
 
 
+class EquipParamsInline(ParamsInline):
+
+	min_num = 0
+	validate_min = 0
+
+
 # class BaseParamsInline(object):
 # 	model = BaseParam
 # 	style = "table"
@@ -116,6 +122,22 @@ class ExerGiftStarAdmin(object):
 	list_editable = ['name', 'configure']
 
 	inlines = [ExerGiftParamRateRangesInline]
+
+
+@xadmin.sites.register(ItemStar)
+class ItemStarAdmin(object):
+	list_display = ['id', 'name', 'adminColor', 'configure']
+
+	list_editable = ['name', 'configure']
+
+
+@xadmin.sites.register(QuestionStar)
+class QuestionStarAdmin(object):
+	list_display = ['id', 'name', 'adminColor', 'level', 'weight',
+					'exp_incr', 'gold_incr', 'std_time', 'min_time']
+
+	list_editable = ['name', 'level', 'weight', 'exp_incr', 'gold_incr',
+					 'std_time', 'min_time', 'configure']
 
 
 @xadmin.sites.register(GameVersion)

@@ -1,6 +1,6 @@
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
-from game_module.adminx import ParamsInline
+from game_module.adminx import EquipParamsInline
 from item_module.adminx import *
 from .models import *
 import xadmin
@@ -8,24 +8,19 @@ import xadmin
 # Register your models here.
 
 
-class HumanItemEffectsInline(BaseEffectsInline):
-	model = HumanItemEffect
+class HumanItemEffectsInline(BaseEffectsInline): model = HumanItemEffect
 
 
-class HumanEquipParamsInline(ParamsInline):
-	model = HumanEquipParam
+class HumanEquipParamsInline(EquipParamsInline): model = HumanEquipParam
 
 
-class HumanPackItemsInline(BaseContItemsInline):
-	model = HumanPackItem
+class HumanPackItemsInline(BaseContItemsInline): model = HumanPackItem
 
 
-class HumanPackEquipsInline(BaseContItemsInline):
-	model = HumanPackEquip
+class HumanPackEquipsInline(BaseContItemsInline): model = HumanPackEquip
 
 
-class HumanEquipSlotItemsInline(BaseContItemsInline):
-	model = HumanEquipSlotItem
+class HumanEquipSlotItemsInline(BaseContItemsInline): model = HumanEquipSlotItem
 
 
 @xadmin.sites.register(LoginInfo)
@@ -63,12 +58,12 @@ class PlayerAdmin(object):
 
 @xadmin.sites.register(HumanItem)
 class HumanItemAdmin(UsableItemAdmin):
-	effect_inlines = HumanItemEffectsInline
+	inlines = LimitedItemAdmin.inlines + [HumanItemEffectsInline]
 
 
 @xadmin.sites.register(HumanEquip)
 class HumanEquipAdmin(EquipableItemAdmin):
-	param_inlines = HumanEquipParamsInline
+	inlines = EquipableItemAdmin.inlines + [HumanEquipParamsInline]
 
 
 @xadmin.sites.register(HumanPack)
@@ -88,13 +83,13 @@ class HumanPackAdmin(PackContainerAdmin):
 class HumanEquipSlotAdmin(SlotContainerAdmin):
 
 	list_display = SlotContainerAdmin.list_display + \
-				   ['pack_equip', 'player']
+				   ['player']
 
-	field_set = [Fieldset('人类装备槽属性', 'pack_equip', 'player')]
+	field_set = [Fieldset('人类装备槽属性', 'player')]
 
 	form_layout = SlotContainerAdmin.form_layout + field_set
 
-	cont_item_inlines = HumanEquipSlotItemsInline
+	inlines = [HumanEquipSlotItemsInline]
 
 
 @xadmin.sites.register(HumanPackItem)

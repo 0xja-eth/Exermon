@@ -20,22 +20,22 @@ class Common:
 
 	# 获取题目
 	@classmethod
-	def getQuestion(cls, return_type='object', error: ErrorType = ErrorType.QuestionNotExist, **args) -> BaseItem:
+	def getQuestion(cls, return_type='object', error: ErrorType = ErrorType.QuestionNotExist, **kwargs) -> BaseItem:
 
-		return ViewUtils.getObject(Question, error, return_type=return_type, **args).target()
+		return ViewUtils.getObject(Question, error, return_type=return_type, **kwargs)
 
 	# 获取题目糖
 	@classmethod
-	def getQuesSugar(cls, return_type='object', error: ErrorType = ErrorType.QuesSugarNotExist, **args) -> BaseItem:
+	def getQuesSugar(cls, return_type='object', error: ErrorType = ErrorType.QuesSugarNotExist, **kwargs) -> BaseItem:
 
-		return ViewUtils.getObject(QuesSugar, error, return_type=return_type, **args).target()
+		return ViewUtils.getObject(QuesSugar, error, return_type=return_type, **kwargs)
 
 	# 确保题目存在
 	@classmethod
-	def ensureQuestionExist(cls, error: ErrorType = ErrorType.QuestionNotExist, **args):
-		return ViewUtils.ensureObjectExist(Question, error, **args)
+	def ensureQuestionExist(cls, error: ErrorType = ErrorType.QuestionNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(Question, error, **kwargs)
 
 	# 确保题目糖存在
 	@classmethod
-	def ensureQuesSugarExist(cls, error: ErrorType = ErrorType.QuesSugarNotExist, **args):
-		return ViewUtils.ensureObjectExist(QuesSugar, error, **args)
+	def ensureQuesSugarExist(cls, error: ErrorType = ErrorType.QuesSugarNotExist, **kwargs):
+		return ViewUtils.ensureObjectExist(QuesSugar, error, **kwargs)

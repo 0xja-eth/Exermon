@@ -130,6 +130,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 获取背包类容器项数据
 	'item/packcontainer/get': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
 	],
 		Item.packContainerGet,  # 处理函数
@@ -138,6 +139,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 获取背包类容器项数据
 	'item/slotcontainer/get': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
 	],
 		Item.slotContainerGet,  # 处理函数
@@ -146,9 +148,12 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 背包类容器获得物品
 	'item/packcontainer/gain': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
+		['i_type', 'int'],
 		['item_id', 'int'],
 		['count', 'int'],
+		['refresh', 'bool'],
 	],
 		Item.packContainerGain,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
@@ -156,8 +161,10 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 背包类容器转移
 	'item/packcontainer/transfer': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
 		['target_cid', 'int'],
+		['ci_types', 'int[]'],
 		['contitem_id', 'int[]'],
 		['count', 'int[]'],
 	],
@@ -167,7 +174,9 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 背包类容器拆分
 	'item/packcontainer/split': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
+		['ci_type', 'int'],
 		['contitem_id', 'int'],
 		['count', 'int'],
 	],
@@ -177,7 +186,9 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 背包类容器组合
 	'item/packcontainer/merge': [[
 		['uid', 'int'],
+		['type', 'int'],
 		['cid', 'int'],
+		['ci_type', 'int'],
 		['contitem_ids', 'int[]'],
 	],
 		Item.packContainerMerge,  # 处理函数
@@ -186,7 +197,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 艾瑟萌槽装备
 	'exermon/exerslot/equip': [[
 		['uid', 'int'],
-		['cid', 'int'],
 		['sid', 'int'],
 		['peid', 'int'],
 		['pgid', 'int'],
@@ -197,7 +207,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 人类装备槽装备
 	'player/equipslot/equip': [[
 		['uid', 'int'],
-		['cid', 'int'],
 		['eid', 'int'],
 		['heid', 'int'],
 	],

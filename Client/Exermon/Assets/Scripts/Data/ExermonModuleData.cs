@@ -534,12 +534,12 @@ public class ExerEquip : EquipableItem {
 /// <summary>
 /// 艾瑟萌背包物品
 /// </summary>
-public class ExerPackItem : PackContItem { }
+//public class ExerPackItem : PackContItem { }
 
 /// <summary>
 /// 艾瑟萌背包装备
 /// </summary>
-public class ExerPackEquip : ExerPackItem {
+public class ExerPackEquip : PackContItem {
 
     /// <summary>
     /// 获取装备实例

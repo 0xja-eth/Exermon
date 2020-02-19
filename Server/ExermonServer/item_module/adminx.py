@@ -51,18 +51,19 @@ class BaseItemAdmin(object):
 
 class LimitedItemAdmin(BaseItemAdmin):
 
+	# 'adminBuyPrice',
 	list_display = BaseItemAdmin.list_display + \
-				   ['adminBuyPrice', 'buy_price', 'sell_price', 'discardable', 'tradable', 'icon']
+				   ['buy_price', 'sell_price', 'discardable', 'tradable']
 
 	list_editable = BaseItemAdmin.list_editable + \
-					['buy_price', 'sell_price', 'discardable', 'tradable', 'icon']
+					['buy_price', 'sell_price', 'discardable', 'tradable']
 
 	field_set = [Fieldset('有限物品属性', 'buy_price', 'sell_price', 'discardable',
 						 'tradable', 'icon')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = [CurrencyInline]
+	inlines = []  # CurrencyInline
 
 
 class UsableItemAdmin(LimitedItemAdmin):
@@ -71,7 +72,7 @@ class UsableItemAdmin(LimitedItemAdmin):
 				   ['max_count', 'battle_use', 'menu_use', 'adventure_use',
 					'consumable', 'freeze', 'i_type', 'adminEffects']
 
-	list_editable = LimitedItemAdmin.list_display + \
+	list_editable = LimitedItemAdmin.list_editable + \
 					['max_count', 'battle_use', 'menu_use', 'adventure_use',
 					'consumable', 'freeze', 'i_type']
 
@@ -80,9 +81,9 @@ class UsableItemAdmin(LimitedItemAdmin):
 
 	form_layout = LimitedItemAdmin.form_layout + field_set
 
-	effect_inlines = None
+	# effect_inlines = None
 
-	inlines = LimitedItemAdmin.inlines + [effect_inlines]
+	# inlines = LimitedItemAdmin.inlines + [effect_inlines]
 
 
 class EquipParamAdmin(object):
@@ -91,17 +92,24 @@ class EquipParamAdmin(object):
 
 	list_editable = ['param', 'value']
 
+	# param_inlines = None
+
+	# inlines = LimitedItemAdmin.inlines + [param_inlines]
+
 
 class EquipableItemAdmin(LimitedItemAdmin):
 
-	param_inlines = None
+	list_display = LimitedItemAdmin.list_display + \
+				   ['adminParams']
 
-	inlines = LimitedItemAdmin().inlines + [param_inlines]
+	# param_inlines = None
+
+	# inlines = LimitedItemAdmin.inlines + [param_inlines]
 
 
 class BaseContainerAdmin(object):
 
-	list_display = ['id']
+	list_display = ['id', 'adminOwnerPlayer']
 
 	list_editable = []
 
@@ -109,9 +117,9 @@ class BaseContainerAdmin(object):
 
 	form_layout = field_set
 
-	cont_item_inlines = None
-
-	inlines = [cont_item_inlines]
+	# cont_item_inlines = None
+	#
+	# inlines = [cont_item_inlines]
 
 
 class PackContainerAdmin(BaseContainerAdmin):
@@ -157,10 +165,10 @@ class BaseContItemAdmin(object):
 class PackContItemAdmin(BaseContItemAdmin):
 
 	list_display = BaseContItemAdmin.list_display + \
-				   ['item', 'count']
+				   ['item', 'count', 'equiped']
 
 	list_editable = BaseContItemAdmin.list_editable + \
-				   ['item', 'count']
+				   ['item', 'count', 'equiped']
 
 	field_set = [Fieldset('背包类容器项属性', 'item', 'count')]
 
@@ -182,7 +190,7 @@ class SlotContItemAdmin(BaseContItemAdmin):
 
 class BaseEffectAdmin(object):
 
-	list_display = ['id', 'item', 'code', 'params']
+	list_display = ['id', 'item', 'code', 'params', 'adminDescribe']
 
 	list_editable = ['code', 'params']
 
