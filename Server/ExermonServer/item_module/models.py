@@ -8,8 +8,6 @@ from utils.exception import ErrorType, ErrorException
 from enum import Enum
 import jsonfield, os, math
 
-# region 基本物品
-
 
 # ===================================================
 #  物品类型枚举
@@ -105,6 +103,9 @@ class ContItemType(Enum):
 	PlayerExermon = 202  # 玩家艾瑟萌关系
 
 
+# region 基本物品
+
+
 # ===================================================
 #  货币表
 # ===================================================
@@ -155,26 +156,26 @@ class BaseItem(models.Model):
 		abstract = True
 		verbose_name = verbose_name_plural = "基础物品"
 
-	# TYPES = [
-	# 	(ItemType.Unset.value, '未知物品'),
-	#
-	# 	# LimitedItem
-	# 	# UsableItem
-	# 	(ItemType.HumanItem.value, '人类物品'),
-	# 	(ItemType.ExerItem.value, '艾瑟萌物品'),
-	#
-	# 	# EquipableItem
-	# 	(ItemType.HumanEquip.value, '人类装备'),
-	# 	(ItemType.ExerEquip.value, '艾瑟萌装备'),
-	#
-	# 	# InfiniteItem
-	# 	(ItemType.QuesSugar.value, '题目糖'),
-	#
-	# 	(ItemType.Exermon.value, '艾瑟萌'),
-	# 	(ItemType.ExerSkill.value, '艾瑟萌技能'),
-	# 	(ItemType.ExerGift.value, '艾瑟萌天赋'),
-	# 	(ItemType.ExerFrag.value, '艾瑟萌碎片'),
-	# ]
+	TYPES = [
+		(ItemType.Unset.value, '未知物品'),
+
+		# LimitedItem
+		# UsableItem
+		(ItemType.HumanItem.value, '人类物品'),
+		(ItemType.ExerItem.value, '艾瑟萌物品'),
+
+		# EquipableItem
+		(ItemType.HumanEquip.value, '人类装备'),
+		(ItemType.ExerEquip.value, '艾瑟萌装备'),
+
+		# InfiniteItem
+		(ItemType.QuesSugar.value, '题目糖'),
+
+		(ItemType.Exermon.value, '艾瑟萌'),
+		(ItemType.ExerSkill.value, '艾瑟萌技能'),
+		(ItemType.ExerGift.value, '艾瑟萌天赋'),
+		(ItemType.ExerFrag.value, '艾瑟萌碎片'),
+	]
 
 	# 道具类型
 	TYPE = ItemType.Unset
@@ -193,7 +194,7 @@ class BaseItem(models.Model):
 
 	# 对应的容器项类
 	@classmethod
-	def contItemClass(cls): return BaseContItem
+	def contItemClass(cls): return PackContItem
 
 	# endregion
 
@@ -509,29 +510,29 @@ class BaseContainer(CacheableModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "基本容器"
 
-	# TYPES = [
-	# 	(ContainerType.Unset.value, '未知容器'),
-	#
-	# 	# Pack
-	# 	(ContainerType.HumanPack.value, '人类背包'),
-	# 	(ContainerType.ExerPack.value, '艾瑟萌背包'),
-	#
-	# 	(ContainerType.ExerFragPack.value, '艾瑟萌碎片背包'),
-	#
-	# 	(ContainerType.QuesSugarPack.value, '题目糖背包'),
-	#
-	# 	# Slot
-	# 	(ContainerType.HumanEquipSlot.value, '人类装备槽'),
-	# 	(ContainerType.ExerEquipSlot.value, '艾瑟萌装备槽'),
-	#
-	# 	(ContainerType.ExerSlot.value, '艾瑟萌槽'),
-	#
-	# 	(ContainerType.ExerSkillSlot.value, '艾瑟萌技能槽'),
-	#
-	# 	# Others
-	# 	(ContainerType.ExerGiftPool.value, '艾瑟萌天赋池'),
-	# 	(ContainerType.ExerHub.value, '艾瑟萌仓库'),
-	# ]
+	TYPES = [
+		(ContainerType.Unset.value, '未知容器'),
+
+		# Pack
+		(ContainerType.HumanPack.value, '人类背包'),
+		(ContainerType.ExerPack.value, '艾瑟萌背包'),
+
+		(ContainerType.ExerFragPack.value, '艾瑟萌碎片背包'),
+
+		(ContainerType.QuesSugarPack.value, '题目糖背包'),
+
+		# Slot
+		(ContainerType.HumanEquipSlot.value, '人类装备槽'),
+		(ContainerType.ExerEquipSlot.value, '艾瑟萌装备槽'),
+
+		(ContainerType.ExerSlot.value, '艾瑟萌槽'),
+
+		(ContainerType.ExerSkillSlot.value, '艾瑟萌技能槽'),
+
+		# Others
+		(ContainerType.ExerGiftPool.value, '艾瑟萌天赋池'),
+		(ContainerType.ExerHub.value, '艾瑟萌仓库'),
+	]
 
 	# 容器类型
 	TYPE = ContainerType.Unset
@@ -599,7 +600,7 @@ class BaseContainer(CacheableModel):
 		super().__init__(*args, **kwargs)
 		# if self.type == ContainerType.Unset.value:
 		# 	self.type = self.TYPE.value
-		self.cache(self.REMOVED_CACHE_KEY, [])
+		self._cache(self.REMOVED_CACHE_KEY, [])
 
 	def __str__(self):
 		name = self._meta.verbose_name
@@ -783,8 +784,8 @@ class BaseContainer(CacheableModel):
 
 	# 获取/生成缓存容器项
 	def _cachedContItems(self):
-		return self.getOrSetCache(self.CONTITEM_CACHE_KEY,
-			lambda: self._contItemsFromDb(listed=True))
+		return self._getOrSetCache(self.CONTITEM_CACHE_KEY,
+								   lambda: self._contItemsFromDb(listed=True))
 
 	# 添加缓存容器项
 	def _addCachedContItem(self, cont_item):
@@ -793,7 +794,7 @@ class BaseContainer(CacheableModel):
 	# 移除缓存容器项
 	def _removeCachedContItem(self, cont_item):
 		self._cachedContItems().remove(cont_item)
-		self.getCache(self.REMOVED_CACHE_KEY).append(cont_item)
+		self._getCache(self.REMOVED_CACHE_KEY).append(cont_item)
 
 	# 获取指定物品数量或所有物品总数（占用格子数）
 	def contItemCnt(self, db=False, cla=None, **kwargs):
@@ -1425,8 +1426,8 @@ class SlotContainer(BaseContainer):
 
 		key = self.CONTAINERS_CACHE_KEY % index
 
-		return self.getOrSetCache(key,
-			lambda: self._equipContainer(index))
+		return self._getOrSetCache(key,
+								   lambda: self._equipContainer(index))
 
 	def _equipContainer(self, index):
 		raise NotImplementedError
@@ -1583,31 +1584,31 @@ class BaseContItem(CacheableModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "基本容器项"
 
-	# TYPES = [
-	# 	(ContItemType.Unset.value, '未知容器物品'),
-	#
-	# 	# Pack
-	# 	(ContItemType.HumanPackItem.value, '人类背包物品项'),
-	# 	(ContItemType.ExerPackItem.value, '艾瑟萌背包物品项'),
-	# 	(ContItemType.HumanPackEquip.value, '人类背包装备项'),
-	# 	(ContItemType.ExerPackEquip.value, '艾瑟萌背包装备项'),
-	#
-	# 	(ContItemType.ExerFragPackItem.value, '艾瑟萌碎片背包项'),
-	#
-	# 	(ContItemType.QuesSugarPackItem.value, '题目糖背包项'),
-	#
-	# 	# Slot
-	# 	(ContItemType.HumanEquipSlotItem.value, '人类装备槽项'),
-	# 	(ContItemType.ExerEquipSlotItem.value, '艾瑟萌装备槽项'),
-	#
-	# 	(ContItemType.ExerSlotItem.value, '艾瑟萌槽项'),
-	#
-	# 	(ContItemType.ExerSkillSlotItem.value, '艾瑟萌技能槽项'),
-	#
-	# 	# Others
-	# 	(ContItemType.PlayerExerGift.value, '艾瑟萌天赋池项'),
-	# 	(ContItemType.PlayerExermon.value, '艾瑟萌仓库项'),
-	# ]
+	TYPES = [
+		(ContItemType.Unset.value, '未知容器物品'),
+
+		# Pack
+		(ContItemType.HumanPackItem.value, '人类背包物品项'),
+		(ContItemType.ExerPackItem.value, '艾瑟萌背包物品项'),
+		(ContItemType.HumanPackEquip.value, '人类背包装备项'),
+		(ContItemType.ExerPackEquip.value, '艾瑟萌背包装备项'),
+
+		(ContItemType.ExerFragPackItem.value, '艾瑟萌碎片背包项'),
+
+		(ContItemType.QuesSugarPackItem.value, '题目糖背包项'),
+
+		# Slot
+		(ContItemType.HumanEquipSlotItem.value, '人类装备槽项'),
+		(ContItemType.ExerEquipSlotItem.value, '艾瑟萌装备槽项'),
+
+		(ContItemType.ExerSlotItem.value, '艾瑟萌槽项'),
+
+		(ContItemType.ExerSkillSlotItem.value, '艾瑟萌技能槽项'),
+
+		# Others
+		(ContItemType.PlayerExerGift.value, '艾瑟萌天赋池项'),
+		(ContItemType.PlayerExermon.value, '艾瑟萌仓库项'),
+	]
 
 	# 容器项类型
 	TYPE = ContItemType.Unset
@@ -1771,6 +1772,10 @@ class PackContItem(BaseContItem):
 
 	# region 配置项
 
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return BaseContainer
+
 	# 所接受的物品类
 	@classmethod
 	def acceptedItemClass(cls): return BaseItem
@@ -1933,7 +1938,7 @@ class SlotContItem(BaseContItem):
 		super().__init__(*args, **kwargs)
 		# if self.type == ContainerType.Unset.value:
 		# 	self.type = self.TYPE.value
-		self.cache(self.REMOVED_CACHE_KEY, [])
+		self._cache(self.REMOVED_CACHE_KEY, [])
 
 	def __str__(self):
 		equip_cnt = self.equipCount()
@@ -1983,13 +1988,13 @@ class SlotContItem(BaseContItem):
 	def equipItem(self, index):
 		key = self.EQUIPS_CACHE_KEY % index
 
-		return self.getOrSetCache(key,
-			lambda: self._equipItem(index))
+		return self._getOrSetCache(key,
+								   lambda: self._equipItem(index))
 
 	# 设置装备项缓存
 	def _setEquipItemCache(self, index, equip_item):
 		key = self.EQUIPS_CACHE_KEY % index
-		self.cache(key, equip_item)
+		self._cache(key, equip_item)
 
 		self._setEquipItem(index, equip_item)
 
@@ -2001,8 +2006,8 @@ class SlotContItem(BaseContItem):
 		if equip_item is not None:
 			# equip_item.deequip()
 
-			self.getCache(self.REMOVED_CACHE_KEY).append(equip_item)
-			self.cache(key, None)
+			self._getCache(self.REMOVED_CACHE_KEY).append(equip_item)
+			self._cache(key, None)
 
 		self._setEquipItem(index, None)
 

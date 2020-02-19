@@ -484,7 +484,7 @@ class RuntimeManager:
 		ep.show()
 		TestUtils.catch('查看装备情况')
 
-		p.clearCache()
+		p._clearCache()
 		TestUtils.catch('清除缓存并储存容器情况')
 
 		equip_slot.show()

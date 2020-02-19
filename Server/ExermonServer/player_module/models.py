@@ -130,6 +130,15 @@ class LoginInfo(models.Model):
 	# 登陆IP
 	ip_address = models.GenericIPAddressField(verbose_name="IP地址")
 
+	# 创建实例
+	@classmethod
+	def create(cls, player_id, addr):
+		info = cls()
+		info.player_id = player_id
+		info.ip_address = addr
+
+		return info
+
 
 # ===================================================
 #  密码更改记录表
@@ -340,6 +349,9 @@ class Player(CacheableModel):
 	# 个人介绍
 	description = models.CharField(blank=True, null=True, max_length=128, verbose_name="个人介绍")
 
+	# 信誉积分
+	credit = models.PositiveSmallIntegerField(default=100, verbose_name="信誉积分")
+
 	# 删除标志
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
@@ -357,47 +369,51 @@ class Player(CacheableModel):
 
 	# region 容器管理
 
+	# 获取相关容器
+	def getContainer(self, cla):
+		return self._getOneToOneCache(cla)
+
 	# 获取人类背包
 	def humanPack(self):
-		return self.getOneToOneCache(HumanPack)
+		return self._getOneToOneCache(HumanPack)
 
 	# 获取艾瑟萌背包
 	def exerPack(self):
 		from exermon_module.models import ExerPack
-		return self.getOneToOneCache(ExerPack)
+		return self._getOneToOneCache(ExerPack)
 
 	# 获取艾瑟萌碎片背包
 	def exerFragPack(self):
 		from exermon_module.models import ExerFragPack
-		return self.getOneToOneCache(ExerFragPack)
+		return self._getOneToOneCache(ExerFragPack)
 
 	# 获取艾瑟萌天赋池
 	def exerGiftPool(self):
 		from exermon_module.models import ExerGiftPool
-		return self.getOneToOneCache(ExerGiftPool)
+		return self._getOneToOneCache(ExerGiftPool)
 
 	# 获取艾瑟萌仓库
 	def exerHub(self):
 		from exermon_module.models import ExerHub
-		return self.getOneToOneCache(ExerHub)
+		return self._getOneToOneCache(ExerHub)
 
 	# 获取题目糖背包
 	def quesSugarPack(self):
 		from question_module.models import QuesSugarPack
-		return self.getOneToOneCache(QuesSugarPack)
+		return self._getOneToOneCache(QuesSugarPack)
 
 	# 获取艾瑟萌槽
 	def exerSlot(self):
 		from exermon_module.models import ExerSlot
-		return self.getOneToOneCache(ExerSlot)
+		return self._getOneToOneCache(ExerSlot)
 
 	# 获取装备槽
 	def humanEquipSlot(self):
-		return self.getOneToOneCache(HumanEquipSlot)
+		return self._getOneToOneCache(HumanEquipSlot)
 
 	# 获取金钱
 	def playerMoney(self):
-		return self.getOneToOneCache(PlayerMoney)
+		return self._getOneToOneCache(PlayerMoney)
 
 	def _packContainerIndices(self):
 
@@ -452,6 +468,8 @@ class Player(CacheableModel):
 			'exp': self.exp,
 			'level': level,
 			'next': next,
+			'money': money,
+			'credit': self.credit,
 			'create_time': create_time,
 			'birth': birth,
 			'school': self.school,
@@ -460,7 +478,6 @@ class Player(CacheableModel):
 			'description': self.description,
 			'pack_containers': self._packContainerIndices(),
 			'slot_containers': self._slotContainerIndices(),
-			'money': money
 		}
 
 		# 其他玩家
@@ -516,12 +533,11 @@ class Player(CacheableModel):
 	# 登陆
 	def login(self, consumer):
 
-		login = LoginInfo()
-		login.player = self
-		login.ip_address = consumer.ip_address
+		self._setLoginInfo(
+			LoginInfo.create(self.id, consumer.ip_address)
+		)
 
 		self.online = True
-		self._setLoginInfo(login)
 
 		if self.status == PlayerStatus.CharacterCreated:
 			self._createContainers()
@@ -540,13 +556,13 @@ class Player(CacheableModel):
 		self.online = False
 		self.save()
 
-		self.clearCache()
+		self._clearCache()
 
 	def _setLoginInfo(self, login_info):
-		self.cache(self.LOGININFO_CACHE_KEY, login_info)
+		self._cache(self.LOGININFO_CACHE_KEY, login_info)
 
 	def _getLoginInfo(self):
-		return self.getCache(self.LOGININFO_CACHE_KEY)
+		return self._getCache(self.LOGININFO_CACHE_KEY)
 
 	# 重置密码
 	def resetPassword(self, consumer, pw):
@@ -582,14 +598,14 @@ class Player(CacheableModel):
 
 			player_exers.append(self._createPlayerExer(exers[i], enames[i]))
 
-		if self.exerSlot(): self.deleteCache(ExerSlot)
+		if self.exerSlot(): self._deleteCache(ExerSlot)
 
 		exer_slot = ExerSlot.create(player=self, player_exers=player_exers)
 
 		# for player_exer in player_exers:
 		# 	player_exer.save()
 
-		self.cache(ExerSlot, exer_slot)
+		self._cache(ExerSlot, exer_slot)
 
 		self.status = PlayerStatus.ExermonsCreated.value
 
@@ -691,11 +707,11 @@ class Player(CacheableModel):
 
 	# 设置当前刷题
 	def setExercise(self, exercise):
-		self.cache("exercise", exercise)
+		self._cache("exercise", exercise)
 
 	# 清除当前刷题
 	def clearExercise(self):
-		self.clearCache("exercise")
+		self._clearCache("exercise")
 
 	# 获得金钱
 	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
@@ -855,6 +871,10 @@ class HumanPackItem(PackContItem):
 	item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
 
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return HumanPack
+
 	# 所接受的物品类
 	@classmethod
 	def acceptedItemClass(cls): return HumanItem
@@ -877,6 +897,10 @@ class HumanPackEquip(PackContItem):
 	# 物品
 	item = models.ForeignKey('HumanEquip', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return HumanPack
 
 	# 所接受的物品类
 	@classmethod

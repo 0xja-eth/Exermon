@@ -1,4 +1,5 @@
 from django.db import models
+from item_module.models import ItemType, BaseItem
 from utils.model_utils import CacheableModel, Common as ModelUtils
 from utils.exception import ErrorType, ErrorException
 from enum import Enum
@@ -217,22 +218,23 @@ class PlayerQuestion(CacheableModel):
 
 	def convertToDict(self, type=None):
 
-		if type == 'answer':
-
-			return {
-				'score': self.score(),
-				'correct_selection': self.question.correctAnswer()
-			}
-
-		return {
+		base = {
+			'id': self.id,
 			'question_id': self.question.id,
 			'selection': self.selection,
 			'timespan': self.timespan,
-			'exp_incr': self.exp_incr,
-			'slot_exp_incr': self.slot_exp_incr,
-			'gold_incr': self.gold_incr,
 			'is_new': self.is_new,
 		}
+
+		if type == 'result':
+
+			base['exp_incr'] = self.exp_incr
+			base['slot_exp_incr'] = self.slot_exp_incr
+			base['gold_incr'] = self.gold_incr
+			base['score'] = self.score()
+			base['correct_selection'] = self.question.correctAnswer()
+
+		return base
 
 	# 创建题目
 	@classmethod
@@ -274,22 +276,22 @@ class PlayerQuestion(CacheableModel):
 
 	# 是否正确
 	def correct(self):
-		return self.getOrSetCache(self.CORRECT_CACHE_KEY,
-			lambda: self.question.calcCorrect(self.selection))
+		return self._getOrSetCache(self.CORRECT_CACHE_KEY,
+								   lambda: self.question.calcCorrect(self.selection))
 
 	# 计算得分
 	def score(self):
-		return self.getOrSetCache(self.SCORE_CACHE_KEY,
-			lambda: self.question.calcScore(self.selection))
+		return self._getOrSetCache(self.SCORE_CACHE_KEY,
+								   lambda: self.question.calcScore(self.selection))
 
 	# 开始做题
 	def start(self):
-		self.cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
+		self._cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
 	# 作答
 	def answer(self, selection, record):
 
-		start_time = self.getCache(self.STARTTIME_CACHE_KEY)
+		start_time = self._getCache(self.STARTTIME_CACHE_KEY)
 
 		if start_time is None:
 			raise ErrorException(ErrorType.QuestionNotStarted)
@@ -354,7 +356,72 @@ class QuestionSetType(Enum):
 	Exam = 2  # 考核
 	Battle = 3  # 对战
 
-	Unset = 0 # 未设置
+	Unset = 0  # 未设置
+
+
+# ===================================================
+#  题目集奖励表
+# ===================================================
+class QuestionSetReward(models.Model):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "题目集奖励"
+
+	# 奖励物品类型
+	type = models.PositiveSmallIntegerField(choices=BaseItem.TYPES, verbose_name="物品类型")
+
+	# 奖励物品ID
+	item_id = models.PositiveSmallIntegerField(verbose_name="物品ID")
+
+	# 奖励物品数量
+	count = models.PositiveSmallIntegerField(verbose_name="数量")
+
+	# 题目集记录
+	record = None
+
+	def __str__(self):
+		return "%s *%d" % (self.item(), self.count)
+
+	# 创建实例
+	@classmethod
+	def create(cls, record, item: BaseItem, count):
+		reward = cls()
+		reward.record = record
+		reward.type = item.TYPE
+		reward.item_id = item.id
+		reward.count = count
+
+		return reward
+
+	# 转化为字典
+	def convertToDict(self):
+		return {
+			'type': self.type,
+			'item_id': self.item_id,
+			'count': self.count
+		}
+
+	# 获取物品
+	def item(self) -> BaseItem:
+		from item_module.views import Common
+		return Common.getItem(self.type, id=self.item_id)
+
+	# 获取容器类型
+	def containerType(self):
+		return self.item().contItemClass().containerClass()
+
+
+# ===================================================
+#  刷题奖励表
+# ===================================================
+class ExerciseReward(models.Model):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "刷题奖励"
+
+	# 刷题记录
+	record = models.ForeignKey("ExerciseRecord", on_delete=models.CASCADE, verbose_name="刷题记录")
 
 
 # ===================================================
@@ -370,6 +437,9 @@ class QuestionSetRecord(CacheableModel):
 
 	# 题目缓存键
 	QUES_CACHE_KEY = 'player_ques'
+
+	# 奖励缓存键
+	REWARD_CACHE_KEY = 'rewards'
 
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
@@ -390,22 +460,12 @@ class QuestionSetRecord(CacheableModel):
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self._cache(self.REWARD_CACHE_KEY, [])
+
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
-
-	def convertToDict(self, type=None):
-
-		create_time = ModelUtils.timeToStr(self.create_time)
-		player_questions = ModelUtils.objectsToDict(self.playerQuestions())
-
-		return {
-			'id': self.id,
-			'exp_incr': self.exp_incr,
-			'slot_exp_incr': self.slot_exp_incr,
-			'gold_incr': self.gold_incr,
-			'player_questions': player_questions,
-			'create_time': create_time,
-		}
 
 	# 创建一个题目集
 	@classmethod
@@ -422,13 +482,39 @@ class QuestionSetRecord(CacheableModel):
 		from utils.calc_utils import QuestionSetResultRewardCalc
 		return QuestionSetResultRewardCalc
 
+	# 奖励记录类
+	@classmethod
+	def rewardClass(cls): return QuestionSetReward
+
 	# 生成名字
 	def generateName(self): return ''
 
+	def convertToDict(self, type=None):
+
+		create_time = ModelUtils.timeToStr(self.create_time)
+		player_questions = ModelUtils.objectsToDict(self.playerQuestions(), type=type)
+
+		base = {
+			'id': self.id,
+			'name': self.generateName(),
+			'player_questions': player_questions,
+			'create_time': create_time,
+		}
+
+		if type == 'result':
+			rewards = ModelUtils.objectsToDict(self.rewards())
+
+			base['exp_incr'] = self.exp_incr
+			base['slot_exp_incr'] = self.slot_exp_incr
+			base['gold_incr'] = self.gold_incr
+			base['rewards'] = rewards
+
+		return base
+
 	# 获取所有题目关系
 	def playerQuestions(self):
-		return self.getOrSetCache(self.QUES_CACHE_KEY,
-			lambda: self._playerQuestions())
+		return self._getOrSetCache(self.QUES_CACHE_KEY,
+								   lambda: self._playerQuestions())
 
 	# 获取所有题目关系
 	def _playerQuestions(self):
@@ -499,10 +585,19 @@ class QuestionSetRecord(CacheableModel):
 
 	def _applyResult(self, calc):
 
-		self.exactlyPlayer().gainMoney(self.gold_incr)
-		self.exactlyPlayer().gainExp(self.slot_exp_incr,
+		player = self.exactlyPlayer()
+
+		player.gainMoney(self.gold_incr)
+		player.gainExp(self.slot_exp_incr,
 							calc.exer_exp_incrs,
 							calc.exerslot_exp_incrs)
+
+		rewards = self.rewards()
+
+		for reward in rewards:
+			cla = reward.containerType()
+			container = player.getContainer(cla)
+			container.gainItems(reward.item(), reward.count)
 
 	# 增加题目
 	def addQuestion(self, question_id):
@@ -528,11 +623,11 @@ class QuestionSetRecord(CacheableModel):
 
 	# 初始化题目缓存
 	def _initQuestionCache(self):
-		self.cache(self.QUES_CACHE_KEY, [])
+		self._cache(self.QUES_CACHE_KEY, [])
 
 	# 获取题目缓存
 	def _getQuestionCache(self):
-		cache = self.getCache(self.QUES_CACHE_KEY)
+		cache = self._getCache(self.QUES_CACHE_KEY)
 		if cache is None: return []
 		return cache
 
@@ -550,8 +645,8 @@ class QuestionSetRecord(CacheableModel):
 	def _totalData(self, key, func, player_queses=None):
 		if not self.finished: return []
 
-		return self.getOrSetCache('total_' + key,
-			lambda: self.__generTotalData(func, player_queses))
+		return self._getOrSetCache('total_' + key,
+								   lambda: self.__generTotalData(func, player_queses))
 
 	def __generTotalData(self, func, player_queses=None):
 		res = []
@@ -568,8 +663,8 @@ class QuestionSetRecord(CacheableModel):
 	def _sumData(self, key, func, player_queses=None):
 		if not self.finished: return -1
 
-		return self.getOrSetCache('sum_' + key,
-			lambda: self.__generSumData(func, player_queses))
+		return self._getOrSetCache('sum_' + key,
+								   lambda: self.__generSumData(func, player_queses))
 
 	def __generSumData(self, func, player_queses=None):
 		res = 0
@@ -622,6 +717,26 @@ class QuestionSetRecord(CacheableModel):
 		return corr_cnt / len(results)
 
 	# endregion
+
+	# 添加奖励
+	def addReward(self, item, count):
+		cla = self.rewardClass()
+		reward = cla.create(self, item, count)
+
+		self._addCachedReward(reward)
+
+	# 添加一个缓存奖励
+	def _addCachedReward(self, reward):
+		self._getCache(self.REWARD_CACHE_KEY).append(reward)
+
+	# 获取奖励
+	def rewards(self):
+		return self._getOrSetCache(self.REWARD_CACHE_KEY,
+								   lambda: list(self._rewards()))
+
+	# 实际获取奖励
+	def _rewards(self):
+		raise NotImplementedError
 
 
 # ===================================================
@@ -683,6 +798,10 @@ class ExerciseRecord(QuestionSetRecord):
 		from utils.calc_utils import ExerciseResultRewardCalc
 		return ExerciseResultRewardCalc
 
+	# 奖励记录类
+	@classmethod
+	def rewardClass(cls): return ExerciseReward
+
 	# 生成名字
 	def generateName(self):
 
@@ -692,3 +811,15 @@ class ExerciseRecord(QuestionSetRecord):
 	# 获取所有题目关系
 	def _playerQuestions(self):
 		return self.exercisequestion_set.all()
+
+	def convertToDict(self, type=None):
+
+		res = super().convertToDict(type)
+
+		res['subject_id'] = self.subject_id
+		res['count'] = self.count
+		res['dtb_type'] = self.dtb_type
+
+		return res
+
+	def _rewards(self): return self.exercisereward_set

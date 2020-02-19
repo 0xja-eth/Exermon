@@ -264,7 +264,11 @@ class PlayerExermon(PackContItem):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.cache(self.PARAMS_CACHE_KEY, {})
+		self._cache(self.PARAMS_CACHE_KEY, {})
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerHub
 
 	# 所接受的物品类
 	@classmethod
@@ -272,8 +276,8 @@ class PlayerExermon(PackContItem):
 
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
-		self.cache(self.EXERSKILL_CACHE_KEY,
-				   ExerSkillSlot.create(player_exer=self))
+		self._cache(self.EXERSKILL_CACHE_KEY,
+					ExerSkillSlot.create(player_exer=self))
 
 	# 创建容器项
 	# def transfer(self, container, **kwargs):
@@ -288,7 +292,7 @@ class PlayerExermon(PackContItem):
 
 	# 获取艾瑟萌技能槽
 	def exerSkillSlot(self):
-		return self.getOneToOneCache(
+		return self._getOneToOneCache(
 			ExerSkillSlot, self.EXERSKILL_CACHE_KEY)
 
 	# 转换属性为 dict
@@ -346,7 +350,7 @@ class PlayerExermon(PackContItem):
 
 		from utils.calc_utils import ExermonParamCalc
 
-		cache = self.getCache(self.PARAMS_CACHE_KEY)
+		cache = self._getCache(self.PARAMS_CACHE_KEY)
 
 		# 如果该属性没有缓存
 		if key not in cache:
@@ -387,7 +391,7 @@ class PlayerExermon(PackContItem):
 
 	# 清除属性缓存
 	def _clearParamsCache(self):
-		self.cache(self.PARAMS_CACHE_KEY, {})
+		self._cache(self.PARAMS_CACHE_KEY, {})
 
 	# 总经验
 	def sumExp(self):
@@ -535,6 +539,10 @@ class ExerFragPackItem(PackContItem):
 	# 物品
 	item = models.ForeignKey('ExerFrag', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerFragPack
 
 	# 所接受的物品类
 	@classmethod
@@ -688,6 +696,10 @@ class PlayerExerGift(PackContItem):
 	# 物品
 	item = models.ForeignKey('ExerGift', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerGiftPool
 
 	# 所接受的物品类
 	@classmethod
@@ -859,7 +871,7 @@ class ExerSlotItem(SlotContItem):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.cache(self.PARAMS_CACHE_KEY, {})
+		self._cache(self.PARAMS_CACHE_KEY, {})
 
 	# def _equipItem(self, index):
 	# 	if index == 0: return self.player_exer
@@ -877,7 +889,7 @@ class ExerSlotItem(SlotContItem):
 
 	# 获取艾瑟萌技能槽
 	def exerEquipSlot(self):
-		return self.getOneToOneCache(
+		return self._getOneToOneCache(
 			ExerEquipSlot, self.EQUIPSLOT_CACHE_KEY)
 
 	# 转化为 dict
@@ -899,8 +911,8 @@ class ExerSlotItem(SlotContItem):
 
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
-		self.cache(self.EQUIPSLOT_CACHE_KEY,
-				   ExerEquipSlot.create(exer_slot=self))
+		self._cache(self.EQUIPSLOT_CACHE_KEY,
+					ExerEquipSlot.create(exer_slot=self))
 
 	# 移动容器项
 	def transfer(self, container: ExerSlot, **kwargs):
@@ -938,7 +950,7 @@ class ExerSlotItem(SlotContItem):
 		key = attr or param_id
 		if key is None: return 0
 
-		cache = self.getCache(self.PARAMS_CACHE_KEY)
+		cache = self._getCache(self.PARAMS_CACHE_KEY)
 
 		# 如果该属性没有缓存
 		if key not in cache:
@@ -1024,7 +1036,7 @@ class ExerSlotItem(SlotContItem):
 
 	# 清除属性缓存
 	def _clearParamsCache(self):
-		self.cache(self.PARAMS_CACHE_KEY, {})
+		self._cache(self.PARAMS_CACHE_KEY, {})
 
 	# 刷新艾瑟萌
 	def refresh(self):
@@ -1526,6 +1538,10 @@ class ExerPackItem(PackContItem):
 	item = models.ForeignKey('ExerItem', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
 
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerPack
+
 	# 所接受的物品类
 	@classmethod
 	def acceptedItemClass(cls): return ExerItem
@@ -1548,6 +1564,10 @@ class ExerPackEquip(PackContItem):
 	# 物品
 	item = models.ForeignKey('ExerEquip', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerPack
 
 	# 所接受的物品类
 	@classmethod

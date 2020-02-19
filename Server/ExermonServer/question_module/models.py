@@ -85,8 +85,8 @@ class QuesPicture(models.Model):
 
 	def convertToDict(self):
 		return {
-			'number' : self.number,
-			'data' : self.convertToBase64
+			'number': self.number,
+			'data': self.convertToBase64
 		}
 
 
@@ -495,6 +495,10 @@ class QuesSugarPackItem(PackContItem):
 	# 物品
 	item = models.ForeignKey('QuesSugar', on_delete=models.CASCADE,
 							 null=True, verbose_name="物品")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return QuesSugarPack
 
 	# 所接受的物品类
 	@classmethod

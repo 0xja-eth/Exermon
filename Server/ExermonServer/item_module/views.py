@@ -206,9 +206,9 @@ class Common:
 	def getSameContItems(cls, type, ids, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
 					 **kwargs) -> BaseContItem:
 
-		Check.ensureItemType(type)
+		Check.ensureContItemType(type)
 
-		cla = eval(ContainerType(type).name)
+		cla = eval(ContItemType(type).name)
 
 		res = ViewUtils.getObjects(cla, return_type=return_type, id__in=ids, **kwargs)
 

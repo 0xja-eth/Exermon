@@ -29,87 +29,87 @@ class CacheableModel(models.Model):
 		super().__setattr__(key, value)
 
 	# 进行缓存
-	def cache(self, key, value):
+	def _cache(self, key, value):
 		self.cached_dict[key] = value
 
 	# 获取缓存
-	def getCache(self, key):
+	def _getCache(self, key):
 		if key in self.cached_dict:
 			return self.cached_dict[key]
 		return None
 
 	# 获取或者设置（如果不存在）缓存
-	def getOrSetCache(self, key, func):
+	def _getOrSetCache(self, key, func):
 		if key not in self.cached_dict:
-			self.cache(key, func())
+			self._cache(key, func())
 		return self.cached_dict[key]
 
 	# 获取一对一关系的缓存
-	def getOneToOneCache(self, cla, key=None):
+	def _getOneToOneCache(self, cla, key=None):
 		try:
 			if key is None: key = cla
 			attr_name = cla.__name__.lower()
-			return self.getOrSetCache(key,
-				lambda: getattr(self, attr_name))
+			return self._getOrSetCache(key,
+									   lambda: getattr(self, attr_name))
 		except cla.DoesNotExist: return None
 		except AttributeError: return None
 
 	# 获取外键关系的缓存
-	def getForeignKeyCache(self, cla, key=None):
+	def _getForeignKeyCache(self, cla, key=None):
 		try:
 			if key is None: key = cla
 			attr_name = cla.__name__.lower()+'_set'
-			return self.getOrSetCache(key,
-				lambda: list(getattr(self, attr_name).all()))
+			return self._getOrSetCache(key,
+									   lambda: list(getattr(self, attr_name).all()))
 		except AttributeError: return None
 
 	# 保存缓存
-	def saveCache(self, key=None):
+	def _saveCache(self, key=None):
 		if key is None:
-			self._saveCacheItem(self.cached_dict)
+			self.__saveCacheItem(self.cached_dict)
 
 		elif key in self.cached_dict:
-			self._saveCacheItem(self.cached_dict[key])
+			self.__saveCacheItem(self.cached_dict[key])
 
 	# 保存缓存项
-	def _saveCacheItem(self, item):
+	def __saveCacheItem(self, item):
 		if isinstance(item, (list, tuple)):
-			for val in item: self._saveCacheItem(val)
+			for val in item: self.__saveCacheItem(val)
 
 		elif isinstance(item, dict):
-			for key in item: self._saveCacheItem(item[key])
+			for key in item: self.__saveCacheItem(item[key])
 
 		elif hasattr(item, '__iter__'):
-			for val in item: self._saveCacheItem(val)
+			for val in item: self.__saveCacheItem(val)
 
 		elif isinstance(item, models.Model): item.save()
 
 	# 删除缓存
-	def deleteCache(self, key=None):
+	def _deleteCache(self, key=None):
 		if key is None:
-			self._deleteCacheItem(self.cached_dict)
+			self.__deleteCacheItem(self.cached_dict)
 
 		elif key in self.cached_dict:
-			self._deleteCacheItem(self.cached_dict[key])
+			self.__deleteCacheItem(self.cached_dict[key])
 
-		self.clearCache(key, False)
+		self._clearCache(key, False)
 
 	# 删除缓存项
-	def _deleteCacheItem(self, item):
+	def __deleteCacheItem(self, item):
 		if isinstance(item, (list, tuple)):
-			for val in item: self._saveCacheItem(val)
+			for val in item: self.__saveCacheItem(val)
 
 		elif isinstance(item, dict):
-			for key in item: self._saveCacheItem(item[key])
+			for key in item: self.__saveCacheItem(item[key])
 
 		elif hasattr(item, '__iter__'):
-			for val in item: self._saveCacheItem(val)
+			for val in item: self.__saveCacheItem(val)
 
 		elif isinstance(item, models.Model): item.delete()
 
 	# 清除缓存
-	def clearCache(self, key=None, save=True):
-		if save: self.saveCache(key)
+	def _clearCache(self, key=None, save=True):
+		if save: self._saveCache(key)
 
 		if key is None:
 			self.cached_dict.clear()
@@ -124,7 +124,7 @@ class CacheableModel(models.Model):
 			print(str(self)+" saved!")
 
 		self.saved = True
-		self.saveCache()
+		self._saveCache()
 
 
 # ===================================================
