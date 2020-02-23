@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 可拖动物品展示组件
 /// </summary>
-public class DraggableItemDisplay<T> : ItemDisplay<T>, 
+public class DraggableItemDisplay<T> : ItemDisplay<T>,
     IBeginDragHandler, IDragHandler, IEndDragHandler where T : class {
 
     /// <summary>
@@ -86,6 +86,7 @@ public class DraggableItemDisplay<T> : ItemDisplay<T>,
     public void OnBeginDrag(PointerEventData eventData) {
         if (!isDraggable()) return;
         dragging = true;
+        onBeforeDrag();
         if (createDragObj) dragObj = createDraggingObject();
         else dragObj = convertToDraggingObject();
         updateDraggingObjectPosition(eventData);
@@ -110,7 +111,7 @@ public class DraggableItemDisplay<T> : ItemDisplay<T>,
         dragging = false;
         if (!isDraggable()) return;
 
-        if (createDragObj) Destroy(dragObj); 
+        if (createDragObj) Destroy(dragObj);
         else resetFromDraggingObject();
         dragObj = null;
         refreshStatus();
@@ -119,6 +120,11 @@ public class DraggableItemDisplay<T> : ItemDisplay<T>,
     #endregion
 
     #region 拖拽控制
+
+    /// <summary>
+    /// 开始拖拽
+    /// </summary>
+    protected virtual void onBeforeDrag() { }
 
     /// <summary>
     /// 生成拖拽对象
@@ -155,9 +161,21 @@ public class DraggableItemDisplay<T> : ItemDisplay<T>,
     /// <param name="go">对象</param>
     protected virtual void adjustDraggingObjectTransform(GameObject go) {
         var rt = go.transform as RectTransform;
-        
+
+        Debug.Log("======================");
+        Debug.Log("rt.anchorMin: " + rt.anchorMin);
+        Debug.Log("rt.anchorMax: " + rt.anchorMax);
+        Debug.Log("rt.sizeDelta: " + rt.sizeDelta);
+        Debug.Log("rt.rect: " + rt.rect);
+
         rt.SetParent(draggingParent);
-        
+
+        Debug.Log("======================");
+        Debug.Log("rt.anchorMin: " + rt.anchorMin);
+        Debug.Log("rt.anchorMax: " + rt.anchorMax);
+        Debug.Log("rt.sizeDelta: " + rt.sizeDelta);
+        Debug.Log("rt.rect: " + rt.rect);
+
         rt.SetAsLastSibling();
     }
 

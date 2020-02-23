@@ -59,25 +59,36 @@ public class InfoWindow : BaseWindow {
     }
 
     /// <summary>
-    /// 执行创建
+    /// 跳过创建
     /// </summary>
-    void doCreate() {
-        var birth = birthInput.getValue();
-        var school = schoolInput.getValue();
-        var city = cityInput.getValue();
-        var contact = contactInput.getValue();
-        var description = descriptionInput.getValue();
-
-        playerSer.createInfo(birth, school, city,
-            contact, description, onCreateSuccess);
+    public void jump() {
+        doCreate(true);
     }
 
     /// <summary>
-    /// 创建人物成功回调
+    /// 执行创建
+    /// </summary>
+    void doCreate(bool jump=false) {
+        if (jump)
+            playerSer.createInfo(onCreateSuccess);
+        else {
+            var birth = birthInput.getValue();
+            var school = schoolInput.getValue();
+            var city = cityInput.getValue();
+            var contact = contactInput.getValue();
+            var description = descriptionInput.getValue();
+
+            playerSer.createInfo(birth, school, city,
+                contact, description, onCreateSuccess);
+        }
+    }
+
+    /// <summary>
+    /// 完善信息成功回调
     /// </summary>
     void onCreateSuccess() {
-        var req = gameSys.requestAlert(CreateSuccessText);
-        req.addButton(AlertWindow.OKText, scene.refresh);
+        gameSys.requestAlert(CreateSuccessText);
+        scene.refresh();
     }
 
     #endregion

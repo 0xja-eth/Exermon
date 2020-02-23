@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using LitJson;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 属性展示
@@ -22,8 +23,15 @@ public class ParamDisplay : BaseView {
     const string DefaultFalseText = "否";
 
     static readonly Color DefaultTrueColor = new Color(0, 1, 0);
-    static readonly Color DefaultFalseColor = new Color(1, 0, 0);
+    static readonly Color DefaultFalseColor = new Color(0.92549f, 0.42353f, 0.42353f);
     static readonly Color DefaultNormalColor = new Color(1, 1, 1);
+
+    public const string TrueColorKey = "_true_color";
+    public const string FalseColorKey = "_false_color";
+    public const string NormalColorKey = "_normal_color";
+
+    const string DefaultTrueSign = "+";
+    const string DefaultFalseSign = "-";
 
     /// <summary>
     /// 能转化为属性显示数据的接口
@@ -52,13 +60,13 @@ public class ParamDisplay : BaseView {
     /// <summary>
     /// 显示项
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct DisplayItem {
         // 键名
         public string key;
         // 对应显示的 GameObject
         public GameObject obj;
-        // 对应显示的类型：Text, Color, ScaleX, ScaleY
+        // 对应显示的类型：Text, Sign, Date, DateTime, Color, ScaleX, ScaleY, Sign
         public string type;
         // 是否有动画效果
         public bool animated;
@@ -66,8 +74,15 @@ public class ParamDisplay : BaseView {
         public bool configData;
         // 格式
         public string format;
+        // 触发模式：None, Click, Hover, HOC (HoverOrClick)
+        public string trigger;
     }
 
+    /// <summary>
+    /// 外部组件设置
+    /// </summary>
+    public EventTrigger trigger;
+    
     /// <summary>
     /// 外部变量定义
     /// </summary>
@@ -77,6 +92,7 @@ public class ParamDisplay : BaseView {
     /// 内部变量声明
     /// </summary>
     JsonData displayData; // 要显示的数据
+    JsonData rawData; // 原始数据
 
     bool force = false;
 
@@ -96,10 +112,51 @@ public class ParamDisplay : BaseView {
     void processDisplayItems() {
         for (int i = 0; i < displayItems.Length; i++) {
             var item = displayItems[i];
+            bindDisplayItemEvent(item);
             if (item.obj == null) {
                 var name = DataLoader.underline2UpperHump(item.key);
                 displayItems[i].obj = SceneUtils.find(transform, name);
             }
+        }
+    }
+
+    /// <summary>
+    /// 绑定显示项事件
+    /// </summary>
+    /// <param name="item">显示项</param>
+    void bindDisplayItemEvent(DisplayItem item) {
+        if (trigger == null) return;
+        if (item.trigger == "") return;
+        EventTrigger.Entry entry;
+
+        switch (item.trigger.ToLower()) {
+            case "click":
+                entry = new EventTrigger.Entry();
+                entry.callback = new EventTrigger.TriggerEvent();
+                entry.callback.AddListener((_) => refreshKey(item));
+                entry.eventID = EventTriggerType.PointerClick;
+                trigger.triggers.Add(entry);
+                break;
+            case "hover":
+                entry = new EventTrigger.Entry();
+                entry.callback = new EventTrigger.TriggerEvent();
+                entry.callback.AddListener((_) => refreshKey(item));
+                entry.eventID = EventTriggerType.PointerEnter;
+                trigger.triggers.Add(entry);
+                break;
+            case "hoc":
+                entry = new EventTrigger.Entry();
+                entry.callback = new EventTrigger.TriggerEvent();
+                entry.callback.AddListener((_) => refreshKey(item));
+                entry.eventID = EventTriggerType.PointerEnter;
+                trigger.triggers.Add(entry);
+
+                entry = new EventTrigger.Entry();
+                entry.callback = new EventTrigger.TriggerEvent();
+                entry.callback.AddListener((_) => refreshKey(item));
+                entry.eventID = EventTriggerType.PointerClick;
+                trigger.triggers.Add(entry);
+                break;
         }
     }
 
@@ -111,6 +168,7 @@ public class ParamDisplay : BaseView {
         displayData.SetJsonType(JsonType.Object);
         foreach (var item in displayItems)
             displayData[item.key] = null;
+        rawData = displayData;
     }
 
     /// <summary>
@@ -142,6 +200,7 @@ public class ParamDisplay : BaseView {
         foreach (var item in displayItems)
             if (DataLoader.contains(value, item.key))
                 setKey(item.key, value[item.key]);
+        rawData = value;
     }
     /// <param name="obj">值对象</param>
     public void setValue(DisplayDataConvertable obj, string type = "", bool force = false) {
@@ -183,20 +242,25 @@ public class ParamDisplay : BaseView {
     /// 刷新所有键
     /// </summary>
     void refreshKeys() {
-        foreach(var item in displayItems) 
-            refreshKey(item, displayData[item.key]);
+        foreach (var item in displayItems)
+            if (item.trigger == "") refreshKey(item);
     }
 
     /// <summary>
     /// 刷新键
     /// </summary>
     /// <param name="item">显示项</param>
+    void refreshKey(DisplayItem item) {
+        var value = DataLoader.loadJsonData(displayData, item.key);
+        refreshKey(item, value);
+    }
     /// <param name="value">值</param>
     void refreshKey(DisplayItem item, JsonData value) {
         if (item.obj == null) return;
 
         switch (item.type) {
             case "Text": processTextDisplayItem(item, value); break;
+            case "Sign": processSignDisplayItem(item, value); break;
             case "Date": processDateDisplayItem(item, value); break;
             case "DateTime": processDateTimeDisplayItem(item, value); break;
             case "Color": processColorDisplayItem(item, value); break;
@@ -226,6 +290,33 @@ public class ParamDisplay : BaseView {
             text.text = string.Format(format, val ? DefaultTrueText : DefaultFalseText);
         } else
             text.text = string.Format(format, value);
+    }
+
+    /// <summary>
+    /// 处理日期类型的显示项
+    /// </summary>
+    /// <param name="item">显示项</param>
+    /// <param name="value">值</param>
+    void processSignDisplayItem(DisplayItem item, JsonData value) {
+        var text = SceneUtils.text(item.obj);
+        if (text == null) return;
+        var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
+        string signText = "";
+        if (value != null && value.IsDouble) {
+            var val = DataLoader.loadDouble(value);
+            if (val > 0) signText = DefaultTrueSign;
+            text.text = signText + string.Format(format, val);
+        } else if (value != null && value.IsInt) {
+            var val = DataLoader.loadInt(value);
+            if (val > 0) signText = DefaultTrueSign;
+            text.text = signText + string.Format(format, val);
+        } else if (value != null && value.IsBoolean) {
+            var val = DataLoader.loadBool(value);
+            signText = val ? DefaultTrueSign : DefaultFalseSign;
+            text.text = string.Format(format, signText);
+        } else
+            text.text = string.Format(format, value);
+
     }
 
     /// <summary>
@@ -270,12 +361,12 @@ public class ParamDisplay : BaseView {
             if (value.IsString) color = DataLoader.loadColor(value);
             else if (value.IsBoolean) {
                 var val = DataLoader.loadBool(value);
-                color = val ? DefaultTrueColor : DefaultFalseColor;
+                color = val ? trueColor() : falseColor();
             } else if (value.IsInt || value.IsDouble) {
                 var val = DataLoader.loadDouble(value);
-                if (val > 0) color = DefaultTrueColor;
-                else if (val < 0) color = DefaultFalseColor;
-                else color = DefaultNormalColor;
+                if (val > 0) color = trueColor();
+                else if (val < 0) color = falseColor();
+                else color = normalColor();
             }
 
         var ani = SceneUtils.ani(item.obj);
@@ -289,6 +380,36 @@ public class ParamDisplay : BaseView {
             tmpAni.addCurve(typeof(Graphic), "m_Color.a", ori.a, color.a);
             tmpAni.setupAnimation(ani);
         } else graphic.color = color;
+    }
+
+    /// <summary>
+    /// 获取正确颜色
+    /// </summary>
+    /// <returns></returns>
+    Color trueColor() {
+        if (DataLoader.contains(rawData, TrueColorKey))
+            return DataLoader.loadColor(rawData, TrueColorKey);
+        return DefaultTrueColor;
+    }
+
+    /// <summary>
+    /// 获取正确颜色
+    /// </summary>
+    /// <returns></returns>
+    Color falseColor() {
+        if (DataLoader.contains(rawData, FalseColorKey))
+            return DataLoader.loadColor(rawData, FalseColorKey);
+        return DefaultFalseColor;
+    }
+
+    /// <summary>
+    /// 获取常规颜色
+    /// </summary>
+    /// <returns></returns>
+    Color normalColor() {
+        if (DataLoader.contains(rawData, NormalColorKey))
+            return DataLoader.loadColor(rawData, NormalColorKey);
+        return DefaultNormalColor;
     }
 
     /// <summary>

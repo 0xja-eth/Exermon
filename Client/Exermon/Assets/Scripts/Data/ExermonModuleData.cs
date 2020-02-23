@@ -220,7 +220,11 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// </summary>
     public int starId { get; private set; }
     public int gType { get; private set; }
+    public Color color { get; private set; }
     public ParamData[] params_ { get; private set; }
+
+    public Texture2D icon { get; private set; }
+    public Texture2D bigIcon { get; private set; }
 
     /// <summary>
     /// 转化为属性信息集
@@ -237,6 +241,7 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
             json["max"] = max;
             json["value"] = value;
             json["rate"] = value / max;
+            json["color"] = DataLoader.convertColor(color);
             data[i] = json;
         }
         return data;
@@ -269,9 +274,12 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         base.load(json);
 
         starId = DataLoader.loadInt(json, "star_id");
+        color = DataLoader.loadColor(json, "color");
         gType = DataLoader.loadInt(json, "g_type");
         params_ = DataLoader.loadDataArray<ParamData>(json, "params");
 
+        icon = AssetLoader.loadExerGift(getID());
+        bigIcon = AssetLoader.loadBigExerGift(getID());
     }
 
     /// <summary>
@@ -282,6 +290,7 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         var json = base.toJson();
 
         json["star_id"] = starId;
+        json["color"] = DataLoader.convertColor(color);
         json["g_type"] = gType;
         json["params"] = DataLoader.convertDataArray(params_);
 
@@ -917,10 +926,19 @@ public class ExerSlotItem : SlotContItem,
         var max = exermon().star().rateRanges[index].maxValue;
         var delta = value - ori;
         var deltaRate = delta / value;
+        var gift = exerGift();
+        var color = new Color(1, 1, 1);
+        if (gift != null) color = gift.color;
         json["max"] = max;
         json["value"] = value;
         json["rate"] = value / max;
+        json["delta"] = delta;
         json["delta_rate"] = deltaRate;
+
+        json[ParamDisplay.TrueColorKey] = DataLoader.convertColor(color);
+
+        Debug.Log("Growth: " + json.ToJson());
+
         return json;
     }
 

@@ -25,6 +25,7 @@ public static class AssetLoader {
     public const string ExermonFullPath = "Exermon/Full/";
     public const string ExermonIconPath = "Exermon/Icon/";
     public const string ExermonBattlePath = "Exermon/Battle/";
+    public const string ExerGiftIconPath = "ExerGift/Icon/";
     public const string ExerSkillIconPath = "Exermon/Skill/Icon";
     public const string ExerSkillAniPath = "Exermon/Skill/Ani";
     public const string ExerSkillTargetPath = "Exermon/Skill/Target";
@@ -35,6 +36,8 @@ public static class AssetLoader {
     public const string CharacterFileName = "Character";
     public const string ItemFileName = "Item";
     public const string ExermonFileName = "Exermon";
+    public const string ExerGiftFileName = "ExerGift";
+    public const string BigExerGiftFileName = "BigExerGift";
     public const string ExerSkillFileName = "Skill";
 
     /// <summary>
@@ -113,6 +116,24 @@ public static class AssetLoader {
     /// <returns>2D纹理</returns>
     public static Texture2D loadExermonBattle(int id) {
         return loadTexture2D(ExermonBattlePath, ExermonFileName, id);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌战斗图
+    /// </summary>
+    /// <param name="id">艾瑟萌ID</param>
+    /// <returns>2D纹理</returns>
+    public static Texture2D loadExerGift(int id) {
+        return loadTexture2D(ExerGiftIconPath, ExerGiftFileName, id);
+    }
+
+    /// <summary>
+    /// 读取艾瑟萌战斗图
+    /// </summary>
+    /// <param name="id">艾瑟萌ID</param>
+    /// <returns>2D纹理</returns>
+    public static Texture2D loadBigExerGift(int id) {
+        return loadTexture2D(ExerGiftIconPath, BigExerGiftFileName, id);
     }
 
     /// <summary>

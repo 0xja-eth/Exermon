@@ -21,7 +21,7 @@ public class ValidateService : BaseService<ValidateService> {
 
     static readonly Regex CodeReg = new Regex(@"^\d{6}$");
 
-    static readonly int[] NameLen = new int[] { 1, 8 };
+    public static readonly int[] NameLen = new int[] { 1, 8 };
 
     /*
     static readonly int[] ExerNameLen = new int[] { 0, 4 };

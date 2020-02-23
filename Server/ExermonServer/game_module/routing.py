@@ -4,6 +4,7 @@ from game_module.views import Service as Game
 from player_module.views import Service as Player
 from item_module.views import Service as Item
 from exermon_module.views import Service as Exermon
+from record_module.views import Service as Record
 from question_module.views import Service as Question
 from .consumer import ChannelLayerTag, GameConsumer
 
@@ -127,6 +128,35 @@ WEBSOCKET_METHOD_ROUTER = {
 		Player.getBasic,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 获取玩家状态界面信息
+	'player/get/status': [[
+		['uid', 'int'],
+		['get_uid', 'int'],
+	],
+		Player.getStatus,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 玩家修改昵称
+	'player/edit/nickname': [[
+		['uid', 'int'],
+		['name', 'str'],
+	],
+		Player.editNickname,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 玩家修改个人信息
+	'player/edit/info': [[
+		['uid', 'int'],
+		['grade', 'int'],
+		['birth', 'var'],
+		['school', 'var'],
+		['city', 'var'],
+		['contact', 'var'],
+		['description', 'var'],
+	],
+		Player.editInfo,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 获取背包类容器项数据
 	'item/packcontainer/get': [[
 		['uid', 'int'],
@@ -221,6 +251,76 @@ WEBSOCKET_METHOD_ROUTER = {
 		['eeid', 'int'],
 	],
 		Exermon.equipSlotEquip,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 艾瑟萌改名
+	'exermon/playerexer/rename': [[
+		['uid', 'int'],
+		['peid', 'int'],
+		['name', 'str']
+	],
+		Exermon.playerExerRename,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 查询记录
+	'record/record/get': [[
+		['uid', 'int']
+	],
+		Record.get,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 收藏/解除收藏题目
+	'record/question/collect': [[
+		['uid', 'int'],
+		['qid', 'int']
+	],
+		Record.collect,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 解除错题
+	'record/question/unwrong': [[
+		['uid', 'int'],
+		['qid', 'int']
+	],
+		Record.unwrong,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 添加备注
+	'record/question/note': [[
+		['uid', 'int'],
+		['qid', 'int'],
+		['note', 'str']
+	],
+		Record.note,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 开始刷题
+	'record/exercise/start': [[
+		['uid', 'int'],
+		['sid', 'int'],
+		['dtb_type', 'int'],
+		['count', 'int']
+	],
+		Record.exerciseStart,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 作答刷题题目
+	'record/exercise/answer': [[
+		['uid', 'int'],
+		['eid', 'int'],
+		['eqid', 'int'],
+		['selection', 'int[]'],
+		['timespan', 'int'],
+		['terminate', 'bool']
+	],
+		Record.exerciseAnswer,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 查询题目
+	'question/question/get': [[
+		['qids', 'int[]']
+	],
+		Question.get,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 

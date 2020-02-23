@@ -74,16 +74,18 @@ public class InitExerSlotDisplay : SlotItemDisplay<ExerSlotItem, ExerGift> {
         this.icon.overrideSprite = Sprite.Create(
             icon, rect, new Vector2(0.5f, 0.5f));
         this.icon.overrideSprite.name = icon.name;
-        name.text = item.playerExer.name();
-        subject.text = exermon.subject().name;
+        this.icon.gameObject.SetActive(true);
+        if (name) name.text = item.playerExer.name();
+        if (subject) subject.text = exermon.subject().name;
     }
 
     /// <summary>
     /// 清除物品
     /// </summary>
     protected override void clearItem() {
-        name.text = subject.text = "";
-        icon.overrideSprite = null;
+        if (name) name.text = "";
+        if (subject) subject.text = "";
+        icon.gameObject.SetActive(false);
     }
 
     /// <summary>

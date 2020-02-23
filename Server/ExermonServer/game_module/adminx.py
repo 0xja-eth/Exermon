@@ -71,16 +71,16 @@ class ExerGiftParamRateRangesInline(ParamsInline):
 
 @xadmin.sites.register(Subject)
 class SubjectAdmin(object):
-	list_display = ['id', 'name', 'max_score', 'force', 'adminColor', 'configure']
+	list_display = ['id', 'name', 'max_score', 'force', 'color', 'adminColor', 'configure']
 
-	list_editable = ['name', 'max_score', 'force', 'configure']
+	list_editable = ['name', 'max_score', 'force', 'color', 'configure']
 
 
 @xadmin.sites.register(BaseParam)
 class BaseParamAdmin(object):
-	list_display = ['id', 'name', 'description', 'attr', 'adminColor', 'configure']
+	list_display = ['id', 'name', 'description', 'attr', 'color', 'adminColor', 'configure']
 
-	list_editable = ['name', 'description', 'attr', 'configure']
+	list_editable = ['name', 'description', 'attr', 'color', 'configure']
 
 
 @xadmin.sites.register(UsableItemType)
@@ -106,37 +106,37 @@ class ExerEquipTypeAdmin(object):
 
 @xadmin.sites.register(ExerStar)
 class ExerStarAdmin(object):
-	list_display = ['id', 'name',
+	list_display = ['id', 'name', 'color',
 					'adminColor', 'max_level', 'adminLevelExpFactors',
 					'adminParamBaseRanges', 'adminParamRateRanges', 'configure']
 
-	list_editable = ['name', 'max_level', 'configure']
+	list_editable = ['name', 'color', 'max_level', 'configure']
 
 	inlines = [ExerParamBaseRangesInline, ExerParamRateRangesInline]
 
 
 @xadmin.sites.register(ExerGiftStar)
 class ExerGiftStarAdmin(object):
-	list_display = ['id', 'name', 'adminColor', 'configure']
+	list_display = ['id', 'name', 'color', 'adminColor', 'configure']
 
-	list_editable = ['name', 'configure']
+	list_editable = ['name', 'color', 'configure']
 
 	inlines = [ExerGiftParamRateRangesInline]
 
 
 @xadmin.sites.register(ItemStar)
 class ItemStarAdmin(object):
-	list_display = ['id', 'name', 'adminColor', 'configure']
+	list_display = ['id', 'name', 'color', 'adminColor', 'configure']
 
-	list_editable = ['name', 'configure']
+	list_editable = ['name', 'color', 'configure']
 
 
 @xadmin.sites.register(QuestionStar)
 class QuestionStarAdmin(object):
-	list_display = ['id', 'name', 'adminColor', 'level', 'weight',
+	list_display = ['id', 'name', 'color', 'adminColor', 'level', 'weight',
 					'exp_incr', 'gold_incr', 'std_time', 'min_time']
 
-	list_editable = ['name', 'level', 'weight', 'exp_incr', 'gold_incr',
+	list_editable = ['name', 'color', 'level', 'weight', 'exp_incr', 'gold_incr',
 					 'std_time', 'min_time', 'configure']
 
 

@@ -449,6 +449,14 @@ class Player(CacheableModel):
 			'humanequipslot': humanequipslot,
 		}
 
+	# 对战信息
+	def _battleInfo(self):
+		return {}
+
+	# 刷题信息
+	def _exerciseInfo(self):
+		return {}
+
 	def convertToDict(self, type=None):
 
 		create_time = ModelUtils.timeToStr(self.create_time)
@@ -461,33 +469,41 @@ class Player(CacheableModel):
 			'id': self.id,
 			'name': self.name,
 			'character_id': self.character_id,
-			'grade': self.grade,
+			'level': level,
 			'status': self.status,
 			'type': self.type,
-			'online': self.online,
-			'exp': self.exp,
-			'level': level,
-			'next': next,
-			'money': money,
-			'credit': self.credit,
 			'create_time': create_time,
-			'birth': birth,
-			'school': self.school,
-			'city': self.city,
-			'contact': self.contact,
-			'description': self.description,
 			'pack_containers': self._packContainerIndices(),
 			'slot_containers': self._slotContainerIndices(),
 		}
 
 		# 其他玩家
-		if type == "others": pass
+		if type == "others":
+			base['online'] = self.online
 
 		# 当前玩家
 		if type == "current":
 			base['username'] = self.username
 			base['phone'] = self.phone
 			base['email'] = self.email
+			base['exp'] = self.exp
+			base['next'] = next
+			base['money'] = money
+
+		# 当前玩家
+		if type == "status":
+			base['exp'] = self.exp
+			base['next'] = next
+
+			base['grade'] = self.grade
+			base['birth'] = birth
+			base['school'] = self.school
+			base['city'] = self.city
+			base['contact'] = self.contact
+			base['description'] = self.description
+
+			base['battle_info'] = self._battleInfo()
+			base['exercise_info'] = self._exerciseInfo()
 
 		return base
 
@@ -632,7 +648,7 @@ class Player(CacheableModel):
 		self.save()
 
 	# 补全人物信息
-	def createInfos(self, birth, school, city, contact, description):
+	def createInfo(self, birth, school, city, contact, description):
 
 		self.birth = birth
 		self.school = school
@@ -683,6 +699,16 @@ class Player(CacheableModel):
 
 		if self.quesSugarPack() is None:
 			QuesSugarPack.create(player=self)
+
+	# 修改人物信息
+	def editInfo(self, grade, birth, school, city, contact, description):
+
+		self.grade = grade
+		self.birth = birth
+		self.school = school
+		self.city = city
+		self.contact = contact
+		self.description = description
 
 	# 等级（本等级, 下一级所需经验）
 	def level(self, calc_next=False):

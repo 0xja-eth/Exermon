@@ -20,6 +20,16 @@ public class BaseInputField<T> : BaseView {
     /// </summary>
     public Text explainer; // 错误提示
     public GameObject correct, wrong; // 图标提示
+    public GameObject current; // 当前箭头
+    public Image inputBackground; // 输入背景
+
+    /// <summary>
+    /// 外部变量设置
+    /// </summary>
+    public bool isFocusEnable = false;
+
+    public Color focusColor = new Color(1, 1, 1, 0.85f);
+    public Color blurColor = new Color(1, 1, 1, 0.5f);
 
     /// <summary>
     /// 内部变量声明
@@ -29,12 +39,37 @@ public class BaseInputField<T> : BaseView {
 
     protected T value = default; // 值
 
+    bool focused = false;
+
     #region 初始化
 
     /// <summary>
     /// 初次打开时初始化（子类中重载）
     /// </summary>
     protected override void initializeOnce() {
+        value = emptyValue();
+        onBlur();
+    }
+
+    #endregion
+
+    #region 更新控制
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    protected override void update() {
+        base.update();
+        updateFocus();
+    }
+
+    /// <summary>
+    /// 更新 Focus 事件
+    /// </summary>
+    void updateFocus() {
+        Debug.Log(name + ": " + isRealFocused());
+        if (isRealFocused() && !isFocused()) onFocus();
+        if (!isRealFocused() && isFocused()) onBlur();
     }
 
     #endregion
@@ -56,8 +91,12 @@ public class BaseInputField<T> : BaseView {
     /// </summary>
     /// <param name="display">判断后是否显示校验信息</param>
     public string doCheck(bool display = true) {
-        if (check == null) return "";
-        var res = check.Invoke(getValue());
+        var value = getValue();
+        var res = (check != null ? check.Invoke(value) : "");
+        // 如果当前为空值且允许，不进行信息提示
+        if (value.Equals(emptyValue()) && res == "") {
+            clear(); return "";
+        }
         if (display) displayCheckResult(res);
         return res;
     }
@@ -77,6 +116,12 @@ public class BaseInputField<T> : BaseView {
     #endregion
 
     #region 数据控制
+
+    /// <summary>
+    /// 空值
+    /// </summary>
+    /// <returns></returns>
+    public virtual T emptyValue() { return default; }
 
     /// <summary>
     /// 获取内容值
@@ -134,7 +179,7 @@ public class BaseInputField<T> : BaseView {
     /// 清除值
     /// </summary>
     protected virtual void clearValue() {
-        setValue(default, false, false);
+        setValue(emptyValue(), false, false);
         requestRefresh(true);
     }
 
@@ -216,6 +261,59 @@ public class BaseInputField<T> : BaseView {
         clearStatus();
         clearExplainerText();
     }
+
+    #endregion
+
+    #region 事件控制
+
+    /// <summary>
+    /// 是否有焦点
+    /// </summary>
+    /// <returns></returns>
+    public bool isFocused() {
+        return focused;
+    }
+
+    /// <summary>
+    /// 是否实际有焦点
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool isRealFocused() {
+        return isFocused();
+    }
+
+    /// <summary>
+    /// 获取焦点
+    /// </summary>
+    protected virtual void onFocus() {
+        if (!isFocusEnable) return;
+        Debug.Log("onFocus");
+        focused = true;
+        current?.SetActive(true);
+        if (inputBackground)
+            inputBackground.color = focusColor;
+    }
+
+    /// <summary>
+    /// 失去焦点
+    /// </summary>
+    protected virtual void onBlur() {
+        if (!isFocusEnable) return;
+        Debug.Log("onBlur");
+        focused = false;
+        current?.SetActive(false);
+        if (inputBackground)
+            inputBackground.color = blurColor;
+    }
+
+    #endregion
+
+    #region 流程控制
+
+    /// <summary>
+    /// 激活
+    /// </summary>
+    public virtual void activate() {}
 
     #endregion
 

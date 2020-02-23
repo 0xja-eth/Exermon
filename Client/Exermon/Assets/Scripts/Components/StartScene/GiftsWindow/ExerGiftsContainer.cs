@@ -18,7 +18,6 @@ public class ExerGiftsContainer : ItemContainer<ExerGift> {
     /// </summary>
     public RectTransform draggingParent; // 拖拽对象的父变换
 
-    public ExerGiftDetail detail; // 帮助界面
     public ExerSlotDetail slotDetail; // 艾瑟萌槽帮助界面
     public ExerSlotsContainer exerSlot; // 艾瑟萌槽
 
@@ -30,14 +29,6 @@ public class ExerGiftsContainer : ItemContainer<ExerGift> {
     public bool inStartScene = false; // 是否在开始场景中
 
     #region 数据控制
-
-    /// <summary>
-    /// 获取物品帮助组件
-    /// </summary>
-    /// <returns>帮助组件</returns>
-    protected override ItemInfo<ExerGift> getItemDetail() {
-        return detail;
-    }
 
     /// <summary>
     /// 准备转移

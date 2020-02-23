@@ -30,7 +30,7 @@ public class DateTimePicker : BaseView,
     public Type type; // 日期类型
     public int itemCount = 2; // 备选数量（上下对称）
     public int threshold = 15; // 灵敏度
-    public int fontSize = 18; // 每个数值的字体大小
+    public int itemHeight = 42; // 每个项的大小
 
     public Color currentTextColor = new Color(1, 1, 1); // 当前项的文本颜色
     public Color minTextColor = new Color(0.2f, 0.2f, 0.2f); // 最远项的文本颜色
@@ -72,11 +72,12 @@ public class DateTimePicker : BaseView,
         for (int i = 0; i < cnt; ++i) {
             float dist = Math.Abs(i - currentItemIndex());
             var go = Instantiate(itemPerfab, container);
+            var rt = go.transform as RectTransform;
             var text = SceneUtils.text(go);
             var rate = 1 - dist / itemCount;
             text.color = minTextColor + 
                 (currentTextColor - minTextColor) * rate;
-            text.fontSize = fontSize;
+            SceneUtils.setRectHeight(rt, itemHeight);
             items[i] = text;
         }
     }

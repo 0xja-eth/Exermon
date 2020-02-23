@@ -10,7 +10,13 @@ from utils.exception import ErrorType, ErrorException
 # 题目服务类，封装管理题目模块的业务处理函数
 # =======================
 class Service:
-	pass
+
+	# 查询题目
+	@classmethod
+	async def get(cls, consumer, qids: list):
+		# 返回数据：
+		# questions: 题目数据（数组） => 题目数据集
+		pass
 
 
 # =======================

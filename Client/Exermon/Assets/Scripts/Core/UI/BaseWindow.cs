@@ -52,7 +52,7 @@ public class BaseWindow : BaseView {
     /// 更新窗口背景
     /// </summary>
     void updateBackground() {
-        if (background != null) background.SetActive(isVisibleState());
+        if (background != null) background.SetActive(isBackgroundVisible());
     }
 
     /// <summary>
@@ -145,7 +145,15 @@ public class BaseWindow : BaseView {
     /// 判断是否处于可视状态
     /// </summary>
     /// <returns>是否可视状态</returns>
-    bool isVisibleState() {
+    protected virtual bool isBackgroundVisible() {
+        return isVisibleState();
+    }
+
+    /// <summary>
+    /// 判断是否处于可视状态
+    /// </summary>
+    /// <returns>是否可视状态</returns>
+    protected bool isVisibleState() {
         return state != State.None && state != State.Hidden;
     }
 

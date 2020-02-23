@@ -12,17 +12,21 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// <summary>
     /// 常量设置
     /// </summary>
-    const string StarTextFormat = "星级：{0}";
-    const string TypeTextFormat = "类型：{0}";
-    const string AnimalTextFormat = "品种：{0}";
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public Image full;
-    public Text name, subject, description, star, type, animal;
+    public Text name, subject, animal;
     public ParamDisplaysGroup paramsView;
+
     public TextInputField nicknameInput;
+    public GameObject oriNameView;
+
+    /// <summary>
+    /// 内部变量设置
+    /// </summary>
+    string nickname;
 
     #region 初始化
 
@@ -47,6 +51,14 @@ public class ExermonDetail : ItemInfo<Exermon> {
     #region 数据控制
 
     /// <summary>
+    /// 物品改变回调
+    /// </summary>
+    protected override void onItemChanged() {
+        nickname = item.name;
+        base.onItemChanged();
+    }
+
+    /// <summary>
     /// 获取容器
     /// </summary>
     /// <returns></returns>
@@ -63,24 +75,21 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// </summary>
     /// <param name="exermon">物品</param>
     protected override void drawExactlyItem(Exermon exermon) {
-        drawFullView(exermon);
+        completeNicknameText();
         drawInfoView(exermon);
         drawParamsView(exermon);
-        completeNicknameText();
     }
 
     /// <summary>
-    /// 绘制全身像卡片
+    /// 绘制全身像
     /// </summary>
     /// <param name="exermon">物品</param>
-    void drawFullView(Exermon exermon) {
+    void drawFull(Exermon exermon) {
         var full = exermon.full;
         var rect = new Rect(0, 0, full.width, full.height);
         this.full.overrideSprite = Sprite.Create(
             full, rect, new Vector2(0.5f, 0.5f));
         this.full.overrideSprite.name = full.name;
-        name.text = exermon.name;
-        subject.text = exermon.subject().name;
     }
 
     /// <summary>
@@ -88,13 +97,14 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// </summary>
     /// <param name="exermon">物品</param>
     void drawInfoView(Exermon exermon) {
+        drawFull(exermon);
+
         var starText = exermon.star().name;
         var typeText = exermon.typeText();
 
-        description.text = exermon.description;
-        star.text = string.Format(StarTextFormat, starText);
-        type.text = string.Format(TypeTextFormat, typeText);
-        animal.text = string.Format(AnimalTextFormat, exermon.animal);
+        name.text = nickname;
+        subject.text = exermon.subject().name;
+        animal.text = exermon.animal;
     }
 
     /// <summary>
@@ -110,24 +120,18 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// </summary>
     void completeNicknameText() {
         var container = getContainer();
-        nicknameInput.setValue(container.getNickname(index));
+        nickname = container.getNickname(index);
+        nicknameInput.setValue(nickname, false, false);
     }
 
     /// <summary>
-    /// 清除全身像卡片
-    /// </summary>
-    void clearFullView() {
-        full.overrideSprite = null;
-        name.text = subject.text = "";
-    }
-
-    /// <summary>
-    /// 清除基本信息
+    /// 清除信息视图
     /// </summary>
     void clearInfoView() {
-        description.text = star.text = type.text = animal.text = "";
+        full.overrideSprite = null;
+        name.text = subject.text = animal.text = "";
     }
-
+    
     /// <summary>
     /// 清除属性信息
     /// </summary>
@@ -139,14 +143,13 @@ public class ExermonDetail : ItemInfo<Exermon> {
     /// 清空昵称输入
     /// </summary>
     void clearNicknameText() {
-        nicknameInput.setValue("", false);
+        nicknameInput.setValue("", false, false);
     }
 
     /// <summary>
     /// 清除物品
     /// </summary>
     protected override void clearItem() {
-        clearFullView();
         clearInfoView();
         clearParamsView();
         clearNicknameText();
@@ -157,10 +160,31 @@ public class ExermonDetail : ItemInfo<Exermon> {
     #region 流程控制
 
     /// <summary>
+    /// 开始昵称输入
+    /// </summary>
+    public void startNicknameInput() {
+        oriNameView.SetActive(false);
+        nicknameInput.setValue(nickname, false, false);
+        nicknameInput.startView();
+        nicknameInput.activate();
+    }
+
+    /// <summary>
+    /// 结束昵称输入
+    /// </summary>
+    void terminateNicknameInput() {
+        oriNameView.SetActive(true);
+        nicknameInput.terminateView();
+        requestRefresh();
+    }
+
+    /// <summary>
     /// 昵称改变回调事件
     /// </summary>
     public void onNicknameChanged(string value) {
-        getContainer().changeNickname(index, value);
+        nickname = (value == "" ? item.name : value);
+        getContainer().changeNickname(index, nickname);
+        terminateNicknameInput();
     }
 
     #endregion

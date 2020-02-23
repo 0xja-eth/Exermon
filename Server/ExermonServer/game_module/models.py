@@ -273,7 +273,7 @@ class GroupConfigure(models.Model):
 	Count = None
 
 	# 所属配置
-	configure = models.ForeignKey('GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
+	configure = models.ForeignKey('game_module.GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
 
 	# 名称
 	name = models.CharField(max_length=8, verbose_name="名称")
@@ -358,7 +358,7 @@ class Subject(GroupConfigure):
 	# 必选科目
 	force = models.BooleanField(default=False, verbose_name="必选科目")
 
-	# 管理界面用：显示星级颜色
+	# 管理界面用：显示科目颜色
 	def adminColor(self):
 		from django.utils.html import format_html
 

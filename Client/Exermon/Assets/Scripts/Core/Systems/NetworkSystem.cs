@@ -611,7 +611,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     void doSendRequest(RequestObject req) {
         Debug.Log("Send:" + req.sendData.ToJson());
         webSocket.Send(req.sendData.ToJson());
-        if (req.showLoading) SceneUtils.startLoadingWindow(req.tipsText);
+        if (req.showLoading) gameSys.requestLoadStart(req.tipsText);
     }
 
     /// <summary>
@@ -621,7 +621,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     void doSendRequest(JsonData sendData) {
         Debug.Log("Send:" + sendData.ToJson());
         webSocket.Send(sendData.ToJson());
-        if (showLoading) SceneUtils.startLoadingWindow(tipsText);
+        if (showLoading) gameSys.requestLoadStart(tipsText);
     }
 
     #endregion

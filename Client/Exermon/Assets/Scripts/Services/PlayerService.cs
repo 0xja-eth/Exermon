@@ -341,7 +341,6 @@ public class PlayerService : BaseService<PlayerService> {
         };
     }
 
-
     /// <summary>
     /// 补全信息
     /// </summary>
@@ -352,18 +351,26 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="description">个人介绍</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void createInfo(DateTime birth, string school, 
+    public void createInfo(DateTime birth, string school,
         string city, string contact, string description,
         UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateInfoSuccessFunc(birth, school, city, 
+            generateCreateInfoSuccessFunc(birth, school, city,
             contact, description, onSuccess);
 
         JsonData data = new JsonData();
         data["birth"] = DataLoader.convertDate(birth);
         data["school"] = school; data["city"] = city;
         data["contact"] = contact; data["description"] = description;
+        sendRequest(Oper.CreateInfo, data, _onSuccess, onError, uid: true);
+    }
+    public void createInfo(UnityAction onSuccess, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess =
+            generateCreateInfoSuccessFunc(onSuccess);
+
+        JsonData data = new JsonData();
         sendRequest(Oper.CreateInfo, data, _onSuccess, onError, uid: true);
     }
 
@@ -377,11 +384,18 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="description">个人介绍</param>
     /// <param name="onSuccess">成功回调</param>
     NetworkSystem.RequestObject.SuccessAction
-        generateCreateInfoSuccessFunc(DateTime birth, 
-        string school, string city, string contact, 
+        generateCreateInfoSuccessFunc(DateTime birth,
+        string school, string city, string contact,
         string description, UnityAction onSuccess) {
         return (res) => {
             player.createInfo(birth, school, city, contact, description);
+            onSuccess?.Invoke();
+        };
+    }
+    NetworkSystem.RequestObject.SuccessAction
+        generateCreateInfoSuccessFunc(UnityAction onSuccess) {
+        return (res) => {
+            player.createInfo();
             onSuccess?.Invoke();
         };
     }

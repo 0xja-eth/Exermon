@@ -69,6 +69,7 @@ public class GiftsWindow : BaseWindow {
         foreach (var exer in exerGifts)
             if (exer.gType == 1) initGifts.Add(exer);
         this.exerGifts.configure(initGifts);
+        this.exerGifts.startView(-1);
     }
 
     /// <summary>
@@ -96,16 +97,15 @@ public class GiftsWindow : BaseWindow {
     /// 不正确的格式
     /// </summary>
     void onCheckFailed() {
-        gameSys.requestAlert(InvalidSelectionAlertText, null, null);
+        gameSys.requestAlert(InvalidSelectionAlertText);
     }
 
     /// <summary>
     /// 确认
     /// </summary>
     void confirmCreate() {
-        var req = gameSys.requestAlert(ConfirmText);
-        req.addButton(AlertWindow.YesText, doCreate);
-        req.addButton(AlertWindow.NoText);
+        gameSys.requestAlert(ConfirmText, 
+            AlertWindow.Type.YesOrNo, doCreate);
     }
     
     /// <summary>
@@ -121,8 +121,8 @@ public class GiftsWindow : BaseWindow {
     /// 选择艾瑟萌成功回调
     /// </summary>
     void onCreateSuccess() {
-        var req = gameSys.requestAlert(CreateSuccessText);
-        req.addButton(AlertWindow.OKText, scene.refresh);
+        gameSys.requestAlert(CreateSuccessText);
+        scene.refresh();
     }
 
     #region 数据校验

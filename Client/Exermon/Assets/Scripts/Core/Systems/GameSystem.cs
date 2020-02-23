@@ -64,44 +64,24 @@ public class GameSystem : BaseSystem<GameSystem> {
         /// 属性
         /// </summary>
         public string text { get; }
+        public float duration { get; }
 
-        public string[] btns { get; } =
-            new string[AlertWindow.MaxButtons] { null, null, null };
+        public AlertWindow.Type type { get; }
 
-        public UnityAction[] actions { get; } =
-            new UnityAction[AlertWindow.MaxButtons] { null, null, null };
-
-        /// <summary>
-        /// 按钮数量（填满后不可更改）
-        /// </summary>
-        int btnCnt = 0;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="text">弹窗文本</param>
-        public AlertRequest(string text) {
-            this.text = text;
-        }
+        public UnityAction onOK { get; }
+        public UnityAction onCancel { get; }
+        
         /// <param name="btns">弹窗按钮文本</param>
         /// <param name="actions">弹窗按钮动作</param>
-        public AlertRequest(string text, string[] btns, UnityAction[] actions = null) {
-            this.text = text; this.btns = btns;
-            this.actions = actions;
-            btnCnt = AlertWindow.MaxButtons;
+        public AlertRequest(string text,
+            AlertWindow.Type type = AlertWindow.Type.Notice,
+            UnityAction onOK = null, UnityAction onCancel = null,
+            float duration = AlertWindow.DefaultDuration) {
+            this.text = text; this.type = type;
+            this.onOK = onOK; this.onCancel = onCancel;
+            this.duration = duration;
         }
 
-        /// <summary>
-        /// 添加按钮
-        /// </summary>
-        /// <param name="btn"></param>
-        /// <param name="act"></param>
-        public void addButton(string btn = null, UnityAction act = null) {
-            if (btnCnt >= AlertWindow.MaxButtons) return;
-            int index = btnCnt++;
-            btns[index] = btn;
-            actions[index] = act;
-        }
     }
 
     /// <summary>
@@ -161,13 +141,11 @@ public class GameSystem : BaseSystem<GameSystem> {
     /// 弹窗请求
     /// </summary>
     public AlertRequest alertRequest { get; private set; } = null;
-    public void requestAlert(string text, string[] btns, UnityAction[] actions = null) {
-        Debug.Log("requestAlert: " + text);
-        alertRequest = new AlertRequest(text, btns, actions);
-    }
-    public AlertRequest requestAlert(string text) {
-        Debug.Log("requestAlert: " + text);
-        return alertRequest = new AlertRequest(text);
+    public void requestAlert(string text, 
+        AlertWindow.Type type = AlertWindow.Type.Notice, 
+        UnityAction onOK = null, UnityAction onCancel = null, 
+        float duration = AlertWindow.DefaultDuration) {
+        alertRequest = new AlertRequest(text, type, onOK, onCancel, duration);
     }
     public void clearRequestAlert() {
         alertRequest = null;
@@ -415,9 +393,8 @@ public class GameSystem : BaseSystem<GameSystem> {
     void processException(int status, string errmsg,
         string format, State state, UnityAction retry) {
         var text = string.Format(format, errmsg);
-        var btns = AlertWindow.RetryOrCancel;
-        var actions = new UnityAction[] { null, retry, terminate };
-        requestAlert(text, btns, actions);
+        var type = AlertWindow.Type.RetryOrNo;
+        requestAlert(text, type, retry, terminate);
         changeState(state);
     }
 

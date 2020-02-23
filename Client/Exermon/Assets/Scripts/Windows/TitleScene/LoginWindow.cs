@@ -208,7 +208,7 @@ public class LoginWindow : BaseWindow {
     /// 不正确的格式
     /// </summary>
     void onCheckFailed() {
-        gameSys.requestAlert(InvalidInputAlertText, null, null);
+        gameSys.requestAlert(InvalidInputAlertText);
     }
 
     /// <summary>
@@ -263,8 +263,8 @@ public class LoginWindow : BaseWindow {
     /// <param name="res">返回结果</param>
     void onRegisterSuccess(JsonData res) {
         var id = DataLoader.loadInt(res, "id");
-        gameSys.requestAlert(string.Format(RegisterSuccessText, id),
-            AlertWindow.OK, new UnityAction[] { null, gotoLogin });
+        gameSys.requestAlert(string.Format(RegisterSuccessText, id));
+        gotoLogin();
     }
 
     /// <summary>
@@ -283,8 +283,8 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     /// <param name="res">返回结果</param>
     void onForgetSuccess(JsonData res) {
-        gameSys.requestAlert(ForgetSuccessText,
-            AlertWindow.OK, new UnityAction[] { null, gotoLogin });
+        gameSys.requestAlert(ForgetSuccessText);
+        gotoLogin();
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     /// <param name="res">返回结果</param>
     void onSendSuccess(JsonData res) {
-        gameSys.requestAlert(SendCodeSuccessText, null);
+        gameSys.requestAlert(SendCodeSuccessText);
     }
 
     #region 数据校验

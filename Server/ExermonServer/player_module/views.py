@@ -276,7 +276,7 @@ class Service:
 
 		if description: Check.ensureDescriptionFormat(description)
 
-		player.createInfos(birth, school, city, contact, description)
+		player.createInfo(birth, school, city, contact, description)
 
 	# 获取玩家基本信息
 	@classmethod
@@ -291,6 +291,46 @@ class Service:
 			target_player = Common.getPlayer(id=get_uid)
 
 		return {'player': target_player.convertToDict(type=type)}
+
+	# 获取玩家状态界面信息
+	@classmethod
+	async def getStatus(cls, consumer, player: Player, get_uid: int, ):
+		# 返回数据：
+		# player: 玩家状态数据 => 玩家状态数据
+
+		target_player = Common.getPlayer(id=get_uid)
+
+		return {'player': target_player.convertToDict(type="status")}
+
+
+	# 玩家修改昵称
+	@classmethod
+	async def editNickname(cls, consumer, player: Player, name: str, ):
+		# 返回数据：
+		pass
+
+	# 玩家修改个人信息
+	@classmethod
+	async def editInfo(cls, consumer, player: Player, grade: int, birth=None, school=None,
+						 city=None, contact=None, description=None):
+		# 返回数据：无
+		from utils.interface_manager import Common as InterfaceCommon
+
+		Check.ensureGradeFormat(grade)
+
+		if birth:
+			birth = InterfaceCommon.convertDataType(birth, 'date')
+			Check.ensureBirthFormat(birth)
+
+		if school: Check.ensureSchoolFormat(school)
+
+		if city: Check.ensureCityFormat(city)
+
+		if contact: Check.ensureContactFormat(contact)
+
+		if description: Check.ensureDescriptionFormat(description)
+
+		player.editInfo(grade, birth, school, city, contact, description)
 
 	# 人类装备槽装备
 	@classmethod
@@ -456,3 +496,9 @@ class Common:
 	@classmethod
 	def deleteOnlinePlayer(cls, pid):
 		return RuntimeManager.delete(OnlinePlayer, pid)
+
+	# 获取所有在线玩家（返回：{pid: OnlinePlayer}）
+	@classmethod
+	def getOnlinePlayers(cls):
+		return RuntimeManager.get(OnlinePlayer)
+

@@ -161,11 +161,8 @@ public class BaseService<T> : BaseSystem<T> where T : BaseService<T>, new()  {
         UnityAction retry, UnityAction onError = null) {
         return (status, errmsg) => {
             var text = string.Format(format, errmsg);
-            var btns = AlertWindow.RetryOrCancel;
-            var actions = new UnityAction[] {
-                null, retry, onError
-            };
-            gameSys.requestAlert(text, btns, actions);
+            var type = AlertWindow.Type.RetryOrNo;
+            gameSys.requestAlert(text, type, retry, onError);
         };
     }
 

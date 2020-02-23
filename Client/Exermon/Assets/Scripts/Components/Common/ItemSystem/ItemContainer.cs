@@ -306,7 +306,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
 
         var item = subViews[index];
         if (!item.isSelectable()) return;
-        if (selectedIndex == index) return;
+        //if (selectedIndex == index) return;
 
         selectedIndex = index;
         onSelectChanged();
@@ -316,7 +316,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// 取消选择
     /// </summary>
     public virtual void deselect() {
-        if (selectedIndex >= 0) return;
+        //if (selectedIndex < 0) return;
 
         selectedIndex = -1;
         onSelectChanged();

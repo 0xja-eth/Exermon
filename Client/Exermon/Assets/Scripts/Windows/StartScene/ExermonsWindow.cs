@@ -80,7 +80,7 @@ public class ExermonsWindow : BaseWindow {
     /// 不正确的格式
     /// </summary>
     void onCheckFailed() {
-        gameSys.requestAlert(InvalidSelectionAlertText, null, null);
+        gameSys.requestAlert(InvalidSelectionAlertText);
     }
 
     /// <summary>
@@ -88,9 +88,8 @@ public class ExermonsWindow : BaseWindow {
     /// </summary>
     void confirmCreate() {
         var text = generateSelectedSubjectsText();
-        var req = gameSys.requestAlert(string.Format(ConfirmTextFormat, text));
-        req.addButton(AlertWindow.YesText, doCreate);
-        req.addButton(AlertWindow.NoText);
+        gameSys.requestAlert(string.Format(ConfirmTextFormat, text), 
+            AlertWindow.Type.YesOrNo, doCreate);
     }
 
     /// <summary>
@@ -119,8 +118,8 @@ public class ExermonsWindow : BaseWindow {
     /// 选择艾瑟萌成功回调
     /// </summary>
     void onCreateSuccess() {
-        var req = gameSys.requestAlert(CreateSuccessText);
-        req.addButton(AlertWindow.OKText, scene.refresh);
+        gameSys.requestAlert(CreateSuccessText);
+        scene.refresh();
     }
 
     #region 数据校验

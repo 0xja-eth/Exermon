@@ -12,15 +12,15 @@ public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
     /// <summary>
     /// 常量设置
     /// </summary>
+    const string SelectionFormat = "<size=80><color=#ffea92>{0}</color></size>/{1}";
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public ExerSlotDetail detail; // 帮助界面
-    public ExerGiftDetail giftDetail; // 天赋帮助界面
     public ExerGiftsContainer exerGifts; // 艾瑟萌天赋
 
-    public GameObject tips;
+    public Text selectionDisplay; // 选择数目显示
 
     /// <summary>
     /// 外部变量设置
@@ -35,6 +35,17 @@ public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
     /// <returns>帮助组件</returns>
     protected override ItemInfo<ExerSlotItem> getItemDetail() {
         return detail;
+    }
+
+    /// <summary>
+    /// 已装备数目
+    /// </summary>
+    /// <returns>已装备天赋的艾瑟萌的数目</returns>
+    public int equipedCount() {
+        var cnt = 0;
+        for (int i = 0; i < itemDisplaysCount(); ++i)
+            if (items[i].exerGift() != null) cnt++;
+        return cnt;
     }
 
     /// <summary>
@@ -65,7 +76,7 @@ public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
 
     #endregion
 
-    #region 物品帮助绘制
+    #region 界面绘制
 
     /// <summary>
     /// 绘制实际物品帮助
@@ -73,9 +84,23 @@ public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
     /// <param name="item">物品</param>
     protected override void drawExactlyItemHelp(ExerSlotItem item) {
         if (exerGifts) exerGifts.deselect();
-        if (giftDetail) giftDetail.terminateView();
-        if (tips) tips.SetActive(false);
         base.drawExactlyItemHelp(item);
+    }
+
+    /// <summary>
+    /// 绘制选择数量
+    /// </summary>
+    void refreshSelectionDisplay() {
+        selectionDisplay.text = string.Format(
+            SelectionFormat, equipedCount(), itemsCount());
+    }
+
+    /// <summary>
+    /// 刷新视窗
+    /// </summary>
+    protected override void refresh() {
+        base.refresh();
+        refreshSelectionDisplay();
     }
 
     #endregion

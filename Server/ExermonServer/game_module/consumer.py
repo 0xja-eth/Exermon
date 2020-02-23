@@ -1,23 +1,36 @@
 
 # chat/consumers.py
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.layers import get_channel_layer
 from utils.exception import WebscoketCloseCode
 from enum import Enum
 import json, random, datetime
 
 
+# =====================
+# 发送数据类型枚举
+# =====================
 class EmitType(Enum):
 	Link = 'link'
 	Disconnect = 'disconnect'
+	SeasonSwitch = 'season_switch'
+	RankChanged = 'rank_changed'
 
 
+# =====================
+# Channel层枚举
+# =====================
 class ChannelLayerTag(Enum):
-	AllLayer	= -2
-	NoLayer		= -1
-	Self		= 0
-	Battle		= 1
+	AllLayer = -2
+	NoLayer = -1
+	Self = 0
+	Battle = 1
+	Common = 2
 
 
+# =====================
+# 游戏Consumer
+# =====================
 class GameConsumer(AsyncWebsocketConsumer):
 
 	# 加入的组（{ ChannelLayerTag: string }
@@ -31,6 +44,36 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	# IP地址
 	ip_address = None
+
+	# 公用组名
+	COMMON_GROUP_NAME = "COMMON"
+
+	# 默认 Channel 层
+	DEFAULT_CHANNEL_LAYER = get_channel_layer()
+
+	# 广播全体（对全体在线玩家广播）
+	@classmethod
+	async def broadcast(cls, type: EmitType, data, method='response'):
+
+		from utils.interface_manager import WebSocket
+
+		result = WebSocket.processEmit(type, data, ChannelLayerTag.Common)
+
+		group_name = cls.COMMON_GROUP_NAME
+		group_name = cls.processGroupName(group_name)
+
+		await cls.DEFAULT_CHANNEL_LAYER.group_send(
+			group_name, {'type': method, 'data': result})
+
+	# 处理组名（保证都是英文字符）
+	@classmethod
+	def processGroupName(cls, name):
+
+		res = ''
+		for c in name:
+			res += chr(ord('A') + ord(c) % 26)
+
+		return res
 
 	# 设置关联在线玩家
 	def setOnlineInfo(self, online_info):
@@ -53,6 +96,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 		self.online_info = None
 		self.server_close = False
 		self.ip_address = self.scope['client']
+
+		# 加入公共组
+		await self.joinGroup(ChannelLayerTag.Common, self.COMMON_GROUP_NAME)
 
 		# 加入组
 		await self.joinGroup(ChannelLayerTag.Self, self.channel_name)
@@ -162,15 +208,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 		tmp = self.joined_groups.copy()
 
 		for tag in tmp: await self.leaveGroup(tag)
-
-	# 处理组名（保证都是英文字符）
-	def processGroupName(self, name):
-
-		res = ''
-		for c in name:
-			res += chr(ord('A') + ord(c)%26)
-
-		return res
 
 	# 广播操作
 	# 组内广播（标签，数据，响应函数）

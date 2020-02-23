@@ -12,11 +12,14 @@ public class ExermonsContainer : ItemContainer<Exermon> {
     /// <summary>
     /// 常量设置
     /// </summary>
+    const string SelectionFormat = "<size=80><color=#ffea92>{0}</color></size>/{1}";
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public ExermonDetail detail; // 帮助界面
+
+    public Text selectionDisplay; // 选择数目显示
 
     /// <summary>
     /// 外部变量设置
@@ -54,7 +57,8 @@ public class ExermonsContainer : ItemContainer<Exermon> {
     void setupEnames() {
         var cnt = itemsCount();
         enames = new string[cnt];
-        for (int i = 0; i < cnt; i++) enames[i] = "";
+        for (int i = 0; i < cnt; i++)
+            enames[i] = items[i].name;
     }
 
     /// <summary>
@@ -63,6 +67,7 @@ public class ExermonsContainer : ItemContainer<Exermon> {
     /// <param name="index">索引</param>
     /// <param name="name">名称</param>
     public void changeNickname(int index, string name) {
+        if (enames == null) return;
         enames[index] = name;
     }
 
@@ -126,5 +131,25 @@ public class ExermonsContainer : ItemContainer<Exermon> {
     }
 
     #endregion
-    
+
+    #region 界面绘制
+
+    /// <summary>
+    /// 绘制选择数量
+    /// </summary>
+    void refreshSelectionDisplay() {
+        selectionDisplay.text = string.Format(
+            SelectionFormat, checkedIndices.Count, maxCheckCount());
+    }
+
+    /// <summary>
+    /// 刷新视窗
+    /// </summary>
+    protected override void refresh() {
+        base.refresh();
+        refreshSelectionDisplay();
+    }
+
+    #endregion
+
 }

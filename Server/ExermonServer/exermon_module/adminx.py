@@ -106,12 +106,12 @@ class ExerFragAdmin(BaseItemAdmin):
 class ExerGiftAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['star', 'adminParamRates', 'g_type']
+				   ['star', 'color', 'adminColor', 'adminParamRates', 'g_type']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   ['star', 'g_type']
+				   ['star', 'color', 'g_type']
 
-	field_set = [Fieldset('艾瑟萌天赋属性', 'star', 'g_type')]
+	field_set = [Fieldset('艾瑟萌天赋属性', 'star', 'color', 'g_type')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 

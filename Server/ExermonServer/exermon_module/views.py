@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import *
 from player_module.models import Player
 from utils.exception import ErrorType, ErrorException
@@ -39,6 +38,12 @@ class Service:
 		pack_equip = Common.getPackEquip(id=eeid)
 
 		ItemService.slotContainerEquip(player, equip_slot, pack_equip, e_type_id=eid)
+
+	# 艾瑟萌改名
+	@classmethod
+	async def playerExerRename(cls, consumer, player: Player, peid: int, name: str):
+		# 返回数据：
+		pass
 
 
 # =======================

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 
 using LitJson;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 创建人物窗口
@@ -19,6 +20,12 @@ public class CharacterWindow : BaseWindow {
     const string InvalidInputAlertText = "请检查输入格式正确后再提交！";
 
     const string CreateSuccessText = "创建人物成功！";
+
+    /// <summary>
+    /// 名字库
+    /// </summary>
+    const string NameBase = "阿贝呗思斯坦爱蓉梦怡海山河光耀纽特盖百世白可乐胡虎威猛鲜花华为小米安俺菌俊李狗鸡蛋然冉苒秒妙内外" +
+        "色杀金沙林之若者也琳韬丁马博邹生死吴王君利零虚爷老文章黄红泓道鼹彦闪孙儿杰任静俪康灵玲女男无痕攻击力名人博仁忍者目木水雷";
 
     /// <summary>
     /// 外部组件设置
@@ -73,6 +80,34 @@ public class CharacterWindow : BaseWindow {
     #region 流程控制
 
     /// <summary>
+    /// 随机名称
+    /// </summary>
+    public void random() {
+        nameInput.setValue(generateRandomName());
+    }
+
+    /// <summary>
+    /// 生成随机名字
+    /// </summary>
+    public string generateRandomName() {
+        string res = "";
+        var nameLen = ValidateService.NameLen;
+        var partNum = Random.Range(0, 3); // 片段数量
+        while (res.Length < nameLen[1] && partNum >= 0) {
+            var partLen = Random.Range(nameLen[0], nameLen[1]-1);
+            for (int i = 0; i < partLen; i++) {
+                var index = Random.Range(0, NameBase.Length);
+                if (res.Length >= nameLen[1]) return res;
+                res += NameBase[index];
+            }
+            if (res.Length >= nameLen[1]-1) return res;
+            if (partNum > 0) res += "·";
+            partNum--;
+        }
+        return res;
+    }
+
+    /// <summary>
     /// 创建角色
     /// </summary>
     public void create() {
@@ -84,7 +119,7 @@ public class CharacterWindow : BaseWindow {
     /// 不正确的格式
     /// </summary>
     void onCheckFailed() {
-        gameSys.requestAlert(InvalidInputAlertText, null, null);
+        gameSys.requestAlert(InvalidInputAlertText);
     }
 
     /// <summary>
@@ -102,8 +137,8 @@ public class CharacterWindow : BaseWindow {
     /// 创建人物成功回调
     /// </summary>
     void onCreateSuccess() {
-        var req = gameSys.requestAlert(CreateSuccessText);
-        req.addButton(AlertWindow.OKText, scene.refresh);
+        gameSys.requestAlert(CreateSuccessText);
+        scene.refresh();
     }
 
     #region 数据校验

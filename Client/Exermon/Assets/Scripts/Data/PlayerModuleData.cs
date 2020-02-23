@@ -359,6 +359,18 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     }
 
     /// <summary>
+    /// 补全信息
+    /// </summary>
+    /// <param name="birth">出生日期</param>
+    /// <param name="school">学校名称</param>
+    /// <param name="city">居住地</param>
+    /// <param name="contact">联系方式</param>
+    /// <param name="description">个人介绍</param>
+    public void createInfo() {
+        status = (int)Status.Normal;
+    }
+
+    /// <summary>
     /// 获取人物
     /// </summary>
     /// <returns>人物</returns>

@@ -81,7 +81,8 @@ public class TestSystem : BaseSystem<TestSystem> {
             result += "\n" + point.Item1 + ": " + ms + "ms";
         }
         string final = "Sum: " + (sum / Stopwatch.Frequency * 1000) + "ms";
-        if (alert) SceneUtils.alert("<size=18>" + result + "\n</size>" + final);
+        if (alert) GameSystem.get().requestAlert(
+            "<size=18>" + result + "\n</size>" + final);
         Debug.Log(result + "\n" + final);
     }
 

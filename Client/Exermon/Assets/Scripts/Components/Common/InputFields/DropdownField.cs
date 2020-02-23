@@ -2,12 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
 /// 下拉列表域
 /// </summary>
 public class DropdownField : BaseInputField<Tuple<int, string>> {
+
+    /// <summary>
+    /// 无效值提示语
+    /// </summary>
+    const string InvalidValueTips = "所选值无效！";
 
     /// <summary>
     /// 外部组件设置
@@ -25,6 +31,8 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
     /// 初次打开时初始化（子类中重载）
     /// </summary>
     protected override void initializeOnce() {
+        base.initializeOnce();
+        //check = check ?? defaultCheckFunc;
         processPresetedOptions();
         dropdown?.onValueChanged.AddListener(
             (index) => {
@@ -151,7 +159,16 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
             }
         base.setValue(null, check, emit);
     }
-    
+    /*
+    /// <summary>
+    /// 默认检查函数
+    /// </summary>
+    public string defaultCheckFunc(Tuple<int, string> value) {
+        foreach (var item in options)
+            if (item.Item1 == value.Item1) return "";
+        return InvalidValueTips;
+    }
+    */
     #endregion
 
     #region 界面绘制
@@ -165,6 +182,18 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
         dropdown.itemText.text = value.Item2;
         Debug.Log("drowdown.value = " + dropdown.value + 
             "\ndrowdown.itemText.text = " + dropdown.itemText.text);
+    }
+
+    #endregion
+
+    #region 事件控制
+
+    /// <summary>
+    /// 是否实际有焦点
+    /// </summary>
+    public override bool isRealFocused() {
+        return dropdown && 
+            dropdown.gameObject == EventSystem.current.currentSelectedGameObject;
     }
 
     #endregion

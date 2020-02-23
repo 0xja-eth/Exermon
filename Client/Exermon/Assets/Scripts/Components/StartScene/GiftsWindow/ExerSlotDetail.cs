@@ -14,7 +14,7 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// </summary>
     public Image full;
     public ExerGiftCard gift; // 天赋卡片（装备的）
-    public Text name, subject, description;
+    public Text name;
     public ParamDisplaysGroup paramsView;
 
     #region 初始化
@@ -66,7 +66,6 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// <param name="exermon">物品</param>
     protected override void drawExactlyItem(ExerSlotItem item) {
         drawFullView(item);
-        drawInfoView(item);
         drawParamsView(item);
     }
 
@@ -81,19 +80,8 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
         this.full.overrideSprite = Sprite.Create(
             full, rect, new Vector2(0.5f, 0.5f));
         this.full.overrideSprite.name = full.name;
-        name.text = item.playerExer.name();
+        this.full.gameObject.SetActive(true);
         gift.setItem(item.exerGift());
-    }
-
-    /// <summary>
-    /// 绘制基本信息
-    /// </summary>
-    /// <param name="exermon">物品</param>
-    void drawInfoView(ExerSlotItem item) {
-        var exermon = getExermon(item);
-
-        subject.text = exermon.subject().name;
-        description.text = exermon.description;
     }
 
     /// <summary>
@@ -101,6 +89,7 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// </summary>
     /// <param name="exermon">物品</param>
     void drawParamsView(ExerSlotItem item) {
+        name.text = item.playerExer.name();
         paramsView.setValues(item, "growth");
     }
 
@@ -108,22 +97,15 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// 清除全身像卡片
     /// </summary>
     void clearFullView() {
-        full.overrideSprite = null;
-        name.text = subject.text = "";
+        full.gameObject.SetActive(false);
         gift.setItem(null);
-    }
-
-    /// <summary>
-    /// 清除基本信息
-    /// </summary>
-    void clearInfoView() {
-        description.text = "";
     }
 
     /// <summary>
     /// 清除属性信息
     /// </summary>
     void clearParamsView() {
+        name.text = "";
         paramsView.clearValues();
     }
 
@@ -132,7 +114,6 @@ public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
     /// </summary>
     protected override void clearItem() {
         clearFullView();
-        clearInfoView();
         clearParamsView();
     }
 

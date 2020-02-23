@@ -589,12 +589,22 @@ class ExerGift(BaseItem):
 	# 艾瑟萌星级
 	star = models.ForeignKey('game_module.ExerGiftStar', on_delete=models.CASCADE, verbose_name="艾瑟萌星级")
 
-	# # 标志颜色（#ABCDEF）
-	# color = models.CharField(max_length=7, null=False, default='#FFFFFF', verbose_name="标志颜色")
+	# 标志颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#FFFFFF', verbose_name="标志颜色")
 
 	# 艾瑟萌天赋类型
 	g_type = models.PositiveSmallIntegerField(default=ExerGiftType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌天赋类型")
+
+	# 管理界面用：显示天赋颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "天赋颜色"
 
 	# 管理界面用：显示属性成长率
 	def adminParamRates(self):
@@ -628,7 +638,7 @@ class ExerGift(BaseItem):
 		res = super().convertToDict(**kwargs)
 
 		res['star_id'] = self.star_id
-		# res['color'] = self.color
+		res['color'] = self.color
 		res['g_type'] = self.g_type
 		res['params'] = ModelUtils.objectsToDict(self.paramRates())
 

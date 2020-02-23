@@ -55,15 +55,16 @@ public class InitExermonCard : ItemDisplay<Exermon> {
         this.icon.overrideSprite = Sprite.Create(
             icon, rect, new Vector2(0.5f, 0.5f));
         this.icon.overrideSprite.name = icon.name;
-        name.text = exermon.name;
-        subject.text = exermon.subject().name;
+        if (name) name.text = exermon.name;
+        if (subject) subject.text = exermon.subject().name;
     }
 
     /// <summary>
     /// 清除物品
     /// </summary>
     protected override void clearItem() {
-        name.text = subject.text = "";
+        if (name) name.text = "";
+        if (subject) subject.text = "";
         icon.overrideSprite = null;
     }
 

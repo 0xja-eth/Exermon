@@ -119,463 +119,463 @@ class RuntimeManager:
 	def registerEvent(cls, event):
 		cls.event_processors.append(event)
 
-	# 测试函数
-	@classmethod
-	def testFunc(cls):
-
-		from utils.test_utils import Common as TestUtils
-
-		# def createTerms():
-		# 	if GameTerm.get().exists(): return
-		#
-		# 	term = GameTerm.objects.create()
-		#
-		# 	createSubjects(term)
-		# 	createBaseParams(term)
-		# 	createUsableItemType(term)
-		# 	createHumanEquipType(term)
-		# 	createExerEquipType(term)
-		# 	createExerStar(term)
-		# 	createExerGiftStar(term)
-		#
-		# def createSubjects(term):
-		# 	Subject.objects.create(term=term, name="语文", max_score=150, force=True)
-		# 	Subject.objects.create(term=term, name="数学", max_score=150, force=True)
-		# 	Subject.objects.create(term=term, name="英语", max_score=150, force=True)
-		# 	Subject.objects.create(term=term, name="物理")
-		# 	Subject.objects.create(term=term, name="化学")
-		# 	Subject.objects.create(term=term, name="生物")
-		# 	Subject.objects.create(term=term, name="政治")
-		# 	Subject.objects.create(term=term, name="历史")
-		# 	Subject.objects.create(term=term, name="地理")
-		#
-		# def createBaseParams(term):
-		# 	BaseParam.objects.create(term=term, name="体力值", attr='MHP', min_value=1)
-		# 	BaseParam.objects.create(term=term, name="精力值", attr='MMP')
-		# 	BaseParam.objects.create(term=term, name="攻击力", attr='ATK')
-		# 	BaseParam.objects.create(term=term, name="防御力", attr='DEF')
-		# 	BaseParam.objects.create(term=term, name="回避率", attr='EVA', scale=10000)
-		# 	BaseParam.objects.create(term=term, name="暴击率", attr='CRI', scale=10000)
-		#
-		# def createUsableItemType(term):
-		# 	UsableItemType.objects.create(term=term, name="补给道具")
-		# 	UsableItemType.objects.create(term=term, name="强化道具")
-		# 	UsableItemType.objects.create(term=term, name="功能道具")
-		# 	UsableItemType.objects.create(term=term, name="宝箱")
-		# 	UsableItemType.objects.create(term=term, name="材料道具")
-		# 	UsableItemType.objects.create(term=term, name="任务道具")
-		# 	UsableItemType.objects.create(term=term, name="其他")
-		#
-		# def createHumanEquipType(term):
-		# 	HumanEquipType.objects.create(term=term, name="武器")
-		# 	HumanEquipType.objects.create(term=term, name="头部")
-		# 	HumanEquipType.objects.create(term=term, name="身体")
-		# 	HumanEquipType.objects.create(term=term, name="腿部")
-		# 	HumanEquipType.objects.create(term=term, name="其他")
-		#
-		# def createExerEquipType(term):
-		# 	ExerEquipType.objects.create(term=term, name="武器")
-		# 	ExerEquipType.objects.create(term=term, name="头部")
-		# 	ExerEquipType.objects.create(term=term, name="身体")
-		# 	ExerEquipType.objects.create(term=term, name="腿部")
-		# 	ExerEquipType.objects.create(term=term, name="其他")
-		#
-		# def createExerStar(term):
-		# 	ExerStar.objects.create(term=term, name="一星", max_level=40,
-		# 							level_exp_factors={'a': 1.4, 'b': -3, 'c': 300})
-		# 	ExerStar.objects.create(term=term, name="二星", max_level=50,
-		# 							level_exp_factors={'a': 1.84, 'b': -2, 'c': 315})
-		# 	ExerStar.objects.create(term=term, name="三星", max_level=60,
-		# 							level_exp_factors={'a': 2.33, 'b': -1, 'c': 340})
-		# 	ExerStar.objects.create(term=term, name="四星", max_level=70,
-		# 							level_exp_factors={'a': 2.88, 'b': 0, 'c': 375})
-		# 	ExerStar.objects.create(term=term, name="五星", max_level=80,
-		# 							level_exp_factors={'a': 3.6, 'b': 1, 'c': 420})
-		# 	ExerStar.objects.create(term=term, name="六星", max_level=100,
-		# 							level_exp_factors={'a': 4.5, 'b': 2, 'c': 500})
-		#
-		# def createExerGiftStar(term):
-		# 	ExerGiftStar.objects.create(term=term, name="一星")
-		# 	ExerGiftStar.objects.create(term=term, name="二星")
-		# 	ExerGiftStar.objects.create(term=term, name="三星")
-		#
-		# createTerms()
-
-		# def createPlayer(username, name="", grade=1, cid=None):
-		# 	player = Player()
-		# 	player.username = username
-		# 	player.create(name, grade, cid)
-		#
-		# 	return player
-
-		# def createRandomItem(type, cnt):
-		# 	import random
-		#
-		# 	for i in range(cnt):
-		# 		item: BaseItem = type()
-		# 		item.name = "测试%3d" % i
-		#
-		# 		if isinstance(item, Exermon):
-		# 			item.star_id = random.randrange(1, 7)
-		# 			item.subject_id = random.randrange(1, 10)
-		# 			item.e_type = random.randrange(1, 5)
-		#
-		# 		if isinstance(item, ExerGift):
-		# 			item.star_id = random.randrange(1, 4)
-		#
-		# 		if isinstance(item, (ExerSkill, ExerFrag)):
-		# 			item.o_exermon_id = random.randrange(
-		# 				1, Exermon.objects.count()+1)
-		#
-		# 		if isinstance(item, (ExerEquip, HumanEquip)):
-		# 			item.e_type_id = random.randrange(1, 6)
-		#
-		# 		if isinstance(item, (ExerItem, HumanItem)):
-		# 			item.i_type_id = random.randrange(1, 8)
-		#
-		# 		item.save()
-
-		# createRandomItem(Exermon, 81)
-		# createRandomItem(ExerSkill, 81)
-		# createRandomItem(HumanItem, 150)
-		# createRandomItem(ExerItem, 75)
-		# createRandomItem(HumanEquip, 80)
-		# createRandomItem(ExerEquip, 100)
-		# createRandomItem(ExerGift, 30)
-		# createRandomItem(ExerFrag, 40)
-
-		p: Player = Player.objects.all().first()
-
-		from player_module.views import Common
-
-		Common.addOnlinePlayer(p, None)
-
-		hp: HumanPack = p.humanPack()
-		ep: ExerPack = p.exerPack()
-		es: ExerSlot = p.exerSlot()
-		eh: ExerHub = p.exerHub()
-		egp: ExerGiftPool = p.exerGiftPool()
-
-		exermons = Exermon.objects.all()
-		human_items = HumanItem.objects.all()
-		human_equips = HumanEquip.objects.all()
-		exer_items = ExerItem.objects.all()
-		exer_equips = ExerEquip.objects.all()
-		exer_gifts = ExerGift.objects.all()
-
-		human_item1 = human_items[0]
-		human_item2 = human_items[1]
-		human_item3 = human_items[2]
-
-		exermon1 = exermons[1]
-		exermon2 = exermons[3]
-		exermon3 = exermons.last()
-
-		"========== 背包物品测试 =========="
-
-		# TestUtils.start('人类背包测试')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况')
-		#
-		# cont_item = hp.gainItems(human_item1, 50)[0]
-		# TestUtils.catch('hp.gainItems(human_item1, 50)')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# hp.gainItems(human_item2, 199)
-		# TestUtils.catch('hp.gainItems(human_item2, 199)')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# hp.gainItems(human_item1, 50)
-		# hp.gainItems(human_item3, 19)
-		# TestUtils.catch('hp.gainItems(human_item1, 50) & hp.gainItems(human_item3, 19)')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# hp.lostItems(human_item2, 101)
-		# TestUtils.catch('hp.lostItems(human_item2, 101)')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# cont_item2, _ = hp.splitItem(cont_item, 11)
-		# TestUtils.catch('hp.splitItem(cont_item, 11)')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# hp.mergeItem([cont_item, cont_item2])
-		# TestUtils.catch('hp.mergeItem([cont_item, cont_item2])')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# try:
-		# 	hp.lostItems(human_item1, 101)
-		# except ErrorException as exception:
-		# 	TestUtils.catch('抛出异常测试')
-		# 	traceback.print_exc()
-		#
-		# hp.clearCache()
-		# TestUtils.catch('清除缓存并储存容器情况')
-		#
-		# hp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# hp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# # 抛出异常
-		# TestUtils.end('人类背包测试结束')
-
-		# TestUtils.start('装备艾瑟萌测试')
-		#
-		# eh.show()
-		# TestUtils.catch('查看艾瑟萌仓库情况')
-
-		# player_exers3 = eh.gainItems(exermon3, 2)
-		# TestUtils.catch('eh.gainItems(exermon3, 2)')
-		#
-		# eh.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# eh.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# player_exers1 = eh.gainItems(exermon1, 5)
-		# TestUtils.catch('eh.gainItems(exermon1, 5)')
-		# player_exers2 = eh.gainItems(exermon2, 2)
-		# TestUtils.catch('eh.gainItems(exermon2, 2)')
-		#
-		# eh.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# eh.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-
-		# player_exer = eh.contItem(item=exermon3)
-		# # player_exers5 = eh.contItem(item=exermon2)
-		#
-		# es.show()
-		# TestUtils.catch('查看槽情况')
-		#
-		# es.setPlayerExer(player_exer)
-		# TestUtils.catch('es.setPlayerExer(player_exer)')
-		#
-		# eh.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# es.show()
-		# TestUtils.catch('查看槽情况（缓存）')
-		# es.show(db=True)
-		# TestUtils.catch('查看槽情况（数据库）')
-		#
-		# es.setPlayerExer(None, 2)
-		# TestUtils.catch('es.setPlayerExer(None, 2)')
-		#
-		# eh.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# es.show()
-		# TestUtils.catch('查看槽情况（缓存）')
-		# es.show(db=True)
-		# TestUtils.catch('查看槽情况（数据库）')
-		#
-		# player_gifts = egp.gainItems(exer_gifts[0], 10)
-		# TestUtils.catch('egp.gainItems(exer_gifts[0], 10)')
-		#
-		# egp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		#
-		# print('player_gifts: ' + str(player_gifts))
-		#
-		# es.setPlayerGift(player_gifts[1], 8)
-		# TestUtils.catch('es.setPlayerGift(player_gifts[1], 8)')
-		#
-		# egp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# egp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		# es.show()
-		# TestUtils.catch('查看槽情况（缓存）')
-		# es.show(db=True)
-		# TestUtils.catch('查看槽情况（数据库）')
-		#
-		# p.clearCache()
-		# TestUtils.catch('清除缓存并储存容器情况')
-		#
-		# es.show()
-		# TestUtils.catch('查看槽情况（缓存）')
-		# es.show(db=True)
-		# TestUtils.catch('查看槽情况（数据库）')
-		#
-		# eh.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# eh.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# egp.show()
-		# TestUtils.catch('查看容器情况（缓存）')
-		# egp.show(db=True)
-		# TestUtils.catch('查看容器情况（数据库）')
-		#
-		# TestUtils.end('装备艾瑟萌测试结束')
-
-		TestUtils.start('艾瑟萌装备槽测试')
-
-		exer_slot_item: ExerSlotItem = es.contItem(subject_id=2)
-		equip_slot: ExerEquipSlot = exer_slot_item.exerEquipSlot()
-
-		exer_equip1 = exer_equips.get(e_type_id=1)
-		exer_equip2 = exer_equips.get(e_type_id=2)
-		exer_equip3 = exer_equips.get(e_type_id=3)
-
-		pack_equip1 = ep.contItem(item=exer_equip1)
-		pack_equip2 = ep.contItem(item=exer_equip2)
-		pack_equip3 = ep.contItem(item=exer_equip3)
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		equip_slot.setPackEquip(pack_equip1)
-		TestUtils.catch('equip_slot.setPackEquip(pack_equip1)')
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		equip_slot.setPackEquip(pack_equip2)
-		equip_slot.setPackEquip(pack_equip3)
-		TestUtils.catch('equip_slot.setPackEquip(pack_equip2, pack_equip3)')
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		equip_slot.setPackEquip(pack_equip2)
-		TestUtils.catch('equip_slot.setPackEquip(pack_equip2)')
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		equip_slot.setPackEquip(None, 1)
-		TestUtils.catch('equip_slot.setPackEquip(None, 1)')
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		p._clearCache()
-		TestUtils.catch('清除缓存并储存容器情况')
-
-		equip_slot.show()
-		TestUtils.catch('查看背包情况')
-		ep.show()
-		TestUtils.catch('查看装备情况')
-
-		TestUtils.end('装备艾瑟萌测试结束')
-
-		temp = 2
-
-		"========== 背包物品测试 =========="
-
-		# human_pack1 = p1.humanpack
-		# human_pack2 = p2.humanpack
-
-		# human_item1 = human_items[0]
-		# human_item2 = human_items[1]
-		# human_item3 = human_items[2]
-		#
-		# human_equip1 = human_equips[0]
-		# human_equip2 = human_equips[1]
-		#
-		# human_pack1.show("HumanPack1")
-		# human_pack2.show("HumanPack2")
-
-		# human_pack1.lostItems(human_item2, 5000)
-
-		# 测试计算性能
-		# TestUtils.start('人类背包测试')
-
-		# human_pack1.gainItems(human_item1, 5)
-		# TestUtils.catch('gainItems test1')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-		#
-		# human_pack1.gainItems(human_item2, 50)
-		# TestUtils.catch('gainItems test2')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-
-		# human_pack1.lostItems(human_item2, 40)
-		# TestUtils.catch('lostItems test1')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-		#
-		# human_pack1.gainItems(human_item3, 500)
-		# TestUtils.catch('gainItems test3')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-
-		# human_pack1.gainItems(human_equip1, 2)
-		# TestUtils.catch('gainItems test4')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-		#
-		# human_pack1.lostItems(human_equip1, 1)
-		# TestUtils.catch('lostItems test2')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-		#
-		# human_pack1.gainItems(human_equip2, 3)
-		# TestUtils.catch('gainItems test5')
-		# human_pack1.show("HumanPack1")
-		# TestUtils.catch('show result')
-		#
-		# human_pack2.gainItems(human_item3, 100)
-		# TestUtils.catch('gainItems test6')
-		# human_pack2.show("HumanPack2")
-		# TestUtils.catch('show result')
-		#
-		# human_pack2.gainItems(human_equip2, 3)
-		# TestUtils.catch('gainItems test7')
-		# human_pack2.show("HumanPack2")
-		# TestUtils.catch('show result')
-		#
-		# human_pack2.transferItems(human_pack1, human_item3, 50)
-		# TestUtils.catch('transferItems test1')
-		# human_pack1.show("HumanPack1")
-		# human_pack2.show("HumanPack2")
-		# TestUtils.catch('show result')
-		#
-		# human_pack1.transferItems(human_pack2, human_equip2, 2)
-		# TestUtils.catch('transferItems test2')
-		# human_pack1.show("HumanPack1")
-		# human_pack2.show("HumanPack2")
-		# TestUtils.catch('show result')
-		#
-		# TestUtils.end('测试结束')
-
-		"========== 槽物品测试 =========="
+	# # 测试函数
+	# @classmethod
+	# def testFunc(cls):
+	#
+	# 	from utils.test_utils import Common as TestUtils
+	#
+	# 	# def createTerms():
+	# 	# 	if GameTerm.get().exists(): return
+	# 	#
+	# 	# 	term = GameTerm.objects.create()
+	# 	#
+	# 	# 	createSubjects(term)
+	# 	# 	createBaseParams(term)
+	# 	# 	createUsableItemType(term)
+	# 	# 	createHumanEquipType(term)
+	# 	# 	createExerEquipType(term)
+	# 	# 	createExerStar(term)
+	# 	# 	createExerGiftStar(term)
+	# 	#
+	# 	# def createSubjects(term):
+	# 	# 	Subject.objects.create(term=term, name="语文", max_score=150, force=True)
+	# 	# 	Subject.objects.create(term=term, name="数学", max_score=150, force=True)
+	# 	# 	Subject.objects.create(term=term, name="英语", max_score=150, force=True)
+	# 	# 	Subject.objects.create(term=term, name="物理")
+	# 	# 	Subject.objects.create(term=term, name="化学")
+	# 	# 	Subject.objects.create(term=term, name="生物")
+	# 	# 	Subject.objects.create(term=term, name="政治")
+	# 	# 	Subject.objects.create(term=term, name="历史")
+	# 	# 	Subject.objects.create(term=term, name="地理")
+	# 	#
+	# 	# def createBaseParams(term):
+	# 	# 	BaseParam.objects.create(term=term, name="体力值", attr='MHP', min_value=1)
+	# 	# 	BaseParam.objects.create(term=term, name="精力值", attr='MMP')
+	# 	# 	BaseParam.objects.create(term=term, name="攻击力", attr='ATK')
+	# 	# 	BaseParam.objects.create(term=term, name="防御力", attr='DEF')
+	# 	# 	BaseParam.objects.create(term=term, name="回避率", attr='EVA', scale=10000)
+	# 	# 	BaseParam.objects.create(term=term, name="暴击率", attr='CRI', scale=10000)
+	# 	#
+	# 	# def createUsableItemType(term):
+	# 	# 	UsableItemType.objects.create(term=term, name="补给道具")
+	# 	# 	UsableItemType.objects.create(term=term, name="强化道具")
+	# 	# 	UsableItemType.objects.create(term=term, name="功能道具")
+	# 	# 	UsableItemType.objects.create(term=term, name="宝箱")
+	# 	# 	UsableItemType.objects.create(term=term, name="材料道具")
+	# 	# 	UsableItemType.objects.create(term=term, name="任务道具")
+	# 	# 	UsableItemType.objects.create(term=term, name="其他")
+	# 	#
+	# 	# def createHumanEquipType(term):
+	# 	# 	HumanEquipType.objects.create(term=term, name="武器")
+	# 	# 	HumanEquipType.objects.create(term=term, name="头部")
+	# 	# 	HumanEquipType.objects.create(term=term, name="身体")
+	# 	# 	HumanEquipType.objects.create(term=term, name="腿部")
+	# 	# 	HumanEquipType.objects.create(term=term, name="其他")
+	# 	#
+	# 	# def createExerEquipType(term):
+	# 	# 	ExerEquipType.objects.create(term=term, name="武器")
+	# 	# 	ExerEquipType.objects.create(term=term, name="头部")
+	# 	# 	ExerEquipType.objects.create(term=term, name="身体")
+	# 	# 	ExerEquipType.objects.create(term=term, name="腿部")
+	# 	# 	ExerEquipType.objects.create(term=term, name="其他")
+	# 	#
+	# 	# def createExerStar(term):
+	# 	# 	ExerStar.objects.create(term=term, name="一星", max_level=40,
+	# 	# 							level_exp_factors={'a': 1.4, 'b': -3, 'c': 300})
+	# 	# 	ExerStar.objects.create(term=term, name="二星", max_level=50,
+	# 	# 							level_exp_factors={'a': 1.84, 'b': -2, 'c': 315})
+	# 	# 	ExerStar.objects.create(term=term, name="三星", max_level=60,
+	# 	# 							level_exp_factors={'a': 2.33, 'b': -1, 'c': 340})
+	# 	# 	ExerStar.objects.create(term=term, name="四星", max_level=70,
+	# 	# 							level_exp_factors={'a': 2.88, 'b': 0, 'c': 375})
+	# 	# 	ExerStar.objects.create(term=term, name="五星", max_level=80,
+	# 	# 							level_exp_factors={'a': 3.6, 'b': 1, 'c': 420})
+	# 	# 	ExerStar.objects.create(term=term, name="六星", max_level=100,
+	# 	# 							level_exp_factors={'a': 4.5, 'b': 2, 'c': 500})
+	# 	#
+	# 	# def createExerGiftStar(term):
+	# 	# 	ExerGiftStar.objects.create(term=term, name="一星")
+	# 	# 	ExerGiftStar.objects.create(term=term, name="二星")
+	# 	# 	ExerGiftStar.objects.create(term=term, name="三星")
+	# 	#
+	# 	# createTerms()
+	#
+	# 	# def createPlayer(username, name="", grade=1, cid=None):
+	# 	# 	player = Player()
+	# 	# 	player.username = username
+	# 	# 	player.create(name, grade, cid)
+	# 	#
+	# 	# 	return player
+	#
+	# 	# def createRandomItem(type, cnt):
+	# 	# 	import random
+	# 	#
+	# 	# 	for i in range(cnt):
+	# 	# 		item: BaseItem = type()
+	# 	# 		item.name = "测试%3d" % i
+	# 	#
+	# 	# 		if isinstance(item, Exermon):
+	# 	# 			item.star_id = random.randrange(1, 7)
+	# 	# 			item.subject_id = random.randrange(1, 10)
+	# 	# 			item.e_type = random.randrange(1, 5)
+	# 	#
+	# 	# 		if isinstance(item, ExerGift):
+	# 	# 			item.star_id = random.randrange(1, 4)
+	# 	#
+	# 	# 		if isinstance(item, (ExerSkill, ExerFrag)):
+	# 	# 			item.o_exermon_id = random.randrange(
+	# 	# 				1, Exermon.objects.count()+1)
+	# 	#
+	# 	# 		if isinstance(item, (ExerEquip, HumanEquip)):
+	# 	# 			item.e_type_id = random.randrange(1, 6)
+	# 	#
+	# 	# 		if isinstance(item, (ExerItem, HumanItem)):
+	# 	# 			item.i_type_id = random.randrange(1, 8)
+	# 	#
+	# 	# 		item.save()
+	#
+	# 	# createRandomItem(Exermon, 81)
+	# 	# createRandomItem(ExerSkill, 81)
+	# 	# createRandomItem(HumanItem, 150)
+	# 	# createRandomItem(ExerItem, 75)
+	# 	# createRandomItem(HumanEquip, 80)
+	# 	# createRandomItem(ExerEquip, 100)
+	# 	# createRandomItem(ExerGift, 30)
+	# 	# createRandomItem(ExerFrag, 40)
+	#
+	# 	p: Player = Player.objects.all().first()
+	#
+	# 	from player_module.views import Common
+	#
+	# 	Common.addOnlinePlayer(p, None)
+	#
+	# 	hp: HumanPack = p.humanPack()
+	# 	ep: ExerPack = p.exerPack()
+	# 	es: ExerSlot = p.exerSlot()
+	# 	eh: ExerHub = p.exerHub()
+	# 	egp: ExerGiftPool = p.exerGiftPool()
+	#
+	# 	exermons = Exermon.objects.all()
+	# 	human_items = HumanItem.objects.all()
+	# 	human_equips = HumanEquip.objects.all()
+	# 	exer_items = ExerItem.objects.all()
+	# 	exer_equips = ExerEquip.objects.all()
+	# 	exer_gifts = ExerGift.objects.all()
+	#
+	# 	human_item1 = human_items[0]
+	# 	human_item2 = human_items[1]
+	# 	human_item3 = human_items[2]
+	#
+	# 	exermon1 = exermons[1]
+	# 	exermon2 = exermons[3]
+	# 	exermon3 = exermons.last()
+	#
+	# 	"========== 背包物品测试 =========="
+	#
+	# 	# TestUtils.start('人类背包测试')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况')
+	# 	#
+	# 	# cont_item = hp.gainItems(human_item1, 50)[0]
+	# 	# TestUtils.catch('hp.gainItems(human_item1, 50)')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# hp.gainItems(human_item2, 199)
+	# 	# TestUtils.catch('hp.gainItems(human_item2, 199)')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# hp.gainItems(human_item1, 50)
+	# 	# hp.gainItems(human_item3, 19)
+	# 	# TestUtils.catch('hp.gainItems(human_item1, 50) & hp.gainItems(human_item3, 19)')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# hp.lostItems(human_item2, 101)
+	# 	# TestUtils.catch('hp.lostItems(human_item2, 101)')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# cont_item2, _ = hp.splitItem(cont_item, 11)
+	# 	# TestUtils.catch('hp.splitItem(cont_item, 11)')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# hp.mergeItem([cont_item, cont_item2])
+	# 	# TestUtils.catch('hp.mergeItem([cont_item, cont_item2])')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# try:
+	# 	# 	hp.lostItems(human_item1, 101)
+	# 	# except ErrorException as exception:
+	# 	# 	TestUtils.catch('抛出异常测试')
+	# 	# 	traceback.print_exc()
+	# 	#
+	# 	# hp.clearCache()
+	# 	# TestUtils.catch('清除缓存并储存容器情况')
+	# 	#
+	# 	# hp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# hp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# # 抛出异常
+	# 	# TestUtils.end('人类背包测试结束')
+	#
+	# 	# TestUtils.start('装备艾瑟萌测试')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看艾瑟萌仓库情况')
+	#
+	# 	# player_exers3 = eh.gainItems(exermon3, 2)
+	# 	# TestUtils.catch('eh.gainItems(exermon3, 2)')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# eh.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# player_exers1 = eh.gainItems(exermon1, 5)
+	# 	# TestUtils.catch('eh.gainItems(exermon1, 5)')
+	# 	# player_exers2 = eh.gainItems(exermon2, 2)
+	# 	# TestUtils.catch('eh.gainItems(exermon2, 2)')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# eh.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	#
+	# 	# player_exer = eh.contItem(item=exermon3)
+	# 	# # player_exers5 = eh.contItem(item=exermon2)
+	# 	#
+	# 	# es.show()
+	# 	# TestUtils.catch('查看槽情况')
+	# 	#
+	# 	# es.setPlayerExer(player_exer)
+	# 	# TestUtils.catch('es.setPlayerExer(player_exer)')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# es.show()
+	# 	# TestUtils.catch('查看槽情况（缓存）')
+	# 	# es.show(db=True)
+	# 	# TestUtils.catch('查看槽情况（数据库）')
+	# 	#
+	# 	# es.setPlayerExer(None, 2)
+	# 	# TestUtils.catch('es.setPlayerExer(None, 2)')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# es.show()
+	# 	# TestUtils.catch('查看槽情况（缓存）')
+	# 	# es.show(db=True)
+	# 	# TestUtils.catch('查看槽情况（数据库）')
+	# 	#
+	# 	# player_gifts = egp.gainItems(exer_gifts[0], 10)
+	# 	# TestUtils.catch('egp.gainItems(exer_gifts[0], 10)')
+	# 	#
+	# 	# egp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	#
+	# 	# print('player_gifts: ' + str(player_gifts))
+	# 	#
+	# 	# es.setPlayerGift(player_gifts[1], 8)
+	# 	# TestUtils.catch('es.setPlayerGift(player_gifts[1], 8)')
+	# 	#
+	# 	# egp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# egp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	# es.show()
+	# 	# TestUtils.catch('查看槽情况（缓存）')
+	# 	# es.show(db=True)
+	# 	# TestUtils.catch('查看槽情况（数据库）')
+	# 	#
+	# 	# p.clearCache()
+	# 	# TestUtils.catch('清除缓存并储存容器情况')
+	# 	#
+	# 	# es.show()
+	# 	# TestUtils.catch('查看槽情况（缓存）')
+	# 	# es.show(db=True)
+	# 	# TestUtils.catch('查看槽情况（数据库）')
+	# 	#
+	# 	# eh.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# eh.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# egp.show()
+	# 	# TestUtils.catch('查看容器情况（缓存）')
+	# 	# egp.show(db=True)
+	# 	# TestUtils.catch('查看容器情况（数据库）')
+	# 	#
+	# 	# TestUtils.end('装备艾瑟萌测试结束')
+	#
+	# 	TestUtils.start('艾瑟萌装备槽测试')
+	#
+	# 	exer_slot_item: ExerSlotItem = es.contItem(subject_id=2)
+	# 	equip_slot: ExerEquipSlot = exer_slot_item.exerEquipSlot()
+	#
+	# 	exer_equip1 = exer_equips.get(e_type_id=1)
+	# 	exer_equip2 = exer_equips.get(e_type_id=2)
+	# 	exer_equip3 = exer_equips.get(e_type_id=3)
+	#
+	# 	pack_equip1 = ep.contItem(item=exer_equip1)
+	# 	pack_equip2 = ep.contItem(item=exer_equip2)
+	# 	pack_equip3 = ep.contItem(item=exer_equip3)
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	equip_slot.setPackEquip(pack_equip1)
+	# 	TestUtils.catch('equip_slot.setPackEquip(pack_equip1)')
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	equip_slot.setPackEquip(pack_equip2)
+	# 	equip_slot.setPackEquip(pack_equip3)
+	# 	TestUtils.catch('equip_slot.setPackEquip(pack_equip2, pack_equip3)')
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	equip_slot.setPackEquip(pack_equip2)
+	# 	TestUtils.catch('equip_slot.setPackEquip(pack_equip2)')
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	equip_slot.setPackEquip(None, 1)
+	# 	TestUtils.catch('equip_slot.setPackEquip(None, 1)')
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	p._clearCache()
+	# 	TestUtils.catch('清除缓存并储存容器情况')
+	#
+	# 	equip_slot.show()
+	# 	TestUtils.catch('查看背包情况')
+	# 	ep.show()
+	# 	TestUtils.catch('查看装备情况')
+	#
+	# 	TestUtils.end('装备艾瑟萌测试结束')
+	#
+	# 	temp = 2
+	#
+	# 	"========== 背包物品测试 =========="
+	#
+	# 	# human_pack1 = p1.humanpack
+	# 	# human_pack2 = p2.humanpack
+	#
+	# 	# human_item1 = human_items[0]
+	# 	# human_item2 = human_items[1]
+	# 	# human_item3 = human_items[2]
+	# 	#
+	# 	# human_equip1 = human_equips[0]
+	# 	# human_equip2 = human_equips[1]
+	# 	#
+	# 	# human_pack1.show("HumanPack1")
+	# 	# human_pack2.show("HumanPack2")
+	#
+	# 	# human_pack1.lostItems(human_item2, 5000)
+	#
+	# 	# 测试计算性能
+	# 	# TestUtils.start('人类背包测试')
+	#
+	# 	# human_pack1.gainItems(human_item1, 5)
+	# 	# TestUtils.catch('gainItems test1')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack1.gainItems(human_item2, 50)
+	# 	# TestUtils.catch('gainItems test2')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	#
+	# 	# human_pack1.lostItems(human_item2, 40)
+	# 	# TestUtils.catch('lostItems test1')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack1.gainItems(human_item3, 500)
+	# 	# TestUtils.catch('gainItems test3')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	#
+	# 	# human_pack1.gainItems(human_equip1, 2)
+	# 	# TestUtils.catch('gainItems test4')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack1.lostItems(human_equip1, 1)
+	# 	# TestUtils.catch('lostItems test2')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack1.gainItems(human_equip2, 3)
+	# 	# TestUtils.catch('gainItems test5')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack2.gainItems(human_item3, 100)
+	# 	# TestUtils.catch('gainItems test6')
+	# 	# human_pack2.show("HumanPack2")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack2.gainItems(human_equip2, 3)
+	# 	# TestUtils.catch('gainItems test7')
+	# 	# human_pack2.show("HumanPack2")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack2.transferItems(human_pack1, human_item3, 50)
+	# 	# TestUtils.catch('transferItems test1')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# human_pack2.show("HumanPack2")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# human_pack1.transferItems(human_pack2, human_equip2, 2)
+	# 	# TestUtils.catch('transferItems test2')
+	# 	# human_pack1.show("HumanPack1")
+	# 	# human_pack2.show("HumanPack2")
+	# 	# TestUtils.catch('show result')
+	# 	#
+	# 	# TestUtils.end('测试结束')
+	#
+	# 	"========== 槽物品测试 =========="
 
 		# sbj_exers = {}
 		#
@@ -736,10 +736,10 @@ class RuntimeManager:
 		future = cls.update()
 		loop.run_until_complete(future)
 
-from game_module.models import *
-from exermon_module.models import *
-from item_module.models import *
-from player_module.models import *
+# from game_module.models import *
+# from exermon_module.models import *
+# from item_module.models import *
+# from player_module.models import *
 
 # 初始化
 try:

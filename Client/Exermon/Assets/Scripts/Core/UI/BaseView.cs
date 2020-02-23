@@ -97,7 +97,7 @@ public class BaseView : BaseComponent {
     /// </summary>
     protected virtual void showView() {
         gameObject.SetActive(shown = true);
-        requestRefresh();
+        requestRefresh(true);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class BaseView : BaseComponent {
     /// 隐藏视窗
     /// </summary>
     protected virtual void hideView() {
-        requestClear();
+        requestClear(true);
         gameObject.SetActive(shown = false);
     }
 

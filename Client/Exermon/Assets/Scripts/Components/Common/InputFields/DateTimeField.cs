@@ -222,4 +222,15 @@ public class DateTimeField : BaseInputField<DateTime> {
 
     #endregion
 
+    #region 事件控制
+
+    /// <summary>
+    /// 是否实际有焦点
+    /// </summary>
+    public override bool isRealFocused() {
+        return pickersPlane.shown;
+    }
+
+    #endregion
+
 }

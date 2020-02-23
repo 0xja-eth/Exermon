@@ -237,35 +237,35 @@ public static class SceneUtils {
     /// <param name="msg">提示信息</param>
     /// <param name="btns">按键文本</param>
     /// <param name="actions">按键回调</param>
-    public static void alert(string msg, string[] btns = null, 
-        UnityAction[] actions = null, int defaultActionId=-1) {
-        Debug.Log("alert: " + msg + ":" + alertWindow);
-        if (alertWindow) alertWindow.startWindow(msg, btns, actions);
+    static void alert(string text,
+        AlertWindow.Type type = AlertWindow.Type.Notice,
+        UnityAction onOK = null, UnityAction onCancel = null,
+        float duration = AlertWindow.DefaultDuration) {
+        Debug.Log("alert: " + text + ":" + alertWindow);
+        if (alertWindow) alertWindow.startWindow(text, type, onOK, onCancel, duration);
         // 若未设置提示窗口，储存这个信息
-        else { alertText = msg;
-            if (actions != null && defaultActionId >= 0 &&
-                actions.Length > defaultActionId &&
-                actions[defaultActionId] != null)
-                actions[defaultActionId].Invoke();
+        else {
+            alertText = text;
+            onOK?.Invoke();
         }
     }
     /// <param name="req">弹窗请求</param>
-    public static void alert(GameSystem.AlertRequest req) {
-        alert(req.text, req.btns, req.actions);
+    static void alert(GameSystem.AlertRequest req) {
+        alert(req.text, req.type, req.onOK, req.onCancel, req.duration);
     }
 
     /// <summary>
     /// 开始加载窗口
     /// </summary>
     /// <param name="tips">加载界面文本</param>
-    public static void startLoadingWindow(string tips = "") {
+    static void startLoadingWindow(string tips = "") {
         if (loadingWindow) loadingWindow.startWindow(tips);
     }
 
     /// <summary>
     /// 结束加载窗口
     /// </summary>
-    public static void endLoadingWindow() {
+    static void endLoadingWindow() {
         if (loadingWindow) loadingWindow.terminateWindow();
     }
 
@@ -273,7 +273,7 @@ public static class SceneUtils {
     /// 设置加载窗口进度
     /// </summary>
     /// <param name="rate">进度</param>
-    public static void setLoadingProgress(float rate) {
+    static void setLoadingProgress(float rate) {
         if (loadingWindow) loadingWindow.setProgress(rate);
     }
 
