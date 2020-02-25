@@ -8,7 +8,6 @@ import xadmin
 
 class CurrencyInline(object):
 
-	model = Currency
 	min_num = 1
 	max_num = 1
 	validate_min = 1
@@ -28,12 +27,11 @@ class BaseEffectsInline(object):
 	style = "table"
 
 
-@xadmin.sites.register(Currency)
 class CurrencyAdmin(object):
 
-	list_display = ['id', 'gold', 'ticket', 'bound_ticket']
+	list_display = ['id', 'gold', 'ticket', 'bound_ticket', 'item']
 
-	list_editable = ['gold', 'ticket', 'bound_ticket']
+	list_editable = ['gold', 'ticket', 'bound_ticket', 'item']
 
 
 class BaseItemAdmin(object):
@@ -53,17 +51,15 @@ class LimitedItemAdmin(BaseItemAdmin):
 
 	# 'adminBuyPrice',
 	list_display = BaseItemAdmin.list_display + \
-				   ['buy_price', 'sell_price', 'discardable', 'tradable']
+				   ['adminBuyPrice', 'sell_price', 'discardable', 'tradable']
 
 	list_editable = BaseItemAdmin.list_editable + \
-					['buy_price', 'sell_price', 'discardable', 'tradable']
+					['sell_price', 'discardable', 'tradable']
 
-	field_set = [Fieldset('有限物品属性', 'buy_price', 'sell_price', 'discardable',
+	field_set = [Fieldset('有限物品属性', 'sell_price', 'discardable',
 						 'tradable', 'icon')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
-
-	inlines = []  # CurrencyInline
 
 
 class UsableItemAdmin(LimitedItemAdmin):

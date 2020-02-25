@@ -37,12 +37,17 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         public const string PlayerCode = "player/player/code";
 
         public const string PlayerLogout = "player/player/logout";
+
         public const string PlayerGetBasic = "player/get/basic";
+        public const string PlayerGetStatus = "player/get/status";
 
         public const string PlayerCreateCharacter = "player/create/character";
         public const string PlayerCreateExermons = "player/create/exermons";
         public const string PlayerCreateGifts = "player/create/gifts";
         public const string PlayerCreateInfo = "player/create/info";
+
+        public const string PlayerEditName = "player/edit/name";
+        public const string PlayerEditInfo = "player/edit/info";
 
         public const string PlayerEquipSlotEquip = "player/equipslot/equip";
 
@@ -55,6 +60,18 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
 
         public const string ExermonExerSlotEquip = "exermon/exerslot/equip";
         public const string ExermonEquipSlotEquip = "exermon/equipslot/equip";
+        public const string ExermonPlayerExerRename = "exermon/playerexer/rename";
+
+        public const string RecordGet = "record/record/get";
+        public const string RecordQuestionCollect = "record/question/collect";
+        public const string RecordQeestionUnwrong = "record/question/unwrong";
+        public const string RecordQeestionNote = "record/question/note";
+
+        public const string RecordExerciseGenerate = "record/exercise/generate";
+        public const string RecordExerciseStart = "record/exercise/start";
+        public const string RecordExerciseAnswer = "record/exercise/answer";
+
+        public const string QuestionGet = "question/question/get";
 
     }
 

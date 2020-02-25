@@ -1,6 +1,7 @@
 from .models import *
 from player_module.models import Player
-from utils.exception import ErrorType, ErrorException
+from item_module.views import Service as ItemService, Common as ItemCommon
+from utils.exception import ErrorType, GameException
 
 # Create your views here.
 
@@ -14,40 +15,45 @@ class Service:
 	@classmethod
 	async def exerSlotEquip(cls, consumer, player: Player, sid: int, peid: int, pgid: int):
 		# 返回数据：无
-		from item_module.views import Service as ItemService
 
 		Subject.ensure(id=sid)
 
-		exer_slot = player.exerSlot()
+		exer_slot = Common.getExerSlot(player)
 
-		player_exer = Common.getPlayerExer(id=peid)
-		player_gift = Common.getPlayerGift(id=pgid)
+		player_exer = Common.getPlayerExer(player, id=peid)
+		player_gift = Common.getPlayerGift(player, id=pgid)
 
-		ItemService.slotContainerEquip(player, exer_slot, [player_exer, player_gift], subject_id=sid)
+		ItemService.slotContainerEquip(player, exer_slot,
+									   [player_exer, player_gift], subject_id=sid)
 
 	# 艾瑟萌装备槽装备
 	@classmethod
-	async def equipSlotEquip(cls, consumer, player: Player, cid: int, eid: int, eeid: int):
+	async def equipSlotEquip(cls, consumer, player: Player, sid: int, eeid: int):
 		# 返回数据：无
-		from item_module.views import Service as ItemService
 
-		ExerEquipType.ensure(id=eid)
+		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
 
-		equip_slot = Common.getExerEquipSlot(id=cid)
+		pack_equip = Common.getPackEquip(player, id=eeid)
 
-		pack_equip = Common.getPackEquip(id=eeid)
-
-		ItemService.slotContainerEquip(player, equip_slot, pack_equip, e_type_id=eid)
+		ItemService.slotContainerEquip(player, equip_slot, pack_equip,
+									   e_type_id=pack_equip.item.e_type_id)
 
 	# 艾瑟萌改名
 	@classmethod
 	async def playerExerRename(cls, consumer, player: Player, peid: int, name: str):
 		# 返回数据：
-		pass
+
+		Check.ensureNameFormat(name)
+
+		player_exer = Common.getPlayerExer(player, id=peid)
+
+		ItemCommon.ensureContItemOwnerPlayer(player_exer, player)
+
+		player_exer.nickname = name
 
 
 # =======================
-# 用户校验类，封装用户业务数据格式校验的函数
+# 艾瑟萌校验类，封装艾瑟萌业务数据格式校验的函数
 # =======================
 class Check:
 
@@ -55,13 +61,13 @@ class Check:
 	@classmethod
 	def ensureExermonCount(cls, val: list):
 		if len(val) != Subject.MAX_SELECTED:
-			raise ErrorException(ErrorType.InvalidExermonCount)
+			raise GameException(ErrorType.InvalidExermonCount)
 
 	# 校验名字格式
 	@classmethod
-	def ensureExermonNameFormat(cls, val: str):
+	def ensureNameFormat(cls, val: str):
 		if len(val) > Exermon.NAME_LEN:
-			raise ErrorException(ErrorType.InvalidExermonName)
+			raise GameException(ErrorType.InvalidExermonName)
 
 
 # =======================
@@ -71,45 +77,65 @@ class Common:
 
 	# 获取艾瑟萌
 	@classmethod
-	def getExermon(cls, return_type='object', error: ErrorType = ErrorType.ExermonNotExist,
-				   **kwargs) -> Exermon:
-
-		return ViewUtils.getObject(Exermon, error, return_type=return_type, **kwargs)
+	def getExermon(cls, error: ErrorType = ErrorType.ExermonNotExist, **kwargs) -> Exermon:
+		return ViewUtils.getObject(Exermon, error, **kwargs)
 
 	# 获取艾瑟萌天赋
 	@classmethod
-	def getExerGift(cls, return_type='object', error: ErrorType = ErrorType.ExerGiftNotExist,
-					**kwargs) -> ExerGift:
+	def getExerGift(cls, error: ErrorType = ErrorType.ExerGiftNotExist, **kwargs) -> ExerGift:
+		return ViewUtils.getObject(ExerGift, error, **kwargs)
 
-		return ViewUtils.getObject(ExerGift, error, return_type=return_type, **kwargs)
+	# 获取艾瑟萌背包
+	@classmethod
+	def getExerPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerPack:
+		return ItemCommon.getContainer(cla=ExerPack, player=player, error=error)
+
+	# 获取艾瑟萌仓库
+	@classmethod
+	def getExerHub(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerHub:
+		return ItemCommon.getContainer(cla=ExerHub, player=player, error=error)
+
+	# 获取艾瑟萌天赋池
+	@classmethod
+	def getExerGiftPool(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerHub:
+		return ItemCommon.getContainer(cla=ExerGiftPool, player=player, error=error)
 
 	# 获取艾瑟萌槽
 	@classmethod
-	def getExerEquipSlot(cls, return_type='object', error: ErrorType = ErrorType.ContainerNotExist,
-						 **kwargs) -> ExerEquipSlot:
+	def getExerSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerSlot:
+		return ItemCommon.getContainer(cla=ExerSlot, player=player, error=error)
 
-		return ViewUtils.getObject(ExerEquipSlot, error, return_type=return_type, **kwargs)
+	# 获取艾瑟萌槽项
+	@classmethod
+	def getExerSlotItem(cls, player: Player, error: ErrorType = ErrorType.ExerSlotItemNotExist,
+						**kwargs) -> ExerSlotItem:
+		return ItemCommon.getContItem(cla=ExerSlotItem, player=player, error=error, **kwargs)
+
+	# 获取艾瑟萌装备槽
+	@classmethod
+	def getExerEquipSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist,
+						 **kwargs) -> ExerEquipSlot:
+		res = cls.getExerSlotItem(player, **kwargs).exerEquipSlot()
+		if res is None: raise GameException(error)
+		return res
 
 	# 获取玩家艾瑟萌关系
 	@classmethod
-	def getPlayerExer(cls, return_type='object', error: ErrorType = ErrorType.PlayerExermonNotExist,
+	def getPlayerExer(cls, player: Player, error: ErrorType = ErrorType.PlayerExermonNotExist,
 					  **kwargs) -> PlayerExermon:
-
-		return ViewUtils.getObject(PlayerExermon, error, return_type=return_type, **kwargs)
+		return ItemCommon.getContItem(cla=PlayerExermon, player=player, error=error, **kwargs)
 
 	# 获取玩家艾瑟萌天赋关系
 	@classmethod
-	def getPlayerGift(cls, return_type='object', error: ErrorType = ErrorType.PlayerExerGiftNotExist,
+	def getPlayerGift(cls, player: Player, error: ErrorType = ErrorType.PlayerExerGiftNotExist,
 					  **kwargs) -> PlayerExerGift:
-
-		return ViewUtils.getObject(PlayerExerGift, error, return_type=return_type, **kwargs)
+		return ItemCommon.getContItem(cla=PlayerExerGift, player=player, error=error, **kwargs)
 
 	# 获取玩家持有艾瑟萌装备
 	@classmethod
-	def getPackEquip(cls, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
+	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
 					 **kwargs) -> ExerPackEquip:
-
-		return ViewUtils.getObject(ExerPackEquip, error, return_type=return_type, **kwargs)
+		return ItemCommon.getContItem(cla=ExerPackEquip, player=player, error=error, **kwargs)
 
 	# 获取多个艾瑟萌
 	@classmethod
@@ -120,10 +146,10 @@ class Common:
 		res = ViewUtils.getObjects(Exermon, id__in=ids)
 
 		# 数量不一致，说明获取出现问题
-		if res.count() != len(unique_ids): raise ErrorException(error)
+		if res.count() != len(unique_ids): raise GameException(error)
 
 		# 如果本身给的 ids 没有重复，直接返回
-		if len(unique_ids) == len(ids): return res
+		# if len(unique_ids) == len(ids): return res
 
 		# 否则，需要按顺序抽取
 		real_res = []
@@ -140,10 +166,10 @@ class Common:
 		res = ViewUtils.getObjects(ExerGift, id__in=unique_ids)
 
 		# 数量不一致，说明获取出现问题
-		if res.count() != len(unique_ids): raise ErrorException(error)
+		if res.count() != len(unique_ids): raise GameException(error)
 
 		# 如果本身给的 ids 没有重复，直接返回
-		if len(unique_ids) == len(ids): return res
+		# if len(unique_ids) == len(ids): return res
 
 		# 否则，需要按顺序抽取
 		real_res = []
@@ -169,7 +195,7 @@ class Common:
 		for exer in exers:
 			sid = exer.subject_id
 			if sid in sbjs:
-				raise ErrorException(ErrorType.InvalidExermonSubject)
+				raise GameException(ErrorType.InvalidExermonSubject)
 
 			sbjs.append(sid)
 
@@ -177,7 +203,7 @@ class Common:
 
 		for sbj in force_sbjs:
 			if sbj.id not in sbjs:
-				raise ErrorException(ErrorType.InvalidExermonSubject)
+				raise GameException(ErrorType.InvalidExermonSubject)
 
 	# 确保艾瑟萌类型
 	@classmethod
@@ -186,7 +212,7 @@ class Common:
 
 		if exer is not None:
 			if exer.e_type != e_type.value:
-				raise ErrorException(ErrorType.InvalidExermonType)
+				raise GameException(ErrorType.InvalidExermonType)
 
 		if exers is not None:
 			for exer in exers:
@@ -198,7 +224,7 @@ class Common:
 
 		if gift is not None:
 			if gift.g_type != g_type.value:
-				raise ErrorException(ErrorType.InvalidExerGiftType)
+				raise GameException(ErrorType.InvalidExerGiftType)
 
 		if gifts is not None:
 			for gift in gifts:

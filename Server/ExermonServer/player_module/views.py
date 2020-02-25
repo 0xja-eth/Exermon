@@ -2,6 +2,7 @@ from django.conf import settings
 from .code_manager import *
 from .models import *
 from .runtimes import OnlinePlayer
+from item_module.views import Common as ItemCommon
 from utils.view_utils import Common as ViewUtils
 from utils.runtime_manager import RuntimeManager
 from utils.exception import WebscoketCloseCode
@@ -75,7 +76,7 @@ class Service:
 		code = CodeManager.generateCode(un, email, type)
 
 		if not (type == 'register' or type == 'forget'):
-			raise ErrorException(ErrorType.ParameterError)
+			raise GameException(ErrorType.ParameterError)
 
 		print("sendCode to %s [%s]: %s" % (email, type, code))
 		cls._doSendCode(un, email, code, conf)
@@ -131,10 +132,10 @@ class Service:
 
 		except smtplib.SMTPException as exception:
 			print("ERROR in sendEmailCode: " + str(exception))
-			raise ErrorException(ErrorType.EmailSendError)
+			raise GameException(ErrorType.EmailSendError)
 
 		except:
-			raise ErrorException(ErrorType.UnknownError)
+			raise GameException(ErrorType.UnknownError)
 
 	# 实际执行重置密码的操作
 	@classmethod
@@ -217,6 +218,9 @@ class Service:
 
 		Check.ensureNameFormat(name)
 		Check.ensureGradeFormat(grade)
+
+		# 保证相同昵称的玩家不存在
+		Common.ensurePlayerNotExist(name=name)
 		Common.ensureCharacterExist(id=cid)
 
 		player.create(name, grade, cid)
@@ -232,7 +236,7 @@ class Service:
 		ExermonCheck.ensureExermonCount(enames)
 
 		for name in enames:
-			ExermonCheck.ensureExermonNameFormat(name)
+			ExermonCheck.ensureNameFormat(name)
 
 		exers = ExermonCommon.getExermons(eids)
 
@@ -302,12 +306,17 @@ class Service:
 
 		return {'player': target_player.convertToDict(type="status")}
 
-
 	# 玩家修改昵称
 	@classmethod
-	async def editNickname(cls, consumer, player: Player, name: str, ):
-		# 返回数据：
-		pass
+	async def editName(cls, consumer, player: Player, name: str, ):
+		# 返回数据：无
+
+		Check.ensureNameFormat(name)
+
+		# 保证相同昵称的玩家不存在
+		Common.ensurePlayerNotExist(name=name)
+
+		player.editName(name)
 
 	# 玩家修改个人信息
 	@classmethod
@@ -334,17 +343,16 @@ class Service:
 
 	# 人类装备槽装备
 	@classmethod
-	async def equipSlotEquip(cls, consumer, player: Player, eid: int, heid: int):
+	async def equipSlotEquip(cls, consumer, player: Player, heid: int):
 		# 返回数据：无
 		from item_module.views import Service as ItemService
 
-		HumanEquipType.ensure(id=eid)
+		equip_slot = Common.getHumanEquipSlot(player)
 
-		equip_slot = player.humanEquipSlot()
+		pack_equip = Common.getPackEquip(player, id=heid)
 
-		pack_equip = Common.getPackEquip(id=heid)
-
-		ItemService.slotContainerEquip(player, equip_slot, pack_equip, e_type_id=eid)
+		ItemService.slotContainerEquip(player, equip_slot, pack_equip,
+									   e_type_id=pack_equip.item.e_type_id)
 
 
 # =======================
@@ -382,31 +390,31 @@ class Check:
 		now = datetime.datetime.now()
 		min_date = datetime.datetime(1900, 1, 1)
 		if val < min_date or val > now:
-			raise ErrorException(ErrorType.InvalidBirth)
+			raise GameException(ErrorType.InvalidBirth)
 
 	# 校验学校格式
 	@classmethod
 	def ensureSchoolFormat(cls, val: int):
 		if len(val) > Player.SCHOOL_LEN:
-			raise ErrorException(ErrorType.InvalidSchool)
+			raise GameException(ErrorType.InvalidSchool)
 
 	# 校验居住地格式
 	@classmethod
 	def ensureCityFormat(cls, val: int):
 		if len(val) > Player.CITY_LEN:
-			raise ErrorException(ErrorType.InvalidCity)
+			raise GameException(ErrorType.InvalidCity)
 
 	# 校验联系方式格式
 	@classmethod
 	def ensureContactFormat(cls, val: int):
 		if len(val) > Player.CONTACT_LEN:
-			raise ErrorException(ErrorType.InvalidContact)
+			raise GameException(ErrorType.InvalidContact)
 
 	# 校验个人介绍格式
 	@classmethod
 	def ensureDescriptionFormat(cls, val: int):
 		if len(val) > Player.DESC_LEN:
-			raise ErrorException(ErrorType.InvalidDescription)
+			raise GameException(ErrorType.InvalidDescription)
 
 
 # =======================
@@ -416,27 +424,31 @@ class Common:
 
 	# 获取玩家
 	@classmethod
-	def getPlayer(cls, return_type='object', error: ErrorType = ErrorType.PlayerNotExist, **kwargs) -> Player:
+	def getPlayer(cls, error: ErrorType = ErrorType.PlayerNotExist, **kwargs) -> Player:
 
-		if 'id' in kwargs and return_type == 'object':
+		if 'id' in kwargs:
 			# 首先在在线玩家中查找
 			online_player: OnlinePlayer = cls.getOnlinePlayer(kwargs['id'])
 			if online_player: return online_player.player
 
-		return ViewUtils.getObject(Player, error, return_type=return_type, **kwargs)
+		return ViewUtils.getObject(Player, error, **kwargs)
 
 	# 获取形象
 	@classmethod
-	def getCharacter(cls, return_type='object', error: ErrorType = ErrorType.CharacterNotExist,
+	def getCharacter(cls, error: ErrorType = ErrorType.CharacterNotExist,
 					 **kwargs) -> Character:
-		return ViewUtils.getObject(Character, error, return_type=return_type, **kwargs)
+		return ViewUtils.getObject(Character, error, **kwargs)
+
+	# 获取艾瑟萌装备槽
+	@classmethod
+	def getHumanEquipSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanEquipSlot:
+		return ItemCommon.getContainer(cla=HumanEquipSlot, player=player, error=error)
 
 	# 获取玩家持有装备
 	@classmethod
-	def getPackEquip(cls, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
+	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
 					 **kwargs) -> HumanPackEquip:
-
-		return ViewUtils.getObject(HumanPackEquip, error, return_type=return_type, **kwargs)
+		return ItemCommon.getContItem(cla=HumanPackEquip, player=player, error=error, **kwargs)
 
 	# 确保玩家存在
 	@classmethod
@@ -471,16 +483,23 @@ class Common:
 	@classmethod
 	def ensurePlayerNormalState(cls, player):
 		if player.isBanned():
-			raise ErrorException(ErrorType.UserAbnormal)
+			raise GameException(ErrorType.UserAbnormal)
 		if player.isFrozen():
-			raise ErrorException(ErrorType.UserFrozen)
+			raise GameException(ErrorType.UserFrozen)
 
 	# 确保密码正确
 	@classmethod
 	def ensurePasswordCorrect(cls, player, pw):
 		pw = Service.cryptoPassword(pw)
 		if player.password != pw:
-			raise ErrorException(ErrorType.IncorrectPassword)
+			raise GameException(ErrorType.IncorrectPassword)
+
+	# 确保选科
+	@classmethod
+	def ensureSubjectSelected(cls, player, subject):
+		subjects = player.subjects()
+		if subject not in subjects:
+			raise GameException(ErrorType.UnselectedSubject)
 
 	# 添加在线玩家
 	@classmethod

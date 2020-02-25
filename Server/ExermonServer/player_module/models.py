@@ -3,7 +3,7 @@ from django.conf import settings
 from item_module.models import *
 from utils.model_utils import CacheableModel, \
 	CharacterImageUpload, Common as ModelUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 import os, base64
 from enum import Enum
 
@@ -78,7 +78,7 @@ class Character(models.Model):
 				os.path.exists(battle):
 			return bust, face, battle
 		else:
-			raise ErrorException(ErrorType.PictureFileNotFound)
+			raise GameException(ErrorType.PictureFileNotFound)
 
 	# 获取视频base64编码
 	def convertToBase64(self):
@@ -179,16 +179,16 @@ class PlayerGrades(Enum):
 class PlayerStatus(Enum):
 
 	# 已注册，未创建角色
-	Uncreated = 0  # 未创建
-	CharacterCreated = 1  # 已创建人物
-	ExermonsCreated = 2  # 已选择艾瑟萌
-	GiftsCreated = 3  # 已选择天赋
+	Uncreated = 1  # 未创建
+	CharacterCreated = 2  # 已创建人物
+	ExermonsCreated = 3  # 已选择艾瑟萌
+	GiftsCreated = 4  # 已选择天赋
 
 	# 已完全创建角色
 	Normal = 10  # 正常
 	Banned = 20  # 封禁
 	Frozen = 30  # 冻结
-	Other = -1  # 其他
+	Other = 0  # 其他
 
 
 # ===================================================
@@ -215,6 +215,14 @@ class PlayerMoney(Currency):
 	# 对应玩家
 	player = models.OneToOneField("Player", on_delete=models.CASCADE,
 									 null=True, verbose_name="玩家")
+
+	# 创建
+	@classmethod
+	def create(cls, player):
+		money = cls()
+		money.player = player
+		money.save()
+		return money
 
 	# 获得金钱
 	def gain(self, gold=0, ticket=0, bound_ticket=0):
@@ -289,6 +297,9 @@ class Player(CacheableModel):
 
 	# 登录信息缓存键
 	LOGININFO_CACHE_KEY = 'login_info'
+
+	# 当前题目集缓存键
+	CUR_QUES_SET_CACHE_KEY = 'question_set'
 
 	# 用户名（OPENID）
 	username = models.CharField(null=False, max_length=64, verbose_name="用户名")
@@ -366,6 +377,20 @@ class Player(CacheableModel):
 
 	def __str__(self):
 		return "%d. %s(%s)" % (self.id, self.name, self.username)
+
+	# 管理界面用
+	def adminLevel(self):
+		return self.level()
+
+	adminLevel.short_description = "等级"
+
+	# 管理界面用
+	def adminMoney(self):
+		money = self.playerMoney()
+		if money: return str(money)
+		return "无"
+
+	adminMoney.short_description = "持有金钱"
 
 	# region 容器管理
 
@@ -453,9 +478,40 @@ class Player(CacheableModel):
 	def _battleInfo(self):
 		return {}
 
-	# 刷题信息
-	def _exerciseInfo(self):
-		return {}
+	# 做题信息
+	def _questionInfo(self):
+
+		question_records = self.questionRecords()
+
+		cnt = count = corr_cnt = 0
+		sum_timespan = avg_timespan = corr_timespan = 0
+		sum_exp = sum_gold = 0
+
+		for rec in question_records:
+			cnt += 1
+			count += rec.count
+			corr_cnt += rec.correct
+			sum_timespan += rec.count*rec.avg_time
+			avg_timespan += rec.avg_time
+			corr_timespan += rec.corr_time
+			sum_exp += rec.sum_exp
+			sum_gold += rec.sum_gold
+
+		corr_rate = corr_cnt / count
+
+		avg_timespan /= cnt
+		corr_timespan /= cnt
+
+		return {
+			'count': count,
+			'corr_cnt': corr_cnt,
+			'corr_rate': corr_rate,
+			'sum_timespan': sum_timespan,
+			'avg_timespan': avg_timespan,
+			'corr_timespan': corr_timespan,
+			'sum_exp': sum_exp,
+			'sum_gold': sum_gold,
+		}
 
 	def convertToDict(self, type=None):
 
@@ -464,6 +520,15 @@ class Player(CacheableModel):
 		money = ModelUtils.objectToDict(self.playerMoney())
 
 		level, next = self.level(True)
+
+		if type == "records":
+			question_records = ModelUtils.objectsToDict(self.questionRecords())
+			exercise_records = ModelUtils.objectsToDict(self.exerciseRecords())
+
+			return {
+				'question_records': question_records,
+				'exercise_records': exercise_records
+			}
 
 		base = {
 			'id': self.id,
@@ -503,11 +568,13 @@ class Player(CacheableModel):
 			base['description'] = self.description
 
 			base['battle_info'] = self._battleInfo()
-			base['exercise_info'] = self._exerciseInfo()
+			base['question_info'] = self._questionInfo()
 
 		return base
 
 	# endregion
+
+	# region 账号操作
 
 	# 注册（类方法）
 	@classmethod
@@ -522,30 +589,6 @@ class Player(CacheableModel):
 
 		return player
 
-	# 是否是异常状态
-	def isAbnormalState(self):
-		return self.isBanned() or self.isFrozen()
-
-	# 是否在线
-	def isCreated(self):
-		return self.status >= PlayerStatus.OffLine.value
-
-	# 是否在线
-	def isOnline(self):
-		return self.online
-
-	# 是否离线
-	def isOffline(self):
-		return not self.online
-
-	# 是否封禁
-	def isBanned(self):
-		return self.status == PlayerStatus.Banned.value
-
-	# 是否冻结
-	def isFrozen(self):
-		return self.status == PlayerStatus.Frozen.value
-
 	# 登陆
 	def login(self, consumer):
 
@@ -555,7 +598,8 @@ class Player(CacheableModel):
 
 		self.online = True
 
-		if self.status == PlayerStatus.CharacterCreated:
+		# 如果是已经创建了角色的玩家，对容器进行检查并创建
+		if self.status >= PlayerStatus.CharacterCreated:
 			self._createContainers()
 
 		self.save()
@@ -591,6 +635,10 @@ class Player(CacheableModel):
 
 		self.password = pw
 		self.save()
+
+	# endregion
+
+	# region 创建/修改操作
 
 	# 创建角色
 	def create(self, name, grade, cid):
@@ -636,7 +684,7 @@ class Player(CacheableModel):
 
 		if exerslot is None:
 			self.status = PlayerStatus.CharacterCreated
-			raise ErrorException(ErrorType.ExerSlotNotExist)
+			raise GameException(ErrorType.ExerSlotNotExist)
 
 		for i in range(len(gifts)):
 
@@ -700,6 +748,14 @@ class Player(CacheableModel):
 		if self.quesSugarPack() is None:
 			QuesSugarPack.create(player=self)
 
+		if self.playerMoney() is None:
+			PlayerMoney.create(self)
+
+	# 修改人物名称
+	def editName(self, name):
+
+		self.name = name
+
 	# 修改人物信息
 	def editInfo(self, grade, birth, school, city, contact, description):
 
@@ -709,6 +765,36 @@ class Player(CacheableModel):
 		self.city = city
 		self.contact = contact
 		self.description = description
+
+	# endregion
+
+	# region 状态判断
+
+	# 是否是异常状态
+	def isAbnormalState(self):
+		return self.isBanned() or self.isFrozen()
+
+	# 是否在线
+	def isCreated(self):
+		return self.status >= PlayerStatus.OffLine.value
+
+	# 是否在线
+	def isOnline(self):
+		return self.online
+
+	# 是否离线
+	def isOffline(self):
+		return not self.online
+
+	# 是否封禁
+	def isBanned(self):
+		return self.status == PlayerStatus.Banned.value
+
+	# 是否冻结
+	def isFrozen(self):
+		return self.status == PlayerStatus.Frozen.value
+
+	# endregion
 
 	# 等级（本等级, 下一级所需经验）
 	def level(self, calc_next=False):
@@ -721,6 +807,13 @@ class Player(CacheableModel):
 		next = ExermonSlotLevelCalc.calcPlayerNext(level)
 		return level, next
 
+	# 获取所选科目
+	def subjects(self):
+		exerslot = self.exerSlot()
+		if exerslot is None: return []
+		slot_items = exerslot.contItems()
+		return ModelUtils.getObjectRelatedForAll(slot_items, 'subject')
+
 	# 获取题目记录
 	def questionRecords(self):
 		return self.questionrecord_set.all()
@@ -731,13 +824,21 @@ class Player(CacheableModel):
 		if res.exists(): return res.first()
 		return None
 
-	# 设置当前刷题
-	def setExercise(self, exercise):
-		self._cache("exercise", exercise)
+	# 获取刷题记录
+	def exerciseRecords(self):
+		return self.exerciserecord_set.all()
+
+	# 设置当前题目集
+	def setCurrentQuestionSet(self, ques_set):
+		self._cache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
+
+	# 设置当前题目集
+	def currentQuestionSet(self):
+		return self._getCache(self.CUR_QUES_SET_CACHE_KEY)
 
 	# 清除当前刷题
-	def clearExercise(self):
-		self._clearCache("exercise")
+	def clearCurrentQuestionSet(self):
+		self._clearCache(self.CUR_QUES_SET_CACHE_KEY)
 
 	# 获得金钱
 	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
@@ -769,6 +870,19 @@ class HumanItemEffect(BaseEffect):
 
 
 # ===================================================
+#  人类物品价格
+# ===================================================
+class HumanItemPrice(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类物品价格"
+
+	# 物品
+	item = models.OneToOneField('HumanItem', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
+# ===================================================
 #  人类物品表
 # ===================================================
 class HumanItem(UsableItem):
@@ -793,6 +907,11 @@ class HumanItem(UsableItem):
 	def effects(self):
 		return self.humanitemeffect_set.all()
 
+	# 购买价格
+	def buyPrice(self):
+		try: return self.humanitemprice
+		except HumanItemPrice.DoesNotExist: return None
+
 
 # ===================================================
 #  人类装备属性值表
@@ -815,6 +934,19 @@ class HumanEquipParam(ParamValue):
 
 
 # ===================================================
+#  人类装备价格
+# ===================================================
+class HumanEquipPrice(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备价格"
+
+	# 物品
+	item = models.OneToOneField('HumanEquip', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
+# ===================================================
 #  人类装备
 # ===================================================
 class HumanEquip(EquipableItem):
@@ -832,10 +964,6 @@ class HumanEquip(EquipableItem):
 	@classmethod
 	def contItemClass(cls): return HumanPackEquip
 
-	# 获取所有的属性基本值
-	def params(self):
-		return self.humanequipparam_set.all()
-
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
 		res = super().convertToDict(**kwargs)
@@ -843,6 +971,15 @@ class HumanEquip(EquipableItem):
 		res['e_type'] = self.e_type_id
 
 		return res
+
+	# 获取所有的属性基本值
+	def params(self):
+		return self.humanequipparam_set.all()
+
+	# 购买价格
+	def buyPrice(self):
+		try: return self.humanequipprice
+		except HumanEquipPrice.DoesNotExist: return None
 
 
 # ===================================================
@@ -973,7 +1110,7 @@ class HumanEquipSlot(SlotContainer):
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
 		if slot_item.e_type_id != equip.item.e_type_id:
-			raise ErrorException(ErrorType.IncorrectEquipType)
+			raise GameException(ErrorType.IncorrectEquipType)
 
 		return True
 
@@ -1019,6 +1156,10 @@ class HumanEquipSlotItem(SlotContItem):
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return HumanEquipSlot
 
 	# 所接受的装备项类（可多个）
 	@classmethod

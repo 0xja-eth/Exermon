@@ -50,6 +50,12 @@ class PlayerExermonsInline(BaseContItemsInline): model = PlayerExermon
 class ExerSkillSlotItemsInline(BaseContItemsInline): model = ExerSkillSlotItem
 
 
+class ExerItemPriceInline(CurrencyInline): model = ExerItemPrice
+
+
+class ExerEquipPriceInline(CurrencyInline): model = ExerEquipPrice
+
+
 class ExerSkillsInline(object):
 
 	model = ExerSkill
@@ -58,16 +64,6 @@ class ExerSkillsInline(object):
 	validate_max = 3
 	style = "accordion"
 	fk_name = 'o_exermon'
-
-
-# class ExerEquipSlotInline(object):
-#
-# 	model = ExerEquipSlot
-# 	min_num = 1
-# 	max_num = 1
-# 	validate_min = 1
-# 	validate_max = 1
-# 	style = "one"
 
 
 @xadmin.sites.register(Exermon)
@@ -143,12 +139,12 @@ class ExerSkillAdmin(BaseItemAdmin):
 
 @xadmin.sites.register(ExerItem)
 class ExerItemAdmin(UsableItemAdmin):
-	inlines = UsableItemAdmin.inlines + [ExerItemEffectsInline]
+	inlines = [ExerItemPriceInline, ExerItemEffectsInline]
 
 
 @xadmin.sites.register(ExerEquip)
 class ExerEquipAdmin(EquipableItemAdmin):
-	inlines = EquipableItemAdmin.inlines + [ExerEquipParamsInline]
+	inlines = [ExerEquipPriceInline, ExerEquipParamsInline]
 
 
 @xadmin.sites.register(ExerHub)
@@ -327,11 +323,8 @@ class PlayerExerGiftAdmin(PackContItemAdmin):
 	pass
 
 
-@xadmin.sites.register(ExerItemEffect)
-class ExerItemEffectAdmin(BaseEffectAdmin):
-	pass
+xadmin.site.register(ExerItemEffect, BaseEffectAdmin)
+xadmin.site.register(ExerSkillEffect, BaseEffectAdmin)
 
-
-@xadmin.sites.register(ExerSkillEffect)
-class ExerSkillEffectAdmin(BaseEffectAdmin):
-	pass
+xadmin.site.register(ExerItemPrice, CurrencyAdmin)
+xadmin.site.register(ExerEquipPrice, CurrencyAdmin)

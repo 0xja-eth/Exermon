@@ -112,7 +112,8 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            if (container.realTime) container.load(res);
+            if(container.realTime)
+                container.load(DataLoader.loadJsonData(res, "container"));
             onSuccess?.Invoke();
         };
 
@@ -168,7 +169,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(res);
+            container.load(DataLoader.loadJsonData(res, "container"));
             onSuccess?.Invoke();
         };
 
@@ -211,7 +212,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(res);
+            container.load(DataLoader.loadJsonData(res, "container"));
             onSuccess?.Invoke();
         };
 
@@ -241,7 +242,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(res);
+            container.load(DataLoader.loadJsonData(res, "container"));
             onSuccess?.Invoke();
         };
 

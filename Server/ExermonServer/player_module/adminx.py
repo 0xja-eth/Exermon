@@ -23,6 +23,15 @@ class HumanPackEquipsInline(BaseContItemsInline): model = HumanPackEquip
 class HumanEquipSlotItemsInline(BaseContItemsInline): model = HumanEquipSlotItem
 
 
+class PlayerMoneyInline(CurrencyInline): model = PlayerMoney
+
+
+class HumanItemPriceInline(CurrencyInline): model = HumanItemPrice
+
+
+class HumanEquipPriceInline(CurrencyInline): model = HumanEquipPrice
+
+
 @xadmin.sites.register(LoginInfo)
 class LoginInfoAdmin(object):
 
@@ -43,27 +52,35 @@ class CharacterAdmin(object):
 	list_editable = ['name', 'description', 'gender']
 
 
+@xadmin.sites.register(PlayerMoney)
+class PlayerMoneyAdmin(object):
+
+	list_display = ['id', 'gold', 'ticket', 'bound_ticket', 'player']
+
+	list_editable = ['gold', 'ticket', 'bound_ticket', 'player']
+
+
 @xadmin.sites.register(Player)
 class PlayerAdmin(object):
 
-	list_display = ['id', 'username', 'password', 'phone', 'email', 'name',
-					'character', 'exp', 'online', 'create_time', 'last_refresh_time',
-					'status', 'type', 'grade', 'birth', 'school', 'city', 'contact',
-					'description', 'is_deleted']
+	list_display = ['id', 'username', 'phone', 'email', 'name', 'status',
+					'character', 'exp', 'adminLevel', 'adminMoney', 'online',
+					'type', 'grade', 'create_time', 'last_refresh_time']
 
 	list_editable = ['username', 'phone', 'email', 'name', 'character', 'exp',
-					 'status', 'type', 'online', 'grade', 'birth', 'school',
-					 'city', 'contact', 'description']
+					 'status', 'type', 'online', 'grade']
+
+	inlines = [PlayerMoneyInline]
 
 
 @xadmin.sites.register(HumanItem)
 class HumanItemAdmin(UsableItemAdmin):
-	inlines = LimitedItemAdmin.inlines + [HumanItemEffectsInline]
+	inlines = [HumanItemPriceInline, HumanItemEffectsInline]
 
 
 @xadmin.sites.register(HumanEquip)
 class HumanEquipAdmin(EquipableItemAdmin):
-	inlines = EquipableItemAdmin.inlines + [HumanEquipParamsInline]
+	inlines = [HumanEquipPriceInline, HumanEquipParamsInline]
 
 
 @xadmin.sites.register(HumanPack)
@@ -118,7 +135,7 @@ class HumanEquipSlotItemAdmin(SlotContItemAdmin):
 	form_layout = SlotContItemAdmin().form_layout + field_set
 
 
-@xadmin.sites.register(HumanItemEffect)
-class HumanItemEffectAdmin(BaseEffectAdmin):
-	pass
+xadmin.site.register(HumanItemEffect, BaseEffectAdmin)
 
+xadmin.site.register(HumanItemPrice, CurrencyAdmin)
+xadmin.site.register(HumanEquipPrice, CurrencyAdmin)

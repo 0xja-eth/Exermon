@@ -1,4 +1,6 @@
 import math, random
+from .exception import GameException, ErrorType
+from enum import Enum
 
 
 # ================================
@@ -584,3 +586,324 @@ class ExerciseResultRewardCalc(QuestionSetResultRewardCalc):
 	def _goldPlusRate(self):
 		return 1
 
+
+# ===================================================
+#  题目生成类型枚举
+# ===================================================
+class QuestionGenerateType(Enum):
+	Normal = 0  # 普通模式
+	OccurFirst = 1  # 已做优先
+	NotOccurFirst = 2  # 未做优先
+	WrongFirst = 3  # 错题优先
+	CollectedFirst = 4  # 收藏优先
+	SimpleFirst = 5  # 简单题优先
+	MiddleFirst = 6  # 中等题优先
+	DifficultFirst = 7  # 难题优先
+
+
+# ================================
+# 题目生成配置
+# ================================
+class QuestionGenerateConfigure:
+
+	def __init__(self, question_set, player, subject,
+				 gen_type=QuestionGenerateType.Normal.value,
+				 count=None, star_dtb=None, questions=None,
+				 ques_type=None, ques_star=None):
+		from record_module.models import QuestionSetRecord, QuestionSetType
+		from question_module.models import QuestionType
+		from player_module.models import Player
+		from game_module.models import Subject, QuestionStar
+
+		self.player: Player = player
+		self.subject: Subject = subject
+		self.question_set: QuestionSetRecord = question_set
+		self.gen_type: QuestionGenerateType = gen_type  # 生成类型
+		self.ques_type: QuestionType = ques_type  # 限制题目类型
+		self.ques_star: QuestionStar = ques_star  # 限制题目星级
+
+		self.questions = questions  # 指定的题目集（QuerySet）
+
+		self.count = count
+		self.star_dtb = star_dtb
+
+		self.ignore_star = self.ques_star is not None or \
+						   self.question_set.TYPE == QuestionSetType.Exam
+
+	# 调试用
+	def convertToDictForDebug(self):
+		return {
+			'question_set': self.question_set,
+			'player': str(self.player),
+			'subject': str(self.subject),
+			'gen_type': str(self.gen_type),
+			'questions': self.questions,
+			'count': self.count,
+			'star_dtb': self.star_dtb,
+			'ques_type': str(self.ques_type),
+			'ques_star': str(self.ques_star),
+			'ignore_star': self.ignore_star,
+		}
+
+
+# ================================
+# 题目生成器类
+# ================================
+class QuestionGenerator:
+	GENERATE_TIMES_LIMIT = 1024
+
+	@classmethod
+	def generate(cls, configure: QuestionGenerateConfigure, return_id=False):
+		generator = cls(configure, return_id)
+		return generator
+
+	def __init__(self, configure: QuestionGenerateConfigure, return_id=False):
+		self.configure = configure
+		self.return_id = return_id
+		self.result = self.doGenerate()
+
+	# 生成题目
+	def doGenerate(self):
+
+		print("QuestionGenerator:\n%s" % self.configure.convertToDictForDebug())
+
+		questions = self.processFilter()
+
+		sub = self.processConditions(questions)
+
+		return self.processGenerate(sub, questions)
+
+	# 处理过滤（过滤非法题目）
+	def processFilter(self):
+		from question_module.views import Common as QuestionCommon
+
+		configure = self.configure
+
+		print("==== processFilter ====")
+
+		print("filtering subject: %s" % configure.subject)
+
+		questions = configure.questions
+
+		if questions is None:
+			questions = QuestionCommon.getQuestions(subject=configure.subject)
+
+		print("questions count: %d" % questions.count())
+
+		if configure.ques_type is not None:
+			print("limiting question type: %s" % configure.ques_type)
+			questions = questions.filter(type_id=configure.ques_type.id)
+
+		if configure.ques_star is not None:
+			print("limiting question star: %s" % configure.ques_star)
+			questions = questions.filter(star_id=configure.ques_star.id)
+
+		print("questions count: %d" % questions.count())
+
+		return questions
+
+	# 处理条件（分配条件）
+	def processConditions(self, questions):
+
+		from exermon_module.models import ExerSlot, ExerSlotItem
+
+		configure = self.configure
+
+		player = configure.player
+		subject = configure.subject
+		gen_type = configure.gen_type
+
+		sub = questions
+
+		print("==== processConditions ====")
+
+		print("questions count: " + str(questions.count()))
+
+		# 如果不忽略玩家的最大题目星级限制
+		# 处理星级限制
+		if not configure.ignore_star:
+
+			exer_slot: ExerSlot = player.exerSlot()
+			slot_item: ExerSlotItem = exer_slot.contItem(subject_id=subject.id)
+			level = slot_item.slotLevel()
+
+			min_star = 1
+			max_star = self.getMaxStar(level)
+
+			print("slot level: %d, max_star: %d" % (level, max_star))
+
+			if gen_type >= QuestionGenerateType.SimpleFirst.value:
+				# 根据星级生成模式
+				print("limiting star")
+
+				if gen_type == QuestionGenerateType.SimpleFirst.value:
+					print("SimpleFirst")
+
+					max_star = int((max_star - 1) / 2) + 1
+
+				elif gen_type == QuestionGenerateType.MiddleFirst.value:
+					print("MiddleFirst")
+
+					min_star = int((max_star - 1) / 4) + 1
+					max_star = int((max_star - 1) / 4 * 3) + 1
+
+				elif gen_type == QuestionGenerateType.DifficultFirst.value:
+					print("DifficultFirst")
+
+					min_star = int((max_star - 1) / 2) + 1
+
+			print("min_star, max_star: %d, %d" % (min_star, max_star))
+
+			sub = sub.filter(star_id__in=range(min_star, max_star))
+
+		elif gen_type >= QuestionGenerateType.SimpleFirst.value:
+			raise GameException(ErrorType.InvalidGenerateConfigure)
+
+		# 处理ID限制
+		if QuestionGenerateType.OccurFirst.value <= gen_type <= \
+			QuestionGenerateType.CollectedFirst.value:
+			from .model_utils import Common as ModelUtils
+
+			# id 限制
+			print("limiting id")
+
+			occur_questions = player.questionRecords()
+			occur_qids = ModelUtils.getObjectRelatedForFilter(occur_questions, 'question_id')
+
+			id_limit = []
+			exclude = False
+
+			if gen_type == QuestionGenerateType.OccurFirst.value:
+				print("OccurFirst")
+
+				id_limit = occur_qids
+
+			elif gen_type == QuestionGenerateType.NotOccurFirst.value:
+				print("NotOccurFirst")
+
+				id_limit = occur_qids
+				exclude = True
+
+			elif gen_type == QuestionGenerateType.WrongFirst.value:
+				print("WrongFirst")
+
+				wrong_questions = occur_questions.filter(wrong=True)
+				wrong_qids = ModelUtils.getObjectRelatedForFilter(wrong_questions, 'question_id')
+
+				id_limit = wrong_qids
+
+			elif gen_type == QuestionGenerateType.CollectedFirst.value:
+				print("CollectedFirst")
+
+				collected_questions = occur_questions.filter(collected=True)
+				collected_qids = ModelUtils.getObjectRelatedForFilter(collected_questions, 'question_id')
+
+				id_limit = collected_qids
+
+			print("id_limit: %s" % id_limit)
+			print("id_limit count: %d" % len(id_limit))
+
+			if exclude:
+				sub = questions.exclude(id__in=id_limit)
+			else:
+				sub = questions.filter(id__in=id_limit)
+
+		print("sub questions count: %d" % sub.count())
+		for q in sub:
+			print("star_id: %d" % q.star_id)
+
+		return sub
+
+	# 处理生成
+	def processGenerate(self, sub, questions):
+
+		# from record_module.models import QuestionSetType
+		#
+		# configure = self.configure
+		# question_set = configure.question_set
+
+		print("==== processGenerate ====")
+
+		return self.processGeneralGenerate(sub, questions)
+
+	# 默认生成方式
+	def processGeneralGenerate(self, sub, questions):
+		configure = self.configure
+		count = configure.count
+
+		result = []
+		ques_len = questions.count()
+
+		sub = self.shuffleQuestions(sub)
+		sub_len = len(sub)
+
+		print("sub_len: %d, ques_len: %d" % (sub_len, ques_len))
+
+		for i in range(count):
+			if i < sub_len:
+				question = sub[i]
+
+				print("in-condition: %d" % question.id)
+
+			else:
+				ltd = self.GENERATE_TIMES_LIMIT
+				index = random.randint(0, ques_len-1)
+				question = questions[index]
+
+				# 随机出题，保证不重复
+				while ((self.return_id and question.id in result) or \
+						(not self.return_id and question in result)) \
+						and ltd > 0:
+
+					index = random.randint(0, ques_len-1)
+					question = questions[index]
+					ltd -= 1
+
+				print("out-condition: %d" % question.id)
+
+			if self.return_id:
+				result.append(question.id)
+			else:
+				result.append(question)
+
+		print("result: %s" % result)
+
+		return result
+
+	# 乱序题目
+	@classmethod
+	def shuffleQuestions(cls, questions):
+
+		result = []
+		for question in questions:
+			result.append(question)
+		random.shuffle(result)
+
+		return result
+
+	# 获取最大星级编号
+	def getMaxStar(self, level):
+
+		return MaxStarCalc.calc(level)
+
+
+# ===================================================
+# 计算最大星级类
+# player: Player
+# ===================================================
+class MaxStarCalc():
+
+	@classmethod
+	def calc(cls, level):
+
+		from game_module.models import QuestionStar
+
+		stars = QuestionStar.objs()
+
+		star_id = 0
+		for star in stars:
+			if level < star.level:
+				return star_id
+			star_id += 1
+
+		return star_id

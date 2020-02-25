@@ -3,7 +3,7 @@ from django.conf import settings
 from game_module.models import ParamRate
 from item_module.models import *
 from utils.model_utils import QuestionImageUpload, Common as ModelUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 import os, base64
 from enum import Enum
 
@@ -73,7 +73,7 @@ class QuesPicture(models.Model):
 		if os.path.exists(path):
 			return path
 		else:
-			raise ErrorException(ErrorType.PictureFileNotFound)
+			raise GameException(ErrorType.PictureFileNotFound)
 
 	# 获取视频base64编码
 	def convertToBase64(self):
@@ -133,6 +133,44 @@ class QuesReport(models.Model):
 
 	# 反馈描述
 	description = models.CharField(max_length=MAX_DESC_LEN, verbose_name="描述")
+
+	# 反馈时间
+	create_time = models.DateTimeField(auto_now_add=True, verbose_name="反馈时间")
+
+	# 处理结果
+	result = models.CharField(max_length=MAX_DESC_LEN, null=True, blank=True, verbose_name="描述")
+
+	# 处理时间
+	result_time = models.DateTimeField(null=True, blank=True, verbose_name="处理时间")
+
+	def __str__(self):
+		return "%d. %s %s %s" % (self.id, self.player, self.question.number(), self.type)
+
+	# 创建
+	@classmethod
+	def create(cls, player, question_id, type, description):
+		report = cls()
+		report.player = player
+		report.question_id = question_id
+		report.type = type
+		report.description = description
+		report.save()
+
+		return report
+
+	def convertToDict(self):
+
+		create_time = ModelUtils.timeToStr(self.create_time)
+		result_time = ModelUtils.timeToStr(self.result_time)
+
+		return {
+			'question_id': self.question_id,
+			'type': self.type,
+			'description': self.description,
+			'create_time': create_time,
+			'result': self.result,
+			'result_time': result_time,
+		}
 
 
 # ===================================================
@@ -243,40 +281,38 @@ class Question(models.Model):
 
 	adminCorrectAnswer.short_description = "正确选项"
 
-	def convertToDict(self, filter_type=None):
+	def convertToDict(self, type=None):
 
-		if filter_type == 'info':
+		if type == 'info':
 			return {
 				'id': self.id,
 				'star_id': self.star.id,
 				'subject_id': self.subject.id,
 			}
 
-		create_time = self.create_time.strftime('%Y-%m-%d %H:%M:%S')
+		create_time = ModelUtils.timeToStr(self.create_time)
 
-		if not filter_type:
+		choices = ModelUtils.objectsToDict(self.choices())
+		pictures = ModelUtils.objectsToDict(self.pictures())
 
-			choices = ModelUtils.objectsToDict(self.choices())
-			pictures = ModelUtils.objectsToDict(self.pictures())
+		return {
+			'id': self.id,
+			'number': self.number(),
+			'title': self.title,
+			'description': self.description,
+			'source': self.source,
+			'star_id': self.star.id,
+			'level': self.level,
+			'score': self.score,
+			'subject_id': self.subject_id,
+			'type': self.type,
+			'status': self.status,
 
-			return {
-				'id': self.id,
-				'number': self.number(),
-				'title': self.title,
-				'description': self.description,
-				'source': self.source,
-				'star_id': self.star.id,
-				'level': self.level,
-				'score': self.score,
-				'subject_id': self.subject.id,
-				'type': self.type,
-				'status': self.status,
+			'create_time': create_time,
 
-				'create_time': create_time,
-
-				'choices': choices,
-				'pictures': pictures
-			}
+			'choices': choices,
+			'pictures': pictures
+		}
 
 	# 正确答案（编号）
 	def correctAnswer(self):
@@ -339,18 +375,6 @@ class Question(models.Model):
 
 
 # ===================================================
-#  题目糖价格表
-# ===================================================
-# class QuesSugarPrice(Currency):
-# 	class Meta:
-# 		verbose_name = verbose_name_plural = "题目糖价格"
-#
-# 	# 对应题目糖
-# 	sugar = models.OneToOneField("QuesSugar", on_delete=models.CASCADE,
-# 									 null=True, verbose_name="题目糖")
-
-
-# ===================================================
 #  题目糖属性值表
 # ===================================================
 class QuesSugarParam(ParamRate):
@@ -372,6 +396,19 @@ class QuesSugarParam(ParamRate):
 
 
 # ===================================================
+#  题目糖价格
+# ===================================================
+class QuesSugarPrice(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "题目糖价格"
+
+	# 物品
+	item = models.OneToOneField('QuesSugar', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
+# ===================================================
 #  题目糖表
 # ===================================================
 class QuesSugar(BaseItem):
@@ -386,10 +423,6 @@ class QuesSugar(BaseItem):
 	# 题目
 	question = models.ForeignKey("Question", on_delete=models.CASCADE, verbose_name="对应题目")
 
-	# 购买价格（None为不可购买）
-	buy_price = models.OneToOneField('item_module.Currency', null=True, blank=True,
-									 on_delete=models.CASCADE, verbose_name="购买价格")
-
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
 
@@ -398,6 +431,12 @@ class QuesSugar(BaseItem):
 
 	# 获得个数
 	get_count = models.PositiveSmallIntegerField(default=1, verbose_name="获得个数")
+
+	# 管理界面用：显示购入价格
+	def adminBuyPrice(self):
+		return self.buyPrice()
+
+	adminBuyPrice.short_description = "购入价格"
 
 	# 管理界面用：显示属性基础值
 	def adminParams(self):
@@ -417,7 +456,7 @@ class QuesSugar(BaseItem):
 	def convertToDict(self):
 		res = super().convertToDict()
 
-		buy_price = ModelUtils.objectToDict(self.buy_price)
+		buy_price = ModelUtils.objectToDict(self.buyPrice())
 
 		res['question_id'] = self.question
 		res['buy_price'] = buy_price
@@ -428,14 +467,14 @@ class QuesSugar(BaseItem):
 
 		return res
 
-	# 获取购买价格
-	# def buyPrice(self):
-	# 	try: return self.quessugarprice
-	# 	except QuesSugarPrice.DoesNotExist: return None
-
 	# 获取所有的属性成长率
 	def params(self):
 		return self.quessugarparam_set.all()
+
+	# 购买价格
+	def buyPrice(self):
+		try: return self.quessugarprice
+		except QuesSugarPrice.DoesNotExist: return None
 
 	# 获取属性值
 	def param(self, param_id=None, attr=None):

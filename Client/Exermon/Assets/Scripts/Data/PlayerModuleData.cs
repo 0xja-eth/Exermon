@@ -77,66 +77,12 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        /*
-        public int humanPackId { get; private set; }
-        public int exerPackId { get; private set; }
-        public int exerFragPackId { get; private set; }
-        public int exerGiftPoolId { get; private set; }
-        public int exerHubId { get; private set; }
-        public int quesSugarPackId { get; private set; }
-        */
-
-        /// <summary>
-        /// 缓存属性
-        /// </summary>
-        public PackContainer<PackContItem> humanPack { get; private set; }
-        public PackContainer<PackContItem> exerPack { get; private set; }
-        public PackContainer<PackContItem> exerFragPack { get; private set; }
-        public PackContainer<PackContItem> exerGiftPool { get; private set; }
+        public PackContainer<HumanPackContItem> humanPack { get; private set; }
+        public PackContainer<ExerPackContItem> exerPack { get; private set; }
+        public PackContainer<ExerFragPackItem> exerFragPack { get; private set; }
+        public PackContainer<PlayerExerGift> exerGiftPool { get; private set; }
         public PackContainer<PlayerExermon> exerHub { get; private set; }
-        public PackContainer<PackContItem> quesSugarPack { get; private set; }
-
-        /*
-        /// <summary>
-        /// 读取人类背包
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadHumanPack(JsonData json) {
-            humanPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
-        }
-
-        /// <summary>
-        /// 读取艾瑟萌背包
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadExerPack(JsonData json) {
-            exerPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
-        }
-
-        /// <summary>
-        /// 读取艾瑟萌碎片背包
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadExerFragPack(JsonData json) {
-            exerFragPack = DataLoader.loadData<PackContainer<PackContItem>>(json);
-        }
-
-        /// <summary>
-        /// 读取艾瑟萌天赋池
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadExerGiftPool(JsonData json) {
-            exerGiftPool = DataLoader.loadData<PackContainer<PackContItem>>(json);
-        }
-
-        /// <summary>
-        /// 读取艾瑟萌仓库
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadExerHub(JsonData json) {
-            exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json);
-        }
-        */
+        public PackContainer<QuesSugarPackItem> quesSugarPack { get; private set; }
 
         /// <summary>
         /// 数据加载
@@ -145,12 +91,12 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override void load(JsonData json) {
             base.load(json);
 
-            humanPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "humanpack");
-            exerPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "exerpack");
-            exerFragPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "exerfragpack");
-            exerGiftPool = DataLoader.loadData<PackContainer<PackContItem>>(json, "exergiftpool");
+            humanPack = DataLoader.loadData<PackContainer<HumanPackContItem>>(json, "humanpack");
+            exerPack = DataLoader.loadData<PackContainer<ExerPackContItem>>(json, "exerpack");
+            exerFragPack = DataLoader.loadData<PackContainer<ExerFragPackItem>>(json, "exerfragpack");
+            exerGiftPool = DataLoader.loadData<PackContainer<PlayerExerGift>>(json, "exergiftpool");
             exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json, "exerhub");
-            quesSugarPack = DataLoader.loadData<PackContainer<PackContItem>>(json, "quessugarpack");
+            quesSugarPack = DataLoader.loadData<PackContainer<QuesSugarPackItem>>(json, "quessugarpack");
         }
 
         /// <summary>
@@ -179,36 +125,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        /*
-        public int exerSlotId { get; set; }
-        public int humanEquipSlotId { get; private set; }
-        */
-
-        /// <summary>
-        /// 缓存属性
-        /// </summary>
-        public SlotContainer<ExerSlotItem> exerSlot { get; private set; }
+        public ExerSlot exerSlot { get; private set; }
         public HumanEquipSlot humanEquipSlot { get; private set; }
-
-        /*
-        /// <summary>
-        /// 读取艾瑟萌槽
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadExerSlot(JsonData json) {
-            exerSlot = DataLoader.loadData
-                <SlotContainer<ExerSlotItem>>(json, "container");
-        }
-
-        /// <summary>
-        /// 读取人类装备槽
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadHumanEquipSlot(JsonData json) {
-            humanEquipSlot = DataLoader.loadData
-                <HumanEquipSlot>(json, "container");
-        }
-        */
 
         /// <summary>
         /// 数据加载
@@ -216,8 +134,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <param name="json">数据</param>
         public override void load(JsonData json) {
             base.load(json);
-
-            exerSlot = DataLoader.loadData<SlotContainer<ExerSlotItem>>(json, "exerslot");
+            
+            exerSlot = DataLoader.loadData<ExerSlot>(json, "exerslot");
             humanEquipSlot = DataLoader.loadData<HumanEquipSlot>(json, "humanequipslot");
         }
 
@@ -228,8 +146,160 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public override JsonData toJson() {
             var json = base.toJson();
 
-            json["exerslot"] = DataLoader.convertData(exerSlot); ;
-            json["humanequipslot"] = DataLoader.convertData(humanEquipSlot); ;
+            json["exerslot"] = DataLoader.convertData(exerSlot);
+            json["humanequipslot"] = DataLoader.convertData(humanEquipSlot);
+
+            return json;
+        }
+    }
+
+    /// <summary>
+    /// 对战信息
+    /// </summary>
+    public class BattleInfo : BaseData, ParamDisplay.DisplayDataConvertable {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        public int rankId { get; private set; }
+        public int subRank { get; private set; }
+        public int starNum { get; private set; }
+        public int score { get; private set; }
+        public int credit { get; private set; }
+        public int count { get; private set; }
+        public double winRate { get; private set; }
+        public double corrRate { get; private set; }
+        public double avgHurt { get; private set; }
+        public double avgDamage { get; private set; }
+        public double avgScore { get; private set; }
+        public int maxHurt { get; private set; }
+        public int maxDamage { get; private set; }
+        public double maxScore { get; private set; }
+
+        /// <summary>
+        /// 转换成显示数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public JsonData convertToDisplayData(string type = "") {
+            return toJson();
+        }
+
+        /// <summary>
+        /// 获取段位实例
+        /// </summary>
+        /// <returns></returns>
+        public CompRank rank() {
+            return DataService.get().compRank(rankId);
+        }
+
+        /// <summary>
+        /// 数据加载
+        /// </summary>
+        /// <param name="json">数据</param>
+        public override void load(JsonData json) {
+            base.load(json);
+
+            rankId = DataLoader.loadInt(json, "rank_id");
+            subRank = DataLoader.loadInt(json, "sub_rank");
+            starNum = DataLoader.loadInt(json, "star_num");
+            score = DataLoader.loadInt(json, "score");
+            credit = DataLoader.loadInt(json, "credit");
+            count = DataLoader.loadInt(json, "count");
+            winRate = DataLoader.loadDouble(json, "win_rate");
+            corrRate = DataLoader.loadDouble(json, "corr_rate");
+            avgHurt = DataLoader.loadDouble(json, "avg_hurt");
+            avgDamage = DataLoader.loadDouble(json, "avg_damage");
+            avgScore = DataLoader.loadDouble(json, "avg_score");
+            maxHurt = DataLoader.loadInt(json, "max_hurt");
+            maxDamage = DataLoader.loadInt(json, "max_damage");
+            maxScore = DataLoader.loadInt(json, "max_score");
+        }
+
+        /// <summary>
+        /// 获取JSON数据
+        /// </summary>
+        /// <returns>JsonData</returns>
+        public override JsonData toJson() {
+            var json = base.toJson();
+
+            json["rank_id"] = rankId;
+            json["sub_rank"] = subRank;
+            json["star_num"] = starNum;
+            json["score"] = score;
+            json["credit"] = credit;
+            json["count"] = count;
+            json["win_rate"] = winRate;
+            json["corr_rate"] = corrRate;
+            json["avg_hurt"] = avgHurt;
+            json["avg_damage"] = avgDamage;
+            json["avg_score"] = avgScore;
+            json["max_hurt"] = maxHurt;
+            json["max_damage"] = maxDamage;
+            json["max_score"] = maxScore;
+
+            return json;
+        }
+    }
+
+    /// <summary>
+    /// 做题信息
+    /// </summary>
+    public class QuestionInfo : BaseData, ParamDisplay.DisplayDataConvertable {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        public int count { get; private set; }
+        public int corrCnt { get; private set; }
+        public double corrRate { get; private set; }
+        public int sumTimespan { get; private set; }
+        public double avgTimespan { get; private set; }
+        public double corrTimespan { get; private set; }
+        public int sumExp { get; private set; }
+        public int sumGold { get; private set; }
+
+        /// <summary>
+        /// 转换成显示数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public JsonData convertToDisplayData(string type = "") {
+            return toJson();
+        }
+
+        /// <summary>
+        /// 数据加载
+        /// </summary>
+        /// <param name="json">数据</param>
+        public override void load(JsonData json) {
+            base.load(json);
+
+            count = DataLoader.loadInt(json, "count");
+            corrCnt = DataLoader.loadInt(json, "corr_cnt");
+            corrRate = DataLoader.loadDouble(json, "corr_rate");
+            sumTimespan = DataLoader.loadInt(json, "sum_timespan");
+            avgTimespan = DataLoader.loadDouble(json, "avg_timespan");
+            corrTimespan = DataLoader.loadDouble(json, "corr_timespan");
+            sumExp = DataLoader.loadInt(json, "sum_exp");
+            sumGold = DataLoader.loadInt(json, "sum_gold");
+        }
+
+        /// <summary>
+        /// 获取JSON数据
+        /// </summary>
+        /// <returns>JsonData</returns>
+        public override JsonData toJson() {
+            var json = base.toJson();
+
+            json["count"] = count;
+            json["corr_cnt"] = corrCnt;
+            json["corr_rate"] = corrRate;
+            json["sum_timespan"] = sumTimespan;
+            json["avg_timespan"] = avgTimespan;
+            json["corr_timespan"] = corrTimespan;
+            json["sum_exp"] = sumExp;
+            json["sum_gold"] = sumGold;
 
             return json;
         }
@@ -240,16 +310,16 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     /// </summary>
     public enum Status {
         // 已注册，未创建角色
-        Uncreated = 0,  // 未创建
-        CharacterCreated = 1,  // 已创建人物
-        ExermonsCreated = 2,  // 已选择艾瑟萌
-        GiftsCreated = 3,  // 已选择天赋
+        Uncreated = 1,  // 未创建
+        CharacterCreated = 2,  // 已创建人物
+        ExermonsCreated = 3,  // 已选择艾瑟萌
+        GiftsCreated = 4,  // 已选择天赋
 
         // 已完全创建角色
         Normal = 10,  // 正常
         Banned = 20,  // 封禁
         Frozen = 30,  // 冻结
-        Other = -1  // 其他
+        Other = 0  // 其他
     }
 
     /// <summary>
@@ -275,8 +345,15 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     public string contact { get; private set; }
     public string description { get; private set; }
 
+    public ItemPrice money { get; private set; }
+
     public PackContainerInfo packContainers { get; private set; }
     public SlotContainerInfo slotContainers { get; private set; }
+
+    public BattleInfo battleInfo { get; private set; }
+    public QuestionInfo questionInfo { get; private set; }
+
+    #region 信息转换
 
     /// <summary>
     /// 转化为属性信息集
@@ -285,6 +362,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     public JsonData convertToDisplayData(string type = "") {
         switch (type.ToLower()) {
             case "exp": return convertExp();
+            case "battle_info": return battleInfo.toJson();
+            case "question_info": return questionInfo.toJson();
             default: return toJson();
         }
     }
@@ -301,6 +380,10 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         json["rate"] = exp / next;
         return json;
     }
+
+    #endregion
+
+    #region 数据操作
 
     /// <summary>
     /// 设置密码
@@ -359,6 +442,33 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     }
 
     /// <summary>
+    /// 修改昵称
+    /// </summary>
+    /// <param name="name"></param>
+    public void editNmae(string name) {
+        this.name = name;
+    }
+
+    /// <summary>
+    /// 修改个人信息
+    /// </summary>
+    /// <param name="grade">年级</param>
+    /// <param name="birth">生日</param>
+    /// <param name="school">学校</param>
+    /// <param name="city">城市</param>
+    /// <param name="contact">联系方式</param>
+    /// <param name="description">个人描述</param>
+    public void editInfo(int grade, DateTime birth, string school,
+        string city, string contact, string description) {
+        this.grade = grade;
+        this.birth = birth;
+        this.school = school;
+        this.city = city;
+        this.contact = contact;
+        this.description = description;
+    }
+
+    /// <summary>
     /// 补全信息
     /// </summary>
     /// <param name="birth">出生日期</param>
@@ -410,6 +520,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         return DataService.get().playerType(type).Item2;
     }
 
+    #region 状态判断
+
     /// <summary>
     /// 玩家是否已完全创建
     /// </summary>
@@ -442,13 +554,9 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         return status >= (int)Status.GiftsCreated;
     }
 
-    /// <summary>
-    /// 读取基础信息
-    /// </summary>
-    /// <param name="json">数据</param>
-    public void loadBasic(JsonData json) {
-        load(json);
-    }
+    #endregion
+
+    #endregion
 
     /// <summary>
     /// 数据加载
@@ -479,10 +587,15 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         contact = DataLoader.loadString(json, "contact");
         description = DataLoader.loadString(json, "description");
 
+        money = DataLoader.loadData<ItemPrice>(json, "money");
+
         packContainers = DataLoader.loadData
             <PackContainerInfo>(json, "pack_containers");
         slotContainers = DataLoader.loadData
             <SlotContainerInfo>(json, "slot_containers");
+
+        battleInfo = DataLoader.loadData<BattleInfo>(json, "battle_info");
+        questionInfo = DataLoader.loadData<QuestionInfo>(json, "question_info");
     }
 
     /// <summary>
@@ -515,12 +628,19 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         json["contact"] = contact;
         json["description"] = description;
 
+        json["money"] = DataLoader.convertData(money);
+
         json["pack_containers"] = DataLoader.convertData(packContainers);
         json["slot_containers"] = DataLoader.convertData(slotContainers);
+
+        json["battle_info"] = DataLoader.convertData(battleInfo);
+        json["question_info"] = DataLoader.convertData(questionInfo);
 
         return json;
     }
 }
+
+#region 物品
 
 /// <summary>
 /// 人类物品
@@ -569,98 +689,9 @@ public class HumanEquip : EquipableItem {
 
 }
 
-/// <summary>
-/// 人类背包物品
-/// </summary>
-//public class HumanPackItem : PackContItem { }
+#endregion
 
-/// <summary>
-/// 人类背包装备
-/// </summary>
-public class HumanPackEquip : PackContItem {
-
-    /// <summary>
-    /// 获取装备实例
-    /// </summary>
-    /// <returns>装备</returns>
-    public HumanEquip equip() {
-        return item() as HumanEquip;
-    }
-
-    /// <summary>
-    /// 获取装备的所有属性
-    /// </summary>
-    /// <returns>属性数据数组</returns>
-    public ParamData[] getParams() {
-        var equip = this.equip();
-        if (equip == null) return new ParamData[0];
-        return equip.params_;
-    }
-
-    /// <summary>
-    /// 获取装备的属性
-    /// </summary>
-    /// <param name="paramId">属性ID</param>
-    /// <returns>属性数据</returns>
-    public ParamData getParam(int paramId) {
-        var equip = this.equip();
-        if (equip == null) return new ParamData(paramId);
-        return equip.getParam(paramId);
-    }
-
-}
-
-/// <summary>
-/// 人类装备槽项
-/// </summary>
-public class HumanEquipSlotItem : SlotContItem {
-
-    /// <summary>
-    /// 属性
-    /// </summary>
-    public HumanPackEquip packEquip { get; private set; }
-    public int eType { get; private set; }
-
-    /// <summary>
-    /// 获取装备类型
-    /// </summary>
-    /// <returns>装备类型</returns>
-    public TypeData equipType() {
-        return DataService.get().humanEquipType(eType);
-    }
-
-    /// <summary>
-    /// 获取装备类型
-    /// </summary>
-    /// <returns>装备类型</returns>
-    public HumanEquip equip() {
-        return (HumanEquip)packEquip.item();
-    }
-
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        packEquip = DataLoader.loadData<HumanPackEquip>(json, "pack_equip");
-        eType = DataLoader.loadInt(json, "e_type");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["pack_equip"] = DataLoader.convertData(packEquip);
-        json["e_type"] = eType;
-
-        return json;
-    }
-}
+#region 容器
 
 /// <summary>
 /// 人类装备槽
@@ -673,10 +704,19 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
     /// <param name="eType">装备类型</param>
     /// <returns>装备项数据</returns>
     public HumanEquipSlotItem getEquipSlotItem(int eType) {
-        foreach (var item in items)
-            if (item.eType == eType) return item;
-        return null;
+        return getItem((item) => item.eType == eType);
     }
+
+    /// <summary>
+    /// 装备
+    /// </summary>
+    /// <param name="packEquip">背包装备</param>
+    public void setEquip(HumanPackEquip packEquip) {
+        var equip = packEquip.equip();
+        var slotItem = getEquipSlotItem(equip.eType);
+        slotItem.setEquip(packEquip);
+    }
+
     /*
     /// <summary>
     /// 获取装备的所有属性
@@ -715,3 +755,162 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
     */
 }
 
+#endregion
+
+#region 容器项
+
+/// <summary>
+/// 人类背包容器项
+/// </summary>
+public class HumanPackContItem : PackContItem {
+
+    /// <summary>
+    /// 默认类型
+    /// </summary>
+    /// <returns></returns>
+    public override Type defaultType() { return Type.Unset; }
+
+    /// <summary>
+    /// 物品
+    /// </summary>
+    /// <returns></returns>
+    public LimitedItem item() {
+        if (type == (int)Type.HumanPackItem)
+            return DataService.get().humanItem(itemId);
+        if (type == (int)Type.HumanPackEquip)
+            return DataService.get().humanEquip(itemId);
+        return null;
+    }
+
+}
+
+/// <summary>
+/// 人类背包物品
+/// </summary>
+public class HumanPackItem : HumanPackContItem {
+
+    /// <summary>
+    /// 默认类型
+    /// </summary>
+    /// <returns></returns>
+    public override Type defaultType() { return Type.HumanPackItem; }
+
+    /// <summary>
+    /// 获取装备实例
+    /// </summary>
+    /// <returns>装备</returns>
+    public new HumanItem item() {
+        return DataService.get().humanItem(itemId);
+    }
+
+}
+
+/// <summary>
+/// 人类背包装备
+/// </summary>
+public class HumanPackEquip : HumanPackContItem {
+
+    /// <summary>
+    /// 默认类型
+    /// </summary>
+    /// <returns></returns>
+    public override Type defaultType() { return Type.HumanPackEquip; }
+
+    /// <summary>
+    /// 获取装备实例
+    /// </summary>
+    /// <returns>装备</returns>
+    public HumanEquip equip() {
+        return DataService.get().humanEquip(itemId);
+    }
+
+    /// <summary>
+    /// 获取装备的所有属性
+    /// </summary>
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        var equip = this.equip();
+        if (equip == null) return new ParamData[0];
+        return equip.params_;
+    }
+
+    /// <summary>
+    /// 获取装备的属性
+    /// </summary>
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        var equip = this.equip();
+        if (equip == null) return new ParamData(paramId);
+        return equip.getParam(paramId);
+    }
+
+}
+
+/// <summary>
+/// 人类装备槽项
+/// </summary>
+public class HumanEquipSlotItem : SlotContItem {
+
+    /// <summary>
+    /// 默认类型
+    /// </summary>
+    /// <returns></returns>
+    public override Type defaultType() { return Type.HumanEquipSlotItem; }
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public HumanPackEquip packEquip { get; private set; }
+    public int eType { get; private set; }
+
+    /// <summary>
+    /// 获取装备类型
+    /// </summary>
+    /// <returns>装备类型</returns>
+    public TypeData equipType() {
+        return DataService.get().humanEquipType(eType);
+    }
+
+    /// <summary>
+    /// 获取装备类型
+    /// </summary>
+    /// <returns>装备类型</returns>
+    public HumanEquip equip() {
+        return packEquip.equip();
+    }
+
+    /// <summary>
+    /// 设置装备
+    /// </summary>
+    /// <param name="packEquip">背包装备</param>
+    public void setEquip(HumanPackEquip packEquip) {
+        this.packEquip = packEquip;
+    }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+
+        packEquip = DataLoader.loadData<HumanPackEquip>(json, "pack_equip");
+        eType = DataLoader.loadInt(json, "e_type");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+
+        json["pack_equip"] = DataLoader.convertData(packEquip);
+        json["e_type"] = eType;
+
+        return json;
+    }
+}
+
+#endregion

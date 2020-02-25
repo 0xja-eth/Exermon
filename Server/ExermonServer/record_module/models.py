@@ -1,7 +1,8 @@
 from django.db import models
-from item_module.models import ItemType, BaseItem
+from item_module.models import BaseItem
 from utils.model_utils import CacheableModel, Common as ModelUtils
-from utils.exception import ErrorType, ErrorException
+from utils.calc_utils import QuestionGenerateType
+from utils.exception import ErrorType, GameException
 from enum import Enum
 import jsonfield, datetime
 
@@ -35,6 +36,8 @@ class QuestionRecord(models.Model):
 		(RecordSource.Adventure.value, '冒险'),
 		(RecordSource.Others.value, '其他'),
 	]
+
+	MAX_NOTE_LEN = 128
 
 	# 题目
 	question = models.ForeignKey('question_module.Question', null=False,
@@ -82,7 +85,7 @@ class QuestionRecord(models.Model):
 	wrong = models.BooleanField(default=False, verbose_name="错题标志")
 
 	# 备注
-	note = models.CharField(blank=True, null=True, max_length=128, verbose_name="备注")
+	note = models.CharField(blank=True, null=True, max_length=MAX_NOTE_LEN, verbose_name="备注")
 
 	# 转化为字符串
 	def __str__(self):
@@ -115,14 +118,18 @@ class QuestionRecord(models.Model):
 	# 创建新记录
 	@classmethod
 	def create(cls, player, question_id):
-		record = cls()
-		record.player = player
-		record.question_id = question_id
+		record = player.questionRecord(question_id)
+
+		if record is None:
+			record = cls()
+			record.player = player
+			record.question_id = question_id
+			record.save()
 
 		return record
 
 	# 更新已有记录
-	def updateRecord(self, player_ques, collect=False):
+	def updateRecord(self, player_ques):
 
 		timespan = player_ques.timespan
 
@@ -143,8 +150,6 @@ class QuestionRecord(models.Model):
 		self.sum_exp += player_ques.exp_incr
 		self.sum_gold += player_ques.gold_incr
 
-		if collect: self.collected = True
-
 		self.last_date = datetime.datetime.now()
 		self.count += 1
 
@@ -162,6 +167,9 @@ class PlayerQuestion(CacheableModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "玩家题目关系"
+
+	# 前后端时间差最大值（毫秒）
+	MAX_DELTATIME = 10*1000
 
 	# 缓存键配置
 	STARTTIME_CACHE_KEY = 'start_time'
@@ -223,6 +231,7 @@ class PlayerQuestion(CacheableModel):
 			'question_id': self.question.id,
 			'selection': self.selection,
 			'timespan': self.timespan,
+			'answered': self.answered,
 			'is_new': self.is_new,
 		}
 
@@ -242,7 +251,7 @@ class PlayerQuestion(CacheableModel):
 		ques = cls()
 		ques.question_id = question_id
 		ques.setQuestionSet(question_set)
-		ques._updateNew()
+		ques._updateIsNew(question_set)
 
 		return ques
 
@@ -253,12 +262,10 @@ class PlayerQuestion(CacheableModel):
 		return QuestionSetSingleRewardCalc
 
 	# 更新是否新题目
-	def _updateNew(self):
-		player = self.questionSet().player
-		res = player.questionrecord_set.filter(
-			question_id=self.question_id)
-
-		self.is_new = res.exists()
+	def _updateIsNew(self, question_set):
+		player = question_set.player
+		rec = player.questionRecord(self.question_id)
+		self.is_new = rec is None
 
 	# 来源
 	def source(self):
@@ -289,24 +296,31 @@ class PlayerQuestion(CacheableModel):
 		self._cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
 	# 作答
-	def answer(self, selection, record):
+	def answer(self, selection, timespan, record):
 
 		start_time = self._getCache(self.STARTTIME_CACHE_KEY)
 
 		if start_time is None:
-			raise ErrorException(ErrorType.QuestionNotStarted)
+			raise GameException(ErrorType.QuestionNotStarted)
 
 		now = datetime.datetime.now()
 		if now <= start_time:
-			raise ErrorException(ErrorType.InvalidTimeSpan)
+			raise GameException(ErrorType.InvalidTimeSpan)
 
-		self.timespan = (now - start_time).microseconds
+		backend_timespan = (now - start_time).microseconds
+
+		self.timespan = self._realTimespan(timespan, backend_timespan)
 		self.selection = selection
 		self.answered = True
 
 		self._calcRewards(record)
 
 		# self.save()
+
+	def _realTimespan(self, frontend, backend):
+		delta = backend - frontend
+		if delta > self.MAX_DELTATIME: return backend
+		return min(frontend, backend)
 
 	# 计算奖励
 	def _calcRewards(self, record):
@@ -404,8 +418,8 @@ class QuestionSetReward(models.Model):
 
 	# 获取物品
 	def item(self) -> BaseItem:
-		from item_module.views import Common
-		return Common.getItem(self.type, id=self.item_id)
+		from item_module.views import Common as ItemCommon
+		return ItemCommon.getItem(self.type, id=self.item_id)
 
 	# 获取容器类型
 	def containerType(self):
@@ -460,6 +474,10 @@ class QuestionSetRecord(CacheableModel):
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
 
+	# 所属赛季
+	season = models.ForeignKey('season_module.CompSeason', on_delete=models.CASCADE,
+							   verbose_name="所属赛季")
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self._cache(self.REWARD_CACHE_KEY, [])
@@ -472,6 +490,7 @@ class QuestionSetRecord(CacheableModel):
 	def create(cls, player, **kwargs):
 		record = cls()
 		record.player = player
+		record._create(**kwargs)
 		record.start(**kwargs)
 
 		return record
@@ -486,8 +505,11 @@ class QuestionSetRecord(CacheableModel):
 	@classmethod
 	def rewardClass(cls): return QuestionSetReward
 
+	# 子类配置属性
+	def _create(self, **kwargs): pass
+
 	# 生成名字
-	def generateName(self): return ''
+	def generateName(self): return '题目集记录'
 
 	def convertToDict(self, type=None):
 
@@ -496,9 +518,11 @@ class QuestionSetRecord(CacheableModel):
 
 		base = {
 			'id': self.id,
+			'season_id': self.season_id,
 			'name': self.generateName(),
-			'player_questions': player_questions,
+			'questions': player_questions,
 			'create_time': create_time,
+			'finished': self.finished,
 		}
 
 		if type == 'result':
@@ -536,6 +560,25 @@ class QuestionSetRecord(CacheableModel):
 
 		return None
 
+	# 初始化题目缓存
+	def _initQuestionCache(self):
+		self._cache(self.QUES_CACHE_KEY, [])
+
+	# 获取题目缓存
+	def _getQuestionCache(self):
+		cache = self._getCache(self.QUES_CACHE_KEY)
+		if cache is None: return []
+		return cache
+
+	# 往缓存中添加题目
+	def _addQuestionToCache(self, player_ques):
+		self._getQuestionCache().append(player_ques)
+
+	# 从缓存中移除题目
+	def _removeQuestionFromCache(self, player_ques):
+		cache = self._getQuestionCache()
+		if player_ques in cache: cache.remove(player_ques)
+
 	# 实际玩家（获取在线信息）
 	def exactlyPlayer(self):
 		from player_module.views import Common
@@ -553,13 +596,24 @@ class QuestionSetRecord(CacheableModel):
 
 		self._initQuestionCache()
 
-		self.exactlyPlayer().setExercise(self)
+		# 设置当前的刷题
+		self.exactlyPlayer().setCurrentQuestionSet(self)
 
 		self._generateQuestions(**kwargs)
 
 	# 生成题目
 	def _generateQuestions(self, **kwargs):
-		pass
+		from utils.calc_utils import QuestionGenerator
+
+		configure = self.__makeGenerateConfigure(**kwargs)
+
+		qids = QuestionGenerator.generate(configure, True)
+
+		for qid in qids: self.addQuestion(qid)
+
+	# 生成题目生成配置信息
+	def __makeGenerateConfigure(self, **kwargs):
+		raise NotImplementedError
 
 	# 结束答题
 	def terminate(self, **kwargs):
@@ -568,10 +622,17 @@ class QuestionSetRecord(CacheableModel):
 
 		self._applyResult(self._calcResult())
 
-		# self._saveQuestionCache()
-
 		# 会自动保存
-		self.exactlyPlayer().clearExercise()
+		self.exactlyPlayer().clearCurrentQuestionSet()
+
+	# 压缩题目（排除掉未做题目）
+	def shrinkQuestions(self):
+
+		player_queses = self._getQuestionCache()
+
+		for player_ques in player_queses:
+			if not player_ques.answer:
+				self._removeQuestionFromCache(player_ques)
 
 	def _calcResult(self):
 
@@ -609,31 +670,26 @@ class QuestionSetRecord(CacheableModel):
 
 		self._addQuestionToCache(player_ques)
 
+		return player_ques
+
+	# 开始题目
+	def startQuestion(self, question_id):
+
+		# 从缓存中读取
+		player_ques: PlayerQuestion = self.cachedPlayerQuestion(question_id)
+		player_ques.start()
+
 	# 回答题目
-	def answerQuestion(self, question_id, selection, collect=False):
+	def answerQuestion(self, question_id, selection, timespan):
 
 		# 从缓存中读取
 		player_ques: PlayerQuestion = self.cachedPlayerQuestion(question_id)
 
-		rec = QuestionRecord.create(self.player, player_ques.question_id)
+		rec = QuestionRecord.create(self.player, question_id)
 
-		player_ques.answer(selection, rec)
+		player_ques.answer(selection, timespan, rec)
 
-		rec.updateRecord(player_ques, collect)
-
-	# 初始化题目缓存
-	def _initQuestionCache(self):
-		self._cache(self.QUES_CACHE_KEY, [])
-
-	# 获取题目缓存
-	def _getQuestionCache(self):
-		cache = self._getCache(self.QUES_CACHE_KEY)
-		if cache is None: return []
-		return cache
-
-	# 往缓存中添加题目
-	def _addQuestionToCache(self, player_ques):
-		self._getQuestionCache().append(player_ques)
+		rec.updateRecord(player_ques)
 
 	# # 初始化题目缓存
 	# def _saveQuestionCache(self):
@@ -740,20 +796,6 @@ class QuestionSetRecord(CacheableModel):
 
 
 # ===================================================
-#  分配类型枚举
-# ===================================================
-class ExerciseDistributionType(Enum):
-	Normal = 0  # 普通模式
-	OccurFirst = 1  # 已做优先
-	NotOccurFirst = 2  # 未做优先
-	WorngFirst = 3  # 错题优先
-	CorrFirst = 4  # 对题优先
-	SimpleFirst = 5  # 简单题优先
-	MiddleFirst = 6  # 中等题优先
-	DifficultFirst = 7  # 难题优先
-
-
-# ===================================================
 #  刷题记录表
 # ===================================================
 class ExerciseRecord(QuestionSetRecord):
@@ -763,34 +805,33 @@ class ExerciseRecord(QuestionSetRecord):
 
 	TYPE = QuestionSetType.Exercise
 
-	DTB_CHOICES = [
-		(ExerciseDistributionType.Normal.value, '普通模式'),
-		(ExerciseDistributionType.OccurFirst.value, '已做优先'),
-		(ExerciseDistributionType.NotOccurFirst.value, '未做优先'),
-		(ExerciseDistributionType.WorngFirst.value, '错题优先'),
-		(ExerciseDistributionType.CorrFirst.value, '对题优先'),
-		(ExerciseDistributionType.SimpleFirst.value, '简单题优先'),
-		(ExerciseDistributionType.MiddleFirst.value, '中等题优先'),
-		(ExerciseDistributionType.DifficultFirst.value, '难题优先'),
+	# 最大刷题数
+	MAX_COUNT = 10
+
+	GEN_TYPES = [
+		(QuestionGenerateType.Normal.value, '普通模式'),
+		(QuestionGenerateType.OccurFirst.value, '已做优先'),
+		(QuestionGenerateType.NotOccurFirst.value, '未做优先'),
+		(QuestionGenerateType.WrongFirst.value, '错题优先'),
+		(QuestionGenerateType.CollectedFirst.value, '收藏优先'),
+		(QuestionGenerateType.SimpleFirst.value, '简单题优先'),
+		(QuestionGenerateType.MiddleFirst.value, '中等题优先'),
+		(QuestionGenerateType.DifficultFirst.value, '难题优先'),
 	]
 
 	# 常量定义
 	NAME_STRING_FMT = "%s\n%s 刷题记录"
 
 	# 科目
-	subject = models.ForeignKey('game_module.Subject', default=1,
-								on_delete=models.CASCADE, verbose_name="科目")
+	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE,
+								verbose_name="科目")
 
 	# 题量（用于生成题目）
 	count = models.PositiveSmallIntegerField(default=1, verbose_name="题量")
 
-	# 题目分配类型
-	dtb_type = models.PositiveSmallIntegerField(choices=DTB_CHOICES, default=0,
-												verbose_name="分配类型")
-
-	# 所属赛季
-	# season = models.ForeignKey('rank_module.GraduationSeason', on_delete=models.CASCADE,
-	#						   verbose_name="赛季")
+	# 题目分配模式
+	gen_type = models.PositiveSmallIntegerField(choices=GEN_TYPES, default=0,
+												verbose_name="生成模式")
 
 	# 奖励计算类
 	@classmethod
@@ -818,8 +859,26 @@ class ExerciseRecord(QuestionSetRecord):
 
 		res['subject_id'] = self.subject_id
 		res['count'] = self.count
-		res['dtb_type'] = self.dtb_type
+		res['gen_type'] = self.gen_type
 
 		return res
 
 	def _rewards(self): return self.exercisereward_set
+
+	# 开始刷题
+	def _create(self, subject, count, gen_type):
+		self.subject = subject
+		self.count = count
+		self.gen_type = gen_type
+
+	# 生成题目生成配置信息
+	def __makeGenerateConfigure(self):
+		from utils.calc_utils import QuestionGenerateConfigure
+
+		return QuestionGenerateConfigure(self, self.player, self.subject,
+										 gen_type=self.gen_type, count=self.count)
+
+	# 终止答题
+	def terminate(self, **kwargs):
+		self.shrinkQuestions()
+		super().terminate(**kwargs)

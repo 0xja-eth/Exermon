@@ -6,7 +6,7 @@ from item_module.models import *
 from utils.model_utils import SkillImageUpload, ExermonImageUpload, \
 	Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 
 from enum import Enum
 import jsonfield, os, base64
@@ -392,6 +392,11 @@ class PlayerExermon(PackContItem):
 	# 清除属性缓存
 	def _clearParamsCache(self):
 		self._cache(self.PARAMS_CACHE_KEY, {})
+
+	# 修改昵称
+	def editNickname(self, name):
+		self.nickname = name
+		self.save()
 
 	# 总经验
 	def sumExp(self):
@@ -788,7 +793,7 @@ class ExerSlot(SlotContainer):
 	# 保证科目与槽一致
 	def ensureSubject(self, slot_item, exermon):
 		if slot_item.subject_id != exermon.exermon().subject_id:
-			raise ErrorException(ErrorType.IncorrectSubject)
+			raise GameException(ErrorType.IncorrectSubject)
 
 		return True
 
@@ -870,6 +875,10 @@ class ExerSlotItem(SlotContItem):
 
 	# 属性值（缓存）
 	cached_params = None
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerSlot
 
 	# 所接受的装备项类
 	@classmethod
@@ -1227,7 +1236,7 @@ class ExerSkill(BaseItem):
 				os.path.exists(target_ani):
 			return icon, ani, target_ani
 		else:
-			raise ErrorException(ErrorType.PictureFileNotFound)
+			raise GameException(ErrorType.PictureFileNotFound)
 
 	# 获取图标base64编码
 	def convertToBase64(self):
@@ -1365,6 +1374,10 @@ class ExerSkillSlotItem(SlotContItem):
 
 	# region 配置项
 
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerSkillSlot
+
 	# endregion
 
 	# 转化为 dict
@@ -1415,6 +1428,19 @@ class ExerItemEffect(BaseEffect):
 
 
 # ===================================================
+#  艾瑟萌物品价格
+# ===================================================
+class ExerItemPrice(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌物品价格"
+
+	# 物品
+	item = models.OneToOneField('ExerItem', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
+# ===================================================
 #  艾瑟萌物品表
 # ===================================================
 class ExerItem(UsableItem):
@@ -1444,6 +1470,11 @@ class ExerItem(UsableItem):
 	def effects(self):
 		return self.exeritemeffect_set.all()
 
+	# 购买价格
+	def buyPrice(self):
+		try: return self.exeritemprice
+		except ExerItemPrice.DoesNotExist: return None
+
 
 # ===================================================
 #  艾瑟萌装备属性值表
@@ -1466,6 +1497,19 @@ class ExerEquipParam(ParamValue):
 
 
 # ===================================================
+#  艾瑟萌装备价格
+# ===================================================
+class ExerEquipPrice(Currency):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌装备价格"
+
+	# 物品
+	item = models.OneToOneField('ExerEquip', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
+# ===================================================
 #  艾瑟萌装备
 # ===================================================
 class ExerEquip(EquipableItem):
@@ -1483,10 +1527,6 @@ class ExerEquip(EquipableItem):
 	@classmethod
 	def contItemClass(cls): return ExerPackEquip
 
-	# 获取所有的属性基本值
-	def params(self):
-		return self.exerequipparam_set.all()
-
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
 		res = super().convertToDict(**kwargs)
@@ -1494,6 +1534,15 @@ class ExerEquip(EquipableItem):
 		res['e_type'] = self.e_type_id
 
 		return res
+
+	# 获取所有的属性基本值
+	def params(self):
+		return self.exerequipparam_set.all()
+
+	# 购买价格
+	def buyPrice(self):
+		try: return self.exerequipprice
+		except ExerEquipPrice.DoesNotExist: return None
 
 
 # ===================================================
@@ -1630,7 +1679,7 @@ class ExerEquipSlot(SlotContainer):
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):
 		if slot_item.e_type_id != equip.item.e_type_id:
-			raise ErrorException(ErrorType.IncorrectEquipType)
+			raise GameException(ErrorType.IncorrectEquipType)
 
 		return True
 
@@ -1689,6 +1738,10 @@ class ExerEquipSlotItem(SlotContItem):
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.ExerEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return ExerEquipSlot
 
 	# 所接受的装备项类
 	@classmethod

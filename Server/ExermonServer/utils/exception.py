@@ -32,10 +32,9 @@ class ErrorType(Enum):
 	PlayerNotExist = 100  # 玩家不存在
 	PlayerExist = 101  # 玩家已存在
 	IncorrectPassword = 102  # 密码错误
-	IncorrectCode = 103  # 验证码错误
-	EmailSendError = 104  # 邮件发送错误
+	UnselectedSubject = 103  # 人物未选择该科目
 
-	# PlayerRegister
+	# PlayerRegister/Forget
 	UsernameExist = 110  # 用户名已存在
 	InvalidUsername = 111  # 非法的用户名
 	InvalidPassword = 112  # 非法的密码
@@ -43,14 +42,14 @@ class ErrorType(Enum):
 	InvalidPhone = 114  # 非法的电话号码
 	EmailExist = 115  # 邮箱地址已存在
 	InvalidEmail = 116  # 非法的邮箱地址
+	IncorrectForget = 117  # 不正确的找回密码参数
+	IncorrectCode = 118  # 验证码错误
+	EmailSendError = 119  # 邮件发送错误
 
 	# PlayerLogin
-	IncorrectLogin = 120  # 不正确的登陆
-	UserAbnormal = 121  # 用户状态异常
-	UserFrozen = 122  # 用户被冻结
-
-	# PlayerForget
-	IncorrectForget = 130  # 不正确的找回密码
+	IncorrectLogin = 130  # 不正确的登陆参数
+	UserAbnormal = 131  # 用户状态异常
+	UserFrozen = 132  # 用户被冻结
 
 	# PlayerInfo
 	NameExist = 140  # 该名字已存在
@@ -89,9 +88,11 @@ class ErrorType(Enum):
 	ExermonNotExist = 300  # 艾瑟萌不存在
 	ExerGiftNotExist = 301  # 艾瑟萌天赋不存在
 	ExerSlotNotExist = 302  # 艾瑟萌槽不存在
-	PlayerExermonNotExist = 303  # 玩家艾瑟萌不存在
-	PlayerExerGiftNotExist = 304  # 玩家艾瑟萌天赋不存在
+	ExerSlotItemNotExist = 303  # 艾瑟萌槽项不存在
+	PlayerExermonNotExist = 304  # 玩家艾瑟萌不存在
+	PlayerExerGiftNotExist = 305  # 玩家艾瑟萌天赋不存在
 
+	# Create/Edit
 	InvalidExermonCount = 310  # 非法的艾瑟萌数量
 	InvalidExermonName = 311  # 非法的艾瑟萌昵称
 	InvalidExermonSubject = 312  # 非法的艾瑟萌科目
@@ -104,13 +105,25 @@ class ErrorType(Enum):
 	# QuestionCommon
 	QuestionNotExist = 400  # 题目不存在
 	QuesSugarNotExist = 401  # 题目糖不存在
+	QuestionLinkNotExist = 402  # 题目关系不存在
 
-	# QuestionSet
-	QuestionNotStarted = 410  # 本题还没开始作答
-	InvalidTimeSpan = 411  # 作答时间有误
+	# QuestionGenerate
+	InvalidGenerateConfigure = 410  # 非法的题目生成配置
+
+	# RecordCommon
+	QuestionRecordNotExist = 500  # 题目记录不存在
+	ExerciseRecordNotExist = 501  # 刷题记录不存在
+	ExerciseQuestionNotExist = 502  # 刷题题目不存在
+
+	# QuestionRecord
+	InvalidNote = 510  # 无效的备注格式
+
+	# QuestionSetRecord
+	QuestionNotStarted = 520  # 本题还没开始作答
+	InvalidTimeSpan = 521  # 作答时间有误
 
 
-class ErrorException(Exception):
+class GameException(Exception):
 
 	ERROR_DICT = {
 		# Common
@@ -133,10 +146,9 @@ class ErrorException(Exception):
 		ErrorType.PlayerNotExist: "玩家不存在！",
 		ErrorType.PlayerExist: "玩家已存在！",
 		ErrorType.IncorrectPassword: "密码错误！",
-		ErrorType.IncorrectCode: "验证码过时或不正确！",
-		ErrorType.EmailSendError: "邮件发送错误！",
+		ErrorType.UnselectedSubject: "人物未选择该科目！",
 
-		# PlayerRegister
+		# PlayerRegister/Forget
 		ErrorType.UsernameExist: "用户名已存在！",
 		ErrorType.InvalidUsername: "非法的用户名格式！",
 		ErrorType.InvalidPassword: "非法的密码格式！",
@@ -144,14 +156,14 @@ class ErrorException(Exception):
 		ErrorType.InvalidPhone: "非法的电话号码格式！",
 		ErrorType.EmailExist: "邮箱地址已存在！",
 		ErrorType.InvalidEmail: "非法的邮箱地址格式！",
+		ErrorType.IncorrectForget: "用户名不存在或邮箱错误！",
+		ErrorType.IncorrectCode: "验证码过时或不正确！",
+		ErrorType.EmailSendError: "邮件发送错误！",
 
 		# PlayerLogin
 		ErrorType.IncorrectLogin: "用户名不存在或密码错误！",
 		ErrorType.UserAbnormal: "用户状态异常，请联系管理员！",
 		ErrorType.UserFrozen: "用户已被冻结，请联系管理员！",
-
-		# PlayerForget
-		ErrorType.IncorrectForget: "用户名不存在或邮箱错误！",
 
 		# PlayerInfo
 		ErrorType.NameExist: "该名字已存在！",
@@ -190,9 +202,11 @@ class ErrorException(Exception):
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",
 		ErrorType.ExerGiftNotExist: "艾瑟萌天赋不存在！",
 		ErrorType.ExerSlotNotExist: "艾瑟萌槽未创建！",
+		ErrorType.ExerSlotItemNotExist: "尚未拥有该艾瑟萌槽！",
 		ErrorType.PlayerExermonNotExist: "尚未拥有该艾瑟萌！",
 		ErrorType.PlayerExerGiftNotExist: "尚未拥有该天赋！",
 
+		# Create/Edit
 		ErrorType.InvalidExermonCount: "非法的艾瑟萌数量！",
 		ErrorType.InvalidExermonName: "非法的艾瑟萌昵称格式！",
 		ErrorType.InvalidExermonSubject: "非法的艾瑟萌科目！",
@@ -200,13 +214,25 @@ class ErrorException(Exception):
 		ErrorType.InvalidExerGiftType: "非法的艾瑟萌天赋类型！",
 
 		# ExerSlot
-		ErrorType.IncorrectSubject: "艾瑟萌科目与艾瑟萌槽科目不一致！",
+		ErrorType.IncorrectSubject: "艾瑟萌科目与槽科目不一致！",
 
 		# QuestionCommon
 		ErrorType.QuestionNotExist: "题目不存在！",
 		ErrorType.QuesSugarNotExist: "题目糖不存在！",
+		ErrorType.QuestionLinkNotExist: "题目不存在！",
 
-		# QuestionSet
+		# QuestionGenerate
+		ErrorType.InvalidGenerateConfigure: "非法的题目生成配置！",
+
+		# RecordCommon
+		ErrorType.QuestionRecordNotExist: "题目记录不存在！",
+		ErrorType.ExerciseRecordNotExist: "刷题记录不存在！",
+		ErrorType.ExerciseQuestionNotExist: "刷题题目不存在！",
+
+		# QuestionRecord
+		ErrorType.InvalidNote: "无效的备注格式",
+
+		# QuestionSetRecord
 		ErrorType.QuestionNotStarted: "本题还没开始作答！",
 		ErrorType.InvalidTimeSpan: "作答时间有误！",
 
@@ -214,7 +240,7 @@ class ErrorException(Exception):
 
 	def __init__(self, error_type: ErrorType):
 		self.error_type = error_type
-		self.msg = ErrorException.ERROR_DICT[error_type]
+		self.msg = GameException.ERROR_DICT[error_type]
 
 	def __str__(self):
 		return self.msg

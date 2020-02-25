@@ -3,7 +3,8 @@ from .models import *
 from player_module.models import *
 from exermon_module.models import *
 from question_module.models import *
-from utils.exception import ErrorType, ErrorException
+from utils.interface_manager import Common as InterfaceCommon
+from utils.exception import ErrorType, GameException
 
 # Create your views here.
 
@@ -14,40 +15,45 @@ from utils.exception import ErrorType, ErrorException
 class Service:
 	# 获取背包类容器项数据
 	@classmethod
-	async def packContainerGet(cls, consumer, player: Player, type: int, cid: int):
+	async def packContainerGet(cls, consumer, player: Player, type: int, cid=None):
 		# 返回数据：
 		# items: 背包容器项数据（数组） => 人类背包项
-		container: PackContainer = Common.getContainer(type, id=cid)
+
+		if cid:
+			cid = InterfaceCommon.convertDataType(cid, 'int')
+			container: PackContainer = Common.getContainer(type, id=cid)
+		else:
+			container: PackContainer = Common.getContainer(type, player=player)
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
-
-		Common.ensureContainerOwnerPlayer(container, player)
 
 		return cls._getContainerItems(container)
 
 	# 获取背包类容器项数据
 	@classmethod
-	async def slotContainerGet(cls, consumer, player: Player, type: int, cid: int):
+	async def slotContainerGet(cls, consumer, player: Player, type: int, cid=None):
 		# 返回数据：
 		# items: 槽容器项数据（数组） => 人类背包项
-		container: SlotContainer = Common.getContainer(type, id=cid)
+
+		if cid:
+			cid = InterfaceCommon.convertDataType(cid, 'int')
+			container: SlotContainer = Common.getContainer(type, id=cid)
+		else:
+			container: SlotContainer = Common.getContainer(type, player=player)
 
 		ViewUtils.ensureObjectType(container, SlotContainer, ErrorType.IncorrectContainerType)
-
-		Common.ensureContainerOwnerPlayer(container, player)
 
 		return cls._getContainerItems(container)
 
 	# 背包类容器获得物品
 	@classmethod
-	async def packContainerGain(cls, consumer, player: Player, type: int, cid: int,
-								i_type: int, item_id: int, count: int, refresh: bool):
+	async def packContainerGain(cls, consumer, player: Player, type: int, i_type: int,
+								item_id: int, count: int, refresh: bool):
 		# 返回数据：无
-		container: PackContainer = Common.getContainer(type, id=cid)
+
+		container: PackContainer = Common.getContainer(type, player=player)
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
-
-		Common.ensureContainerOwnerPlayer(container, player)
 
 		item = Common.getItem(i_type, id=item_id)
 
@@ -57,18 +63,17 @@ class Service:
 
 	# 背包类容器转移
 	@classmethod
-	async def packContainerTransfer(cls, consumer, player: Player, type: int, cid: int, target_cid: int,
+	async def packContainerTransfer(cls, consumer, player: Player, type: int, target_cid: int,
 									ci_types: list, contitem_ids: list, counts: list):
 		# 返回数据：无
-		container: PackContainer = Common.getContainer(type, id=cid)
+
+		container: PackContainer = Common.getContainer(type, player=player)
 		target: PackContainer = Common.getContainer(type, id=target_cid)
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 		ViewUtils.ensureObjectType(target, PackContainer, ErrorType.IncorrectContainerType)
 
-		Common.ensureContainerOwnerPlayer(container, player)
-
-		cont_items = Common.getContItems(ci_types, ids=contitem_ids)
+		cont_items = Common.getContItems(contitem_ids, types=ci_types, player=player)
 
 		container.transferContItems(target, cont_items, counts)
 
@@ -76,16 +81,15 @@ class Service:
 
 	# 背包类容器拆分
 	@classmethod
-	async def packContainerSplit(cls, consumer, player: Player, type: int, cid: int,
-								 ci_type: int, contitem_id: int, count: int, ):
+	async def packContainerSplit(cls, consumer, player: Player, type: int, ci_type: int,
+								 contitem_id: int, count: int):
 		# 返回数据：无
-		container: PackContainer = Common.getContainer(type, id=cid)
+
+		container: PackContainer = Common.getContainer(type, player=player)
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		Common.ensureContainerOwnerPlayer(container, player)
-
-		cont_item = Common.getContItem(ci_type, id=contitem_id)
+		cont_item = Common.getContItem(type=ci_type, player=player, id=contitem_id)
 
 		container.splitItem(cont_item, count)
 
@@ -93,16 +97,15 @@ class Service:
 
 	# 背包类容器组合
 	@classmethod
-	async def packContainerMerge(cls, consumer, player: Player, type: int, cid: int,
-								 ci_type: int, contitem_ids: list, ):
+	async def packContainerMerge(cls, consumer, player: Player, type: int,
+								 ci_type: int, contitem_ids: list):
 		# 返回数据：无
-		container: PackContainer = Common.getContainer(type, id=cid)
+
+		container: PackContainer = Common.getContainer(type, player=player)
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		Common.ensureContainerOwnerPlayer(container, player)
-
-		cont_items = Common.getSameContItems(ci_type, ids=contitem_ids)
+		cont_items = Common.getSameContItems(contitem_ids, type=ci_type, player=player)
 
 		container.mergeItem(cont_items)
 
@@ -113,8 +116,6 @@ class Service:
 	def slotContainerEquip(cls, player: Player, container: SlotContainer, equip_items: list, **kwargs):
 
 		ViewUtils.ensureObjectType(container, SlotContainer, ErrorType.IncorrectContainerType)
-
-		Common.ensureContainerOwnerPlayer(container, player)
 
 		for equip_item in equip_items:
 
@@ -135,21 +136,21 @@ class Check:
 	@classmethod
 	def ensureItemType(cls, val: int):
 		if val == 0:
-			raise ErrorException(ErrorType.IncorrectItemType)
+			raise GameException(ErrorType.IncorrectItemType)
 		ViewUtils.ensureEnumData(val, ItemType, ErrorType.IncorrectItemType, True)
 
 	# 校验物品类型
 	@classmethod
 	def ensureContainerType(cls, val: int):
 		if val == 0:
-			raise ErrorException(ErrorType.IncorrectContainerType)
+			raise GameException(ErrorType.IncorrectContainerType)
 		ViewUtils.ensureEnumData(val, ContainerType, ErrorType.IncorrectContainerType, True)
 
 	# 校验容器项类型
 	@classmethod
 	def ensureContItemType(cls, val: int):
 		if val == 0:
-			raise ErrorException(ErrorType.IncorrectContItemType)
+			raise GameException(ErrorType.IncorrectContItemType)
 		ViewUtils.ensureEnumData(val, ContItemType, ErrorType.IncorrectContItemType, True)
 
 
@@ -160,71 +161,123 @@ class Common:
 
 	# 获取物品
 	@classmethod
-	def getItem(cls, type, return_type='object', error: ErrorType = ErrorType.ItemNotExist, **kwargs) -> BaseItem:
+	def getItem(cls, type=None, cla=None, error: ErrorType = ErrorType.ItemNotExist, **kwargs) -> BaseItem:
 
-		Check.ensureItemType(type)
+		if cla is None:
+			Check.ensureItemType(type)
+			cla = eval(ItemType(type).name)
 
-		cla = eval(ItemType(type).name)
-
-		return ViewUtils.getObject(cla, error, return_type=return_type, **kwargs)
+		return ViewUtils.getObject(cla, error, **kwargs)
 
 	# 获取容器
 	@classmethod
-	def getContainer(cls, type, return_type='object', error: ErrorType = ErrorType.ContainerNotExist,
+	def getContainer(cls, type=None, cla=None, player: Player=None, error: ErrorType = ErrorType.ContainerNotExist,
 					 **kwargs) -> BaseContainer:
 
-		Check.ensureContainerType(type)
+		if cla is None:
+			Check.ensureContainerType(type)
+			cla = eval(ContainerType(type).name)
 
-		cla = eval(ContainerType(type).name)
+		if player is None:
+			return ViewUtils.getObject(cla, error, **kwargs)
 
-		return ViewUtils.getObject(cla, error, return_type=return_type, **kwargs)
+		return player.getContainer(cla)
 
 	# 获取容器项
 	@classmethod
-	def getContItem(cls, type, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> BaseContItem:
+	def getContItem(cls, type=None, cla=None,
+					player: Player = None, container: BaseContainer = None,
+					error: ErrorType = ErrorType.ContItemNotExist, **kwargs) -> BaseContItem:
 
-		Check.ensureContItemType(type)
+		if container is None:
 
-		cla = eval(ContItemType(type).name)
+			if cla is None:
+				Check.ensureContItemType(type)
+				cla = eval(ContItemType(type).name)
 
-		return ViewUtils.getObject(cla, error, return_type=return_type, **kwargs)
+			if player is None:
+				return ViewUtils.getObject(cla, error, **kwargs)
+
+			container_cla = cla.containerClass()
+
+			container = cls.getContainer(cla=container_cla, player=player)
+
+		cont_item = container.contItem(cla=cla, **kwargs)
+
+		if cont_item is None: raise GameException(error)
+
+		return cont_item
 
 	# 获取容器项（多个）
 	@classmethod
-	def getContItems(cls, types, ids, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> BaseContItem:
+	def getContItems(cls, ids, types=None, clas=None,
+					 player: Player = None, container: BaseContainer = None,
+					 error: ErrorType = ErrorType.ContItemNotExist) -> BaseContItem:
 		res = []
 
 		for i in len(range(ids)):
-			res.append(cls.getContItem(types[i], return_type=return_type,
-									   error=error, id=ids[i], **kwargs))
+			cont_item = None
+
+			if types is not None:
+				cont_item = cls.getContItem(
+					type=types[i], player=player, container=container,
+					error=error, id=ids[i])
+
+			elif clas is not None:
+				cont_item = cls.getContItem(
+					cla=clas[i], player=player, container=container,
+					error=error, id=ids[i])
+
+			if cont_item is None: raise GameException(error)
+
+			res.append(cont_item)
+
 		return res
 
 	# 获取容器项（同种类型，多个）
 	@classmethod
-	def getSameContItems(cls, type, ids, return_type='object', error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> BaseContItem:
+	def getSameContItems(cls, ids, type=None, cla=None,
+					 	 player: Player = None, container: BaseContainer = None,
+						 error: ErrorType = ErrorType.ContItemNotExist, **kwargs) -> BaseContItem:
 
-		Check.ensureContItemType(type)
+		if container is None:
 
-		cla = eval(ContItemType(type).name)
+			if cla is None:
+				Check.ensureContItemType(type)
+				cla = eval(ContItemType(type).name)
 
-		res = ViewUtils.getObjects(cla, return_type=return_type, id__in=ids, **kwargs)
+			if player is None:
+				return ViewUtils.getObject(cla, error, **kwargs)
 
-		# 数量不一致，说明获取出现问题
-		if len(ids) != res.count(): raise ErrorException(error)
+			container_cla = cla.containerClass()
 
-		return res
+			container = cls.getContainer(cla=container_cla, player=player)
+
+		cont_items = container.contItems(
+			cla=cla, cond=lambda x: x.id in ids)
+
+		if len(cont_items) != len(ids): raise GameException(error)
+
+		return cont_items
 
 	# 确保容器的持有者
 	@classmethod
-	def ensureContainerOwnerPlayer(cls, container: BaseContainer, player):
-		if container.exactlyPlayer() != player:
-			raise ErrorException(ErrorType.ContainerNotOwner)
+	def ensureContainerOwnerPlayer(cls, container: BaseContainer, player,
+								   error=ErrorType.ContainerNotOwner):
+		if container.exactlyPlayer() != player: raise GameException(error)
+
+	# 确保容器项的持有者
+	@classmethod
+	def ensureContItemOwnerPlayer(cls, cont_item: BaseContItem, player,
+								  error=ErrorType.ContItemNotHold):
+		container = cont_item.container
+
+		if container is None: raise GameException(error)
+
+		cls.ensureContainerOwnerPlayer(container, player, error)
 
 	# 确保容器项容器正确
 	@classmethod
-	def ensureContainerItem(cls, container: BaseContainer, cont_item: BaseContItem):
-		if cont_item.container_id != container.id:
-			raise ErrorException(ErrorType.ContItemNotHold)
+	def ensureContainerItem(cls, container: BaseContainer, cont_item: BaseContItem,
+							error=ErrorType.ContItemNotHold):
+		if cont_item.container_id != container.id: raise GameException(error)

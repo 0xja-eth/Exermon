@@ -3,3 +3,4 @@
 settings.py
 db.sqlite3
 __pycache__/
+subject_*

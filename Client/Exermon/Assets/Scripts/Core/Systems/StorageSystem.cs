@@ -90,6 +90,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
     DataService dataSer;
     GameSystem gameSys;
     ExermonGameSystem exermonSys;
+    QuestionService quesSer;
 
     #region 初始化
 
@@ -111,6 +112,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
         storageItems = new List<StorageItem>();
         storageItems.Add(new StorageItem(dataSer.staticData, StaticDataFilename));
         storageItems.Add(new StorageItem(exermonSys.configure, ConfigDataFilename));
+        storageItems.Add(new StorageItem(quesSer.questionCache, CacheDataFilename));
     }
 
     #endregion

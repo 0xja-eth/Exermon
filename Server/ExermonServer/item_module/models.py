@@ -4,7 +4,7 @@ from django.conf import settings
 from game_module.models import ParamValue, GameConfigure, ExerEquipType, HumanEquipType
 from utils.model_utils import CacheableModel, ItemIconUpload, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 from enum import Enum
 import jsonfield, os, math
 
@@ -111,7 +111,7 @@ class ContItemType(Enum):
 # ===================================================
 class Currency(models.Model):
 	class Meta:
-		# abstract = True
+		abstract = True
 		verbose_name = verbose_name_plural = "货币"
 
 	# 默认金币
@@ -132,10 +132,6 @@ class Currency(models.Model):
 			term.gold, self.gold,
 			term.ticket, self.ticket,
 			term.bound_ticket, self.bound_ticket)
-
-	# 物品
-	# def adminItem(self):
-	# 	pass
 
 	def convertToDict(self):
 		return {
@@ -292,8 +288,8 @@ class LimitedItem(BaseItem):
 	star = models.ForeignKey("game_module.ItemStar", on_delete=models.CASCADE, verbose_name="星级")
 
 	# 购买价格（None为不可购买）
-	buy_price = models.OneToOneField('item_module.Currency', null=True, blank=True,
-									 on_delete=models.CASCADE, verbose_name="购买价格")
+	# buy_price = models.OneToOneField('item_module.Currency', null=True, blank=True,
+	# 								 on_delete=models.CASCADE, verbose_name="购买价格")
 
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
@@ -309,15 +305,16 @@ class LimitedItem(BaseItem):
 							 null=True, blank=True, verbose_name="图标")
 
 	# 管理界面用：显示购入价格
-	# def adminBuyPrice(self):
-	# 	return self.itemprice
-	#
-	# adminBuyPrice.short_description = "购入价格"
+	def adminBuyPrice(self):
+		return self.buyPrice()
+
+	adminBuyPrice.short_description = "购入价格"
 
 	# 获取购买价格
-	# def buyPrice(self):
-	# 	try: return self.itemprice
-	# 	except ItemPrice.DoesNotExist: return None
+	def buyPrice(self):
+		raise NotImplementedError
+		# try: return self.itemprice
+		# except ItemPrice.DoesNotExist: return None
 
 	# # 获取完整路径
 	# def getExactlyIconPath(self):
@@ -341,7 +338,7 @@ class LimitedItem(BaseItem):
 	def convertToDict(self, **kwargs):
 		res = super().convertToDict(**kwargs)
 
-		buy_price = ModelUtils.objectToDict(self.buy_price)
+		buy_price = ModelUtils.objectToDict(self.buyPrice())
 
 		res['star_id'] = self.star_id
 		res['buy_price'] = buy_price
@@ -421,6 +418,10 @@ class UsableItem(LimitedItem):
 	def effects(self):
 		raise NotImplementedError
 
+	# 获取购买价格
+	def buyPrice(self):
+		raise NotImplementedError
+
 
 # # ===================================================
 # #  装备属性值表
@@ -475,6 +476,10 @@ class EquipableItem(LimitedItem):
 
 	# 获取所有的属性基本值
 	def params(self):
+		raise NotImplementedError
+
+	# 获取购买价格
+	def buyPrice(self):
 		raise NotImplementedError
 
 	# # 用于获取属性值
@@ -707,7 +712,9 @@ class BaseContainer(CacheableModel):
 
 		cont_items = self._cachedContItems()
 
-		if cla is not None: cont_items = cont_items[cla]
+		if cla is not None:
+			cont_items = ModelUtils.filter(
+				cont_items, lambda x: isinstance(x, cla))
 
 		if cond is not None:
 			return ModelUtils.filter(cont_items, cond, map)
@@ -856,12 +863,12 @@ class BaseContainer(CacheableModel):
 	# 确保物品类型可接受
 	def ensureItemAcceptable(self, **kwargs):
 		if not self.isItemAcceptable(**kwargs):
-			raise ErrorException(ErrorType.IncorrectItemType)
+			raise GameException(ErrorType.IncorrectItemType)
 
 	# 确保包含容器项
 	def ensureContItemContained(self, cont_item):
 		if cont_item.container_id != self.id:
-			raise ErrorException(ErrorType.QuantityInsufficient)
+			raise GameException(ErrorType.QuantityInsufficient)
 
 	# 准备转移
 	def prepareTransfer(self, **kwargs) -> dict:
@@ -918,6 +925,9 @@ class PackContainer(BaseContainer):
 	def _create(self, **kwargs):
 		super()._create(**kwargs)
 		self.capacity = self.defaultCapacity()
+
+	def _contItemsFromDb(self, listed=False, cla=None, **kwargs):
+		return super()._contItemsFromDb(listed, cla, equiped=False, **kwargs)
 
 	# 持有者
 	def owner(self):
@@ -1011,17 +1021,17 @@ class PackContainer(BaseContainer):
 	# 确保持有特定数量的物品（格子数）
 	def ensureHasItem(self, count, **kwargs):
 		if not self.hasItem(count, **kwargs):
-			raise ErrorException(ErrorType.QuantityInsufficient)
+			raise GameException(ErrorType.QuantityInsufficient)
 
 	# 确保容器容量可用（格子数）
 	def ensureCapacityAvailable(self, count=1):
 		if not self.isCapacityAvailable(count):
-			raise ErrorException(ErrorType.CapacityInsufficient)
+			raise GameException(ErrorType.CapacityInsufficient)
 
 	# 确保可以获取指定数量的指定物品
 	def ensureGainItemAvailable(self, item: BaseItem, count=1):
 		if not self.isGainItemAvailable(item, count):
-			raise ErrorException(ErrorType.CapacityInsufficient)
+			raise GameException(ErrorType.CapacityInsufficient)
 
 	# 确保可以获取指定数量的指定物品
 	def ensureGainItemsEnable(self, item: BaseItem, count=1):
@@ -1155,7 +1165,7 @@ class PackContainer(BaseContainer):
 
 		# 如果还有剩余，抛出数量不足异常
 		if ensure and count > 0:
-			raise ErrorException(ErrorType.QuantityInsufficient)
+			raise GameException(ErrorType.QuantityInsufficient)
 
 		# 更新删除的物品
 		# cla.objects.bulk_update(old_items, ['count', 'container'])
@@ -1498,7 +1508,7 @@ class SlotContainer(BaseContainer):
 
 		# 容器为空，操作错误
 		if container is None:
-			raise ErrorException(ErrorType.InvalidContainer)
+			raise GameException(ErrorType.InvalidContainer)
 
 		equiped_item = slot_item.equipItem(equip_index)
 
@@ -1687,6 +1697,10 @@ class BaseContItem(CacheableModel):
 
 	# endregion
 
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return BaseContainer
+
 	# 创建容器项
 	@classmethod
 	def create(cls, container, **kwargs):
@@ -1720,12 +1734,12 @@ class BaseContItem(CacheableModel):
 	# 确保容器项可复制
 	def ensureContItemCopyable(self, cont_item):
 		if type(self) != type(cont_item):
-			raise ErrorException(ErrorType.IncorrectItemType)
+			raise GameException(ErrorType.IncorrectItemType)
 
 	# 确保容器项相等
 	def ensureContItemEqual(self, cont_item):
 		if not self.isEqual(cont_item):
-			raise ErrorException(ErrorType.IncorrectContItemType)
+			raise GameException(ErrorType.IncorrectContItemType)
 
 	# 最大叠加数量
 	def maxCount(self): return 1
@@ -1774,7 +1788,7 @@ class PackContItem(BaseContItem):
 
 	# 所属容器的类
 	@classmethod
-	def containerClass(cls): return BaseContainer
+	def containerClass(cls): return PackContainer
 
 	# 所接受的物品类
 	@classmethod
@@ -1879,7 +1893,6 @@ class PackContItem(BaseContItem):
 
 	# 装备容器项（设置 equip）
 	def equip(self):
-		self.container = None
 		self.equiped = True
 
 	# 卸下容器项
@@ -1919,6 +1932,10 @@ class SlotContItem(BaseContItem):
 	# 								   on_delete=models.CASCADE, verbose_name="装备项2")
 
 	# region 配置项
+
+	# 所属容器的类
+	@classmethod
+	def containerClass(cls): return SlotContainer
 
 	# 所接受的装备项类（可多个）
 	@classmethod
@@ -2213,7 +2230,7 @@ class BaseEffect(models.Model):
 		from game_module.models import BaseParam, GameConfigure, Subject
 
 		if not isinstance(self.params, list):
-			raise ErrorException(ErrorType.DatabaseError)
+			raise GameException(ErrorType.DatabaseError)
 
 		conf: GameConfigure = GameConfigure.get()
 		code = ItemEffectCode(self.code)

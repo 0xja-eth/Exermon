@@ -2,7 +2,7 @@ from django.conf import settings
 
 from .models import *
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 
 
 # =======================
@@ -26,25 +26,32 @@ class Service:
 		# 返回数据：
 		# data: 动态数据 => 系统动态数据
 
-		return {'data': None}
+		return {'data': cls._generateDynamicData()}
 
 	# 生成静态数据
 	@classmethod
 	def _generateStaticData(cls, updated):
 
 		cur_version = Common.getCurVersion()
-		data = cls._generateVersionData(cur_version)
+		data = cls._generateVersionsData(cur_version)
 
 		if updated:
 			data = cls._generateMainData(data, cur_version)
 
 		return data
 
+	# 生成动态数据
+	@classmethod
+	def _generateDynamicData(cls):
+		configure = GameConfigure.get()
+		return configure.convertToDict("dynamic")
+
 	# 生成版本数据
 	@classmethod
-	def _generateVersionData(cls, cur_version):
+	def _generateVersionsData(cls, cur_version):
 
-		last_versions = Common.getLastVersions(cur_version, 'dict')
+		last_versions = Common.getLastVersions(cur_version)
+		last_versions = ModelUtils.objectsToDict(last_versions)
 
 		return {
 			'cur_version': cur_version.convertToDict(),
@@ -87,7 +94,7 @@ class Service:
 	def _generateMainData(cls, data, cur_version: GameVersion):
 		configure = cur_version.configure
 
-		data['configure'] = configure.convertToDict()
+		data['configure'] = configure.convertToDict("static")
 		data['data'] = cls._generateResourceData()
 
 		return data
@@ -110,7 +117,7 @@ class Check:
 
 		if main != cur_version.main_version:
 
-			raise ErrorException(ErrorType.RequestUpdate)
+			raise GameException(ErrorType.RequestUpdate)
 
 		return sub == cur_version.sub_version
 
@@ -127,18 +134,18 @@ class Common:
 
 	# 获取当前版本
 	@classmethod
-	def getLastVersions(cls, version: GameVersion, return_type='QuerySet'):
-		return ViewUtils.getObjects(GameVersion, return_type=return_type, update_time__lt=version.update_time)
+	def getLastVersions(cls, version: GameVersion):
+		return ViewUtils.getObjects(GameVersion, update_time__lt=version.update_time)
 
 	# 获取指定版本
 	@classmethod
-	def getVersion(cls, main, sub, return_type='object', error: ErrorType = ErrorType.ErrorVersion) -> GameVersion:
-		return ViewUtils.getObject(GameVersion, error, return_type=return_type, main_version=main, sub_version=sub)
+	def getVersion(cls, main, sub, error: ErrorType = ErrorType.ErrorVersion) -> GameVersion:
+		return ViewUtils.getObject(GameVersion, error, main_version=main, sub_version=sub)
 
 	# 获取主版本的所有副版本
 	@classmethod
-	def getSubVersions(cls, main, return_type='QuerySet'):
-		return ViewUtils.getObjects(GameVersion, return_type=return_type, main_version=main)
+	def getSubVersions(cls, main):
+		return ViewUtils.getObjects(GameVersion, main_version=main)
 
 	# 确保版本存在
 	@classmethod

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import JsonResponse
 from django.urls import path
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 import json, datetime, traceback
 
 # ===============================
@@ -36,7 +36,7 @@ class HTTP:
 			# 进行业务操作并返回结果到 res['data'] 中
 			res['data'] = func(**data)
 
-		except ErrorException as exception:
+		except GameException as exception:
 			# 打印错误路径
 			traceback.print_exc()
 			# 返回错误响应
@@ -56,7 +56,7 @@ class HTTP:
 
 		# 解析并判断请求方法
 		if method.upper() != request.META['REQUEST_METHOD']:
-			raise ErrorException(ErrorType.InvalidRequest)
+			raise GameException(ErrorType.InvalidRequest)
 
 		body = request.body.decode()
 
@@ -87,7 +87,7 @@ class HTTP:
 			if value:
 				data[key] = value
 			else:
-				raise ErrorException(ErrorType.ParameterError)
+				raise GameException(ErrorType.ParameterError)
 
 		return data
 
@@ -136,7 +136,7 @@ class WebSocket:
 			if 'uid' in data:
 				player = consumer.getPlayer()
 				if player is None or player.id != data['uid']:
-					raise ErrorException(ErrorType.InvalidUserOper)
+					raise GameException(ErrorType.InvalidUserOper)
 
 				data.pop('uid')
 				data['player'] = player
@@ -144,7 +144,7 @@ class WebSocket:
 			# 执行
 			res['data'] = await method(consumer, **data)
 
-		except ErrorException as exception:
+		except GameException as exception:
 			# 打印错误路径
 			traceback.print_exc()
 
@@ -174,7 +174,7 @@ class WebSocket:
 	@classmethod
 	def _ensureRequestFormat(cls, data):
 		if 'route' not in data or 'data' not in data:
-			raise ErrorException(ErrorType.ParameterError)
+			raise GameException(ErrorType.ParameterError)
 		# if data['data'] == "None": data['data'] = {}
 
 	# 获取路由配置数据
@@ -184,7 +184,7 @@ class WebSocket:
 		from game_module.routing import WEBSOCKET_METHOD_ROUTER
 
 		if route not in WEBSOCKET_METHOD_ROUTER:
-			raise ErrorException(ErrorType.InvalidRoute)
+			raise GameException(ErrorType.InvalidRoute)
 
 		return WEBSOCKET_METHOD_ROUTER[route]
 
@@ -272,7 +272,7 @@ class Common:
 				data[key] = Common.convertDataType(request_data[key], type)
 			elif type != 'var':
 				# 否则且如果该参数不是可选的，抛出异常
-				raise ErrorException(ErrorType.ParameterError)
+				raise GameException(ErrorType.ParameterError)
 
 		return data
 
@@ -313,7 +313,7 @@ class Common:
 			return value
 
 		except:
-			raise ErrorException(ErrorType.ParameterError)
+			raise GameException(ErrorType.ParameterError)
 
 	# 封装成功响应数据字典
 	@classmethod
@@ -327,7 +327,7 @@ class Common:
 
 	# 封装错误响应数据字典
 	@classmethod
-	def getErrorResponseDict(cls, exception: ErrorException):
+	def getErrorResponseDict(cls, exception: GameException):
 		return {
 			'status': exception.error_type.value,
 			'errmsg': str(exception)

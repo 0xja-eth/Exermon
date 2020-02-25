@@ -20,11 +20,15 @@ public class PlayerService : BaseService<PlayerService> {
     const string Logout = "登出";
 
     const string GetBasic = "拉取玩家基本信息";
+    const string GetStatus = "拉取玩家状态信息";
 
     const string CreateCharacter = "创建角色";
     const string CreateExermons = "装备艾瑟萌";
     const string CreateGifts = "装备天赋";
     const string CreateInfo = "提交信息";
+
+    const string EditName = "修改昵称";
+    const string EditInfo = "修改信息";
 
     const string EquipSlotEquip = "装备";
 
@@ -33,8 +37,9 @@ public class PlayerService : BaseService<PlayerService> {
     /// </summary>
     public enum Oper {
         Register, Login, Forget, Code, Logout,
-        GetBasic,
+        GetBasic, GetStatus,
         CreateCharacter, CreateExermons, CreateGifts, CreateInfo,
+        EditName, EditInfo, 
         EquipSlotEquip,
     }
 
@@ -93,6 +98,7 @@ public class PlayerService : BaseService<PlayerService> {
         addOperDict(Oper.Logout, Logout, NetworkSystem.Interfaces.PlayerLogout);
 
         addOperDict(Oper.GetBasic, GetBasic, NetworkSystem.Interfaces.PlayerGetBasic);
+        addOperDict(Oper.GetStatus, GetStatus, NetworkSystem.Interfaces.PlayerGetStatus);
 
         addOperDict(Oper.CreateCharacter, CreateCharacter, 
             NetworkSystem.Interfaces.PlayerCreateCharacter);
@@ -102,6 +108,9 @@ public class PlayerService : BaseService<PlayerService> {
             NetworkSystem.Interfaces.PlayerCreateGifts);
         addOperDict(Oper.CreateInfo, CreateInfo,
             NetworkSystem.Interfaces.PlayerCreateInfo);
+
+        addOperDict(Oper.EditName, EditName, NetworkSystem.Interfaces.PlayerEditName);
+        addOperDict(Oper.EditInfo, EditInfo, NetworkSystem.Interfaces.PlayerEditInfo);
 
         addOperDict(Oper.EquipSlotEquip, EquipSlotEquip,
             NetworkSystem.Interfaces.PlayerEquipSlotEquip);
@@ -147,26 +156,17 @@ public class PlayerService : BaseService<PlayerService> {
     public void login(string un, string pw,
         UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = generateOnLoginSuccessFunc(onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            changeState(State.Logined);
+            player = DataLoader.loadData<Player>(res, "player");
+            onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         data["un"] = un; data["pw"] = pw;
         sendRequest(Oper.Login, data, _onSuccess, onError);
     }
-
-    /// <summary>
-    /// 生成登陆成功回调函数
-    /// </summary>
-    /// <param name="onSuccess">成功回调</param>
-    /// <returns></returns>
-    NetworkSystem.RequestObject.SuccessAction generateOnLoginSuccessFunc(UnityAction onSuccess) {
-        return (res) => {
-            changeState(State.Logined);
-            player = DataLoader.loadData<Player>(res, "player");
-            onSuccess?.Invoke();
-        };
-    }
-
+    
     /// <summary>
     /// 忘记密码
     /// </summary>
@@ -210,23 +210,14 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="onError">失败回调</param>
     public void logout(UnityAction onSuccess = null, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = generateOnLogoutSuccessFunc(onSuccess);
-
-        JsonData data = new JsonData();
-        sendRequest(Oper.Logout, data, _onSuccess, onError, uid: true);
-    }
-
-    /// <summary>
-    /// 生成登出成功回调函数
-    /// </summary>
-    /// <param name="onSuccess">成功回调</param>
-    /// <returns></returns>
-    NetworkSystem.RequestObject.SuccessAction generateOnLogoutSuccessFunc(UnityAction onSuccess) {
-        return (res) => {
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             player = null;
             changeState(State.Unlogin);
             onSuccess?.Invoke();
         };
+
+        JsonData data = new JsonData();
+        sendRequest(Oper.Logout, data, _onSuccess, onError, uid: true);
     }
 
     /// <summary>
@@ -242,11 +233,24 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="uid">要获取信息的玩家ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void getBasic(int uid, 
+    public void getBasic(int uid,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
         data["get_uid"] = uid;
         sendRequest(Oper.GetBasic, data, onSuccess, onError, uid: true);
+    }
+
+    /// <summary>
+    /// 获取玩家状态信息
+    /// </summary>
+    /// <param name="uid">要获取信息的玩家ID</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void getStatus(int uid,
+        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        JsonData data = new JsonData();
+        data["get_uid"] = uid;
+        sendRequest(Oper.GetStatus, data, onSuccess, onError, uid: true);
     }
 
     /// <summary>
@@ -260,25 +264,14 @@ public class PlayerService : BaseService<PlayerService> {
     public void createCharacter(string name, int grade, int cid,
         UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = 
-            generateCreateCharacterSuccessFunc(name, grade, cid, onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.createCharacter(name, grade, cid);
+            onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         data["name"] = name; data["grade"] = grade; data["cid"] = cid;
         sendRequest(Oper.CreateCharacter, data, _onSuccess, onError, uid: true);
-    }
-
-    /// <summary>
-    /// 生成创建角色成功回调函数
-    /// </summary>
-    /// <param name="onSuccess">成功回调</param>
-    NetworkSystem.RequestObject.SuccessAction 
-        generateCreateCharacterSuccessFunc(string name, 
-        int grade, int cid, UnityAction onSuccess) {
-        return (res) => {
-            player.createCharacter(name, grade, cid);
-            onSuccess?.Invoke();
-        };
     }
 
     /// <summary>
@@ -291,25 +284,15 @@ public class PlayerService : BaseService<PlayerService> {
     public void createExermons(int[] eids, string[] enames,
         UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateExermonsSuccessFunc(onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.createExermons(res);
+            onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         data["eids"] = DataLoader.convertArray(eids);
         data["enames"] = DataLoader.convertArray(enames);
         sendRequest(Oper.CreateExermons, data, _onSuccess, onError, uid: true);
-    }
-
-    /// <summary>
-    /// 生成选择艾瑟萌成功回调函数
-    /// </summary>
-    /// <param name="onSuccess">成功回调</param>
-    NetworkSystem.RequestObject.SuccessAction
-        generateCreateExermonsSuccessFunc(UnityAction onSuccess) {
-        return (res) => {
-            player.createExermons(res);
-            onSuccess?.Invoke();
-        };
     }
 
     /// <summary>
@@ -321,24 +304,14 @@ public class PlayerService : BaseService<PlayerService> {
     public void createGifts(int[] gids,
         UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateGiftsSuccessFunc(gids, onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.createGifts(gids);
+            onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         data["gids"] = DataLoader.convertArray(gids);
         sendRequest(Oper.CreateGifts, data, _onSuccess, onError, uid: true);
-    }
-
-    /// <summary>
-    /// 生成选择天赋成功回调函数
-    /// </summary>
-    /// <param name="onSuccess">成功回调</param>
-    NetworkSystem.RequestObject.SuccessAction
-        generateCreateGiftsSuccessFunc(int[] gids, UnityAction onSuccess) {
-        return (res) => {
-            player.createGifts(gids);
-            onSuccess?.Invoke();
-        };
     }
 
     /// <summary>
@@ -355,9 +328,10 @@ public class PlayerService : BaseService<PlayerService> {
         string city, string contact, string description,
         UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateInfoSuccessFunc(birth, school, city,
-            contact, description, onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.createInfo(birth, school, city, contact, description);
+            onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         data["birth"] = DataLoader.convertDate(birth);
@@ -367,51 +341,57 @@ public class PlayerService : BaseService<PlayerService> {
     }
     public void createInfo(UnityAction onSuccess, UnityAction onError = null) {
 
-        NetworkSystem.RequestObject.SuccessAction _onSuccess =
-            generateCreateInfoSuccessFunc(onSuccess);
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.createInfo(); onSuccess?.Invoke();
+        };
 
         JsonData data = new JsonData();
         sendRequest(Oper.CreateInfo, data, _onSuccess, onError, uid: true);
     }
 
     /// <summary>
-    /// 补全信息成功回调函数
+    /// 修改昵称
     /// </summary>
+    /// <param name="name">新昵称</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void editname(string name, UnityAction onSuccess, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.editNmae(name);
+            onSuccess?.Invoke();
+        };
+
+        JsonData data = new JsonData(); data["name"] = name;
+        sendRequest(Oper.EditName, data, _onSuccess, onError, uid: true);
+    }
+
+    /// <summary>
+    /// 修改信息
+    /// </summary>
+    /// <param name="grade">年级ID</param>
     /// <param name="birth">出生日期</param>
     /// <param name="school">学校名称</param>
     /// <param name="city">居住地</param>
     /// <param name="contact">联系方式</param>
     /// <param name="description">个人介绍</param>
     /// <param name="onSuccess">成功回调</param>
-    NetworkSystem.RequestObject.SuccessAction
-        generateCreateInfoSuccessFunc(DateTime birth,
-        string school, string city, string contact,
-        string description, UnityAction onSuccess) {
-        return (res) => {
-            player.createInfo(birth, school, city, contact, description);
-            onSuccess?.Invoke();
-        };
-    }
-    NetworkSystem.RequestObject.SuccessAction
-        generateCreateInfoSuccessFunc(UnityAction onSuccess) {
-        return (res) => {
-            player.createInfo();
-            onSuccess?.Invoke();
-        };
-    }
-
-    /// <summary>
-    /// 装备人物装备
-    /// </summary>
-    /// <param name="eid">装备位置ID</param>
-    /// <param name="heid">人类背包装备项ID</param>
-    /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void equipSlotEquip(int eid, int heid, 
-        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+    public void editInfo(int grade, DateTime birth, string school,
+        string city, string contact, string description,
+        UnityAction onSuccess, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.editInfo(grade, birth, school, city, contact, description);
+            onSuccess?.Invoke();
+        };
+
         JsonData data = new JsonData();
-        data["eid"] = eid; data["heid"] = heid;
-        sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
+        data["grade"] = grade;
+        data["birth"] = DataLoader.convertDate(birth);
+        data["school"] = school; data["city"] = city;
+        data["contact"] = contact; data["description"] = description;
+        sendRequest(Oper.EditInfo, data, _onSuccess, onError, uid: true);
     }
 
     /// <summary>
@@ -421,11 +401,49 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="onError">失败回调</param>
     public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.loadBasic(DataLoader.loadJsonData(res, "player"));
+            player.load(DataLoader.loadJsonData(res, "player"));
             onSuccess?.Invoke();
         };
 
         getBasic(player.getID(), _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 获取玩家自身基础信息数据
+    /// </summary>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void getPlayerStatus(UnityAction onSuccess = null, UnityAction onError = null) {
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            player.load(DataLoader.loadJsonData(res, "player"));
+            onSuccess?.Invoke();
+        };
+
+        getStatus(player.getID(), _onSuccess, onError);
+    }
+
+    /// <summary>
+    /// 装备人物装备
+    /// </summary>
+    /// <param name="packEquip">人类背包装备</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void equipSlotEquip(HumanPackEquip packEquip,
+        UnityAction onSuccess, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            var equipSlot = player.slotContainers.humanEquipSlot;
+            equipSlot.setEquip(packEquip);
+            onSuccess?.Invoke();
+        };
+
+        equipSlotEquip(packEquip.getID(), _onSuccess, onError);
+    }
+    /// <param name="heid">人类背包装备项ID</param>
+    public void equipSlotEquip(int heid,
+        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        JsonData data = new JsonData(); data["heid"] = heid;
+        sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
     }
 
     /// <summary>

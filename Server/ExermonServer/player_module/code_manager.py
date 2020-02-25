@@ -1,4 +1,4 @@
-from utils.exception import ErrorException, ErrorType
+from utils.exception import GameException, ErrorType
 import datetime, random
 
 
@@ -67,10 +67,10 @@ class CodeManager:
     def ensureCode(cls, un, email, code, type):
         key = cls.getKey(un, email, type)
         if key not in cls.code_data:
-            raise ErrorException(ErrorType.IncorrectCode)
+            raise GameException(ErrorType.IncorrectCode)
 
         if cls.code_data[key].code != code:
-            raise ErrorException(ErrorType.IncorrectCode)
+            raise GameException(ErrorType.IncorrectCode)
 
     # 扫描 Code，如果过期就删去
     @classmethod

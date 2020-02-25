@@ -10,7 +10,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>REABAECJUAFAgChgAQCkAQCIAACgGIAoICARCACEAEA=</HashCode>
+      <HashCode>AkAAAEIAkghgAAgAAACEAYCYAAABBQQIgCAAADAFAMQ=</HashCode>
       <FileName>Assets\Scripts\Windows\Common\AlertWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -27,7 +27,7 @@
   <Class Name="AssetLoader" Collapsed="true">
     <Position X="112" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>gACRAACABACABAAIAACQAAIoIIIgAAIACAAIBgAAAAA=</HashCode>
+      <HashCode>gACRBCCABACABAAIAACQAAIoIIIgAAIhCAAIBgAAAAA=</HashCode>
       <FileName>Assets\Scripts\Core\Data\AssetLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -38,10 +38,10 @@
       <FileName>Assets\Scripts\Core\UI\BaseComponent.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="BaseContainer" Collapsed="true">
+  <Class Name="BaseContainer&lt;T&gt;" Collapsed="true">
     <Position X="24.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAAAAIAAAAAAAAhAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAQIAAAAAAAAoAAAAAAAAhAAAAAAIAAAAIAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -51,7 +51,7 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAhAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAhAAAAAAAAAQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -68,15 +68,8 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>BECBgEAAAABIICAAAAaAAAIwBAAAQmABAAiBAAAgAAA=</HashCode>
+      <HashCode>BECBgECAAABIJCAAAUaAUAIwlAAAYmABAAihwAAkAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\BaseInputField.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="BaseItem" Collapsed="true">
-    <Position X="60.75" Y="3" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAAIAAAAAAAAAAlAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BaseParam" Collapsed="true">
@@ -159,7 +152,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>QAEAAAAAAAgAAAAQAAQEAYEAAAAAKAAEAAQEAAAEKAA=</HashCode>
+      <HashCode>QAEAAAAAAggAAAAQAAQEAYEAAAAAKAAEAAQEAAAEKAA=</HashCode>
       <FileName>Assets\Scripts\Core\UI\BaseWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -219,7 +212,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>IAAAAwAAAAAIFAAgAASAAIAAAAAAAAACAABABEgAAAg=</HashCode>
+      <HashCode>IAAAAwAAAAAIFAAgAASAAIAAAAIAAAACAARABEgQAAg=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\CharacterWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -262,7 +255,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>CIAZQCCQ0LBAAAAAAIABWJCAIIQMBEGQAAQAAOIQAIA=</HashCode>
+      <HashCode>CIIZQCCQ0LBAAAAAIIABWJCAIIQMhEmQAgQAAOIUAIA=</HashCode>
       <FileName>Assets\Scripts\Core\Services\DataService.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -286,7 +279,7 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>BACACFAgCAABAAICACrIEAAASCAhgCAABAIRQQQEAAA=</HashCode>
+      <HashCode>BACACFAgCAABAAIAACrIEAAASCAhwCAABAIRQQQEAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\DateTimePicker.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -310,7 +303,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAEAAAAAAAAgUIAABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
+      <HashCode>AAAAEAAAAAAAAgUIEABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\DraggableItemDisplay.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -318,7 +311,7 @@
   <Class Name="DropdownField" Collapsed="true">
     <Position X="28.25" Y="11.25" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>BEABAAAAAEAAIAgAAAKAEAADQACIAAAAAAAAAQAAAAA=</HashCode>
+      <HashCode>BEABAAAAAEAAIAgAAAKAEAADQACIAAAAAAAgAQAAACA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\DropdownField.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -362,14 +355,7 @@
   <Class Name="ExerEquipSlot" Collapsed="true">
     <Position X="25.25" Y="4.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAIAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="ExerEquipSlotItem" Collapsed="true">
-    <Position X="38.5" Y="4.75" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAIAAAAAIAAABAAAAAAAAAQAAAgAAAAAIAAIAAAAAA=</HashCode>
+      <HashCode>AAAAAAIAAAAAAAAQAAAAAAAAAAEAAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -382,16 +368,8 @@
   </Class>
   <Class Name="ExerGift" Collapsed="true">
     <Position X="65" Y="3" Width="1.5" />
-    <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="61.5" Y="3.548" />
-        <Point X="61.5" Y="4.125" />
-        <Point X="65.75" Y="4.125" />
-        <Point X="65.75" Y="3.677" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAEAIAAAAIAAAAAAAAAAABAAAACgAAAAAAQAAAAAAAQ=</HashCode>
+      <HashCode>AAEAIAAAAIAACAAAAAAAABAAAACgAACAAQQAAAAAAAQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -399,7 +377,7 @@
   <Class Name="ExerGiftCard" Collapsed="true">
     <Position X="28.5" Y="21.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAgAAEAAAAAAAAAQAAgAA=</HashCode>
+      <HashCode>AAAAAAAAAAAACAEAEAAAAAAAAAAAAAAAAQCIAAAAgAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftCard.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -430,7 +408,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAEABAAEAAAAAAAQAAAAAACAAAAAAAIgBAgAEA=</HashCode>
+      <HashCode>AAAAAAAEABAAEAAAAAAAQAAAAAACAAAAAAAAgBAAAEA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -450,14 +428,6 @@
   </Class>
   <Class Name="Exermon" Collapsed="true">
     <Position X="63" Y="3" Width="1.5" />
-    <InheritanceLine Type="BaseItem" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="61.5" Y="3.548" />
-        <Point X="61.5" Y="4.125" />
-        <Point X="63.75" Y="4.125" />
-        <Point X="63.75" Y="3.677" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAQIABCIIAAAAAACAAAABCREAiiEQBQAQAAAAAAAIQ=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
@@ -475,7 +445,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>CAQAIEAKQAAAAAEAIACAIBCAIACnAAAgIBAQAAAIhAA=</HashCode>
+      <HashCode>CAQAIEAIQCAAAAEQAACgAECAAAAmAAAgABCQAAAIhQA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\ExermonDetail.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -498,7 +468,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAQAAAAABAAAAAAAAAIABAgAAAAUAABAAAIAAAgBAA=</HashCode>
+      <HashCode>EAAQAEAAABAAAAAAAAAICBAgAAAAUAABAAAIABAgBAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\ExermonsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -515,7 +485,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAgAAAAIgAAQAIAAAAAIAAAQAAEBAAgAAAAgAAAE=</HashCode>
+      <HashCode>AAAAAgAAAAIgAAQAIAAAAAIAAAQAAEBAAgAAAAgAgAE=</HashCode>
       <FileName>Assets\Scripts\Services\ExermonService.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -535,7 +505,7 @@
   <Class Name="ExerPackEquip" Collapsed="true">
     <Position X="48" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -549,7 +519,7 @@
   <Class Name="ExerSkillSlotItem" Collapsed="true">
     <Position X="41" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAAAIAAAAAAAAAAAAABAEAgAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAABAAAIAAAAAAAAAAAAABAEAgAAAAAAAAAQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -564,17 +534,9 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAIAAKQAAAAAEAIACAAACAIAAWAAAgAAAQAAAIhAA=</HashCode>
+      <HashCode>AAAAIAAKQAAAAAEAAACAAAAAIAAWAAAAAAAAAAAIhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerSlotDetail.cs</FileName>
     </TypeIdentifier>
-  </Class>
-  <Class Name="ExerSlotItem" Collapsed="true">
-    <Position X="33.5" Y="4.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAQIQACIIEAAAAAAAAAAASCEAkiAABQAIAAAEAQAgQ=</HashCode>
-      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
   </Class>
   <Class Name="ExerSlotsContainer" Collapsed="true">
     <Position X="26.25" Y="15.5" Width="2" />
@@ -588,7 +550,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAAAAIAAAAABAAAAAAAABAAAAIgEAgAEA=</HashCode>
+      <HashCode>EAAAAEAAABAAAAAAAAAACBAAAAAAAABAAAAIgHAgAAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerSlotsContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -612,21 +574,21 @@
   <Class Name="GameConfigure" Collapsed="true">
     <Position X="50.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QIABQQAAAIIAAgAAgAAAAAgAAAAsGABAAAQAIBIAAAg=</HashCode>
+      <HashCode>QIIBUQEAAIIEAgAAoAAAAIgABAAsGABAAgQAIBIAAAg=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameDatabase" Collapsed="true">
     <Position X="52.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIAAABAEIAAACAAIAAAAAAAAAAhAAAAAEAAAEAAAIA=</HashCode>
+      <HashCode>AAIAAABAEIAAACAAIAAAAAAAAAApAAAAAEAAAEAAAIA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GameDynamicData" Collapsed="true">
     <Position X="54.75" Y="1.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIABAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAAAAAIAAAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\GameModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -685,17 +647,18 @@
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="HumanEquipSlot" Collapsed="true">
+  <Class Name="ExerSlot" Collapsed="true">
     <Position X="22" Y="4.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
+      <HashCode>AAAQAAAAAQAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Data\PlayerModuleData.cs</NewMemberFileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HumanEquipSlotItem" Collapsed="true">
     <Position X="35.75" Y="4.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAIAAAAAIAAABAAAAAAAAAQAAAgAAAAAAAAIAAAAAA=</HashCode>
+      <HashCode>AAAIAAIAAIAAABAAAAAAAAAQAAAgAAAAAAAAIQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -709,7 +672,7 @@
   <Class Name="HumanPackEquip" Collapsed="true">
     <Position X="45.5" Y="6.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAIQAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -722,7 +685,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>IAAAAgAgAAAQEIAAAACAgIAAAAAAAACCAABAAAgAAAA=</HashCode>
+      <HashCode>IAACAgAgAAAQEIAAAACAgIAAAAAAAACCAABAAAgAAAA=</HashCode>
       <FileName>Assets\Scripts\Windows\StartScene\InfoWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -805,20 +768,20 @@
     <NestedTypes>
       <Enum Name="ItemService.Oper" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\ItemServices.cs</NewMemberFileName>
+          <NewMemberFileName>Assets\Scripts\Services\ItemService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAgAAAAIAAAgAAAAIAgAQAAMwEAABIAAAIAAAACAA=</HashCode>
-      <FileName>Assets\Scripts\Services\ItemServices.cs</FileName>
+      <FileName>Assets\Scripts\Services\ItemService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="LimitedItem" Collapsed="true">
+  <Class Name="ExerciseRecord" Collapsed="true">
     <Position X="60.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAABIAAAAAAAAAAAAAAAAAgAAAAAQGAAAAAgAA=</HashCode>
-      <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
+      <HashCode>AAAQAAAAAIAAAAAABAAAAACAAQAgAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\RecordModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="LoadingWindow" Collapsed="true">
@@ -866,7 +829,7 @@
   <Class Name="PackContainer&lt;T&gt;" Collapsed="true">
     <Position X="25.25" Y="3.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -876,7 +839,7 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAICAAAAABAQAAAAAAAAgAAAAAAAAAACAAAA=</HashCode>
+      <HashCode>AAAAAAAAAICAAAAABAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -900,7 +863,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AEgQAUAIIgAAABAUAUaAgCAAQQgCASgQAAAAAYAAQAA=</HashCode>
+      <HashCode>AEgQgUBIMgAAAJAUAUaFgSAAQQgCAagQAAgAAYAAQAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ParamDisplay\ParamDisplay.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -934,6 +897,18 @@
           <NewMemberFileName>Assets\Scripts\Data\PlayerModuleData.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
+      <Class Name="Player.BattleInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Data\PlayerModuleData.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Class Name="Player.QuestionInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Data\PlayerModuleData.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
       <Enum Name="Player.Status" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Data\PlayerModuleData.cs</NewMemberFileName>
@@ -941,39 +916,43 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAQIAAAAgoEAAAIgaAAAShkAABFlAUAwAQAQA0IICpI=</HashCode>
+      <HashCode>AAQIAAQAgoEAAAIgYAAIShkAABHlAUAwAQAwA0IIGpI=</HashCode>
       <FileName>Assets\Scripts\Data\PlayerModuleData.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="PlayerExermon" Collapsed="true">
+  <Class Name="PlayerExerGift" Collapsed="true">
     <Position X="43.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAIAACIIAAAAAAAAAAAAQCEAkkAABQAAAAAAAQAwQ=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" />
   </Class>
-  <Class Name="PlayerService">
+  <Class Name="QuestionService">
     <Position X="22" Y="28.25" Width="3" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="PlayerService.Oper" Collapsed="true">
+      <Enum Name="QuestionService.Oper" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\PlayerService.cs</NewMemberFileName>
+          <NewMemberFileName>Assets\Scripts\Services\QuestionService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Enum Name="PlayerService.State" Collapsed="true">
+      <Enum Name="QuestionService.State" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\PlayerService.cs</NewMemberFileName>
+          <NewMemberFileName>Assets\Scripts\Services\RecordService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
+      <Class Name="QuestionService.QuestionCache" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Services\QuestionService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AIAIAAQAggAggAAAIIDgQMIEiARDAEABARASQWqAWAA=</HashCode>
-      <FileName>Assets\Scripts\Services\PlayerService.cs</FileName>
+      <HashCode>AAAAgAAAAIQAAABGAAAAQAAAAAYAAACAwAAAAAAIAAA=</HashCode>
+      <FileName>Assets\Scripts\Services\QuestionService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PolygonEdges" Collapsed="true">
@@ -1045,7 +1024,7 @@
   <Class Name="SlotContainer&lt;T&gt;" Collapsed="true">
     <Position X="22.5" Y="3.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Data\ItemModuleData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -1152,7 +1131,7 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>BAACAAAEAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BAACAAAEAAAAAAAAAACAQAAAAAAAAAAAAAAggAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\InputFields\TextInputField.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -1191,6 +1170,28 @@
       <HashCode>0AIAUAAAAAgIABiAABAAAAAMIAIgAQACAAAQAAVQAAA=</HashCode>
       <FileName>Assets\Scripts\Services\ValidateService.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="CompRank" Collapsed="true">
+    <Position X="60.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAIAAAAAAAAAAAAAACAAgAACAAAAAEAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\SeasonModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerEquipSlotItem" Collapsed="true">
+    <Position X="38.5" Y="4.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAIAAIAAABAAAAAAAAAQAAAgAAAAAIAAIQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerSlotItem" Collapsed="true">
+    <Position X="33.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQIQACIIEAAAAAAAAAAASCEAkqAABQAIAAAUAQAgQ=</HashCode>
+      <FileName>Assets\Scripts\Data\ExermonModuleData.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Microsoft YaHei UI" Size="9" />
 </ClassDiagram>

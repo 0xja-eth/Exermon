@@ -2,7 +2,7 @@ from django.db import models
 from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorException, ErrorType
+from utils.exception import GameException, ErrorType
 import jsonfield, traceback
 
 # Create your models here.
@@ -62,7 +62,7 @@ class GameVersion(models.Model):
 	def load(cls):
 
 		cls.Version: GameVersion = ViewUtils.getObject(
-			GameVersion, ErrorType.NoCurVersion, return_type='object', is_used=True)
+			GameVersion, ErrorType.NoCurVersion, is_used=True)
 
 	@classmethod
 	def get(cls):
@@ -298,7 +298,7 @@ class GroupConfigure(models.Model):
 		configure: GameConfigure = GameConfigure.get()
 
 		if configure is None:
-			raise ErrorException(ErrorType.NoCurConfigure)
+			raise GameException(ErrorType.NoCurConfigure)
 
 		cls.Objects = ViewUtils.getObjects(cls, configure=configure)
 		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
@@ -309,7 +309,7 @@ class GroupConfigure(models.Model):
 
 		if cls.Objects is None: cls.load()
 
-		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR, return_type='object',
+		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
 								   objects=cls.Objects, **kwargs)
 
 	# 确保存在
@@ -736,8 +736,8 @@ class QuestionStar(GroupConfigure):
 	# 基础金币奖励
 	gold_incr = models.PositiveSmallIntegerField(default=0, verbose_name="基础金币奖励")
 
-	# 等级标准时间（单位：分钟）
-	std_time = models.PositiveSmallIntegerField(default=0, verbose_name="标准时间（分）")
+	# 等级标准时间（单位：秒）
+	std_time = models.PositiveSmallIntegerField(default=0, verbose_name="标准时间（秒）")
 
 	# 等级最短时间（单位：秒）
 	min_time = models.PositiveSmallIntegerField(default=0, verbose_name="最短时间（秒）")
@@ -802,11 +802,16 @@ class GameConfigure(models.Model):
 	def __str__(self):
 		return "%d. %s 配置" % (self.id, self.name)
 
-	def convertToDict(self):
+	def convertToDict(self, type="static"):
+
+		if type == 'static': return self._convertStaticDataToDict()
+		if type == 'dynamic': return self._convertDynamicDataToDict()
+
+	def _convertStaticDataToDict(self):
 		from player_module.models import Character, Player
 		from exermon_module.models import Exermon, ExerSkill
 		from question_module.models import Question, QuesReport
-		from record_module.models import QuestionRecord
+		from record_module.models import QuestionRecord, ExerciseRecord
 
 		subjects = ModelUtils.objectsToDict(self.subject_set.all())
 		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
@@ -815,6 +820,8 @@ class GameConfigure(models.Model):
 		exer_equip_types = ModelUtils.objectsToDict(self.exerequiptype_set.all())
 		exer_stars = ModelUtils.objectsToDict(self.exerstar_set.all())
 		exer_gift_stars = ModelUtils.objectsToDict(self.exergiftstar_set.all())
+		ques_stars = ModelUtils.objectsToDict(self.questionstar_set.all())
+		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
 
 		return {
 			'name': self.name,
@@ -825,6 +832,8 @@ class GameConfigure(models.Model):
 
 			# 配置量
 			'max_subject': Subject.MAX_SELECTED,
+			'max_exercise_count': ExerciseRecord.MAX_COUNT,
+			'report_desc_len': QuesReport.MAX_DESC_LEN,
 
 			# player_module
 			'character_genders': Character.CHARACTER_GENDERS,
@@ -840,10 +849,11 @@ class GameConfigure(models.Model):
 			# question_module
 			'question_types': Question.TYPES,
 			'question_statuses': Question.STATUSES,
-			'qeusreport_types': QuesReport.TYPES,
+			'ques_report_types': QuesReport.TYPES,
 
 			# record_module
-			'record_source': QuestionRecord.SOURCES,
+			'record_sources': QuestionRecord.SOURCES,
+			'exercise_gen_types': ExerciseRecord.GEN_TYPES,
 
 			# 组合配置
 			'subjects': subjects,
@@ -852,7 +862,17 @@ class GameConfigure(models.Model):
 			'human_equip_types': human_equip_types,
 			'exer_equip_types': exer_equip_types,
 			'exer_stars': exer_stars,
-			'exer_gift_stars': exer_gift_stars
+			'exer_gift_stars': exer_gift_stars,
+			'ques_stars': ques_stars,
+			'comp_ranks': comp_ranks,
+		}
+
+	def _convertDynamicDataToDict(self):
+
+		seasons = ModelUtils.objectsToDict(self.compseason_set.all())
+
+		return {
+			'seasons': seasons,
 		}
 
 	@classmethod
@@ -862,7 +882,7 @@ class GameConfigure(models.Model):
 		version: GameVersion = GameVersion.get()
 
 		if version is None:
-			raise ErrorException(ErrorType.NoCurVersion)
+			raise GameException(ErrorType.NoCurVersion)
 
 		cls.Configure = version.configure
 

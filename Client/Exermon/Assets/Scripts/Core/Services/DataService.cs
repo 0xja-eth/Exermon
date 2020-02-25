@@ -196,6 +196,17 @@ public class DataService : BaseService<DataService> {
     /// <param name="collection">数据集合</param>
     /// <param name="id">ID</param>
     /// <returns>目标数据</returns>
+    public static T get<T>(List<T> collection, int id) where T : BaseData {
+        return collection.Find((d) => d.getID() == id);
+    }
+
+    /// <summary>
+    /// 获取数据
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="collection">数据集合</param>
+    /// <param name="id">ID</param>
+    /// <returns>目标数据</returns>
     public static BaseData get(BaseData[] collection, int id) {
         foreach (var element in collection)
             if (element.getID() == id) return element;
@@ -306,6 +317,21 @@ public class DataService : BaseService<DataService> {
     public Tuple<int, string> exerSkillHitType(int id) {
         return get(staticData.configure.exerSkillHitTypes, id);
     }
+    public Tuple<int, string> questionType(int id) {
+        return get(staticData.configure.questionTypes, id);
+    }
+    public Tuple<int, string> questionStatus(int id) {
+        return get(staticData.configure.questionStatuses, id);
+    }
+    public Tuple<int, string> quesReportType(int id) {
+        return get(staticData.configure.quesReportTypes, id);
+    }
+    public Tuple<int, string> recordSource(int id) {
+        return get(staticData.configure.recordSources, id);
+    }
+    public Tuple<int, string> exerciseGenType(int id) {
+        return get(staticData.configure.exerciseGenTypes, id);
+    }
 
     /// <summary>
     /// 组合配置
@@ -333,6 +359,12 @@ public class DataService : BaseService<DataService> {
     }
     public ItemStar itemStar(int id) {
         return get(staticData.configure.itemStars, id);
+    }
+    public QuesStar quesStar(int id) {
+        return get(staticData.configure.quesStars, id);
+    }
+    public CompRank compRank(int id) {
+        return get(staticData.configure.compRanks, id);
     }
 
     /// <summary>
@@ -365,11 +397,19 @@ public class DataService : BaseService<DataService> {
     public ExerEquip exerEquip(int id) {
         return get(staticData.data.exerEquips, id);
     }
-    public ExerEquip quesSugar(int id) {
-        return null;
-        // return get(staticData.data.quesSugars, id);
+    public QuesSugar quesSugar(int id) {
+        return get(staticData.data.quesSugars, id);
     }
-    
+
+    /// <summary>
+    /// 动态数据
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public CompSeason season(int id) {
+        return get(dynamicData.seasons, id);
+    }
+
     #endregion
 
     #region 回调控制

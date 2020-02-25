@@ -133,21 +133,18 @@ public class GameDynamicData : BaseData {
     protected override bool idEnable() { return false; }
 
     /// <summary>
-    /// 搜索数据
+    /// 属性
     /// </summary>
-    /// <param name="data">数据集合</param>
-    /// <param name="id">ID</param>
-    /// <returns>目标数据</returns>
-    public T findData<T>(List<T> data, int id) where T : BaseData {
-        return data.Find((d) => d.getID() == id);
-    }
-
+    public List<CompSeason> seasons { get; private set; }
+    
     /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
     public override void load(JsonData json) {
         base.load(json);
+
+        seasons = DataLoader.loadDataList<CompSeason>(json, "seasons");
     }
 
     /// <summary>
@@ -156,6 +153,9 @@ public class GameDynamicData : BaseData {
     /// <returns>JsonData</returns>
     public override JsonData toJson() {
         var json = base.toJson();
+
+        json["seasons"] = DataLoader.convertDataArray(seasons);
+
         return json;
     }
 
@@ -412,6 +412,55 @@ public class ItemStar : TypeData {
 }
 
 /// <summary>
+/// 题目星级数据
+/// </summary>
+public class QuesStar : TypeData {
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    public Color color { get; private set; }
+    public int level { get; private set; }
+    public int weight { get; private set; }
+    public int expIncr { get; private set; }
+    public int goldIncr { get; private set; }
+    public int stdTime { get; private set; }
+    public int minTime { get; private set; }
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    public override void load(JsonData json) {
+        base.load(json);
+        color = DataLoader.loadColor(json, "color");
+        level = DataLoader.loadInt(json, "level");
+        weight = DataLoader.loadInt(json, "weight");
+        expIncr = DataLoader.loadInt(json, "exp_incr");
+        goldIncr = DataLoader.loadInt(json, "gold_incr");
+        stdTime = DataLoader.loadInt(json, "std_time");
+        minTime = DataLoader.loadInt(json, "min_time");
+    }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public override JsonData toJson() {
+        var json = base.toJson();
+        json["color"] = DataLoader.convertColor(color);
+        json["level"] = level;
+        json["weight"] = weight;
+        json["exp_incr"] = expIncr;
+        json["gold_incr"] = goldIncr;
+        json["std_time"] = stdTime;
+        json["min_time"] = minTime;
+
+        return json;
+    }
+}
+
+/// <summary>
 /// 游戏版本数据
 /// </summary>
 public class GameVersionData : BaseData {
@@ -476,6 +525,7 @@ public class GameConfigure : BaseData {
     /// 配置量
     /// </summary>
     public int maxSubject { get; private set; }
+    public int maxExerciseCount { get; private set; }
 
     /// <summary>
     /// 组合术语
@@ -489,6 +539,13 @@ public class GameConfigure : BaseData {
     public Tuple<int, string>[] exerSkillTargetTypes { get; private set; }
     public Tuple<int, string>[] exerSkillHitTypes { get; private set; }
 
+    public Tuple<int, string>[] questionTypes { get; private set; }
+    public Tuple<int, string>[] questionStatuses { get; private set; }
+    public Tuple<int, string>[] quesReportTypes { get; private set; }
+
+    public Tuple<int, string>[] recordSources { get; private set; }
+    public Tuple<int, string>[] exerciseGenTypes { get; private set; }
+
     /// <summary>
     /// 组合配置
     /// </summary>
@@ -500,6 +557,8 @@ public class GameConfigure : BaseData {
     public ExerStar[] exerStars { get; private set; }
     public ExerGiftStar[] exerGiftStars { get; private set; }
     public ItemStar[] itemStars { get; private set; }
+    public QuesStar[] quesStars { get; private set; }
+    public CompRank[] compRanks { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -514,6 +573,7 @@ public class GameConfigure : BaseData {
         boundTicket = DataLoader.loadString(json, "bound_ticket");
 
         maxSubject = DataLoader.loadInt(json, "max_subject");
+        maxExerciseCount = DataLoader.loadInt(json, "max_exercise_count");
 
         characterGenders = DataLoader.loadTupleArray(json, "character_genders");
         playerGrades = DataLoader.loadTupleArray(json, "player_grades");
@@ -524,6 +584,13 @@ public class GameConfigure : BaseData {
         exerSkillTargetTypes = DataLoader.loadTupleArray(json, "exerskill_target_types");
         exerSkillHitTypes = DataLoader.loadTupleArray(json, "exerskill_hit_types");
 
+        questionTypes = DataLoader.loadTupleArray(json, "question_types");
+        questionStatuses = DataLoader.loadTupleArray(json, "question_statuses");
+        quesReportTypes = DataLoader.loadTupleArray(json, "ques_report_types");
+
+        recordSources = DataLoader.loadTupleArray(json, "record_sources");
+        exerciseGenTypes = DataLoader.loadTupleArray(json, "exercise_gen_types");
+
         subjects = DataLoader.loadDataArray<Subject>(json, "subjects");
         baseParams = DataLoader.loadDataArray<BaseParam>(json, "base_params");
         usableItemTypes = DataLoader.loadDataArray<UsableItemType>(json, "usable_item_types");
@@ -532,6 +599,8 @@ public class GameConfigure : BaseData {
         exerStars = DataLoader.loadDataArray<ExerStar>(json, "exer_stars");
         exerGiftStars = DataLoader.loadDataArray<ExerGiftStar>(json, "exer_gift_stars");
         itemStars = DataLoader.loadDataArray<ItemStar>(json, "item_stars");
+        quesStars = DataLoader.loadDataArray<QuesStar>(json, "ques_stars");
+        compRanks = DataLoader.loadDataArray<CompRank>(json, "comp_ranks");
     }
 
     /// <summary>
@@ -547,6 +616,7 @@ public class GameConfigure : BaseData {
         json["bound_ticket"] = boundTicket;
 
         json["max_subject"] = maxSubject;
+        json["max_exercise_count"] = maxExerciseCount;
 
         json["character_genders"] = DataLoader.convertTupleArray(characterGenders);
         json["player_grades"] = DataLoader.convertTupleArray(playerGrades);
@@ -557,6 +627,13 @@ public class GameConfigure : BaseData {
         json["exerskill_target_types"] = DataLoader.convertTupleArray(exerSkillTargetTypes);
         json["exerskill_hit_types"] = DataLoader.convertTupleArray(exerSkillHitTypes);
 
+        json["question_types"] = DataLoader.convertTupleArray(questionTypes);
+        json["question_statuses"] = DataLoader.convertTupleArray(questionStatuses);
+        json["ques_report_types"] = DataLoader.convertTupleArray(quesReportTypes);
+
+        json["record_sources"] = DataLoader.convertTupleArray(recordSources);
+        json["exercise_gen_types"] = DataLoader.convertTupleArray(exerciseGenTypes);
+
         json["subjects"] = DataLoader.convertDataArray(subjects);
         json["base_params"] = DataLoader.convertDataArray(baseParams);
         json["usable_item_types"] = DataLoader.convertDataArray(usableItemTypes);
@@ -565,6 +642,8 @@ public class GameConfigure : BaseData {
         json["exer_stars"] = DataLoader.convertDataArray(exerStars);
         json["exer_gift_stars"] = DataLoader.convertDataArray(exerGiftStars);
         json["item_stars"] = DataLoader.convertDataArray(itemStars);
+        json["ques_stars"] = DataLoader.convertDataArray(quesStars);
+        json["comp_ranks"] = DataLoader.convertDataArray(compRanks);
 
         return json;
     }
@@ -580,14 +659,15 @@ public class GameDatabase : BaseData {
     /// 数据库
     /// </summary>
     public Character[] characters { get; private set; }
+    public HumanItem[] humanItems { get; private set; }
+    public HumanEquip[] humanEquips { get; private set; }
     public Exermon[] exermons { get; private set; }
     public ExerFrag[] exerFrags { get; private set; }
     public ExerSkill[] exerSkills { get; private set; }
     public ExerGift[] exerGifts { get; private set; }
-    public HumanItem[] humanItems { get; private set; }
-    public HumanEquip[] humanEquips { get; private set; }
     public ExerItem[] exerItems { get; private set; }
     public ExerEquip[] exerEquips { get; private set; }
+    public QuesSugar[] quesSugars { get; private set; }
 
     /// <summary>
     /// 数据加载
@@ -597,14 +677,15 @@ public class GameDatabase : BaseData {
         base.load(json);
 
         characters = DataLoader.loadDataArray<Character>(json, "characters");
+        humanItems = DataLoader.loadDataArray<HumanItem>(json, "human_items");
+        humanEquips = DataLoader.loadDataArray<HumanEquip>(json, "human_equips");
         exermons = DataLoader.loadDataArray<Exermon>(json, "exermons");
         exerFrags = DataLoader.loadDataArray<ExerFrag>(json, "exer_frags");
         exerSkills = DataLoader.loadDataArray<ExerSkill>(json, "exer_skills");
         exerGifts = DataLoader.loadDataArray<ExerGift>(json, "exer_gifts");
         exerItems = DataLoader.loadDataArray<ExerItem>(json, "exer_items");
         exerEquips = DataLoader.loadDataArray<ExerEquip>(json, "exer_equips");
-        humanItems = DataLoader.loadDataArray<HumanItem>(json, "human_items");
-        humanEquips = DataLoader.loadDataArray<HumanEquip>(json, "human_equips");
+        quesSugars = DataLoader.loadDataArray<QuesSugar>(json, "ques_sugars");
     }
 
     /// <summary>
@@ -615,14 +696,15 @@ public class GameDatabase : BaseData {
         var json = base.toJson();
 
         json["characters"] = DataLoader.convertDataArray(characters);
+        json["human_items"] = DataLoader.convertDataArray(humanItems);
+        json["human_equips"] = DataLoader.convertDataArray(humanEquips);
         json["exermons"] = DataLoader.convertDataArray(exermons);
         json["exer_frags"] = DataLoader.convertDataArray(exerFrags);
         json["exer_skills"] = DataLoader.convertDataArray(exerSkills);
         json["exer_gifts"] = DataLoader.convertDataArray(exerGifts);
         json["exer_items"] = DataLoader.convertDataArray(exerItems);
         json["exer_equips"] = DataLoader.convertDataArray(exerEquips);
-        json["human_items"] = DataLoader.convertDataArray(humanItems);
-        json["human_equips"] = DataLoader.convertDataArray(humanEquips);
+        json["ques_sugars"] = DataLoader.convertDataArray(quesSugars);
 
         return json;
     }

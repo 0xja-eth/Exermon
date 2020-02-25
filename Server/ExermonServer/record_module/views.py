@@ -1,7 +1,8 @@
 from .models import *
 from player_module.models import Player
+from question_module.views import Common as QuestionCommon
 from utils.view_utils import Common as ViewUtils
-from utils.exception import ErrorType, ErrorException
+from utils.exception import ErrorType, GameException
 
 # Create your views here.
 
@@ -12,43 +13,106 @@ from utils.exception import ErrorType, ErrorException
 class Service:
 	# 查询记录
 	@classmethod
-	async def get(cls, consumer, player: Player):
+	async def get(cls, consumer, player: Player, ):
 		# 返回数据：
 		# question_records: 题目记录数据（数组） => 所有题目记录
-		pass
+		# exercise_records: 刷题结果数据（数组） => 所有刷题记录
+		# exam_records: 考核记录数据（数组） => 所有考核记录
+		# battle_records: 对战记录数据（数组） => 所有对战记录
+		return player.convertToDict("records")
 
 	# 收藏/解除收藏题目
 	@classmethod
 	async def collect(cls, consumer, player: Player, qid: int):
 		# 返回数据：
 		# collected: bool => 是否收藏（处理后）
-		pass
+
+		QuestionCommon.ensureQuestionExist(id=qid)
+
+		rec = QuestionRecord.create(player, qid)
+
+		rec.collected = not rec.collected
+		rec.save()
+
+		return {'collected': rec.collected}
 
 	# 解除错题
 	@classmethod
 	async def unwrong(cls, consumer, player: Player, qid: int):
-		# 返回数据：
-		pass
+		# 返回数据：无
+
+		QuestionCommon.ensureQuestionExist(id=qid)
+
+		rec = QuestionRecord.create(player, qid)
+
+		rec.wrong = False
+		rec.save()
 
 	# 添加备注
 	@classmethod
 	async def note(cls, consumer, player: Player, qid: int, note: str):
-		# 返回数据：
-		pass
+		# 返回数据：无
+
+		Check.ensureNoteFormat(note)
+
+		QuestionCommon.ensureQuestionExist(id=qid)
+
+		rec = QuestionRecord.create(player, qid)
+
+		rec.note = note
+		rec.save()
 
 	# 开始刷题
 	@classmethod
-	async def exerciseStart(cls, consumer, player: Player, sid: int, dtb_type: int, count: int):
+	async def exerciseGenerate(cls, consumer, player: Player, sid: int, gen_type: int, count: int):
 		# 返回数据：
 		# record: 刷题记录数据 => 刷题记录
-		pass
+		from game_module.models import Subject
+		from player_module.views import Common as PlayerCommon
+
+		subject = Subject.get(id=sid)
+
+		PlayerCommon.ensureSubjectSelected(player, subject)
+
+		rec = ExerciseRecord.create(player, subject=subject,
+									gen_type=gen_type, count=count)
+
+		return {'record': rec.convertToDict()}
+
+	# 开始刷题
+	@classmethod
+	async def exerciseStart(cls, consumer, player: Player, qid: int):
+		# 返回数据：无
+
+		exercise = player.currentQuestionSet()
+		exercise.startQuestion(qid)
 
 	# 作答刷题题目
 	@classmethod
-	async def exerciseAnswer(cls, consumer, player: Player, eid: int, eqid: int, selection: list, timespan: int, terminate: bool):
+	async def exerciseAnswer(cls, consumer, player: Player, qid: int,
+							 selection: list, timespan: int, terminate: bool):
 		# 返回数据：
 		# result: 刷题结果数据 => 刷题结果（可选）
-		pass
+
+		exercise = player.currentQuestionSet()
+		exercise.answerQuestion(qid, selection, timespan)
+
+		if terminate:
+			exercise.terminate()
+
+			return {'result': exercise.convertToDict('result')}
+
+
+# =======================
+# 记录校验类，封装记录业务数据格式校验的函数
+# =======================
+class Check:
+
+	# 校验备注格式
+	@classmethod
+	def ensureNoteFormat(cls, val: str):
+		if len(val) != QuestionRecord.MAX_NOTE_LEN:
+			raise GameException(ErrorType.InvalidNote)
 
 
 # =======================
@@ -58,12 +122,27 @@ class Common:
 
 	# 获取题目记录
 	@classmethod
-	def getQuestionRecord(cls, return_type='object', error: ErrorType = ErrorType.QuestionNotExist, **kwargs) -> BaseItem:
+	def getQuestionRecord(cls, error: ErrorType = ErrorType.QuestionNotExist,
+						  **kwargs) -> QuestionRecord:
 
-		return ViewUtils.getObject(QuestionRecord, error, return_type=return_type, **kwargs)
+		return ViewUtils.getObject(QuestionRecord, error, **kwargs)
 
 	# 获取刷题记录
 	@classmethod
-	def getExerciseRecord(cls, return_type='object', error: ErrorType = ErrorType.QuesSugarNotExist, **kwargs) -> BaseItem:
+	def getExerciseRecord(cls, error: ErrorType = ErrorType.ExerciseRecordNotExist,
+						  **kwargs) -> ExerciseRecord:
 
-		return ViewUtils.getObject(ExerciseRecord, error, return_type=return_type, **kwargs)
+		return ViewUtils.getObject(ExerciseRecord, error, **kwargs)
+
+	# 获取刷题题目
+	@classmethod
+	def getExerciseQuestion(cls, error: ErrorType = ErrorType.ExerciseQuestionNotExist,
+							**kwargs) -> ExerciseQuestion:
+
+		return ViewUtils.getObject(ExerciseQuestion, error, **kwargs)
+
+	# 确保题目集记录所属玩家
+	@classmethod
+	def ensureQuestionSetPlayer(cls, ques_set_rec: QuestionSetRecord, player):
+		if ques_set_rec.player != player:
+			raise GameException(ErrorType.ExerciseRecordNotExist)

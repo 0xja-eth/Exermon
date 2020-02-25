@@ -13,7 +13,7 @@ using UnityEditor;
 /// 基本物品数据
 /// </summary>
 public class BaseItem : BaseData {
-    /*
+    
     /// <summary>
     /// 物品类型
     /// </summary>
@@ -38,7 +38,7 @@ public class BaseItem : BaseData {
         ExerGift = 203,  // 艾瑟萌天赋
         ExerFrag = 204,  // 艾瑟萌碎片
     }
-    */
+    
     /// <summary>
     /// 属性
     /// </summary>
@@ -317,10 +317,10 @@ public class EquipableItem : LimitedItem {
 /// <summary>
 /// 基本容器项
 /// </summary>
-public class BaseContItem : BaseData {
+public abstract class BaseContItem : BaseData {
 
     /// <summary>
-    /// 物品类型
+    /// 容器项类型
     /// </summary>
     public enum Type {
         Unset = 0,  // 未设置
@@ -350,22 +350,22 @@ public class BaseContItem : BaseData {
         PlayerExerGift = 201,  // 玩家艾瑟萌天赋关系
         PlayerExermon = 202,  // 玩家艾瑟萌关系
     }
-
+    
     /// <summary>
     /// 属性
     /// </summary>
     public int type { get; private set; }
 
     /// <summary>
-    /// 构造函数
+    /// 默认类型
     /// </summary>
-    public BaseContItem() { }
+    /// <returns></returns>
+    public abstract Type defaultType();
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    /// <param name="type">类型</param>
-    public BaseContItem(Type type) { this.type = (int)type; }
+    public BaseContItem() { type = (int)defaultType(); }
 
     /// <summary>
     /// 数据加载
@@ -393,7 +393,7 @@ public class BaseContItem : BaseData {
 /// <summary>
 /// 背包类容器项
 /// </summary>
-public class PackContItem : BaseContItem {
+public abstract class PackContItem : BaseContItem {
 
     /// <summary>
     /// 属性
@@ -401,6 +401,7 @@ public class PackContItem : BaseContItem {
     public int itemId { get; private set; }
     public int count { get; private set; }
 
+    /**
     /// <summary>
     /// 查找物品函数类型
     /// </summary>
@@ -410,7 +411,7 @@ public class PackContItem : BaseContItem {
     /// 获取物品类型
     /// </summary>
     /// <returns></returns>
-    protected virtual System.Type getItemType() {
+    protected abstract virtual System.Type getItemType() {
         var type = (Type)this.type;
         var data = DataService.get();
 
@@ -436,19 +437,16 @@ public class PackContItem : BaseContItem {
         if (type == null) return null;
         return (BaseItem)DataService.get().get(type, itemId);
     }
+    */
 
     /// <summary>
     /// 构造函数
     /// </summary>
     public PackContItem() { }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
     /// <param name="type">类型</param>
     /// <param name="itemId">物品ID</param>
     /// <param name="count">数量</param>
-    public PackContItem(Type type, int itemId=0, int count=1) : base(type) {
+    public PackContItem(int itemId, int count=1) {
         this.itemId = itemId;
         this.count = count;
     }
@@ -481,7 +479,7 @@ public class PackContItem : BaseContItem {
 /// <summary>
 /// 槽类容器项
 /// </summary>
-public class SlotContItem : BaseContItem {
+public abstract class SlotContItem : BaseContItem {
 
     /// <summary>
     /// 属性
@@ -514,7 +512,7 @@ public class SlotContItem : BaseContItem {
 /// <summary>
 /// 基本容器数据
 /// </summary>
-public class BaseContainer : BaseData {
+public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
 
     /// <summary>
     /// 属性
@@ -522,10 +520,30 @@ public class BaseContainer : BaseData {
     public int type { get; private set; }
     public int capacity { get; private set; }
 
+    public List<T> items { get; private set; }
+
     /// <summary>
     /// 数据是否需要实时同步（在背包界面时需要实时同步）
     /// </summary>
     public bool realTime = false;
+
+    /// <summary>
+    /// 获得一个物品
+    /// </summary>
+    /// <param name="p">条件</param>
+    /// <returns>物品</returns>
+    public T getItem(Predicate<T> p) {
+        return items.Find(p);
+    }
+
+    /// <summary>
+    /// 获得多个物品
+    /// </summary>
+    /// <param name="p">条件</param>
+    /// <returns>物品列表</returns>
+    public List<T> getItems(Predicate<T> p) {
+        return items.FindAll(p);
+    }
 
     /// <summary>
     /// 数据加载
@@ -536,6 +554,8 @@ public class BaseContainer : BaseData {
 
         type = DataLoader.loadInt(json, "type");
         capacity = DataLoader.loadInt(json, "capacity");
+
+        items = DataLoader.loadDataList<T>(json, "items");
     }
 
     /// <summary>
@@ -546,39 +566,8 @@ public class BaseContainer : BaseData {
         var json = base.toJson();
 
         json["type"] = type;
-
-        return json;
-    }
-}
-
-/// <summary>
-/// 背包类容器数据
-/// </summary>
-public class PackContainer<T> : BaseContainer where T : PackContItem, new() {
-
-    /// <summary>
-    /// 属性
-    /// </summary>
-    public List<T> items { get; private set; }
-    
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        items = DataLoader.loadDataList<T>(json, "items");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
         json["capacity"] = capacity;
+
         json["items"] = DataLoader.convertDataArray(items);
 
         return json;
@@ -588,32 +577,13 @@ public class PackContainer<T> : BaseContainer where T : PackContItem, new() {
 /// <summary>
 /// 背包类容器数据
 /// </summary>
-public class SlotContainer<T> : BaseContainer where T : SlotContItem, new() {
+public class PackContainer<T> : BaseContainer<T> where T : PackContItem, new() {
+    
+}
 
-    /// <summary>
-    /// 属性
-    /// </summary>
-    public List<T> items { get; private set; }
-
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        
-        items = DataLoader.loadDataList<T>(json, "items");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        
-        json["items"] = DataLoader.convertDataArray(items);
-
-        return json;
-    }
+/// <summary>
+/// 背包类容器数据
+/// </summary>
+public class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new() {
+    
 }

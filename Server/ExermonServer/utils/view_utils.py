@@ -1,5 +1,5 @@
 from django.conf import settings
-from .exception import ErrorType, ErrorException
+from .exception import ErrorType, GameException
 from .model_utils import Common as ModelUtils
 
 from enum import Enum
@@ -14,45 +14,45 @@ class Common:
 	@classmethod
 	def ensureAuth(cls, auth):
 		if auth != settings.AUTH_KEY:
-			raise ErrorException(ErrorType.PermissionDenied)
+			raise GameException(ErrorType.PermissionDenied)
 
 	# 确保字符串格式按照指定正则表达式
 	@classmethod
 	def ensureRegexp(cls, val: str, reg, error: ErrorType, empty=False):
 		# 空校验
-		if not val and not empty: raise ErrorException(error)
+		if not val and not empty: raise GameException(error)
 
-		if not re.compile(reg).search(val): raise ErrorException(error)
+		if not re.compile(reg).search(val): raise GameException(error)
 
 	# 确保某ID存在于枚举数据中
 	@classmethod
 	def ensureEnumData(cls, id: int, enum_type, error: ErrorType, empty=False):
 		# 空校验
-		if id is None and not empty: raise ErrorException(error)
+		if id is None and not empty: raise GameException(error)
 
 		if id is not None:
 			try: enum_type(id)
-			except: raise ErrorException(error)
+			except: raise GameException(error)
 
 	# 确保类型正确
 	@classmethod
 	def ensureObjectType(cls, obj, type, error):
 		if not isinstance(obj, type):
-			raise ErrorException(error)
+			raise GameException(error)
 
 	# 确保某模型数据对象存在
 	@classmethod
 	def ensureObjectExist(cls, obj_type, error, objects=None,
 						  include_deleted=False, **kwargs):
 		if not cls.hasObjects(obj_type, objects, include_deleted, **kwargs):
-			raise ErrorException(error)
+			raise GameException(error)
 
 	# 确保某模型数据对象不存在
 	@classmethod
 	def ensureObjectNotExist(cls, obj_type, error, objects=None,
 							 include_deleted=False, **kwargs):
 		if cls.hasObjects(obj_type, objects, include_deleted, **kwargs):
-			raise ErrorException(error)
+			raise GameException(error)
 
 	# 是否存在某模型数据对象
 	@classmethod
@@ -69,12 +69,12 @@ class Common:
 				return objects.filter(**kwargs).exists()
 
 		except:
-			raise ErrorException(ErrorType.ParameterError)
+			raise GameException(ErrorType.ParameterError)
 
 	# 获取模型数据对象
 	@classmethod
 	def getObject(cls, obj_type, error, objects=None,
-				  return_type='QuerySet', include_deleted=False, **kwargs):
+				  return_type='object', include_deleted=False, **kwargs):
 
 		if objects is None: objects = obj_type.objects.all()
 
@@ -88,7 +88,7 @@ class Common:
 				return query_set[0]
 
 			else:
-				raise ErrorException(error)
+				raise GameException(error)
 
 		# 如果是获取 字典 数据（通过 convertToDict）：
 		if return_type == 'dict':
@@ -105,7 +105,7 @@ class Common:
 				return objects.filter(**kwargs)
 
 		except:
-			raise ErrorException(ErrorType.ParameterError)
+			raise GameException(ErrorType.ParameterError)
 
 	# 获取模型数据对象集
 	@classmethod

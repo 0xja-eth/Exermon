@@ -36,6 +36,9 @@ class QuesSugarParamsInline(ParamsInline): model = QuesSugarParam
 class QuesSugarPackItemsInline(BaseContItemsInline): model = QuesSugarPackItem
 
 
+class QuesSugarPriceInline(CurrencyInline): model = QuesSugarPrice
+
+
 # @xadmin.sites.register(QuesSugarPrice)
 # class QuesSugarPriceAdmin(object):
 #
@@ -68,19 +71,19 @@ class QuesReportAdmin(object):
 class QuesSugarAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['question', 'buy_price', 'sell_price',
+				   ['question', 'sell_price',
 					'get_rate', 'get_count']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   ['question', 'buy_price', 'sell_price',
+				   ['question', 'sell_price',
 					'get_rate', 'get_count']
 
-	field_set = [Fieldset('题目糖属性', 'question', 'buy_price',
+	field_set = [Fieldset('题目糖属性', 'question',
 						  'sell_price', 'get_rate', 'get_count')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = [QuesSugarParamsInline]
+	inlines = [QuesSugarPriceInline, QuesSugarParamsInline]
 
 
 @xadmin.sites.register(QuesSugarPack)
@@ -99,3 +102,6 @@ class QuesSugarPackAdmin(PackContainerAdmin):
 @xadmin.sites.register(QuesSugarPackItem)
 class QuesSugarPackItemAdmin(PackContItemAdmin):
 	pass
+
+
+xadmin.site.register(QuesSugarPrice, CurrencyAdmin)

@@ -79,7 +79,7 @@ public class CalcService : BaseService<CalcService> {
         double value;
 
         PlayerExermon playerExer;
-        PackContItem playerGift;
+        PlayerExerGift playerGift;
         ExerEquipSlot exerEquipSlot;
         Exermon exermon;
 

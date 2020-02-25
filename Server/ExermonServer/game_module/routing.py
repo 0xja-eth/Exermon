@@ -137,11 +137,19 @@ WEBSOCKET_METHOD_ROUTER = {
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 玩家修改昵称
-	'player/edit/nickname': [[
+	'player/edit/name': [[
 		['uid', 'int'],
 		['name', 'str'],
 	],
-		Player.editNickname,  # 处理函数
+		Player.editName,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 人类装备槽装备
+	'player/equipslot/equip': [[
+		['uid', 'int'],
+		['heid', 'int'],
+	],
+		Player.equipSlotEquip,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 玩家修改个人信息
@@ -161,7 +169,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/packcontainer/get': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
+		['cid', 'var'],
 	],
 		Item.packContainerGet,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
@@ -170,7 +178,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/slotcontainer/get': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
+		['cid', 'var'],
 	],
 		Item.slotContainerGet,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
@@ -179,7 +187,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/packcontainer/gain': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
 		['i_type', 'int'],
 		['item_id', 'int'],
 		['count', 'int'],
@@ -192,7 +199,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/packcontainer/transfer': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
 		['target_cid', 'int'],
 		['ci_types', 'int[]'],
 		['contitem_id', 'int[]'],
@@ -205,7 +211,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/packcontainer/split': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
 		['ci_type', 'int'],
 		['contitem_id', 'int'],
 		['count', 'int'],
@@ -217,7 +222,6 @@ WEBSOCKET_METHOD_ROUTER = {
 	'item/packcontainer/merge': [[
 		['uid', 'int'],
 		['type', 'int'],
-		['cid', 'int'],
 		['ci_type', 'int'],
 		['contitem_ids', 'int[]'],
 	],
@@ -234,20 +238,10 @@ WEBSOCKET_METHOD_ROUTER = {
 		Exermon.exerSlotEquip,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
-	# 人类装备槽装备
-	'player/equipslot/equip': [[
-		['uid', 'int'],
-		['eid', 'int'],
-		['heid', 'int'],
-	],
-		Player.equipSlotEquip,  # 处理函数
-		ChannelLayerTag.Self  # 是否需要响应
-	],
 	# 艾瑟萌装备槽装备
 	'exermon/equipslot/equip': [[
 		['uid', 'int'],
-		['cid', 'int'],
-		['eid', 'int'],
+		['sid', 'int'],
 		['eeid', 'int'],
 	],
 		Exermon.equipSlotEquip,  # 处理函数
@@ -294,12 +288,20 @@ WEBSOCKET_METHOD_ROUTER = {
 		Record.note,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
-	# 开始刷题
-	'record/exercise/start': [[
+	# 生成刷题
+	'record/exercise/generate': [[
 		['uid', 'int'],
 		['sid', 'int'],
-		['dtb_type', 'int'],
-		['count', 'int']
+		['gen_type', 'int'],
+		['count', 'int'],
+	],
+		Record.exerciseGenerate,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 开始答题
+	'record/exercise/start': [[
+		['uid', 'int'],
+		['qid', 'int'],
 	],
 		Record.exerciseStart,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
@@ -307,8 +309,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	# 作答刷题题目
 	'record/exercise/answer': [[
 		['uid', 'int'],
-		['eid', 'int'],
-		['eqid', 'int'],
+		['qid', 'int'],
 		['selection', 'int[]'],
 		['timespan', 'int'],
 		['terminate', 'bool']
@@ -318,6 +319,7 @@ WEBSOCKET_METHOD_ROUTER = {
 	],
 	# 查询题目
 	'question/question/get': [[
+		['uid', 'int'],
 		['qids', 'int[]']
 	],
 		Question.get,  # 处理函数
