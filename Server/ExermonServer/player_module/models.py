@@ -483,7 +483,7 @@ class Player(CacheableModel):
 
 		question_records = self.questionRecords()
 
-		cnt = count = corr_cnt = 0
+		cnt = count = corr_cnt = corr_rate = 0
 		sum_timespan = avg_timespan = corr_timespan = 0
 		sum_exp = sum_gold = 0
 
@@ -497,10 +497,12 @@ class Player(CacheableModel):
 			sum_exp += rec.sum_exp
 			sum_gold += rec.sum_gold
 
-		corr_rate = corr_cnt / count
+		if count > 0:
+			corr_rate = corr_cnt / count
 
-		avg_timespan /= cnt
-		corr_timespan /= cnt
+		if cnt > 0:
+			avg_timespan /= cnt
+			corr_timespan /= cnt
 
 		return {
 			'count': count,

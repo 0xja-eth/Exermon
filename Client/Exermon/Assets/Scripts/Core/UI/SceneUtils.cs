@@ -23,6 +23,7 @@ public static class SceneUtils {
         public const string TitleScene = "TitleScene";
         public const string StartScene = "StartScene";
         public const string MainScene = "MainScene";
+        public const string StatusScene = "StatusScene";
         public const string HelpScene = "HelpScene";
     }
 
