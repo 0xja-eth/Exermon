@@ -211,4 +211,38 @@ public class CalcService : BaseService<CalcService> {
             return DataService.get().baseParam(paramId);
         }
     }
+
+    /// <summary>
+    /// 战斗力计算类
+    /// </summary>
+    public class BattlePointCalc {
+
+        /// <summary>
+        /// 参数定义
+        /// </summary>
+        const double C = 2;
+
+        public delegate ParamData paramFunc(int index);
+
+        /// <summary>
+        /// 执行计算
+        /// </summary>
+        /// <returns>战斗力</returns>
+        public static int calc(paramFunc func) {
+            var params_ = DataService.get().staticData.configure.baseParams;
+            return calc(func(1).value, func(2).value, func(3).value,
+                func(4).value, func(5).value, func(6).value);
+        }
+
+        /// <summary>
+        /// 执行计算
+        /// </summary>
+        /// <returns>战斗力</returns>
+        public static int calc(double mhp, double mmp, double atk,
+            double def, double eva, double cri) {
+            return (int)Math.Round((mhp + mmp * 2 + atk * 6 * C *
+                (1 + cri / 100) + def * 4) * (1 + eva / 50));
+        }
+    }
+
 }

@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
-from game_module.models import BaseParam, ParamValue, ParamRate, \
-	ParamValueRange, ParamRateRange, Subject
+from game_module.models import BaseParam, ParamRate, Subject
 from item_module.models import *
 from utils.model_utils import SkillImageUpload, ExermonImageUpload, \
 	Common as ModelUtils
@@ -189,6 +188,11 @@ class Exermon(BaseItem):
 
 		return param.first().getValue()
 
+	# 战斗力
+	def battlePoint(self):
+		from utils.calc_utils import BattlePointCalc
+		return BattlePointCalc.calc(self.paramBase)
+
 
 # ===================================================
 #  艾瑟萌仓库
@@ -314,6 +318,9 @@ class PlayerExermon(PackContItem):
 	def __getattr__(self, item):
 		type = item[4:]
 
+		if type == 'value':
+			return self.paramValue(attr=item[:3])
+
 		if type == 'base':
 			return self.paramBase(attr=item[:3])
 
@@ -321,6 +328,11 @@ class PlayerExermon(PackContItem):
 			return self.paramRate(attr=item[:3])
 
 		return super().__getattr__(item)
+
+	# 战斗力
+	def battlePoint(self):
+		from utils.calc_utils import BattlePointCalc
+		return BattlePointCalc.calc(self.paramValue)
 
 	# 获取所有属性
 	def paramVals(self):
@@ -1001,42 +1013,10 @@ class ExerSlotItem(SlotContItem):
 
 		return vals
 
-	# # 艾瑟萌基本属性值（BPV）
-	# def baseParamVal(self, param_id=None, attr=None):
-	# 	from utils.calc_utils import ExermonParamCalc
-	#
-	# 	base = self.paramBase(param_id, attr)
-	# 	rate = self.paramRate(param_id, attr)
-	# 	return ExermonParamCalc.calc(base, rate, self.exermonLevel())
-	#
-	# # 艾瑟萌附加属性值（PPV）
-	# def plusParamVal(self, param_id=None, attr=None):
-	# 	return self.exerEquipSlot().param(param_id, attr)
-	#
-	# # 实际加成率（RR）
-	# def realRate(self, param_id=None, attr=None):
-	# 	return self.baseRate(param_id, attr)*self.plusRate(param_id, attr)
-	#
-	# # 基础加成率（BR）
-	# def baseRate(self, param_id=None, attr=None): return 1
-	#
-	# # 附加加成率（PR）
-	# def plusRate(self, param_id=None, attr=None): return 1
-	#
-	# # 追加属性值（APV）
-	# def appendParamVal(self, param_id=None, attr=None): return 0
-	#
-	# # 调整属性值
-	# def adjustParamVal(self, val, param_id=None, attr=None):
-	# 	param = None
-	# 	if param_id is not None:
-	# 		param: BaseParam = BaseParam.get(id=param_id)
-	# 	if attr is not None:
-	# 		param: BaseParam = BaseParam.get(attr=attr)
-	#
-	# 	if param is None: return val
-	#
-	# 	return param.clamp(val)
+	# 战斗力
+	def battlePoint(self):
+		from utils.calc_utils import BattlePointCalc
+		return BattlePointCalc.calc(self.paramValue)
 
 	# endregion
 

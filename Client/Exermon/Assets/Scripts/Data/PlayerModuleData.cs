@@ -37,34 +37,15 @@ public class Character : BaseData {
     }
 
     /// <summary>
-    /// 数据加载
+    /// 加载自定义数据
     /// </summary>
     /// <param name="json">数据</param>
     protected override void loadCustomAttributes(JsonData json) {
         base.loadCustomAttributes(json);
-        /*
-        name = DataLoader.loadString(json, "name");
-        gender = DataLoader.loadInt(json, "gender");
-        description = DataLoader.loadString(json, "description");
-        */
         bust = AssetLoader.loadCharacterBust(getID());
         face = AssetLoader.loadCharacterFace(getID());
         battle = AssetLoader.loadCharacterBattle(getID());
     }
-    /*
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["name"] = name;
-        json["gender"] = gender;
-        json["description"] = description;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -98,38 +79,6 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         [AutoConvert]
         public PackContainer<QuesSugarPackItem> quesSugarPack { get; protected set; }
             = new PackContainer<QuesSugarPackItem>();
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            humanPack = DataLoader.loadData<PackContainer<HumanPackContItem>>(json, "humanpack");
-            exerPack = DataLoader.loadData<PackContainer<ExerPackContItem>>(json, "exerpack");
-            exerFragPack = DataLoader.loadData<PackContainer<ExerFragPackItem>>(json, "exerfragpack");
-            exerGiftPool = DataLoader.loadData<PackContainer<PlayerExerGift>>(json, "exergiftpool");
-            exerHub = DataLoader.loadData<PackContainer<PlayerExermon>>(json, "exerhub");
-            quesSugarPack = DataLoader.loadData<PackContainer<QuesSugarPackItem>>(json, "quessugarpack");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["humanpack"] = DataLoader.convertData(humanPack);
-            json["exerpack"] = DataLoader.convertData(exerPack);
-            json["exerfragpack"] = DataLoader.convertData(exerFragPack);
-            json["exergiftpool"] = DataLoader.convertData(exerGiftPool);
-            json["exerhub"] = DataLoader.convertData(exerHub);
-            json["quessugarpack"] = DataLoader.convertData(quesSugarPack);
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -144,31 +93,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public ExerSlot exerSlot { get; protected set; } = new ExerSlot();
         [AutoConvert]
         public HumanEquipSlot humanEquipSlot { get; protected set; } = new HumanEquipSlot();
-
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-            
-            exerSlot = DataLoader.loadData<ExerSlot>(json, "exerslot");
-            humanEquipSlot = DataLoader.loadData<HumanEquipSlot>(json, "humanequipslot");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["exerslot"] = DataLoader.convertData(exerSlot);
-            json["humanequipslot"] = DataLoader.convertData(humanEquipSlot);
-
-            return json;
-        }*/
+        
     }
 
     /// <summary>
@@ -224,54 +149,6 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public CompRank rank() {
             return DataService.get().compRank(rankId);
         }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            rankId = DataLoader.loadInt(json, "rank_id");
-            subRank = DataLoader.loadInt(json, "sub_rank");
-            starNum = DataLoader.loadInt(json, "star_num");
-            score = DataLoader.loadInt(json, "score");
-            credit = DataLoader.loadInt(json, "credit");
-            count = DataLoader.loadInt(json, "count");
-            winRate = DataLoader.loadDouble(json, "win_rate");
-            corrRate = DataLoader.loadDouble(json, "corr_rate");
-            avgHurt = DataLoader.loadDouble(json, "avg_hurt");
-            avgDamage = DataLoader.loadDouble(json, "avg_damage");
-            avgScore = DataLoader.loadDouble(json, "avg_score");
-            maxHurt = DataLoader.loadInt(json, "max_hurt");
-            maxDamage = DataLoader.loadInt(json, "max_damage");
-            maxScore = DataLoader.loadInt(json, "max_score");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["rank_id"] = rankId;
-            json["sub_rank"] = subRank;
-            json["star_num"] = starNum;
-            json["score"] = score;
-            json["credit"] = credit;
-            json["count"] = count;
-            json["win_rate"] = winRate;
-            json["corr_rate"] = corrRate;
-            json["avg_hurt"] = avgHurt;
-            json["avg_damage"] = avgDamage;
-            json["avg_score"] = avgScore;
-            json["max_hurt"] = maxHurt;
-            json["max_damage"] = maxDamage;
-            json["max_score"] = maxScore;
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -307,42 +184,6 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public JsonData convertToDisplayData(string type = "") {
             return toJson();
         }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            count = DataLoader.loadInt(json, "count");
-            corrCnt = DataLoader.loadInt(json, "corr_cnt");
-            corrRate = DataLoader.loadDouble(json, "corr_rate");
-            sumTimespan = DataLoader.loadInt(json, "sum_timespan");
-            avgTimespan = DataLoader.loadDouble(json, "avg_timespan");
-            corrTimespan = DataLoader.loadDouble(json, "corr_timespan");
-            sumExp = DataLoader.loadInt(json, "sum_exp");
-            sumGold = DataLoader.loadInt(json, "sum_gold");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["count"] = count;
-            json["corr_cnt"] = corrCnt;
-            json["corr_rate"] = corrRate;
-            json["sum_timespan"] = sumTimespan;
-            json["avg_timespan"] = avgTimespan;
-            json["corr_timespan"] = corrTimespan;
-            json["sum_exp"] = sumExp;
-            json["sum_gold"] = sumGold;
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -426,7 +267,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     public JsonData convertToDisplayData(string type = "") {
         switch (type.ToLower()) {
             case "exp": return convertExp();
-            //case "params_info": return covnertParamsInfo();
+            case "params_info": return covnertParamsInfo();
             case "battle_info": return battleInfo.toJson();
             case "question_info": return questionInfo.toJson();
             case "personal_info": return covnertPersonalInfo();
@@ -451,9 +292,21 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     /// 转化为属性信息
     /// </summary>
     /// <returns></returns>
-    //JsonData covnertParamsInfo() {
+    JsonData covnertParamsInfo() {
+        var exerSlot = slotContainers.exerSlot;
+        var json = new JsonData();
+        var params_ = DataService.get().staticData.configure.baseParams;
 
-    //}
+        json["sum_mhp"] = exerSlot.sumParam(params_[0].getID()).value;
+        json["sum_mmp"] = exerSlot.sumParam(params_[1].getID()).value;
+        json["avg_atk"] = exerSlot.avgParam(params_[2].getID()).value;
+        json["avg_def"] = exerSlot.avgParam(params_[3].getID()).value;
+        json["avg_eva"] = exerSlot.avgParam(params_[4].getID()).value;
+        json["avg_cri"] = exerSlot.avgParam(params_[5].getID()).value;
+        json["sum_bp"] = exerSlot.sumBattlePoint();
+
+        return json;
+    }
 
     /// <summary>
     /// 转化为属性信息
@@ -645,87 +498,6 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     #endregion
 
     #endregion
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        
-        username = DataLoader.loadString(json, "username");
-        phone = DataLoader.loadString(json, "phone");
-        email = DataLoader.loadString(json, "email");
-        name = DataLoader.loadString(json, "name");
-        characterId = DataLoader.loadInt(json, "character_id");
-        grade = DataLoader.loadInt(json, "grade");
-        status = DataLoader.loadInt(json, "status");
-        type = DataLoader.loadInt(json, "type");
-        online = DataLoader.loadBool(json, "online");
-
-        exp = DataLoader.loadInt(json, "exp");
-        level = DataLoader.loadInt(json, "level");
-        next = DataLoader.loadInt(json, "next");
-
-        createTime = DataLoader.loadDateTime(json, "create_time");
-        birth = DataLoader.loadDateTime(json, "birth");
-
-        school = DataLoader.loadString(json, "school");
-        city = DataLoader.loadString(json, "city");
-        contact = DataLoader.loadString(json, "contact");
-        description = DataLoader.loadString(json, "description");
-
-        money = DataLoader.loadData<ItemPrice>(json, "money");
-
-        packContainers = DataLoader.loadData
-            <PackContainerInfo>(json, "pack_containers");
-        slotContainers = DataLoader.loadData
-            <SlotContainerInfo>(json, "slot_containers");
-
-        battleInfo = DataLoader.loadData<BattleInfo>(json, "battle_info");
-        questionInfo = DataLoader.loadData<QuestionInfo>(json, "question_info");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["username"] = username;
-        json["password"] = password;
-        json["phone"] = phone;
-        json["email"] = email;
-        json["name"] = name;
-        json["character_id"] = characterId;
-        json["grade"] = grade;
-        json["status"] = status;
-        json["type"] = type;
-        json["online"] = online;
-
-        json["exp"] = exp;
-        json["level"] = level;
-        json["next"] = next;
-
-        json["create_time"] = DataLoader.convertDateTime(createTime);
-        json["birth"] = DataLoader.convertDate(birth);
-
-        json["school"] = school;
-        json["city"] = city;
-        json["contact"] = contact;
-        json["description"] = description;
-
-        json["money"] = DataLoader.convertData(money);
-
-        json["pack_containers"] = DataLoader.convertData(packContainers);
-        json["slot_containers"] = DataLoader.convertData(slotContainers);
-
-        json["battle_info"] = DataLoader.convertData(battleInfo);
-        json["question_info"] = DataLoader.convertData(questionInfo);
-
-        return json;
-    }*/
 }
 
 #region 物品

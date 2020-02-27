@@ -142,36 +142,6 @@ public class LimitedItem : BaseItem {
     public bool tradable { get; protected set; }
 
     public Texture2D icon { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        buyPrice = DataLoader.loadData<ItemPrice>(json, "buy_price");
-        sellPrice = DataLoader.loadInt(json, "sell_price");
-        discardable = DataLoader.loadBool(json, "discardable");
-        tradable = DataLoader.loadBool(json, "tradable");
-
-        icon = AssetLoader.loadItemIcon(getID());
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["buy_price"] = DataLoader.convertData(buyPrice);
-        json["sell_price"] = sellPrice;
-        json["discardable"] = discardable;
-        json["tradable"] = tradable;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -188,32 +158,6 @@ public class EffectData : BaseData {
     public JsonData params_ { get; protected set; } // 参数（数组）
     [AutoConvert]
     public string description { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        code = DataLoader.loadInt(json, "code");
-        params_ = DataLoader.loadJsonData(json, "params");
-        description = DataLoader.loadString(json, "description");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["code"] = code;
-        json["params"] = params_;
-        json["description"] = description;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -252,44 +196,6 @@ public class UsableItem : LimitedItem {
     public UsableItemType itemType() {
         return DataService.get().usableItemType(iType);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        maxCount = DataLoader.loadInt(json, "max_count");
-        consumable = DataLoader.loadBool(json, "consumable");
-        battleUse = DataLoader.loadBool(json, "battle_use");
-        menuUse = DataLoader.loadBool(json, "menu_use");
-        adventureUse = DataLoader.loadBool(json, "adventure_use");
-        freeze = DataLoader.loadInt(json, "freeze");
-        iType = DataLoader.loadInt(json, "i_type");
-
-        effects = DataLoader.loadDataList<EffectData>(json, "effects");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["max_count"] = maxCount;
-        json["consumable"] = consumable;
-        json["battle_use"] = battleUse;
-        json["menu_use"] = menuUse;
-        json["adventure_use"] = adventureUse;
-        json["freeze"] = freeze;
-        json["i_type"] = iType;
-
-        json["effects"] = DataLoader.convertDataArray(effects);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -313,28 +219,6 @@ public class EquipableItem : LimitedItem {
             if (param.paramId == paramId) return param;
         return new ParamData(paramId);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        params_ = DataLoader.loadDataArray<ParamData>(json, "params");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["params"] = DataLoader.convertDataArray(params_);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -390,28 +274,6 @@ public abstract class BaseContItem : BaseData {
     /// 构造函数
     /// </summary>
     public BaseContItem() { type = (int)defaultType(); }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        type = DataLoader.loadInt(json, "type");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["type"] = type;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -476,30 +338,6 @@ public abstract class PackContItem : BaseContItem {
         this.itemId = itemId;
         this.count = count;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        itemId = DataLoader.loadInt(json, "item_id");
-        count = DataLoader.loadInt(json, "count");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["item_id"] = itemId;
-        json["count"] = count;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -512,28 +350,6 @@ public abstract class SlotContItem : BaseContItem {
     /// </summary>
     [AutoConvert]
     public int index { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        index = DataLoader.loadInt(json, "index");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["index"] = index;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -574,34 +390,6 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     public List<T> getItems(Predicate<T> p) {
         return items.FindAll(p);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        type = DataLoader.loadInt(json, "type");
-        capacity = DataLoader.loadInt(json, "capacity");
-
-        items = DataLoader.loadDataList<T>(json, "items");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["type"] = type;
-        json["capacity"] = capacity;
-
-        json["items"] = DataLoader.convertDataArray(items);
-
-        return json;
-    }*/
 }
 
 /// <summary>

@@ -900,6 +900,14 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
             param.setValue(paramBase(param.paramId).value);
     }
 
+    /// <summary>
+    /// 战斗力
+    /// </summary>
+    /// <returns></returns>
+    public int battlePoint() {
+        return CalcService.BattlePointCalc.calc(paramValue);
+    }
+
     #endregion
 
     #endregion
@@ -910,45 +918,7 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     public PlayerExermon() { }
     /// <param name="itemId">物品ID</param>
     public PlayerExermon(int itemId) : base(itemId) { }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
 
-        nickname = DataLoader.loadString(json, "nickname");
-        exp = DataLoader.loadInt(json, "exp");
-        level = DataLoader.loadInt(json, "level");
-
-        exerSkillSlot = DataLoader.loadData<SlotContainer
-            <ExerSkillSlotItem>>(json, "exerskillslot");
-
-        var paramRanges = DataLoader.loadJsonData(json, "params");
-
-        paramValues = DataLoader.loadDataArray<ParamData>(paramRanges, "values");
-        rateParams = DataLoader.loadDataArray<ParamData>(paramRanges, "rates");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["nickname"] = nickname;
-        json["exp"] = exp;
-        json["level"] = level;
-        json["exerskillslot"] = DataLoader.convertData(exerSkillSlot);
-
-        json["params"] = new JsonData();
-        json["params"]["values"] = DataLoader.convertDataArray(paramValues);
-        json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -1203,107 +1173,24 @@ public class ExerSlotItem : SlotContItem,
             param.setValue(paramRate(param.paramId).value);
     }
 
-    #endregion
-
-    #endregion
-    /*
     /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        playerExer = DataLoader.loadData<PlayerExermon>(json, "player_exer");
-        playerGift = DataLoader.loadData<PlayerExerGift>(json, "player_gift");
-
-        subjectId = DataLoader.loadInt(json, "subject_id");
-        exp = DataLoader.loadInt(json, "exp");
-        level = DataLoader.loadInt(json, "level");
-
-        exerEquipSlot = DataLoader.loadData<ExerEquipSlot>(json, "exerequipslot");
-        if (exerEquipSlot != default)
-            exerEquipSlot.exerSlotItem = this;
-
-        var paramRanges = DataLoader.loadJsonData(json, "params");
-
-        paramValues = DataLoader.loadDataArray<ParamData>(paramRanges, "values");
-        rateParams = DataLoader.loadDataArray<ParamData>(paramRanges, "rates");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["player_exer"] = DataLoader.convertData(playerExer);
-        json["player_gift"] = DataLoader.convertData(playerGift);
-
-        json["subject_id"] = subjectId;
-        json["exp"] = exp;
-        json["level"] = level;
-        json["exerequipslot"] = DataLoader.convertData(exerEquipSlot);
-
-        json["params"] = new JsonData();
-        json["params"]["values"] = DataLoader.convertDataArray(paramValues);
-        json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
-
-        return json;
-    }*/
-}
-
-/// <summary>
-/// 艾瑟萌技能槽项
-/// </summary>
-public class ExerSkillSlotItem : SlotContItem {
-
-    /// <summary>
-    /// 默认类型
+    /// 战斗力
     /// </summary>
     /// <returns></returns>
-    public override Type defaultType() { return Type.ExerSkillSlotItem; }
-
-    /// <summary>
-    /// 属性
-    /// </summary>
-    [AutoConvert]
-    public int skillId { get; protected set; }
-    [AutoConvert]
-    public int useCount { get; protected set; }
-
-    /// <summary>
-    /// 获取科目
-    /// </summary>
-    /// <returns>科目</returns>
-    public ExerSkill skill() {
-        return DataService.get().exerSkill(skillId);
-    }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        skillId = DataLoader.loadInt(json, "skill_id");
-        useCount = DataLoader.loadInt(json, "use_count");
+    public int battlePoint() {
+        return CalcService.BattlePointCalc.calc(paramValue);
     }
 
+    #endregion
+
+    #endregion
+
     /// <summary>
-    /// 获取JSON数据
+    /// 构造函数
     /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["skill_id"] = skillId;
-        json["use_count"] = useCount;
-
-        return json;
-    }*/
+    public ExerSlotItem() {
+        exerEquipSlot = new ExerEquipSlot(this);
+    }
 }
 
 /// <summary>
@@ -1367,30 +1254,34 @@ public class ExerEquipSlotItem : SlotContItem {
         if (packEquip == null) return new ParamData(paramId);
         return packEquip.getParam(paramId);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
+}
 
-        packEquip = DataLoader.loadData<ExerPackEquip>(json, "pack_equip");
-        eType = DataLoader.loadInt(json, "e_type");
+/// <summary>
+/// 艾瑟萌技能槽项
+/// </summary>
+public class ExerSkillSlotItem : SlotContItem {
+
+    /// <summary>
+    /// 默认类型
+    /// </summary>
+    /// <returns></returns>
+    public override Type defaultType() { return Type.ExerSkillSlotItem; }
+
+    /// <summary>
+    /// 属性
+    /// </summary>
+    [AutoConvert]
+    public int skillId { get; protected set; }
+    [AutoConvert]
+    public int useCount { get; protected set; }
+
+    /// <summary>
+    /// 获取科目
+    /// </summary>
+    /// <returns>科目</returns>
+    public ExerSkill skill() {
+        return DataService.get().exerSkill(skillId);
     }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["pack_equip"] = DataLoader.convertData(packEquip);
-        json["e_type"] = eType;
-
-        return json;
-    }*/
 }
 
 #endregion
@@ -1401,6 +1292,40 @@ public class ExerEquipSlotItem : SlotContItem {
 /// 人类装备槽
 /// </summary>
 public class ExerSlot : SlotContainer<ExerSlotItem> {
+
+    #region 数据操作
+
+    /// <summary>
+    /// 获取属性总和
+    /// </summary>
+    /// <param name="index">属性索引</param>
+    /// <returns></returns>
+    public ParamData sumParam(int paramId) {
+        ParamData sum = new ParamData(paramId, 0);
+        foreach (var item in items)
+            sum += item.paramValue(paramId);
+        return sum;
+    }
+
+    /// <summary>
+    /// 获取属性平均值
+    /// </summary>
+    /// <param name="index">属性索引</param>
+    /// <returns></returns>
+    public ParamData avgParam(int paramId) {
+        return sumParam(paramId) / items.Count;
+    }
+
+    /// <summary>
+    /// 总战斗力
+    /// </summary>
+    /// <returns></returns>
+    public int sumBattlePoint() {
+        int sum = 0;
+        foreach (var item in items)
+            sum += item.battlePoint();
+        return sum;
+    }
 
     /// <summary>
     /// 获取艾瑟萌槽项
@@ -1430,6 +1355,8 @@ public class ExerSlot : SlotContainer<ExerSlotItem> {
         var slotItem = getExerSlotItem(sid);
         slotItem.setPlayerGift(playerGift);
     }
+
+    #endregion
 }
 
 /// <summary>
@@ -1440,7 +1367,17 @@ public class ExerEquipSlot : SlotContainer<ExerEquipSlotItem> {
     /// <summary>
     /// 对应的艾瑟萌槽项
     /// </summary>
-    public ExerSlotItem exerSlotItem;
+    public ExerSlotItem exerSlotItem { get; protected set; }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="exerSlotItem">所属的艾瑟萌槽项</param>
+    public ExerEquipSlot(ExerSlotItem exerSlotItem) {
+        this.exerSlotItem = exerSlotItem;
+    }
+
+    #region 数据操作
 
     /// <summary>
     /// 获取装备项
@@ -1496,6 +1433,7 @@ public class ExerEquipSlot : SlotContainer<ExerEquipSlotItem> {
         return param;
     }
 
+    #endregion
 }
 
 #endregion

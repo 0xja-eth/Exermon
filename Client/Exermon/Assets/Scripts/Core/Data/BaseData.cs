@@ -225,6 +225,8 @@ public class ParamData : BaseData {
     /// </summary>
     protected override bool idEnable() { return false; }
 
+    #region 数据操作
+
     /// <summary>
     /// 获取基本属性
     /// </summary>
@@ -248,6 +250,26 @@ public class ParamData : BaseData {
     public void addValue(double val) {
         value += val;
     }
+    public static ParamData operator +(ParamData a, ParamData b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.addValue(b.value);
+        return res;
+    }
+    public static ParamData operator +(ParamData a, double b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.addValue(b);
+        return res;
+    }
+    public static ParamData operator -(ParamData a, ParamData b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.addValue(-b.value);
+        return res;
+    }
+    public static ParamData operator -(ParamData a, double b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.addValue(-b);
+        return res;
+    }
 
     /// <summary>
     /// 乘值
@@ -256,6 +278,68 @@ public class ParamData : BaseData {
     public void timesValue(double val) {
         value *= val;
     }
+    public static ParamData operator *(ParamData a, ParamData b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.timesValue(b.value);
+        return res;
+    }
+    public static ParamData operator *(ParamData a, double b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.timesValue(b);
+        return res;
+    }
+    public static ParamData operator /(ParamData a, ParamData b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.timesValue(1/b.value);
+        return res;
+    }
+    public static ParamData operator /(ParamData a, double b) {
+        var res = new ParamData(a.paramId, a.value);
+        res.timesValue(1/b);
+        return res;
+    }
+
+    /// <summary>
+    /// 比较
+    /// </summary>
+    public static bool operator ==(ParamData a, ParamData b) {
+        return a.paramId == b.paramId && a.value == b.value;
+    }
+    public static bool operator ==(ParamData a, double b) {
+        return a.value == b;
+    }
+    public static bool operator !=(ParamData a, ParamData b) {
+        return a.paramId != b.paramId || a.value != b.value;
+    }
+    public static bool operator !=(ParamData a, double b) {
+        return a.value != b;
+    }
+    public static bool operator >(ParamData a, ParamData b) {
+        return a.paramId == b.paramId && a.value > b.value;
+    }
+    public static bool operator >(ParamData a, double b) {
+        return a.value > b;
+    }
+    public static bool operator >=(ParamData a, ParamData b) {
+        return a.paramId == b.paramId && a.value >= b.value;
+    }
+    public static bool operator >=(ParamData a, double b) {
+        return a.value >= b;
+    }
+    public static bool operator <(ParamData a, ParamData b) {
+        return a.paramId == b.paramId && a.value < b.value;
+    }
+    public static bool operator <(ParamData a, double b) {
+        return a.value < b;
+    }
+    public static bool operator <=(ParamData a, ParamData b) {
+        return a.paramId == b.paramId && a.value <= b.value;
+    }
+    public static bool operator <=(ParamData a, double b) {
+        return a.value <= b;
+    }
+
+    #endregion
 
     /// <summary>
     /// 构造函数
@@ -269,27 +353,6 @@ public class ParamData : BaseData {
         this.paramId = paramId;
         this.value = value;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        paramId = DataLoader.loadInt(json, "param_id");
-        value = DataLoader.loadDouble(json, "value");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["param_id"] = paramId;
-        json["value"] = value;
-        return json;
-    }*/
 }
 
 /// <summary>

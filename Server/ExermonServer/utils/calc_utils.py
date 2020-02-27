@@ -273,6 +273,32 @@ class ExerSlotItemParamCalc:
 # ================================
 # 刷题（单题）收益计算类
 # ================================
+class BattlePointCalc:
+	# 暴击加成
+	C = 2
+
+	# 计算（object 是实现了 BaseParam 中 attr 属性的对象）
+	@classmethod
+	def calc(cls, func):
+		from game_module.models import BaseParam
+
+		kwargs = {}
+		params = BaseParam.objs()
+		for param in params:
+			kwargs[param.attr] = func(param.id)
+
+		return cls.doCalc(**kwargs)
+
+	# 计算战斗力
+	@classmethod
+	def doCalc(cls, mhp, mmp, atk, def_, eva, cri):
+		return round((mhp + mmp*2 + atk*6*cls.C*(1+cri/100)
+					  + def_*4) * (1+eva/50))
+
+
+# ================================
+# 刷题（单题）收益计算类
+# ================================
 class QuestionSetSingleRewardCalc:
 
 	@classmethod

@@ -103,34 +103,6 @@ public class GameStaticData : BaseData {
 
         loaded = true;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json"></param>
-    public override void load(JsonData json) {
-        Debug.Log("Loading static data:" + json.ToJson());
-        Debug.Log("Loaded: " + loaded);
-        base.load(json);
-        curVersion = DataLoader.loadData<GameVersionData>(json, "cur_version");
-        lastVersions = DataLoader.loadDataList<GameVersionData>(json, "last_versions");
-
-        Debug.Log("Load end");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["cur_version"] = DataLoader.convertData(curVersion);
-        json["last_versions"] = DataLoader.convertDataArray(lastVersions);
-        json["configure"] = DataLoader.convertData(configure);
-        json["data"] = DataLoader.convertData(data);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -148,29 +120,6 @@ public class GameDynamicData : BaseData {
     /// </summary>
     [AutoConvert]
     public List<CompSeason> seasons { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        seasons = DataLoader.loadDataList<CompSeason>(json, "seasons");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["seasons"] = DataLoader.convertDataArray(seasons);
-
-        return json;
-    }
-    */
 }
 
 /// <summary>
@@ -210,31 +159,6 @@ public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
         base.loadCustomAttributes(json);
         if (force) ForceCount++;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-        maxScore = DataLoader.loadInt(json, "max_score");
-        force = DataLoader.loadBool(json, "force");
-
-        if (force) ForceCount++;
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["color"] = DataLoader.convertColor(color);
-        json["max_score"] = maxScore;
-        json["force"] = force;
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -285,35 +209,6 @@ public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
         if (maxValue > 0) val = Math.Min(maxValue, val);
         return val;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-        maxValue = DataLoader.loadInt(json, "max_value");
-        minValue = DataLoader.loadInt(json, "min_value");
-        default_ = DataLoader.loadInt(json, "default");
-        scale = DataLoader.loadInt(json, "scale");
-        attr = DataLoader.loadString(json, "attr");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["color"] = DataLoader.convertColor(color);
-        json["max_value"] = maxValue;
-        json["min_value"] = minValue;
-        json["default"] = default_;
-        json["scale"] = scale;
-        json["attr"] = attr;
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -347,37 +242,6 @@ public class ExerStar : TypeData {
     public ParamRangeData[] baseRanges { get; protected set; }
     [AutoConvert]
     public ParamRangeData[] rateRanges { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-        maxLevel = DataLoader.loadInt(json, "max_level");
-
-        var paramRanges = DataLoader.loadJsonData(json, "param_ranges");
-
-        baseRanges = DataLoader.loadDataArray<ParamRangeData>(paramRanges, "bases");
-        rateRanges = DataLoader.loadDataArray<ParamRangeData>(paramRanges, "rates");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["color"] = DataLoader.convertColor(color);
-        json["max_level"] = maxLevel;
-        json["param_ranges"] = new JsonData();
-        json["param_ranges"]["bases"] = DataLoader.convertDataArray(baseRanges);
-        json["param_ranges"]["rates"] = DataLoader.convertDataArray(rateRanges);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -393,28 +257,6 @@ public class ExerGiftStar : TypeData {
     [AutoConvert]
     public ParamRangeData[] paramRanges { get; protected set; }
 
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-        paramRanges = DataLoader.loadDataList<ParamRangeData>(json, "param_ranges");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["color"] = DataLoader.convertColor(color);
-        json["param_ranges"] = DataLoader.convertDataArray(paramRanges);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -427,27 +269,6 @@ public class ItemStar : TypeData {
     /// </summary>
     [AutoConvert]
     public Color color { get; protected set; }
-
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["color"] = DataLoader.convertColor(color);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -472,39 +293,7 @@ public class QuesStar : TypeData {
     public int stdTime { get; protected set; }
     [AutoConvert]
     public int minTime { get; protected set; }
-
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-        color = DataLoader.loadColor(json, "color");
-        level = DataLoader.loadInt(json, "level");
-        weight = DataLoader.loadInt(json, "weight");
-        expIncr = DataLoader.loadInt(json, "exp_incr");
-        goldIncr = DataLoader.loadInt(json, "gold_incr");
-        stdTime = DataLoader.loadInt(json, "std_time");
-        minTime = DataLoader.loadInt(json, "min_time");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["color"] = DataLoader.convertColor(color);
-        json["level"] = level;
-        json["weight"] = weight;
-        json["exp_incr"] = expIncr;
-        json["gold_incr"] = goldIncr;
-        json["std_time"] = stdTime;
-        json["min_time"] = minTime;
-
-        return json;
-    }*/
+    
 }
 
 /// <summary>
@@ -530,33 +319,6 @@ public class GameVersionData : BaseData {
     public DateTime updateTime { get; protected set; }
     [AutoConvert]
     public string description { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json"></param>
-    public override void load(JsonData json) {
-        base.load(json);
-        mainVersion = DataLoader.loadString(json, "main_version");
-        subVersion = DataLoader.loadString(json, "sub_version");
-        updateNote = DataLoader.loadString(json, "update_note");
-        updateTime = DataLoader.loadDateTime(json, "update_time");
-        description = DataLoader.loadString(json, "description");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["main_version"] = mainVersion;
-        json["sub_version"] = subVersion;
-        json["update_note"] = updateNote;
-        json["update_time"] = DataLoader.convertDateTime(updateTime);
-        json["description"] = description;
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -640,95 +402,6 @@ public class GameConfigure : BaseData {
     public QuesStar[] quesStars { get; protected set; }
     [AutoConvert]
     public CompRank[] compRanks { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json"></param>
-    public override void load(JsonData json) {
-        base.load(json);
-        name = DataLoader.loadString(json, "name");
-        engName = DataLoader.loadString(json, "eng_name");
-        gold = DataLoader.loadString(json, "gold");
-        ticket = DataLoader.loadString(json, "ticket");
-        boundTicket = DataLoader.loadString(json, "bound_ticket");
-
-        maxSubject = DataLoader.loadInt(json, "max_subject");
-        maxExerciseCount = DataLoader.loadInt(json, "max_exercise_count");
-
-        characterGenders = DataLoader.loadTupleArray(json, "character_genders");
-        playerGrades = DataLoader.loadTupleArray(json, "player_grades");
-        playerStatuses = DataLoader.loadTupleArray(json, "player_statuses");
-        playerTypes = DataLoader.loadTupleArray(json, "player_types");
-
-        exermonTypes = DataLoader.loadTupleArray(json, "exermon_types");
-        exerSkillTargetTypes = DataLoader.loadTupleArray(json, "exerskill_target_types");
-        exerSkillHitTypes = DataLoader.loadTupleArray(json, "exerskill_hit_types");
-
-        questionTypes = DataLoader.loadTupleArray(json, "question_types");
-        questionStatuses = DataLoader.loadTupleArray(json, "question_statuses");
-        quesReportTypes = DataLoader.loadTupleArray(json, "ques_report_types");
-
-        recordSources = DataLoader.loadTupleArray(json, "record_sources");
-        exerciseGenTypes = DataLoader.loadTupleArray(json, "exercise_gen_types");
-
-        subjects = DataLoader.loadDataArray<Subject>(json, "subjects");
-        baseParams = DataLoader.loadDataArray<BaseParam>(json, "base_params");
-        usableItemTypes = DataLoader.loadDataArray<UsableItemType>(json, "usable_item_types");
-        humanEquipTypes = DataLoader.loadDataArray<HumanEquipType>(json, "human_equip_types");
-        exerEquipTypes = DataLoader.loadDataArray<ExerEquipType>(json, "exer_equip_types");
-        exerStars = DataLoader.loadDataArray<ExerStar>(json, "exer_stars");
-        exerGiftStars = DataLoader.loadDataArray<ExerGiftStar>(json, "exer_gift_stars");
-        itemStars = DataLoader.loadDataArray<ItemStar>(json, "item_stars");
-        quesStars = DataLoader.loadDataArray<QuesStar>(json, "ques_stars");
-        compRanks = DataLoader.loadDataArray<CompRank>(json, "comp_ranks");
-    }
-    
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-        json["name"] = name;
-        json["eng_name"] = engName;
-        json["gold"] = gold;
-        json["ticket"] = ticket;
-        json["bound_ticket"] = boundTicket;
-
-        json["max_subject"] = maxSubject;
-        json["max_exercise_count"] = maxExerciseCount;
-
-        json["character_genders"] = DataLoader.convertTupleArray(characterGenders);
-        json["player_grades"] = DataLoader.convertTupleArray(playerGrades);
-        json["player_statuses"] = DataLoader.convertTupleArray(playerStatuses);
-        json["player_types"] = DataLoader.convertTupleArray(playerTypes);
-
-        json["exermon_types"] = DataLoader.convertTupleArray(exermonTypes);
-        json["exerskill_target_types"] = DataLoader.convertTupleArray(exerSkillTargetTypes);
-        json["exerskill_hit_types"] = DataLoader.convertTupleArray(exerSkillHitTypes);
-
-        json["question_types"] = DataLoader.convertTupleArray(questionTypes);
-        json["question_statuses"] = DataLoader.convertTupleArray(questionStatuses);
-        json["ques_report_types"] = DataLoader.convertTupleArray(quesReportTypes);
-
-        json["record_sources"] = DataLoader.convertTupleArray(recordSources);
-        json["exercise_gen_types"] = DataLoader.convertTupleArray(exerciseGenTypes);
-
-        json["subjects"] = DataLoader.convertDataArray(subjects);
-        json["base_params"] = DataLoader.convertDataArray(baseParams);
-        json["usable_item_types"] = DataLoader.convertDataArray(usableItemTypes);
-        json["human_equip_types"] = DataLoader.convertDataArray(humanEquipTypes);
-        json["exer_equip_types"] = DataLoader.convertDataArray(exerEquipTypes);
-        json["exer_stars"] = DataLoader.convertDataArray(exerStars);
-        json["exer_gift_stars"] = DataLoader.convertDataArray(exerGiftStars);
-        json["item_stars"] = DataLoader.convertDataArray(itemStars);
-        json["ques_stars"] = DataLoader.convertDataArray(quesStars);
-        json["comp_ranks"] = DataLoader.convertDataArray(compRanks);
-
-        return json;
-    }
-    */
 }
 
 /// <summary>
@@ -759,45 +432,4 @@ public class GameDatabase : BaseData {
     public ExerEquip[] exerEquips { get; protected set; }
     [AutoConvert]
     public QuesSugar[] quesSugars { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json"></param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        characters = DataLoader.loadDataArray<Character>(json, "characters");
-        humanItems = DataLoader.loadDataArray<HumanItem>(json, "human_items");
-        humanEquips = DataLoader.loadDataArray<HumanEquip>(json, "human_equips");
-        exermons = DataLoader.loadDataArray<Exermon>(json, "exermons");
-        exerFrags = DataLoader.loadDataArray<ExerFrag>(json, "exer_frags");
-        exerSkills = DataLoader.loadDataArray<ExerSkill>(json, "exer_skills");
-        exerGifts = DataLoader.loadDataArray<ExerGift>(json, "exer_gifts");
-        exerItems = DataLoader.loadDataArray<ExerItem>(json, "exer_items");
-        exerEquips = DataLoader.loadDataArray<ExerEquip>(json, "exer_equips");
-        quesSugars = DataLoader.loadDataArray<QuesSugar>(json, "ques_sugars");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["characters"] = DataLoader.convertDataArray(characters);
-        json["human_items"] = DataLoader.convertDataArray(humanItems);
-        json["human_equips"] = DataLoader.convertDataArray(humanEquips);
-        json["exermons"] = DataLoader.convertDataArray(exermons);
-        json["exer_frags"] = DataLoader.convertDataArray(exerFrags);
-        json["exer_skills"] = DataLoader.convertDataArray(exerSkills);
-        json["exer_gifts"] = DataLoader.convertDataArray(exerGifts);
-        json["exer_items"] = DataLoader.convertDataArray(exerItems);
-        json["exer_equips"] = DataLoader.convertDataArray(exerEquips);
-        json["ques_sugars"] = DataLoader.convertDataArray(quesSugars);
-
-        return json;
-    }
-    */
 }
