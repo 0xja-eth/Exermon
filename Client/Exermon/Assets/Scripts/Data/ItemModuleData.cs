@@ -366,7 +366,7 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     public int capacity { get; protected set; }
 
     [AutoConvert]
-    public List<T> items { get; protected set; }
+    public List<T> items { get; protected set; } = new List<T>();
 
     /// <summary>
     /// 数据是否需要实时同步（在背包界面时需要实时同步）

@@ -480,7 +480,7 @@ public static class SceneUtils {
     /// <param name="span">TimeSpan实例</param>
     /// <returns>转换后字符串</returns>
     public static string time2StrWithHour(TimeSpan span) {
-        return String.Format("{0:00}:{1:00}:{2:00}", Math.Floor(span.TotalHours), span.Minutes, span.Seconds);
+        return String.Format("{0}:{1:00}:{2:00}", Math.Floor(span.TotalHours), span.Minutes, span.Seconds);
     }
     /// <summary>
     /// 秒数转字符串（00:00:00 格式）
@@ -488,7 +488,12 @@ public static class SceneUtils {
     /// <param name="span">TimeSpan实例</param>
     /// <returns>转换后字符串</returns>
     public static string time2StrWithHour(int sec) {
-        return string.Format("{0:00}:{1:00}:{2:00}", sec/60/60, sec/60%60, sec%60);
+        return string.Format("{0}:{1:00}:{2:00}", sec / 60 / 60, sec / 60 % 60, sec % 60);
+    }
+    public static string time2StrWithHour(double sec) {
+        sec = Math.Round(sec, 2);
+        return string.Format("{0}:{1:00}:{2:00}", (int)sec / 60 / 60, 
+            (int)sec / 60 % 60, sec % 60);
     }
 
     #endregion

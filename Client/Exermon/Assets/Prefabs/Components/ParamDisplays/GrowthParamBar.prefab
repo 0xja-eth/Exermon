@@ -168,7 +168,7 @@ MonoBehaviour:
     type: Text
     animated: 0
     configData: 0
-    format: '{0:0.00}'
+    format: 
     trigger: 
   - key: rate
     obj: {fileID: 2954553874544383259}

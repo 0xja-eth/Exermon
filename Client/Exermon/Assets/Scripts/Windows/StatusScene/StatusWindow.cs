@@ -31,8 +31,8 @@ public class StatusWindow : BaseWindow {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    HumanView humanView;
-    ExermonView exermonView;
+    public HumanView humanView;
+    public ExermonView exermonView;
 
     /// <summary>
     /// 内部组件声明
@@ -41,7 +41,7 @@ public class StatusWindow : BaseWindow {
     /// <summary>
     /// 场景组件引用
     /// </summary>
-    StartScene scene;
+    StatusScene scene;
 
     /// <summary>
     /// 外部系统引用
@@ -56,7 +56,7 @@ public class StatusWindow : BaseWindow {
     protected override void initializeOnce() {
         base.initializeOnce();
         if (playerSer == null) playerSer = PlayerService.get();
-        scene = (StartScene)SceneUtils.getSceneObject("Scene");
+        scene = (StatusScene)SceneUtils.getSceneObject("Scene");
         configureSubViews();
     }
 

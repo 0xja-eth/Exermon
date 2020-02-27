@@ -81,6 +81,22 @@ public class MainScene : BaseScene {
     public void refresh() {
 
     }
-    
+
+    #endregion
+
+    #region 流程控制
+
+    /// <summary>
+    /// 建筑物点击回调
+    /// </summary>
+    /// <param name="index"></param>
+    public void onBulidingsClick(int index) {
+        string sceneName = this.sceneName();
+        switch(index) {
+            case 1: sceneName = SceneUtils.GameScene.StatusScene; break;
+        }
+        gameSys.requestChangeScene(sceneName, GameSystem.ChangeSceneRequest.Type.Push); 
+    }
+
     #endregion
 }

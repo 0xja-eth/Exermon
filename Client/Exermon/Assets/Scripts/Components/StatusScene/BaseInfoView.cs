@@ -9,7 +9,7 @@ using HedgehogTeam.EasyTouch;
 /// <summary>
 /// 人物基本信息视图
 /// </summary>
-class BaseInfoView : ItemDisplay<Player> {
+public class BaseInfoView : ItemDisplay<Player> {
 
     /// <summary>
     /// 外部组件设置
@@ -49,10 +49,10 @@ class BaseInfoView : ItemDisplay<Player> {
         var character = player.character();
         var bust = character.bust;
         var rect = new Rect(0, 0, bust.width, bust.height);
+        this.bust.gameObject.SetActive(true);
         this.bust.overrideSprite = Sprite.Create(
             bust, rect, new Vector2(0.5f, 0.5f));
         this.bust.overrideSprite.name = bust.name;
-        this.bust.SetNativeSize();
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ class BaseInfoView : ItemDisplay<Player> {
     /// </summary>
     protected override void clearItem() {
         name.text = "";
-        bust.overrideSprite = null;
+        bust.gameObject.SetActive(false);
         expBar.clearValue();
     }
 

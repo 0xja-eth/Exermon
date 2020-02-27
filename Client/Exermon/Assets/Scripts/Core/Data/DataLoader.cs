@@ -131,8 +131,10 @@ public static class DataLoader {
 
         // 处理基本类型
         if (type == typeof(int)) return (int)data;
-        if (type == typeof(double)) return (double)data;
-        if (type == typeof(float)) return (float)(double)data;
+        if (type == typeof(double))
+            return data.IsDouble ? (double)data : (int)data;
+        if (type == typeof(float))
+            return data.IsDouble ? (float)(double)data : (int)data;
         if (type == typeof(string)) return (string)data;
         if (type == typeof(bool)) return (bool)data;
 
@@ -239,8 +241,8 @@ public static class DataLoader {
 
         // 处理特殊类型
         if (type == typeof(Color)) return convertColor((Color)data);
-        if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
         if (type == typeof(DateTime) && format == "date") return convertDate((DateTime)data);
+        if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
         if (type == typeof(Tuple<int, string>)) return convertTuple((Tuple<int, string>)data);
         if (type == typeof(Texture2D)) return convertTexture2D(data as Texture2D);
 

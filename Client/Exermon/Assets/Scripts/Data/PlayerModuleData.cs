@@ -102,6 +102,11 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     public class BattleInfo : BaseData, ParamDisplay.DisplayDataConvertable {
 
         /// <summary>
+        /// 子段位标志
+        /// </summary>
+        const string SubRankSign = "I";
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -139,7 +144,9 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <param name="type"></param>
         /// <returns></returns>
         public JsonData convertToDisplayData(string type = "") {
-            return toJson();
+            var res = toJson();
+            res["rank_text"] = rankText();
+            return res;
         }
 
         /// <summary>
@@ -148,6 +155,19 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <returns></returns>
         public CompRank rank() {
             return DataService.get().compRank(rankId);
+        }
+
+        /// <summary>
+        /// 完整段位文本
+        /// </summary>
+        /// <returns>段位文本</returns>
+        public string rankText() {
+            var rank = this.rank();
+            if (rank == null) return "无";
+            string res = rank.name + SubRankSign;
+            for (int i = 0; i < subRank; ++i)
+                res += SubRankSign;
+            return res;
         }
     }
 
@@ -182,7 +202,11 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <param name="type"></param>
         /// <returns></returns>
         public JsonData convertToDisplayData(string type = "") {
-            return toJson();
+            var res = toJson();
+            res["sum_timespan"] = sumTimespan / 1000;
+            res["avg_timespan"] = (int)avgTimespan / 1000;
+            res["corr_timespan"] = (int)corrTimespan / 1000;
+            return res;
         }
     }
 
@@ -268,8 +292,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         switch (type.ToLower()) {
             case "exp": return convertExp();
             case "params_info": return covnertParamsInfo();
-            case "battle_info": return battleInfo.toJson();
-            case "question_info": return questionInfo.toJson();
+            case "battle_info": return battleInfo.convertToDisplayData();
+            case "question_info": return questionInfo.convertToDisplayData();
             case "personal_info": return covnertPersonalInfo();
             default: return toJson();
         }
@@ -297,8 +321,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         var json = new JsonData();
         var params_ = DataService.get().staticData.configure.baseParams;
 
-        json["sum_mhp"] = exerSlot.sumParam(params_[0].getID()).value;
-        json["sum_mmp"] = exerSlot.sumParam(params_[1].getID()).value;
+        json["sum_mhp"] = (int)exerSlot.sumParam(params_[0].getID()).value;
+        json["sum_mmp"] = (int)exerSlot.sumParam(params_[1].getID()).value;
         json["avg_atk"] = exerSlot.avgParam(params_[2].getID()).value;
         json["avg_def"] = exerSlot.avgParam(params_[3].getID()).value;
         json["avg_eva"] = exerSlot.avgParam(params_[4].getID()).value;
@@ -316,6 +340,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         var json = new JsonData();
         json["grade"] = gradeText();
         json["school"] = school;
+        json["birth"] = DataLoader.convert(birth);
         json["city"] = city;
         json["contact"] = contact;
         json["description"] = description;

@@ -474,6 +474,17 @@ class Player(CacheableModel):
 			'human_equip_slot': humanequipslot,
 		}
 
+	def _slotContainerItems(self):
+
+		exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
+
+		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
+
+		return {
+			'exer_slot': exerslot,
+			'human_equip_slot': humanequipslot,
+		}
+
 	# 对战信息
 	def _battleInfo(self):
 		return {}
@@ -571,6 +582,8 @@ class Player(CacheableModel):
 
 			base['battle_info'] = self._battleInfo()
 			base['question_info'] = self._questionInfo()
+
+			base['slot_containers'] = self._slotContainerItems()
 
 		return base
 

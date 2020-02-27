@@ -9,7 +9,7 @@ using HedgehogTeam.EasyTouch;
 /// <summary>
 /// 人物详细信息视图
 /// </summary>
-class DetailInfoView : ItemDisplay<Player> {
+public class DetailInfoView : ItemDisplay<Player> {
 
     /// <summary>
     /// 外部组件设置

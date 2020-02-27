@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 3ee5f11c2b7df404cb4b549e1e777931
-  - enabled: 0
-    path: Assets/DownloadedAssets/EasyTouchBundle/EasyTouch/Examples/5.X new features/QuickGesture.unity
-    guid: 897a68b4076b4f441b4ae694f52a349a
+  - enabled: 1
+    path: Assets/Scenes/StatusScene.unity
+    guid: 83eab85173baeca42923c4afa2063e94
   m_configObjects: {}

@@ -20,6 +20,7 @@ public class StatusScene : BaseScene {
     /// <summary>
     /// 内部系统声明
     /// </summary>
+    PlayerService playerSer;
 
     #region 初始化
 
@@ -36,6 +37,7 @@ public class StatusScene : BaseScene {
     /// </summary>
     protected override void initializeSystems() {
         base.initializeSystems();
+        playerSer = PlayerService.get();
     }
 
     /// <summary>
@@ -67,7 +69,7 @@ public class StatusScene : BaseScene {
     /// 刷新场景
     /// </summary>
     public void refresh() {
-        statusWindow.startWindow();
+        playerSer.getPlayerStatus(statusWindow.startWindow);
     }
     
     #endregion

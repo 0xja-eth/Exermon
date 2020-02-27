@@ -58,6 +58,13 @@ public class ParamDisplay : BaseView {
     }
 
     /// <summary>
+    /// 数据类型
+    /// </summary>
+    public enum Type {
+
+    }
+
+    /// <summary>
     /// 显示项
     /// </summary>
     [Serializable]
@@ -66,7 +73,8 @@ public class ParamDisplay : BaseView {
         public string key;
         // 对应显示的 GameObject
         public GameObject obj;
-        // 对应显示的类型：Text, Sign, Date, DateTime, Color, ScaleX, ScaleY
+        // 对应显示的类型   Text, Sign, Percent, TimeSpan, TimeSpanWithHour, 
+        //                 Date, DateTime, Color, ScaleX, ScaleY
         public string type;
         // 是否有动画效果
         public bool animated;
@@ -74,7 +82,7 @@ public class ParamDisplay : BaseView {
         public bool configData;
         // 格式
         public string format;
-        // 触发模式：Click, Hover, HOC (HoverOrClick)
+        // 触发模式         Click, Hover, HOC (HoverOrClick)
         public string trigger;
     }
 
@@ -261,6 +269,9 @@ public class ParamDisplay : BaseView {
         switch (item.type) {
             case "Text": processTextDisplayItem(item, value); break;
             case "Sign": processSignDisplayItem(item, value); break;
+            case "Percent": processPercentDisplayItem(item, value); break;
+            case "TimeSpan": processTimeSpanDisplayItem(item, value); break;
+            case "TimeSpanWithHour": processTimeSpanDisplayItem(item, value, true); break;
             case "Date": processDateDisplayItem(item, value); break;
             case "DateTime": processDateTimeDisplayItem(item, value); break;
             case "Color": processColorDisplayItem(item, value); break;
@@ -281,9 +292,10 @@ public class ParamDisplay : BaseView {
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
-        if (value != null && value.IsDouble)
-            text.text = string.Format(format, DataLoader.load<double>(value));
-        else if (value != null && value.IsInt)
+        if (value != null && value.IsDouble) {
+            var val = DataLoader.load<double>(value);
+            text.text = string.Format(format, SceneUtils.double2Str(val));
+        } else if (value != null && value.IsInt)
             text.text = string.Format(format, DataLoader.load<int>(value));
         else if (value != null && value.IsBoolean) {
             var val = DataLoader.load<bool>(value);
@@ -293,7 +305,7 @@ public class ParamDisplay : BaseView {
     }
 
     /// <summary>
-    /// 处理日期类型的显示项
+    /// 处理符号类型的显示项
     /// </summary>
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
@@ -316,7 +328,43 @@ public class ParamDisplay : BaseView {
             text.text = string.Format(format, signText);
         } else
             text.text = string.Format(format, value);
+    }
 
+    /// <summary>
+    /// 处理百分比类型的显示项
+    /// </summary>
+    /// <param name="item">显示项</param>
+    /// <param name="value">值</param>
+    void processPercentDisplayItem(DisplayItem item, JsonData value) {
+        var text = SceneUtils.text(item.obj);
+        if (text == null) return;
+        var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
+        if (value != null && value.IsDouble) {
+            var val = DataLoader.load<double>(value);
+            text.text = string.Format(format, SceneUtils.double2Perc(val));
+        } else
+            text.text = string.Format(format, value + "%");
+    }
+
+    /// <summary>
+    /// 处理时间段类型的显示项
+    /// </summary>
+    /// <param name="item">显示项</param>
+    /// <param name="value">值</param>
+    void processTimeSpanDisplayItem(DisplayItem item, JsonData value, bool hour = false) {
+        var text = SceneUtils.text(item.obj);
+        if (text == null) return;
+        var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
+        if (value != null && value.IsDouble) {
+            var val = DataLoader.load<double>(value); // 单位须为秒
+            var txtVal = hour ? SceneUtils.time2StrWithHour(val) : SceneUtils.time2Str(val);
+            text.text = string.Format(format, txtVal);
+        } else if (value != null && value.IsInt) {
+            var val = DataLoader.load<int>(value); // 单位须为秒
+            var txtVal = hour ? SceneUtils.time2StrWithHour(val) : SceneUtils.time2Str(val);
+            text.text = string.Format(format, txtVal);
+        } else
+            text.text = string.Format(format, value);
     }
 
     /// <summary>
@@ -327,8 +375,7 @@ public class ParamDisplay : BaseView {
     void processDateDisplayItem(DisplayItem item, JsonData value) {
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
-        var format = item.format.Length > 0 ?
-            item.format : DefaultDateFormat;
+        var format = item.format.Length > 0 ? item.format : DefaultDateFormat;
         var date = DataLoader.load<DateTime>(value);
         text.text = date.ToString(format);
     }
@@ -341,8 +388,7 @@ public class ParamDisplay : BaseView {
     void processDateTimeDisplayItem(DisplayItem item, JsonData value) {
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
-        var format = item.format.Length > 0 ?
-            item.format : DefaultDateTimeFormat;
+        var format = item.format.Length > 0 ? item.format : DefaultDateTimeFormat;
         var date = DataLoader.load<DateTime>(value);
         text.text = date.ToString(format);
     }

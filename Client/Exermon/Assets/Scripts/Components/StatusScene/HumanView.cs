@@ -9,7 +9,7 @@ using HedgehogTeam.EasyTouch;
 /// <summary>
 /// 状态窗口人物视图
 /// </summary>
-class HumanView : ItemDisplay<Player> {
+public class HumanView : ItemDisplay<Player> {
 
     /// <summary>
     /// 外部组件设置

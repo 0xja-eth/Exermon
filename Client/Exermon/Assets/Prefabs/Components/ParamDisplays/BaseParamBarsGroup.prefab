@@ -209,7 +209,17 @@ PrefabInstance:
     - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
         type: 3}
       propertyPath: displayItems.Array.data[1].format
-      value: '{0:0.00}%'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[1].type
+      value: Percent
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}
@@ -341,6 +351,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseParamBar1
       objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}
 --- !u!224 &1780700583050590559 stripped
@@ -471,6 +486,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseParamBar4
       objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}
 --- !u!224 &1780700581314818913 stripped
@@ -600,6 +620,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BaseParamBar3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}
@@ -734,7 +759,17 @@ PrefabInstance:
     - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
         type: 3}
       propertyPath: displayItems.Array.data[1].format
-      value: '{0:0.00}%'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[1].type
+      value: Percent
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}
@@ -865,6 +900,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BaseParamBar2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019630482929764621, guid: e8706879c5dea694b8998cd5d98917eb,
+        type: 3}
+      propertyPath: displayItems.Array.data[3].format
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8706879c5dea694b8998cd5d98917eb, type: 3}

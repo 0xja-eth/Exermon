@@ -213,6 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcad9d5743933584ea7b9a9e2951b800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trigger: {fileID: 0}
   displayItems:
   - key: name
     obj: {fileID: 0}
@@ -220,24 +221,28 @@ MonoBehaviour:
     animated: 0
     configData: 1
     format: "{0}\u6210\u957F\u52A0\u6210"
+    trigger: 
   - key: value
     obj: {fileID: 0}
     type: Text
     animated: 0
     configData: 0
-    format: '{0:0.00}'
+    format: 
+    trigger: 
   - key: rate
     obj: {fileID: 2472205158413256646}
     type: ScaleX
     animated: 1
     configData: 0
     format: 
+    trigger: 
   - key: color
     obj: {fileID: 2472205158413256646}
     type: Color
     animated: 0
     configData: 1
     format: 
+    trigger: 
 --- !u!1 &2472205158331390095
 GameObject:
   m_ObjectHideFlags: 0

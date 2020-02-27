@@ -22,7 +22,7 @@ class ClockDisplay : BaseView {
     /// 外部组件设置
     /// </summary>
     public RectTransform second, minute, hour;
-    public Text date;
+    public Text dateTime;
 
     /// <summary>
     /// 外部变量设置
@@ -61,7 +61,7 @@ class ClockDisplay : BaseView {
         setClockArrowRot(this.hour, hourRate);
         setClockArrowRot(this.minute, minRate);
         setClockArrowRot(this.second, secRate);
-        date.text = dateTime.ToString(dateTimeFormat);
+        this.dateTime.text = dateTime.ToString(dateTimeFormat);
     }
 
     /// <summary>
@@ -70,6 +70,7 @@ class ClockDisplay : BaseView {
     /// <param name="arrow">针</param>
     /// <param name="rate">比率</param>
     void setClockArrowRot(RectTransform arrow, float rate) {
+        if (arrow == null) return;
         var rot = new Vector3(0, 0, -rate * 360);
         arrow.transform.localEulerAngles = rot;
     }
