@@ -31,8 +31,10 @@ public class RecordService : BaseService<RecordService> {
         /// <summary>
         /// 属性
         /// </summary>
-        public List<QuestionRecord> questionRecords { get; private set; }
-        public List<ExerciseRecord> exerciseRecords { get; private set; }
+    [AutoConvert]
+        public List<QuestionRecord> questionRecords { get; protected set; }
+    [AutoConvert]
+        public List<ExerciseRecord> exerciseRecords { get; protected set; }
 
         #region 数据操作
 
@@ -107,7 +109,7 @@ public class RecordService : BaseService<RecordService> {
         #endregion
 
         #endregion
-
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -130,7 +132,7 @@ public class RecordService : BaseService<RecordService> {
             json["exercise_records"] = DataLoader.convertDataArray(exerciseRecords);
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -161,12 +163,12 @@ public class RecordService : BaseService<RecordService> {
     /// <summary>
     /// 当前题目集记录（刷题时用）
     /// </summary>
-    public QuestionSetRecord currentRecord { get; private set; } = null;
+    public QuestionSetRecord currentRecord { get; protected set; } = null;
 
     /// <summary>
     /// 记录数据
     /// </summary>
-    public RecordData recordData { get; private set; }
+    public RecordData recordData { get; protected set; }
 
     /// <summary>
     /// 外部系统
@@ -240,7 +242,7 @@ public class RecordService : BaseService<RecordService> {
     public void get(UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            recordData = DataLoader.loadData<RecordData>(res);
+            recordData = DataLoader.load<RecordData>(res);
             onSuccess?.Invoke();
         };
         JsonData data = new JsonData();
@@ -336,7 +338,7 @@ public class RecordService : BaseService<RecordService> {
         UnityAction onSuccess, UnityAction onError = null) {
         return (res) => {
             changeState(State.Generated);
-            currentRecord.load(DataLoader.loadJsonData(res, "record"));
+            currentRecord = DataLoader.load(currentRecord, res, "record");
             var qids = currentRecord.getQuestionIds();
             quesSer.loadQuestions(qids, onSuccess, onError);
         };
@@ -377,7 +379,7 @@ public class RecordService : BaseService<RecordService> {
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             if (terminate) {
                 changeState(State.Terminated);
-                currentRecord.load(DataLoader.loadJsonData(res, "record"));
+                currentRecord = DataLoader.load(currentRecord, res, "record");
             } else
                 changeState(State.Answered);
             onSuccess?.Invoke();
@@ -386,7 +388,7 @@ public class RecordService : BaseService<RecordService> {
         JsonData data = new JsonData();
         data["qid"] = qid;
         data["timespan"] = timespan; data["terminate"] = terminate;
-        data["selection"] = DataLoader.convertArray(selection);
+        data["selection"] = DataLoader.convert(selection);
         
         sendRequest(Oper.ExerciseAnswer, data, _onSuccess, onError, uid: true);
     }

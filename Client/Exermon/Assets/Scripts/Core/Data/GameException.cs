@@ -20,12 +20,12 @@ public class GameException : Exception {
     /// <summary>
     /// 错误代码
     /// </summary>
-    public int code { get; private set; }
+    public int code { get; protected set; }
 
     /// <summary>
     /// 错误消息
     /// </summary>
-    public string message { get; private set; }
+    public string message { get; protected set; }
 
     /// <summary>
     /// 处理函数

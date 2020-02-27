@@ -13,13 +13,15 @@ using UnityEditor;
 /// 赛季数据
 /// </summary>
 public class CompSeason : TypeData {
-    
+
     /// <summary>
     /// 属性
     /// </summary>
-    public DateTime startTime { get; private set; }
-    public DateTime endTime { get; private set; }
-    
+    [AutoConvert]
+    public DateTime startTime { get; protected set; }
+    [AutoConvert]
+    public DateTime endTime { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -42,7 +44,7 @@ public class CompSeason : TypeData {
         json["end_time"] = DataLoader.convertDateTime(endTime);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -53,11 +55,15 @@ public class CompRank : TypeData {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public int subRankNum { get; private set; }
-    public int scoreFactor { get; private set; }
-    public int offsetFactor { get; private set; }
-
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public int subRankNum { get; protected set; }
+    [AutoConvert]
+    public int scoreFactor { get; protected set; }
+    [AutoConvert]
+    public int offsetFactor { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -82,5 +88,5 @@ public class CompRank : TypeData {
         json["offset_factor"] = offsetFactor;
 
         return json;
-    }
+    }*/
 }

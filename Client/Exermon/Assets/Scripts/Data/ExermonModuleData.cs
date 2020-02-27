@@ -20,23 +20,29 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// <summary>
     /// 属性
     /// </summary>
-    public string animal { get; private set; }
-    public int starId { get; private set; }
-    public int subjectId { get; private set; }
-    public int eType { get; private set; }
+    [AutoConvert]
+    public string animal { get; protected set; }
+    [AutoConvert]
+    public int starId { get; protected set; }
+    [AutoConvert]
+    public int subjectId { get; protected set; }
+    [AutoConvert]
+    public int eType { get; protected set; }
 
-    public ParamData[] baseParams { get; private set; }
-    public ParamData[] rateParams { get; private set; }
+    [AutoConvert]
+    public ParamData[] baseParams { get; protected set; }
+    [AutoConvert]
+    public ParamData[] rateParams { get; protected set; }
 
-    public Texture2D full { get; private set; }
-    public Texture2D icon { get; private set; }
-    public Texture2D battle { get; private set; }
+    public Texture2D full { get; protected set; }
+    public Texture2D icon { get; protected set; }
+    public Texture2D battle { get; protected set; }
 
     /// <summary>
     /// 后续增加属性
     /// </summary>
-    public List<ExerSkill> exerSkills { get; private set; } = new List<ExerSkill>();
-    public ExerFrag exerFrag { get; private set; } = null;
+    public List<ExerSkill> exerSkills { get; protected set; } = new List<ExerSkill>();
+    public ExerFrag exerFrag { get; protected set; } = null;
 
     #region 属性显示数据生成
 
@@ -107,6 +113,8 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
 
     #endregion
 
+    #region 数据操作
+
     /// <summary>
     /// 获取艾瑟萌星级
     /// </summary>
@@ -148,6 +156,8 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         if (exerSkills.Count < 3) exerSkills.Add(skill);
     }
 
+    #region 属性操作
+
     /// <summary>
     /// 获取属性基础值
     /// </summary>
@@ -170,6 +180,27 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         return new ParamData(paramId);
     }
 
+    #endregion
+
+    #endregion
+    
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+        /*
+        name = DataLoader.loadString(json, "name");
+        gender = DataLoader.loadInt(json, "gender");
+        description = DataLoader.loadString(json, "description");
+        */
+        full = AssetLoader.loadExermonFull(getID());
+        icon = AssetLoader.loadExermonIcon(getID());
+        battle = AssetLoader.loadExermonBattle(getID());
+    }
+
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -209,7 +240,7 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -220,13 +251,19 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// <summary>
     /// 属性
     /// </summary>
-    public int starId { get; private set; }
-    public int gType { get; private set; }
-    public Color color { get; private set; }
-    public ParamData[] params_ { get; private set; }
+    [AutoConvert]
+    public int starId { get; protected set; }
+    [AutoConvert]
+    public int gType { get; protected set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert("params")]
+    public ParamData[] params_ { get; protected set; }
 
-    public Texture2D icon { get; private set; }
-    public Texture2D bigIcon { get; private set; }
+    public Texture2D icon { get; protected set; }
+    public Texture2D bigIcon { get; protected set; }
+
+    #region 属性显示数据生成
 
     /// <summary>
     /// 转化为属性信息集
@@ -243,11 +280,15 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
             json["max"] = max;
             json["value"] = value;
             json["rate"] = value / max;
-            json["color"] = DataLoader.convertColor(color);
+            json["color"] = DataLoader.convert(color);
             data[i] = json;
         }
         return data;
     }
+
+    #endregion
+
+    #region 数据操作
 
     /// <summary>
     /// 获取艾瑟萌天赋星级
@@ -268,6 +309,24 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         return new ParamData(paramId);
     }
 
+    #endregion
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+        /*
+        name = DataLoader.loadString(json, "name");
+        gender = DataLoader.loadInt(json, "gender");
+        description = DataLoader.loadString(json, "description");
+        */
+        icon = AssetLoader.loadExerGift(getID());
+        bigIcon = AssetLoader.loadBigExerGift(getID());
+    }
+
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -280,8 +339,6 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         gType = DataLoader.loadInt(json, "g_type");
         params_ = DataLoader.loadDataArray<ParamData>(json, "params");
 
-        icon = AssetLoader.loadExerGift(getID());
-        bigIcon = AssetLoader.loadBigExerGift(getID());
     }
 
     /// <summary>
@@ -297,7 +354,7 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         json["params"] = DataLoader.convertDataArray(params_);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -308,9 +365,12 @@ public class ExerFrag : BaseItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int exermonId { get; private set; }
-    public int sellPrice { get; private set; }
-    public int count { get; private set; }
+    [AutoConvert]
+    public int exermonId { get; protected set; }
+    [AutoConvert]
+    public int sellPrice { get; protected set; }
+    [AutoConvert]
+    public int count { get; protected set; }
 
     /// <summary>
     /// 获取艾瑟萌
@@ -324,6 +384,17 @@ public class ExerFrag : BaseItem {
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+
+        var exer = exermon();
+        if (exer != null) exer.setExerFrag(this);
+    }
+    /*
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
     public override void load(JsonData json) {
         base.load(json);
 
@@ -331,8 +402,6 @@ public class ExerFrag : BaseItem {
         sellPrice = DataLoader.loadInt(json, "sell_price");
         count = DataLoader.loadInt(json, "count");
 
-        var exer = exermon();
-        if(exer != null) exer.setExerFrag(this);
     }
 
     /// <summary>
@@ -347,7 +416,7 @@ public class ExerFrag : BaseItem {
         json["count"] = count;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -358,26 +427,41 @@ public class ExerSkill : BaseItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int exermonId { get; private set; }
-    public bool passive { get; private set; }
-    public int nextSkillId { get; private set; }
-    public int needCount { get; private set; }
-    public int mpCost { get; private set; }
-    public int rate { get; private set; }
-    public int freeze { get; private set; }
-    public int maxUseCount { get; private set; }
-    public int target { get; private set; }
-    public int hitType { get; private set; }
-    public int atkRate { get; private set; }
-    public int defRate { get; private set; }
-    public Texture2D icon { get; private set; }
-    public Texture2D ani { get; private set; }
-    public Texture2D targetAni { get; private set; }
+    [AutoConvert]
+    public int exermonId { get; protected set; }
+    [AutoConvert]
+    public bool passive { get; protected set; }
+    [AutoConvert]
+    public int nextSkillId { get; protected set; }
+    [AutoConvert]
+    public int needCount { get; protected set; }
+    [AutoConvert]
+    public int mpCost { get; protected set; }
+    [AutoConvert]
+    public int rate { get; protected set; }
+    [AutoConvert]
+    public int freeze { get; protected set; }
+    [AutoConvert]
+    public int maxUseCount { get; protected set; }
+    [AutoConvert]
+    public int target { get; protected set; }
+    [AutoConvert]
+    public int hitType { get; protected set; }
+    [AutoConvert]
+    public int atkRate { get; protected set; }
+    [AutoConvert]
+    public int defRate { get; protected set; }
+
+    public Texture2D icon { get; protected set; }
+    public Texture2D ani { get; protected set; }
+    public Texture2D targetAni { get; protected set; }
+
+    #region 数据操作
 
     /// <summary>
     /// 使用效果
     /// </summary>
-    public List<EffectData> effects { get; private set; }
+    public List<EffectData> effects { get; protected set; }
 
     /// <summary>
     /// 获取艾瑟萌
@@ -411,6 +495,23 @@ public class ExerSkill : BaseItem {
         return DataService.get().exerSkillHitType(hitType).Item2;
     }
 
+    #endregion
+
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+
+        icon = AssetLoader.loadExerSkillIcon(getID());
+        ani = AssetLoader.loadExerSkillAni(getID());
+        targetAni = AssetLoader.loadExerSkillTarget(getID());
+
+        var exer = exermon();
+        if (exer != null) exer.addExerSkill(this);
+    }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -433,12 +534,6 @@ public class ExerSkill : BaseItem {
 
         effects = DataLoader.loadDataList<EffectData>(json, "effects");
 
-        icon = AssetLoader.loadExerSkillIcon(getID());
-        ani = AssetLoader.loadExerSkillAni(getID());
-        targetAni = AssetLoader.loadExerSkillTarget(getID());
-
-        var exer = exermon();
-        if (exer != null) exer.addExerSkill(this);
     }
 
     /// <summary>
@@ -464,7 +559,7 @@ public class ExerSkill : BaseItem {
         json["effects"] = DataLoader.convertDataArray(effects);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -475,8 +570,9 @@ public class ExerItem : UsableItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int rate { get; private set; }
-
+    [AutoConvert]
+    public int rate { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -498,7 +594,7 @@ public class ExerItem : UsableItem {
 
         return json;
     }
-
+    */
 }
 
 /// <summary>
@@ -509,7 +605,8 @@ public class ExerEquip : EquipableItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int eType { get; private set; }
+    [AutoConvert]
+    public int eType { get; protected set; }
 
     /// <summary>
     /// 获取装备类型
@@ -518,7 +615,7 @@ public class ExerEquip : EquipableItem {
     public TypeData equipType() {
         return DataService.get().exerEquipType(eType);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -539,7 +636,7 @@ public class ExerEquip : EquipableItem {
         json["e_type"] = eType;
 
         return json;
-    }
+    }*/
 }
 
 #endregion 
@@ -666,14 +763,20 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     /// <summary>
     /// 属性
     /// </summary>
-    public string nickname { get; private set; }
-    public int exp { get; private set; }
-    public int level { get; private set; }
+    [AutoConvert]
+    public string nickname { get; protected set; }
+    [AutoConvert]
+    public int exp { get; protected set; }
+    [AutoConvert]
+    public int level { get; protected set; }
 
-    public SlotContainer<ExerSkillSlotItem> exerSkillSlot { get; private set; }
+    [AutoConvert]
+    public SlotContainer<ExerSkillSlotItem> exerSkillSlot { get; protected set; }
 
-    public ParamData[] paramValues { get; private set; }
-    public ParamData[] rateParams { get; private set; }
+    [AutoConvert]
+    public ParamData[] paramValues { get; protected set; }
+    [AutoConvert]
+    public ParamData[] rateParams { get; protected set; }
 
     #region 属性显示数据生成
 
@@ -807,7 +910,7 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     public PlayerExermon() { }
     /// <param name="itemId">物品ID</param>
     public PlayerExermon(int itemId) : base(itemId) { }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -845,7 +948,7 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
         json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -892,16 +995,24 @@ public class ExerSlotItem : SlotContItem,
     /// <summary>
     /// 属性
     /// </summary>
-    public PlayerExermon playerExer { get; private set; }
-    public PlayerExerGift playerGift { get; private set; }
-    public int subjectId { get; private set; }
-    public int exp { get; private set; }
-    public int level { get; private set; }
+    [AutoConvert]
+    public PlayerExermon playerExer { get; protected set; }
+    [AutoConvert]
+    public PlayerExerGift playerGift { get; protected set; }
+    [AutoConvert]
+    public int subjectId { get; protected set; }
+    [AutoConvert]
+    public int exp { get; protected set; }
+    [AutoConvert]
+    public int level { get; protected set; }
 
-    public ExerEquipSlot exerEquipSlot { get; private set; }
+    [AutoConvert]
+    public ExerEquipSlot exerEquipSlot { get; protected set; }
 
-    public ParamData[] paramValues { get; private set; }
-    public ParamData[] rateParams { get; private set; }
+    [AutoConvert]
+    public ParamData[] paramValues { get; protected set; }
+    [AutoConvert]
+    public ParamData[] rateParams { get; protected set; }
 
     #region 属性显示数据生成
     /*
@@ -978,7 +1089,7 @@ public class ExerSlotItem : SlotContItem,
         json["delta"] = delta;
         json["delta_rate"] = deltaRate;
 
-        json[ParamDisplay.TrueColorKey] = DataLoader.convertColor(color);
+        json[ParamDisplay.TrueColorKey] = DataLoader.convert(color);
 
         Debug.Log("Growth: " + json.ToJson());
 
@@ -1095,7 +1206,7 @@ public class ExerSlotItem : SlotContItem,
     #endregion
 
     #endregion
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -1140,7 +1251,7 @@ public class ExerSlotItem : SlotContItem,
         json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -1157,8 +1268,10 @@ public class ExerSkillSlotItem : SlotContItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int skillId { get; private set; }
-    public int useCount { get; private set; }
+    [AutoConvert]
+    public int skillId { get; protected set; }
+    [AutoConvert]
+    public int useCount { get; protected set; }
 
     /// <summary>
     /// 获取科目
@@ -1167,7 +1280,7 @@ public class ExerSkillSlotItem : SlotContItem {
     public ExerSkill skill() {
         return DataService.get().exerSkill(skillId);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -1190,7 +1303,7 @@ public class ExerSkillSlotItem : SlotContItem {
         json["use_count"] = useCount;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -1207,8 +1320,10 @@ public class ExerEquipSlotItem : SlotContItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public ExerPackEquip packEquip { get; private set; }
-    public int eType { get; private set; }
+    [AutoConvert]
+    public ExerPackEquip packEquip { get; protected set; }
+    [AutoConvert]
+    public int eType { get; protected set; }
 
     /// <summary>
     /// 获取装备类型
@@ -1252,7 +1367,7 @@ public class ExerEquipSlotItem : SlotContItem {
         if (packEquip == null) return new ParamData(paramId);
         return packEquip.getParam(paramId);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -1275,7 +1390,7 @@ public class ExerEquipSlotItem : SlotContItem {
         json["e_type"] = eType;
 
         return json;
-    }
+    }*/
 }
 
 #endregion

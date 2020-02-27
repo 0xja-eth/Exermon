@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 初始艾瑟萌卡片
 /// </summary>
-public class InitExermonCard : ItemDisplay<Exermon> {
+public class InitExermonCard : SelectableItemInfo<Exermon> {
 
     /// <summary>
     /// 常量定义

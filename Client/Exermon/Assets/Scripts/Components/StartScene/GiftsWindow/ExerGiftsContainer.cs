@@ -46,7 +46,7 @@ public class ExerGiftsContainer : ItemContainer<ExerGift> {
     /// ItemDisplay 创建回调
     /// </summary>
     /// <param name="item">ItemDisplay</param>
-    protected override void onSubViewCreated(ItemDisplay<ExerGift> item, int index) {
+    protected override void onSubViewCreated(SelectableItemInfo<ExerGift> item, int index) {
         base.onSubViewCreated(item, index);
         if (!inStartScene) return;
         var giftCard = item as ExerGiftCard;

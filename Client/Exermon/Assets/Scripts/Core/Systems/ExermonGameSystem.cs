@@ -19,7 +19,7 @@ public class ExermonGameSystem : BaseSystem<ExermonGameSystem> {
     /// <summary>
     /// 游戏配置（设置）
     /// </summary>
-    public ConfigureData configure { get; private set; } = new ConfigureData();
+    public ConfigureData configure { get; protected set; } = new ConfigureData();
 
     /// <summary>
     /// 外部系统

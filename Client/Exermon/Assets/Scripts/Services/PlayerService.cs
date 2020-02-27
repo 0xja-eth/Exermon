@@ -58,7 +58,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <summary>
     /// 玩家
     /// </summary>
-    public Player player { get; private set; } = null;
+    public Player player { get; protected set; } = null;
 
     /// <summary>
     /// 外部系统
@@ -158,7 +158,7 @@ public class PlayerService : BaseService<PlayerService> {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             changeState(State.Logined);
-            player = DataLoader.loadData<Player>(res, "player");
+            player = DataLoader.load(player, res, "player");
             onSuccess?.Invoke();
         };
 
@@ -290,8 +290,8 @@ public class PlayerService : BaseService<PlayerService> {
         };
 
         JsonData data = new JsonData();
-        data["eids"] = DataLoader.convertArray(eids);
-        data["enames"] = DataLoader.convertArray(enames);
+        data["eids"] = DataLoader.convert(eids);
+        data["enames"] = DataLoader.convert(enames);
         sendRequest(Oper.CreateExermons, data, _onSuccess, onError, uid: true);
     }
 
@@ -310,7 +310,7 @@ public class PlayerService : BaseService<PlayerService> {
         };
 
         JsonData data = new JsonData();
-        data["gids"] = DataLoader.convertArray(gids);
+        data["gids"] = DataLoader.convert(gids);
         sendRequest(Oper.CreateGifts, data, _onSuccess, onError, uid: true);
     }
 
@@ -334,7 +334,7 @@ public class PlayerService : BaseService<PlayerService> {
         };
 
         JsonData data = new JsonData();
-        data["birth"] = DataLoader.convertDate(birth);
+        data["birth"] = DataLoader.convert(birth, "date");
         data["school"] = school; data["city"] = city;
         data["contact"] = contact; data["description"] = description;
         sendRequest(Oper.CreateInfo, data, _onSuccess, onError, uid: true);
@@ -388,7 +388,7 @@ public class PlayerService : BaseService<PlayerService> {
 
         JsonData data = new JsonData();
         data["grade"] = grade;
-        data["birth"] = DataLoader.convertDate(birth);
+        data["birth"] = DataLoader.convert(birth, "date");
         data["school"] = school; data["city"] = city;
         data["contact"] = contact; data["description"] = description;
         sendRequest(Oper.EditInfo, data, _onSuccess, onError, uid: true);
@@ -401,7 +401,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="onError">失败回调</param>
     public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.load(DataLoader.loadJsonData(res, "player"));
+            player = DataLoader.load(player, res, "player");
             onSuccess?.Invoke();
         };
 
@@ -415,7 +415,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="onError">失败回调</param>
     public void getPlayerStatus(UnityAction onSuccess = null, UnityAction onError = null) {
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            player.load(DataLoader.loadJsonData(res, "player"));
+            player = DataLoader.load(player, res, "player");
             onSuccess?.Invoke();
         };
 

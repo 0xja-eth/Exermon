@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 主场景
+/// 状态场景
 /// </summary>
 public class StatusScene : BaseScene {
 
@@ -15,19 +15,11 @@ public class StatusScene : BaseScene {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-
-    /// <summary>
-    /// 能否跟随旋转
-    /// </summary>
-    public bool rotatable { get; set; } = true;
+    public StatusWindow statusWindow;
 
     /// <summary>
     /// 内部系统声明
     /// </summary>
-    GameSystem gameSys;
-    PlayerService playerSer;
-    ExermonService exermonSer;
-    ExermonGameSystem exermonSys;
 
     #region 初始化
 
@@ -44,10 +36,6 @@ public class StatusScene : BaseScene {
     /// </summary>
     protected override void initializeSystems() {
         base.initializeSystems();
-        gameSys = GameSystem.get();
-        exermonSys = ExermonGameSystem.get();
-        playerSer = PlayerService.get();
-        exermonSer = ExermonService.get();
     }
 
     /// <summary>
@@ -79,7 +67,7 @@ public class StatusScene : BaseScene {
     /// 刷新场景
     /// </summary>
     public void refresh() {
-
+        statusWindow.startWindow();
     }
     
     #endregion

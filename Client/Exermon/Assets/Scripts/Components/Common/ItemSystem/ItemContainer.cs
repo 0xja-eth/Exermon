@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 物品容器
 /// </summary>
-public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
+public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class {
 
     /// <summary>
     /// 常量设置
@@ -150,7 +150,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// </summary>
     /// <param name="item">物品</param>
     /// <returns>物品显示项</returns>
-    public ItemDisplay<T> getItemDisplay(T item) {
+    public SelectableItemInfo<T> getItemDisplay(T item) {
         return subViews.Find((item_) => item_.getItem() == item);
     }
 
@@ -232,7 +232,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// 获取物品显示项数组
     /// </summary>
     /// <returns>物品显示项数组</returns>
-    public ItemDisplay<T>[] getItemDisplays() {
+    public SelectableItemInfo<T>[] getItemDisplays() {
         return subViews.ToArray();
     }
 
@@ -281,7 +281,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// 获取选择项
     /// </summary>
     /// <returns>选择项</returns>
-    public ItemDisplay<T> selectedItemDisplay() {
+    public SelectableItemInfo<T> selectedItemDisplay() {
         if (selectedIndex == -1) return null;
         return subViews[selectedIndex];
     }
@@ -371,9 +371,9 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// 获取选中项
     /// </summary>
     /// <returns>选中项数组</returns>
-    public ItemDisplay<T>[] getCheckedItemDisplays() {
+    public SelectableItemInfo<T>[] getCheckedItemDisplays() {
         var cnt = checkedIndices.Count;
-        var items = new ItemDisplay<T>[cnt];
+        var items = new SelectableItemInfo<T>[cnt];
         for (int i = 0; i < cnt; ++i) {
             var index = checkedIndices[i];
             items[i] = subViews[index];
@@ -521,7 +521,7 @@ public class ItemContainer<T> : GroupView<ItemDisplay<T>> where T: class {
     /// ItemDisplay 创建回调
     /// </summary>
     /// <param name="item">ItemDisplay</param>
-    protected override void onSubViewCreated(ItemDisplay<T> sub, int index) {
+    protected override void onSubViewCreated(SelectableItemInfo<T> sub, int index) {
         sub.configure(this, index);
         base.onSubViewCreated(sub, index);
     }

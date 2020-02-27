@@ -191,19 +191,12 @@
   </Class>
   <Class Name="CharacterDisplay" Collapsed="true">
     <Position X="34.5" Y="20.25" Width="1.75" />
-    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedToPoint="true">
-      <Path>
-        <Point X="34.125" Y="19.177" />
-        <Point X="34.125" Y="20.589" />
-        <Point X="34.5" Y="20.589" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAQEACAAAAIRACEEIACAAIAgEAAAAAQAAAABAAAEhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\CharacterWindow\CharacterDisplay.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CharacterWindow" Collapsed="true">
+  <Class Name="StatusWindow" Collapsed="true">
     <Position X="39.25" Y="18.5" Width="1.75" />
     <InheritanceLine Type="BaseWindow" FixedToPoint="true">
       <Path>
@@ -212,8 +205,9 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>IAAAAwAAAAAIFAAgAASAAIAAAAIAAAACAARABEgQAAg=</HashCode>
-      <FileName>Assets\Scripts\Windows\StartScene\CharacterWindow.cs</FileName>
+      <HashCode>IAAAAAAAAAAAEAAoAASAAIAQAAAAAAAAAAAAAAAABBA=</HashCode>
+      <FileName>Assets\Scripts\Windows\StatusScene\StatusWindow.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Windows\StartScene\CharacterWindow.cs</NewMemberFileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ClockDisplay" Collapsed="true">
@@ -294,14 +288,6 @@
   </Class>
   <Class Name="DraggableItemDisplay&lt;T&gt;" Collapsed="true">
     <Position X="28.5" Y="20.25" Width="2.25" />
-    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true">
-      <Path>
-        <Point X="34.125" Y="19.177" />
-        <Point X="34.125" Y="19.848" />
-        <Point X="29.625" Y="19.848" />
-        <Point X="29.625" Y="20.25" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAEAAAAAAAAgUIEABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\DraggableItemDisplay.cs</FileName>
@@ -383,14 +369,6 @@
   </Class>
   <Class Name="ExerGiftDetail" Collapsed="true">
     <Position X="29.25" Y="18.5" Width="1.5" />
-    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="32.5" Y="17.177" />
-        <Point X="32.5" Y="18.264" />
-        <Point X="29.938" Y="18.264" />
-        <Point X="29.938" Y="18.5" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAQAAAAAEAIACAAAAAgAAEAAAAAAAAAQAIoAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerGiftDetail.cs</FileName>
@@ -436,14 +414,6 @@
   </Class>
   <Class Name="ExermonDetail" Collapsed="true">
     <Position X="31.25" Y="18.5" Width="1.5" />
-    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="32.5" Y="17.177" />
-        <Point X="32.5" Y="18.264" />
-        <Point X="31.938" Y="18.264" />
-        <Point X="31.938" Y="18.5" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>CAQAIEAIQCAAAAEQAACgAECAAAAmAAAgABCQAAAIhQA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\ExermonDetail.cs</FileName>
@@ -525,14 +495,6 @@
   </Class>
   <Class Name="ExerSlotDetail" Collapsed="true">
     <Position X="29" Y="17.25" Width="2" />
-    <InheritanceLine Type="ItemInfo&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="32.5" Y="17.177" />
-        <Point X="32.5" Y="18.264" />
-        <Point X="29.938" Y="18.264" />
-        <Point X="29.938" Y="17.927" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAIAAKQAAAAAEAAACAAAAAIAAWAAAAAAAAAAAIhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\GiftsWindow\ExerSlotDetail.cs</FileName>
@@ -691,13 +653,6 @@
   </Class>
   <Class Name="InitExermonCard" Collapsed="true">
     <Position X="34.5" Y="21.5" Width="1.75" />
-    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedToPoint="true">
-      <Path>
-        <Point X="34.125" Y="19.177" />
-        <Point X="34.125" Y="21.875" />
-        <Point X="34.5" Y="21.875" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAACAAAAEAAAAQQAAAAAAhAA=</HashCode>
       <FileName>Assets\Scripts\Components\StartScene\ExermonsWindow\InitExermonCard.cs</FileName>
@@ -723,23 +678,15 @@
       <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemContainer.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ItemDisplay&lt;T&gt;" Collapsed="true">
+  <Class Name="SelectableItemInfo&lt;T&gt;" Collapsed="true">
     <Position X="33.25" Y="18.5" Width="1.75" />
-    <InheritanceLine Type="ItemInfo&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="32.5" Y="17.177" />
-        <Point X="32.5" Y="18.264" />
-        <Point X="34.125" Y="18.264" />
-        <Point X="34.125" Y="18.5" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEAAoEBegiAIoAgSAAEAIRIAwIZgAARA1AHQAQAAJCI=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemDisplay.cs</FileName>
+      <FileName>Assets\Scripts\Components\Common\ItemSystem\SelectableItemInfo.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="ItemInfo&lt;T&gt;" Collapsed="true">
+  <Class Name="ItemDisplay&lt;T&gt;" Collapsed="true">
     <Position X="31.75" Y="16.5" Width="1.5" />
     <InheritanceLine Type="BaseView" ManuallyRouted="true" FixedToPoint="true">
       <Path>
@@ -749,8 +696,9 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>BEAAAFAEQAAAIAEQAAQIAABAQAAAAAAAAAAAAAABgAA=</HashCode>
-      <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemInfo.cs</FileName>
+      <HashCode>AEAAAFAEQAAAIAEQAAQIAABAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Components\Common\ItemSystem\ItemDisplay.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Components\Common\ItemSystem\ItemInfo.cs</NewMemberFileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ItemPrice">
@@ -801,11 +749,12 @@
       <FileName>Assets\Scripts\Windows\TitleScene\LoginWindow.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MainScene">
+  <Class Name="StatusScene">
     <Position X="43.75" Y="10.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAEwAAAACEAAgAIAAAAAAAAAAAEQCAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Scenes\MainScene.cs</FileName>
+      <HashCode>AAAAAEAAAAACAAAgAIAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\StatusScene.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Scenes\MainScene.cs</NewMemberFileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MapDisplay" Collapsed="true">
@@ -934,21 +883,16 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Enum Name="QuestionService.Oper" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\QuestionService.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="QuestionService.State" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Assets\Scripts\Services\RecordService.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
       <Class Name="QuestionService.QuestionCache" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Assets\Scripts\Services\QuestionService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
+      <Enum Name="QuestionService.Oper" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Services\QuestionService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAgAAAAIQAAABGAAAAQAAAAAYAAACAwAAAAAAIAAA=</HashCode>
@@ -1037,14 +981,6 @@
   </Class>
   <Class Name="SlotItemDisplay&lt;T, E&gt;" Collapsed="true">
     <Position X="31.25" Y="20.25" Width="2.5" />
-    <InheritanceLine Type="ItemDisplay&lt;T&gt;" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="34.125" Y="19.177" />
-        <Point X="34.125" Y="19.848" />
-        <Point X="32.5" Y="19.848" />
-        <Point X="32.5" Y="20.25" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEAgAEIgCAAAAAAQBAADAAAAAAAAAAAIAAAQIAAAUAA=</HashCode>
       <FileName>Assets\Scripts\Components\Common\ItemSystem\SlotItemDisplay.cs</FileName>
@@ -1068,11 +1004,11 @@
       <FileName>Assets\Scripts\Scenes\StartScene.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="StatusDisplay" Collapsed="true">
+  <Class Name="BaseInfoView" Collapsed="true">
     <Position X="36.75" Y="11.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAAAAAAAAABCAAAAAAAAAAAABAAAAAAgAAAA=</HashCode>
-      <FileName>Assets\Scripts\Components\MainScene\StatusDisplay.cs</FileName>
+      <HashCode>AAAAIAAAAAAAAAEAAACEAAAAAAAEAAAIAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Components\StatusScene\BaseInfoView.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="StorageSystem" Collapsed="true">

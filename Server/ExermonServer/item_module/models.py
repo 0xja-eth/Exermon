@@ -344,6 +344,7 @@ class LimitedItem(BaseItem):
 		res['buy_price'] = buy_price
 		res['sell_price'] = self.sell_price
 		res['discardable'] = self.discardable
+		res['tradable'] = self.tradable
 		# res['icon'] = self.convertIconToBase64()
 
 		return res

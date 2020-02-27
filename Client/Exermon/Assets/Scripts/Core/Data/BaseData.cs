@@ -7,6 +7,45 @@ using UnityEngine.SceneManagement;
 
 using LitJson;
 using UnityEditor;
+using System.Reflection;
+
+/// <summary>
+/// 可自动转化的属性特性
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class AutoConvertAttribute : Attribute {
+
+    /// <summary>
+    /// 键名
+    /// </summary>
+    public string keyName;
+
+    /// <summary>
+    /// 防止覆盖
+    /// </summary>
+    public bool preventCover;
+
+    /// <summary>
+    /// 忽略空值
+    /// </summary>
+    public bool ignoreNull;
+
+    /// <summary>
+    /// 转换格式
+    /// </summary>
+    public string format;
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public AutoConvertAttribute(string keyName = null, 
+        bool preventCover = true, bool ignoreNull = false, string format = "") {
+        this.keyName = keyName;
+        this.preventCover = preventCover;
+        this.ignoreNull = ignoreNull;
+        this.format = format;
+    }
+}
 
 /// <summary>
 /// 游戏数据父类
@@ -17,6 +56,7 @@ public class BaseData {
     /// 属性
     /// </summary>
     int id; // ID（只读）
+    //public int id { get; protected set; }
     public int getID() { return id; }
 
     /// <summary>
@@ -33,21 +73,86 @@ public class BaseData {
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
-    public virtual void load(JsonData json) {
+    public void load(JsonData json) {
         rawData = json;
+        Debug.Log("load: " + json.ToJson());
+        loadAutoAttributes(json);
+        loadCustomAttributes(json);
+    }
 
-        id = idEnable() ? DataLoader.loadInt(json, "id") : -1;
+    /// <summary>
+    /// 读取自定义属性
+    /// </summary>
+    /// <param name="json"></param>
+    protected virtual void loadCustomAttributes(JsonData json) {
+        id = idEnable() ? DataLoader.load<int>(json, "id") : -1;
+    }
+
+    /// <summary>
+    /// 读取自动转换属性
+    /// </summary>
+    void loadAutoAttributes(JsonData json) {
+        var type = GetType();
+
+        foreach (var p in type.GetProperties())
+            foreach (Attribute a in p.GetCustomAttributes(false))
+                if (a.GetType() == typeof(AutoConvertAttribute)) {
+                    var attr = (AutoConvertAttribute)a;
+                    var pType = p.PropertyType; var pName = p.Name;
+                    var key = attr.keyName ?? DataLoader.hump2Underline(pName);
+                    var val = p.GetValue(this);
+
+                    var debug = string.Format("Loading {0} {1} {2} in {3} " +
+                        "(ori:{4})", p, pType, pName, type, val);
+                    Debug.Log(debug);
+
+                    val = attr.preventCover ? DataLoader.load(
+                        pType, val, json, key, attr.ignoreNull) : 
+                        DataLoader.load(pType, json, key);
+                    p.SetValue(this, val, BindingFlags.Public | BindingFlags.NonPublic, null, null, null);
+                }
     }
 
     /// <summary>
     /// 获取JSON数据
     /// </summary>
     /// <returns>JsonData</returns>
-    public virtual JsonData toJson() {
+    public JsonData toJson() {
         var json = new JsonData();
         json.SetJsonType(JsonType.Object);
-        if (idEnable()) json["id"] = id;
+        convertAutoAttributes(ref json);
+        convertCustomAttributes(ref json);
         return json;
+    }
+
+    /// <summary>
+    /// 转换自定义属性
+    /// </summary>
+    /// <param name="json"></param>
+    protected virtual void convertCustomAttributes(ref JsonData json) {
+        if (idEnable()) json["id"] = id;
+    }
+
+    /// <summary>
+    /// 转换自动转换属性
+    /// </summary>
+    void convertAutoAttributes(ref JsonData json) {
+        var type = GetType();
+
+        foreach (var p in type.GetProperties())
+            foreach (Attribute a in p.GetCustomAttributes(false))
+                if (a.GetType() == typeof(AutoConvertAttribute)) {
+                    var attr = (AutoConvertAttribute)a;
+                    var pType = p.PropertyType; var pName = p.Name;
+                    var key = attr.keyName ?? DataLoader.hump2Underline(pName);
+                    var val = p.GetValue(this);
+
+                    json[key] = DataLoader.convert(pType, val, attr.format);
+
+                    var debug = string.Format("Converting {0} {1} in {2} (val:{3}) " +
+                        "to key: {4}, res: {5}", pType, pName, type, val, key, json[key]);
+                    Debug.Log(debug);
+                }
     }
 
     /// <summary>
@@ -57,12 +162,12 @@ public class BaseData {
     public string rawJson() { return rawData.ToJson(); }
 
     /// <summary>
-    /// 类型转化
+    /// 类型转化（需要读取时候执行，因为 rawData 不会同步改变）
     /// </summary>
     /// <typeparam name="T">目标类型</typeparam>
     /// <returns>目标类型对象</returns>
     public T convert<T>() where T: BaseData, new() {
-        return DataLoader.loadData<T>(rawData);
+        return DataLoader.load<T>(rawData);
     }
 }
 
@@ -74,9 +179,11 @@ public class TypeData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public string name { get; private set; }
-    public string description { get; private set; }
-
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -97,6 +204,7 @@ public class TypeData : BaseData {
         json["description"] = description;
         return json;
     }
+    */
 }
 
 /// <summary>
@@ -107,9 +215,11 @@ public class ParamData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int paramId { get; private set; }
-    public double value { get; private set; } // 真实值
-
+    [AutoConvert]
+    public int paramId { get; protected set; }
+    [AutoConvert]
+    public double value { get; protected set; } // 真实值
+    
     /// <summary>
     /// 是否需要ID
     /// </summary>
@@ -159,7 +269,7 @@ public class ParamData : BaseData {
         this.paramId = paramId;
         this.value = value;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -179,7 +289,7 @@ public class ParamData : BaseData {
         json["param_id"] = paramId;
         json["value"] = value;
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -190,9 +300,12 @@ public class ParamRangeData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int paramId { get; private set; }
-    public double minValue { get; private set; } // 真实值
-    public double maxValue { get; private set; } // 真实值
+    [AutoConvert]
+    public int paramId { get; protected set; }
+    [AutoConvert]
+    public double minValue { get; protected set; } // 真实值
+    [AutoConvert]
+    public double maxValue { get; protected set; } // 真实值
 
     /// <summary>
     /// 是否需要ID
@@ -206,7 +319,7 @@ public class ParamRangeData : BaseData {
     public BaseParam param() {
         return DataService.get().baseParam(paramId);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -228,5 +341,5 @@ public class ParamRangeData : BaseData {
         json["min_value"] = minValue;
         json["max_value"] = maxValue;
         return json;
-    }
+    }*/
 }

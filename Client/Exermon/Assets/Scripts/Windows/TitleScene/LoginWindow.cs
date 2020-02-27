@@ -262,7 +262,7 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     /// <param name="res">返回结果</param>
     void onRegisterSuccess(JsonData res) {
-        var id = DataLoader.loadInt(res, "id");
+        var id = DataLoader.load<int>(res, "id");
         gameSys.requestAlert(string.Format(RegisterSuccessText, id));
         gotoLogin();
     }

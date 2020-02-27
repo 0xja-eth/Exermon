@@ -66,7 +66,7 @@ public class ParamDisplay : BaseView {
         public string key;
         // 对应显示的 GameObject
         public GameObject obj;
-        // 对应显示的类型：Text, Sign, Date, DateTime, Color, ScaleX, ScaleY, Sign
+        // 对应显示的类型：Text, Sign, Date, DateTime, Color, ScaleX, ScaleY
         public string type;
         // 是否有动画效果
         public bool animated;
@@ -74,7 +74,7 @@ public class ParamDisplay : BaseView {
         public bool configData;
         // 格式
         public string format;
-        // 触发模式：None, Click, Hover, HOC (HoverOrClick)
+        // 触发模式：Click, Hover, HOC (HoverOrClick)
         public string trigger;
     }
 
@@ -251,7 +251,7 @@ public class ParamDisplay : BaseView {
     /// </summary>
     /// <param name="item">显示项</param>
     void refreshKey(DisplayItem item) {
-        var value = DataLoader.loadJsonData(displayData, item.key);
+        var value = DataLoader.load(displayData, item.key);
         refreshKey(item, value);
     }
     /// <param name="value">值</param>
@@ -282,11 +282,11 @@ public class ParamDisplay : BaseView {
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
         if (value != null && value.IsDouble)
-            text.text = string.Format(format, DataLoader.loadDouble(value));
+            text.text = string.Format(format, DataLoader.load<double>(value));
         else if (value != null && value.IsInt)
-            text.text = string.Format(format, DataLoader.loadInt(value));
+            text.text = string.Format(format, DataLoader.load<int>(value));
         else if (value != null && value.IsBoolean) {
-            var val = DataLoader.loadBool(value);
+            var val = DataLoader.load<bool>(value);
             text.text = string.Format(format, val ? DefaultTrueText : DefaultFalseText);
         } else
             text.text = string.Format(format, value);
@@ -303,15 +303,15 @@ public class ParamDisplay : BaseView {
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
         string signText = "";
         if (value != null && value.IsDouble) {
-            var val = DataLoader.loadDouble(value);
+            var val = DataLoader.load<double>(value);
             if (val > 0) signText = DefaultTrueSign;
             text.text = signText + string.Format(format, val);
         } else if (value != null && value.IsInt) {
-            var val = DataLoader.loadInt(value);
+            var val = DataLoader.load<int>(value);
             if (val > 0) signText = DefaultTrueSign;
             text.text = signText + string.Format(format, val);
         } else if (value != null && value.IsBoolean) {
-            var val = DataLoader.loadBool(value);
+            var val = DataLoader.load<bool>(value);
             signText = val ? DefaultTrueSign : DefaultFalseSign;
             text.text = string.Format(format, signText);
         } else
@@ -329,7 +329,7 @@ public class ParamDisplay : BaseView {
         if (text == null) return;
         var format = item.format.Length > 0 ?
             item.format : DefaultDateFormat;
-        var date = DataLoader.loadDateTime(value);
+        var date = DataLoader.load<DateTime>(value);
         text.text = date.ToString(format);
     }
 
@@ -343,7 +343,7 @@ public class ParamDisplay : BaseView {
         if (text == null) return;
         var format = item.format.Length > 0 ?
             item.format : DefaultDateTimeFormat;
-        var date = DataLoader.loadDateTime(value);
+        var date = DataLoader.load<DateTime>(value);
         text.text = date.ToString(format);
     }
 
@@ -358,12 +358,12 @@ public class ParamDisplay : BaseView {
 
         var color = new Color();
         if(value != null)
-            if (value.IsString) color = DataLoader.loadColor(value);
+            if (value.IsString) color = DataLoader.load<Color>(value);
             else if (value.IsBoolean) {
-                var val = DataLoader.loadBool(value);
+                var val = DataLoader.load<bool>(value);
                 color = val ? trueColor() : falseColor();
             } else if (value.IsInt || value.IsDouble) {
-                var val = DataLoader.loadDouble(value);
+                var val = DataLoader.load<Double>(value);
                 if (val > 0) color = trueColor();
                 else if (val < 0) color = falseColor();
                 else color = normalColor();
@@ -388,7 +388,7 @@ public class ParamDisplay : BaseView {
     /// <returns></returns>
     Color trueColor() {
         if (DataLoader.contains(rawData, TrueColorKey))
-            return DataLoader.loadColor(rawData, TrueColorKey);
+            return DataLoader.load<Color>(rawData, TrueColorKey);
         return DefaultTrueColor;
     }
 
@@ -398,7 +398,7 @@ public class ParamDisplay : BaseView {
     /// <returns></returns>
     Color falseColor() {
         if (DataLoader.contains(rawData, FalseColorKey))
-            return DataLoader.loadColor(rawData, FalseColorKey);
+            return DataLoader.load<Color>(rawData, FalseColorKey);
         return DefaultFalseColor;
     }
 
@@ -408,7 +408,7 @@ public class ParamDisplay : BaseView {
     /// <returns></returns>
     Color normalColor() {
         if (DataLoader.contains(rawData, NormalColorKey))
-            return DataLoader.loadColor(rawData, NormalColorKey);
+            return DataLoader.load<Color>(rawData, NormalColorKey);
         return DefaultNormalColor;
     }
 
@@ -421,7 +421,7 @@ public class ParamDisplay : BaseView {
         var transform = item.obj.transform;
         if (transform == null) return;
 
-        var rate = DataLoader.loadFloat(value);
+        var rate = DataLoader.load<float>(value);
         var ani = SceneUtils.ani(item.obj);
         var ori = transform.localScale;
 
@@ -442,7 +442,7 @@ public class ParamDisplay : BaseView {
         var transform = item.obj.transform;
         if (transform == null) return;
 
-        var rate = DataLoader.loadFloat(value);
+        var rate = DataLoader.load<float>(value);
         var ani = SceneUtils.ani(item.obj);
         var ori = transform.localScale;
 

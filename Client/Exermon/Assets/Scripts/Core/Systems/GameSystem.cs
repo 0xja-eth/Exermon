@@ -140,7 +140,7 @@ public class GameSystem : BaseSystem<GameSystem> {
     /// <summary>
     /// 弹窗请求
     /// </summary>
-    public AlertRequest alertRequest { get; private set; } = null;
+    public AlertRequest alertRequest { get; protected set; } = null;
     public void requestAlert(string text, 
         AlertWindow.Type type = AlertWindow.Type.Notice, 
         UnityAction onOK = null, UnityAction onCancel = null, 
@@ -154,7 +154,7 @@ public class GameSystem : BaseSystem<GameSystem> {
     /// <summary>
     /// 加载请求
     /// </summary>
-    public LoadingRequest loadingRequest { get; private set; } = null;
+    public LoadingRequest loadingRequest { get; protected set; } = null;
     public void requestLoadStart(string text, bool start = true) {
         loadingRequest = new LoadingRequest(text, start);
     }
@@ -168,7 +168,7 @@ public class GameSystem : BaseSystem<GameSystem> {
     /// <summary>
     /// 场景切换控制
     /// </summary>
-    public ChangeSceneRequest changeScene { get; private set; } = null;
+    public ChangeSceneRequest changeScene { get; protected set; } = null;
     public void requestChangeScene(string scene, ChangeSceneRequest.Type type) {
         changeScene = new ChangeSceneRequest(scene, type);
     }

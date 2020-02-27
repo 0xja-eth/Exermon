@@ -13,7 +13,7 @@ public class BaseSystem<T> where T : BaseSystem<T>, new() {
     /// <summary>
     /// 初始化标志
     /// </summary>
-    public static bool initialized { get; private set; } = false;
+    public static bool initialized { get; protected set; } = false;
     public bool isInitialized() { return initialized; }
 
     /// <summary>
@@ -32,8 +32,8 @@ public class BaseSystem<T> where T : BaseSystem<T>, new() {
     /// <summary>
     /// 当前状态
     /// </summary>
-    public int state { get; private set; } = -1;
-    public int lastState { get; private set; } = -1;
+    public int state { get; protected set; } = -1;
+    public int lastState { get; protected set; } = -1;
 
     /// <summary>
     /// 单例函数

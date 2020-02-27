@@ -53,7 +53,7 @@ public class ScrollList : BaseView {
     /// <summary>
     /// 选项是否改变
     /// </summary>
-    public bool isDirty { get; private set; }
+    public bool isDirty { get; protected set; }
 
     #region 初始化
 

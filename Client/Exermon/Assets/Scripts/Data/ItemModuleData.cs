@@ -38,14 +38,17 @@ public class BaseItem : BaseData {
         ExerGift = 203,  // 艾瑟萌天赋
         ExerFrag = 204,  // 艾瑟萌碎片
     }
-    
+
     /// <summary>
     /// 属性
     /// </summary>
-    public string name { get; private set; }
-    public string description { get; private set; }
-    public int type { get; private set; } // 物品类型
-
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
+    [AutoConvert]
+    public int type { get; protected set; } // 物品类型
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -70,7 +73,7 @@ public class BaseItem : BaseData {
         json["type"] = type;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -81,15 +84,18 @@ public class ItemPrice : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int gold { get; private set; }
-    public int ticket { get; private set; }
-    public int boundTicket { get; private set; } // 物品类型
+    [AutoConvert]
+    public int gold { get; protected set; }
+    [AutoConvert]
+    public int ticket { get; protected set; }
+    [AutoConvert]
+    public int boundTicket { get; protected set; } // 物品类型
 
     /// <summary>
     /// 是否需要ID
     /// </summary>
     protected override bool idEnable() { return false; }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -115,7 +121,7 @@ public class ItemPrice : BaseData {
 
         return json;
     }
-
+    */
 }
 
 /// <summary>
@@ -126,12 +132,17 @@ public class LimitedItem : BaseItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public ItemPrice buyPrice { get; private set; }
-    public int sellPrice { get; private set; }
-    public bool discardable { get; private set; }
-    public bool tradable { get; private set; }
-    public Texture2D icon { get; private set; }
+    [AutoConvert]
+    public ItemPrice buyPrice { get; protected set; }
+    [AutoConvert]
+    public int sellPrice { get; protected set; }
+    [AutoConvert]
+    public bool discardable { get; protected set; }
+    [AutoConvert]
+    public bool tradable { get; protected set; }
 
+    public Texture2D icon { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -160,7 +171,7 @@ public class LimitedItem : BaseItem {
         json["tradable"] = tradable;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -171,10 +182,13 @@ public class EffectData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int code { get; private set; }
-    public JsonData params_ { get; private set; } // 参数（数组）
-    public string description { get; private set; }
-
+    [AutoConvert]
+    public int code { get; protected set; }
+    [AutoConvert("params")]
+    public JsonData params_ { get; protected set; } // 参数（数组）
+    [AutoConvert]
+    public string description { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -199,7 +213,7 @@ public class EffectData : BaseData {
         json["description"] = description;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -210,18 +224,26 @@ public class UsableItem : LimitedItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int maxCount { get; private set; }
-    public bool battleUse { get; private set; }
-    public bool menuUse { get; private set; }
-    public bool adventureUse { get; private set; }
-    public bool consumable { get; private set; }
-    public int freeze { get; private set; }
-    public int iType { get; private set; }
+    [AutoConvert]
+    public int maxCount { get; protected set; }
+    [AutoConvert]
+    public bool battleUse { get; protected set; }
+    [AutoConvert]
+    public bool menuUse { get; protected set; }
+    [AutoConvert]
+    public bool adventureUse { get; protected set; }
+    [AutoConvert]
+    public bool consumable { get; protected set; }
+    [AutoConvert]
+    public int freeze { get; protected set; }
+    [AutoConvert]
+    public int iType { get; protected set; }
 
     /// <summary>
     /// 使用效果
     /// </summary>
-    public List<EffectData> effects { get; private set; }
+    [AutoConvert]
+    public List<EffectData> effects { get; protected set; }
 
     /// <summary>
     /// 获取物品类型
@@ -230,7 +252,7 @@ public class UsableItem : LimitedItem {
     public UsableItemType itemType() {
         return DataService.get().usableItemType(iType);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -267,7 +289,7 @@ public class UsableItem : LimitedItem {
         json["effects"] = DataLoader.convertDataArray(effects);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -278,7 +300,8 @@ public class EquipableItem : LimitedItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public ParamData[] params_ { get; private set; }
+    [AutoConvert("params")]
+    public ParamData[] params_ { get; protected set; }
 
     /// <summary>
     /// 获取装备的属性
@@ -290,7 +313,7 @@ public class EquipableItem : LimitedItem {
             if (param.paramId == paramId) return param;
         return new ParamData(paramId);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -311,7 +334,7 @@ public class EquipableItem : LimitedItem {
         json["params"] = DataLoader.convertDataArray(params_);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -350,11 +373,12 @@ public abstract class BaseContItem : BaseData {
         PlayerExerGift = 201,  // 玩家艾瑟萌天赋关系
         PlayerExermon = 202,  // 玩家艾瑟萌关系
     }
-    
+
     /// <summary>
     /// 属性
     /// </summary>
-    public int type { get; private set; }
+    [AutoConvert]
+    public int type { get; protected set; }
 
     /// <summary>
     /// 默认类型
@@ -366,7 +390,7 @@ public abstract class BaseContItem : BaseData {
     /// 构造函数
     /// </summary>
     public BaseContItem() { type = (int)defaultType(); }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -387,7 +411,7 @@ public abstract class BaseContItem : BaseData {
         json["type"] = type;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -398,8 +422,10 @@ public abstract class PackContItem : BaseContItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int itemId { get; private set; }
-    public int count { get; private set; }
+    [AutoConvert]
+    public int itemId { get; protected set; }
+    [AutoConvert]
+    public int count { get; protected set; }
 
     /**
     /// <summary>
@@ -450,7 +476,7 @@ public abstract class PackContItem : BaseContItem {
         this.itemId = itemId;
         this.count = count;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -473,7 +499,7 @@ public abstract class PackContItem : BaseContItem {
         json["count"] = count;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -484,8 +510,9 @@ public abstract class SlotContItem : BaseContItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int index { get; private set; }
-
+    [AutoConvert]
+    public int index { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -506,7 +533,7 @@ public abstract class SlotContItem : BaseContItem {
         json["index"] = index;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -517,10 +544,13 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     /// <summary>
     /// 属性
     /// </summary>
-    public int type { get; private set; }
-    public int capacity { get; private set; }
+    [AutoConvert]
+    public int type { get; protected set; }
+    [AutoConvert]
+    public int capacity { get; protected set; }
 
-    public List<T> items { get; private set; }
+    [AutoConvert]
+    public List<T> items { get; protected set; }
 
     /// <summary>
     /// 数据是否需要实时同步（在背包界面时需要实时同步）
@@ -544,7 +574,7 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     public List<T> getItems(Predicate<T> p) {
         return items.FindAll(p);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -571,7 +601,7 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
         json["items"] = DataLoader.convertDataArray(items);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>

@@ -26,7 +26,8 @@ public class QuestionService : BaseService<QuestionService> {
         /// <summary>
         /// 缓存的题目
         /// </summary>
-        public List<Question> questions { get; private set; } = new List<Question>();
+        [AutoConvert]
+        public List<Question> questions { get; protected set; } = new List<Question>();
 
         /// <summary>
         /// 添加题目
@@ -35,7 +36,7 @@ public class QuestionService : BaseService<QuestionService> {
         public void addQuestions(Question[] questions) {
             this.questions.AddRange(questions);
         }
-
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -55,7 +56,7 @@ public class QuestionService : BaseService<QuestionService> {
             json["questions"] = DataLoader.convertDataArray(questions);
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -69,12 +70,12 @@ public class QuestionService : BaseService<QuestionService> {
     /// <summary>
     /// 缓存题目数据
     /// </summary>
-    public QuestionCache questionCache { get; private set; } = new QuestionCache();
+    public QuestionCache questionCache { get; protected set; } = new QuestionCache();
 
     /// <summary>
     /// 反馈记录
     /// </summary>
-    public QuesReport[] quesReports { get; private set; }
+    public QuesReport[] quesReports { get; protected set; }
 
     /// <summary>
     /// 外部系统
@@ -108,12 +109,12 @@ public class QuestionService : BaseService<QuestionService> {
     public void get(int[] qids, UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            var questions = DataLoader.loadDataArray<Question>(res, "questions");
+            var questions = DataLoader.load<Question[]>(res, "questions");
             questionCache.addQuestions(questions);
             onSuccess?.Invoke();
         };
         JsonData data = new JsonData();
-        data["qids"] = DataLoader.convertArray(qids);
+        data["qids"] = DataLoader.convert(qids);
         sendRequest(Oper.Get, data, _onSuccess, onError, uid: true);
     }
 
@@ -125,7 +126,7 @@ public class QuestionService : BaseService<QuestionService> {
     public void getReports(UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            quesReports = DataLoader.loadDataArray<QuesReport>(res, "reports");
+            quesReports = DataLoader.load(quesReports, res, "reports");
             onSuccess?.Invoke();
         };
 

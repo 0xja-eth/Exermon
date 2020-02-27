@@ -161,11 +161,11 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         public static void handleResponse(JsonData data) {
             Debug.Log("handleResponse: " + data.ToJson());
 
-            string route = DataLoader.loadString(data, "route");
-            int index = DataLoader.loadInt(data, "index");
-            int status = DataLoader.loadInt(data, "status");
-            string errmsg = DataLoader.loadString(data, "errmsg");
-            JsonData _data = DataLoader.loadJsonData(data, "data");
+            string route = DataLoader.load<string>(data, "route");
+            int index = DataLoader.load<int>(data, "index");
+            int status = DataLoader.load<int>(data, "status");
+            string errmsg = DataLoader.load<string>(data, "errmsg");
+            JsonData _data = DataLoader.load(data, "data");
 
             processResponseData(route, index, status, errmsg, _data);
         }
@@ -204,9 +204,10 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         /// </summary>
         /// <param name="data">接收发送数据</param>
         public static void handleEmit(JsonData data) {
-            string type = DataLoader.loadString(data, "type");
-            int status = DataLoader.loadInt(data, "status");
-            if (status > 0) throw new GameException(status, DataLoader.loadString(data, "errmsg"), EmitErrorHandler);
+            string type = DataLoader.load<string>(data, "type");
+            int status = DataLoader.load<int>(data, "status");
+            if (status > 0) throw new GameException(
+                status, DataLoader.load<string>(data, "errmsg"), EmitErrorHandler);
             processEmitData(type, data["data"]);
         }
 
@@ -230,7 +231,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         /// </summary>
         /// <param name="data">发送数据</param>
         static void processLink(JsonData data) {
-            get().socketName = DataLoader.loadString(data, "channel_name");
+            get().socketName = DataLoader.load<string>(data, "channel_name");
         }
 
         /// <summary>
@@ -238,9 +239,9 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         /// </summary>
         /// <param name="data">发送数据</param>
         static void processDisconnect(JsonData data) {
-            var channelName = DataLoader.loadString(data, "channel_name");
-            var code = DataLoader.loadInt(data, "code");
-            var message = DataLoader.loadString(data, "message");
+            var channelName = DataLoader.load<string>(data, "channel_name");
+            var code = DataLoader.load<int>(data, "code");
+            var message = DataLoader.load<string>(data, "message");
 
             if (channelName == get().socketName)
                 onSelfDisconnect(code, message);
@@ -300,7 +301,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     /// <summary>
     /// 状态信息（错误状态/断开连接状态）
     /// </summary>
-    public Tuple<int, string> stateInfo { get; private set; } = null;
+    public Tuple<int, string> stateInfo { get; protected set; } = null;
     public void clearStateInfo() { stateInfo = null; }
 
     /// <summary>
@@ -404,7 +405,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         Debug.Log("onReceived: " + message);
         try {
             JsonData data = JsonMapper.ToObject(message);
-            switch (DataLoader.loadString(data, "method")) {
+            switch (DataLoader.load<string>(data, "method")) {
                 // 接收处理请求响应（模仿HTTP）
                 case "response": ResponseDataHandler.handleResponse(data); break;
                 // 接收服务器主动发射的消息

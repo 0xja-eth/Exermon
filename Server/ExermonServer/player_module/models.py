@@ -455,12 +455,12 @@ class Player(CacheableModel):
 		quessugarpack = ModelUtils.objectToDict(self.quesSugarPack())
 
 		return {
-			'humanpack': humanpack,
-			'exerpack': exerpack,
-			'exerfragpack': exerfragpack,
-			'exergiftpool': exergiftpool,
-			'exerhub': exerhub,
-			'quessugarpack': quessugarpack,
+			'human_pack': humanpack,
+			'exer_pack': exerpack,
+			'exer_frag_pack': exerfragpack,
+			'exer_gift_pool': exergiftpool,
+			'exer_hub': exerhub,
+			'ques_sugar_pack': quessugarpack,
 		}
 
 	def _slotContainerIndices(self):
@@ -470,8 +470,8 @@ class Player(CacheableModel):
 		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot())
 
 		return {
-			'exerslot': exerslot,
-			'humanequipslot': humanequipslot,
+			'exer_slot': exerslot,
+			'human_equip_slot': humanequipslot,
 		}
 
 	# 对战信息
@@ -601,7 +601,7 @@ class Player(CacheableModel):
 		self.online = True
 
 		# 如果是已经创建了角色的玩家，对容器进行检查并创建
-		if self.status >= PlayerStatus.CharacterCreated:
+		if self.status >= PlayerStatus.CharacterCreated.value:
 			self._createContainers()
 
 		self.save()

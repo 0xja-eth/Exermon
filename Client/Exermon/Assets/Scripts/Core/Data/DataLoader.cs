@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using LitJson;
+using System.Reflection;
+using System.Linq;
 
 /// <summary>
 /// 数据控制器
@@ -34,19 +36,172 @@ public static class DataLoader {
     }
 
     #region 加载JsonData
-
+    
     /// <summary>
-    /// 加载本身
+    /// 加载数据
     /// </summary>
     /// <param name="json">数据</param>
     /// <param name="key">键</param>
-    public static JsonData loadJsonData(JsonData json, string key) {
+    public static JsonData load(JsonData json, string key) {
         if (contains(json, key)) return json[key];
         var data = new JsonData();
         data.SetJsonType(JsonType.Object);
         return data;
     }
 
+    /// <typeparam name="T">读取数据类型</typeparam>
+    /// <param name="val">原始值</param>
+    /// <param name="ignoreNull">是否忽略空值</param>
+    public static T load<T>(T val, JsonData json, string key, bool ignoreNull = false) {
+        if (!contains(json, key)) return val; // 如果不存在键，则返回原样
+        return (T)load(typeof(T), val, json[key], ignoreNull);
+    }
+    /// <param name="data">数据</param>
+    public static T load<T>(T val, JsonData data, bool ignoreNull = false) {
+        if (data == null)
+            // 如果值为空且忽略空值，则返回原样
+            return ignoreNull ? val : default;
+        return (T)load(typeof(T), val, data);
+    }
+    /// <param name="type">类型</param>
+    public static object load(Type type, object val, JsonData json, string key, bool ignoreNull = false) {
+        if (!contains(json, key)) return val; // 如果不存在键，则返回原样
+        return load(type, val, json[key], ignoreNull);
+    }
+    public static object load(Type type, object val, JsonData data, bool ignoreNull = false) {
+        if (data == null) 
+            // 如果值为空且忽略空值，则返回原样
+            return ignoreNull ? val : default;
+        // 判断特殊类型
+        if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData)) {
+            if (val == default) val = Activator.CreateInstance(type);
+            ((BaseData)val).load(data);
+            return val;
+        } else return load(type, data);
+    }
+
+    public static T load<T>(JsonData json, string key) {
+        if (!contains(json, key)) return default;
+        return (T)load(typeof(T), json[key]);
+    }
+    public static T load<T>(JsonData data) {
+        if (data == null) return default;
+        return (T)load(typeof(T), data);
+    }
+    public static object load(Type type, JsonData json, string key) {
+        if (!contains(json, key)) return default;
+        return load(type, json[key]);
+    }
+    public static object load(Type type, JsonData data) {
+        if (data == null) return default;
+
+        // 处理数组情况
+        if (type.IsArray) {
+            if (!data.IsArray) return default;
+            var cnt = data.Count;
+            var eleType = type.GetElementType();
+            var res = Array.CreateInstance(eleType, cnt);
+            for (var i = 0; i < cnt; ++i)
+                res.SetValue(load(eleType, data[i]), i);
+            return res;
+        }
+
+        // 处理列表情况
+        if (type.Name == typeof(List<>).Name) {
+            if (!data.IsArray) return default;
+            var cnt = data.Count;
+            var eleType = type.GetGenericArguments()[0];
+            var res = Activator.CreateInstance(type);
+            for (var i = 0; i < cnt; ++i)
+                type.GetMethod("Add").Invoke(res,
+                    new object[] { load(eleType, data[i]) });
+            return res;
+        }
+
+        // 处理特殊类型
+        if (type == typeof(Color)) return loadColor(data);
+        if (type == typeof(DateTime)) return loadDateTime(data);
+        if (type == typeof(TimeSpan)) return loadTimeSpan(data);
+        if (type == typeof(Tuple<int, string>)) return loadTuple(data);
+        if (type == typeof(Texture2D)) return loadTexture2D(data);
+
+        if (type.IsSubclassOf(typeof(BaseData))) return loadData(type, data);
+
+        // 处理基本类型
+        if (type == typeof(int)) return (int)data;
+        if (type == typeof(double)) return (double)data;
+        if (type == typeof(float)) return (float)(double)data;
+        if (type == typeof(string)) return (string)data;
+        if (type == typeof(bool)) return (bool)data;
+
+        // 其他情况下，直接返回即可
+        return data;
+    }
+
+    #region 具体加载函数
+
+    /// <summary>
+    /// 加载颜色
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的颜色</returns>
+    static Color loadColor(JsonData data) {
+        return SceneUtils.str2Color((string)data);
+    }
+
+    /// <summary>
+    /// 加载日期时间
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的字符串</returns>
+    static DateTime loadDateTime(JsonData data) {
+        try { return Convert.ToDateTime((string)data); } 
+        catch { return default; }
+    }
+
+    /// <summary>
+    /// 加载TimeSpan
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的TimeSpan</returns>
+    static TimeSpan loadTimeSpan(JsonData data) {
+        return new TimeSpan((int)data);
+    }
+
+    /// <summary>
+    /// 加载(int, string)二元组
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的二元组</returns>
+    static Tuple<int, string> loadTuple(JsonData data) {
+        return new Tuple<int, string>((int)data[0], (string)data[1]);
+    }
+
+    /// <summary>
+    /// 加载纹理
+    /// </summary>
+    /// <param name="json">数据</param>
+    /// <returns>加载的纹理</returns>
+    static Texture2D loadTexture2D(JsonData data) {
+        byte[] bytes = Convert.FromBase64String((string)data);
+        var res = new Texture2D(0, 0);
+        res.LoadImage(bytes);
+        return res;
+    }
+
+    /// <summary>
+    /// 加载数据
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <param name="data">数据</param>
+    static BaseData loadData(Type type, JsonData data) {
+        var res = (BaseData)Activator.CreateInstance(type);
+        res.load(data); return res;
+    }
+
+    #endregion
+
+    /*
     /// <summary>
     /// 加载整数
     /// </summary>
@@ -59,6 +214,10 @@ public static class DataLoader {
     public static int loadInt(JsonData json, string key) {
         if (contains(json, key)) return loadInt(json[key]);
         return default;
+    }
+    /// <param name="key">键</param>
+    public static void loadInt(ref int val, JsonData json, string key) {
+        if (contains(json, key)) val = loadInt(json[key]);
     }
 
     /// <summary>
@@ -73,6 +232,9 @@ public static class DataLoader {
     public static float loadFloat(JsonData json, string key) {
         if (contains(json, key)) return loadFloat(json[key]);
         return default;
+    }
+    public static void loadFloat(ref float val, JsonData json, string key) {
+        if (contains(json, key)) val = loadFloat(json[key]);
     }
 
     /// <summary>
@@ -116,7 +278,7 @@ public static class DataLoader {
         if (contains(json, key)) return loadString(json[key]);
         return default;
     }
-
+    
     /// <summary>
     /// 加载纹理
     /// </summary>
@@ -137,108 +299,35 @@ public static class DataLoader {
         return default;
     }
 
-    /// <summary>
-    /// 加载颜色
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的颜色</returns>
-    public static Color loadColor(JsonData json) {
-        if(json == null) return default;
-        return SceneUtils.str2Color(loadString(json));
-    }
     /// <param name="key">键</param>
     public static Color loadColor(JsonData json, string key) {
         if (contains(json, key)) return loadColor(json[key]);
         return default;
-    }
-
-    /// <summary>
-    /// 加载日期时间
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的字符串</returns>
-    public static DateTime loadDateTime(JsonData json) {
-        try {
-            return Convert.ToDateTime((string)json);
-        } catch {
-            return default;
-        }
     }
     /// <param name="key">键</param>
     public static DateTime loadDateTime(JsonData json, string key) {
         if (contains(json, key)) return loadDateTime(json[key]);
         return default;
     }
-
-    /// <summary>
-    /// 加载TimeSpan
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的TimeSpan</returns>
-    public static TimeSpan loadTimeSpan(JsonData json) {
-        return json == null ? default : new TimeSpan((int)json);
-    }
     /// <param name="key">键</param>
     public static TimeSpan loadTimeSpan(JsonData json, string key) {
         if (contains(json, key)) return loadTimeSpan(json[key]);
         return default;
-    }
-
-    /// <summary>
-    /// 加载(int, string)二元组
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的二元组</returns>
-    public static Tuple<int, string> loadTuple(JsonData json) {
-        return json == null ? default : new Tuple<int, string>((int)json[0], (string)json[1]);
     }
     /// <param name="key">键</param>
     public static Tuple<int, string> loadTuple(JsonData json, string key) {
         if (contains(json, key)) return loadTuple(json[key]);
         return default;
     }
-
-    /// <summary>
-    /// 加载整数数组
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的整数数组</returns>
-    public static int[] loadIntArray(JsonData json) {
-        var cnt = json.Count; int[] res = new int[cnt];
-        for (int i = 0; i < cnt; i++) res[i] = loadInt(json[i]);
-        return res;
-    }
     /// <param name="key">键</param>
     public static int[] loadIntArray(JsonData json, string key) {
         if (contains(json, key)) return loadIntArray(json[key]);
         return default; // null
     }
-
-    /// <summary>
-    /// 加载整数二维数组
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的整数二维数组</returns>
-    public static int[][] loadInt2DArray(JsonData json) {
-        var cnt = json.Count; int[][] res = new int[cnt][];
-        for (int i = 0; i < cnt; i++) res[i] = loadIntArray(json[i]);
-        return res;
-    }
     /// <param name="key">键</param>
     public static int[][] loadInt2DArray(JsonData json, string key) {
         if (contains(json, key)) return loadInt2DArray(json[key]);
         return default; // null
-    }
-
-    /// <summary>
-    /// 加载字符串数组
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的字符串数组</returns>
-    public static string[] loadStringArray(JsonData json) {
-        var cnt = json.Count; string[] res = new string[cnt];
-        for (int i = 0; i < cnt; i++) res[i] = loadString(json[i]);
-        return res;
     }
     /// <param name="key">键</param>
     public static string[] loadStringArray(JsonData json, string key) {
@@ -278,7 +367,7 @@ public static class DataLoader {
         if (contains(json, key)) return loadTupleArray(json[key]);
         return default; // null
     }
-
+    
     /// <summary>
     /// 加载数据
     /// </summary>
@@ -304,6 +393,7 @@ public static class DataLoader {
         if (contains(json, key)) loadData(ref data, json[key]);
         else data = default;
     }
+    
 
     /// <summary>
     /// 加载数据数组
@@ -311,13 +401,7 @@ public static class DataLoader {
     /// <typeparam name="T">要加载的类型</typeparam>
     /// <param name="data">数据容器</param>
     /// <param name="json">数据</param>
-    public static T[] loadDataArray<T>(/*ref T[] data, */JsonData json) where T : BaseData, new() {
-        /*
-        var cnt = json.Count; data = new T[cnt];
-        for (int i = 0; i < cnt; i++) {
-            data[i] = new T(); data[i].load(json[i]);
-        }
-        */
+    public static T[] loadDataArray<T>(JsonData json) where T : BaseData, new() {
         var cnt = json.Count;
         T[] data = new T[cnt];
         for (int i = 0; i < cnt; i++) {
@@ -348,7 +432,7 @@ public static class DataLoader {
     /// <typeparam name="T">要加载的类型</typeparam>
     /// <param name="data">数据容器（列表）</param>
     /// <param name="json">数据</param>
-    public static List<T> loadDataList<T>(/*ref List<T> data, */JsonData json) where T : BaseData, new() {
+    public static List<T> loadDataList<T>(JsonData json) where T : BaseData, new() {
         var cnt = json.Count;
         List<T> data = new List<T>();
         for (int i = 0; i < cnt; i++) {
@@ -374,45 +458,71 @@ public static class DataLoader {
         if (contains(json, key)) loadDataList(ref data, json[key]);
         else data = new List<T>();
     }
+    */
 
     #endregion
 
     #region 转化为JsonData
 
     /// <summary>
-    /// 转化泛型数组
+    /// 转化为JsonData
     /// </summary>
-    /// <param name="data">整型数组</param>
-    /// <returns>转化后的JsonData</returns>
-    public static JsonData convertArray<T>(T[] data) {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        foreach (var d in data) json.Add(d);
-        return json;
+    /// <typeparam name="T">类型</typeparam>
+    /// <param name="data">数据</param>
+    /// <param name="format">转化格式</param>
+    /// <returns>JsonData</returns>
+    public static JsonData convert<T>(T data, string format = "") {
+        return convert(typeof(T), data, format);
+    }
+    /// <param name="type">类型</param>
+    public static JsonData convert(Type type, object data, string format = "") {
+        format = format.ToLower();
+        bool isArray = false;
+        Type eleType = null;
+
+        // 处理数组情况
+        if (isArray = type.IsArray) 
+            eleType = type.GetElementType();
+        if (type.Name == typeof(List<>).Name) 
+            eleType = type.GetGenericArguments()[0];
+        if (isArray) {
+            var array = (IEnumerable)data;
+            var json = new JsonData();
+            json.SetJsonType(JsonType.Array);
+            foreach (var d in array)
+                json.Add(convert(eleType, d, format));
+            return json;
+        }
+
+        // 处理特殊类型
+        if (type == typeof(Color)) return convertColor((Color)data);
+        if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
+        if (type == typeof(DateTime) && format == "date") return convertDate((DateTime)data);
+        if (type == typeof(Tuple<int, string>)) return convertTuple((Tuple<int, string>)data);
+        if (type == typeof(Texture2D)) return convertTexture2D(data as Texture2D);
+
+        if (type.IsSubclassOf(typeof(BaseData))) return convertData(data as BaseData);
+
+        // 处理基本类型
+        if (type == typeof(int)) return (int)data;
+        if (type == typeof(double)) return (double)data;
+        if (type == typeof(float)) return (double)data;
+        if (type == typeof(string)) return (string)data;
+        if (type == typeof(bool)) return (bool)data;
+
+        // 其他情况下，直接返回即可
+        return data as JsonData;
     }
 
-    /// <summary>
-    /// 转化泛型2D数组
-    /// </summary>
-    /// <param name="data">2D整型数组</param>
-    /// <returns>转化后的JsonData</returns>
-    public static JsonData convert2DArray<T>(T[][] data) {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        foreach (var d in data) json.Add(convertArray(d));
-        return json;
-    }
+    #region 具体转化函数
 
     /// <summary>
-    /// 转化泛型3D数组
+    /// 加载颜色
     /// </summary>
-    /// <param name="data">3D整型数组</param>
-    /// <returns>转化后的JsonData</returns>
-    public static JsonData convert3DArray<T>(T[][][] data) {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        foreach (var d in data) json.Add(convert2DArray(d));
-        return json;
+    /// <param name="json">数据</param>
+    /// <returns>加载的颜色</returns>
+    static JsonData convertColor(Color c) {
+        return SceneUtils.color2Str(c);
     }
 
     /// <summary>
@@ -420,7 +530,7 @@ public static class DataLoader {
     /// </summary>
     /// <param name="data">日期时间</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertDateTime(DateTime data) {
+    static JsonData convertDateTime(DateTime data) {
         if (data == null) return "";
         return data.ToString(SystemDateTimeFormat);
     }
@@ -430,42 +540,9 @@ public static class DataLoader {
     /// </summary>
     /// <param name="data">日期时间</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertDate(DateTime data) {
+    static JsonData convertDate(DateTime data) {
         if (data == null) return "";
         return data.ToString(SystemDateFormat);
-    }
-
-    /// <summary>
-    /// 加载颜色
-    /// </summary>
-    /// <param name="json">数据</param>
-    /// <returns>加载的颜色</returns>
-    public static JsonData convertColor(Color c) {
-        return SceneUtils.color2Str(c);
-    }
-
-    /// <summary>
-    /// 转化纹理
-    /// </summary>
-    /// <param name="data">纹理</param>
-    /// <returns>转化后的JsonData</returns>
-    public static JsonData convertTexture2D(Texture2D data) {
-        if (data == null) return "";
-        byte[] bytes = data.EncodeToPNG();
-        return Convert.ToBase64String(bytes, 0, bytes.Length);
-    }
-
-    /// <summary>
-    /// 转化纹理数组
-    /// </summary>
-    /// <param name="data">纹理数组</param>
-    /// <returns>转化后的JsonData</returns>
-    public static JsonData convertTexture2DArray(Texture2D[] data) {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        if (data == null) return json;
-        foreach (var d in data) json.Add(convertTexture2D(d));
-        return json;
     }
 
     /// <summary>
@@ -473,7 +550,7 @@ public static class DataLoader {
     /// </summary>
     /// <param name="data">二元组数据</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertTuple(Tuple<int, string> data) {
+    static JsonData convertTuple(Tuple<int, string> data) {
         var json = new JsonData();
         json.SetJsonType(JsonType.Array);
         if (data == null) return json;
@@ -482,16 +559,14 @@ public static class DataLoader {
     }
 
     /// <summary>
-    /// 转化(int, string)二元组数组
+    /// 转化纹理
     /// </summary>
-    /// <param name="data">二元组数组</param>
+    /// <param name="data">纹理</param>
     /// <returns>转化后的JsonData</returns>
-    public static JsonData convertTupleArray(Tuple<int, string>[] data) {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        if (data == null) return json;
-        foreach (var d in data) json.Add(convertTuple(d));
-        return json;
+    static JsonData convertTexture2D(Texture2D data) {
+        if (data == null) return "";
+        byte[] bytes = data.EncodeToPNG();
+        return Convert.ToBase64String(bytes, 0, bytes.Length);
     }
 
     /// <summary>
@@ -499,38 +574,102 @@ public static class DataLoader {
     /// </summary>
     /// <typeparam name="T">要转化的类型</typeparam>
     /// <param name="data">数据</param>
-    public static JsonData convertData<T>(T data) where T : BaseData, new() {
-        if(data != null) return data.toJson();
+    public static JsonData convertData(BaseData data) {
+        if (data != null) return data.toJson();
         var json = new JsonData();
         json.SetJsonType(JsonType.Object);
         return json;
     }
 
-    /// <summary>
-    /// 转化数据数组
-    /// </summary>
-    /// <typeparam name="T">要转化的类型</typeparam>
-    /// <param name="data">数据数组</param>
-    public static JsonData convertDataArray<T>(T[] data) where T : BaseData, new() {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        if (data == null) return json;
-        foreach (var d in data) json.Add(convertData(d));
-        return json;
-    }
+    #endregion
 
-    /// <summary>
-    /// 转化数据数组
-    /// </summary>
-    /// <typeparam name="T">要转化的类型</typeparam>
-    /// <param name="data">数据列表</param>
-    public static JsonData convertDataArray<T>(List<T> data) where T : BaseData, new() {
-        var json = new JsonData();
-        json.SetJsonType(JsonType.Array);
-        if (data == null) return json;
-        foreach (var d in data) json.Add(convertData(d));
-        return json;
-    }
+    ///// <summary>
+    ///// 转化泛型数组
+    ///// </summary>
+    ///// <param name="data">整型数组</param>
+    ///// <returns>转化后的JsonData</returns>
+    //public static JsonData convert<T>(T[] data) {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    foreach (var d in data) json.Add(d);
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化泛型2D数组
+    ///// </summary>
+    ///// <param name="data">2D整型数组</param>
+    ///// <returns>转化后的JsonData</returns>
+    //public static JsonData convert2DArray<T>(T[][] data) {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    foreach (var d in data) json.Add(convert(d));
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化泛型3D数组
+    ///// </summary>
+    ///// <param name="data">3D整型数组</param>
+    ///// <returns>转化后的JsonData</returns>
+    //static JsonData convert3DArray<T>(T[][][] data) {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    foreach (var d in data) json.Add(convert2DArray(d));
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化纹理数组
+    ///// </summary>
+    ///// <param name="data">纹理数组</param>
+    ///// <returns>转化后的JsonData</returns>
+    //public static JsonData convertTexture2DArray(Texture2D[] data) {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    if (data == null) return json;
+    //    foreach (var d in data) json.Add(convertTexture2D(d));
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化(int, string)二元组数组
+    ///// </summary>
+    ///// <param name="data">二元组数组</param>
+    ///// <returns>转化后的JsonData</returns>
+    //public static JsonData convertTupleArray(Tuple<int, string>[] data) {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    if (data == null) return json;
+    //    foreach (var d in data) json.Add(convertTuple(d));
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化数据数组
+    ///// </summary>
+    ///// <typeparam name="T">要转化的类型</typeparam>
+    ///// <param name="data">数据数组</param>
+    //public static JsonData convertDataArray<T>(T[] data) where T : BaseData, new() {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    if (data == null) return json;
+    //    foreach (var d in data) json.Add(convertData(d));
+    //    return json;
+    //}
+
+    ///// <summary>
+    ///// 转化数据数组
+    ///// </summary>
+    ///// <typeparam name="T">要转化的类型</typeparam>
+    ///// <param name="data">数据列表</param>
+    //public static JsonData convertDataArray<T>(List<T> data) where T : BaseData, new() {
+    //    var json = new JsonData();
+    //    json.SetJsonType(JsonType.Array);
+    //    if (data == null) return json;
+    //    foreach (var d in data) json.Add(convertData(d));
+    //    return json;
+    //}
 
     #endregion
 

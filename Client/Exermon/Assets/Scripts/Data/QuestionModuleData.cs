@@ -27,10 +27,13 @@ public class Question : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
-        public int order { get; private set; }
-        public string text { get; private set; }
-        public bool answer { get; private set; }
-
+        [AutoConvert]
+        public int order { get; protected set; }
+        [AutoConvert]
+        public string text { get; protected set; }
+        [AutoConvert]
+        public bool answer { get; protected set; }
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -56,6 +59,7 @@ public class Question : BaseData {
 
             return json;
         }
+        */
     }
 
     /// <summary>
@@ -71,9 +75,11 @@ public class Question : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
-        public int number { get; private set; }
-        public Texture2D data { get; private set; }
-
+        [AutoConvert]
+        public int number { get; protected set; }
+        [AutoConvert]
+        public Texture2D data { get; protected set; }
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -96,27 +102,42 @@ public class Question : BaseData {
             json["data"] = DataLoader.convertTexture2D(data);
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
     /// 属性
     /// </summary>
-    public int number { get; private set; }
-    public string title { get; private set; }
-    public string description { get; private set; }
-    public string source { get; private set; }
-    public int starId { get; private set; }
-    public int level { get; private set; }
-    public int score { get; private set; }
-    public int subjectId { get; private set; }
-    public int type { get; private set; }
-    public int status { get; private set; }
+    [AutoConvert]
+    public int number { get; protected set; }
+    [AutoConvert]
+    public string title { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
+    [AutoConvert]
+    public string source { get; protected set; }
+    [AutoConvert]
+    public int starId { get; protected set; }
+    [AutoConvert]
+    public int level { get; protected set; }
+    [AutoConvert]
+    public int score { get; protected set; }
+    [AutoConvert]
+    public int subjectId { get; protected set; }
+    [AutoConvert]
+    public int type { get; protected set; }
+    [AutoConvert]
+    public int status { get; protected set; }
 
-    public DateTime createTime { get; private set; }
+    [AutoConvert]
+    public DateTime createTime { get; protected set; }
 
-    public Choice[] choices { get; private set; }
-    public Picture[] pictures { get; private set; }
+    [AutoConvert]
+    public Choice[] choices { get; protected set; }
+    [AutoConvert]
+    public Picture[] pictures { get; protected set; }
+
+    #region 数据操作
 
     /// <summary>
     /// 星级实例
@@ -150,6 +171,8 @@ public class Question : BaseData {
         return DataService.get().questionStatus(status).Item2;
     }
 
+    #endregion
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -194,7 +217,7 @@ public class Question : BaseData {
         json["pictures"] = DataLoader.convertDataArray(pictures);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -205,13 +228,19 @@ public class QuesSugar : BaseItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int questionId { get; private set; }
-    public ItemPrice buyPrice { get; private set; }
-    public int sellPrice { get; private set; }
-    public int getRate { get; private set; }
-    public int getCount { get; private set; }
+    [AutoConvert]
+    public int questionId { get; protected set; }
+    [AutoConvert]
+    public ItemPrice buyPrice { get; protected set; }
+    [AutoConvert]
+    public int sellPrice { get; protected set; }
+    [AutoConvert]
+    public int getRate { get; protected set; }
+    [AutoConvert]
+    public int getCount { get; protected set; }
 
-    public ParamData[] params_ { get; private set; }
+    [AutoConvert("params")]
+    public ParamData[] params_ { get; protected set; }
 
     /// <summary>
     /// 获取装备的属性
@@ -223,7 +252,7 @@ public class QuesSugar : BaseItem {
             if (param.paramId == paramId) return param;
         return new ParamData(paramId);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -259,7 +288,7 @@ public class QuesSugar : BaseItem {
         json["params"] = DataLoader.convertDataArray(params_);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -291,13 +320,19 @@ public class QuesReport : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int questionId { get; private set; }
-    public int type { get; private set; }
-    public string description { get; private set; }
-    public DateTime createTime { get; private set; }
-    public string result { get; private set; }
-    public DateTime resultTime { get; private set; }
-
+    [AutoConvert]
+    public int questionId { get; protected set; }
+    [AutoConvert]
+    public int type { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
+    [AutoConvert]
+    public DateTime createTime { get; protected set; }
+    [AutoConvert]
+    public string result { get; protected set; }
+    [AutoConvert]
+    public DateTime resultTime { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -328,5 +363,5 @@ public class QuesReport : BaseData {
         json["result_time"] = DataLoader.convertDateTime(resultTime);
 
         return json;
-    }
+    }*/
 }

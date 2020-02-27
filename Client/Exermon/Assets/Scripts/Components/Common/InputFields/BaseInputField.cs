@@ -67,7 +67,6 @@ public class BaseInputField<T> : BaseView {
     /// 更新 Focus 事件
     /// </summary>
     void updateFocus() {
-        Debug.Log(name + ": " + isRealFocused());
         if (isRealFocused() && !isFocused()) onFocus();
         if (!isRealFocused() && isFocused()) onBlur();
     }

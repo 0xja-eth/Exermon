@@ -47,8 +47,8 @@ public class DataService : BaseService<DataService> {
     /// <summary>
     /// 游戏数据
     /// </summary>
-    public GameStaticData staticData { get; private set; } = new GameStaticData();
-    public GameDynamicData dynamicData { get; private set; } = new GameDynamicData();
+    public GameStaticData staticData { get; protected set; } = new GameStaticData();
+    public GameDynamicData dynamicData { get; protected set; } = new GameDynamicData();
 
     /// <summary>
     /// 接受失败函数（初始加载用）
@@ -419,7 +419,7 @@ public class DataService : BaseService<DataService> {
     /// </summary>
     /// <param name="data">静态数据</param>
     void onStaticDataLoaded(JsonData data) {
-        staticData.load(DataLoader.loadJsonData(data, "data"));
+        staticData.load(DataLoader.load(data, "data"));
         storageSys.save();
         loadDynamicData();
     }
@@ -429,7 +429,7 @@ public class DataService : BaseService<DataService> {
     /// </summary>
     /// <param name="data">数据</param>
     void onDynamicDataLoaded(JsonData data) {
-        dynamicData.load(DataLoader.loadJsonData(data, "data"));
+        dynamicData.load(DataLoader.load(data, "data"));
         changeState(State.Loaded);
     }
 

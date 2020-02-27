@@ -137,14 +137,9 @@ class Exermon(BaseItem):
 		return super().__getattr__(item)
 
 	# 转换属性为 dict
-	def _convertParamsToDict(self):
-
-		data = dict()
-
-		data['bases'] = ModelUtils.objectsToDict(self.paramBases())
-		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
-
-		return data
+	def _convertParamsToDict(self, res):
+		res['base_params'] = ModelUtils.objectsToDict(self.paramBases())
+		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
 	# 转化为 dict
 	def convertToDict(self):
@@ -154,7 +149,7 @@ class Exermon(BaseItem):
 		res['star_id'] = self.star_id
 		res['subject_id'] = self.subject_id
 		res['e_type'] = self.e_type
-		res['params'] = self._convertParamsToDict()
+		self._convertParamsToDict(res)
 
 		return res
 
@@ -296,14 +291,9 @@ class PlayerExermon(PackContItem):
 			ExerSkillSlot, self.EXERSKILL_CACHE_KEY)
 
 	# 转换属性为 dict
-	def _convertParamsToDict(self):
-
-		data = dict()
-
-		data['values'] = ModelUtils.objectsToDict(self.paramVals())
-		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
-
-		return data
+	def _convertParamsToDict(self, res):
+		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
+		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
@@ -314,8 +304,9 @@ class PlayerExermon(PackContItem):
 		res['nickname'] = self.nickname
 		res['exp'] = self.exp
 		res['level'] = self.level
-		res['params'] = self._convertParamsToDict()
-		res['exerskillslot'] = exerskillslot
+		res['exer_skill_slot'] = exerskillslot
+
+		self._convertParamsToDict(res)
 
 		return res
 
@@ -897,14 +888,9 @@ class ExerSlotItem(SlotContItem):
 	# 	if index == 1: return self.player_gift
 
 	# 转换属性为 dict
-	def _convertParamsToDict(self):
-
-		data = dict()
-
-		data['values'] = ModelUtils.objectsToDict(self.paramVals())
-		data['rates'] = ModelUtils.objectsToDict(self.paramRates())
-
-		return data
+	def _convertParamsToDict(self, res):
+		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
+		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
 	# 获取艾瑟萌技能槽
 	def exerEquipSlot(self):
@@ -923,8 +909,9 @@ class ExerSlotItem(SlotContItem):
 		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
-		res['params'] = self._convertParamsToDict()
-		res['exerequipslot'] = exerequipslot
+		res['exer_equip_slot'] = exerequipslot
+
+		self._convertParamsToDict(res)
 
 		return res
 

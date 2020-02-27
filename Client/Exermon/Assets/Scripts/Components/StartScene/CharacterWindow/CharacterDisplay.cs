@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 人物显示项
 /// </summary>
-public class CharacterDisplay : ItemDisplay<Character> {
+public class CharacterDisplay : SelectableItemInfo<Character> {
 
     /// <summary>
     /// 常量定义
@@ -146,8 +146,9 @@ public class CharacterDisplay : ItemDisplay<Character> {
         image.overrideSprite = Sprite.Create(
             bust, rect, new Vector2(0.5f, 0.5f));
         image.overrideSprite.name = bust.name;
-        SceneUtils.setRectWidth(rectTransform, bust.width);
-        SceneUtils.setRectHeight(rectTransform, bust.height);
+        image.SetNativeSize();
+        //SceneUtils.setRectWidth(rectTransform, bust.width);
+        //SceneUtils.setRectHeight(rectTransform, bust.height);
     }
 
     /// <summary>

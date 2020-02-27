@@ -60,7 +60,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(DataLoader.loadJsonData(res, "container"));
+            container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -85,7 +85,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : SlotContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(DataLoader.loadJsonData(res, "container"));
+            container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -113,7 +113,7 @@ public class ItemService : BaseService<ItemService> {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             if(container.realTime)
-                container.load(DataLoader.loadJsonData(res, "container"));
+                container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -169,7 +169,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(DataLoader.loadJsonData(res, "container"));
+            container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -194,8 +194,8 @@ public class ItemService : BaseService<ItemService> {
         JsonData data = new JsonData();
         data["type"] = type; data["cid"] = cid;
         data["target_cid"] = targetCid;
-        data["contitem_ids"] = DataLoader.convertArray(contItemIds);
-        data["counts"] = DataLoader.convertArray(counts);
+        data["contitem_ids"] = DataLoader.convert(contItemIds);
+        data["counts"] = DataLoader.convert(counts);
         sendRequest(Oper.TransferItem, data, onSuccess, onError, uid: true);
     }
 
@@ -212,7 +212,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(DataLoader.loadJsonData(res, "container"));
+            container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -242,7 +242,7 @@ public class ItemService : BaseService<ItemService> {
         UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            container.load(DataLoader.loadJsonData(res, "container"));
+            container = DataLoader.load(container, res, "container");
             onSuccess?.Invoke();
         };
 
@@ -265,7 +265,7 @@ public class ItemService : BaseService<ItemService> {
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
         data["type"] = type; data["cid"] = cid; 
-        data["contitem_ids"] = DataLoader.convertArray(contItemIds);
+        data["contitem_ids"] = DataLoader.convert(contItemIds);
         sendRequest(Oper.MergeItem, data, onSuccess, onError, uid: true);
     }
 

@@ -23,12 +23,14 @@ public class GameStaticData : BaseData {
     /// <summary>
     /// 后台版本
     /// </summary>
-    public GameVersionData curVersion { get; private set; }
+    [AutoConvert]
+    public GameVersionData curVersion { get; protected set; }
 
     /// <summary>
     /// 历史版本
     /// </summary>
-    public List<GameVersionData> lastVersions { get; private set; }
+    [AutoConvert]
+    public List<GameVersionData> lastVersions { get; protected set; }
 
     /// <summary>
     /// 游戏配置
@@ -85,13 +87,9 @@ public class GameStaticData : BaseData {
     /// <summary>
     /// 数据加载
     /// </summary>
-    /// <param name="json"></param>
-    public override void load(JsonData json) {
-        Debug.Log("Loading static data:" + json.ToJson());
-        Debug.Log("Loaded: " + loaded);
-        base.load(json);
-        curVersion = DataLoader.loadData<GameVersionData>(json, "cur_version");
-        lastVersions = DataLoader.loadDataList<GameVersionData>(json, "last_versions");
+    /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
 
         Debug.Log("curVersion: " + curVersion + " (" + (curVersion == default) + ")");
         if (curVersion == default) return;
@@ -100,10 +98,23 @@ public class GameStaticData : BaseData {
         if (curVersion.mainVersion == LocalMainVersion &&
             curVersion.subVersion == LocalSubVersion && loaded) return;
 
-        DataLoader.loadData(ref _configure, json, "configure");
-        DataLoader.loadData(ref _data, json, "data");
+        configure = DataLoader.load(configure, json, "configure");
+        data = DataLoader.load(data, json, "data");
 
         loaded = true;
+    }
+    /*
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json"></param>
+    public override void load(JsonData json) {
+        Debug.Log("Loading static data:" + json.ToJson());
+        Debug.Log("Loaded: " + loaded);
+        base.load(json);
+        curVersion = DataLoader.loadData<GameVersionData>(json, "cur_version");
+        lastVersions = DataLoader.loadDataList<GameVersionData>(json, "last_versions");
+
         Debug.Log("Load end");
     }
 
@@ -119,7 +130,7 @@ public class GameStaticData : BaseData {
         json["data"] = DataLoader.convertData(data);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -135,8 +146,9 @@ public class GameDynamicData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public List<CompSeason> seasons { get; private set; }
-    
+    [AutoConvert]
+    public List<CompSeason> seasons { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -158,7 +170,7 @@ public class GameDynamicData : BaseData {
 
         return json;
     }
-
+    */
 }
 
 /// <summary>
@@ -174,9 +186,12 @@ public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public int maxScore { get; private set; }
-    public bool force { get; private set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public int maxScore { get; protected set; }
+    [AutoConvert]
+    public bool force { get; protected set; }
 
     /// <summary>
     /// 转化为属性信息
@@ -187,6 +202,15 @@ public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
         return toJson();
     }
 
+    /// <summary>
+    /// 数据加载
+    /// </summary>
+    /// <param name="json">数据</param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+        if (force) ForceCount++;
+    }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -210,7 +234,7 @@ public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
         json["max_score"] = maxScore;
         json["force"] = force;
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -221,12 +245,18 @@ public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public int maxValue { get; private set; }
-    public int minValue { get; private set; }
-    public int default_ { get; private set; }
-    public int scale { get; private set; }
-    public string attr { get; private set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public int maxValue { get; protected set; }
+    [AutoConvert]
+    public int minValue { get; protected set; }
+    [AutoConvert("default")]
+    public int default_ { get; protected set; }
+    [AutoConvert]
+    public int scale { get; protected set; }
+    [AutoConvert]
+    public string attr { get; protected set; }
 
     /// <summary>
     /// 转化为属性信息
@@ -255,7 +285,7 @@ public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
         if (maxValue > 0) val = Math.Min(maxValue, val);
         return val;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -283,7 +313,7 @@ public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
         json["scale"] = scale;
         json["attr"] = attr;
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -309,11 +339,15 @@ public class ExerStar : TypeData {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public int maxLevel { get; private set; }
-    public ParamRangeData[] baseRanges { get; private set; }
-    public ParamRangeData[] rateRanges { get; private set; }
-
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public int maxLevel { get; protected set; }
+    [AutoConvert]
+    public ParamRangeData[] baseRanges { get; protected set; }
+    [AutoConvert]
+    public ParamRangeData[] rateRanges { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -343,7 +377,7 @@ public class ExerStar : TypeData {
         json["param_ranges"]["rates"] = DataLoader.convertDataArray(rateRanges);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -354,9 +388,12 @@ public class ExerGiftStar : TypeData {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public List<ParamRangeData> paramRanges { get; private set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public ParamRangeData[] paramRanges { get; protected set; }
 
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -377,7 +414,7 @@ public class ExerGiftStar : TypeData {
         json["param_ranges"] = DataLoader.convertDataArray(paramRanges);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -388,8 +425,10 @@ public class ItemStar : TypeData {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
 
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -408,7 +447,7 @@ public class ItemStar : TypeData {
         json["color"] = DataLoader.convertColor(color);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -419,14 +458,22 @@ public class QuesStar : TypeData {
     /// <summary>
     /// 属性
     /// </summary>
-    public Color color { get; private set; }
-    public int level { get; private set; }
-    public int weight { get; private set; }
-    public int expIncr { get; private set; }
-    public int goldIncr { get; private set; }
-    public int stdTime { get; private set; }
-    public int minTime { get; private set; }
+    [AutoConvert]
+    public Color color { get; protected set; }
+    [AutoConvert]
+    public int level { get; protected set; }
+    [AutoConvert]
+    public int weight { get; protected set; }
+    [AutoConvert]
+    public int expIncr { get; protected set; }
+    [AutoConvert]
+    public int goldIncr { get; protected set; }
+    [AutoConvert]
+    public int stdTime { get; protected set; }
+    [AutoConvert]
+    public int minTime { get; protected set; }
 
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -457,7 +504,7 @@ public class QuesStar : TypeData {
         json["min_time"] = minTime;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -473,12 +520,17 @@ public class GameVersionData : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public string mainVersion { get; private set; }
-    public string subVersion { get; private set; }
-    public string updateNote { get; private set; }
-    public DateTime updateTime { get; private set; }
-    public string description { get; private set; }
-
+    [AutoConvert]
+    public string mainVersion { get; protected set; }
+    [AutoConvert]
+    public string subVersion { get; protected set; }
+    [AutoConvert]
+    public string updateNote { get; protected set; }
+    [AutoConvert]
+    public DateTime updateTime { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -504,7 +556,7 @@ public class GameVersionData : BaseData {
         json["update_time"] = DataLoader.convertDateTime(updateTime);
         json["description"] = description;
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -515,51 +567,80 @@ public class GameConfigure : BaseData {
     /// <summary>
     /// 基本术语
     /// </summary>
-    public string name { get; private set; }
-    public string engName { get; private set; }
-    public string gold { get; private set; }
-    public string ticket { get; private set; }
-    public string boundTicket { get; private set; }
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public string engName { get; protected set; }
+    [AutoConvert]
+    public string gold { get; protected set; }
+    [AutoConvert]
+    public string ticket { get; protected set; }
+    [AutoConvert]
+    public string boundTicket { get; protected set; }
 
     /// <summary>
     /// 配置量
     /// </summary>
-    public int maxSubject { get; private set; }
-    public int maxExerciseCount { get; private set; }
+    [AutoConvert]
+    public int maxSubject { get; protected set; }
+    [AutoConvert]
+    public int maxExerciseCount { get; protected set; }
 
     /// <summary>
     /// 组合术语
     /// </summary>
-    public Tuple<int, string>[] characterGenders { get; private set; }
-    public Tuple<int, string>[] playerGrades { get; private set; }
-    public Tuple<int, string>[] playerStatuses { get; private set; }
-    public Tuple<int, string>[] playerTypes { get; private set; }
+    [AutoConvert]
+    public Tuple<int, string>[] characterGenders { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] playerGrades { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] playerStatuses { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] playerTypes { get; protected set; }
 
-    public Tuple<int, string>[] exermonTypes { get; private set; }
-    public Tuple<int, string>[] exerSkillTargetTypes { get; private set; }
-    public Tuple<int, string>[] exerSkillHitTypes { get; private set; }
+    [AutoConvert]
+    public Tuple<int, string>[] exermonTypes { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] exerSkillTargetTypes { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] exerSkillHitTypes { get; protected set; }
 
-    public Tuple<int, string>[] questionTypes { get; private set; }
-    public Tuple<int, string>[] questionStatuses { get; private set; }
-    public Tuple<int, string>[] quesReportTypes { get; private set; }
+    [AutoConvert]
+    public Tuple<int, string>[] questionTypes { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] questionStatuses { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] quesReportTypes { get; protected set; }
 
-    public Tuple<int, string>[] recordSources { get; private set; }
-    public Tuple<int, string>[] exerciseGenTypes { get; private set; }
+    [AutoConvert]
+    public Tuple<int, string>[] recordSources { get; protected set; }
+    [AutoConvert]
+    public Tuple<int, string>[] exerciseGenTypes { get; protected set; }
 
     /// <summary>
     /// 组合配置
     /// </summary>
-    public Subject[] subjects { get; private set; }
-    public BaseParam[] baseParams { get; private set; }
-    public UsableItemType[] usableItemTypes { get; private set; }
-    public HumanEquipType[] humanEquipTypes { get; private set; }
-    public ExerEquipType[] exerEquipTypes { get; private set; }
-    public ExerStar[] exerStars { get; private set; }
-    public ExerGiftStar[] exerGiftStars { get; private set; }
-    public ItemStar[] itemStars { get; private set; }
-    public QuesStar[] quesStars { get; private set; }
-    public CompRank[] compRanks { get; private set; }
-
+    [AutoConvert]
+    public Subject[] subjects { get; protected set; }
+    [AutoConvert]
+    public BaseParam[] baseParams { get; protected set; }
+    [AutoConvert]
+    public UsableItemType[] usableItemTypes { get; protected set; }
+    [AutoConvert]
+    public HumanEquipType[] humanEquipTypes { get; protected set; }
+    [AutoConvert]
+    public ExerEquipType[] exerEquipTypes { get; protected set; }
+    [AutoConvert]
+    public ExerStar[] exerStars { get; protected set; }
+    [AutoConvert]
+    public ExerGiftStar[] exerGiftStars { get; protected set; }
+    [AutoConvert]
+    public ItemStar[] itemStars { get; protected set; }
+    [AutoConvert]
+    public QuesStar[] quesStars { get; protected set; }
+    [AutoConvert]
+    public CompRank[] compRanks { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -602,7 +683,7 @@ public class GameConfigure : BaseData {
         quesStars = DataLoader.loadDataArray<QuesStar>(json, "ques_stars");
         compRanks = DataLoader.loadDataArray<CompRank>(json, "comp_ranks");
     }
-
+    
     /// <summary>
     /// 获取JSON数据
     /// </summary>
@@ -647,7 +728,7 @@ public class GameConfigure : BaseData {
 
         return json;
     }
-
+    */
 }
 
 /// <summary>
@@ -658,17 +739,27 @@ public class GameDatabase : BaseData {
     /// <summary>
     /// 数据库
     /// </summary>
-    public Character[] characters { get; private set; }
-    public HumanItem[] humanItems { get; private set; }
-    public HumanEquip[] humanEquips { get; private set; }
-    public Exermon[] exermons { get; private set; }
-    public ExerFrag[] exerFrags { get; private set; }
-    public ExerSkill[] exerSkills { get; private set; }
-    public ExerGift[] exerGifts { get; private set; }
-    public ExerItem[] exerItems { get; private set; }
-    public ExerEquip[] exerEquips { get; private set; }
-    public QuesSugar[] quesSugars { get; private set; }
-
+    [AutoConvert]
+    public Character[] characters { get; protected set; }
+    [AutoConvert]
+    public HumanItem[] humanItems { get; protected set; }
+    [AutoConvert]
+    public HumanEquip[] humanEquips { get; protected set; }
+    [AutoConvert]
+    public Exermon[] exermons { get; protected set; }
+    [AutoConvert]
+    public ExerFrag[] exerFrags { get; protected set; }
+    [AutoConvert]
+    public ExerSkill[] exerSkills { get; protected set; }
+    [AutoConvert]
+    public ExerGift[] exerGifts { get; protected set; }
+    [AutoConvert]
+    public ExerItem[] exerItems { get; protected set; }
+    [AutoConvert]
+    public ExerEquip[] exerEquips { get; protected set; }
+    [AutoConvert]
+    public QuesSugar[] quesSugars { get; protected set; }
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -708,5 +799,5 @@ public class GameDatabase : BaseData {
 
         return json;
     }
-
+    */
 }

@@ -17,13 +17,16 @@ public class Character : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public string name { get; private set; }
-    public int gender { get; private set; }
-    public string description { get; private set; }
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public int gender { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
 
-    public Texture2D bust { get; private set; }
-    public Texture2D face { get; private set; }
-    public Texture2D battle { get; private set; }
+    public Texture2D bust { get; protected set; }
+    public Texture2D face { get; protected set; }
+    public Texture2D battle { get; protected set; }
 
     /// <summary>
     /// 获取性别文本
@@ -37,18 +40,18 @@ public class Character : BaseData {
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+        /*
         name = DataLoader.loadString(json, "name");
         gender = DataLoader.loadInt(json, "gender");
         description = DataLoader.loadString(json, "description");
-
+        */
         bust = AssetLoader.loadCharacterBust(getID());
         face = AssetLoader.loadCharacterFace(getID());
         battle = AssetLoader.loadCharacterBattle(getID());
     }
-
+    /*
     /// <summary>
     /// 获取JSON数据
     /// </summary>
@@ -61,7 +64,7 @@ public class Character : BaseData {
         json["description"] = description;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -77,13 +80,25 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        public PackContainer<HumanPackContItem> humanPack { get; private set; }
-        public PackContainer<ExerPackContItem> exerPack { get; private set; }
-        public PackContainer<ExerFragPackItem> exerFragPack { get; private set; }
-        public PackContainer<PlayerExerGift> exerGiftPool { get; private set; }
-        public PackContainer<PlayerExermon> exerHub { get; private set; }
-        public PackContainer<QuesSugarPackItem> quesSugarPack { get; private set; }
-
+        [AutoConvert]
+        public PackContainer<HumanPackContItem> humanPack { get; protected set; } 
+            = new PackContainer<HumanPackContItem>();
+        [AutoConvert]
+        public PackContainer<ExerPackContItem> exerPack { get; protected set; }
+            = new PackContainer<ExerPackContItem>();
+        [AutoConvert]
+        public PackContainer<ExerFragPackItem> exerFragPack { get; protected set; }
+            = new PackContainer<ExerFragPackItem>();
+        [AutoConvert]
+        public PackContainer<PlayerExerGift> exerGiftPool { get; protected set; }
+            = new PackContainer<PlayerExerGift>();
+        [AutoConvert]
+        public PackContainer<PlayerExermon> exerHub { get; protected set; }
+            = new PackContainer<PlayerExermon>();
+        [AutoConvert]
+        public PackContainer<QuesSugarPackItem> quesSugarPack { get; protected set; }
+            = new PackContainer<QuesSugarPackItem>();
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -114,7 +129,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
             json["quessugarpack"] = DataLoader.convertData(quesSugarPack);
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -125,9 +140,12 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        public ExerSlot exerSlot { get; private set; }
-        public HumanEquipSlot humanEquipSlot { get; private set; }
+        [AutoConvert]
+        public ExerSlot exerSlot { get; protected set; } = new ExerSlot();
+        [AutoConvert]
+        public HumanEquipSlot humanEquipSlot { get; protected set; } = new HumanEquipSlot();
 
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -150,7 +168,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
             json["humanequipslot"] = DataLoader.convertData(humanEquipSlot);
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -161,20 +179,34 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        public int rankId { get; private set; }
-        public int subRank { get; private set; }
-        public int starNum { get; private set; }
-        public int score { get; private set; }
-        public int credit { get; private set; }
-        public int count { get; private set; }
-        public double winRate { get; private set; }
-        public double corrRate { get; private set; }
-        public double avgHurt { get; private set; }
-        public double avgDamage { get; private set; }
-        public double avgScore { get; private set; }
-        public int maxHurt { get; private set; }
-        public int maxDamage { get; private set; }
-        public double maxScore { get; private set; }
+        [AutoConvert]
+        public int rankId { get; protected set; }
+        [AutoConvert]
+        public int subRank { get; protected set; }
+        [AutoConvert]
+        public int starNum { get; protected set; }
+        [AutoConvert]
+        public int score { get; protected set; }
+        [AutoConvert]
+        public int credit { get; protected set; }
+        [AutoConvert]
+        public int count { get; protected set; }
+        [AutoConvert]
+        public double winRate { get; protected set; }
+        [AutoConvert]
+        public double corrRate { get; protected set; }
+        [AutoConvert]
+        public double avgHurt { get; protected set; }
+        [AutoConvert]
+        public double avgDamage { get; protected set; }
+        [AutoConvert]
+        public double avgScore { get; protected set; }
+        [AutoConvert]
+        public int maxHurt { get; protected set; }
+        [AutoConvert]
+        public int maxDamage { get; protected set; }
+        [AutoConvert]
+        public double maxScore { get; protected set; }
 
         /// <summary>
         /// 转换成显示数据
@@ -192,7 +224,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public CompRank rank() {
             return DataService.get().compRank(rankId);
         }
-
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -239,7 +271,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
             json["max_score"] = maxScore;
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -250,14 +282,22 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// <summary>
         /// 属性
         /// </summary>
-        public int count { get; private set; }
-        public int corrCnt { get; private set; }
-        public double corrRate { get; private set; }
-        public int sumTimespan { get; private set; }
-        public double avgTimespan { get; private set; }
-        public double corrTimespan { get; private set; }
-        public int sumExp { get; private set; }
-        public int sumGold { get; private set; }
+        [AutoConvert]
+        public int count { get; protected set; }
+        [AutoConvert]
+        public int corrCnt { get; protected set; }
+        [AutoConvert]
+        public double corrRate { get; protected set; }
+        [AutoConvert]
+        public int sumTimespan { get; protected set; }
+        [AutoConvert]
+        public double avgTimespan { get; protected set; }
+        [AutoConvert]
+        public double corrTimespan { get; protected set; }
+        [AutoConvert]
+        public int sumExp { get; protected set; }
+        [AutoConvert]
+        public int sumGold { get; protected set; }
 
         /// <summary>
         /// 转换成显示数据
@@ -267,7 +307,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public JsonData convertToDisplayData(string type = "") {
             return toJson();
         }
-
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -302,7 +342,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
             json["sum_gold"] = sumGold;
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -325,33 +365,57 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     /// <summary>
     /// 属性
     /// </summary>
-    public string username { get; private set; }
-    public string password { get; private set; }
-    public string phone { get; private set; }
-    public string email { get; private set; }
-    public string name { get; private set; }
-    public int characterId { get; private set; }
-    public int grade { get; private set; }
-    public int status { get; private set; }
-    public int type { get; private set; }
-    public bool online { get; private set; }
-    public int exp { get; private set; }
-    public int level { get; private set; }
-    public int next { get; private set; }
-    public DateTime createTime { get; private set; }
-    public DateTime birth { get; private set; }
-    public string school { get; private set; }
-    public string city { get; private set; }
-    public string contact { get; private set; }
-    public string description { get; private set; }
+    [AutoConvert]
+    public string username { get; protected set; }
+    [AutoConvert]
+    public string password { get; protected set; }
+    [AutoConvert]
+    public string phone { get; protected set; }
+    [AutoConvert]
+    public string email { get; protected set; }
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public int characterId { get; protected set; }
+    [AutoConvert]
+    public int grade { get; protected set; }
+    [AutoConvert]
+    public int status { get; protected set; }
+    [AutoConvert]
+    public int type { get; protected set; }
+    [AutoConvert]
+    public bool online { get; protected set; }
+    [AutoConvert]
+    public int exp { get; protected set; }
+    [AutoConvert]
+    public int level { get; protected set; }
+    [AutoConvert]
+    public int next { get; protected set; }
+    [AutoConvert]
+    public DateTime createTime { get; protected set; }
+    [AutoConvert(format: "date")]
+    public DateTime birth { get; protected set; }
+    [AutoConvert]
+    public string school { get; protected set; }
+    [AutoConvert]
+    public string city { get; protected set; }
+    [AutoConvert]
+    public string contact { get; protected set; }
+    [AutoConvert]
+    public string description { get; protected set; }
 
-    public ItemPrice money { get; private set; }
+    [AutoConvert]
+    public ItemPrice money { get; protected set; }
 
-    public PackContainerInfo packContainers { get; private set; }
-    public SlotContainerInfo slotContainers { get; private set; }
+    [AutoConvert]
+    public PackContainerInfo packContainers { get; protected set; }
+    [AutoConvert]
+    public SlotContainerInfo slotContainers { get; protected set; }
 
-    public BattleInfo battleInfo { get; private set; }
-    public QuestionInfo questionInfo { get; private set; }
+    [AutoConvert]
+    public BattleInfo battleInfo { get; protected set; }
+    [AutoConvert]
+    public QuestionInfo questionInfo { get; protected set; }
 
     #region 信息转换
 
@@ -362,8 +426,10 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     public JsonData convertToDisplayData(string type = "") {
         switch (type.ToLower()) {
             case "exp": return convertExp();
+            //case "params_info": return covnertParamsInfo();
             case "battle_info": return battleInfo.toJson();
             case "question_info": return questionInfo.toJson();
+            case "personal_info": return covnertPersonalInfo();
             default: return toJson();
         }
     }
@@ -378,6 +444,28 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         json["next"] = next;
         json["level"] = level;
         json["rate"] = exp / next;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化为属性信息
+    /// </summary>
+    /// <returns></returns>
+    //JsonData covnertParamsInfo() {
+
+    //}
+
+    /// <summary>
+    /// 转化为属性信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData covnertPersonalInfo() {
+        var json = new JsonData();
+        json["grade"] = gradeText();
+        json["school"] = school;
+        json["city"] = city;
+        json["contact"] = contact;
+        json["description"] = description;
         return json;
     }
 
@@ -557,14 +645,14 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     #endregion
 
     #endregion
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
     /// <param name="json">数据</param>
     public override void load(JsonData json) {
         base.load(json);
-
+        
         username = DataLoader.loadString(json, "username");
         phone = DataLoader.loadString(json, "phone");
         email = DataLoader.loadString(json, "email");
@@ -637,7 +725,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         json["question_info"] = DataLoader.convertData(questionInfo);
 
         return json;
-    }
+    }*/
 }
 
 #region 物品
@@ -655,7 +743,8 @@ public class HumanEquip : EquipableItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public int eType { get; private set; }
+    [AutoConvert]
+    public int eType { get; protected set; }
 
     /// <summary>
     /// 获取装备类型
@@ -664,7 +753,7 @@ public class HumanEquip : EquipableItem {
     public TypeData equipType() {
         return DataService.get().humanEquipType(eType);
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -686,7 +775,7 @@ public class HumanEquip : EquipableItem {
 
         return json;
     }
-
+    */
 }
 
 #endregion
@@ -861,8 +950,10 @@ public class HumanEquipSlotItem : SlotContItem {
     /// <summary>
     /// 属性
     /// </summary>
-    public HumanPackEquip packEquip { get; private set; }
-    public int eType { get; private set; }
+    [AutoConvert]
+    public HumanPackEquip packEquip { get; protected set; }
+    [AutoConvert]
+    public int eType { get; protected set; }
 
     /// <summary>
     /// 获取装备类型
@@ -887,7 +978,7 @@ public class HumanEquipSlotItem : SlotContItem {
     public void setEquip(HumanPackEquip packEquip) {
         this.packEquip = packEquip;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -910,7 +1001,7 @@ public class HumanEquipSlotItem : SlotContItem {
         json["e_type"] = eType;
 
         return json;
-    }
+    }*/
 }
 
 #endregion

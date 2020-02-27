@@ -600,25 +600,23 @@ class ExerStar(GroupConfigure):
 	adminParamRateRanges.short_description = "属性成长率范围"
 
 	# 转换属性为 dict
-	def _convertParamsToDict(self):
-
-		data = dict()
-
-		data['bases'] = ModelUtils.objectsToDict(self.paramBaseRanges())
-		data['rates'] = ModelUtils.objectsToDict(self.paramRateRanges())
-
-		return data
+	def _convertParamsToDict(self, res):
+		res['base_ranges'] = ModelUtils.objectsToDict(self.paramBaseRanges())
+		res['rate_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
 
 	def convertToDict(self):
 
-		return {
+		res = {
 			'id': self.id,
 			'name': self.name,
 			'color': self.color,
 			'max_level': self.max_level,
 			'level_exp_factors': self.level_exp_factors,
-			'param_ranges': self._convertParamsToDict(),
 		}
+
+		self._convertParamsToDict(res)
+
+		return res
 
 	# 获取所有的属性基本值
 	def paramBaseRanges(self):

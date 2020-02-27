@@ -16,8 +16,11 @@ public class ConfigureData : BaseData {
     /// <summary>
     /// 设置项
     /// </summary>
+    [AutoConvert]
     public string rememberPassword { get; set; } = null; // 记住密码
+    [AutoConvert]
     public string rememberUsername { get; set; } = null; // 记住账号
+    [AutoConvert]
     public bool autoLogin { get; set; } = false; // 自动登录
 
     /// <summary>
@@ -25,6 +28,7 @@ public class ConfigureData : BaseData {
     /// </summary>
     protected override bool idEnable() { return false; }
 
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -46,5 +50,5 @@ public class ConfigureData : BaseData {
         json["remember_username"] = rememberUsername;
         json["auto_login"] = autoLogin;
         return json;
-    }
+    }*/
 }

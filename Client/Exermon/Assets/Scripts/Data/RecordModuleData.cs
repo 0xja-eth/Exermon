@@ -9,24 +9,38 @@ using UnityEditor;
 /// 题目记录数据
 /// </summary>
 public class QuestionRecord : BaseData {
-    
+
     /// <summary>
     /// 属性
     /// </summary>
-    public int questionId { get; private set; }
-    public int count { get; private set; }
-    public int correct { get; private set; }
-    public DateTime firstDate { get; private set; }
-    public DateTime lastDate { get; private set; }
-    public int firstTime { get; private set; }
-    public double avgTime { get; private set; }
-    public double corrTime { get; private set; }
-    public int sumExp { get; private set; }
-    public int sumGold { get; private set; }
-    public int source { get; private set; }
-    public bool collected { get; private set; }
-    public bool wrong { get; private set; }
-    public string note { get; private set; }
+    [AutoConvert]
+    public int questionId { get; protected set; }
+    [AutoConvert]
+    public int count { get; protected set; }
+    [AutoConvert]
+    public int correct { get; protected set; }
+    [AutoConvert]
+    public DateTime firstDate { get; protected set; }
+    [AutoConvert]
+    public DateTime lastDate { get; protected set; }
+    [AutoConvert]
+    public int firstTime { get; protected set; }
+    [AutoConvert]
+    public double avgTime { get; protected set; }
+    [AutoConvert]
+    public double corrTime { get; protected set; }
+    [AutoConvert]
+    public int sumExp { get; protected set; }
+    [AutoConvert]
+    public int sumGold { get; protected set; }
+    [AutoConvert]
+    public int source { get; protected set; }
+    [AutoConvert]
+    public bool collected { get; protected set; }
+    [AutoConvert]
+    public bool wrong { get; protected set; }
+    [AutoConvert]
+    public string note { get; protected set; }
 
     #region 数据操作
 
@@ -75,7 +89,7 @@ public class QuestionRecord : BaseData {
     public QuestionRecord(int qid) {
         questionId = qid;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -122,7 +136,7 @@ public class QuestionRecord : BaseData {
         json["note"] = note;
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -138,14 +152,22 @@ public class QuestionSetRecord : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
-        public int questionId { get; private set; }
-        public int[] selection { get; private set; }
-        public int timespan { get; private set; }
-        public int expIncr { get; private set; }
-        public int slotExpIncr { get; private set; }
-        public int goldIncr { get; private set; }
-        public bool isNew { get; private set; }
+        [AutoConvert]
+        public int questionId { get; protected set; }
+        [AutoConvert]
+        public int[] selection { get; protected set; }
+        [AutoConvert]
+        public int timespan { get; protected set; }
+        [AutoConvert]
+        public int expIncr { get; protected set; }
+        [AutoConvert]
+        public int slotExpIncr { get; protected set; }
+        [AutoConvert]
+        public int goldIncr { get; protected set; }
+        [AutoConvert]
+        public bool isNew { get; protected set; }
 
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -171,7 +193,7 @@ public class QuestionSetRecord : BaseData {
 
             json["question_id"] = questionId;
 
-            json["selection"] = DataLoader.convertArray(selection);
+            json["selection"] = DataLoader.convert(selection);
             json["timespan"] = timespan;
             json["exp_incr"] = expIncr;
             json["slot_exp_incr"] = slotExpIncr;
@@ -179,7 +201,7 @@ public class QuestionSetRecord : BaseData {
             json["is_new"] = isNew;
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
@@ -195,9 +217,12 @@ public class QuestionSetRecord : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
-        public int type { get; private set; }
-        public int itemId { get; private set; }
-        public int count { get; private set; }
+        [AutoConvert]
+        public int type { get; protected set; }
+        [AutoConvert]
+        public int itemId { get; protected set; }
+        [AutoConvert]
+        public int count { get; protected set; }
 
         /// <summary>
         /// 获取物品实例
@@ -210,7 +235,7 @@ public class QuestionSetRecord : BaseData {
             var type = Type.GetType(name);
             return (BaseItem)DataService.get().get(type, itemId);
         }
-
+        /*
         /// <summary>
         /// 数据加载
         /// </summary>
@@ -235,24 +260,33 @@ public class QuestionSetRecord : BaseData {
             json["count"] = count;
 
             return json;
-        }
+        }*/
     }
 
     /// <summary>
     /// 属性
     /// </summary>
-    public string name { get; private set; }
-    public int seasonId { get; private set; }
-    public int expIncr { get; private set; }
-    public int slotExpIncr { get; private set; }
-    public int goldIncr { get; private set; }
+    [AutoConvert]
+    public string name { get; protected set; }
+    [AutoConvert]
+    public int seasonId { get; protected set; }
+    [AutoConvert]
+    public int expIncr { get; protected set; }
+    [AutoConvert]
+    public int slotExpIncr { get; protected set; }
+    [AutoConvert]
+    public int goldIncr { get; protected set; }
 
-    public bool finished { get; private set; }
+    [AutoConvert]
+    public bool finished { get; protected set; }
 
-    public DateTime createTime { get; private set; }
+    [AutoConvert]
+    public DateTime createTime { get; protected set; }
 
-    public PlayerQuestion[] questions { get; private set; }
-    public Reward[] rewards { get; private set; }
+    [AutoConvert]
+    public PlayerQuestion[] questions { get; protected set; }
+    [AutoConvert]
+    public Reward[] rewards { get; protected set; }
 
     /// <summary>
     /// 获取所有题目的ID
@@ -265,7 +299,7 @@ public class QuestionSetRecord : BaseData {
             ids[i] = questions[i].questionId;
         return ids;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -307,7 +341,7 @@ public class QuestionSetRecord : BaseData {
         json["rewards"] = DataLoader.convertDataArray(rewards);
 
         return json;
-    }
+    }*/
 }
 
 /// <summary>
@@ -318,9 +352,12 @@ public class ExerciseRecord : BaseData {
     /// <summary>
     /// 属性
     /// </summary>
-    public int subjectId { get; private set; }
-    public int genType { get; private set; }
-    public int count { get; private set; }
+    [AutoConvert]
+    public int subjectId { get; protected set; }
+    [AutoConvert]
+    public int genType { get; protected set; }
+    [AutoConvert]
+    public int count { get; protected set; }
 
     /// <summary>
     /// 科目实例
@@ -337,7 +374,7 @@ public class ExerciseRecord : BaseData {
     public string genTypeText() {
         return DataService.get().exerciseGenType(genType).Item2;
     }
-
+    /*
     /// <summary>
     /// 数据加载
     /// </summary>
@@ -362,5 +399,5 @@ public class ExerciseRecord : BaseData {
         json["count"] = count;
 
         return json;
-    }
+    }*/
 }

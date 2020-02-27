@@ -52,7 +52,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
         /// <typeparam name="T">类型</typeparam>
         /// <param name="data">读取的数据</param>
         public void load(JsonData json) {
-            DataLoader.loadData(ref data, json);
+            data = DataLoader.load(data, json);
         }
 
     }
@@ -100,8 +100,9 @@ public class StorageSystem : BaseSystem<StorageSystem> {
     protected override void initializeSystems() {
         base.initializeSystems();
         gameSys = GameSystem.get();
-        exermonSys = ExermonGameSystem.get();
         dataSer = DataService.get();
+        exermonSys = ExermonGameSystem.get();
+        quesSer = QuestionService.get();
     }
 
     /// <summary>
@@ -163,7 +164,7 @@ public class StorageSystem : BaseSystem<StorageSystem> {
     public void loadObjectFromFile<T>(ref T data, string path) where T : BaseData, new() {
         Debug.Log("Loading " + data + " from " + path);
         var json = loadJsonFromFile(path);
-        DataLoader.loadData(ref data, json);
+        data = DataLoader.load(data, json);
     }
 
     /// <summary>
