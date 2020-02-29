@@ -10,6 +10,7 @@ using LitJson;
 /// <summary>
 /// 属性条组
 /// </summary>
+/// 
 public class ParamDisplaysGroup : GroupView<ParamDisplay> {
     
     #region 初始化
@@ -58,6 +59,14 @@ public class ParamDisplaysGroup : GroupView<ParamDisplay> {
     #endregion
 
     #region 数据控制
+    
+    /// <summary>
+    /// 设置忽略触发器
+    /// </summary>
+    public void setIgnoreTrigger(int index=0) {
+        if (index >= subViewsCount()) return;
+        subViews[index].setIgnoreTrigger();
+    }
 
     /// <summary>
     /// 设置值

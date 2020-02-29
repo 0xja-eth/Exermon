@@ -355,7 +355,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="name">新昵称</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void editname(string name, UnityAction onSuccess, UnityAction onError = null) {
+    public void editName(string name, UnityAction onSuccess, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             player.editNmae(name);

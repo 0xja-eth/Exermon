@@ -12,6 +12,13 @@ using LitJson;
 public class CalcService : BaseService<CalcService> {
 
     /// <summary>
+    /// 艾瑟萌等级计算类
+    /// </summary>
+    public class ExermonLevelCalc {
+
+    }
+
+    /// <summary>
     /// 艾瑟萌属性计算类
     /// </summary>
     public class ExermonParamCalc {

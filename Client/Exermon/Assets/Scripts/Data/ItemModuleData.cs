@@ -288,44 +288,11 @@ public abstract class PackContItem : BaseContItem {
     public int itemId { get; protected set; }
     [AutoConvert]
     public int count { get; protected set; }
-
-    /**
+    
     /// <summary>
-    /// 查找物品函数类型
+    /// 是否装备
     /// </summary>
-    protected delegate BaseItem GetFunc(int id);
-
-    /// <summary>
-    /// 获取物品类型
-    /// </summary>
-    /// <returns></returns>
-    protected abstract virtual System.Type getItemType() {
-        var type = (Type)this.type;
-        var data = DataService.get();
-
-        switch (type) {
-            case Type.HumanPackItem: return typeof(HumanItem);
-            case Type.ExerPackItem: return typeof(ExerItem);
-            case Type.HumanPackEquip: return typeof(HumanEquip);
-            case Type.ExerPackEquip: return typeof(ExerEquip);
-            case Type.PlayerExermon: return typeof(Exermon);
-            case Type.ExerFragPackItem: return typeof(ExerFrag);
-            case Type.PlayerExerGift: return typeof(ExerGift);
-            //case Type.QuesSugarPackItem: return typeof(ExerGift);
-            default: return null;
-        }
-    }
-
-    /// <summary>
-    /// 获取对应物品
-    /// </summary>
-    /// <returns></returns>
-    public virtual BaseItem item() {
-        var type = getItemType();
-        if (type == null) return null;
-        return (BaseItem)DataService.get().get(type, itemId);
-    }
-    */
+    public bool equiped = false;
 
     /// <summary>
     /// 构造函数

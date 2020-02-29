@@ -103,6 +103,7 @@ public class ParamDisplay : BaseView {
     JsonData rawData; // 原始数据
 
     bool force = false;
+    bool ignoreTrigger = false;
 
     #region 初始化
     
@@ -200,6 +201,14 @@ public class ParamDisplay : BaseView {
     #region 数据控制
     
     /// <summary>
+    /// 设置忽略触发器
+    /// </summary>
+    public void setIgnoreTrigger() {
+        ignoreTrigger = true;
+        requestRefresh();
+    }
+
+    /// <summary>
     /// 设置值
     /// </summary>
     /// <param name="value">值</param>
@@ -249,9 +258,10 @@ public class ParamDisplay : BaseView {
     /// <summary>
     /// 刷新所有键
     /// </summary>
-    void refreshKeys() {
+    void refreshKeys(bool ignoreTrigger = false) {
         foreach (var item in displayItems)
-            if (item.trigger == "") refreshKey(item);
+            if (ignoreTrigger || item.trigger == "")
+                refreshKey(item);
     }
 
     /// <summary>
@@ -514,7 +524,8 @@ public class ParamDisplay : BaseView {
     /// </summary>
     protected override void refresh() {
         base.refresh();
-        refreshKeys();
+        refreshKeys(ignoreTrigger);
+        ignoreTrigger = false;
         force = false;
     }
 

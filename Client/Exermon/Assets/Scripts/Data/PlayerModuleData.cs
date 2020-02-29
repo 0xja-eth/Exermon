@@ -351,6 +351,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
 
     #region 数据操作
 
+    #region 登陆/创建/修改
+
     /// <summary>
     /// 设置密码
     /// </summary>
@@ -446,6 +448,8 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         status = (int)Status.Normal;
     }
 
+    #endregion
+
     /// <summary>
     /// 获取人物
     /// </summary>
@@ -486,6 +490,14 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         return DataService.get().playerType(type).Item2;
     }
 
+    /// <summary>
+    /// 获取所选科目
+    /// </summary>
+    /// <returns></returns>
+    public Subject[] subjects() {
+        return slotContainers.exerSlot.subjects();
+    }
+
     #region 状态判断
 
     /// <summary>
@@ -521,6 +533,16 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     }
 
     #endregion
+
+    /// <summary>
+    /// 获取艾瑟萌槽项
+    /// </summary>
+    /// <param name="subject"></param>
+    /// <returns></returns>
+    public ExerSlotItem getExerSlotItem(Subject subject) {
+        var exerSlot = slotContainers.exerSlot;
+        return exerSlot.getExerSlotItem(subject.getID());
+    }
 
     #endregion
 }

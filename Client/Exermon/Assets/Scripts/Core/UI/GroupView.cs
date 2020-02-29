@@ -10,12 +10,13 @@ using UnityEngine.UI;
 /// 用途：当一个父物体里面需要包含多个子物体（必须为同一种预制件的物体）
 /// 且该子物体挂载了T脚本，该脚本能够对子物体进行统一管理。
 /// </summary>
-public class GroupView<T> : BaseView where T: BaseView {
+public class GroupView<T> : BaseView where T: MonoBehaviour {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public Transform container;
+    public T[] presetSubViews;
 
     /// <summary>
     /// 外部变量设置
@@ -46,12 +47,25 @@ public class GroupView<T> : BaseView where T: BaseView {
     /// 初始化子视图
     /// </summary>
     void initializeSubViews() {
-        int index = 0;
-        string name; T subView;
+        if (presetSubViews.Length > 0)
+            initializeSubViewsByPreset();
+        else initializeSubViewsByAutoFind();
+    }
 
-        if (container == null)
-            container = transform;
+    /// <summary>
+    /// 通过预设来初始化子视图
+    /// </summary>
+    void initializeSubViewsByPreset() {
+        for (int i = 0; i < presetSubViews.Length; i++)
+            onSubViewCreated(presetSubViews[i], i);
+    }
 
+    /// <summary>
+    /// 通过查找来初始化子视图
+    /// </summary>
+    void initializeSubViewsByAutoFind() {
+        int index = 0; string name; T subView;
+        container = container ?? transform;
         while (true) {
             name = subViewName(index);
             subView = SceneUtils.find<T>(container, name);
@@ -152,15 +166,17 @@ public class GroupView<T> : BaseView where T: BaseView {
     /// </summary>
     void refreshSubViews() {
         for (int i = 0; i < subViews.Count; ++i)
-            refreshSubView(subViews[i]);
+            refreshSubView(subViews[i], i);
     }
 
     /// <summary>
     /// 刷新子视图
     /// </summary>
     /// <param name="sub">子视图</param>
-    protected virtual void refreshSubView(T sub) {
-        sub.requestRefresh(true);
+    protected virtual void refreshSubView(T sub, int index) {
+        if(typeof(T).IsSubclassOf(typeof(BaseView)) || 
+            typeof(T) == typeof(BaseView))
+            ((BaseView)(object)sub).requestRefresh(true);
     }
 
     /// <summary>
@@ -176,7 +192,9 @@ public class GroupView<T> : BaseView where T: BaseView {
     /// </summary>
     /// <param name="sub">子视图</param>
     protected virtual void clearSubView(T sub) {
-        sub.requestClear(true);
+        if (typeof(T).IsSubclassOf(typeof(BaseView)) ||
+            typeof(T) == typeof(BaseView))
+            ((BaseView)(object)sub).requestClear(true);
     }
 
     /// <summary>

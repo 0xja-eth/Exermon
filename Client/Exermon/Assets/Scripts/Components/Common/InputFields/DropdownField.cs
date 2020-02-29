@@ -8,7 +8,8 @@ using UnityEngine.UI;
 /// <summary>
 /// 下拉列表域
 /// </summary>
-public class DropdownField : BaseInputField<Tuple<int, string>> {
+public class DropdownField : BaseInputField<Tuple<int, string>>, 
+    IPointerEnterHandler, IPointerExitHandler {
 
     /// <summary>
     /// 无效值提示语
@@ -24,6 +25,9 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
     /// 内部变量声明
     /// </summary>
     Tuple<int, string>[] options = new Tuple<int, string>[0];
+
+    bool enter = false;
+    bool focused_ = false;
 
     #region 初始化
 
@@ -87,8 +91,27 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
     void clearOptions() {
         dropdown.ClearOptions();
     }
-    
+
     #endregion
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    protected override void update() {
+        base.update();
+        updateFocus();
+    }
+
+    /// <summary>
+    /// 更新 Focus 事件
+    /// </summary>
+    void updateFocus() {
+        if (Input.GetMouseButtonDown(0) ||
+            Input.GetMouseButtonDown(1) ||
+            Input.touchCount > 0) {
+            focused_ = enter;
+        }
+    }
 
     #region 启动/结束控制
 
@@ -179,7 +202,7 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
     /// <param name="text">值</param>
     protected override void drawValue(Tuple<int, string> value) {
         Debug.Log("drawValue: " + value);
-        dropdown.itemText.text = value.Item2;
+        dropdown.itemText.text = (value == null ? "" : value.Item2);
         Debug.Log("drowdown.value = " + dropdown.value + 
             "\ndrowdown.itemText.text = " + dropdown.itemText.text);
     }
@@ -192,8 +215,23 @@ public class DropdownField : BaseInputField<Tuple<int, string>> {
     /// 是否实际有焦点
     /// </summary>
     public override bool isRealFocused() {
-        return dropdown && 
-            dropdown.gameObject == EventSystem.current.currentSelectedGameObject;
+        return focused_;
+    }
+
+    /// <summary>
+    /// 指针进入回调
+    /// </summary>
+    /// <param name="eventData"></param>
+    public void OnPointerEnter(PointerEventData eventData) {
+        enter = true;
+    }
+
+    /// <summary>
+    /// 指针离开回调
+    /// </summary>
+    /// <param name="eventData"></param>
+    public void OnPointerExit(PointerEventData eventData) {
+        enter = false;
     }
 
     #endregion

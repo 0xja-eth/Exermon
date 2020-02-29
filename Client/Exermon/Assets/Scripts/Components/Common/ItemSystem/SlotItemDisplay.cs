@@ -15,9 +15,15 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     where T : class where E : class {
 
     /// <summary>
+    /// 是否提供预览功能
+    /// </summary>
+    public bool previewable = false;
+
+    /// <summary>
     /// 内部变量定义
     /// </summary>
-    protected E equip; // 装备1
+    protected E equip; // 装备
+    protected E previewingEquip = null; // 装备
 
     #region 数据控制
 
@@ -45,10 +51,43 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     }
 
     /// <summary>
+    /// 设置预览
+    /// </summary>
+    /// <param name="item">物品</param>
+    public virtual void setPreview(E item) {
+        if (previewingEquip == item) return;
+        previewingEquip = item;
+        onPreviewChanged();
+    }
+
+    /// <summary>
+    /// 清除预览
+    /// </summary>
+    public void clearPreview() {
+        setPreview(null);
+    }
+
+    /// <summary>
     /// 获取装备
     /// </summary>
     public E getEquip() {
         return equip;
+    }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    public E getPreview() {
+        return previewingEquip;
+    }
+
+    /// <summary>
+    /// 预览变更回调
+    /// </summary>
+    protected virtual void onPreviewChanged() {
+        if (container != null)
+            container.updateItemHelp();
+        requestRefresh();
     }
 
     /// <summary>
@@ -68,7 +107,7 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     /// 刷新装备
     /// </summary>
     void refreshEquip() {
-        drawEquip(equip);
+        drawEquip(previewingEquip ?? equip);
     }
 
     /// <summary>
@@ -92,7 +131,7 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     protected virtual void drawEmptyEquip() {
         clearEquip();
     }
-
+    
     /// <summary>
     /// 清除装备
     /// </summary>
@@ -119,6 +158,25 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     #region 事件控制
 
     /// <summary>
+    /// 指针进入回调
+    /// </summary>
+    /// <param name="eventData">事件数据</param>
+    public override void OnPointerEnter(PointerEventData data) {
+        base.OnPointerEnter(data);
+        if(previewable)
+            processItemPreview(getDraggingItemDisplay(data));
+    }
+
+    /// <summary>
+    /// 指针离开回调
+    /// </summary>
+    /// <param name="eventData">事件数据</param>
+    public override void OnPointerExit(PointerEventData data) {
+        base.OnPointerExit(data);
+        clearPreview();
+    }
+
+    /// <summary>
     /// 拖拽物品放下回调
     /// </summary>
     /// <param name="data">事件数据</param>
@@ -143,9 +201,18 @@ public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
     /// <summary>
     /// 处理物品放下
     /// </summary>
+    protected virtual void processItemPreview(
+        DraggableItemDisplay<E> display) {
+        Debug.Log(name + " processItemPreview: " + display);
+        if (display != null && display.isDraggable())
+            setPreview(display.getItem());
+    }
+
+    /// <summary>
+    /// 处理物品放下
+    /// </summary>
     protected virtual void processItemDrop(
         DraggableItemDisplay<E> display) {
-        Debug.Log(name + " processItemDrop: " + display);
         if (display != null && display.isDraggable()) {
             var container = display.getContainer();
             var item = display.getItem();

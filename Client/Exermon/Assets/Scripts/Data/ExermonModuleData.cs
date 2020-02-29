@@ -85,9 +85,6 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
         var rate = rateParams[index];
         var max = star().baseRanges[index].maxValue;
         var value = base_.value;
-        if (base_.param().isPercent()) { // 如果是百分数属性
-            max *= 100; value *= 100;
-        }
         json["max"] = max;
         json["value"] = value;
         json["rate"] = value / max;
@@ -190,57 +187,10 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// <param name="json">数据</param>
     protected override void loadCustomAttributes(JsonData json) {
         base.loadCustomAttributes(json);
-        /*
-        name = DataLoader.loadString(json, "name");
-        gender = DataLoader.loadInt(json, "gender");
-        description = DataLoader.loadString(json, "description");
-        */
         full = AssetLoader.loadExermonFull(getID());
         icon = AssetLoader.loadExermonIcon(getID());
         battle = AssetLoader.loadExermonBattle(getID());
     }
-
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        animal = DataLoader.loadString(json, "animal");
-        starId = DataLoader.loadInt(json, "star_id");
-        subjectId = DataLoader.loadInt(json, "subject_id");
-        eType = DataLoader.loadInt(json, "e_type");
-
-        var paramRanges = DataLoader.loadJsonData(json, "params");
-
-        baseParams = DataLoader.loadDataArray<ParamData>(paramRanges, "bases");
-        rateParams = DataLoader.loadDataArray<ParamData>(paramRanges, "rates");
-
-        full = AssetLoader.loadExermonFull(getID());
-        icon = AssetLoader.loadExermonIcon(getID());
-        battle = AssetLoader.loadExermonBattle(getID());
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["animal"] = animal;
-        json["star_id"] = starId;
-        json["subject_id"] = subjectId;
-        json["e_type"] = eType;
-
-        json["params"] = new JsonData();
-        json["params"]["bases"] = DataLoader.convertDataArray(baseParams);
-        json["params"]["rates"] = DataLoader.convertDataArray(rateParams);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -317,44 +267,9 @@ public class ExerGift : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// <param name="json">数据</param>
     protected override void loadCustomAttributes(JsonData json) {
         base.loadCustomAttributes(json);
-        /*
-        name = DataLoader.loadString(json, "name");
-        gender = DataLoader.loadInt(json, "gender");
-        description = DataLoader.loadString(json, "description");
-        */
         icon = AssetLoader.loadExerGift(getID());
         bigIcon = AssetLoader.loadBigExerGift(getID());
     }
-
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        starId = DataLoader.loadInt(json, "star_id");
-        color = DataLoader.loadColor(json, "color");
-        gType = DataLoader.loadInt(json, "g_type");
-        params_ = DataLoader.loadDataArray<ParamData>(json, "params");
-
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["star_id"] = starId;
-        json["color"] = DataLoader.convertColor(color);
-        json["g_type"] = gType;
-        json["params"] = DataLoader.convertDataArray(params_);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -390,33 +305,6 @@ public class ExerFrag : BaseItem {
         var exer = exermon();
         if (exer != null) exer.setExerFrag(this);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        exermonId = DataLoader.loadInt(json, "eid");
-        sellPrice = DataLoader.loadInt(json, "sell_price");
-        count = DataLoader.loadInt(json, "count");
-
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["eid"] = exermonId;
-        json["sell_price"] = sellPrice;
-        json["count"] = count;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -511,55 +399,6 @@ public class ExerSkill : BaseItem {
         var exer = exermon();
         if (exer != null) exer.addExerSkill(this);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        exermonId = DataLoader.loadInt(json, "eid");
-        passive = DataLoader.loadBool(json, "passive");
-        nextSkillId = DataLoader.loadInt(json, "next_skill_id");
-        needCount = DataLoader.loadInt(json, "need_count");
-        mpCost = DataLoader.loadInt(json, "mp_cost");
-        rate = DataLoader.loadInt(json, "rate");
-        freeze = DataLoader.loadInt(json, "freeze");
-        maxUseCount = DataLoader.loadInt(json, "max_use_count");
-        target = DataLoader.loadInt(json, "target");
-        hitType = DataLoader.loadInt(json, "hit_type");
-        atkRate = DataLoader.loadInt(json, "atk_rate");
-        defRate = DataLoader.loadInt(json, "def_rate");
-
-        effects = DataLoader.loadDataList<EffectData>(json, "effects");
-
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["eid"] = exermonId;
-        json["passive"] = passive;
-        json["next_skill_id"] = nextSkillId;
-        json["need_count"] = needCount;
-        json["mp_cost"] = mpCost;
-        json["rate"] = rate;
-        json["freeze"] = freeze;
-        json["max_use_count"] = maxUseCount;
-        json["target"] = target;
-        json["hit_type"] = hitType;
-        json["atk_rate"] = atkRate;
-        json["def_rate"] = defRate;
-
-        json["effects"] = DataLoader.convertDataArray(effects);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -572,29 +411,6 @@ public class ExerItem : UsableItem {
     /// </summary>
     [AutoConvert]
     public int rate { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        rate = DataLoader.loadInt(json, "rate");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["rate"] = rate;
-
-        return json;
-    }
-    */
 }
 
 /// <summary>
@@ -615,28 +431,6 @@ public class ExerEquip : EquipableItem {
     public TypeData equipType() {
         return DataService.get().exerEquipType(eType);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        eType = DataLoader.loadInt(json, "e_type");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["e_type"] = eType;
-
-        return json;
-    }*/
 }
 
 #endregion 
@@ -752,7 +546,9 @@ public class ExerFragPackItem : PackContItem {
 /// <summary>
 /// 艾瑟萌
 /// </summary>
-public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConvertable {
+public class PlayerExermon : PackContItem,
+    ParamDisplay.DisplayDataConvertable, 
+    ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
     /// 默认类型
@@ -768,6 +564,8 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     [AutoConvert]
     public int exp { get; protected set; }
     [AutoConvert]
+    public int next { get; protected set; }
+    [AutoConvert]
     public int level { get; protected set; }
 
     [AutoConvert]
@@ -779,6 +577,31 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     public ParamData[] rateParams { get; protected set; }
 
     #region 属性显示数据生成
+
+    /// <summary>
+    /// 转化为属性信息
+    /// </summary>
+    /// <param name="type">类型</param>
+    /// <returns>属性信息</returns>
+    public JsonData convertToDisplayData(string type = "") {
+        switch (type.ToLower()) {
+            case "exp": return convertExp();
+            default: return toJson();
+        }
+    }
+
+    /// <summary>
+    /// 转化经验信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData convertExp() {
+        var json = new JsonData();
+        json["exp"] = exp;
+        json["next"] = next;
+        json["level"] = level;
+        json["rate"] = exp / next;
+        return json;
+    }
 
     /// <summary>
     /// 转化为属性信息集
@@ -816,8 +639,6 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
         var base_ = paramValues[index];
         var rate = rateParams[index];
         var value = base_.value;
-        if (base_.param().isPercent()) // 如果是百分数属性
-            value *= 100;
         json["value"] = value;
         json["growth"] = rate.value;
         return json;
@@ -857,6 +678,14 @@ public class PlayerExermon : PackContItem, ParamDisplay.DisplayDataArrayConverta
     /// <returns></returns>
     public string name() {
         return nickname.Length > 0 ? nickname : exermon().name;
+    }
+
+    /// <summary>
+    /// 更改昵称
+    /// </summary>
+    /// <param name="name"></param>
+    public void rename(string name) {
+        nickname = name;
     }
 
     #region 属性操作
@@ -953,7 +782,7 @@ public class PlayerExerGift : PackContItem {
 /// 艾瑟萌装备槽项
 /// </summary>
 public class ExerSlotItem : SlotContItem,
-    // ParamDisplay.DisplayDataConvertable,
+    ParamDisplay.DisplayDataConvertable,
     ParamDisplay.DisplayDataArrayConvertable {
 
     /// <summary>
@@ -974,6 +803,8 @@ public class ExerSlotItem : SlotContItem,
     [AutoConvert]
     public int exp { get; protected set; }
     [AutoConvert]
+    public int next { get; protected set; }
+    [AutoConvert]
     public int level { get; protected set; }
 
     [AutoConvert]
@@ -984,17 +815,77 @@ public class ExerSlotItem : SlotContItem,
     [AutoConvert]
     public ParamData[] rateParams { get; protected set; }
 
+    /// <summary>
+    /// 复制的对象，用于生成装备预览
+    /// </summary>
+    public ExerSlotItem copyObj { get; set; } = null;
+
     #region 属性显示数据生成
-    /*
+
+    #region 单信息数据生成
+
     /// <summary>
     /// 转化为属性信息
     /// </summary>
     /// <param name="type">类型</param>
     /// <returns>属性信息</returns>
     public JsonData convertToDisplayData(string type = "") {
-        return toJson();
+        switch (type.ToLower()) {
+            case "exp": return convertExp();
+            case "slot_exp": return convertSlotExp();
+            case "battle_point": return covnertBattlePoint();
+            default: return toJson();
+        }
     }
-    */
+
+    /// <summary>
+    /// 转化经验信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData convertExp() {
+        var json = new JsonData();
+        json["exp"] = playerExer.exp;
+        json["next"] = playerExer.next;
+        json["level"] = playerExer.level;
+        json["rate"] = playerExer.exp / playerExer.next;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化槽经验信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData convertSlotExp() {
+        var json = new JsonData();
+        json["exp"] = exp;
+        json["next"] = next;
+        json["level"] = level;
+        json["rate"] = exp / next;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化战斗力信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData covnertBattlePoint() {
+        var json = new JsonData();
+        var bp = battlePoint();
+
+        json["battle_point"] = bp;
+
+        if(copyObj != null) {
+            var bp2 = copyObj.battlePoint();
+            json["delta_battle_point"] = bp2 - bp;
+        }
+
+        return json;
+    }
+
+    #endregion
+
+    #region 多信息数据生成
+
     /// <summary>
     /// 转化为属性信息集
     /// </summary>
@@ -1016,6 +907,7 @@ public class ExerSlotItem : SlotContItem,
     /// <returns>属性信息</returns>
     JsonData convertParamToDisplayData(int index, string type = "") {
         switch (type.ToLower()) {
+            case "params": return convertParam(index);
             case "growth": return convertGrowth(index);
             default: return convertBasic(index);
         }
@@ -1031,10 +923,52 @@ public class ExerSlotItem : SlotContItem,
         var base_ = paramValues[index];
         var rate = rateParams[index];
         var value = base_.value;
-        if (base_.param().isPercent()) // 如果是百分数属性
-            value *= 100;
         json["value"] = value;
         json["growth"] = rate.value;
+        return json;
+    }
+
+    /// <summary>
+    /// 转化属性信息
+    /// </summary>
+    /// <returns></returns>
+    JsonData convertParam(int index) {
+        var json = new JsonData();
+        var exermon = this.exermon();
+        var level = playerExer.level;
+        var param = paramValues[index].param();
+
+        var value = paramValues[index].value;
+        var growth = rateParams[index].value;
+
+        var baseValue = exermon.baseParams[index].value;
+        var baseGrowth = exermon.rateParams[index].value;
+
+        var levelValue = CalcService.ExermonParamCalc.
+            calc(baseValue, baseGrowth, level) - baseValue;
+        var equipValue = exerEquipSlot.getParam(param.getID()).value;
+        var giftValue = CalcService.ExermonParamCalc.
+            calc(baseValue, growth, level) - levelValue - baseValue;
+
+        json["value"] = value;
+        json["growth"] = growth;
+
+        json["base_value"] = baseValue;
+        json["level_value"] = levelValue;
+        json["equip_value"] = equipValue;
+        json["gift_value"] = giftValue;
+
+        if (copyObj != null) {
+            var value2 = copyObj.paramValues[index].value;
+            var growth2 = copyObj.rateParams[index].value;
+
+            var deltaValue = value2 - value;
+            if (param.isPercent()) deltaValue *= 100;
+
+            json["delta_value"] = deltaValue;
+            json["delta_growth"] = growth2 - growth;
+        }
+
         return json;
     }
 
@@ -1053,6 +987,7 @@ public class ExerSlotItem : SlotContItem,
         var gift = exerGift();
         var color = new Color(1, 1, 1);
         if (gift != null) color = gift.color;
+
         json["max"] = max;
         json["value"] = value;
         json["rate"] = value / max;
@@ -1065,6 +1000,8 @@ public class ExerSlotItem : SlotContItem,
 
         return json;
     }
+
+    #endregion
 
     #endregion
 
@@ -1132,6 +1069,34 @@ public class ExerSlotItem : SlotContItem,
         recomputeParams();
     }
 
+    #region 临时复制对象操作
+
+    /// <summary>
+    /// 生成复制对象用于模拟
+    /// </summary>
+    /// <returns>复制对象</returns>
+    public ExerSlotItem generateCopyObjForSim() {
+        return copyObj = (ExerSlotItem)copy();
+    }
+
+    /// <summary>
+    /// 设置艾瑟萌预览
+    /// </summary>
+    /// <param name="playerExer">玩家艾瑟萌</param>
+    public void setPlayerExerView(PlayerExermon playerExer) {
+        generateCopyObjForSim().setPlayerExer(playerExer);
+    }
+
+    /// <summary>
+    /// 设置艾瑟萌天赋预览
+    /// </summary>
+    /// <param name="playerGift">玩家艾瑟萌天赋</param>
+    public void setPlayerGiftView(PlayerExerGift playerGift) {
+        generateCopyObjForSim().setPlayerGift(playerGift);
+    }
+
+    #endregion
+
     #region 属性操作
 
     /// <summary>
@@ -1190,6 +1155,17 @@ public class ExerSlotItem : SlotContItem,
     /// </summary>
     public ExerSlotItem() {
         exerEquipSlot = new ExerEquipSlot(this);
+    }
+
+    /// <summary>
+    /// 读取自定义属性
+    /// </summary>
+    /// <param name="json"></param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+
+        if (playerExer != null) playerExer.equiped = true;
+        if (playerGift != null) playerGift.equiped = true;
     }
 }
 
@@ -1354,6 +1330,18 @@ public class ExerSlot : SlotContainer<ExerSlotItem> {
     public void setPlayerGift(int sid, PlayerExerGift playerGift) {
         var slotItem = getExerSlotItem(sid);
         slotItem.setPlayerGift(playerGift);
+    }
+
+    /// <summary>
+    /// 获取所选科目
+    /// </summary>
+    /// <returns></returns>
+    public Subject[] subjects() {
+        var cnt = items.Count;
+        var sbjs = new Subject[cnt];
+        for (int i = 0; i < cnt; i++)
+            sbjs[i] = items[i].subject();
+        return sbjs;
     }
 
     #endregion

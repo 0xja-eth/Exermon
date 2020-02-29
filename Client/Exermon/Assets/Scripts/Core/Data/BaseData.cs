@@ -60,6 +60,11 @@ public class BaseData {
     public int getID() { return id; }
 
     /// <summary>
+    /// 是否为复制对象（复制对象无法进行复制）
+    /// </summary>
+    bool copied = false;
+
+    /// <summary>
     /// 原始数据
     /// </summary>
     JsonData rawData;
@@ -68,6 +73,17 @@ public class BaseData {
     /// 是否需要ID
     /// </summary>
     protected virtual bool idEnable() { return true; }
+
+    /// <summary>
+    /// 获取JSON数据
+    /// </summary>
+    /// <returns>JsonData</returns>
+    public virtual BaseData copy() {
+        if (copied) return null; // 如果为复制对象，无法继续复制
+        var res = (BaseData)DataLoader.load(GetType(), toJson());
+        res.copied = true;
+        return res;
+    }
 
     /// <summary>
     /// 数据加载
@@ -169,6 +185,7 @@ public class BaseData {
     public T convert<T>() where T: BaseData, new() {
         return DataLoader.load<T>(rawData);
     }
+
 }
 
 /// <summary>

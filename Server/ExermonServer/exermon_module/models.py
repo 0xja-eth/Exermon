@@ -301,12 +301,18 @@ class PlayerExermon(PackContItem):
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
+		from utils.calc_utils import ExermonLevelCalc
+
 		res = super().convertToDict(**kwargs)
 
-		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot())
+		star = self.item.star
+		next = ExermonLevelCalc.getDetlaExp(star, self.level)
+
+		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot(), type="items")
 
 		res['nickname'] = self.nickname
 		res['exp'] = self.exp
+		res['next'] = int(next)
 		res['level'] = self.level
 		res['exer_skill_slot'] = exerskillslot
 
@@ -441,21 +447,24 @@ class PlayerExermon(PackContItem):
 
 		exp = self.exp
 		level = self.level
-		delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
+		star = self.item.star
+		delta = ExermonLevelCalc.getDetlaExp(star, level)
+		if delta < 0: return  # 如果已经满级，跳过
 
 		# 当可以升级的时候
 		while exp > delta:
 			level += 1  # 升级
 			exp -= delta  # 扣除所需的经验
+			if level >= star.max_level: break
+
 			# 更新所需经验值
-			delta = ExermonLevelCalc.getDetlaExp(self.exermon().star, level)
+			delta = ExermonLevelCalc.getDetlaExp(star, level)
 
 		if level > self.level:
-
-			self.exp = exp
-			self.level = level
-
 			self._onUpgrade()
+
+		self.exp = exp
+		self.level = level
 
 	# 升级触发事件
 	def _onUpgrade(self):
@@ -915,7 +924,7 @@ class ExerSlotItem(SlotContItem):
 
 		level, next = self.slotLevel(True)
 
-		exerequipslot = ModelUtils.objectToDict(self.exerEquipSlot())
+		exerequipslot = ModelUtils.objectToDict(self.exerEquipSlot(), type="items")
 
 		res['subject_id'] = self.subject_id
 		res['exp'] = self.exp

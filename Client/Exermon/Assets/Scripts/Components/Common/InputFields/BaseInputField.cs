@@ -109,7 +109,7 @@ public class BaseInputField<T> : BaseView {
     /// </summary>
     public void startView(T value) {
         base.startView();
-        setValue(value);
+        setValue(value, false, false);
     }
 
     #endregion

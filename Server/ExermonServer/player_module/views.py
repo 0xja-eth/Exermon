@@ -313,10 +313,11 @@ class Service:
 
 		Check.ensureNameFormat(name)
 
-		# 保证相同昵称的玩家不存在
-		Common.ensurePlayerNotExist(name=name)
+		if player.name != name:
+			# 保证相同昵称的玩家不存在
+			Common.ensurePlayerNotExist(name=name)
 
-		player.editName(name)
+			player.editName(name)
 
 	# 玩家修改个人信息
 	@classmethod

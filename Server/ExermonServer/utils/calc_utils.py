@@ -63,11 +63,21 @@ class ExermonLevelCalc:
 
 		if level >= q.max_level: return -1
 
-		if cls.StarLevelTable is None:
-			cls.init()
+		if cls.StarLevelTable is None: cls.init()
 
 		data = cls.StarLevelTable[q]
 		return data[level]-data[level-1]
+
+	# 获取下级所需经验值
+	@classmethod
+	def getDetlaSumExp(cls, q, level):
+
+		if level >= q.max_level: return -1
+
+		if cls.StarLevelTable is None: cls.init()
+
+		data = cls.StarLevelTable[q]
+		return data[level]
 
 	# 获取累计经验
 	@classmethod
@@ -75,8 +85,7 @@ class ExermonLevelCalc:
 
 		if level > q.max_level: level = q.max_level
 
-		if cls.StarLevelTable is None:
-			cls.init()
+		if cls.StarLevelTable is None: cls.init()
 
 		return cls.StarLevelTable[q][level-1]+exp
 

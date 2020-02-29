@@ -544,25 +544,39 @@ MonoBehaviour:
     configData: 0
     format: 
     trigger: 
-  - key: rate
-    obj: {fileID: 0}
-    type: ScaleX
-    animated: 1
+  - key: delta_value
+    obj: {fileID: 4372016217325771010}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: delta_value
+    obj: {fileID: 4372016217325771010}
+    type: Color
+    animated: 0
     configData: 0
     format: 
     trigger: 
   - key: growth
-    obj: {fileID: 6398654948887968328}
+    obj: {fileID: 4372016216059178239}
     type: Text
     animated: 0
     configData: 0
     format: 
     trigger: 
-  - key: color
-    obj: {fileID: 0}
+  - key: delta_growth
+    obj: {fileID: 4372016217004376832}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: delta_growth
+    obj: {fileID: 4372016217004376832}
     type: Color
     animated: 0
-    configData: 1
+    configData: 0
     format: 
     trigger: 
   - key: color
@@ -579,9 +593,51 @@ MonoBehaviour:
     configData: 1
     format: 
     trigger: 
-  - key: description
+  - key: base_value
+    obj: {fileID: 0}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: HOC
+  - key: level_value
+    obj: {fileID: 0}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: HOC
+  - key: equip_value
+    obj: {fileID: 0}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: HOC
+  - key: gift_value
+    obj: {fileID: 0}
+    type: Sign
+    animated: 0
+    configData: 0
+    format: 
+    trigger: HOC
+  - key: value
     obj: {fileID: 0}
     type: Text
+    animated: 0
+    configData: 0
+    format: "\u6700\u7EC8\u503C {0}"
+    trigger: HOC
+  - key: name
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 1
+    format: 
+    trigger: HOC
+  - key: color
+    obj: {fileID: 0}
+    type: Color
     animated: 0
     configData: 1
     format: 

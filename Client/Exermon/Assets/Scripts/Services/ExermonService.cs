@@ -63,17 +63,19 @@ public class ExermonService : BaseService<ExermonService> {
     /// <param name="pgid">艾瑟萌天赋池项ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void exerSlotEquip(int sid, PlayerExermon playerExer, PlayerExerGift playerGift,
-        UnityAction onSuccess, UnityAction onError = null) {
+    public void rename(PlayerExermon playerExer, string name,
+        UnityAction onSuccess = null, UnityAction onError = null) {
+
+        if(playerExer.nickname == name) {
+            onSuccess?.Invoke(); return;
+        }
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            var player = getPlayer();
-            var exerSlot = player.slotContainers.exerSlot;
-
+            playerExer.rename(name);
             onSuccess?.Invoke();
         };
 
-        exerSlotEquip(sid, playerExer.getID(), playerGift.getID(), _onSuccess, onError);
+        rename(playerExer.getID(), name, _onSuccess, onError);
     }
 
     /// <summary>
@@ -81,9 +83,51 @@ public class ExermonService : BaseService<ExermonService> {
     /// </summary>
     /// <param name="sid">科目ID</param>
     /// <param name="peid">艾瑟萌仓库项ID</param>
-    /// <param name="pgid">艾瑟萌天赋池项ID</param>
+    /// <param name="name">新名字</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
+    public void rename(int peid, string name, 
+        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        JsonData data = new JsonData();
+        data["peid"] = peid; data["name"] = name;
+        sendRequest(Oper.Rename, data, onSuccess, onError, uid: true);
+    }
+
+    /// <summary>
+    /// 艾瑟萌槽装备
+    /// </summary>
+    /// <param name="slotItem">艾瑟萌槽项</param>
+    /// <param name="playerExer">艾瑟萌仓库项</param>
+    /// <param name="playerGift">艾瑟萌天赋池项</param>
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    public void exerSlotEquip(ExerSlotItem slotItem, PlayerExermon playerExer, PlayerExerGift playerGift,
+        UnityAction onSuccess = null, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            slotItem.setPlayerExer(playerExer);
+            slotItem.setPlayerGift(playerGift);
+            onSuccess?.Invoke();
+        };
+
+        exerSlotEquip(slotItem.subjectId, playerExer.getID(), playerGift.getID(), _onSuccess, onError);
+    }
+    /// <param name="sid">科目ID</param>
+    public void exerSlotEquip(int sid, PlayerExermon playerExer, PlayerExerGift playerGift,
+        UnityAction onSuccess = null, UnityAction onError = null) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
+            exerSlot.setPlayerExer(playerExer);
+            exerSlot.setPlayerGift(sid, playerGift);
+            onSuccess?.Invoke();
+        };
+
+        exerSlotEquip(sid, playerExer.getID(), playerGift.getID(), _onSuccess, onError);
+    }
+    /// <param name="peid">艾瑟萌仓库项ID</param>
+    /// <param name="pgid">艾瑟萌天赋池项ID</param>
     public void exerSlotEquip(int sid, int peid, int pgid,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
@@ -99,25 +143,28 @@ public class ExermonService : BaseService<ExermonService> {
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
     public void equipSlotEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip,
-        UnityAction onSuccess, UnityAction onError = null) {
+        UnityAction onSuccess = null, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             equipSlot.setEquip(packEquip);
             onSuccess?.Invoke();
         };
 
-        equipSlotEquip(equipSlot.exerSlotItem.subjectId, 
+        equipSlotEquip(equipSlot.exerSlotItem.subjectId,
             packEquip.getID(), _onSuccess, onError);
     }
-    /// <summary>
-    /// 艾瑟萌装备槽装备
-    /// </summary>
-    /// <param name="exerSlot">艾瑟萌槽</param>
+    /// <param name="slotItem">艾瑟萌槽项</param>
+    public void equipSlotEquip(ExerSlotItem slotItem, ExerPackEquip packEquip,
+        UnityAction onSuccess, UnityAction onError = null) {
+        equipSlotEquip(slotItem.exerEquipSlot, packEquip, onSuccess, onError);
+    }
     /// <param name="sid">科目ID</param>
-    public void equipSlotEquip(ExerSlot exerSlot, 
-        int sid, ExerPackEquip packEquip, UnityAction onSuccess, UnityAction onError = null) {
+    public void equipSlotEquip(int sid, ExerPackEquip packEquip, 
+        UnityAction onSuccess = null, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
             var equipSlot = exerSlot.getExerSlotItem(sid).exerEquipSlot;
             equipSlot.setEquip(packEquip);
             onSuccess?.Invoke();
@@ -142,7 +189,7 @@ public class ExermonService : BaseService<ExermonService> {
     /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadExerPack(UnityAction onSuccess, UnityAction onError = null) {
+    public void loadExerPack(UnityAction onSuccess = null, UnityAction onError = null) {
         Player player = getPlayer();
         itemSer.getPack(player.packContainers.exerPack, onSuccess, onError);
     }
@@ -153,7 +200,7 @@ public class ExermonService : BaseService<ExermonService> {
     /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadExerFragPack(UnityAction onSuccess, UnityAction onError = null) {
+    public void loadExerFragPack(UnityAction onSuccess = null, UnityAction onError = null) {
         Player player = getPlayer();
         itemSer.getPack(player.packContainers.exerFragPack, onSuccess, onError);
     }
@@ -164,7 +211,7 @@ public class ExermonService : BaseService<ExermonService> {
     /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadExerGiftPool(UnityAction onSuccess, UnityAction onError = null) {
+    public void loadExerGiftPool(UnityAction onSuccess = null, UnityAction onError = null) {
         Player player = getPlayer();
         itemSer.getPack(player.packContainers.exerGiftPool, onSuccess, onError);
     }
@@ -182,14 +229,13 @@ public class ExermonService : BaseService<ExermonService> {
     /// <summary>
     /// 读取艾瑟萌槽
     /// </summary>
-    /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadExerSlot(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+    public void loadExerSlot(UnityAction onSuccess = null, UnityAction onError = null) {
         Player player = getPlayer();
         itemSer.getSlot(player.slotContainers.exerSlot, onSuccess, onError);
     }
-
+    /*
     /// <summary>
     /// 获取艾瑟萌
     /// </summary>
@@ -200,6 +246,6 @@ public class ExermonService : BaseService<ExermonService> {
         Player player = getPlayer();
         itemSer.getPack(player.packContainers.exerHub, onSuccess, onError);
     }
-
+    */
     #endregion
 }

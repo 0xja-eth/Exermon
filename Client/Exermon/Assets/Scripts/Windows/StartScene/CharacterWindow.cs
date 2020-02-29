@@ -58,8 +58,8 @@ public class CharacterWindow : BaseWindow {
     protected override void initializeOnce() {
         base.initializeOnce();
         if (gameSys == null) gameSys = GameSystem.get();
-        if (playerSer == null) playerSer = PlayerService.get();
         if (dataSer == null) dataSer = DataService.get();
+        if (playerSer == null) playerSer = PlayerService.get();
         scene = (StartScene)SceneUtils.getSceneObject("Scene");
         configureSubViews();
     }
