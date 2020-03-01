@@ -58,9 +58,10 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         public const string ItemSplitItem = "item/packcontainer/split";
         public const string ItemMergeItem = "item/packcontainer/merge";
 
-        public const string ExermonExerSlotEquip = "exermon/exerslot/equip";
-        public const string ExermonEquipSlotEquip = "exermon/equipslot/equip";
-        public const string ExermonPlayerExerRename = "exermon/playerexer/rename";
+        public const string ExermonEquipPlayerExer = "exermon/equip/playerexer";
+        public const string ExermonEquipPlayerGift = "exermon/equip/playergift";
+        public const string ExermonEquipExerEquip = "exermon/equip/exerequip";
+        public const string ExermonEditNickname = "exermon/edit/nickname";
 
         public const string RecordGet = "record/record/get";
         public const string RecordQuestionCollect = "record/question/collect";

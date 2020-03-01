@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 可拖动物品展示组件
 /// </summary>
-public class DraggableItemDisplay<T> : SelectableItemInfo<T>,
+public class DraggableItemDisplay<T> : SelectableItemDisplay<T>,
     IBeginDragHandler, IDragHandler, IEndDragHandler where T : class {
 
     /// <summary>

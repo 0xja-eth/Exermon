@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 物品详细信息
 /// </summary>
-public class ItemInfo<T> : ItemDisplay<T> where T : class {
+public class ItemDetail<T> : ItemDisplay<T> where T : class {
 
     /// <summary>
     /// 内部变量声明

@@ -109,7 +109,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 56, y: 0}
+  m_SizeDelta: {x: 48, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &4372016216059178232
 CanvasRenderer:
@@ -139,12 +139,12 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: b3ce29707ca72534ea5e7746c0a94caf, type: 3}
-    m_FontSize: 18
+    m_FontSize: 16
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 1
-    m_MaxSize: 40
-    m_Alignment: 5
+    m_MaxSize: 18
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -186,7 +186,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 48, y: 0}
+  m_SizeDelta: {x: 42, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &4372016217004376845
 CanvasRenderer:
@@ -218,10 +218,10 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: b3ce29707ca72534ea5e7746c0a94caf, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 0
-    m_MaxSize: 188
-    m_Alignment: 4
+    m_MaxSize: 14
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -295,16 +295,16 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: b3ce29707ca72534ea5e7746c0a94caf, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 0
-    m_MaxSize: 188
-    m_Alignment: 4
+    m_MaxSize: 14
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: +12
+  m_Text: +1.34%
 --- !u!1 &6398654948542223338
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,7 +417,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 54, y: 0}
+  m_SizeDelta: {x: 72, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &6398654948786311786
 CanvasRenderer:
@@ -447,18 +447,18 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: b3ce29707ca72534ea5e7746c0a94caf, type: 3}
-    m_FontSize: 18
+    m_FontSize: 16
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 1
-    m_MaxSize: 188
-    m_Alignment: 5
+    m_MaxSize: 18
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1000
+  m_Text: 12
 --- !u!1 &6398654948840198535
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,7 +626,7 @@ MonoBehaviour:
     type: Text
     animated: 0
     configData: 0
-    format: "\u6700\u7EC8\u503C {0}"
+    format: "<size=14>\u6700\u7EC8\u503C</size> {0}"
     trigger: HOC
   - key: name
     obj: {fileID: 0}
@@ -737,10 +737,10 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 1
     m_MaxSize: 40
-    m_Alignment: 5
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\u6210\u957F"

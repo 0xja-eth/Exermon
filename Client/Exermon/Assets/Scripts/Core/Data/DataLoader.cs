@@ -328,7 +328,30 @@ public static class DataLoader {
     }
 
     #endregion
-    
+
+    #region 特殊格式转化
+
+    /// <summary>
+    /// 转化四舍五入的浮点数
+    /// </summary>
+    /// <param name="x">浮点数</param>
+    /// <param name="d">保留小数</param>
+    /// <param name="intRes">整数结果</param>
+    /// <returns></returns>
+    public static JsonData convertDouble(
+        double x, bool intRes = false, int d = 2) {
+        if (intRes) return (int)x;
+        x = Math.Round(x, d);
+        var m = Math.Pow(10, d);
+        // 如果 x 很接近 0（小数点 d 位以内为 0），则置为 0
+        if ((int)(x * m) == 0) return 0;
+        // 否则直接返回
+        return x;
+        //return (!intRes && x == (int)x ? (int)x : x);
+    }
+
+    #endregion
+
     #endregion
 
     #region 其他工具

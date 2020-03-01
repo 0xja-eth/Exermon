@@ -11,30 +11,8 @@ using UnityEngine.Events;
 public class StatusScene : BaseScene {
 
     /// <summary>
-    /// 请求项，上层需要发起的请求通过该项储存，统一执行
-    /// </summary>
-    struct RequestItem {
-
-        /// <summary>
-        /// 属性
-        /// </summary>
-        public string name;
-        public UnityAction action;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="name">请求名称</param>
-        /// <param name="action">请求函数动作</param>
-        public RequestItem(string name, UnityAction action) {
-            this.name = name; this.action = action;
-        }
-    }
-
-    /// <summary>
     /// 文本定义
     /// </summary>
-    const string RequestAlertTextFormat = "你有 {0} 等 {1} 个操作仍未保存，确定放弃修改返回吗？";
 
     /// <summary>
     /// 外部组件设置
@@ -46,14 +24,14 @@ public class StatusScene : BaseScene {
     public Button confirm;
 
     /// <summary>
-    /// 请求项列表
+    /// 按钮回调
     /// </summary>
-    List<RequestItem> requestItems = new List<RequestItem>();
+    List<UnityAction> confirmCallbacks = new List<UnityAction>(); // 确认按钮回调
+    List<UnityAction> backCallbacks = new List<UnityAction>(); // 返回按钮回调
 
     /// <summary>
     /// 内部系统声明
     /// </summary>
-    GameSystem gameSys;
     PlayerService playerSer;
 
     #region 初始化
@@ -71,7 +49,6 @@ public class StatusScene : BaseScene {
     /// </summary>
     protected override void initializeSystems() {
         base.initializeSystems();
-        gameSys = GameSystem.get();
         playerSer = PlayerService.get();
     }
 
@@ -93,45 +70,32 @@ public class StatusScene : BaseScene {
 
     #endregion
 
-    #region 更新控制
-
-
-    #endregion
-
     #region 请求项控制
 
     /// <summary>
-    /// 添加请求项
+    /// 添加确认回调
     /// </summary>
-    /// <param name="name">名称</param>
     /// <param name="action">动作</param>
-    /// <param name="immediately">立刻发送</param>
-    public void pushRequestItem(string name, UnityAction action, bool immediately = false) {
-        if (immediately) action.Invoke();
-        else requestItems.Add(new RequestItem(name, action));
+    public void pushConfirmCallback(UnityAction action) {
+        confirmCallbacks.Add(action);
         confirm.interactable = true;
     }
 
     /// <summary>
-    /// 清除请求项
+    /// 添加返回回调
     /// </summary>
-    public void clearRequestItems() {
-        requestItems.Clear();
+    /// <param name="action">动作</param>
+    public void pushBackCallback(UnityAction action) {
+        backCallbacks.Add(action);
+    }
+
+    /// <summary>
+    /// 清除回调项
+    /// </summary>
+    public void clearCallbacks() {
+        confirmCallbacks.Clear();
+        backCallbacks.Clear();
         confirm.interactable = false;
-    }
-
-    /// <summary>
-    /// 执行请求项
-    /// </summary>
-    void doRequestItem(RequestItem item) {
-        item.action.Invoke();
-    }
-
-    /// <summary>
-    /// 检查请求项
-    /// </summary>
-    bool checkRequestItems() {
-        return requestItems.Count <= 0;
     }
 
     #endregion
@@ -153,43 +117,18 @@ public class StatusScene : BaseScene {
     /// 确认
     /// </summary>
     public void onConfirm() {
-        foreach (var item in requestItems) doRequestItem(item);
-        clearRequestItems();
+        foreach (var cb in confirmCallbacks) cb.Invoke();
+        clearCallbacks();
     }
 
     /// <summary>
     /// 返回
     /// </summary>
     public void onBack() {
-        if (checkRequestItems()) doBack();
-        else confirmBack();
-    }
-
-    /// <summary>
-    /// 进行返回操作
-    /// </summary>
-    void doBack() {
-        clearRequestItems();
-        if (infoEditWindow.shown) infoEditWindow.terminateView();
-        else gameSys.requestChangeScene(GameSystem.ChangeSceneRequest.Type.Pop);
-    }
-
-    /// <summary>
-    /// 提示确认返回
-    /// </summary>
-    void confirmBack() {
-        gameSys.requestAlert(generateRequestItemAlertText(),
-            AlertWindow.Type.YesOrNo, doBack);
-    }
-
-    /// <summary>
-    /// 生成请求项提示文本
-    /// </summary>
-    /// <returns></returns>
-    string generateRequestItemAlertText() {
-        var cnt = requestItems.Count;
-        var first = requestItems[0].name;
-        return string.Format(RequestAlertTextFormat, first, cnt);
+        if(backCallbacks.Count > 0)
+            foreach (var cb in backCallbacks) cb.Invoke();
+        else popScene();
+        clearCallbacks();
     }
 
     #endregion

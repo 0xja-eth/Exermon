@@ -79,6 +79,7 @@ public class BaseView : BaseComponent {
     void updateRefresh() {
         if (isRefreshRequested()) refresh();
         else if (isClearRequested()) clear();
+        resetRequests();
     }
 
     #endregion
@@ -163,7 +164,6 @@ public class BaseView : BaseComponent {
     /// </summary>
     protected virtual void refresh() {
         Debug.Log(name + " refresh");
-        resetRequests();
     }
 
     /// <summary>
@@ -171,7 +171,6 @@ public class BaseView : BaseComponent {
     /// </summary>
     protected virtual void clear() {
         Debug.Log(name + " clear");
-        resetRequests();
     }
 
     #endregion

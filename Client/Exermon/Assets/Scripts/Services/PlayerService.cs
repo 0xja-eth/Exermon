@@ -426,14 +426,19 @@ public class PlayerService : BaseService<PlayerService> {
     /// 装备人物装备
     /// </summary>
     /// <param name="packEquip">人类背包装备</param>
+    public void equipSlotEquip(HumanPackEquip packEquip) {
+        var humanPack = player.packContainers.humanPack;
+        var equipSlot = player.slotContainers.humanEquipSlot;
+        equipSlot.setEquip(humanPack, packEquip);
+    }
+    /// <param name="packEquip">人类背包装备</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
     public void equipSlotEquip(HumanPackEquip packEquip,
-        UnityAction onSuccess, UnityAction onError = null) {
+        UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            var equipSlot = player.slotContainers.humanEquipSlot;
-            equipSlot.setEquip(packEquip);
+            if (localChange) equipSlotEquip(packEquip);
             onSuccess?.Invoke();
         };
 
@@ -452,7 +457,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="cid">容器ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadHumanPack(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
+    public void loadHumanPack(UnityAction onSuccess = null, UnityAction onError = null) {
         itemSer.getPack(player.packContainers.humanPack, onSuccess, onError);
     }
 

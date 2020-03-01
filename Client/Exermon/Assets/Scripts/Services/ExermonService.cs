@@ -13,17 +13,19 @@ public class ExermonService : BaseService<ExermonService> {
     /// <summary>
     /// 操作文本设定
     /// </summary>
-    const string Rename = "修改昵称";
+    const string EditNickname = "修改昵称";
 
-    const string ExerSlotEquip = "装备";
-    const string EquipSlotEquip = "装备";
+    const string EquipPlayerExer = "装备";
+    const string EquipPlayerGift = "装备";
+    const string EquipExerEquip = "装备";
 
     /// <summary>
     /// 业务操作
     /// </summary>
     public enum Oper {
-        Rename,
-        ExerSlotEquip, EquipSlotEquip
+        EditNickname,
+        EquipPlayerExer, EquipPlayerGift,
+        EquipExerEquip
     }
 
     /// <summary>
@@ -46,9 +48,10 @@ public class ExermonService : BaseService<ExermonService> {
     /// </summary>
     protected override void initializeOperDict() {
         base.initializeOperDict();
-        addOperDict(Oper.Rename, Rename, NetworkSystem.Interfaces.ExermonPlayerExerRename);
-        addOperDict(Oper.ExerSlotEquip, ExerSlotEquip, NetworkSystem.Interfaces.ExermonExerSlotEquip);
-        addOperDict(Oper.EquipSlotEquip, EquipSlotEquip, NetworkSystem.Interfaces.ExermonEquipSlotEquip);
+        addOperDict(Oper.EditNickname, EditNickname, NetworkSystem.Interfaces.ExermonEditNickname);
+        addOperDict(Oper.EquipPlayerExer, EquipPlayerExer, NetworkSystem.Interfaces.ExermonEquipPlayerExer);
+        addOperDict(Oper.EquipPlayerGift, EquipPlayerGift, NetworkSystem.Interfaces.ExermonEquipPlayerGift);
+        addOperDict(Oper.EquipExerEquip, EquipExerEquip, NetworkSystem.Interfaces.ExermonEquipExerEquip);
     }
 
     #endregion
@@ -58,81 +61,135 @@ public class ExermonService : BaseService<ExermonService> {
     /// <summary>
     /// 艾瑟萌槽装备
     /// </summary>
-    /// <param name="sid">科目ID</param>
-    /// <param name="peid">艾瑟萌仓库项ID</param>
-    /// <param name="pgid">艾瑟萌天赋池项ID</param>
+    /// <param name="playerExer">艾瑟萌仓库项</param>
+    /// <param name="name">新名字</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void rename(PlayerExermon playerExer, string name,
+    public void editNickname(PlayerExermon playerExer, string name,
         UnityAction onSuccess = null, UnityAction onError = null) {
 
-        if(playerExer.nickname == name) {
-            onSuccess?.Invoke(); return;
-        }
+        if(playerExer.nickname == name) { onSuccess?.Invoke(); return; }
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             playerExer.rename(name);
             onSuccess?.Invoke();
         };
 
-        rename(playerExer.getID(), name, _onSuccess, onError);
+        editNickname(playerExer.getID(), name, _onSuccess, onError);
     }
-
-    /// <summary>
-    /// 艾瑟萌槽装备
-    /// </summary>
-    /// <param name="sid">科目ID</param>
     /// <param name="peid">艾瑟萌仓库项ID</param>
-    /// <param name="name">新名字</param>
-    /// <param name="onSuccess">成功回调</param>
-    /// <param name="onError">失败回调</param>
-    public void rename(int peid, string name, 
+    public void editNickname(int peid, string name, 
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
         data["peid"] = peid; data["name"] = name;
-        sendRequest(Oper.Rename, data, onSuccess, onError, uid: true);
+        sendRequest(Oper.EditNickname, data, onSuccess, onError, uid: true);
+    }
+
+    /// <summary>
+    /// 艾瑟萌槽装备艾瑟萌
+    /// </summary>
+    /// <param name="slotItem">艾瑟萌槽项</param>
+    /// <param name="playerExer">艾瑟萌仓库项</param>
+    public void equipPlayerExer(ExerSlotItem slotItem, PlayerExermon playerExer) {
+        var player = getPlayer();
+        var exerSlot = player.slotContainers.exerSlot;
+        var exerHub = player.packContainers.exerHub;
+        exerSlot.setEquip(slotItem, exerHub, playerExer);
+    }
+    /// <param name="sid">科目ID</param>
+    public void equipPlayerExer(int sid, PlayerExermon playerExer) {
+        var player = getPlayer();
+        var exerSlot = player.slotContainers.exerSlot;
+        var exerHub = player.packContainers.exerHub;
+        exerSlot.setEquip(exerHub, playerExer);
+    }
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    /// <param name="localChange">本地数据是否改变</param>
+    public void equipPlayerExer(ExerSlotItem slotItem, PlayerExermon playerExer,  
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            if (localChange) equipPlayerExer(slotItem, playerExer);
+            onSuccess?.Invoke();
+        };
+
+        var peid = playerExer == null ? 0 : playerExer.getID();
+
+        equipPlayerExer(slotItem.subjectId, peid, _onSuccess, onError);
+    }
+    public void equipPlayerExer(int sid, PlayerExermon playerExer,
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            if (localChange) equipPlayerExer(sid, playerExer);
+            onSuccess?.Invoke();
+        };
+
+        var peid = playerExer == null ? 0 : playerExer.getID();
+
+        equipPlayerExer(sid, peid, _onSuccess, onError);
+    }
+    /// <param name="peid">艾瑟萌仓库项ID</param>
+    /// <param name="pgid">艾瑟萌天赋池项ID</param>
+    public void equipPlayerExer(int sid, int peid,
+        NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        JsonData data = new JsonData();
+        data["sid"] = sid; data["peid"] = peid;
+        sendRequest(Oper.EquipPlayerExer, data, onSuccess, onError, uid: true);
     }
 
     /// <summary>
     /// 艾瑟萌槽装备
     /// </summary>
     /// <param name="slotItem">艾瑟萌槽项</param>
-    /// <param name="playerExer">艾瑟萌仓库项</param>
     /// <param name="playerGift">艾瑟萌天赋池项</param>
-    /// <param name="onSuccess">成功回调</param>
-    /// <param name="onError">失败回调</param>
-    public void exerSlotEquip(ExerSlotItem slotItem, PlayerExermon playerExer, PlayerExerGift playerGift,
-        UnityAction onSuccess = null, UnityAction onError = null) {
-
-        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            slotItem.setPlayerExer(playerExer);
-            slotItem.setPlayerGift(playerGift);
-            onSuccess?.Invoke();
-        };
-
-        exerSlotEquip(slotItem.subjectId, playerExer.getID(), playerGift.getID(), _onSuccess, onError);
+    public void equipPlayerGift(ExerSlotItem slotItem, PlayerExerGift playerGift) {
+        var player = getPlayer();
+        var exerSlot = player.slotContainers.exerSlot;
+        var exerGiftPool = player.packContainers.exerGiftPool;
+        exerSlot.setEquip(slotItem, exerGiftPool, playerGift);
     }
     /// <param name="sid">科目ID</param>
-    public void exerSlotEquip(int sid, PlayerExermon playerExer, PlayerExerGift playerGift,
-        UnityAction onSuccess = null, UnityAction onError = null) {
+    public void equipPlayerGift(int sid,PlayerExerGift playerGift) {
+        var player = getPlayer();
+        var exerSlot = player.slotContainers.exerSlot;
+        var exerGiftPool = player.packContainers.exerGiftPool;
+        exerSlot.setEquip(sid, exerGiftPool, playerGift);
+    }
+    /// <param name="onSuccess">成功回调</param>
+    /// <param name="onError">失败回调</param>
+    /// <param name="localChange">本地数据是否改变</param>
+    public void equipPlayerGift(ExerSlotItem slotItem, PlayerExerGift playerGift,
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            var player = getPlayer();
-            var exerSlot = player.slotContainers.exerSlot;
-            exerSlot.setPlayerExer(playerExer);
-            exerSlot.setPlayerGift(sid, playerGift);
+            if (localChange) equipPlayerGift(slotItem, playerGift);
             onSuccess?.Invoke();
         };
 
-        exerSlotEquip(sid, playerExer.getID(), playerGift.getID(), _onSuccess, onError);
+        var pgid = playerGift == null ? 0 : playerGift.getID();
+
+        equipPlayerGift(slotItem.subjectId, pgid, _onSuccess, onError);
     }
-    /// <param name="peid">艾瑟萌仓库项ID</param>
+    public void equipPlayerGift(int sid, PlayerExerGift playerGift,
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
+
+        NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            if (localChange) equipPlayerGift(sid, playerGift);
+            onSuccess?.Invoke();
+        };
+
+        var pgid = playerGift == null ? 0 : playerGift.getID();
+
+        equipPlayerGift(sid, pgid, _onSuccess, onError);
+    }
     /// <param name="pgid">艾瑟萌天赋池项ID</param>
-    public void exerSlotEquip(int sid, int peid, int pgid,
+    public void equipPlayerGift(int sid, int pgid,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
-        data["sid"] = sid; data["peid"] = peid; data["pgid"] = pgid;
-        sendRequest(Oper.ExerSlotEquip, data, onSuccess, onError, uid: true);
+        data["sid"] = sid; data["pgid"] = pgid;
+        sendRequest(Oper.EquipPlayerGift, data, onSuccess, onError, uid: true);
     }
 
     /// <summary>
@@ -140,47 +197,56 @@ public class ExermonService : BaseService<ExermonService> {
     /// </summary>
     /// <param name="equipSlot">艾瑟萌装备槽</param>
     /// <param name="packEquip">背包装备</param>
+    public void equipExerEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip) {
+        var player = getPlayer();
+        var exerPack = player.packContainers.exerPack;
+        equipSlot.setEquip(exerPack, packEquip);
+    }
+    /// <param name="sid">科目ID</param>
+    public void equipExerEquip(int sid, ExerPackEquip packEquip) {
+        var player = getPlayer();
+        var exerSlot = player.slotContainers.exerSlot;
+        var equipSlot = exerSlot.getExerSlotItem(sid).exerEquipSlot;
+        equipExerEquip(equipSlot, packEquip);
+    }
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void equipSlotEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip,
-        UnityAction onSuccess = null, UnityAction onError = null) {
+    /// <param name="localChange">本地数据是否改变</param>
+    public void equipExerEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip,
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            equipSlot.setEquip(packEquip);
+            if (localChange) equipExerEquip(equipSlot, packEquip);
             onSuccess?.Invoke();
         };
 
-        equipSlotEquip(equipSlot.exerSlotItem.subjectId,
+        equipExerEquip(equipSlot.exerSlotItem.subjectId,
             packEquip.getID(), _onSuccess, onError);
     }
     /// <param name="slotItem">艾瑟萌槽项</param>
-    public void equipSlotEquip(ExerSlotItem slotItem, ExerPackEquip packEquip,
-        UnityAction onSuccess, UnityAction onError = null) {
-        equipSlotEquip(slotItem.exerEquipSlot, packEquip, onSuccess, onError);
+    public void equipExerEquip(ExerSlotItem slotItem, ExerPackEquip packEquip,
+        UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
+        equipExerEquip(slotItem.exerEquipSlot, packEquip, onSuccess, onError, localChange);
     }
-    /// <param name="sid">科目ID</param>
     public void equipSlotEquip(int sid, ExerPackEquip packEquip, 
-        UnityAction onSuccess = null, UnityAction onError = null) {
+        UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-            var player = getPlayer();
-            var exerSlot = player.slotContainers.exerSlot;
-            var equipSlot = exerSlot.getExerSlotItem(sid).exerEquipSlot;
-            equipSlot.setEquip(packEquip);
+            if (localChange) equipExerEquip(sid, packEquip);
             onSuccess?.Invoke();
         };
 
-        equipSlotEquip(sid, packEquip.getID(), _onSuccess, onError);
+        equipExerEquip(sid, packEquip.getID(), _onSuccess, onError);
     }
     /// <param name="eid">装备位置ID</param>
     /// <param name="eeid">艾瑟萌背包装备项ID</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void equipSlotEquip(int sid, int eeid, 
+    public void equipExerEquip(int sid, int eeid, 
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
         JsonData data = new JsonData();
         data["eeid"] = eeid; data["sid"] = sid;
-        sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
+        sendRequest(Oper.EquipExerEquip, data, onSuccess, onError, uid: true);
     }
 
     /// <summary>

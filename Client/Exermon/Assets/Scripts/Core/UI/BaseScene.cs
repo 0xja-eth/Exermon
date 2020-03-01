@@ -21,6 +21,11 @@ public class BaseScene : BaseComponent {
     /// </summary>
     public bool initialized { get; protected set; } = false;
 
+    /// <summary>
+    /// 内部系统声明
+    /// </summary>
+    protected GameSystem gameSys;
+
     #region 初始化
 
     /// <summary>
@@ -51,7 +56,7 @@ public class BaseScene : BaseComponent {
     /// 初始化外部系统
     /// </summary>
     protected virtual void initializeSystems() {
-
+        gameSys = GameSystem.get();
     }
 
     /// <summary>
@@ -79,4 +84,14 @@ public class BaseScene : BaseComponent {
 
     #endregion
 
+    #region 场景控制
+
+    /// <summary>
+    /// 返回场景
+    /// </summary>
+    public void popScene() {
+        gameSys.requestChangeScene(GameSystem.ChangeSceneRequest.Type.Pop);
+    }
+
+    #endregion
 }

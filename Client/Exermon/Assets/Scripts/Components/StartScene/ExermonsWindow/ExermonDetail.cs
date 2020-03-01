@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 艾瑟萌详细信息
 /// </summary>
-public class ExermonDetail : ItemInfo<Exermon> {
+public class ExermonDetail : ItemDetail<Exermon> {
 
     /// <summary>
     /// 常量设置

@@ -352,7 +352,7 @@ class Service:
 
 		pack_equip = Common.getPackEquip(player, id=heid)
 
-		ItemService.slotContainerEquip(player, equip_slot, pack_equip,
+		ItemService.slotContainerEquip(player, equip_slot, [pack_equip],
 									   e_type_id=pack_equip.item.e_type_id)
 
 

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 艾瑟萌槽详细信息
 /// </summary>
-public class ExerSlotDetail : ItemInfo<ExerSlotItem> {
+public class ExerSlotDetail : ItemDetail<ExerSlotItem> {
     
     /// <summary>
     /// 外部组件设置

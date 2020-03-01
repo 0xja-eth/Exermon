@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 物品容器
 /// </summary>
-public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class {
+public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: class {
 
     /// <summary>
     /// 常量设置
@@ -86,7 +86,7 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// 获取物品帮助组件
     /// </summary>
     /// <returns>帮助组件</returns>
-    protected virtual ItemInfo<T> getItemDetail() {
+    protected virtual ItemDetail<T> getItemDetail() {
         return null;
     }
 
@@ -150,7 +150,7 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// </summary>
     /// <param name="item">物品</param>
     /// <returns>物品显示项</returns>
-    public SelectableItemInfo<T> getItemDisplay(T item) {
+    public SelectableItemDisplay<T> getItemDisplay(T item) {
         return subViews.Find((item_) => item_.getItem() == item);
     }
 
@@ -175,22 +175,14 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// <summary>
     /// 转移物品
     /// </summary>
+    /// <param name="container">容器</param>
     /// <param name="item">物品</param>
     public void transferItem(ItemContainer<T> container, T item) {
-        Debug.Log(name + " transferItem: " + container + ", " + item);
         if (!containsItem(item)) return;
-        Debug.Log(name + " containsItem");
         container.acceptTransfer(prepareTransfer(item));
     }
-
-    /// <summary>
-    /// 转移物品
-    /// </summary>
-    /// <param name="item">物品</param>
     public void transferItem<T1>(SlotItemDisplay<T1, T> slotItem, T item) where T1 : class {
-        Debug.Log(name + " transferItem: " + slotItem + ", " + item);
         if (!containsItem(item)) return;
-        Debug.Log(name + " containsItem");
         slotItem.setEquip(prepareTransfer(item));
     }
 
@@ -232,7 +224,7 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// 获取物品显示项数组
     /// </summary>
     /// <returns>物品显示项数组</returns>
-    public SelectableItemInfo<T>[] getItemDisplays() {
+    public SelectableItemDisplay<T>[] getItemDisplays() {
         return subViews.ToArray();
     }
 
@@ -281,7 +273,7 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// 获取选择项
     /// </summary>
     /// <returns>选择项</returns>
-    public SelectableItemInfo<T> selectedItemDisplay() {
+    public SelectableItemDisplay<T> selectedItemDisplay() {
         if (selectedIndex == -1) return null;
         return subViews[selectedIndex];
     }
@@ -371,9 +363,9 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// 获取选中项
     /// </summary>
     /// <returns>选中项数组</returns>
-    public SelectableItemInfo<T>[] getCheckedItemDisplays() {
+    public SelectableItemDisplay<T>[] getCheckedItemDisplays() {
         var cnt = checkedIndices.Count;
-        var items = new SelectableItemInfo<T>[cnt];
+        var items = new SelectableItemDisplay<T>[cnt];
         for (int i = 0; i < cnt; ++i) {
             var index = checkedIndices[i];
             items[i] = subViews[index];
@@ -489,11 +481,12 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     /// 创建物品显示组件
     /// </summary>
     void refreshItemDisplays() {
-        for (int i = 0; i < itemDisplaysCount(); i++) 
-            if (i < maxItemDisplaysCount()) {
-                T item = (i < itemsCount() ? items[i] : null);
-                createSubView(item, i);
-            } else destroySubView(i);
+        for (int i=0;i< maxItemDisplaysCount(); ++i) {
+            T item = (i < itemsCount() ? items[i] : null);
+            createSubView(item, i);
+        }
+        for(int i= itemDisplaysCount()-1;i>= maxItemDisplaysCount();--i)
+            destroySubView(i);
     }
 
     /// <summary>
@@ -503,25 +496,12 @@ public class ItemContainer<T> : GroupView<SelectableItemInfo<T>> where T: class 
     void createSubView(T item, int index) {
         createSubView(index).startView(item);
     }
-    /*
-    /// <summary>
-    /// 获取或者创建一个 ItemDisplay
-    /// </summary>
-    /// <returns>ItemDisplay</returns>
-    ItemDisplay<T> getOrCreateItemDisplay(int index) {
-        if (index < subViews.Count) return subViews[index];
-        var obj = Instantiate(itemPrefab, container);
-        var item = SceneUtils.get<ItemDisplay<T>>(obj);
-        obj.name = string.Format(itemNameFormat, index);
-        onItemDisplayCreated(item, index);
-        return item;
-    }
-    */
+
     /// <summary>
     /// ItemDisplay 创建回调
     /// </summary>
     /// <param name="item">ItemDisplay</param>
-    protected override void onSubViewCreated(SelectableItemInfo<T> sub, int index) {
+    protected override void onSubViewCreated(SelectableItemDisplay<T> sub, int index) {
         sub.configure(this, index);
         base.onSubViewCreated(sub, index);
     }

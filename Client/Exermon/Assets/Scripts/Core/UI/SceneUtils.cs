@@ -505,7 +505,9 @@ public static class SceneUtils {
     /// </summary>
     /// <param name="value">浮点数</param>
     /// <returns>字符串</returns>
-    public static string double2Str(double value) {
+    public static string double2Str(double value, bool intAdj = false) {
+        if (intAdj && value == (int)value)
+            return string.Format("{0}", (int)value);
         return string.Format("{0:0.00}", value);
     }
 
@@ -514,7 +516,9 @@ public static class SceneUtils {
     /// </summary>
     /// <param name="value">浮点数</param>
     /// <returns>百分数字符串</returns>
-    public static string double2Perc(double value) {
+    public static string double2Perc(double value, bool intAdj = false) {
+        if (intAdj && value == (int)value)
+            return string.Format("{0}%", (int)value * 100);
         return string.Format("{0:0.00}%", value * 100);
     }
 

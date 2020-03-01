@@ -48,32 +48,12 @@ public class BaseItem : BaseData {
     public string description { get; protected set; }
     [AutoConvert]
     public int type { get; protected set; } // 物品类型
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        name = DataLoader.loadString(json, "name");
-        description = DataLoader.loadString(json, "description");
-        type = DataLoader.loadInt(json, "type");
-    }
 
     /// <summary>
-    /// 获取JSON数据
+    /// 最大叠加数量
     /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["name"] = name;
-        json["description"] = description;
-        json["type"] = type;
-
-        return json;
-    }*/
+    /// <returns></returns>
+    public virtual int maxCount() { return 1; }
 }
 
 /// <summary>
@@ -95,33 +75,6 @@ public class ItemPrice : BaseData {
     /// 是否需要ID
     /// </summary>
     protected override bool idEnable() { return false; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        gold = DataLoader.loadInt(json, "gold");
-        ticket = DataLoader.loadInt(json, "ticket");
-        boundTicket = DataLoader.loadInt(json, "bound_ticket");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["gold"] = gold;
-        json["ticket"] = ticket;
-        json["bound_ticket"] = boundTicket;
-
-        return json;
-    }
-    */
 }
 
 /// <summary>
@@ -168,8 +121,8 @@ public class UsableItem : LimitedItem {
     /// <summary>
     /// 属性
     /// </summary>
-    [AutoConvert]
-    public int maxCount { get; protected set; }
+    [AutoConvert("max_count")]
+    public int maxCount_ { get; protected set; }
     [AutoConvert]
     public bool battleUse { get; protected set; }
     [AutoConvert]
@@ -196,6 +149,13 @@ public class UsableItem : LimitedItem {
     public UsableItemType itemType() {
         return DataService.get().usableItemType(iType);
     }
+
+    /// <summary>
+    /// 最大叠加数量
+    /// </summary>
+    /// <returns></returns>
+    public override int maxCount() { return maxCount_; }
+
 }
 
 /// <summary>
@@ -268,18 +228,22 @@ public abstract class BaseContItem : BaseData {
     /// 默认类型
     /// </summary>
     /// <returns></returns>
-    public abstract Type defaultType();
+    //public abstract Type defaultType();
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public BaseContItem() { type = (int)defaultType(); }
+    public BaseContItem() {
+        var typeName = GetType().ToString();
+        var type = (Type)Enum.Parse(typeof(Type), typeName);
+        this.type = (int)type;
+    }
 }
 
 /// <summary>
 /// 背包类容器项
 /// </summary>
-public abstract class PackContItem : BaseContItem {
+public class PackContItem : BaseContItem {
 
     /// <summary>
     /// 属性
@@ -288,23 +252,96 @@ public abstract class PackContItem : BaseContItem {
     public int itemId { get; protected set; }
     [AutoConvert]
     public int count { get; protected set; }
-    
+
     /// <summary>
     /// 是否装备
     /// </summary>
     public bool equiped = false;
 
     /// <summary>
+    /// 容器项容量（0为无限）
+    /// </summary>
+    /// <returns></returns>
+    public virtual int capacity() { return 1; }
+
+    public bool isFull() { return capacity() > 0 && count >= capacity(); }
+
+    /// <summary>
+    /// 移入
+    /// </summary>
+    /// <param name="count"></param>
+    public int enter(int count) {
+        this.count += count;
+        if (capacity() <= 0) return 0; // 如果可以无限叠加
+
+        var res = this.count - capacity();
+        if (this.count > capacity())
+            this.count = capacity();
+        return Math.Max(0, res);
+    }
+
+    /// <summary>
+    /// 移除
+    /// </summary>
+    /// <param name="count"></param>
+    public int leave(int count) {
+        this.count -= count;
+        var res = -this.count;
+        if (this.count < 0) this.count = 0;
+        return Math.Max(0, res);
+    }
+
+    /// <summary>
+    /// 设置个数
+    /// </summary>
+    /// <param name="count">个数</param>
+    /// <returns></returns>
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     public PackContItem() { }
-    /// <param name="type">类型</param>
     /// <param name="itemId">物品ID</param>
     /// <param name="count">数量</param>
-    public PackContItem(int itemId, int count=1) {
+    public PackContItem(int itemId, int count = 1) {
         this.itemId = itemId;
         this.count = count;
     }
+
+}
+
+/// <summary>
+/// 背包类容器项
+/// </summary>
+public class PackContItem<T> : PackContItem where T : BaseItem {
+
+    /// <summary>
+    /// 物品
+    /// </summary>
+    /// <returns></returns>
+    public T item() {
+        return DataService.get().get<T>(itemId);
+    }
+
+    /// <summary>
+    /// 容器项容量（0为无限）
+    /// </summary>
+    /// <returns></returns>
+    public override int capacity() { return item().maxCount(); }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public PackContItem() : base() {}
+    /// <param name="itemId">物品ID</param>
+    /// <param name="count">数量</param>
+    public PackContItem(int itemId, int count = 1) : base(itemId, count) { }
+    /// <param name="item">物品</param>
+    public PackContItem(T item, int count = 1) : base(item.getID(), count) { }
+
 }
 
 /// <summary>
@@ -317,6 +354,97 @@ public abstract class SlotContItem : BaseContItem {
     /// </summary>
     [AutoConvert]
     public int index { get; protected set; }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <returns>装备</returns>
+    public virtual E getEquip<E>() where E : PackContItem, new() { return null; }
+
+    /// <summary>
+    /// 设置装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <param name="equipItem">装备物品</param>
+    public virtual void setEquip<E>(E equipItem) where E : PackContItem, new() { }
+
+}
+
+/// <summary>
+/// 槽类容器项（单装备）
+/// </summary>
+public abstract class SlotContItem<T> : SlotContItem where T : PackContItem, new() {
+
+    /// <summary>
+    /// 装备
+    /// </summary>
+    public abstract T equip1 { get; protected set; }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <returns>装备</returns>
+    public override E getEquip<E>() {
+        if (typeof(E) == typeof(T)) return (E)(object)equip1;
+        return null;
+    }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <param name="equipItem">装备物品</param>
+    public override void setEquip<E>(E equipItem) {
+        if (typeof(E) == typeof(T)) {
+            var lastEquip = equip1;
+            equip1 = (T)(object)equipItem;
+            if (lastEquip != equip1) onEquipChanged();
+        }
+    }
+
+    /// <summary>
+    /// 装备改变回调
+    /// </summary>
+    protected virtual void onEquipChanged() { }
+
+}
+
+/// <summary>
+/// 槽类容器项（双装备）
+/// </summary>
+public abstract class SlotContItem<T1, T2> : SlotContItem<T1> 
+    where T1 : PackContItem, new() where T2 : PackContItem, new() {
+
+    /// <summary>
+    /// 第二装备
+    /// </summary>
+    public abstract T2 equip2 { get; protected set; }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <returns>装备</returns>
+    public override E getEquip<E>() {
+        if (typeof(E) == typeof(T2)) return (E)(object)equip2;
+        return base.getEquip<E>();
+    }
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <param name="equipItem">装备物品</param>
+    public override void setEquip<E>(E equipItem) {
+        if (typeof(E) == typeof(T2)) {
+            var lastEquip = equip2;
+            equip2 = (T2)(object)equipItem;
+            if (lastEquip != equip2) onEquipChanged();
+        } else base.setEquip<E>(equipItem);
+    }
+
 }
 
 /// <summary>
@@ -332,13 +460,15 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     [AutoConvert]
     public int capacity { get; protected set; }
 
-    [AutoConvert]
+    //[AutoConvert]
     public List<T> items { get; protected set; } = new List<T>();
 
     /// <summary>
     /// 数据是否需要实时同步（在背包界面时需要实时同步）
     /// </summary>
     public bool realTime = false;
+
+    #region 数据操作
 
     /// <summary>
     /// 获得一个物品
@@ -357,18 +487,138 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
     public List<T> getItems(Predicate<T> p) {
         return items.FindAll(p);
     }
+
+    #endregion
+
+    /// <summary>
+    /// 读取自定义属性
+    /// </summary>
+    /// <param name="json"></param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+
+        var data = DataLoader.load(json, "items");
+        if (data != null && data.IsArray) {
+            items.Clear();
+            for (int i = 0; i < data.Count; ++i) {
+                var item = loadItem(data[i]);
+                if (item != null) items.Add(item);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 读取单个物品
+    /// </summary>
+    /// <param name="json"></param>
+    protected virtual T loadItem(JsonData json) {
+        return DataLoader.load<T>(json);
+    }
+
 }
 
 /// <summary>
 /// 背包类容器数据
 /// </summary>
 public class PackContainer<T> : BaseContainer<T> where T : PackContItem, new() {
+
+    /// <summary>
+    /// 添加物品
+    /// </summary>
+    /// <param name="item">物品</param>
+    public void pushItem(T item) {
+        if (item == null) return;
+        items.Add(item);
+    }
+
+    /// <summary>
+    /// 移除物品
+    /// </summary>
+    /// <param name="item">物品</param>
+    public void removeItem(T item) {
+        if (item == null) return;
+        items.Remove(item);
+    }
+
+    /// <summary>
+    /// 拆分物品
+    /// </summary>
+    /// <param name="item">物品</param>
+    /// <param name="count">数目</param>
+    public void splitItem(T item, int count) {
+        if (count >= item.count) return;
+        var copyItem = (T)item.copy(false);
+        copyItem.setCount(count);
+        pushItem(copyItem);
+        item.leave(count);
+    }
+
+    /// <summary>
+    /// 拆分物品
+    /// </summary>
+    /// <param name="item">物品</param>
+    /// <param name="count">数目</param>
+    public void mergeItems(T[] items) {
+        var leftIndex = 0;
+        var leftItem = items[leftIndex];
+        for (int i = 1; i < items.Length; i++) {
+            var item = items[i];
+            item.setCount(leftItem.enter(item.count));
+            if (leftItem.isFull()) // 如果最左物品已满，切换之
+                leftItem = items[++leftIndex];
+        }
+        for (int i = items.Length - 1; i > leftIndex; --i)
+            removeItem(items[i]);
+    }
     
 }
 
 /// <summary>
 /// 背包类容器数据
 /// </summary>
-public class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new() {
+public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new() {
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <returns>装备</returns>
+    public E getEquip<E>(T slotItem) where E : PackContItem, new() {
+        return slotItem.getEquip<E>();
+    }
+
+    /// <summary>
+    /// 设置装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
+    /// <param name="container">装备容器</param>
+    /// <param name="equipItem">装备物品</param>
+    public void setEquip<E>(PackContainer<E> container, E equipItem = null) 
+        where E : PackContItem, new() {
+        setEquip(getSlotItemByEquipItem(equipItem), container, equipItem);
+    }
+    public void setEquip<E>(T slotItem, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
+        if (slotItem == null) return;
+        var oriEquip = getEquip<E>(slotItem);
+        container.removeItem(equipItem); // 移出装备
+        container.pushItem(oriEquip); // 卸下装备
+        setEquip(slotItem, equipItem); // 设置装备
+        oriEquip.equiped = false;
+        equipItem.equiped = true;
+    }
+    public void setEquip<E>(E equipItem = null) where E : PackContItem, new() {
+        setEquip(getSlotItemByEquipItem(equipItem), equipItem);
+    }
+    public void setEquip<E>(T slotItem, E equipItem = null) where E : PackContItem, new() {
+        slotItem?.setEquip(equipItem);
+    }
+
+    /// <summary>
+    /// 通过装备物品获取槽ID
+    /// </summary>
+    /// <typeparam name="E">装备物品类型</typeparam>
+    /// <param name="equipItem">装备物品</param>
+    /// <returns>槽ID</returns>
+    protected abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
     
 }

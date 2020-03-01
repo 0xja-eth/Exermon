@@ -1,17 +1,16 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI;
-
 /// <summary>
-/// 状态窗口艾瑟萌页信息显示
+/// 状态窗口艾瑟萌页属性信息显示
 /// </summary>
-public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermon> {
+public class PlayerExermonDetail : ItemDetail<PlayerExermon> {
 
     /// <summary>
-    /// 操作文本常量设置
+    /// 文本常量定义
     /// </summary>
-    const string RenameOperText = "修改艾瑟萌昵称";
-    const string EquipOperText = "更换艾瑟萌";
+    const string AnimalTextFormat = "物种：{0}";
+    const string TypeTextFormat = "类型：{0}";
 
     /// <summary>
     /// 外部组件设置
@@ -26,16 +25,14 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
 
     public GameObject editButton;
 
-    /// <summary>
-    /// 页显示组件
-    /// </summary>
-    public ExermonPageDisplay pageDisplay { get; set; }
+    public ParamDisplaysGroup paramInfo;
+    public ParamDisplay battlePoint;
 
     /// <summary>
-    /// 场景组件引用
+    /// 艾瑟萌槽项
     /// </summary>
-    StatusScene scene;
-
+    public ExerSlotItem slotItem = null;
+    
     /// <summary>
     /// 外部系统设置
     /// </summary>
@@ -47,49 +44,31 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 初始化
     /// </summary>
     protected override void initializeOnce() {
+        base.initializeOnce();
         nicknameInput.onChanged = onNicknameChanged;
         exerSer = ExermonService.get();
-        scene = (StatusScene)SceneUtils.getSceneObject("Scene");
+    }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public override void configure() {
+        base.configure();
+        var params_ = DataService.get().staticData.configure.baseParams;
+        paramInfo.configure(params_);
     }
 
     #endregion
 
     #region 数据控制
-    
-    /// <summary>
-    /// 获取艾瑟萌
-    /// </summary>
-    /// <returns></returns>
-    public Exermon getExermon(ExerSlotItem item = null) {
-        if (item == null) item = this.item;
-        if (item == null) return null;
-        return item.playerExer.exermon();
-    }
 
     /// <summary>
-    /// 配置装备
+    /// 设置艾瑟萌槽项
     /// </summary>
-    protected override void setupEquip() {
-        equip = item.playerExer;
-    }
-
-    /// <summary>
-    /// 装备变更回调
-    /// </summary>
-    protected override void onEquipChanged() {
-        base.onEquipChanged();
-        pageDisplay?.requestRefresh();
-        item.setPlayerExer(equip);
-        requestEquip();
-    }
-
-    /// <summary>
-    /// 预览变更回调
-    /// </summary>
-    protected override void onPreviewChanged() {
-        base.onPreviewChanged();
-        pageDisplay?.requestRefresh();
-        item.setPlayerExerView(equip);
+    /// <param name="slotItem"></param>
+    public void setSlotItem(ExerSlotItem slotItem) {
+        this.slotItem = slotItem;
+        requestRefresh();
     }
 
     #endregion
@@ -100,11 +79,12 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 绘制物品
     /// </summary>
     /// <param name="slotItem">艾瑟萌槽项</param>
-    protected override void drawExactlyEquip(PlayerExermon playerExer) {
-        base.drawExactlyEquip(playerExer);
+    protected override void drawExactlyItem(PlayerExermon playerExer) {
+        base.drawExactlyItem(playerExer);
         drawFullImage(playerExer);
         drawBaseInfo(playerExer);
         drawExpInfo(playerExer);
+        drawParamsInfo(playerExer);
     }
 
     /// <summary>
@@ -129,8 +109,8 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// <param name="slotItem">艾瑟萌槽项</param>
     void drawBaseInfo(PlayerExermon playerExer) {
         var exermon = playerExer.exermon();
-        animal.text = exermon.animal;
-        type.text = exermon.typeText();
+        animal.text = string.Format(AnimalTextFormat, exermon.animal);
+        type.text = string.Format(AnimalTextFormat, exermon.typeText());
         nickname.text = playerExer.name();
         description.text = exermon.description;
     }
@@ -144,6 +124,29 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     }
 
     /// <summary>
+    /// 绘制艾瑟萌图像
+    /// </summary>
+    /// <param name="slotItem">艾瑟萌槽项</param>
+    void drawParamsInfo(PlayerExermon playerExer) {
+        // 如果要显示的艾瑟萌与装备中的一致，直接显示
+        if (slotItem != null)
+            if(playerExer == slotItem.playerExer) {
+                paramInfo.setValues(slotItem, "params");
+                battlePoint.setValue(slotItem, "battle_point");
+            } else {
+                slotItem.setPlayerExerPreview(playerExer);
+                paramInfo.setValues(slotItem, "preview_params");
+                battlePoint.setValue(slotItem, "preview_battle_point");
+                slotItem.clearPreviewObject();
+            }
+        else {
+            paramInfo.setValues(playerExer, "params");
+            battlePoint.setValue(playerExer, "battle_point");
+        }
+        paramInfo.setIgnoreTrigger();
+    }
+
+    /// <summary>
     /// 清除物品
     /// </summary>
     protected override void clearItem() {
@@ -152,6 +155,11 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
         full.gameObject.SetActive(false);
         expBar.clearValue();
         stars.clearValue();
+
+        paramInfo.clearValues();
+        battlePoint.clearValue();
+
+        paramInfo.setIgnoreTrigger();
     }
 
     #endregion
@@ -164,7 +172,7 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     public void onEditClick() {
         nickname.enabled = false;
         editButton.SetActive(false);
-        nicknameInput.startView(item.playerExer.name());
+        nicknameInput.startView(item.name());
         nicknameInput.activate();
     }
 
@@ -182,7 +190,7 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 昵称改变回调事件
     /// </summary>
     public void onNicknameChanged(string value) {
-        var name = item.playerExer.name();
+        var name = item.name();
         requestRename(value == "" ? name : value);
     }
 
@@ -194,19 +202,8 @@ public class ExermonBaseInfoDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 请求更改昵称
     /// </summary>
     void requestRename(string nickname) {
-        scene.pushRequestItem(RenameOperText, () => {
-            exerSer.rename(equip, nickname, terminateNicknameInput);
-        }, true);
+        exerSer.editNickname(item, nickname, terminateNicknameInput);
     }
-
-    /// <summary>
-    /// 请求更改艾瑟萌
-    /// </summary>
-    void requestEquip() {
-        scene.pushRequestItem(EquipOperText, () => {
-            exerSer.exerSlotEquip(item, equip, item.playerGift);
-        }, true);
-    }
-
+    
     #endregion
 }

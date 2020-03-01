@@ -196,49 +196,11 @@ class BaseItem(models.Model):
 
 	# region 类型配置
 
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	if self.type == ItemType.Unset.value:
-	# 		self.type = self.TYPE.value
-
 	def __str__(self):
 		return '%d %s' % (self.id, self.name)
 
-		# type_name = self.getTypeName()
-
-		# return '%d %s（%s）' % (self.id, self.name, type_name)
-
 	def __getattr__(self, item):
 		raise AttributeError(item)
-
-	# 获取类型名称
-	# def getTypeName(self):
-	# 	for type in self.TYPES:
-	# 		if self.type == type[0]:
-	# 			return type[1]
-	#
-	# 	return self.TYPES[0][1]
-
-	# 获取目标的物品
-	# noinspection PyUnresolvedReferences
-	# def target(self):
-	#
-	# 	from exermon_module.models import Exermon, ExerGift, \
-	# 		ExerFrag, ExerSkill, ExerEquip, ExerItem
-	# 	from player_module.models import HumanItem, HumanEquip
-	#
-	# 	target = BaseItem
-	#
-	# 	type_ = ItemType(self.type)
-	# 	if type_ != ItemType.Unset:
-	# 		target = eval(type_.name)
-	#
-	# 	if type(self) == target: return self
-	#
-	# 	return ViewUtils.getObject(target, ErrorType.ItemNotExist,
-	# 							   return_type='object', id=self.id)
-	#
-	# target.short_description = "目标物品"
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
@@ -252,12 +214,7 @@ class BaseItem(models.Model):
 	# endregion
 
 	# 最大叠加数量（为0则不限）
-	def _maxCount(self): return 1
-
-	# 最大叠加数量（为0则不限）
-	def maxCount(self):
-		return self._maxCount()
-		# return self.target()._maxCount()
+	def maxCount(self): return 1
 
 
 # ===================================================
@@ -413,7 +370,7 @@ class UsableItem(LimitedItem):
 		return res
 
 	# 最大叠加数量（为0则不限）
-	def _maxCount(self): return self.max_count
+	def maxCount(self): return self.max_count
 
 	# 获取所有的效果
 	def effects(self):
@@ -1637,57 +1594,13 @@ class BaseContItem(CacheableModel):
 
 	# region 类型配置
 
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	if self.type == ContItemType.Unset.value:
-	# 		self.type = self.TYPE.value
-
 	def __str__(self):
 		# name = type(self).__name__
 		name = self._meta.verbose_name
 		return '%d %s(%s)' % (self.id, name, self.container)
 
-		# type_name = self.getTypeName()
-		#
-		# return '%d %s' % (self.id, type_name)
-
 	def __getattr__(self, item):
 		raise AttributeError(item)
-
-	# 获取类型名称
-	# def getTypeName(self):
-	# 	for type in self.TYPES:
-	# 		if self.type == type[0]:
-	# 			return type[1]
-	#
-	# 	return self.TYPES[0][1]
-
-	# 获取目标的物品
-	# noinspection PyUnresolvedReferences
-	# def target(self):
-	#
-	# 	from exermon_module.models import ExerSlotItem, \
-	# 		ExerEquipSlotItem, ExerPackItem, ExerPackEquip, \
-	# 		PlayerExerGift, PlayerExermon, ExerFragPackItem, \
-	# 		ExerSkillSlotItem
-	# 	from player_module.models import HumanPackItem, \
-	# 		HumanPackEquip, HumanEquipSlotItem
-	#
-	# 	target = BaseContItem
-	#
-	# 	type_ = ContItemType(self.type)
-	# 	if type_ != ContItemType.Unset:
-	# 		target = eval(type_.name)
-	#
-	# 	if type(self) == target: return self
-	#
-	# 	return ViewUtils.getObject(target, ErrorType.ContItemNotExist,
-	# 							   return_type='object', id=self.id)
-
-	# 获取容器
-	# def targetContainer(self):
-		# if self.container is None: return None
-		# return self.container.target()
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):

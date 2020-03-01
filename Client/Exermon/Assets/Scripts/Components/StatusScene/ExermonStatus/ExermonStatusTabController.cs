@@ -15,12 +15,13 @@ public class ExermonStatusTabController : TabView<ExermonPageInfoBase> {
     /// <summary>
     /// 外部变量设置
     /// </summary>
-    public ExerHubDisplay exerHubDisplay;
 
     /// <summary>
     /// 内部变量定义
     /// </summary>
-    ExerSlotItem slotItem;
+    public ExerSlotItem slotItem { get; private set; }
+    public Player player { get; private set; }
+    public Subject subject { get; private set; }
 
     #region 数据控制
 
@@ -30,24 +31,10 @@ public class ExermonStatusTabController : TabView<ExermonPageInfoBase> {
     /// <param name="player">玩家</param>
     /// <param name="subject">科目</param>
     public void setup(Player player, Subject subject) {
+        this.player = player; this.subject = subject;
         if (player == null || subject == null) slotItem = null;
         else slotItem = player.getExerSlotItem(subject);
-        updateExerHubItems(player, subject);
         requestRefresh();
-    }
-
-    /// <summary>
-    /// 更新艾瑟萌仓库物品
-    /// </summary>
-    void updateExerHubItems(Player player, Subject subject) {
-        var items = new List<PlayerExermon>();
-        if (player != null && subject != null) { 
-            var exerHub = player.packContainers.exerHub;
-            items.Add(slotItem.playerExer);
-            items.AddRange(exerHub.items.FindAll(item =>
-                item.exermon().subjectId == subject.getID()));
-        }
-        exerHubDisplay.setItems(items);
     }
 
     #endregion

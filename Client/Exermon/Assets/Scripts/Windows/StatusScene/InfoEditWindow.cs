@@ -117,16 +117,11 @@ public class InfoEditWindow : BaseWindow {
     /// </summary>
     public void startWindow(Type type) {
         base.startWindow();
+        scene.pushConfirmCallback(onConfirm);
+        scene.pushBackCallback(terminateWindow);
         setType(type);
     }
-
-    /// <summary>
-    /// 结束窗口
-    /// </summary>
-    public override void terminateWindow() {
-        base.terminateWindow();
-    }
-
+    
     #endregion
 
     #region 数据控制
@@ -153,7 +148,6 @@ public class InfoEditWindow : BaseWindow {
                 title.text = EditInfoTitle;
                 break;
         }
-        scene.pushRequestItem(title.text, onConfirm);
     }
 
     #endregion

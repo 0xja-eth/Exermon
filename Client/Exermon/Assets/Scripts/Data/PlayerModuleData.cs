@@ -62,20 +62,16 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public PackContainer<HumanPackContItem> humanPack { get; protected set; } 
-            = new PackContainer<HumanPackContItem>();
+        public HumanPack humanPack { get; protected set; } = new HumanPack();
         [AutoConvert]
-        public PackContainer<ExerPackContItem> exerPack { get; protected set; }
-            = new PackContainer<ExerPackContItem>();
+        public ExerPack exerPack { get; protected set; } = new ExerPack();
         [AutoConvert]
         public PackContainer<ExerFragPackItem> exerFragPack { get; protected set; }
             = new PackContainer<ExerFragPackItem>();
         [AutoConvert]
-        public PackContainer<PlayerExerGift> exerGiftPool { get; protected set; }
-            = new PackContainer<PlayerExerGift>();
+        public ExerGiftPool exerGiftPool { get; protected set; } = new ExerGiftPool();
         [AutoConvert]
-        public PackContainer<PlayerExermon> exerHub { get; protected set; }
-            = new PackContainer<PlayerExermon>();
+        public ExerHub exerHub { get; protected set; } = new ExerHub();
         [AutoConvert]
         public PackContainer<QuesSugarPackItem> quesSugarPack { get; protected set; }
             = new PackContainer<QuesSugarPackItem>();
@@ -602,6 +598,26 @@ public class HumanEquip : EquipableItem {
 #region 容器
 
 /// <summary>
+/// 人类背包
+/// </summary>
+public class HumanPack : PackContainer<PackContItem> {
+
+    /// <summary>
+    /// 读取单个物品
+    /// </summary>
+    /// <param name="json"></param>
+    protected override PackContItem loadItem(JsonData json) {
+        var type = DataLoader.load<int>(json, "type");
+        if (type == (int)BaseContItem.Type.HumanPackItem)
+            return DataLoader.load<HumanPackItem>(json);
+        if (type == (int)BaseContItem.Type.HumanPackEquip)
+            return DataLoader.load<HumanPackEquip>(json);
+        return null;
+    }
+
+}
+
+/// <summary>
 /// 人类装备槽
 /// </summary>
 public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
@@ -614,15 +630,19 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
     public HumanEquipSlotItem getEquipSlotItem(int eType) {
         return getItem((item) => item.eType == eType);
     }
-
+    
     /// <summary>
-    /// 装备
+    /// 通过装备物品获取槽ID
     /// </summary>
-    /// <param name="packEquip">背包装备</param>
-    public void setEquip(HumanPackEquip packEquip) {
-        var equip = packEquip.equip();
-        var slotItem = getEquipSlotItem(equip.eType);
-        slotItem.setEquip(packEquip);
+    /// <typeparam name="E">装备物品类型</typeparam>
+    /// <param name="equipItem">装备物品</param>
+    /// <returns>槽ID</returns>
+    protected override HumanEquipSlotItem getSlotItemByEquipItem<E>(E equipItem) {
+        if (typeof(E) == typeof(HumanPackEquip)) {
+            var eType = ((HumanPackEquip)(object)equipItem).equip().eType;
+            return getEquipSlotItem(eType);
+        }
+        return null;
     }
 
     /*
@@ -668,69 +688,20 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
 #region 容器项
 
 /// <summary>
-/// 人类背包容器项
-/// </summary>
-public class HumanPackContItem : PackContItem {
-
-    /// <summary>
-    /// 默认类型
-    /// </summary>
-    /// <returns></returns>
-    public override Type defaultType() { return Type.Unset; }
-
-    /// <summary>
-    /// 物品
-    /// </summary>
-    /// <returns></returns>
-    public LimitedItem item() {
-        if (type == (int)Type.HumanPackItem)
-            return DataService.get().humanItem(itemId);
-        if (type == (int)Type.HumanPackEquip)
-            return DataService.get().humanEquip(itemId);
-        return null;
-    }
-
-}
-
-/// <summary>
 /// 人类背包物品
 /// </summary>
-public class HumanPackItem : HumanPackContItem {
-
-    /// <summary>
-    /// 默认类型
-    /// </summary>
-    /// <returns></returns>
-    public override Type defaultType() { return Type.HumanPackItem; }
-
-    /// <summary>
-    /// 获取装备实例
-    /// </summary>
-    /// <returns>装备</returns>
-    public new HumanItem item() {
-        return DataService.get().humanItem(itemId);
-    }
-
+public class HumanPackItem : PackContItem<HumanItem> {
 }
 
 /// <summary>
 /// 人类背包装备
 /// </summary>
-public class HumanPackEquip : HumanPackContItem {
-
-    /// <summary>
-    /// 默认类型
-    /// </summary>
-    /// <returns></returns>
-    public override Type defaultType() { return Type.HumanPackEquip; }
-
+public class HumanPackEquip : PackContItem<HumanEquip> {
     /// <summary>
     /// 获取装备实例
     /// </summary>
     /// <returns>装备</returns>
-    public HumanEquip equip() {
-        return DataService.get().humanEquip(itemId);
-    }
+    public HumanEquip equip() { return item(); }
 
     /// <summary>
     /// 获取装备的所有属性
@@ -758,13 +729,7 @@ public class HumanPackEquip : HumanPackContItem {
 /// <summary>
 /// 人类装备槽项
 /// </summary>
-public class HumanEquipSlotItem : SlotContItem {
-
-    /// <summary>
-    /// 默认类型
-    /// </summary>
-    /// <returns></returns>
-    public override Type defaultType() { return Type.HumanEquipSlotItem; }
+public class HumanEquipSlotItem : SlotContItem<HumanPackEquip> {
 
     /// <summary>
     /// 属性
@@ -773,6 +738,14 @@ public class HumanEquipSlotItem : SlotContItem {
     public HumanPackEquip packEquip { get; protected set; }
     [AutoConvert]
     public int eType { get; protected set; }
+
+    /// <summary>
+    /// 装备
+    /// </summary>
+    public override HumanPackEquip equip1 {
+        get { return packEquip; }
+        protected set { packEquip = value; }
+    }
 
     /// <summary>
     /// 获取装备类型
@@ -791,36 +764,23 @@ public class HumanEquipSlotItem : SlotContItem {
     }
 
     /// <summary>
-    /// 设置装备
+    /// 获取装备的所有属性
     /// </summary>
-    /// <param name="packEquip">背包装备</param>
-    public void setEquip(HumanPackEquip packEquip) {
-        this.packEquip = packEquip;
-    }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        packEquip = DataLoader.loadData<HumanPackEquip>(json, "pack_equip");
-        eType = DataLoader.loadInt(json, "e_type");
+    /// <returns>属性数据数组</returns>
+    public ParamData[] getParams() {
+        if (packEquip == null) return new ParamData[0];
+        return packEquip.getParams();
     }
 
     /// <summary>
-    /// 获取JSON数据
+    /// 获取装备的属性
     /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["pack_equip"] = DataLoader.convertData(packEquip);
-        json["e_type"] = eType;
-
-        return json;
-    }*/
+    /// <param name="paramId">属性ID</param>
+    /// <returns>属性数据</returns>
+    public ParamData getParam(int paramId) {
+        if (packEquip == null) return new ParamData(paramId);
+        return packEquip.getParam(paramId);
+    }
 }
 
 #endregion

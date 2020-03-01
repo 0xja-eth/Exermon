@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 using LitJson;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 /// <summary>
 /// 属性展示
@@ -22,7 +23,7 @@ public class ParamDisplay : BaseView {
     const string DefaultTrueText = "是";
     const string DefaultFalseText = "否";
 
-    static readonly Color DefaultTrueColor = new Color(0, 1, 0);
+    static readonly Color DefaultTrueColor = new Color(0.27189f, 0.52155f, 0.88679f);
     static readonly Color DefaultFalseColor = new Color(0.92549f, 0.42353f, 0.42353f);
     static readonly Color DefaultNormalColor = new Color(1, 1, 1);
 
@@ -73,8 +74,10 @@ public class ParamDisplay : BaseView {
         public string key;
         // 对应显示的 GameObject
         public GameObject obj;
-        // 对应显示的类型   Text, Sign, Percent, TimeSpan, TimeSpanWithHour, 
-        //                 Date, DateTime, Color, ScaleX, ScaleY
+        // 对应显示的类型： 
+        // Text, Sign, Percent, SignPercent, 
+        // TimeSpan, TimeSpanWithHour, 
+        // Date, DateTime, Color, ScaleX, ScaleY
         public string type;
         // 是否有动画效果
         public bool animated;
@@ -82,7 +85,7 @@ public class ParamDisplay : BaseView {
         public bool configData;
         // 格式
         public string format;
-        // 触发模式         Click, Hover, HOC (HoverOrClick)
+        // 触发模式：Click, Hover, HOC (HoverOrClick)
         public string trigger;
     }
 
@@ -129,6 +132,8 @@ public class ParamDisplay : BaseView {
         }
     }
 
+    #region 触发器处理
+
     /// <summary>
     /// 绑定显示项事件
     /// </summary>
@@ -136,38 +141,46 @@ public class ParamDisplay : BaseView {
     void bindDisplayItemEvent(DisplayItem item) {
         if (trigger == null) return;
         if (item.trigger == "") return;
-        EventTrigger.Entry entry;
+        UnityAction<BaseEventData> func = (_) => refreshKey(item);
 
         switch (item.trigger.ToLower()) {
             case "click":
-                entry = new EventTrigger.Entry();
-                entry.callback = new EventTrigger.TriggerEvent();
-                entry.callback.AddListener((_) => refreshKey(item));
-                entry.eventID = EventTriggerType.PointerClick;
-                trigger.triggers.Add(entry);
-                break;
+                addTriggerEvent(EventTriggerType.PointerClick, func); break;
             case "hover":
-                entry = new EventTrigger.Entry();
-                entry.callback = new EventTrigger.TriggerEvent();
-                entry.callback.AddListener((_) => refreshKey(item));
-                entry.eventID = EventTriggerType.PointerEnter;
-                trigger.triggers.Add(entry);
-                break;
+                addTriggerEvent(EventTriggerType.PointerEnter, func); break;
             case "hoc":
-                entry = new EventTrigger.Entry();
-                entry.callback = new EventTrigger.TriggerEvent();
-                entry.callback.AddListener((_) => refreshKey(item));
-                entry.eventID = EventTriggerType.PointerEnter;
-                trigger.triggers.Add(entry);
-
-                entry = new EventTrigger.Entry();
-                entry.callback = new EventTrigger.TriggerEvent();
-                entry.callback.AddListener((_) => refreshKey(item));
-                entry.eventID = EventTriggerType.PointerClick;
-                trigger.triggers.Add(entry);
+                addTriggerEvent(EventTriggerType.PointerClick, func); 
+                addTriggerEvent(EventTriggerType.PointerEnter, func);
                 break;
         }
     }
+
+    /// <summary>
+    /// 获取或创建一个项
+    /// </summary>
+    /// <param name="eventId">事件类型</param>
+    EventTrigger.Entry getOrCreateTriggerEntry(EventTriggerType eventId) {
+        var res = trigger.triggers.Find(e => e.eventID == eventId);
+        if (res == null) {
+            res = new EventTrigger.Entry();
+            res.callback = new EventTrigger.TriggerEvent();
+            res.eventID = eventId;
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 添加触发事件
+    /// </summary>
+    /// <param name="eventId"></param>
+    /// <param name="func"></param>
+    void addTriggerEvent(EventTriggerType eventId, UnityAction<BaseEventData> func) {
+        var entry = getOrCreateTriggerEntry(eventId);
+        entry.callback.AddListener(func);
+        trigger.triggers.Add(entry);
+    }
+
+    #endregion
 
     /// <summary>
     /// 初始化显示数据
@@ -217,6 +230,7 @@ public class ParamDisplay : BaseView {
         foreach (var item in displayItems)
             if (DataLoader.contains(value, item.key))
                 setKey(item.key, value[item.key]);
+            else if (!item.configData) clearKey(item.key);
         rawData = value;
     }
     /// <param name="obj">值对象</param>
@@ -280,6 +294,7 @@ public class ParamDisplay : BaseView {
             case "Text": processTextDisplayItem(item, value); break;
             case "Sign": processSignDisplayItem(item, value); break;
             case "Percent": processPercentDisplayItem(item, value); break;
+            case "SignPercent": processSignDisplayItem(item, value, true); break;
             case "TimeSpan": processTimeSpanDisplayItem(item, value); break;
             case "TimeSpanWithHour": processTimeSpanDisplayItem(item, value, true); break;
             case "Date": processDateDisplayItem(item, value); break;
@@ -319,25 +334,27 @@ public class ParamDisplay : BaseView {
     /// </summary>
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
-    void processSignDisplayItem(DisplayItem item, JsonData value) {
+    void processSignDisplayItem(DisplayItem item, JsonData value, bool percent = false) {
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
         string signText = "";
         if (value != null && value.IsDouble) {
             var val = DataLoader.load<double>(value);
-            if (val > 0) signText = DefaultTrueSign;
-            text.text = signText + string.Format(format, val);
+            var valTxt = percent ? SceneUtils.double2Perc(val, true) : val.ToString();
+            if (val >= 0) signText = DefaultTrueSign;
+            text.text = signText + string.Format(format, valTxt);
         } else if (value != null && value.IsInt) {
             var val = DataLoader.load<int>(value);
-            if (val > 0) signText = DefaultTrueSign;
-            text.text = signText + string.Format(format, val);
+            var valTxt = percent ? val+"%" : val.ToString();
+            if (val >= 0) signText = DefaultTrueSign;
+            text.text = signText + string.Format(format, valTxt);
         } else if (value != null && value.IsBoolean) {
             var val = DataLoader.load<bool>(value);
             signText = val ? DefaultTrueSign : DefaultFalseSign;
             text.text = string.Format(format, signText);
         } else
-            text.text = string.Format(format, value);
+            text.text = string.Format(format, percent ? value + "%" : value);
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 艾瑟萌天赋详细信息
 /// </summary>
-public class ExerGiftDetail : ItemInfo<ExerGift> {
+public class ExerGiftDetail : ItemDetail<ExerGift> {
 
     /// <summary>
     /// 常量设置

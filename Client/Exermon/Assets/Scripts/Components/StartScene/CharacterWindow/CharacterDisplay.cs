@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 人物显示项
 /// </summary>
-public class CharacterDisplay : SelectableItemInfo<Character> {
+public class CharacterDisplay : SelectableItemDisplay<Character> {
 
     /// <summary>
     /// 常量定义

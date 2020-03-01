@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 玩家艾瑟萌显示
-/// </summary>
-public class PlayerExermonDisplay : DraggableItemDisplay<PlayerExermon> {
+/// </summary
+public class PlayerExermonDisplay : SelectableItemDisplay<PlayerExermon> {
 
     /// <summary>
     /// 常量定义
@@ -21,12 +21,14 @@ public class PlayerExermonDisplay : DraggableItemDisplay<PlayerExermon> {
     public StarsDisplay stars;
     public Text name, level;
 
+    public GameObject equipedFlag;
+
     /// <summary>
     /// 内部变量声明
     /// </summary>
 
     #region 数据控制
-
+    
     /// <summary>
     /// 获取容器
     /// </summary>
@@ -51,8 +53,9 @@ public class PlayerExermonDisplay : DraggableItemDisplay<PlayerExermon> {
             icon, rect, new Vector2(0.5f, 0.5f));
         this.icon.overrideSprite.name = icon.name;
 
-        if (name) name.text = exermon.name;
+        if (name) name.text = playerExer.name();
         if (level) level.text = string.Format(LevelTextFormat, playerExer.level);
+        equipedFlag?.SetActive(playerExer.equiped);
         stars?.setValue(exermon.starId);
     }
 

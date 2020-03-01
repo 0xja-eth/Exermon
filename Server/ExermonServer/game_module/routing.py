@@ -228,32 +228,40 @@ WEBSOCKET_METHOD_ROUTER = {
 		Item.packContainerMerge,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
-	# 艾瑟萌槽装备
-	'exermon/exerslot/equip': [[
+	# 艾瑟萌槽装备艾瑟萌
+	'exermon/equip/playerexer': [[
 		['uid', 'int'],
 		['sid', 'int'],
 		['peid', 'int'],
+	],
+		Exermon.equipPlayerExer,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 艾瑟萌槽装备天赋
+	'exermon/equip/playergift': [[
+		['uid', 'int'],
+		['sid', 'int'],
 		['pgid', 'int'],
 	],
-		Exermon.exerSlotEquip,  # 处理函数
+		Exermon.equipPlayerGift,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 艾瑟萌装备槽装备
-	'exermon/equipslot/equip': [[
+	'exermon/equip/exerequip': [[
 		['uid', 'int'],
 		['sid', 'int'],
 		['eeid', 'int'],
 	],
-		Exermon.equipSlotEquip,  # 处理函数
+		Exermon.equipExerEquip,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 艾瑟萌改名
-	'exermon/playerexer/rename': [[
+	'exermon/edit/nickname': [[
 		['uid', 'int'],
 		['peid', 'int'],
 		['name', 'str']
 	],
-		Exermon.playerExerRename,  # 处理函数
+		Exermon.editNickname,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 查询记录

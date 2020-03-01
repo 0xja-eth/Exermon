@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 物品详细信息
+/// 物品显示组件，用于显示物品的信息
 /// </summary>
 public class ItemDisplay<T> : BaseView where T : class {
 

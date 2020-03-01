@@ -33,33 +33,6 @@ public class Question : BaseData {
         public string text { get; protected set; }
         [AutoConvert]
         public bool answer { get; protected set; }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            order = DataLoader.loadInt(json, "order");
-            text = DataLoader.loadString(json, "text");
-            answer = DataLoader.loadBool(json, "answer");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["order"] = order;
-            json["text"] = text;
-            json["answer"] = answer;
-
-            return json;
-        }
-        */
     }
 
     /// <summary>
@@ -79,30 +52,6 @@ public class Question : BaseData {
         public int number { get; protected set; }
         [AutoConvert]
         public Texture2D data { get; protected set; }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            number = DataLoader.loadInt(json, "number");
-            data = DataLoader.loadTexture2D(json, "data");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["number"] = number;
-            json["data"] = DataLoader.convertTexture2D(data);
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -172,52 +121,7 @@ public class Question : BaseData {
     }
 
     #endregion
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
 
-        number = DataLoader.loadInt(json, "number");
-        title = DataLoader.loadString(json, "title");
-        description = DataLoader.loadString(json, "description");
-        source = DataLoader.loadString(json, "source");
-        starId = DataLoader.loadInt(json, "star_id");
-        level = DataLoader.loadInt(json, "level");
-        subjectId = DataLoader.loadInt(json, "subject_id");
-        type = DataLoader.loadInt(json, "type");
-        status = DataLoader.loadInt(json, "status");
-        createTime = DataLoader.loadDateTime(json, "create_time");
-
-        choices = DataLoader.loadDataArray<Choice>(json, "choices");
-        pictures = DataLoader.loadDataArray<Picture>(json, "pictures");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["number"] = number;
-        json["title"] = title;
-        json["description"] = description;
-        json["source"] = source;
-        json["star_id"] = starId;
-        json["level"] = level;
-        json["subject_id"] = subjectId;
-        json["type"] = type;
-        json["status"] = status;
-        json["create_time"] = DataLoader.convertDateTime(createTime);
-
-        json["choices"] = DataLoader.convertDataArray(choices);
-        json["pictures"] = DataLoader.convertDataArray(pictures);
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -252,63 +156,18 @@ public class QuesSugar : BaseItem {
             if (param.paramId == paramId) return param;
         return new ParamData(paramId);
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        questionId = DataLoader.loadInt(json, "question_id");
-
-        buyPrice = DataLoader.loadData<ItemPrice>(json, "buy_price");
-        sellPrice = DataLoader.loadInt(json, "sell_price");
-        getRate = DataLoader.loadInt(json, "get_rate");
-        getCount = DataLoader.loadInt(json, "get_count");
-
-        params_ = DataLoader.loadDataArray<ParamData>(json, "params");
-
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["question_id"] = questionId;
-
-        json["buy_price"] = DataLoader.convertData(buyPrice);
-        json["sell_price"] = sellPrice;
-        json["get_rate"] = getRate;
-        json["get_count"] = getCount;
-
-        json["params"] = DataLoader.convertDataArray(params_);
-
-        return json;
-    }*/
 }
 
 /// <summary>
 /// 题目糖背包项
 /// </summary>
-public class QuesSugarPackItem : PackContItem {
-
-    /// <summary>
-    /// 默认类型
-    /// </summary>
-    /// <returns></returns>
-    public override Type defaultType() { return Type.QuesSugarPackItem; }
-
+public class QuesSugarPackItem : PackContItem<QuesSugar> {
+    
     /// <summary>
     /// 物品
     /// </summary>
     /// <returns></returns>
-    public QuesSugar sugar() {
-        return DataService.get().quesSugar(itemId);
-    }
+    public QuesSugar sugar() { return item(); }
     
 }
 
@@ -332,36 +191,4 @@ public class QuesReport : BaseData {
     public string result { get; protected set; }
     [AutoConvert]
     public DateTime resultTime { get; protected set; }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        questionId = DataLoader.loadInt(json, "question_id");
-        type = DataLoader.loadInt(json, "type");
-        description = DataLoader.loadString(json, "description");
-        createTime = DataLoader.loadDateTime(json, "create_time");
-        result = DataLoader.loadString(json, "result");
-        resultTime = DataLoader.loadDateTime(json, "result_time");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["question_id"] = questionId;
-        json["type"] = type;
-        json["description"] = description;
-        json["create_time"] = DataLoader.convertDateTime(createTime);
-        json["result"] = result;
-        json["result_time"] = DataLoader.convertDateTime(resultTime);
-
-        return json;
-    }*/
 }

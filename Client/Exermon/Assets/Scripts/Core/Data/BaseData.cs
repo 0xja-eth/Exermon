@@ -78,10 +78,10 @@ public class BaseData {
     /// 获取JSON数据
     /// </summary>
     /// <returns>JsonData</returns>
-    public virtual BaseData copy() {
+    public virtual BaseData copy(bool flag = true) {
         if (copied) return null; // 如果为复制对象，无法继续复制
         var res = (BaseData)DataLoader.load(GetType(), toJson());
-        res.copied = true;
+        if (flag) res.copied = true;
         return res;
     }
 

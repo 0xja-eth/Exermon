@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 物品展示组件
 /// </summary>
-public class SelectableItemInfo<T> : ItemInfo<T>, IPointerEnterHandler, 
+public class SelectableItemDisplay<T> : ItemDisplay<T>, IPointerEnterHandler, 
     IPointerExitHandler, IPointerClickHandler where T: class {
 
     /// <summary>
@@ -46,31 +46,23 @@ public class SelectableItemInfo<T> : ItemInfo<T>, IPointerEnterHandler,
     /// </summary>
     bool highlighting = false; // 是否高亮中
 
+    protected ItemContainer<T> container = null;
+
+    protected int index = -1;
+
     #region 初始化
 
     /// <summary>
     /// 配置组件
     /// </summary>
     public void configure(ItemContainer<T> container, int index) {
+        this.container = container;
         this.index = index;
-        configure(container);
+        configure();
     }
 
     #endregion
-
-    #region 启动控制
-
-    /// <summary>
-    /// 启动窗口
-    /// </summary>
-    /// <param name="item">物品</param>
-    /// <param name="refresh">强制刷新</param>
-    public void startView(T item, bool refresh = false) {
-        startView(item, index, refresh);
-    }
-
-    #endregion
-
+    
     #region 数据控制
 
     #region 物品控制
@@ -81,14 +73,6 @@ public class SelectableItemInfo<T> : ItemInfo<T>, IPointerEnterHandler,
     /// <returns>容器</returns>
     public ItemContainer<T> getContainer() {
         return container;
-    }
-
-    /// <summary>
-    /// 设置物品
-    /// </summary>
-    /// <param name="item">物品</param>
-    public void setItem(T item, bool refresh=false) {
-        setItem(item, index, refresh);
     }
 
     #endregion
@@ -279,16 +263,7 @@ public class SelectableItemInfo<T> : ItemInfo<T>, IPointerEnterHandler,
     }
 
     #endregion
-
-    /*
-    /// <summary>
-    /// 绘制空物品
-    /// </summary>
-    protected override void drawEmptyItem() {
-        terminateView();
-    }
-    */
-
+    
     /// <summary>
     /// 刷新视窗
     /// </summary>

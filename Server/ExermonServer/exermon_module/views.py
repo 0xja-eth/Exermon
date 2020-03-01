@@ -13,34 +13,45 @@ class Service:
 
 	# 艾瑟萌槽装备（艾瑟萌/艾瑟萌天赋）
 	@classmethod
-	async def exerSlotEquip(cls, consumer, player: Player, sid: int, peid: int, pgid: int):
+	async def equipPlayerExer(cls, consumer, player: Player, sid: int, peid: int):
 		# 返回数据：无
 
 		Subject.ensure(id=sid)
 
 		exer_slot = Common.getExerSlot(player)
 
-		player_exer = Common.getPlayerExer(player, id=peid)
-		player_gift = Common.getPlayerGift(player, id=pgid)
+		player_exer = Common.getPlayerExer(player, id=peid) if peid > 0 else None
 
-		ItemService.slotContainerEquip(player, exer_slot,
-									   [player_exer, player_gift], subject_id=sid)
+		ItemService.slotContainerEquip(player, exer_slot, [player_exer], subject_id=sid)
+
+	# 艾瑟萌槽装备（艾瑟萌/艾瑟萌天赋）
+	@classmethod
+	async def equipPlayerGift(cls, consumer, player: Player, sid: int, pgid: int):
+		# 返回数据：无
+
+		Subject.ensure(id=sid)
+
+		exer_slot = Common.getExerSlot(player)
+
+		player_gift = Common.getPlayerGift(player, id=pgid) if pgid > 0 else None
+
+		ItemService.slotContainerEquip(player, exer_slot, [player_gift], subject_id=sid)
 
 	# 艾瑟萌装备槽装备
 	@classmethod
-	async def equipSlotEquip(cls, consumer, player: Player, sid: int, eeid: int):
+	async def equipExerEquip(cls, consumer, player: Player, sid: int, eeid: int):
 		# 返回数据：无
 
 		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
 
 		pack_equip = Common.getPackEquip(player, id=eeid)
 
-		ItemService.slotContainerEquip(player, equip_slot, pack_equip,
+		ItemService.slotContainerEquip(player, equip_slot, [pack_equip],
 									   e_type_id=pack_equip.item.e_type_id)
 
 	# 艾瑟萌改名
 	@classmethod
-	async def playerExerRename(cls, consumer, player: Player, peid: int, name: str):
+	async def editNickname(cls, consumer, player: Player, peid: int, name: str):
 		# 返回数据：
 
 		Check.ensureNameFormat(name)

@@ -16,7 +16,7 @@ public class GroupView<T> : BaseView where T: MonoBehaviour {
     /// 外部组件设置
     /// </summary>
     public Transform container;
-    public T[] presetSubViews;
+    public T[] presetSubViews = new T[0];
 
     /// <summary>
     /// 外部变量设置

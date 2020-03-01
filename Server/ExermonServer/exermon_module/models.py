@@ -509,7 +509,7 @@ class ExerFrag(BaseItem):
 		return res
 
 	# 最大叠加数量（为0则不限）
-	def _maxCount(self): return 0
+	def maxCount(self): return 0
 
 
 # ===================================================

@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 /// </summary>
 /// <typeparam name="T">物品类型</typeparam>
 /// <typeparam name="E">装备类型</typeparam>
-public class SlotItemDisplay<T, E> : SelectableItemInfo<T>, IDropHandler
+public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, IDropHandler
     where T : class where E : class {
 
     /// <summary>
