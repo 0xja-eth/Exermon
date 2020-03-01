@@ -5,17 +5,17 @@ using UnityEngine.UI;
 /// <summary>
 /// 状态窗口艾瑟萌页信息显示
 /// </summary>
-public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermon> {
+public class ExerSlotExerGiftDisplay : SlotItemDisplay<ExerSlotItem, PlayerExerGift> {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public PlayerExermonDetail playerExerDetail;
+    public PlayerExerGiftDetail playerGiftDetail;
 
     /// <summary>
     /// 页显示组件
     /// </summary>
-    public ExermonPageDisplay pageDisplay { get; set; }
+    public ExerGiftPageDisplay pageDisplay { get; set; }
 
     /// <summary>
     /// 外部系统设置
@@ -50,7 +50,7 @@ public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 配置装备
     /// </summary>
     protected override void setupEquip() {
-        equip = item.playerExer;
+        equip = item.playerGift;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// </summary>
     protected override void onItemChanged() {
         base.onItemChanged();
-        playerExerDetail.slotItem = item;
+        playerGiftDetail.slotItem = item;
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// </summary>
     protected override void onPreviewChanged() {
         base.onPreviewChanged();
-        playerExerDetail.setItem(previewingEquip);
+        playerGiftDetail.setItem(previewingEquip);
     }
 
     #endregion
@@ -85,9 +85,9 @@ public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 绘制物品
     /// </summary>
     /// <param name="slotItem">艾瑟萌槽项</param>
-    protected override void drawExactlyEquip(PlayerExermon playerExer) {
-        base.drawExactlyEquip(playerExer);
-        playerExerDetail.setItem(playerExer);
+    protected override void drawExactlyEquip(PlayerExerGift playerGift) {
+        base.drawExactlyEquip(playerGift);
+        playerGiftDetail.setItem(playerGift);
     }
 
     #endregion
@@ -98,7 +98,7 @@ public class ExerSlotExermonDisplay : SlotItemDisplay<ExerSlotItem, PlayerExermo
     /// 请求更改艾瑟萌
     /// </summary>
     void requestEquip() {
-        exerSer.equipPlayerExer(item, equip, pageDisplay.onStatusChanged);
+        exerSer.equipPlayerGift(item, equip, pageDisplay.onStatusChanged);
     }
 
     #endregion

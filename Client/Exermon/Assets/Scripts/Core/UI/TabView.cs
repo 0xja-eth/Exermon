@@ -10,7 +10,7 @@ using LitJson;
 /// <summary>
 /// Tab视图
 /// </summary>
-public abstract class TabView<T> : GroupView<Toggle> {
+public abstract class TabView<T> : GroupView<Toggle> where T : class {
 
     /// <summary>
     /// 外部组件设置
@@ -83,6 +83,15 @@ public abstract class TabView<T> : GroupView<Toggle> {
     public void setIndex(int index) {
         for (int i = 0; i < subViews.Count; i++)
             subViews[i].isOn = (index == i);
+    }
+
+    /// <summary>
+    /// 当前内容
+    /// </summary>
+    /// <returns></returns>
+    public T currentContent() {
+        int index = getIndex();
+        return index >= 0 ? contents[index] : null;
     }
 
     #endregion

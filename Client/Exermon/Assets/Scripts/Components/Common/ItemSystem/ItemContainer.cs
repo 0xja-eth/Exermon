@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// 物品容器
+/// 物品容器显示
 /// </summary>
 public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: class {
 
@@ -14,6 +14,11 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// 常量设置
     /// </summary>
     // public ItemInfo<T> detail; // 帮助界面
+
+    /// <summary>
+    /// 外部组件设置
+    /// </summary>
+    public Text countText; // 个数文本
 
     /// <summary>
     /// 外部变量设置
@@ -79,6 +84,14 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     #endregion
 
     #region 数据控制
+
+    /// <summary>
+    /// 数目文本格式
+    /// </summary>
+    /// <returns></returns>
+    protected virtual string countTextFormat() {
+        return "当前选中/总数目：{0}/{1}";
+    }
 
     #region 物品控制
 
@@ -475,6 +488,22 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
 
     #region 界面控制
 
+    /// <summary>
+    /// 绘制数目
+    /// </summary>
+    void drawCount() {
+        if (countText == null) return;
+        countText.text = string.Format(countTextFormat(),
+            selectedIndex + 1, itemsCount());
+    }
+
+    /// <summary>
+    /// 绘制数目
+    /// </summary>
+    void clearCount() {
+        countText.text = "";
+    }
+
     #region 物品显示项绘制
 
     /// <summary>
@@ -545,12 +574,21 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     }
 
     #endregion
-    
+
+    /// <summary>
+    /// 刷新视窗
+    /// </summary>
+    protected override void refresh() {
+        base.refresh();
+        drawCount();
+    }
+
     /// <summary>
     /// 清除描述
     /// </summary>
     protected override void clear() {
         base.clear();
+        clearCount();
         clearItems();
         clearItemHelp();
     }

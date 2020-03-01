@@ -14,6 +14,7 @@ public class ExerGiftCard : DraggableItemDisplay<ExerGift> {
     /// 外部组件设置
     /// </summary>
     public Image icon; // 图标
+    public Text name; // 名称
     public GameObject detail; // 详细
 
     /// <summary>
@@ -45,6 +46,8 @@ public class ExerGiftCard : DraggableItemDisplay<ExerGift> {
             icon, rect, new Vector2(0.5f, 0.5f));
         this.icon.sprite.name = this.icon.overrideSprite.name = icon.name;
         this.icon.gameObject.SetActive(true);
+
+        if (name) name.text = exerGift.name;
     }
 
     /// <summary>
@@ -52,6 +55,7 @@ public class ExerGiftCard : DraggableItemDisplay<ExerGift> {
     /// </summary>
     protected override void clearItem() {
         icon.gameObject.SetActive(false);
+        if (name) name.text = "";
     }
 
     #endregion

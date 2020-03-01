@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 艾瑟萌仓库显示
+/// 艾瑟萌天赋池显示
 /// </summary>
-public class ExerHubDisplay : ItemContainer<PlayerExermon> {
+public class ExerGiftPoolDisplay : ItemContainer<PlayerExerGift> {
 
     /// <summary>
     /// 常量设置
@@ -16,7 +16,7 @@ public class ExerHubDisplay : ItemContainer<PlayerExermon> {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public PlayerExermonDetail detail; // 帮助界面
+    public PlayerExerGiftDetail detail; // 帮助界面
     
     /// <summary>
     /// 内部变量声明
@@ -28,7 +28,7 @@ public class ExerHubDisplay : ItemContainer<PlayerExermon> {
     /// 获取物品帮助组件
     /// </summary>
     /// <returns>帮助组件</returns>
-    protected override ItemDetail<PlayerExermon> getItemDetail() {
+    protected override ItemDetail<PlayerExerGift> getItemDetail() {
         return detail;
     }
     

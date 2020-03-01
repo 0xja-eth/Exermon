@@ -1,19 +1,18 @@
-﻿
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
 /// <summary>
 /// 状态窗口艾瑟萌页信息显示
 /// </summary>
-public class ExermonPageDisplay : ExermonStatusPageInfo<PlayerExermon> {
+public class ExerGiftPageDisplay : ExermonStatusPageInfo<PlayerExerGift> {
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
     public ExermonStatusTabController tabController;
 
-    public ExerSlotExermonDisplay exermonDisplay;
+    public ExerSlotExerGiftDisplay exerGiftDisplay;
 
-    public ExerHubDisplay exerHubDisplay;
+    public ExerGiftPoolDisplay exerGiftPoolDisplay;
 
     /// <summary>
     /// 外部系统设置
@@ -30,8 +29,8 @@ public class ExermonPageDisplay : ExermonStatusPageInfo<PlayerExermon> {
         base.initializeOnce();
         playerSer = PlayerService.get();
         exerSer = ExermonService.get();
-        exermonDisplay.pageDisplay = this;
-        exerSer.loadExerHub();
+        exerGiftDisplay.pageDisplay = this;
+        exerSer.loadExerGiftPool();
     }
 
     #endregion
@@ -48,40 +47,39 @@ public class ExermonPageDisplay : ExermonStatusPageInfo<PlayerExermon> {
     #endregion
 
     #region 数据控制
-
+    
     /// <summary>
     /// 获取容器组件
     /// </summary>
-    protected override ItemContainer<PlayerExermon>
-        getContainer() { return exerHubDisplay; }
+    protected override ItemContainer<PlayerExerGift>
+        getContainer() { return exerGiftPoolDisplay; }
 
     /// <summary>
     /// 获取艾瑟萌槽项显示组件
     /// </summary>
-    protected override SlotItemDisplay<ExerSlotItem, PlayerExermon>
-        getSlotItemDisplay() { return exermonDisplay; }
+    protected override SlotItemDisplay<ExerSlotItem, PlayerExerGift>
+        getSlotItemDisplay() { return exerGiftDisplay; }
 
     /// <summary>
     /// 物品改变回调
     /// </summary>
     protected override void onItemChanged() {
         base.onItemChanged();
-        updateExerHubItems(item.subjectId);
-        exermonDisplay.setItem(item);
+        updateGiftPoolItems();
+        exerGiftDisplay.setItem(item);
     }
     
     /// <summary>
-    /// 更新艾瑟萌仓库物品
+    /// 更新艾瑟萌天赋池物品
     /// </summary>
-    void updateExerHubItems(int subjectId) {
+    void updateGiftPoolItems() {
         var player = playerSer.player;
-        var items = new List<PlayerExermon>();
-        var exerHub = player.packContainers.exerHub;
-        items.Add(item.playerExer);
-        items.AddRange(exerHub.getItems(item =>
-            item.exermon().subjectId == subjectId));
-        exerHubDisplay.setItems(items);
-        exerHubDisplay.startView(0);
+        var items = new List<PlayerExerGift>();
+        var giftPool = player.packContainers.exerGiftPool;
+        items.Add(item.playerGift);
+        items.AddRange(giftPool.items);
+        exerGiftPoolDisplay.setItems(items);
+        exerGiftPoolDisplay.startView(0);
     }
 
     #endregion

@@ -110,7 +110,7 @@ public class PlayerExermonDetail : ItemDetail<PlayerExermon> {
     void drawBaseInfo(PlayerExermon playerExer) {
         var exermon = playerExer.exermon();
         animal.text = string.Format(AnimalTextFormat, exermon.animal);
-        type.text = string.Format(AnimalTextFormat, exermon.typeText());
+        type.text = string.Format(TypeTextFormat, exermon.typeText());
         nickname.text = playerExer.name();
         description.text = exermon.description;
     }

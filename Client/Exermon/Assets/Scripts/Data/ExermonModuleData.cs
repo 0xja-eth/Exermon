@@ -750,7 +750,7 @@ public class PlayerExermon : PackContItem<Exermon>,
 /// 艾瑟萌天赋
 /// </summary>
 public class PlayerExerGift : PackContItem<ExerGift> {
-    
+
     /// <summary>
     /// 获取艾瑟萌
     /// </summary>
@@ -939,18 +939,24 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
 
             json = previewObj.convertParams(index);
 
-            Debug.Log("convertParams: "+json.ToJson());
-
             var value2 = DataLoader.load<double>(json, "value");
             var growth2 = DataLoader.load<double>(json, "growth");
 
-            json["delta_value"] = DataLoader.convertDouble(value2 - value, !percent, percent ? 4 : 2);
-            json["delta_growth"] = DataLoader.convertDouble(growth2 - growth);
+            var dtValue = value2 - value;
+            var dtGrowth = growth2 - growth;
+
+            json["delta_value"] = DataLoader.convertDouble(dtValue, !percent, percent ? 4 : 2);
+            json["delta_growth"] = DataLoader.convertDouble(dtGrowth);
+
+            json["delta_value_rate"] = dtValue / value;
+            json["delta_growth_rate"] = dtGrowth / growth;
 
         } else {
 
             var exermon = this.exermon();
             var level = playerExer.level;
+
+            var mGrowth = exermon.star().rateRanges[index].maxValue;
 
             var baseValue = exermon.baseParams[index].value;
             var baseGrowth = exermon.rateParams[index].value;
@@ -963,6 +969,9 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
 
             json["value"] = DataLoader.convertDouble(value, !percent, percent ? 4 : 2);
             json["growth"] = DataLoader.convertDouble(growth);
+
+            json["max_growth"] = mGrowth;
+            json["growth_rate"] = growth / mGrowth;
 
             json["base_value"] = DataLoader.convertDouble(baseValue, !percent, percent ? 4 : 2);
             json["level_value"] = DataLoader.convertDouble(levelValue, !percent, percent ? 4 : 2);
@@ -996,8 +1005,6 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
         json["delta_rate"] = deltaRate;
 
         json[ParamDisplay.TrueColorKey] = DataLoader.convert(color);
-
-        Debug.Log("Growth: " + json.ToJson());
 
         return json;
     }
