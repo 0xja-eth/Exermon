@@ -40,16 +40,9 @@ class SeasonManager:
         if now >= cls.current_season.end_time:
             cls.onSeasonChanged()
 
-
-
             # 广播赛季切换信息
             await GameConsumer.broadcast(EmitType.SeasonSwitch,
-                                         "赛季切换信息广播……")
-
-    # 生成最新赛季数据
-    @classmethod
-    def generateSeasonData(cls):
-        return cls.current_season.convertToDict()
+                                         {'season_id': cls.current_season.id})
 
     # 切换赛季
     @classmethod
