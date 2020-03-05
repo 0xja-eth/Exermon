@@ -277,7 +277,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	# 发射操作
 	# 发射数据（类型，组标签，数据）
-	async def emit(self, type: EmitType, tag, data=None):
+	async def emit(self, type: EmitType, tag=ChannelLayerTag.Self, data=None):
 
 		from utils.interface_manager import WebSocket
 

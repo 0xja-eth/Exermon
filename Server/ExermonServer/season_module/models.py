@@ -1,26 +1,35 @@
 from django.db import models
 from utils.model_utils import Common as ModelUtils
 from game_module.models import GroupConfigure
-from game_module import consumer
 from player_module.views import Common
 from player_module.models import Player
 import datetime
 
 # Create your models here.
 
-#对战评星表，记录对战结果与扣除/增加星星数的关系
+
+# =======================
+# 对战评星表，记录对战结果与扣除/增加星星数的关系
+# =======================
 class CombatResult(GroupConfigure):
+
     class Meta:
         verbose_name = verbose_name_plural = "对战评星"
 
-    #对战评价
-    result = models.CharField(max_length=3,verbose_name="对战评价")
+    # 胜利增加星星
+    win = models.SmallIntegerField(default=0, verbose_name="胜利增星数")
 
-    #胜利增加星星
-    win = models.SmallIntegerField(verbose_name="胜利增星数")
+    # 失败增加星星（负数为减少）
+    lose = models.SmallIntegerField(default=0, verbose_name="失败增星数")
 
-    #失败减少星星
-    lose = models.SmallIntegerField(verbose_name="失败减星数")
+    def convertToDict(self):
+        res = super(CombatResult, self).convertToDict()
+
+        res['win'] = self.win
+        res['lose'] = self.lose
+
+        return res
+
 
 # =======================
 # 赛季记录表
@@ -29,6 +38,8 @@ class SeasonRecord(models.Model):
 
     class Meta:
         verbose_name = verbose_name_plural = "赛季记录"
+
+    SUSPEN_SCORE = 50
 
     # 玩家
     player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
@@ -55,63 +66,68 @@ class SeasonRecord(models.Model):
             'suspensions': suspensions,
         }
 
-    #增减赛季积分
-    def adjustPoint(self,*args):
-        self.point+=args
-        if self.point < 0:
-            self.point =0
+    # 增减赛季积分
+    def adjustPoint(self, value):
+        self.point = max(self.point+value, 0)
+
         self.save()
 
-    #增减星星数量
-    def adjustStarNum(self,*args):
+    # 增减星星数量
+    async def adjustStarNum(self, value):
         rank, sub_rank = self.rank()
 
-        #星星减少
-        while args<0 :
-            #当前段位赛季积分和抵消因子
+        # 星星减少
+        while value < 0:
+            # 当前段位赛季积分和抵消因子
             self.point -= rank.offset_factor
-            ++args
-            rank, sub_rank = self.rank()
+            value += 1
 
-            # 情况1.赛季积分不够完全抵消，point用完，此时args<0，段位可能改变
-            if self.point < 0 :
+            # 情况1，赛季积分不够完全抵消，point用完，此时value<0，段位可能改变
+            if self.point < 0:
                 self.point += rank.offset_factor
-                --args
+                value -= 1
                 break
 
-        #情况2，赛季积分可以完全抵消星星减少数，args提前变为0，段位不变
-        #情况3，星星数增加，段位可能改变
-
-        if args != 0:
-            self.star_num += args
+        # 情况2，赛季积分可以完全抵消星星减少数，args提前变为0，段位不变
+        # 情况3，星星数增加，段位可能改变
+        if value != 0:
+            self.star_num += value
             new_rank, new_sub_rank = self.rank()
-            if new_rank != rank or new_sub_rank!= sub_rank:
-                player = Common.getOnlinePlayer(self.player)
-                player.comsumer.emit("段位改变为"+new_rank+new_sub_rank)
+            if new_rank != rank or new_sub_rank != sub_rank:
+                await self._emitRankChanged(new_rank, new_sub_rank)
 
         self.save()
 
-    def adjustCredit(self,uid,credit):
-        temp = Player.objects.get(id=uid)
-        temp.credit += credit
+    # 发送段位变更信息
+    async def _emitRankChanged(self, rank, sub_rank):
+        from game_module.consumer import EmitType
 
-        #针对第1，2，3次禁赛，分别设置3，7，30天的禁赛期
-        if temp.credit <50 and len(self.suspensions())==2:
+        # 生成返回信息，规范见接口文档
+        data = {'rank_id': rank, 'sub_rank': sub_rank, 'star_num': self.star_num}
 
-            sus = SuspensionRecord(self.id, datetime.datetime.now(),30)
-            sus.save()
+        player = Common.getOnlinePlayer(self.player_id)
+        # 使用 emit 函数发送信息，type 为发送信息的类型，
+        # tag 为发送信息的标签（按照默认值即可）
+        # data 为发送的信息，需要传一个 dict
+        await player.comsumer.emit(EmitType.RankChanged, data=data)
 
-        elif temp.credit < 50 and len(self.suspensions())==1:
+    def adjustCredit(self, player: Player, credit):
+        player.credit += credit
 
-            sus = SuspensionRecord(self.id, datetime.datetime.now(),7)
-            sus.save()
+        count = self.suspensions().count()
+        now = datetime.datetime.now()
 
-        elif temp.credit < 50 and len(self.suspensions())==0:
+        # 针对第1，2，>=3次禁赛，分别设置3，7，30天的禁赛期
+        if player.credit < self.SUSPEN_SCORE and count >= 2:
+            SuspensionRecord.create(self.id, now, 30)
 
-            sus = SuspensionRecord(self.id, datetime.datetime.now(), 3)
-            sus.save()
+        elif player.credit < self.SUSPEN_SCORE and count == 1:
+            SuspensionRecord.create(self.id, now, 7)
 
-        temp.save()
+        elif player.credit < self.SUSPEN_SCORE and count == 0:
+            SuspensionRecord.create(self.id, now, 3)
+
+        player.save()
 
     # 所有的禁赛纪录
     def suspensions(self):
@@ -148,11 +164,6 @@ class SuspensionRecord(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "禁赛记录"
 
-    def __init__(self, seaon_rec, start_time, time_length):
-        self.season_rec = seaon_rec
-        self.start_time = start_time
-        self.end_time = start_time+ datetime.timedelta(days=time_length)
-
     # 赛季记录,一对多的关系，多个禁赛记录对应一个赛季记录
     season_rec = models.ForeignKey('SeasonRecord', on_delete=models.CASCADE,
                                    verbose_name="赛季记录")
@@ -162,6 +173,18 @@ class SuspensionRecord(models.Model):
 
     # 结束时间
     end_time = models.DateTimeField(verbose_name="结束时间")
+
+    # 创建一个实例，cls 可以直接当做 SuspensionRecord 来用
+    @classmethod
+    def create(cls, season_rec, start_time, time_length):
+        record = cls()
+        record.season_rec = season_rec
+        record.start_time = start_time
+        record.end_time = start_time + datetime.timedelta(days=time_length)
+
+        record.save()
+
+        return record
 
     def convertToDict(self):
         start_time = ModelUtils.timeToStr(self.start_time)
@@ -180,9 +203,6 @@ class CompSeason(GroupConfigure):
 
     class Meta:
         verbose_name = verbose_name_plural = "赛季信息"
-
-    #赛季名称
-    season_name = models.CharField(max_length=10,verbose_name="赛季名称")
 
     # 开始时间
     start_time = models.DateTimeField(verbose_name="开始时间")
@@ -217,9 +237,6 @@ class CompRank(GroupConfigure):
     color = models.CharField(max_length=7, null=False,
                              default='#000000', verbose_name="颜色")
 
-    #段位名称
-    rank_name = models.CharField(max_length=2,verbose_name="段位名称")
-
     # 子段位数（0 为无限）
     sub_rank_num = models.PositiveSmallIntegerField(default=3, verbose_name="小段位数")
 
@@ -229,10 +246,19 @@ class CompRank(GroupConfigure):
     # 抵消积分
     offset_factor = models.PositiveSmallIntegerField(default=60, verbose_name="抵消使用积分")
 
+    # 管理界面用：显示星级颜色
+    def adminColor(self):
+        from django.utils.html import format_html
+
+        res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+        return format_html(res)
+
+    adminColor.short_description = "星级颜色"
+
     def convertToDict(self):
         res = super().convertToDict()
 
-        res['rank_name'] = self.rank_name
         res['color'] = self.color
         res['sub_rank_num'] = self.sub_rank_num
         res['score_factor'] = self.score_factor

@@ -1,52 +1,62 @@
-from season_module import models as Season
-from utils import exception
-from utils.runtime_manager import RuntimeData,RuntimeManager
-from game_module.consumer import GameConsumer
+from season_module.models import CompSeason
+from utils.runtime_manager import RuntimeManager
+from game_module.consumer import EmitType, GameConsumer
 import datetime
 
-class SeasonManager(RuntimeManager):
 
-    currentSeason = RuntimeData()
+# ===================================================
+# 赛季运行时管理类
+# ===================================================
+class SeasonManager:
 
-    #计算当前赛季
+    current_season: CompSeason = None
+
+    # 计算当前赛季
     @classmethod
     def computeSeason(cls):
 
-        #获取所有赛季
-        allSeason = Season.CompSeason.objs()
+        # 获取所有赛季
+        seasons = CompSeason.objs()
 
-        #当前日期和时间
-        cDateTime = datetime.datetime.now()
+        # 当前日期和时间
+        now = datetime.datetime.now()
 
-        #按照时间顺序从将来往以前读取赛季信息
-        try:
-            for i in allSeason:
-                #当前日期和时间小于某个赛季的开始时间
-                if cDateTime.__le__(i.start_time):
-                    currentSeason = i-1
-                    return currentSeason
-        except exception.ErrorType.DatabaseError:
-            return None
+        # 按照时间顺序从将来往以前读取赛季信息
+        for i in seasons:
+            # 当前日期和时间小于某个赛季的开始时间
+            if now <= i.start_time:
+                current_season = i-1
+                return current_season
 
+        return None
 
-    #维护赛季，即检查日期
-    async def maintainSeason(self):
+    # 维护赛季，即检查日期
+    @classmethod
+    async def maintainSeason(cls):
         
-        cDateTime = datetime.datetime.now()
+        now = datetime.datetime.now()
 
-        #超过了目前赛季的终止日期
-        if cDateTime.__ge__(self.currentSeason.end_time):
-            await self.onSeasonChanged()
-            #广播赛季切换信息
-            GameConsumer.broadcast('link',"赛季切换信息广播……")
+        # 超过了目前赛季的终止日期
+        if now >= cls.current_season.end_time:
+            cls.onSeasonChanged()
 
 
-    #切换赛季
-    def onSeasonChanged(self,cls):
-        self.currentSeason = cls.computeSeason()
+
+            # 广播赛季切换信息
+            await GameConsumer.broadcast(EmitType.SeasonSwitch,
+                                         "赛季切换信息广播……")
+
+    # 生成最新赛季数据
+    @classmethod
+    def generateSeasonData(cls):
+        return cls.current_season.convertToDict()
+
+    # 切换赛季
+    @classmethod
+    def onSeasonChanged(cls):
+        cls.current_season = cls.computeSeason()
 
 
-RuntimeManager.register(SeasonManager)
 RuntimeManager.registerEvent(SeasonManager.maintainSeason)
 
 
