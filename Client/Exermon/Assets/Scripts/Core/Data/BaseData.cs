@@ -117,11 +117,11 @@ public class BaseData {
                     var pType = p.PropertyType; var pName = p.Name;
                     var key = attr.keyName ?? DataLoader.hump2Underline(pName);
                     var val = p.GetValue(this);
-
+                    /*
                     var debug = string.Format("Loading {0} {1} {2} in {3} " +
                         "(ori:{4})", p, pType, pName, type, val);
                     Debug.Log(debug);
-
+                    */
                     val = attr.preventCover ? DataLoader.load(
                         pType, val, json, key, attr.ignoreNull) : 
                         DataLoader.load(pType, json, key);
@@ -164,10 +164,11 @@ public class BaseData {
                     var val = p.GetValue(this);
 
                     json[key] = DataLoader.convert(pType, val, attr.format);
-
+                    /*
                     var debug = string.Format("Converting {0} {1} in {2} (val:{3}) " +
                         "to key: {4}, res: {5}", pType, pName, type, val, key, json[key]);
                     Debug.Log(debug);
+                    */
                 }
     }
 
@@ -257,7 +258,8 @@ public class ParamData : BaseData {
     /// </summary>
     /// <param name="val">值</param>
     public void setValue(double val) {
-        value = val;
+        var isPercent = param().isPercent();
+        value = isPercent ? val : Math.Round(val);
     }
 
     /// <summary>

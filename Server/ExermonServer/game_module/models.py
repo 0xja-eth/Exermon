@@ -160,11 +160,13 @@ class ParamValue(models.Model):
 
 	# 设置值
 	def setValue(self, value, clamp=True):
+		if not self.param.isPercent(): value = round(value)
 		self.value = self.adjustValue(value, clamp)
 
 	# 获取值
 	def getValue(self):
 		value = self._scaleValue(self.value, True)
+		if not self.param.isPercent(): value = round(value)
 		return value
 
 	def convertToDict(self):
@@ -445,6 +447,10 @@ class BaseParam(GroupConfigure):
 		if max_ is not None: val = min(max_, val)
 
 		return val
+
+	# 是否百分比属性
+	def isPercent(self):
+		return self.scale == 10000
 
 	@classmethod
 	def getAttr(cls, id):

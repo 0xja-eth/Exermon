@@ -37,14 +37,15 @@ public static class DataLoader {
     }
 
     #region 加载JsonData
-    
+
     /// <summary>
     /// 加载数据
     /// </summary>
     /// <param name="json">数据</param>
     /// <param name="key">键</param>
-    public static JsonData load(JsonData json, string key) {
+    public static JsonData load(JsonData json, string key, bool returnNull = true) {
         if (contains(json, key, true)) return json[key];
+        if (returnNull) return null;
         var data = new JsonData();
         data.SetJsonType(JsonType.Object);
         return data;
@@ -221,6 +222,8 @@ public static class DataLoader {
     }
     /// <param name="type">类型</param>
     public static JsonData convert(Type type, object data, string format = "") {
+        if (data == null) return null;
+
         format = format.ToLower();
         bool isArray = false;
         Type eleType = null;
@@ -228,7 +231,7 @@ public static class DataLoader {
         // 处理数组情况
         if (isArray = type.IsArray) 
             eleType = type.GetElementType();
-        if (type.Name == typeof(List<>).Name) 
+        else if (isArray = (type.Name == typeof(List<>).Name)) 
             eleType = type.GetGenericArguments()[0];
         if (isArray) {
             var array = (IEnumerable)data;

@@ -154,7 +154,6 @@ public class DateTimePicker : BaseView,
     /// </summary>
     /// <param name="val">值</param>
     public void setValue(int val, bool force=false) {
-        Debug.Log(type + " setValue: " + val);
         val = Mathf.Clamp(val, minValue, maxValue);
         if (!force && value == val) return;
         value = val;

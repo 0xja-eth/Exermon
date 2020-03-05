@@ -79,7 +79,6 @@ public class BaseInputField<T> : BaseView {
     /// 内容变化回调
     /// </summary>
     public virtual void onValueChanged(bool check = true, bool emit = true) {
-        Debug.Log(name + " onValueChanged");
         requestRefresh();
         if (check) doCheck();
         if (emit) onChanged?.Invoke(getValue());
@@ -286,7 +285,6 @@ public class BaseInputField<T> : BaseView {
     /// </summary>
     protected virtual void onFocus() {
         if (!isFocusEnable) return;
-        Debug.Log("onFocus");
         focused = true;
         current?.SetActive(true);
         if (inputBackground)
@@ -298,7 +296,6 @@ public class BaseInputField<T> : BaseView {
     /// </summary>
     protected virtual void onBlur() {
         if (!isFocusEnable) return;
-        Debug.Log("onBlur");
         focused = false;
         current?.SetActive(false);
         if (inputBackground)

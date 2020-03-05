@@ -6,10 +6,17 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
+/// 可拖拽物品接口
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IDraggableItemDisplay<T> : ISelectableItemDisplay<T>,
+    IBeginDragHandler, IDragHandler, IEndDragHandler where T : class {}
+
+/// <summary>
 /// 可拖动物品展示组件
 /// </summary>
-public class DraggableItemDisplay<T> : SelectableItemDisplay<T>,
-    IBeginDragHandler, IDragHandler, IEndDragHandler where T : class {
+public class DraggableItemDisplay<T> : SelectableItemDisplay<T>, 
+    IDraggableItemDisplay<T> where T : class {
 
     /// <summary>
     /// 外部组件设置
@@ -161,21 +168,9 @@ public class DraggableItemDisplay<T> : SelectableItemDisplay<T>,
     /// <param name="go">对象</param>
     protected virtual void adjustDraggingObjectTransform(GameObject go) {
         var rt = go.transform as RectTransform;
-
-        Debug.Log("======================");
-        Debug.Log("rt.anchorMin: " + rt.anchorMin);
-        Debug.Log("rt.anchorMax: " + rt.anchorMax);
-        Debug.Log("rt.sizeDelta: " + rt.sizeDelta);
-        Debug.Log("rt.rect: " + rt.rect);
-
+        
         rt.SetParent(draggingParent);
-
-        Debug.Log("======================");
-        Debug.Log("rt.anchorMin: " + rt.anchorMin);
-        Debug.Log("rt.anchorMax: " + rt.anchorMax);
-        Debug.Log("rt.sizeDelta: " + rt.sizeDelta);
-        Debug.Log("rt.rect: " + rt.rect);
-
+        
         rt.SetAsLastSibling();
     }
 

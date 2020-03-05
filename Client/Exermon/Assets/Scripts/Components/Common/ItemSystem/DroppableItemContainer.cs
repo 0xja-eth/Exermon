@@ -6,9 +6,15 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
+/// 物品容器接口
+/// </summary>
+public interface IDroppableItemContainer<T> : IItemContainer<T>, 
+    IDropHandler where T : class { }
+
+/// <summary>
 /// 物品容器（实现IDropHandler）
 /// </summary>
-public class DroppableItemContainer<T> : ItemContainer<T>, IDropHandler where T : class {
+public class DroppableItemContainer<T> : ItemContainer<T>, IDroppableItemContainer<T> where T : class {
     
     #region 事件控制
 

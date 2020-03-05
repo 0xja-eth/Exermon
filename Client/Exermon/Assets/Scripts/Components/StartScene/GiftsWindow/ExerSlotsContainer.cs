@@ -33,7 +33,7 @@ public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
     /// 获取物品帮助组件
     /// </summary>
     /// <returns>帮助组件</returns>
-    protected override ItemDetail<ExerSlotItem> getItemDetail() {
+    protected override IItemDetail<ExerSlotItem> getItemDetail() {
         return detail;
     }
 

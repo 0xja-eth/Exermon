@@ -3,11 +3,45 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
+/// <summary>
+/// 物品显示接口
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IBaseView {
+
+    /// <summary>
+    /// 配置组件
+    /// </summary>
+    void configure();
+
+    /// <summary>
+    /// 开启视窗
+    /// </summary>
+    void startView();
+
+    /// <summary>
+    /// 结束视窗
+    /// </summary>
+    void terminateView();
+
+    /// <summary>
+    /// 请求刷新
+    /// </summary>
+    void requestRefresh(bool force = false);
+
+    /// <summary>
+    /// 请求清除
+    /// </summary>
+    void requestClear(bool force = false);
+
+}
 
 /// <summary>
 /// 游戏所有视图的基类
 /// </summary>
-public class BaseView : BaseComponent {
+public class BaseView : BaseComponent, IBaseView {
 
     /// <summary>
     /// 外部组件设置
@@ -28,16 +62,23 @@ public class BaseView : BaseComponent {
     /// 初始化
     /// </summary>
     void initialize() {
+        if (!initialized) {
+            initialized = true;
+            initializeSystems();
+            initializeOnce();
+        }
         initializeEvery();
-        if (initialized) return;
-        initialized = true;
-        initializeOnce();
     }
 
     /// <summary>
     /// 初次打开时初始化（子类中重载）
     /// </summary>
     protected virtual void initializeOnce() { }
+
+    /// <summary>
+    /// 初始化系统/服务
+    /// </summary>
+    protected virtual void initializeSystems() { }
 
     /// <summary>
     /// 每次打开时初始化（子类中重载）
@@ -85,7 +126,7 @@ public class BaseView : BaseComponent {
     #endregion
 
     #region 启动/结束控制
-
+    
     /// <summary>
     /// 启动视窗
     /// </summary>
@@ -124,16 +165,14 @@ public class BaseView : BaseComponent {
     /// 请求刷新
     /// </summary>
     public void requestRefresh(bool force = false) {
-        if (force) refresh();
-        else refreshRequested = true;
+        if (force) refresh(); else refreshRequested = true;
     }
 
     /// <summary>
     /// 请求清除
     /// </summary>
     public void requestClear(bool force = false) {
-        if (force) clear();
-        else clearRequested = true;
+        if (force) clear(); else clearRequested = true;
     }
 
     /// <summary>
@@ -163,14 +202,14 @@ public class BaseView : BaseComponent {
     /// 刷新视窗
     /// </summary>
     protected virtual void refresh() {
-        Debug.Log(name + " refresh");
+        //Debug.Log(name + " refresh");
     }
 
     /// <summary>
     /// 清除视窗
     /// </summary>
     protected virtual void clear() {
-        Debug.Log(name + " clear");
+        //Debug.Log(name + " clear");
     }
 
     #endregion

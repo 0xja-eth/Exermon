@@ -37,7 +37,7 @@ public class ExermonsContainer : ItemContainer<Exermon> {
     /// 获取物品帮助组件
     /// </summary>
     /// <returns>帮助组件</returns>
-    protected override ItemDetail<Exermon> getItemDetail() {
+    protected override IItemDetail<Exermon> getItemDetail() {
         return detail;
     }
 

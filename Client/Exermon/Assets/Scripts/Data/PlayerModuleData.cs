@@ -75,6 +75,30 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         [AutoConvert]
         public PackContainer<QuesSugarPackItem> quesSugarPack { get; protected set; }
             = new PackContainer<QuesSugarPackItem>();
+
+        /// <summary>
+        /// 获取容器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public PackContainer<T> getContainer<T>() where T: PackContItem, new() {
+            var type = typeof(T);
+            /* 会出错，需要另外获取
+            if (type == typeof(HumanPackItem) || type == typeof(HumanPackEquip))
+                return (PackContainer<T>)(object)humanPack;
+            if (type == typeof(ExerPackItem) || type == typeof(ExerPackEquip))
+                return (PackContainer<T>)(object)exerPack;
+            */
+            if (type == typeof(ExerFragPackItem))
+                return (PackContainer<T>)(object)exerFragPack;
+            if (type == typeof(PlayerExerGift))
+                return (PackContainer<T>)(object)exerGiftPool;
+            if (type == typeof(PlayerExermon))
+                return (PackContainer<T>)(object)exerHub;
+            if (type == typeof(QuesSugarPackItem))
+                return (PackContainer<T>)(object)quesSugarPack;
+            return null;
+        }
     }
 
     /// <summary>
@@ -304,7 +328,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         json["exp"] = exp;
         json["next"] = next;
         json["level"] = level;
-        json["rate"] = exp / next;
+        json["rate"] = next == 0 ? 0 : exp / next;
         return json;
     }
 
@@ -537,7 +561,7 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
     /// <returns></returns>
     public ExerSlotItem getExerSlotItem(Subject subject) {
         var exerSlot = slotContainers.exerSlot;
-        return exerSlot.getExerSlotItem(subject.getID());
+        return exerSlot.getSlotItem(subject.getID());
     }
 
     #endregion
@@ -627,20 +651,20 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
     /// </summary>
     /// <param name="eType">装备类型</param>
     /// <returns>装备项数据</returns>
-    public HumanEquipSlotItem getEquipSlotItem(int eType) {
+    public override HumanEquipSlotItem getSlotItem(int eType) {
         return getItem((item) => item.eType == eType);
     }
-    
+
     /// <summary>
     /// 通过装备物品获取槽ID
     /// </summary>
     /// <typeparam name="E">装备物品类型</typeparam>
     /// <param name="equipItem">装备物品</param>
     /// <returns>槽ID</returns>
-    protected override HumanEquipSlotItem getSlotItemByEquipItem<E>(E equipItem) {
+    public override HumanEquipSlotItem getSlotItemByEquipItem<E>(E equipItem) {
         if (typeof(E) == typeof(HumanPackEquip)) {
             var eType = ((HumanPackEquip)(object)equipItem).equip().eType;
-            return getEquipSlotItem(eType);
+            return getSlotItem(eType);
         }
         return null;
     }

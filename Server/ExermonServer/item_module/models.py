@@ -454,7 +454,7 @@ class EquipableItem(LimitedItem):
 		if attr is not None:
 			param = self.params().filter(param__attr=attr)
 
-		if param is None or not param.exists(): return None
+		if param is None or not param.exists(): return 0
 
 		return param.first().getValue()
 
@@ -1722,6 +1722,7 @@ class PackContItem(BaseContItem):
 
 		res['item_id'] = item_id
 		res['count'] = self.count
+		res['equiped'] = self.equiped
 
 		return res
 

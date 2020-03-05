@@ -183,16 +183,7 @@ class MapDisplay : BaseView,
             (position - mask.anchoredPosition - maskSize / 2);
         var deltaPos = size / 2 - targetPos;
         var deltaMove = deltaPos * delta;
-        /*
-        Debug.Log("==== adjustScaledPosition ====");
-        Debug.Log("delta: " + delta);
-        Debug.Log("position: " + position);
-        Debug.Log("size: " + size);
-        Debug.Log("maskSize: " + maskSize);
-        Debug.Log("targetPos: " + targetPos);
-        Debug.Log("deltaPos: " + deltaPos);
-        Debug.Log("deltaMove: " + deltaMove);
-        */
+
         moveDetla(deltaMove);
     }
 

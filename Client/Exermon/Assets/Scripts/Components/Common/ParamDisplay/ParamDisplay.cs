@@ -76,7 +76,7 @@ public class ParamDisplay : BaseView {
         public GameObject obj;
         // 对应显示的类型： 
         // Text, Sign, Percent, SignPercent, 
-        // TimeSpan, TimeSpanWithHour, 
+        // TimeSpan, TimeSpanWithHour, Show, Hide
         // Date, DateTime, Color, ScaleX, ScaleY
         public string type;
         // 是否有动画效果
@@ -102,8 +102,8 @@ public class ParamDisplay : BaseView {
     /// <summary>
     /// 内部变量声明
     /// </summary>
-    JsonData displayData; // 要显示的数据
-    JsonData rawData; // 原始数据
+    JsonData displayData = new JsonData(); // 要显示的数据
+    JsonData rawData = new JsonData(); // 原始数据
 
     bool force = false;
     bool ignoreTrigger = false;
@@ -231,11 +231,24 @@ public class ParamDisplay : BaseView {
             if (DataLoader.contains(value, item.key))
                 setKey(item.key, value[item.key]);
             else if (!item.configData) clearKey(item.key);
+        Debug.Log("SetValue: " + name + ":" + value.ToJson());
+        Debug.Log("displayData = " + displayData.ToJson());
+
         rawData = value;
     }
     /// <param name="obj">值对象</param>
     public void setValue(DisplayDataConvertable obj, string type = "", bool force = false) {
         setValue(obj.convertToDisplayData(type), force);
+    }
+    /// <param name="objs">值对象组</param>
+    public void setValue(DisplayDataConvertable[] objs, string type = "", bool force = false) {
+        var json = new JsonData();
+        foreach(var obj in objs) {
+            var res = obj.convertToDisplayData(type);
+            foreach (var key in res.Keys)
+                json[key] = res[key];
+        }
+        setValue(json, force);
     }
 
     /// <summary>
@@ -289,7 +302,10 @@ public class ParamDisplay : BaseView {
     /// <param name="value">值</param>
     void refreshKey(DisplayItem item, JsonData value) {
         if (item.obj == null) return;
-
+        /*
+        Debug.Log("refreshKey: " + name + ": key: " + item.key + 
+            " value:" + (value == null ? "NULL" : value.ToJson()));
+            */
         switch (item.type) {
             case "Text": processTextDisplayItem(item, value); break;
             case "Sign": processSignDisplayItem(item, value); break;
@@ -297,6 +313,8 @@ public class ParamDisplay : BaseView {
             case "SignPercent": processSignDisplayItem(item, value, true); break;
             case "TimeSpan": processTimeSpanDisplayItem(item, value); break;
             case "TimeSpanWithHour": processTimeSpanDisplayItem(item, value, true); break;
+            case "Show": processShowDisplayItem(item, value); break;
+            case "Hide": processShowDisplayItem(item, value); break;
             case "Date": processDateDisplayItem(item, value); break;
             case "DateTime": processDateTimeDisplayItem(item, value); break;
             case "Color": processColorDisplayItem(item, value); break;
@@ -314,6 +332,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processTextDisplayItem(DisplayItem item, JsonData value) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
@@ -335,6 +354,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processSignDisplayItem(DisplayItem item, JsonData value, bool percent = false) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
@@ -363,6 +383,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processPercentDisplayItem(DisplayItem item, JsonData value) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
@@ -379,6 +400,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processTimeSpanDisplayItem(DisplayItem item, JsonData value, bool hour = false) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
@@ -399,7 +421,21 @@ public class ParamDisplay : BaseView {
     /// </summary>
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
+    void processShowDisplayItem(DisplayItem item, JsonData value, bool hide = false) {
+        if (value == null) item.obj.SetActive(hide);
+        if (value.IsBoolean) {
+            var val = DataLoader.load<bool>(value);
+            item.obj.SetActive(hide ? !val : val);
+        }
+    }
+    
+    /// <summary>
+    /// 处理日期类型的显示项
+    /// </summary>
+    /// <param name="item">显示项</param>
+    /// <param name="value">值</param>
     void processDateDisplayItem(DisplayItem item, JsonData value) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultDateFormat;
@@ -413,6 +449,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processDateTimeDisplayItem(DisplayItem item, JsonData value) {
+        if (!item.obj.activeSelf) return;
         var text = SceneUtils.text(item.obj);
         if (text == null) return;
         var format = item.format.Length > 0 ? item.format : DefaultDateTimeFormat;
@@ -426,6 +463,7 @@ public class ParamDisplay : BaseView {
     /// <param name="item">显示项</param>
     /// <param name="value">值</param>
     void processColorDisplayItem(DisplayItem item, JsonData value) {
+        if (!item.obj.activeSelf) return;
         var graphic = SceneUtils.get<Graphic>(item.obj);
         if (graphic == null) return;
 
