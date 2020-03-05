@@ -6,10 +6,29 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// 物品展示组件
+/// 可选择物品接口
 /// </summary>
-public class SelectableItemDisplay<T> : ItemDisplay<T>, IPointerEnterHandler, 
-    IPointerExitHandler, IPointerClickHandler where T: class {
+/// <typeparam name="T"></typeparam>
+public interface ISelectableItemDisplay<T> : IItemDisplay<T>,
+    IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler where T : class {
+
+    /// <summary>
+    /// 配置窗口
+    /// </summary>
+    void configure(ItemContainer<T> container, int index);
+
+    /// <summary>
+    /// 获取容器
+    /// </summary>
+    /// <returns></returns>
+    ItemContainer<T> getContainer();
+
+}
+
+/// <summary>
+/// 可选择物品展示组件
+/// </summary>
+public class SelectableItemDisplay<T> : ItemDisplay<T>, ISelectableItemDisplay<T> where T: class {
 
     /// <summary>
     /// 常量定义

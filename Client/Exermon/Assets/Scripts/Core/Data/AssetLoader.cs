@@ -34,7 +34,7 @@ public static class AssetLoader {
     /// 文件主体名称定义
     /// </summary>
     public const string CharacterFileName = "Character";
-    public const string ItemFileName = "Item";
+    //public const string ItemFileName = "Item";
     public const string ExermonFileName = "Exermon";
     public const string ExerGiftFileName = "ExerGift";
     public const string BigExerGiftFileName = "BigExerGift";
@@ -87,8 +87,11 @@ public static class AssetLoader {
     /// </summary>
     /// <param name="id">物品ID</param>
     /// <returns>2D纹理</returns>
-    public static Texture2D loadItemIcon(int id) {
-        return loadTexture2D(ItemIconPath, ItemFileName, id);
+    public static Texture2D loadItemIcon(int type, int id) {
+        return loadItemIcon((BaseItem.Type)type, id);
+    }
+    public static Texture2D loadItemIcon(BaseItem.Type type, int id) {
+        return loadTexture2D(ItemIconPath, type.ToString(), id);
     }
 
     /// <summary>

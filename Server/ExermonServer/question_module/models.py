@@ -484,7 +484,7 @@ class QuesSugar(BaseItem):
 		if attr is not None:
 			param = self.params().filter(param__attr=attr)
 
-		if param is None or not param.exists(): return None
+		if param is None or not param.exists(): return 0
 
 		return param.first().getValue()
 

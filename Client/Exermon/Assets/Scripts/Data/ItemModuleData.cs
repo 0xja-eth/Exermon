@@ -86,6 +86,8 @@ public class LimitedItem : BaseItem {
     /// 属性
     /// </summary>
     [AutoConvert]
+    public int starId { get; protected set; }
+    [AutoConvert]
     public ItemPrice buyPrice { get; protected set; }
     [AutoConvert]
     public int sellPrice { get; protected set; }
@@ -95,6 +97,23 @@ public class LimitedItem : BaseItem {
     public bool tradable { get; protected set; }
 
     public Texture2D icon { get; protected set; }
+
+    /// <summary>
+    /// 获取星级实例
+    /// </summary>
+    /// <returns></returns>
+    public ItemStar star() {
+        return DataService.get().itemStar(starId);
+    }
+
+    /// <summary>
+    /// 加载自定义属性
+    /// </summary>
+    /// <param name="json"></param>
+    protected override void loadCustomAttributes(JsonData json) {
+        base.loadCustomAttributes(json);
+        icon = AssetLoader.loadItemIcon(type, getID());
+    }
 }
 
 /// <summary>
@@ -231,6 +250,12 @@ public abstract class BaseContItem : BaseData {
     //public abstract Type defaultType();
 
     /// <summary>
+    /// 是否为空
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool isNullItem() { return false; }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     public BaseContItem() {
@@ -252,11 +277,8 @@ public class PackContItem : BaseContItem {
     public int itemId { get; protected set; }
     [AutoConvert]
     public int count { get; protected set; }
-
-    /// <summary>
-    /// 是否装备
-    /// </summary>
-    public bool equiped = false;
+    [AutoConvert]
+    public bool equiped { get; protected set; } = false;
 
     /// <summary>
     /// 容器项容量（0为无限）
@@ -264,7 +286,19 @@ public class PackContItem : BaseContItem {
     /// <returns></returns>
     public virtual int capacity() { return 1; }
 
+    /// <summary>
+    /// 是否已满
+    /// </summary>
+    /// <returns></returns>
     public bool isFull() { return capacity() > 0 && count >= capacity(); }
+
+    /// <summary>
+    /// 是否为空
+    /// </summary>
+    /// <returns></returns>
+    public override bool isNullItem() {
+        return itemId == 0;
+    }
 
     /// <summary>
     /// 移入
@@ -290,6 +324,16 @@ public class PackContItem : BaseContItem {
         if (this.count < 0) this.count = 0;
         return Math.Max(0, res);
     }
+
+    /// <summary>
+    /// 装备
+    /// </summary>
+    public void equip() { equiped = true; }
+
+    /// <summary>
+    /// 卸下
+    /// </summary>
+    public void dequip() { equiped = false; }
 
     /// <summary>
     /// 设置个数
@@ -324,6 +368,14 @@ public class PackContItem<T> : PackContItem where T : BaseItem {
     /// <returns></returns>
     public T item() {
         return DataService.get().get<T>(itemId);
+    }
+
+    /// <summary>
+    /// 是否为空
+    /// </summary>
+    /// <returns></returns>
+    public override bool isNullItem() {
+        return base.isNullItem() || item() == null;
     }
 
     /// <summary>
@@ -382,12 +434,21 @@ public abstract class SlotContItem<T> : SlotContItem where T : PackContItem, new
     public abstract T equip1 { get; protected set; }
 
     /// <summary>
+    /// 是否为空
+    /// </summary>
+    /// <returns></returns>
+    public override bool isNullItem() {
+        return equip1 == null || equip1.isNullItem();
+    }
+
+    /// <summary>
     /// 获取装备
     /// </summary>
     /// <typeparam name="E">装备类型</typeparam>
     /// <returns>装备</returns>
     public override E getEquip<E>() {
-        if (typeof(E) == typeof(T)) return (E)(object)equip1;
+        var et = typeof(E); var tt = typeof(T);
+        if (et == tt || tt.IsSubclassOf(et)) return (E)(object)equip1;
         return null;
     }
 
@@ -397,7 +458,8 @@ public abstract class SlotContItem<T> : SlotContItem where T : PackContItem, new
     /// <typeparam name="E">装备类型</typeparam>
     /// <param name="equipItem">装备物品</param>
     public override void setEquip<E>(E equipItem) {
-        if (typeof(E) == typeof(T)) {
+        var et = typeof(E); var tt = typeof(T);
+        if (et == tt || tt.IsSubclassOf(et)) {
             var lastEquip = equip1;
             equip1 = (T)(object)equipItem;
             if (lastEquip != equip1) onEquipChanged();
@@ -423,26 +485,36 @@ public abstract class SlotContItem<T1, T2> : SlotContItem<T1>
     public abstract T2 equip2 { get; protected set; }
 
     /// <summary>
-    /// 获取装备
+    /// 是否为空
     /// </summary>
-    /// <typeparam name="E">装备类型</typeparam>
-    /// <returns>装备</returns>
-    public override E getEquip<E>() {
-        if (typeof(E) == typeof(T2)) return (E)(object)equip2;
-        return base.getEquip<E>();
+    /// <returns></returns>
+    public override bool isNullItem() {
+        return base.isNullItem() && (equip2 == null || equip2.isNullItem());
     }
 
     /// <summary>
     /// 获取装备
     /// </summary>
     /// <typeparam name="E">装备类型</typeparam>
+    /// <returns>装备</returns>
+    public override E getEquip<E>() {
+        var et = typeof(E); var t2t = typeof(T2);
+        if (et == t2t|| t2t.IsSubclassOf(et)) return (E)(object)equip2;
+        return base.getEquip<E>();
+    }
+
+    /// <summary>
+    /// 设置装备
+    /// </summary>
+    /// <typeparam name="E">装备类型</typeparam>
     /// <param name="equipItem">装备物品</param>
     public override void setEquip<E>(E equipItem) {
-        if (typeof(E) == typeof(T2)) {
+        var et = typeof(E); var t2t = typeof(T2);
+        if (et == t2t || t2t.IsSubclassOf(et)) {
             var lastEquip = equip2;
             equip2 = (T2)(object)equipItem;
             if (lastEquip != equip2) onEquipChanged();
-        } else base.setEquip<E>(equipItem);
+        } else base.setEquip(equipItem);
     }
 
 }
@@ -515,6 +587,14 @@ public class BaseContainer<T> : BaseData where T: BaseContItem, new() {
         return DataLoader.load<T>(json);
     }
 
+    /// <summary>
+    /// 转化自定义数据
+    /// </summary>
+    /// <param name="json">数据</param>
+    protected override void convertCustomAttributes(ref JsonData json) {
+        base.convertCustomAttributes(ref json);
+        json["items"] = DataLoader.convert(items);
+    }
 }
 
 /// <summary>
@@ -601,10 +681,13 @@ public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem
         if (slotItem == null) return;
         var oriEquip = getEquip<E>(slotItem);
         container.removeItem(equipItem); // 移出装备
-        container.pushItem(oriEquip); // 卸下装备
-        setEquip(slotItem, equipItem); // 设置装备
-        oriEquip.equiped = false;
-        equipItem.equiped = true;
+        container.pushItem(oriEquip); // 卸下原装备
+        setEquip(slotItem, equipItem); // 设置新装备
+        if (oriEquip != null) oriEquip.dequip();
+        if (equipItem != null) equipItem.equip();
+    }
+    public void setEquip<E>(int index, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
+        setEquip(getSlotItem(index), container, equipItem);
     }
     public void setEquip<E>(E equipItem = null) where E : PackContItem, new() {
         setEquip(getSlotItemByEquipItem(equipItem), equipItem);
@@ -612,13 +695,26 @@ public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem
     public void setEquip<E>(T slotItem, E equipItem = null) where E : PackContItem, new() {
         slotItem?.setEquip(equipItem);
     }
+    public void setEquip<E>(int index, E equipItem = null) where E : PackContItem, new() {
+        setEquip(getSlotItem(index), equipItem);
+    }
 
     /// <summary>
-    /// 通过装备物品获取槽ID
+    /// 通过索引获取槽
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    public virtual T getSlotItem(int index) {
+        return getItem(item => item.index == index);
+    }
+
+    /// <summary>
+    /// 通过装备物品获取槽
     /// </summary>
     /// <typeparam name="E">装备物品类型</typeparam>
     /// <param name="equipItem">装备物品</param>
     /// <returns>槽ID</returns>
-    protected abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
-    
+    public abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
+
+
 }

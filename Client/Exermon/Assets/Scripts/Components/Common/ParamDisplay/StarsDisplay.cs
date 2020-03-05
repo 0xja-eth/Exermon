@@ -27,8 +27,6 @@ public class StarsDisplay : GroupView<Image> {
     /// </summary>
     /// <param name="count">数目</param>
     public void setValue(int count) {
-        Debug.Log("setStarValue: " + count);
-        Debug.Log("subViews: " + subViews.Count);
         if (this.count == count) return;
         this.count = count;
         requestRefresh();
@@ -50,7 +48,6 @@ public class StarsDisplay : GroupView<Image> {
     /// </summary>
     /// <param name="sub">子视图</param>
     protected override void refreshSubView(Image sub, int index) {
-        Debug.Log("DrawStar");
         sub.gameObject.SetActive(index < count);
     }
     

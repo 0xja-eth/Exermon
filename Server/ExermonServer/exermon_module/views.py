@@ -49,6 +49,16 @@ class Service:
 		ItemService.slotContainerEquip(player, equip_slot, [pack_equip],
 									   e_type_id=pack_equip.item.e_type_id)
 
+	# 艾瑟萌装备槽卸下装备
+	@classmethod
+	async def dequipExerEquip(cls, consumer, player: Player, sid: int, type: int):
+		# 返回数据：无
+
+		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
+
+		ItemService.slotContainerEquip(player, equip_slot, [None],
+									   type=ExerPackEquip, e_type_id=type)
+
 	# 艾瑟萌改名
 	@classmethod
 	async def editNickname(cls, consumer, player: Player, peid: int, name: str):

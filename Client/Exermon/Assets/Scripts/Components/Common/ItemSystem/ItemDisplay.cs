@@ -5,9 +5,33 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
+/// 物品显示接口
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IItemDisplay<T> : IBaseView where T : class {
+    
+    /// <summary>
+    /// 启动窗口
+    /// </summary>
+    void startView(T item, bool refresh = false);
+
+    /// <summary>
+    /// 设置物品
+    /// </summary>
+    void setItem(T item, bool refresh = false);
+
+    /// <summary>
+    /// 获取物品
+    /// </summary>
+    /// <returns>物品</returns>
+    T getItem();
+
+}
+
+/// <summary>
 /// 物品显示组件，用于显示物品的信息
 /// </summary>
-public class ItemDisplay<T> : BaseView where T : class {
+public class ItemDisplay<T> : BaseView, IItemDisplay<T> where T : class {
 
     /// <summary>
     /// 内部变量声明

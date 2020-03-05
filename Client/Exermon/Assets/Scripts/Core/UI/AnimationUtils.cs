@@ -17,7 +17,7 @@ public static class AnimationUtils {
     /// </summary>
     const string AniClipName = "Animation";
     const float AniDuration = 0.5f;
-    
+
     /// <summary>
     /// 临时动画对象
     /// </summary>

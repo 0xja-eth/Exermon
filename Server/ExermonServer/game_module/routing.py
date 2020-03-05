@@ -255,6 +255,15 @@ WEBSOCKET_METHOD_ROUTER = {
 		Exermon.equipExerEquip,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 艾瑟萌装备槽装备
+	'exermon/dequip/exerequip': [[
+		['uid', 'int'],
+		['sid', 'int'],
+		['type', 'int'],
+	],
+		Exermon.dequipExerEquip,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 艾瑟萌改名
 	'exermon/edit/nickname': [[
 		['uid', 'int'],

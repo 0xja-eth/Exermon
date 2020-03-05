@@ -78,13 +78,32 @@ public class ParamDisplaysGroup : GroupView<ParamDisplay> {
             setValue(i, objs[i], type, force);
     }
     /// <param name="obj">对象</param>
-    public void setValues(ParamDisplay.DisplayDataArrayConvertable obj, 
+    public void setValues(ParamDisplay.DisplayDataArrayConvertable obj,
         string type = "", bool force = false) {
         if (obj == null) clearValues();
         else {
             var infos = obj.convertToDisplayDataArray(type);
             for (int i = 0; i < subViewsCount(); i++)
                 setValue(i, infos[i], force);
+        }
+    }
+    /// <param name="objs">多个对象</param>
+    public void setValues(ParamDisplay.DisplayDataArrayConvertable[] objs,
+        string type = "", bool force = false) {
+        if (objs == null || objs.Length <= 0) clearValues();
+        else {
+            var count = subViewsCount();
+            var res = new JsonData[objs.Length][]; // 缓存所有 JsonData
+            for (int i = 0; i < objs.Length; i++)
+                res[i] = objs[i].convertToDisplayDataArray(type);
+            for (int i = 0; i < count; ++i) {
+                var json = new JsonData();
+                for (int j = 0; j < objs.Length; ++j)
+                    foreach (var key in res[j][i].Keys)
+                        json[key] = res[j][i][key];
+                Debug.Log("jsons[" + i + "] = " + json.ToJson());
+                setValue(i, json, force);
+            }
         }
     }
 
@@ -96,10 +115,15 @@ public class ParamDisplaysGroup : GroupView<ParamDisplay> {
         if (index >= subViewsCount()) return;
         subViews[index].setValue(obj, force);
     }
-    public void setValue(int index, ParamDisplay.DisplayDataConvertable obj, 
+    public void setValue(int index, ParamDisplay.DisplayDataConvertable obj,
         string type = "", bool force = false) {
         if (index >= subViewsCount()) return;
         subViews[index].setValue(obj, type, force);
+    }
+    public void setValue(int index, ParamDisplay.DisplayDataConvertable[] objs,
+        string type = "", bool force = false) {
+        if (index >= subViewsCount()) return;
+        subViews[index].setValue(objs, type, force);
     }
 
     /// <summary>

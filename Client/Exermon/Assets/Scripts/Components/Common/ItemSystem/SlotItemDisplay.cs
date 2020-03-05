@@ -7,11 +7,30 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /// <summary>
+/// 槽展示接口
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface ISlotItemDisplay<T, E> : ISelectableItemDisplay<T>, 
+    IDropHandler where T : class where E : class {
+
+    /// <summary>
+    /// 装备
+    /// </summary>
+    /// <param name="item">物品</param>
+    void setEquip(E item);
+
+    /// <summary>
+    /// 获取装备
+    /// </summary>
+    E getEquip();
+}
+
+/// <summary>
 /// 槽展示组件
 /// </summary>
 /// <typeparam name="T">物品类型</typeparam>
 /// <typeparam name="E">装备类型</typeparam>
-public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, IDropHandler
+public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, ISlotItemDisplay<T, E>
     where T : class where E : class {
 
     /// <summary>
@@ -36,7 +55,7 @@ public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, IDropHandler
     }
 
     /// <summary>
-    /// 配置装备
+    /// 配置装备（原始装备）
     /// </summary>
     protected virtual void setupEquip() { }
 
@@ -181,8 +200,6 @@ public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, IDropHandler
     /// </summary>
     /// <param name="data">事件数据</param>
     public void OnDrop(PointerEventData data) {
-        Debug.Log(name + " OnDrop: " + data);
-        Debug.Log(name + " data.pointerDrag: " + data.pointerDrag);
         processItemDrop(getDraggingItemDisplay(data));
     }
 
@@ -203,7 +220,6 @@ public class SlotItemDisplay<T, E> : SelectableItemDisplay<T>, IDropHandler
     /// </summary>
     protected virtual void processItemPreview(
         DraggableItemDisplay<E> display) {
-        Debug.Log(name + " processItemPreview: " + display);
         if (display != null && display.isDraggable())
             setPreview(display.getItem());
     }

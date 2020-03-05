@@ -5,9 +5,32 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
+/// 物品显示接口
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IItemDetail<T> : IItemDisplay<T> where T : class {
+
+    /// <summary>
+    /// 配置窗口
+    /// </summary>
+    void configure(ItemContainer<T> container);
+
+    /// <summary>
+    /// 启动窗口
+    /// </summary>
+    void startView(T item, int index = -1, bool refresh = false);
+
+    /// <summary>
+    /// 设置物品
+    /// </summary>
+    void setItem(T item, int index = -1, bool refresh = false);
+
+}
+
+/// <summary>
 /// 物品详细信息
 /// </summary>
-public class ItemDetail<T> : ItemDisplay<T> where T : class {
+public class ItemDetail<T> : ItemDisplay<T>, IItemDetail<T> where T : class {
 
     /// <summary>
     /// 内部变量声明

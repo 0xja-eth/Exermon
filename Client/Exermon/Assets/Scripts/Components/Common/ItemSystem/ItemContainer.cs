@@ -4,11 +4,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
+
+/// <summary>
+/// 物品容器接口
+/// </summary>
+public interface IItemContainer<T> : IBaseView where T: class {
+
+    /// <summary>
+    /// 配置
+    /// </summary>
+    /// <param name="items">物品集</param>
+    void configure(T[] items);
+    void configure(List<T> items);
+
+    /// <summary>
+    /// 启动视窗
+    /// </summary>
+    void startView(int index = 0);
+
+    /// <summary>
+    /// 设置物品集
+    /// </summary>
+    /// <param name="items">物品集</param>
+    void setItems(T[] items);
+    void setItems(List<T> items);
+
+    /// <summary>
+    /// 是否包含物品
+    /// </summary>
+    /// <param name="item">物品</param>
+    /// <returns>是否包含</returns>
+    bool containsItem(T item);
+
+    /// <summary>
+    /// 获取物品集
+    /// </summary>
+    /// <returns>物品集</returns>
+    T[] getItems();
+}
 
 /// <summary>
 /// 物品容器显示
 /// </summary>
-public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: class {
+public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>>, IItemContainer<T> where T: class {
 
     /// <summary>
     /// 常量设置
@@ -27,13 +66,20 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     public int defaultCapacity = 0; // 默认容量
 
     /// <summary>
+    /// 回调函数集
+    /// </summary>
+    public List<UnityAction> onItemsChangedCallbacks = new List<UnityAction>();
+    public List<UnityAction> onSelectChangedCallbacks = new List<UnityAction>();
+    public List<UnityAction> onCheckChangedCallbacks = new List<UnityAction>();
+
+    /// <summary>
     /// 内部变量声明
     /// </summary>
     protected List<T> items = new List<T>(); // 物品列表
 
     protected List<int> checkedIndices = new List<int>(); // 已选中索引
 
-    protected int selectedIndex = -1; // 选择的索引
+    protected int selectedIndex = -1, lastIndex = -1; // 选择的索引, 上次索引
 
     #region 初始化
     
@@ -47,10 +93,10 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     }
     /// <param name="items">物品集</param>
     public void configure(T[] items) {
-        configure(); setItems(items); select(0);
+        configure(); setItems(items);
     }
     public void configure(List<T> items) {
-        configure(); setItems(items); select(0);
+        configure(); setItems(items);
     }
 
     /// <summary>
@@ -83,6 +129,24 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
 
     #endregion
 
+    #region 回调控制
+
+    /// <summary>
+    /// 添加回调函数
+    /// </summary>
+    /// <param name="cb">回调函数</param>
+    /// <param name="type">回调类型（0：物品变更，1：选择变更，2：选中变更）</param>
+    public void addCallback(UnityAction cb, int type = 0) {
+        if (cb == null) return;
+        switch (type) {
+            case 0: onItemsChangedCallbacks.Add(cb); break;
+            case 1: onSelectChangedCallbacks.Add(cb); break;
+            case 2: onCheckChangedCallbacks.Add(cb); break;
+        }
+    }
+
+    #endregion
+
     #region 数据控制
 
     /// <summary>
@@ -99,7 +163,7 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// 获取物品帮助组件
     /// </summary>
     /// <returns>帮助组件</returns>
-    protected virtual ItemDetail<T> getItemDetail() {
+    protected virtual IItemDetail<T> getItemDetail() {
         return null;
     }
 
@@ -141,12 +205,12 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// </summary>
     /// <param name="items">物品集</param>
     public void setItems(T[] items) {
-        setItems(new List<T>(items));
+        clearItems();
+        this.items = new List<T>(items);
+        onItemsChanged();
     }
     public void setItems(List<T> items) {
-        clearItems();
-        this.items = items;
-        onItemsChanged();
+        setItems(items.ToArray());
     }
 
     /// <summary>
@@ -194,7 +258,7 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
         if (!containsItem(item)) return;
         container.acceptTransfer(prepareTransfer(item));
     }
-    public void transferItem<T1>(SlotItemDisplay<T1, T> slotItem, T item) where T1 : class {
+    public void transferItem<T1>(ISlotItemDisplay<T1, T> slotItem, T item) where T1 : class {
         if (!containsItem(item)) return;
         slotItem.setEquip(prepareTransfer(item));
     }
@@ -248,6 +312,14 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
         refreshItemDisplays();
         processForceCheckItems();
         requestRefresh();
+        callbackItemsChange();
+    }
+
+    /// <summary>
+    /// 处理物品改变回调
+    /// </summary>
+    void callbackItemsChange() {
+        foreach (var cb in onItemsChangedCallbacks) cb?.Invoke();
     }
 
     #endregion
@@ -259,6 +331,7 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// <returns>循环索引</returns>
     protected int getLoopedIndex(int i) {
         var cnt = itemDisplaysCount();
+        if (cnt == 0) return -1;
         return (i % cnt + cnt) % cnt;
     }
 
@@ -308,12 +381,12 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
         //Debug.Log("select: " + index);
 
         index = getLoopedIndex(index);
+        if (index >= 0) {
+            var item = subViews[index];
+            if (!item.isSelectable()) return;
+        }
 
-        var item = subViews[index];
-        if (!item.isSelectable()) return;
-        //if (selectedIndex == index) return;
-
-        selectedIndex = index;
+        lastIndex = selectedIndex = index;
         onSelectChanged();
     }
 
@@ -322,9 +395,18 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// </summary>
     public virtual void deselect() {
         //if (selectedIndex < 0) return;
-
+        
         selectedIndex = -1;
         onSelectChanged();
+    }
+
+    /// <summary>
+    /// 选择上次
+    /// </summary>
+    public virtual void selectLast(int default_ = 0) {
+        if (lastIndex >= 0) select(lastIndex);
+        else if (default_ >= 0) select(default_);
+        else deselect();
     }
 
     /// <summary>
@@ -333,6 +415,14 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     protected virtual void onSelectChanged() {
         requestRefresh();
         updateItemHelp();
+        callbackSelectChange();
+    }
+
+    /// <summary>
+    /// 处理选择改变回调
+    /// </summary>
+    void callbackSelectChange() {
+        foreach (var cb in onSelectChangedCallbacks) cb?.Invoke();
     }
 
     #endregion
@@ -480,6 +570,14 @@ public class ItemContainer<T> : GroupView<SelectableItemDisplay<T>> where T: cla
     /// </summary>
     protected virtual void onCheckChanged() {
         requestRefresh();
+        callbackCheckChange();
+    }
+
+    /// <summary>
+    /// 处理物品改变回调
+    /// </summary>
+    void callbackCheckChange() {
+        foreach (var cb in onCheckChangedCallbacks) cb?.Invoke();
     }
 
     #endregion

@@ -61,6 +61,8 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         public const string ExermonEquipPlayerExer = "exermon/equip/playerexer";
         public const string ExermonEquipPlayerGift = "exermon/equip/playergift";
         public const string ExermonEquipExerEquip = "exermon/equip/exerequip";
+        public const string ExermonDequipExerEquip = "exermon/dequip/exerequip";
+
         public const string ExermonEditNickname = "exermon/edit/nickname";
 
         public const string RecordGet = "record/record/get";
@@ -446,7 +448,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     /// <param name="message">断开连接信息</param>
     void onDisconnected(WebSocket ws, ushort code, string message) {
         //if (GameSystem.isGameEnding()) return;
-        Debug.Log("onDisconnected: " + code + ": " + message);
+        Debug.Log("NetworkSystem.onDisconnected: " + code + ": " + message);
         handleDisconnect(code, message);
     }
 
@@ -652,7 +654,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     /// 发起连接
     /// </summary>
     public void connect() {
-        Debug.Log("connect");
+        Debug.Log("NetworkSystem.connect");
         if (!isConnected()) {
             changeState(State.Connecting);
             setupWebSocket(); webSocket.Open();
@@ -663,7 +665,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
     /// 断开连接
     /// </summary>
     public void disconnect() {
-        Debug.Log("disconnect");
+        Debug.Log("NetworkSystem.disconnect");
         if (isConnected()) {
             changeState(State.Disconnecting);
             webSocket.Close();

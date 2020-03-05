@@ -152,7 +152,6 @@ public class BaseSystem<T> where T : BaseSystem<T>, new() {
     /// </summary>
     /// <param name="state">新状态</param>
     protected void changeState(int state, bool force=false) {
-        Debug.Log("ChangeState: " + lastState + " -> " + state);
         if ((force || hasState(state)) && this.state != state)
             this.state = state;
     }
