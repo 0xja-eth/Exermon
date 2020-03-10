@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
@@ -19,10 +20,6 @@ namespace StatusScene {
         /// </summary>
         public class PageTabController : TabView<ExermonStatusPageDisplay> {
 
-            /// <summary>
-            /// 外部组件设置
-            /// </summary>
-            public Button equip, dequip;
 
             /// <summary>
             /// 内部变量定义
@@ -54,10 +51,7 @@ namespace StatusScene {
             /// </summary>
             /// <param name="content"></param>
             protected override void showContent(ExermonStatusPageDisplay content, int index) {
-                UnityAction action = () => {
-                    refreshButtons();
-                    content.startView(slotItem, true);
-                };
+                UnityAction action = () => content.startView(slotItem, true);
                 if (content.initialized) action.Invoke();
                 else {
                     var loadFunc = content.getLoadFunction();
@@ -72,14 +66,6 @@ namespace StatusScene {
             /// <param name="content"></param>
             protected override void hideContent(ExermonStatusPageDisplay content, int index) {
                 content.terminateView();
-            }
-            
-            /// <summary>
-            /// 切换按钮
-            /// </summary>
-            public void refreshButtons() {
-                equip.interactable = currentContent().equipable();
-                dequip.interactable = currentContent().dequipable();
             }
 
             #endregion
@@ -113,6 +99,13 @@ namespace StatusScene {
             /// 外部组件设置
             /// </summary>
             public PageTabController tabController;
+            
+            public GameObject equip, dequip;
+
+            /// <summary>
+            /// 内部组件设置
+            /// </summary>
+            Button equipBtn, dequipBtn;
 
             /// <summary>
             /// 外部系统设置
@@ -121,6 +114,12 @@ namespace StatusScene {
             protected ExermonService exerSer;
 
             #region 初始化
+
+            protected override void initializeOnce() {
+                base.initializeOnce();
+                equipBtn = SceneUtils.button(equip);
+                dequipBtn = SceneUtils.button(dequip);
+            }
 
             /// <summary>
             /// 初始化系统/服务
@@ -208,6 +207,41 @@ namespace StatusScene {
             #endregion
 
             #endregion
+
+            #region 界面绘制
+
+            /// <summary>
+            /// 切换按钮
+            /// </summary>
+            public virtual void refreshButtons() {
+                equip.SetActive(equipable());
+                dequip.SetActive(!equip.activeSelf && dequipable());
+                equipBtn.interactable = equip.activeSelf;
+                dequipBtn.interactable = dequip.activeSelf;
+                if (!equip.activeSelf && !dequip.activeSelf) {
+                    var obj = defaultShownObject();
+                    if (obj == null) return;
+                    var btn = SceneUtils.button(obj);
+                    obj.SetActive(true);
+                }
+            }
+
+            /// <summary>
+            /// 默认显示按钮
+            /// </summary>
+            public virtual GameObject defaultShownObject() {
+                return equip;
+            }
+            /*
+            /// <summary>
+            /// 刷新
+            /// </summary>
+            protected override void refresh() {
+                base.refresh();
+                refreshButtons();
+            }
+            */
+            #endregion
         }
 
         /// <summary>
@@ -225,8 +259,8 @@ namespace StatusScene {
                 var slotDisplay = getSlotItemDisplay();
                 var packDisplay = getPackDisplay();
                 if (slotDisplay != null) slotDisplay.pageDisplay = this;
-                packDisplay?.addCallback(tabController.refreshButtons, 0);
-                packDisplay?.addCallback(tabController.refreshButtons, 1);
+                packDisplay?.addCallback(refreshButtons, 0);
+                packDisplay?.addCallback(refreshButtons, 1);
             }
 
             #endregion
@@ -352,7 +386,7 @@ namespace StatusScene {
                 return !selectedItem.isNullItem();
             }
             public override bool dequipable() {
-                if (!base.equipable()) return false;
+                if (!base.dequipable()) return false;
                 var slotItemDisplay = getSlotItemDisplay();
                 var equipedItem = slotItemDisplay.getEquip();
                 return equipedItem != null && !equipedItem.isNullItem();

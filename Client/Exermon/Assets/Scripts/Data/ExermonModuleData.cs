@@ -32,7 +32,7 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     [AutoConvert]
     public ParamData[] baseParams { get; protected set; }
     [AutoConvert]
-    public ParamData[] rateParams { get; protected set; }
+    public ParamRateData[] rateParams { get; protected set; }
 
     public Texture2D full { get; protected set; }
     public Texture2D icon { get; protected set; }
@@ -215,7 +215,7 @@ public class ExerGift : BaseItem,
     [AutoConvert]
     public Color color { get; protected set; }
     [AutoConvert("params")]
-    public ParamData[] params_ { get; protected set; }
+    public ParamRateData[] params_ { get; protected set; }
 
     public Texture2D icon { get; protected set; }
     public Texture2D bigIcon { get; protected set; }
@@ -567,9 +567,9 @@ public class PlayerExermon : PackContItem<Exermon>,
     public ExerSkillSlot exerSkillSlot { get; protected set; } = new ExerSkillSlot();
 
     [AutoConvert]
-    public ParamData[] paramValues { get; protected set; }
+    public ParamRateData[] paramValues { get; protected set; }
     [AutoConvert]
-    public ParamData[] rateParams { get; protected set; }
+    public ParamRateData[] rateParams { get; protected set; }
     
     #region 属性显示数据生成
 
@@ -835,9 +835,9 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
     public ExerEquipSlot exerEquipSlot { get; protected set; }
 
     [AutoConvert]
-    public ParamData[] paramValues { get; protected set; }
+    public ParamRateData[] paramValues { get; protected set; }
     [AutoConvert]
-    public ParamData[] rateParams { get; protected set; }
+    public ParamRateData[] rateParams { get; protected set; }
 
     /// <summary>
     /// 装备

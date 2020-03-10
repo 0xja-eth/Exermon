@@ -80,8 +80,6 @@ namespace StatusScene {
             /// </summary>
             void switchButtons() {
                 confirm.SetActive(false);
-                equip.SetActive(true);
-                dequip.SetActive(true);
             }
 
             #endregion

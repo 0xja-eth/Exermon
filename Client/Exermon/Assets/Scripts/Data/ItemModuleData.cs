@@ -328,12 +328,12 @@ public class PackContItem : BaseContItem {
     /// <summary>
     /// 装备
     /// </summary>
-    public void equip() { equiped = true; }
+    public void doEquip() { equiped = true; }
 
     /// <summary>
     /// 卸下
     /// </summary>
-    public void dequip() { equiped = false; }
+    public void doDequip() { equiped = false; }
 
     /// <summary>
     /// 设置个数
@@ -683,8 +683,8 @@ public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem
         container.removeItem(equipItem); // 移出装备
         container.pushItem(oriEquip); // 卸下原装备
         setEquip(slotItem, equipItem); // 设置新装备
-        if (oriEquip != null) oriEquip.dequip();
-        if (equipItem != null) equipItem.equip();
+        if (oriEquip != null) oriEquip.doDequip();
+        if (equipItem != null) equipItem.doEquip();
     }
     public void setEquip<E>(int index, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
         setEquip(getSlotItem(index), container, equipItem);

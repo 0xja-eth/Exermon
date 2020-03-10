@@ -160,14 +160,18 @@ class ParamValue(models.Model):
 
 	# 设置值
 	def setValue(self, value, clamp=True):
-		if not self.param.isPercent(): value = round(value)
+		if not self.isPercent(): value = round(value)
 		self.value = self.adjustValue(value, clamp)
 
 	# 获取值
 	def getValue(self):
 		value = self._scaleValue(self.value, True)
-		if not self.param.isPercent(): value = round(value)
+		if not self.isPercent(): value = round(value)
 		return value
+
+	# 是否百分数
+	def isPercent(self):
+		return self.param.isPercent()
 
 	def convertToDict(self):
 		return {
@@ -196,6 +200,10 @@ class ParamRate(ParamValue):
 	# 最小值
 	def minVal(self):
 		return None
+
+	# 是否百分数
+	def isPercent(self):
+		return True
 
 
 # ===================================================

@@ -237,7 +237,7 @@ public class ParamData : BaseData {
     public int paramId { get; protected set; }
     [AutoConvert]
     public double value { get; protected set; } // 真实值
-    
+
     /// <summary>
     /// 是否需要ID
     /// </summary>
@@ -258,8 +258,15 @@ public class ParamData : BaseData {
     /// </summary>
     /// <param name="val">值</param>
     public void setValue(double val) {
-        var isPercent = param().isPercent();
-        value = isPercent ? val : Math.Round(val);
+        value = isDouble() ? val : Math.Round(val);
+    }
+
+    /// <summary>
+    /// 是否小数
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool isDouble() {
+        return param().isPercent();
     }
 
     /// <summary>
@@ -309,12 +316,12 @@ public class ParamData : BaseData {
     }
     public static ParamData operator /(ParamData a, ParamData b) {
         var res = new ParamData(a.paramId, a.value);
-        res.timesValue(1/b.value);
+        res.timesValue(1 / b.value);
         return res;
     }
     public static ParamData operator /(ParamData a, double b) {
         var res = new ParamData(a.paramId, a.value);
-        res.timesValue(1/b);
+        res.timesValue(1 / b);
         return res;
     }
 
@@ -372,6 +379,34 @@ public class ParamData : BaseData {
         this.paramId = paramId;
         this.value = value;
     }
+}
+
+/// <summary>
+/// 属性（比率）数据
+/// </summary>
+public class ParamRateData : ParamData {
+
+    #region 数据操作
+
+    /// <summary>
+    /// 是否小数
+    /// </summary>
+    /// <returns></returns>
+    public override bool isDouble() {
+        return true;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public ParamRateData() { }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public ParamRateData(int paramId, double value = 0) : base(paramId, value) {}
 }
 
 /// <summary>

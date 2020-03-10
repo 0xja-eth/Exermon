@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
@@ -27,6 +28,13 @@ namespace StatusScene {
                 public ExerSkillSlotDisplay skillSlotDisplay;
 
                 #region 界面绘制
+
+                /// <summary>
+                /// 默认显示按钮
+                /// </summary>
+                public override GameObject defaultShownObject() {
+                    return null;
+                }
 
                 /// <summary>
                 /// 刷新装备槽
