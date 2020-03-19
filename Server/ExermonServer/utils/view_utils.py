@@ -25,14 +25,40 @@ class Common:
 
 		if not re.compile(reg).search(val): raise GameException(error)
 
-	# 确保某ID存在于枚举数据中
 	@classmethod
 	def ensureEnumData(cls, id: int, enum_type, error: ErrorType, empty=False):
+		"""
+		确保枚举值存在
+		Args:
+			id (int): 源ID数据
+			enum_type (type): 枚举类型
+			error (ErrorType): 找不到时抛出的异常
+			empty (bool): 是否允许空值
+		"""
 		# 空校验
 		if id is None and not empty: raise GameException(error)
 
 		if id is not None:
 			try: enum_type(id)
+			except: raise GameException(error)
+
+	@classmethod
+	def getEnumData(cls, id: int, enum_type: type, error: ErrorType, empty=False) -> Enum:
+		"""
+		获取枚举值实例
+		Args:
+			id (int): 源ID数据
+			enum_type (type): 枚举类型
+			error (ErrorType): 找不到时抛出的异常
+			empty (bool): 是否允许空值
+		Returns:
+			返回源ID数据在枚举类型中对应的枚举值，找不到则抛出指定异常
+		"""
+		# 空校验
+		if id is None and not empty: raise GameException(error)
+
+		if id is not None:
+			try: return enum_type(id)
 			except: raise GameException(error)
 
 	# 确保类型正确

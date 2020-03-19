@@ -15,6 +15,14 @@ class EmitType(Enum):
 	Disconnect = 'disconnect'
 	SeasonSwitch = 'season_switch'
 	RankChanged = 'rank_changed'
+	Matched = 'matched'
+	MatchProgress = 'match_progress'
+	NewRound = 'new_round'
+	PrepareCompleted = 'prepare_completed'
+	QuesResult = 'ques_result'
+	ActionStart = 'action_start'
+	RoundResult = 'round_result'
+	BattleResult = 'battle_result'
 
 
 # =====================

@@ -15,6 +15,11 @@ using UnityEditor;
 public class Character : BaseData {
 
     /// <summary>
+    /// 半身像高度
+    /// </summary>
+    public const int BustHeight = 512;
+
+    /// <summary>
     /// 属性
     /// </summary>
     [AutoConvert]

@@ -1,26 +1,38 @@
 import threading, asyncio, traceback
 
 
-# =====================
-# 运行时数据的父类
-# 定义了增删改查的公共操作函数
-# =====================
 class RuntimeData:
+	"""
+	运行时数据的父类
+	定义了增删改查的公共操作函数
+	"""
 
 	def add(self):
+		"""
+		添加时回调函数
+		"""
 		pass
 
 	def delete(self):
+		"""
+		删除时回调函数
+		"""
+		pass
+
+	def getKey(self) -> object:
+		"""
+		生成该项对应的键
+		"""
 		pass
 
 
-# =====================
-# 运行时数据管理器
-# 所有运行时管理器的父类
-# 对运行时数据进行增删改查
-# 也对运行时的更新函数进行处理
-# =====================
 class RuntimeManager:
+	"""
+	运行时数据管理器
+	存有一个运行时数据缓存池
+	对运行时数据进行增删改查
+	也对运行时的更新函数进行处理
+	"""
 
 	# 更新时间
 	PROCESS_DELTA = 0.1
@@ -31,92 +43,149 @@ class RuntimeManager:
 	# 事件操作池
 	event_processors = []
 
-	# 运行时数据操作
-	# 注册一个数据类型（类型）
 	@classmethod
-	def register(cls, type):
-		if not cls.contains(type):
-			cls.objects[type] = {}
+	def register(cls, type_: type):
+		"""
+		注册一个类型，之后可以对该类型进行 add, get, contains, delete 等操作
+		Args:
+			type_ (type): 要注册的类型
+		"""
+		if not cls.contains(type_):
+			cls.objects[type_] = {}
 
-	# 添加元素
 	@classmethod
-	def add(cls, type, key, data=None, **kwargs):
-		object = cls.get(type)
+	def add(cls, type_: type, data: RuntimeData = None, key: any = None, **kwargs) -> RuntimeData:
+		"""
+		添加一个元素
+		Args:
+			type_ (type): 已注册的类型
+			key (any): 元素所属的键
+			data (RuntimeData): 元素数据
+			**kwargs (**dict): 元素数据不存在时，用于初始化的参数
+
+		Returns:
+			返回添加的元素
+		"""
+		object: dict = cls.get(type_)
 
 		if object is not None:
-			data = data or type(**kwargs)
+			data = data or type_(**kwargs)
+
+			if key is None: key = data.getKey()
 
 			object[key] = data
 			data.add()
+		else: data = None
 
-	# 获取元素
+		return data
+
 	@classmethod
-	def get(cls, type, key=None, data=None):
+	def get(cls, type_: type, key: any = None, data: RuntimeData = None) -> RuntimeData:
+		"""
+		获取数据（元素池/元素/键）
+		Args:
+			type_ (type): 已注册的类型
+			key (any): 要获得元素的键
+			data (RuntimeData): 要获得键的元素
+		Returns:
+			若传入 key，返回对应的元素或 None（若找不到）
+			若传入 data，返回对应的键值或 None（若找不到）
+			若仅传入 type_，返回对应的元素池或 None（若找不到）
+		"""
 		# 首先判断 type 是否存在
-		if not cls.contains(type): return None
+		if not cls.contains(type_): return None
 
 		# 如果只是获取 type，直接返回
 		if data is None and key is None:
-			return cls.objects[type]
+			return cls.objects[type_]
 
 		# 如果是 data 传入，返回所在键
 		if data is not None:
-			return cls._getKey(type, data)
+			return cls._getKey(type_, data)
 
 		# 否则返回 data
-		if cls.contains(type, key):
-			return cls.objects[type][key]
+		if cls.contains(type_, key):
+			return cls.objects[type_][key]
 
 		return None
 
-	# 获取元素对应的键（第一个键）
 	@classmethod
-	def _getKey(cls, type, data):
+	def _getKey(cls, type_: type, data: RuntimeData) -> any:
+		"""
+		获取元素对应的键（多个取第一个）
+		Args:
+			type_ (type): 已注册的类型
+			data (RuntimeData): 元素数据
+		Returns:
+			数据对应的键
+		"""
 		# 获取类型对象
-		object = cls.get(type)
+		object: dict = cls.get(type_)
 		if object is not None:
-			keys = object.keys()
-			values = object.values()
-			index = list(values).index(data)
+			keys = list(object.keys())
+			values = list(object.values())
+			index = values.index(data)
 			return keys[index]
 
 		return None
 
-	# 删除元素
 	@classmethod
-	def delete(cls, type, key=None, data=None):
+	def delete(cls, type_: type, key: any = None, data: RuntimeData = None) -> RuntimeData:
+		"""
+		删除元素
+		Args:
+			type_ (type): 已注册的类型
+			key (any): 要删除元素的键
+			data (RuntimeData): 要删除的元素数据
+		Returns:
+			返回删除的项
+		"""
 
 		# 获取正确的 key 和 data
 		if data is not None: # 直接删除数据，获取 key
-			key = cls._getKey(type, data)
+			key = cls._getKey(type_, data)
 		elif key is not None: # 删除键，获取 data
-			data = cls.get(type, key)
+			data = cls.get(type_, key)
 
 		# 若数据存在，则删除
 		if data is not None and key is not None:
 			data.delete()
-			del cls.objects[type][key]
+			del cls.objects[type_][key]
 
-	# 包含元素
+		return data
+
 	@classmethod
-	def contains(cls, type, key=None, data=None):
+	def contains(cls, type_: type, key: any = None, data: RuntimeData = None) -> bool:
+		"""
+		判断类型/元素/键是否包含
+		Args:
+			type_ (type): 要判断的类型
+			key (str): 要判断的键
+			data (RuntimeData): 要判断的元素数据
+		Returns:
+			返回类型/元素/键是否包含
+		"""
 		# 首先判断 type 是否存在
-		if type not in cls.objects: return False
+		if type_ not in cls.objects: return False
 
 		# 如果只是判断 type，直接返回True
 		if data is None and key is None: return True
 
 		# 获取类型对象
-		object = cls.get(type)
+		object: dict = cls.get(type_)
 		if data is not None:  # 如果是直接判断数据
 			return data in object.values()
 
 		return key in object
 
 	# 更新事件操作
-	# 注册更新事件
 	@classmethod
-	def registerEvent(cls, event):
+	def registerEvent(cls, event: callable):
+		"""
+		注册每帧更新事件
+		Args:
+			event (callable): 要注册的函数
+		"""
 		cls.event_processors.append(event)
 
 	# # 测试函数

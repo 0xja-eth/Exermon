@@ -22,7 +22,7 @@ class Service:
 
 		player_exer = Common.getPlayerExer(player, id=peid) if peid > 0 else None
 
-		ItemService.slotContainerEquip(player, exer_slot, [player_exer], subject_id=sid)
+		ItemService.slotContainerEquip(exer_slot, [player_exer], subject_id=sid)
 
 	# 艾瑟萌槽装备（艾瑟萌/艾瑟萌天赋）
 	@classmethod
@@ -35,7 +35,7 @@ class Service:
 
 		player_gift = Common.getPlayerGift(player, id=pgid) if pgid > 0 else None
 
-		ItemService.slotContainerEquip(player, exer_slot, [player_gift], subject_id=sid)
+		ItemService.slotContainerEquip(exer_slot, [player_gift], subject_id=sid)
 
 	# 艾瑟萌装备槽装备
 	@classmethod
@@ -46,8 +46,7 @@ class Service:
 
 		pack_equip = Common.getPackEquip(player, id=eeid)
 
-		ItemService.slotContainerEquip(player, equip_slot, [pack_equip],
-									   e_type_id=pack_equip.item.e_type_id)
+		ItemService.slotContainerEquip(equip_slot, [pack_equip], e_type_id=pack_equip.item.e_type_id)
 
 	# 艾瑟萌装备槽卸下装备
 	@classmethod
@@ -56,8 +55,7 @@ class Service:
 
 		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
 
-		ItemService.slotContainerEquip(player, equip_slot, [None],
-									   type=ExerPackEquip, e_type_id=type)
+		ItemService.slotContainerEquip(equip_slot, [None], type=ExerPackEquip, e_type_id=type)
 
 	# 艾瑟萌改名
 	@classmethod
@@ -99,26 +97,66 @@ class Common:
 	# 获取艾瑟萌
 	@classmethod
 	def getExermon(cls, error: ErrorType = ErrorType.ExermonNotExist, **kwargs) -> Exermon:
+		"""
+		获取艾瑟萌
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回一定条件下查找到的艾瑟萌对象，若不存在抛出设置好的异常
+		"""
 		return ViewUtils.getObject(Exermon, error, **kwargs)
 
 	# 获取艾瑟萌天赋
 	@classmethod
 	def getExerGift(cls, error: ErrorType = ErrorType.ExerGiftNotExist, **kwargs) -> ExerGift:
+		"""
+		获取艾瑟萌天赋
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回一定条件下查找到的艾瑟萌天赋对象，若不存在抛出设置好的异常
+		"""
 		return ViewUtils.getObject(ExerGift, error, **kwargs)
 
 	# 获取艾瑟萌背包
 	@classmethod
 	def getExerPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerPack:
+		"""
+		获取艾瑟萌背包
+		Args:
+			player (Player): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+		Returns:
+			返回对应玩家的艾瑟萌背包对象
+		"""
 		return ItemCommon.getContainer(cla=ExerPack, player=player, error=error)
 
 	# 获取艾瑟萌仓库
 	@classmethod
 	def getExerHub(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerHub:
+		"""
+		获取艾瑟萌仓库
+		Args:
+			player (Player): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+		Returns:
+			返回对应玩家的艾瑟萌仓库对象
+		"""
 		return ItemCommon.getContainer(cla=ExerHub, player=player, error=error)
 
 	# 获取艾瑟萌天赋池
 	@classmethod
 	def getExerGiftPool(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerHub:
+		"""
+		获取艾瑟萌天赋池
+		Args:
+			player (Player): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+		Returns:
+			返回对应玩家的艾瑟萌天赋池对象
+		"""
 		return ItemCommon.getContainer(cla=ExerGiftPool, player=player, error=error)
 
 	# 获取艾瑟萌槽

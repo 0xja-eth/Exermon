@@ -325,7 +325,7 @@ class PlayerExermon(PackContItem):
 		type = item[4:]
 
 		if type == 'value':
-			return self.paramValue(attr=item[:3])
+			return self.paramVal(attr=item[:3])
 
 		if type == 'base':
 			return self.paramBase(attr=item[:3])
@@ -338,7 +338,7 @@ class PlayerExermon(PackContItem):
 	# 战斗力
 	def battlePoint(self):
 		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramValue)
+		return BattlePointCalc.calc(self.paramVal)
 
 	# 获取所有属性
 	def paramVals(self):
@@ -834,7 +834,13 @@ class ExerSlot(SlotContainer):
 			self.setEquip(equip_index=1, equip_item=player_gift, subject_id=subject_id, force=force)
 
 	# 获得经验
-	def gainExp(self, slot_exps, exer_exps):
+	def gainExp(self, slot_exps: dict, exer_exps: dict):
+		"""
+		获得经验
+		Args:
+			slot_exps (dict): 槽经验（字典类型，键为科目ID，值为变更经验值）
+			exer_exps (dict): 艾瑟萌经验（字典类型，键为科目ID，值为变更经验值）
+		"""
 
 		for sid in slot_exps:
 			slot_exp = slot_exps[sid]
@@ -844,6 +850,20 @@ class ExerSlot(SlotContainer):
 			if slot_item is None: continue
 
 			slot_item.gainExp(slot_exp, exer_exp)
+
+	# def sumMHP(self) -> int:
+	# 	"""
+	# 	获取艾瑟萌槽项的总体力值
+	# 	Returns:
+	# 		返回总体力值
+	# 	"""
+	# 	sum = 0
+	#
+	# 	slot_items = self.contItems()
+	# 	for slot_item in slot_items:
+	# 		sum += slot_item.paramVal(attr='mhp')
+	#
+	# 	return sum
 
 
 # ===================================================
@@ -952,16 +972,14 @@ class ExerSlotItem(SlotContItem):
 		self.subject = init_exer.exermon().subject
 		self.equip(0, init_exer)
 
-	# # 获取装备的艾瑟萌
-	# def exermon(self) -> PlayerExermon: return self.targetEquipItem1()
-	#
-	# # 获取装备的天赋
-	# def gift(self) -> PlayerExerGift: return self.targetEquipItem2()
-
 	# region 属性
 
-	# 获取所有属性
-	def paramVals(self):
+	def paramVals(self) -> list:
+		"""
+		获取艾瑟萌槽的所有实际属性数组
+		Returns:
+			返回所有实际属性的数组（元素类型为 ExerParamBase）
+		"""
 		vals = []
 		params = BaseParam.objs()
 
@@ -972,8 +990,15 @@ class ExerSlotItem(SlotContItem):
 
 		return vals
 
-	# 艾瑟萌实际属性值（RPV）
-	def paramVal(self, param_id=None, attr=None):
+	def paramVal(self, param_id: int = None, attr: str = None) -> float:
+		"""
+		获取艾瑟萌属性实际值（RPV）（有缓存机制）
+		Args:
+			param_id (int): 属性ID
+			attr (str): 属性缩写
+		Returns:
+			返回计算后的实际属性值
+		"""
 		key = attr or param_id
 		if key is None: return 0
 
@@ -988,8 +1013,15 @@ class ExerSlotItem(SlotContItem):
 
 		return cache[key]
 
-	# 属性基础值
-	def paramBase(self, param_id=None, attr=None):
+	def paramBase(self, param_id: int = None, attr: str = None) -> float:
+		"""
+		获取基础属性值
+		Args:
+			param_id (int): 属性ID
+			attr (str): 属性缩写
+		Returns:
+			返回指定属性的基础属性值
+		"""
 		player_exer: PlayerExermon = self.player_exer
 
 		if player_exer is None: return 0
@@ -1025,7 +1057,7 @@ class ExerSlotItem(SlotContItem):
 	# 战斗力
 	def battlePoint(self):
 		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramValue)
+		return BattlePointCalc.calc(self.paramVal)
 
 	# endregion
 
@@ -1045,7 +1077,7 @@ class ExerSlotItem(SlotContItem):
 
 		if not calc_next: return level
 
-		next = ExermonSlotLevelCalc.calcNext(level)
+		next = ExermonSlotLevelCalc.calcExp(level+1)
 		return level, next
 
 	# 艾瑟萌等级
@@ -1155,11 +1187,14 @@ class ExerSkill(BaseItem):
 
 	# 目标
 	target_type = models.PositiveSmallIntegerField(default=TargetType.Enemy.value, choices=TARGET_TYPES,
-											  null=True, blank=True, verbose_name="目标")
+												   null=True, blank=True, verbose_name="目标")
 
 	# 命中类型
 	hit_type = models.PositiveSmallIntegerField(default=HitType.HPDamage.value, choices=HIT_TYPES,
 												null=True, blank=True, verbose_name="命中类型")
+
+	# 吸收率（*100）（若命中类型为吸收）
+	drain_rate = models.PositiveSmallIntegerField(default=0, null=True, blank=True, verbose_name="吸收率")
 
 	# 攻击比率（*100）
 	atk_rate = models.PositiveSmallIntegerField(default=100, null=True, blank=True, verbose_name="攻击比率")
@@ -1167,9 +1202,15 @@ class ExerSkill(BaseItem):
 	# 防御比率（*100）
 	def_rate = models.PositiveSmallIntegerField(default=100, null=True, blank=True, verbose_name="防御比率")
 
+	# 命中率加成（判定时用于减少对方的回避率）（*100）
+	hit_rate = models.SmallIntegerField(default=0, null=True, blank=True, verbose_name="命中率加成")
+
+	# 暴击率加成（判定时用于增加己方的暴击率）（*100）
+	cri_rate = models.SmallIntegerField(default=0, null=True, blank=True, verbose_name="暴击率加成")
+
 	# 附加公式
-	# 说明：
-	plus_formula = models.CharField(default="", max_length=256, null=True, blank=True, verbose_name="附加公式")
+	# 说明：a, b 分别为 攻击方, 目标的 TempParam 对象
+	plus_formula = models.CharField(default="0", max_length=256, null=True, blank=True, verbose_name="附加公式")
 
 	# 技能图标
 	icon = models.ImageField(upload_to=SkillImageUpload('icon'),
@@ -1365,6 +1406,14 @@ class ExerSkillSlotItem(SlotContItem):
 
 		return res
 
+	def isContItemUsable(self) -> bool:
+		"""
+		配置当前物品是否可用
+		Returns:
+			返回当前物品是否可用
+		"""
+		return self.skill and not self.skill.passive
+
 	# 移动容器项
 	# def transfer(self, container, **kwargs):
 	# 	super().transfer(container, **kwargs)
@@ -1388,6 +1437,13 @@ class ExerSkillSlotItem(SlotContItem):
 			self.use_count += 1
 			if self.use_count >= skill.need_count:
 				self.setSkill(skill.next_skill)
+
+	def useItem(self, **kwargs):
+		"""
+		使用物品
+		"""
+		self.ensureContItemUsable()
+		self.useSkill()
 
 
 # ===================================================
@@ -1652,20 +1708,42 @@ class ExerEquipSlot(SlotContainer):
 	def _equipContainer(self, index):
 		return self.exactlyPlayer().exerPack()
 
-	# 保证装备类型与槽一致
-	def ensureEquipType(self, slot_item, equip):
-		if slot_item.e_type_id != equip.item.e_type_id:
-			raise GameException(ErrorType.IncorrectEquipType)
-
-		return True
-
-	# 保证满足装备条件
-	def ensureEquipCondition(self, slot_item, equip_item):
+	def ensureEquipCondition(self, slot_item: 'ExerEquipSlotItem', equip_item: ExerPackEquip):
+		"""
+		确保装备条件满足
+		Args:
+			slot_item (ExerEquipSlotItem): 槽项
+			equip_item (ExerPackEquip): 装备项
+		"""
 		super().ensureEquipCondition(slot_item, equip_item)
 
 		self.ensureEquipType(slot_item, equip_item)
 
-		return True
+		self.ensureEquipLevel(equip_item)
+
+	def ensureEquipType(self, slot_item: 'ExerEquipSlotItem', equip_item: ExerPackEquip):
+		"""
+		确保装备类型与槽一致
+		Args:
+			slot_item (ExerEquipSlotItem): 槽项
+			equip_item (ExerPackEquip): 装备项
+		Raises:
+			ErrorType.IncorrectEquipType: 装备类型不正确
+		"""
+		if slot_item.e_type_id != equip_item.item.e_type_id:
+			raise GameException(ErrorType.IncorrectEquipType)
+
+	def ensureEquipLevel(self, equip_item: ExerPackEquip):
+		"""
+		确保装备等级足够
+		Args:
+			equip_item (ExerPackEquip): 装备项
+		Raises:
+			ErrorType.InsufficientLevel: 等级不足
+		"""
+		player_exer = self.exer_slot.player_exer
+		if player_exer.level < equip_item.item.min_level:
+			raise GameException(ErrorType.InsufficientLevel)
 
 	# 设置艾瑟萌装备
 	def setPackEquip(self, pack_equip: ExerPackEquip = None, e_type_id=None, force=False):
@@ -1741,7 +1819,15 @@ class ExerEquipSlotItem(SlotContItem):
 		self.e_type_id = index
 
 	# 获取属性值
-	def param(self, param_id=None, attr=None):
-		if self.pack_equip is None: return 0
-		return self.pack_equip.param(param_id, attr)
+	def param(self, param_id: int = None, attr: str = None) -> float:
+		"""
+		获取装备属性值
+		Args:
+			param_id (int): 属性ID
+			attr (str): 属性缩写
+		Returns:
+			装备的指定属性值
+		"""
+		from utils.calc_utils import EquipParamCalc
+		return EquipParamCalc.calc(self, param_id, attr)
 

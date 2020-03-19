@@ -140,7 +140,7 @@ public class CharacterDisplay : SelectableItemDisplay<Character> {
     /// </summary>
     protected override void drawExactlyItem(Character character) {
         var bust = character.bust;
-        var rect = new Rect(0, 0, bust.width, bust.height);
+        var rect = new Rect(0, 0, bust.width, Character.BustHeight);
         image.overrideSprite = Sprite.Create(
             bust, rect, new Vector2(0.5f, 0.5f));
         image.overrideSprite.name = bust.name;

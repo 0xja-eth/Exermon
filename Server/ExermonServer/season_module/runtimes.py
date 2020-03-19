@@ -9,12 +9,19 @@ import datetime
 # ===================================================
 class SeasonManager:
 
-    current_season: CompSeason = None
+    # 当前赛季
+    CurrentSeason: CompSeason = None
 
-    # 计算当前赛季
+    # 赛季切换回调事件列表
+    OnSeasonChanged: list = None
+
     @classmethod
-    def computeSeason(cls):
-
+    def computeSeason(cls) -> CompSeason:
+        """
+        计算当前赛季
+        Returns:
+            返回当前赛季，没有则返回 None
+        """
         # 获取所有赛季
         seasons = CompSeason.objs()
 
@@ -30,24 +37,51 @@ class SeasonManager:
 
         return None
 
-    # 维护赛季，即检查日期
+    @classmethod
+    def refreshSeason(cls):
+        """
+        刷新当前赛季
+        """
+        cls.CurrentSeason = cls.computeSeason()
+
+    @classmethod
+    def getCurrentSeason(cls) -> CompSeason:
+        """
+        获取缓存的当前赛季（若无缓存，自动计算）
+        Returns:
+            返回当前赛季
+        """
+        if cls.CurrentSeason is None:
+            cls.refreshSeason()
+
+        return cls.CurrentSeason
+
     @classmethod
     async def maintainSeason(cls):
-        
+
         now = datetime.datetime.now()
 
+        season = cls.getCurrentSeason()
+
         # 超过了目前赛季的终止日期
-        if now >= cls.current_season.end_time:
-            cls.onSeasonChanged()
+        if now >= season.end_time:
+            await cls.onSeasonChanged()
 
-            # 广播赛季切换信息
-            await GameConsumer.broadcast(EmitType.SeasonSwitch,
-                                         {'season_id': cls.current_season.id})
-
-    # 切换赛季
     @classmethod
-    def onSeasonChanged(cls):
-        cls.current_season = cls.computeSeason()
+    async def onSeasonChanged(cls):
+        """
+        赛季切换回调
+        """
+        cls.refreshSeason()
+        await cls.broadcastSeasonChange()
+
+    @classmethod
+    async def broadcastSeasonChange(cls):
+        """
+        广播赛季切换信息
+        """
+        await GameConsumer.broadcast(EmitType.SeasonSwitch,
+                               {'season_id': cls.CurrentSeason.id})
 
 
 RuntimeManager.registerEvent(SeasonManager.maintainSeason)

@@ -58,7 +58,7 @@ namespace StatusScene {
             void drawPlayerBust(Player player) {
                 var character = player.character();
                 var bust = character.bust;
-                var rect = new Rect(0, 0, bust.width, bust.height);
+                var rect = new Rect(0, 0, bust.width, Character.BustHeight);
                 this.bust.gameObject.SetActive(true);
                 this.bust.overrideSprite = Sprite.Create(
                     bust, rect, new Vector2(0.5f, 0.5f));
