@@ -13,8 +13,10 @@ public class TextInputField : BaseInputField<string> {
     /// 外部组件设置
     /// </summary>
     public InputField inputField;
-    public Text content, placeholder;
 
+    //public Text content, placeholder;
+    //调用InputField的属性就可以，不需要额外声明
+    
     #region 初始化
 
     /// <summary>

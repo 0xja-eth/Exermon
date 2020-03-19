@@ -15,7 +15,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// </summary>
     const string Register = "注册";
     const string Login = "登陆";
-    const string Forget = "重置密码";
+    const string Retrieve = "找回密码";
     const string Code = "发送验证码";
     const string Logout = "登出";
 
@@ -32,7 +32,7 @@ public class PlayerService : BaseService<PlayerService> {
     /// 业务操作
     /// </summary>
     public enum Oper {
-        Register, Login, Forget, Code, Logout,
+        Register, Login, Retrieve, Code, Logout,
         GetBasic,
         CreateCharacter, CreateExermons, CreateGifts, CreateInfo,
         EquipSlotEquip,
@@ -88,7 +88,7 @@ public class PlayerService : BaseService<PlayerService> {
         base.initializeOperDict();
         addOperDict(Oper.Register, Register, NetworkSystem.Interfaces.PlayerRegister);
         addOperDict(Oper.Login, Login, NetworkSystem.Interfaces.PlayerLogin);
-        addOperDict(Oper.Forget, Forget, NetworkSystem.Interfaces.PlayerForget);
+        addOperDict(Oper.Retrieve, Retrieve, NetworkSystem.Interfaces.PlayerRetrieve);
         addOperDict(Oper.Code, Code, NetworkSystem.Interfaces.PlayerCode);
         addOperDict(Oper.Logout, Logout, NetworkSystem.Interfaces.PlayerLogout);
 
@@ -176,14 +176,14 @@ public class PlayerService : BaseService<PlayerService> {
     /// <param name="code">验证码</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void forget(string un, string pw, string email, string code,
+    public void retrieve(string un, string pw, string email, string code,
         NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
         JsonData data = new JsonData();
         data["un"] = un; data["pw"] = pw;
         data["email"] = email; data["code"] = code;
 
-        sendRequest(Oper.Forget, data, onSuccess, onError);
+        sendRequest(Oper.Retrieve, data, onSuccess, onError);
     }
 
     /// <summary>
