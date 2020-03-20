@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Client/Exermon/Assets/Resources/Item/Icon/ExerEquip_4.png.meta
-guid: 0ec25668b87db2c49a491d09d632d389
-=======
-guid: f5ca057e2b85b514fb3229190ef365fd
->>>>>>> origin/zbt:Client/Exermon/Assets/Sprites/MainScene/MenuButtons/Status.png.meta
+guid: 4a8d28d09f6a5574483d3442d284154b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

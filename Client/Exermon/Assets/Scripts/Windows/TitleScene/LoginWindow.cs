@@ -52,7 +52,7 @@ public class LoginWindow : BaseWindow {
     /// <summary>ck
     /// 界面类型
     /// </summary>
-    private Type _type = Type.Welcome;
+    private Type _type = Type.Login;
     public Type type {
         get { return _type; }
         set {
@@ -82,7 +82,6 @@ public class LoginWindow : BaseWindow {
         base.initializeOnce();
         scene = (TitleScene)SceneUtils.getSceneObject("Scene");
         state = State.Shown;
-        _type = Type.Login;
         initializeInputItemFields();
         setupInputItemFields();
     }

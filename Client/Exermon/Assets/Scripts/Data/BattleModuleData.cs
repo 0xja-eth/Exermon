@@ -52,7 +52,7 @@ public class BattleItemSlotItem : SlotContItem<HumanPackItem> {
         get { return packItem; }
         protected set { packItem = value; }
     }
-
+    
     /// <summary>
     /// 获取装备类型
     /// </summary>
