@@ -49,7 +49,7 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     private TextInputField loginUsernameInput, loginPasswordInput, usernameInput, emailInput, passwordInput, codeInput;
 
-    /// <summary>
+    /// <summary>ck
     /// 界面类型
     /// </summary>
     private Type _type = Type.Welcome;
