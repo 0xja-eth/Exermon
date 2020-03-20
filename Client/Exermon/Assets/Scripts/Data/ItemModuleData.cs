@@ -187,6 +187,12 @@ public class EquipableItem : LimitedItem {
     /// </summary>
     [AutoConvert("params")]
     public ParamData[] params_ { get; protected set; }
+    [AutoConvert]
+    public int minLevel { get; protected set; }
+    [AutoConvert]
+    public int paramType { get; protected set; }
+    [AutoConvert]
+    public int paramRate { get; protected set; }
 
     /// <summary>
     /// 获取装备的属性

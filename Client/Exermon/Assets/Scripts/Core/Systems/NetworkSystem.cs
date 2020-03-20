@@ -75,7 +75,20 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
         public const string RecordExerciseAnswer = "record/exercise/answer";
 
         public const string QuestionGet = "question/question/get";
+        public const string QuestionReportGet = "question/report/get";
+        public const string QuestionReportPush = "question/report/push";
 
+        public const string SeasonRecordGet = "season/record/get";
+
+        public const string BattleEquipItem = "battle/equip/item";
+        public const string BattleDequipItem = "battle/dequip/item";
+        public const string BattleMatchStart = "battle/match/start";
+        public const string BattleMatchCancel = "battle/match/cancel";
+        public const string BattleMatchProgress = "battle/match/progress";
+        public const string BattlePrepareComplete = "battle/prepare/complete";
+        public const string BattleQuestionAnswer = "battle/question/answer";
+        public const string BattleActionComplete = "battle/action/complete";
+        public const string BattleResultComplete = "battle/result/complete";
     }
 
     /// <summary>

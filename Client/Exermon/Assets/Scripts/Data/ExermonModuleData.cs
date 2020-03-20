@@ -1,13 +1,9 @@
 ﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
 using LitJson;
-using UnityEditor;
 using System.Linq;
 
 #region 物品
@@ -177,10 +173,10 @@ public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
     /// </summary>
     /// <param name="paramId">属性ID</param>
     /// <returns>属性数据</returns>
-    public ParamData paramRate(int paramId) {
+    public ParamRateData paramRate(int paramId) {
         foreach (var param in rateParams)
             if (param.paramId == paramId) return param;
-        return new ParamData(paramId);
+        return new ParamRateData(paramId);
     }
 
     #endregion
@@ -567,7 +563,7 @@ public class PlayerExermon : PackContItem<Exermon>,
     public ExerSkillSlot exerSkillSlot { get; protected set; } = new ExerSkillSlot();
 
     [AutoConvert]
-    public ParamRateData[] paramValues { get; protected set; }
+    public ParamData[] paramValues { get; protected set; }
     [AutoConvert]
     public ParamRateData[] rateParams { get; protected set; }
     
@@ -742,7 +738,7 @@ public class PlayerExermon : PackContItem<Exermon>,
     /// </summary>
     /// <param name="paramId">属性ID</param>
     /// <returns>属性数据</returns>
-    public ParamData paramRate(int paramId) {
+    public ParamRateData paramRate(int paramId) {
         return exermon().paramRate(paramId);
     }
 
@@ -835,7 +831,7 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
     public ExerEquipSlot exerEquipSlot { get; protected set; }
 
     [AutoConvert]
-    public ParamRateData[] paramValues { get; protected set; }
+    public ParamData[] paramValues { get; protected set; }
     [AutoConvert]
     public ParamRateData[] rateParams { get; protected set; }
 
@@ -1134,9 +1130,9 @@ public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
     /// </summary>
     /// <param name="paramId">属性ID</param>
     /// <returns>属性数据</returns>
-    public ParamData paramRate(int paramId) {
+    public ParamRateData paramRate(int paramId) {
         var value = CalcService.ExerSlotItemParamRateCalc.calc(this, paramId);
-        return new ParamData(paramId, value);
+        return new ParamRateData(paramId, value);
     }
 
     /// <summary>
@@ -1500,11 +1496,11 @@ public class ExerEquipSlot : SlotContainer<ExerEquipSlotItem> {
     }
 
     /// <summary>
-    /// 通过装备物品获取槽ID
+    /// 通过装备物品获取槽项
     /// </summary>
     /// <typeparam name="E">装备物品类型</typeparam>
     /// <param name="equipItem">装备物品</param>
-    /// <returns>槽ID</returns>
+    /// <returns>槽项</returns>
     public override ExerEquipSlotItem getSlotItemByEquipItem<E>(E equipItem) {
         var et = typeof(E); var pet = typeof(ExerPackEquip);
         if (et == pet || pet.IsSubclassOf(et)) {
@@ -1556,13 +1552,13 @@ public class ExerEquipSlot : SlotContainer<ExerEquipSlotItem> {
 /// 艾瑟萌装备槽
 /// </summary>
 public class ExerSkillSlot : SlotContainer<ExerSkillSlotItem> {
-    
+
     /// <summary>
-    /// 通过装备物品获取槽ID
+    /// 通过装备物品获取槽项
     /// </summary>
     /// <typeparam name="E">装备物品类型</typeparam>
     /// <param name="equipItem">装备物品</param>
-    /// <returns>槽ID</returns>
+    /// <returns>槽项</returns>
     public override ExerSkillSlotItem getSlotItemByEquipItem<E>(E equipItem) {
         return null;
     }

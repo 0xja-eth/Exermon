@@ -36,27 +36,6 @@ public class QuestionService : BaseService<QuestionService> {
         public void addQuestions(Question[] questions) {
             this.questions.AddRange(questions);
         }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json"></param>
-        public override void load(JsonData json) {
-            base.load(json);
-            questions = DataLoader.loadDataList<Question>(json, "questions");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["questions"] = DataLoader.convertDataArray(questions);
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -106,7 +85,7 @@ public class QuestionService : BaseService<QuestionService> {
     /// </summary>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void get(int[] qids, UnityAction onSuccess, UnityAction onError = null) {
+    public void get(int[] qids, UnityAction onSuccess = null, UnityAction onError = null) {
 
         NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
             var questions = DataLoader.load<Question[]>(res, "questions");
@@ -161,12 +140,12 @@ public class QuestionService : BaseService<QuestionService> {
     #region 题目操作
 
     /// <summary>
-    /// 读取题目（存入缓存）
+    /// 读取题目（先判断缓存）
     /// </summary>
     /// <param name="qids">题目ID集</param>
     /// <param name="onSuccess">成功回调</param>
     /// <param name="onError">失败回调</param>
-    public void loadQuestions(int[] qids, UnityAction onSuccess, UnityAction onError = null) {
+    public void loadQuestions(int[] qids, UnityAction onSuccess = null, UnityAction onError = null) {
         var cnt = qids.Length;
         var reqIds = new List<int>(); // 需要请求的题目ID数组
         for (int i = 0; i < cnt; ++i)

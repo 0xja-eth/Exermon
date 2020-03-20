@@ -438,9 +438,12 @@ class Player(CacheableModel):
 
 		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
 
+		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+
 		return {
 			'exer_slot': exerslot,
 			'human_equip_slot': humanequipslot,
+			'battle_item_slot': battle_item_slot,
 		}
 
 	# 对战信息
@@ -579,11 +582,13 @@ class Player(CacheableModel):
 			rank, sub_rank = season_record.rank()
 
 			exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
+			battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
 
 			base["rank_id"] = rank.id
 			base['sub_rank'] = sub_rank
 			base['star_num'] = season_record.star_num
 			base['exer_slot'] = exer_slot
+			base['battle_item_slot'] = battle_item_slot
 
 			return base
 

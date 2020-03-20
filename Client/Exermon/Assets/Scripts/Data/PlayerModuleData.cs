@@ -118,7 +118,9 @@ public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
         public ExerSlot exerSlot { get; protected set; } = new ExerSlot();
         [AutoConvert]
         public HumanEquipSlot humanEquipSlot { get; protected set; } = new HumanEquipSlot();
-        
+        [AutoConvert]
+        public BattleItemSlot battleItemSlot { get; protected set; } = new BattleItemSlot();
+
     }
 
     /// <summary>
@@ -661,11 +663,11 @@ public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
     }
 
     /// <summary>
-    /// 通过装备物品获取槽ID
+    /// 通过装备物品获取槽项
     /// </summary>
     /// <typeparam name="E">装备物品类型</typeparam>
     /// <param name="equipItem">装备物品</param>
-    /// <returns>槽ID</returns>
+    /// <returns>槽项</returns>
     public override HumanEquipSlotItem getSlotItemByEquipItem<E>(E equipItem) {
         if (typeof(E) == typeof(HumanPackEquip)) {
             var eType = ((HumanPackEquip)(object)equipItem).equip().eType;

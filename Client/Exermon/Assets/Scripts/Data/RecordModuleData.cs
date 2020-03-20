@@ -89,54 +89,6 @@ public class QuestionRecord : BaseData {
     public QuestionRecord(int qid) {
         questionId = qid;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        questionId = DataLoader.loadInt(json, "question_id");
-        count = DataLoader.loadInt(json, "count");
-        correct = DataLoader.loadInt(json, "correct");
-        firstDate = DataLoader.loadDateTime(json, "first_date");
-        lastDate = DataLoader.loadDateTime(json, "last_date");
-        firstTime = DataLoader.loadInt(json, "first_time");
-        avgTime = DataLoader.loadDouble(json, "avg_time");
-        corrTime = DataLoader.loadDouble(json, "corr_time");
-        sumExp = DataLoader.loadInt(json, "sum_exp");
-        sumGold = DataLoader.loadInt(json, "sum_gold");
-        source = DataLoader.loadInt(json, "source");
-        collected = DataLoader.loadBool(json, "collected");
-        wrong = DataLoader.loadBool(json, "wrong");
-        note = DataLoader.loadString(json, "note");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["question_id"] = questionId;
-        json["count"] = count;
-        json["correct"] = correct;
-        json["first_date"] = DataLoader.convertDateTime(firstDate);
-        json["last_date"] = DataLoader.convertDateTime(lastDate);
-        json["first_time"] = firstTime;
-        json["avg_time"] = avgTime;
-        json["corr_time"] = corrTime;
-        json["sum_exp"] = sumExp;
-        json["sum_gold"] = sumGold;
-        json["source"] = source;
-        json["collected"] = collected;
-        json["wrong"] = wrong;
-        json["note"] = note;
-
-        return json;
-    }*/
 }
 
 /// <summary>
@@ -166,42 +118,6 @@ public class QuestionSetRecord : BaseData {
         public int goldIncr { get; protected set; }
         [AutoConvert]
         public bool isNew { get; protected set; }
-
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            questionId = DataLoader.loadInt(json, "question_id");
-            selection = DataLoader.loadIntArray(json, "selection");
-            timespan = DataLoader.loadInt(json, "timespan");
-            expIncr = DataLoader.loadInt(json, "exp_incr");
-            slotExpIncr = DataLoader.loadInt(json, "slot_exp_incr");
-            goldIncr = DataLoader.loadInt(json, "gold_incr");
-            isNew = DataLoader.loadBool(json, "is_new");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["question_id"] = questionId;
-
-            json["selection"] = DataLoader.convert(selection);
-            json["timespan"] = timespan;
-            json["exp_incr"] = expIncr;
-            json["slot_exp_incr"] = slotExpIncr;
-            json["gold_incr"] = goldIncr;
-            json["is_new"] = isNew;
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -235,32 +151,6 @@ public class QuestionSetRecord : BaseData {
             var type = Type.GetType(name);
             return (BaseItem)DataService.get().get(type, itemId);
         }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-
-            type = DataLoader.loadInt(json, "type");
-            itemId = DataLoader.loadInt(json, "item_id");
-            count = DataLoader.loadInt(json, "count");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-
-            json["type"] = type;
-            json["item_id"] = itemId;
-            json["count"] = count;
-
-            return json;
-        }*/
     }
 
     /// <summary>
@@ -299,55 +189,12 @@ public class QuestionSetRecord : BaseData {
             ids[i] = questions[i].questionId;
         return ids;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        name = DataLoader.loadString(json, "name");
-        seasonId = DataLoader.loadInt(json, "season_id");
-        expIncr = DataLoader.loadInt(json, "exp_incr");
-        slotExpIncr = DataLoader.loadInt(json, "slot_exp_incr");
-        goldIncr = DataLoader.loadInt(json, "gold_incr");
-
-        finished = DataLoader.loadBool(json, "finished");
-
-        createTime = DataLoader.loadDateTime(json, "create_time");
-
-        questions = DataLoader.loadDataArray<PlayerQuestion>(json, "questions");
-        rewards = DataLoader.loadDataArray<Reward>(json, "rewards");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["name"] = name;
-        json["season_id"] = seasonId;
-        json["exp_incr"] = expIncr;
-        json["slot_exp_incr"] = slotExpIncr;
-        json["gold_incr"] = goldIncr;
-        json["finished"] = finished;
-
-        json["create_time"] = DataLoader.convertDateTime(createTime);
-
-        json["questions"] = DataLoader.convertDataArray(questions);
-        json["rewards"] = DataLoader.convertDataArray(rewards);
-
-        return json;
-    }*/
 }
 
 /// <summary>
 /// 刷题记录数据
 /// </summary>
-public class ExerciseRecord : BaseData {
+public class ExerciseRecord : QuestionSetRecord {
 
     /// <summary>
     /// 属性
@@ -374,30 +221,4 @@ public class ExerciseRecord : BaseData {
     public string genTypeText() {
         return DataService.get().exerciseGenType(genType).Item2;
     }
-    /*
-    /// <summary>
-    /// 数据加载
-    /// </summary>
-    /// <param name="json">数据</param>
-    public override void load(JsonData json) {
-        base.load(json);
-
-        subjectId = DataLoader.loadInt(json, "subject_id");
-        genType = DataLoader.loadInt(json, "gen_type");
-        count = DataLoader.loadInt(json, "count");
-    }
-
-    /// <summary>
-    /// 获取JSON数据
-    /// </summary>
-    /// <returns>JsonData</returns>
-    public override JsonData toJson() {
-        var json = base.toJson();
-
-        json["subject_id"] = subjectId;
-        json["gen_type"] = genType;
-        json["count"] = count;
-
-        return json;
-    }*/
 }

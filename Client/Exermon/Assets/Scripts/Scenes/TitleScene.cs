@@ -33,7 +33,6 @@ public class TitleScene : BaseScene {
     /// <summary>
     /// 内部系统声明
     /// </summary>
-    GameSystem gameSys;
     ExermonGameSystem exermonSys;
 
     #region 初始化
@@ -51,7 +50,6 @@ public class TitleScene : BaseScene {
     /// </summary>
     protected override void initializeSystems() {
         base.initializeSystems();
-        gameSys = GameSystem.get();
         exermonSys = ExermonGameSystem.get();
 
         gameSys.start();

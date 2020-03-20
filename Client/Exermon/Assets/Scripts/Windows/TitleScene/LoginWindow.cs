@@ -87,13 +87,20 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     protected override void initializeOnce() {
         base.initializeOnce();
-        if (gameSys == null) gameSys = GameSystem.get();
-        if (exermonSys == null) exermonSys = ExermonGameSystem.get();
-        if (playerSer == null) playerSer = PlayerService.get();
         scene = (TitleScene)SceneUtils.getSceneObject("Scene");
         initializeInputItemFields();
         initializeForgetBtnText();
         setupInputItemFields();
+    }
+
+    /// <summary>
+    /// 初始化外部系统
+    /// </summary>
+    protected override void initializeSystems() {
+        base.initializeSystems();
+        gameSys = GameSystem.get();
+        exermonSys = ExermonGameSystem.get();
+        playerSer = PlayerService.get();
     }
 
     /// <summary>

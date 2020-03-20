@@ -194,7 +194,7 @@ class RuntimeBattleItem:
 			返回转化后的字典
 		"""
 		return {
-			'index': self.slot_item.index,
+			'id': self.slot_item.index,
 			'freeze_round': self.freeze_round
 		}
 
@@ -292,7 +292,7 @@ class RuntimeBattleExerSkill:
 			返回转化后的字典
 		"""
 		return {
-			'index': self.skill_item.index,
+			'id': self.skill_item.index,
 			'use_count': self.use_count,
 			'freeze_round': self.freeze_round
 		}
@@ -445,6 +445,7 @@ class RuntimeBattleExermon:
 		skills = ModelUtils.objectsToDict(self.skills)
 
 		return {
+			'subject_id': self.subject.id,
 			'mp': self.mp,
 			'params': params,
 			'buffs': buffs,

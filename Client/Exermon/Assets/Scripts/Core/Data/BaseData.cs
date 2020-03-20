@@ -304,6 +304,7 @@ public class ParamData : BaseData {
     public void timesValue(double val) {
         value *= val;
     }
+
     public static ParamData operator *(ParamData a, ParamData b) {
         var res = new ParamData(a.paramId, a.value);
         res.timesValue(b.value);
@@ -363,6 +364,29 @@ public class ParamData : BaseData {
     }
     public static bool operator <=(ParamData a, double b) {
         return a.value <= b;
+    }
+
+    /// <summary>
+    /// 判断相等
+    /// </summary>
+    /// <param name="obj">对象</param>
+    /// <returns>返回是否相等</returns>
+    public override bool Equals(object obj) {
+        var data = obj as ParamData;
+        return data != null &&
+               paramId == data.paramId &&
+               value == data.value;
+    }
+
+    /// <summary>
+    /// 生成哈希码
+    /// </summary>
+    /// <returns>返回哈希码</returns>
+    public override int GetHashCode() {
+        var hashCode = 574597825;
+        hashCode = hashCode * -1521134295 + paramId.GetHashCode();
+        hashCode = hashCode * -1521134295 + value.GetHashCode();
+        return hashCode;
     }
 
     #endregion
