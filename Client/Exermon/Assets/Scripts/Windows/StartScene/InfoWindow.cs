@@ -7,10 +7,15 @@ using UnityEngine.Events;
 
 using LitJson;
 
-/// <summary>
-/// 开始场景
-/// </summary>
-namespace StartScene {
+using Core.Systems;
+using Core.UI;
+using Core.UI.Utils;
+
+using PlayerModule.Services;
+
+using UI.Common.Controls.InputFields;
+
+namespace UI.StartScene.Windows {
 
     /// <summary>
     /// 补全信息窗口

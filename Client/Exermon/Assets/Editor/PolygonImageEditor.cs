@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor.UI;
 using UnityEditor;
-using System.Collections;
 using UnityEditorInternal;
+
+using UI.Common.Controls.RadarDisplay;
 
 [CustomEditor(typeof(PolygonImage))]
 [CanEditMultipleObjects]

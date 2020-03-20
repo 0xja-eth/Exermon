@@ -1,9 +1,18 @@
 ﻿using System.Collections.Generic;
 
-/// <summary>
-/// 开始场景
-/// </summary>
-namespace StartScene {
+using Core.Systems;
+using Core.UI;
+using Core.UI.Utils;
+
+using GameModule.Services;
+using PlayerModule.Services;
+
+using ExermonModule.Data;
+
+using UI.Common.Windows;
+using UI.StartScene.Controls.Exermon;
+
+namespace UI.StartScene.Windows {
 
     /// <summary>
     /// 选择艾瑟萌窗口
@@ -44,11 +53,18 @@ namespace StartScene {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (gameSys == null) gameSys = GameSystem.get();
-            if (playerSer == null) playerSer = PlayerService.get();
-            if (dataSer == null) dataSer = DataService.get();
             scene = (StartScene)SceneUtils.getSceneObject("Scene");
             configureSubViews();
+        }
+
+        /// <summary>
+        /// 初始化系统/服务
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            gameSys = GameSystem.get();
+            playerSer = PlayerService.get();
+            dataSer = DataService.get();
         }
 
         /// <summary>

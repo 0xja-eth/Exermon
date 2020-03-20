@@ -7,10 +7,20 @@ using UnityEngine.Events;
 
 using LitJson;
 
-/// <summary>
-/// 开始场景
-/// </summary>
-namespace StartScene {
+using Core.Systems;
+using Core.UI;
+using Core.UI.Utils;
+
+using ExermonModule.Data;
+
+using GameModule.Services;
+using PlayerModule.Services;
+
+using UI.Common.Windows;
+
+using UI.StartScene.Controls.ExerGift;
+
+namespace UI.StartScene.Windows {
 
     /// <summary>
     /// 选择天赋窗口

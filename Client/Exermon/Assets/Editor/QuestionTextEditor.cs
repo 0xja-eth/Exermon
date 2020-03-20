@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEngine.UI;
 using UnityEditor.UI;
 
+using UI.Common.Controls.SystemExtend.QuestionText;
+
 [CustomEditor(typeof(QuestionText), true)]
 [CanEditMultipleObjects]
 public class QuestionTextEditor : UnityEditor.UI.TextEditor {
