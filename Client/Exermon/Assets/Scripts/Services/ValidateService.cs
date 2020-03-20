@@ -35,12 +35,12 @@ public class ValidateService : BaseService<ValidateService> {
     /// <summary>
     /// 提示文本设定
     /// </summary>
-    public const string UsernameTips = "用户名由6~16个英文字母或数字组成";
-    public const string PasswordTips = "密码由8~24个非中文字符组成";
+    public const string UsernameTips = "请输入6~16个英文字母或数字";
+    public const string PasswordTips = "请输入8~24个非中文字符";
     public const string PhoneTips = "请按正确的电话号码格式输入";
-    public const string EmailTips = "请按正确的邮箱格式输入";
+    public const string EmailTips = "请输入有效邮箱格式";
 
-    public const string CodeTips = "请输入收到的6位数字验证码";
+    public const string CodeTips = "请输入6位数字";
 
     public const string NameTips = "昵称由1~8个任意字符组成";
     public const string ExerNameTips = "艾瑟萌昵称由1~8个任意字符组成";

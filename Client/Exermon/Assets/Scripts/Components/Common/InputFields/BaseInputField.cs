@@ -18,8 +18,8 @@ public class BaseInputField<T> : BaseView {
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public Text explainer; // 错误提示
-    public GameObject correct, wrong; // 图标提示
+    public Text explainer; // 文本提示
+    public GameObject correct, wrong, attention; // 图标提示
     public GameObject current; // 当前箭头
     public Image inputBackground; // 输入背景
 

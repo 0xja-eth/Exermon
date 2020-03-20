@@ -33,7 +33,7 @@ public class NetworkSystem : BaseSystem<NetworkSystem> {
 
         public const string PlayerRegister = "player/player/register";
         public const string PlayerLogin = "player/player/login";
-        public const string PlayerForget = "player/player/forget";
+        public const string PlayerRetrieve = "player/player/retrieve";
         public const string PlayerCode = "player/player/code";
 
         public const string PlayerLogout = "player/player/logout";

@@ -19,44 +19,37 @@ public class LoginWindow : BaseWindow {
         Welcome, // 欢迎界面
         Login, // 登陆界面
         Register, // 注册界面
-        Forget // 忘记密码界面
+        Retrieve // 找回密码界面
     }
+   
+
 
     /// <summary>
-    /// 文本常量定义
+    /// 提示框内容
     /// </summary>
-    const string WelcomeTitle = "点击进入";
-    const string LoginTitle = "登陆";
-    const string RegisterTitle = "注册";
-    const string ForgetTitle = "重置密码";
-
-    const string DefaultPasswordPlaceholder = "请输入密码"; // 默认密码输入占位符
-    const string ForgetPasswordPlaceholder = "请输入新密码"; // 忘记密码时密码输入占位符
-
-    const string ForgetEntryBtnText = "忘记密码"; // 登陆界面中忘记密码按钮文本
-    const string ForgetConfirmBtnText = "重置密码"; // 重置密码界面中的确认按钮文本
+    const string IncorrectUsernameOrPassword = "用户名或密码错误";//
+  
 
     const string InvalidInputAlertText = "请检查输入格式正确后再提交！";
 
     const string RegisterSuccessText = "注册用户成功！你的幸运号码是 {0} ！";
-    const string ForgetSuccessText = "密码已重置！请返回登录！";
+    const string RetrieveSuccessText = "密码已重置！请返回登录！";
     const string SendCodeSuccessText = "验证码发送成功！请留意你的邮箱！";
 
     /// <summary>
     /// 外部组件设置
     /// </summary>
-    public Text typeText; // 类型名称显示
-    public Button menuBtn; // 中间按钮
-    public GameObject username, email, password, code;
-    public GameObject loginBtn, registerBtn, forgetBtn, backBtn;
-
+    public GameObject loginUsername, loginPassword;
+    public GameObject registerRetrieveUsername, registerRetrievePassword, registerRetrieveEmail, registerRetrieveCode;
+    public Button loginBtn, registerBtn, retrieveBtn, finishBtn;//功能按钮
+    public GameObject registerPattern, retrievePattern;//界面花纹
+    public GameObject loginWindow, registerRetrieveWindow, chooseWindow, buttons;//界面
     /// <summary>
     /// 内部组件声明
     /// </summary>
-    TextInputField usernameInput, emailInput, passwordInput, codeInput;
-    Text forgetBtnText;
+    private TextInputField loginUsernameInput, loginPasswordInput, usernameInput, emailInput, passwordInput, codeInput;
 
-    /// <summary>
+    /// <summary>ck
     /// 界面类型
     /// </summary>
     private Type _type = Type.Welcome;
@@ -88,8 +81,9 @@ public class LoginWindow : BaseWindow {
     protected override void initializeOnce() {
         base.initializeOnce();
         scene = (TitleScene)SceneUtils.getSceneObject("Scene");
+        state = State.Shown;
+        _type = Type.Login;
         initializeInputItemFields();
-        initializeForgetBtnText();
         setupInputItemFields();
     }
 
@@ -104,26 +98,28 @@ public class LoginWindow : BaseWindow {
     }
 
     /// <summary>
-    /// 初始化忘记密码按钮文本
-    /// </summary>
-    void initializeForgetBtnText() {
-        if (forgetBtn) forgetBtnText = SceneUtils.find<Text>(forgetBtn, "Text");
-    }
-
-    /// <summary>
     /// 初始化输入域
     /// </summary>
     void initializeInputItemFields() {
-        if (username) usernameInput = SceneUtils.find<TextInputField>(username, "InputField");
-        if (password) passwordInput = SceneUtils.find<TextInputField>(password, "InputField");
-        if (email) emailInput = SceneUtils.find<TextInputField>(email, "InputField");
-        if (code) codeInput = SceneUtils.find<TextInputField>(code, "InputField");
+        //登录输入域
+        if (loginUsername) loginUsernameInput = SceneUtils.get<TextInputField>(loginUsername);
+        if (loginPassword) loginPasswordInput = SceneUtils.get<TextInputField>(loginPassword);
+
+        //注册和找回输入域
+        if (registerRetrieveUsername) usernameInput = SceneUtils.get<TextInputField>(registerRetrieveUsername);
+        if (registerRetrievePassword) passwordInput = SceneUtils.get<TextInputField>(registerRetrievePassword);
+        if (registerRetrieveEmail) emailInput = SceneUtils.get<TextInputField>(registerRetrieveEmail);
+        if (registerRetrieveCode) codeInput = SceneUtils.get<TextInputField>(registerRetrieveCode);
     }
 
     /// <summary>
     /// 配置输入域
     /// </summary>
     void setupInputItemFields() {
+        /*
+        if (loginUsernameInput) loginUsernameInput.check = ValidateService.checkUsername;
+        if (loginPasswordInput) loginPasswordInput.check = ValidateService.checkPassword;
+        */
         if (usernameInput) usernameInput.check = ValidateService.checkUsername;
         if (passwordInput) passwordInput.check = ValidateService.checkPassword;
         if (emailInput) emailInput.check = ValidateService.checkEmail;
@@ -146,7 +142,7 @@ public class LoginWindow : BaseWindow {
     /// 更新类型变换
     /// </summary>
     void updateType() {
-
+        
     }
 
     #endregion
@@ -158,7 +154,6 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     public void gotoLogin() {
         type = Type.Login;
-        menuBtn.interactable = false;
         scene.rotatable = false;
     }
 
@@ -170,10 +165,10 @@ public class LoginWindow : BaseWindow {
     }
 
     /// <summary>
-    /// 进入忘记密码界面
+    /// 进入找回密码界面
     /// </summary>
-    public void gotoForget() {
-        type = Type.Forget;
+    public void gotoRetrieve() {
+        type = Type.Retrieve;
     }
 
     /// <summary>
@@ -189,17 +184,15 @@ public class LoginWindow : BaseWindow {
     /// 注册
     /// </summary>
     public void register() {
-        if (type != Type.Register) gotoRegister();
-        else if (checkRegisterOrForget()) doRegister();
+        if (checkRegisterOrRetrieve()) doRegister();
         else onCheckFailed();
     }
 
     /// <summary>
-    /// 忘记密码
+    /// 找回密码
     /// </summary>
-    public void forget() {
-        if (type != Type.Forget) gotoForget();
-        else if (checkRegisterOrForget()) doForget();
+    public void retrieve() {
+        if (checkRegisterOrRetrieve()) doRetrieve();
         else onCheckFailed();
     }
 
@@ -222,8 +215,8 @@ public class LoginWindow : BaseWindow {
     /// 执行登陆
     /// </summary>
     void doLogin() {
-        var un = usernameInput.getValue();
-        var pw = passwordInput.getValue();
+        var un = loginUsernameInput.getValue();
+        var pw = loginPasswordInput.getValue();
 
         playerSer.login(un, pw, onLoginSuccess);
     }
@@ -241,15 +234,15 @@ public class LoginWindow : BaseWindow {
     }
 
     /// <summary>
-    /// 执行重置密码
+    /// 执行找回密码
     /// </summary>
-    void doForget() {
+    void doRetrieve() {
         var un = usernameInput.getValue();
         var pw = passwordInput.getValue();
         var email = emailInput.getValue();
         var code = codeInput.getValue();
 
-        playerSer.forget(un, pw, email, code, onRegisterSuccess);
+        playerSer.retrieve(un, pw, email, code, onRegisterSuccess);
     }
 
     /// <summary>
@@ -260,7 +253,7 @@ public class LoginWindow : BaseWindow {
         var email = emailInput.getValue();
         var type = "";
         if (this.type == Type.Register) type = "register";
-        if (this.type == Type.Forget) type = "forget";
+        if (this.type == Type.Retrieve) type = "retrieve";
         playerSer.sendCode(un, email, type, onSendSuccess);
     }
 
@@ -289,8 +282,8 @@ public class LoginWindow : BaseWindow {
     /// 重置密码成功回调
     /// </summary>
     /// <param name="res">返回结果</param>
-    void onForgetSuccess(JsonData res) {
-        gameSys.requestAlert(ForgetSuccessText);
+    void onRetrieveSuccess(JsonData res) {
+        gameSys.requestAlert(RetrieveSuccessText);
         gotoLogin();
     }
 
@@ -321,7 +314,7 @@ public class LoginWindow : BaseWindow {
     /// <summary>
     /// 检查是否可以注册/忘记密码
     /// </summary>
-    bool checkRegisterOrForget() {
+    bool checkRegisterOrRetrieve() {
         return usernameInput.isCorrect() && passwordInput.isCorrect() &&
             emailInput.isCorrect() && codeInput.isCorrect();
     }
@@ -337,11 +330,12 @@ public class LoginWindow : BaseWindow {
     /// </summary>
     protected override void refresh() {
         base.refresh();
-        switch(type) {
+        clearAllInputFields();
+        switch (type) {
             case Type.Welcome: refreshWelcome(); break;
             case Type.Login: refreshLogin(); break;
             case Type.Register: refreshRegister(); break;
-            case Type.Forget: refreshForget(); break;
+            case Type.Retrieve: refreshRetrieve(); break;
         }
     }
 
@@ -349,17 +343,15 @@ public class LoginWindow : BaseWindow {
     /// 欢迎界面
     /// </summary>
     void refreshWelcome() {
-        typeText.text = WelcomeTitle;
     }
 
     /// <summary>
     /// 登陆界面
     /// </summary>
     void refreshLogin() {
-        typeText.text = LoginTitle;
-        passwordInput.placeholder.text = DefaultPasswordPlaceholder;
+        loginWindow.SetActive(true);
         showLoginInputFields();
-        showLoginButtons();
+        showAllButtons();
         autoComplete();
     }
 
@@ -367,20 +359,28 @@ public class LoginWindow : BaseWindow {
     /// 注册界面
     /// </summary>
     void refreshRegister() {
-        typeText.text = RegisterTitle;
-        passwordInput.placeholder.text = DefaultPasswordPlaceholder;
-        showAllInputFields();
-        showRegisterButtons();
+        registerRetrieveWindow.SetActive(true);
+        registerPattern.SetActive(true);
+
+        showRegisterRetrieveInputFields();
+
+        finishBtn.onClick.RemoveAllListeners();
+        finishBtn.onClick.AddListener(register);
+
     }
 
     /// <summary>
-    /// 忘记密码界面
+    /// 找回界面
     /// </summary>
-    void refreshForget() {
-        typeText.text = ForgetTitle;
-        passwordInput.placeholder.text = ForgetPasswordPlaceholder;
-        showAllInputFields();
-        showForgetButtons();
+    void refreshRetrieve() {
+        registerRetrieveWindow.SetActive(true);
+        retrievePattern.SetActive(true);
+
+        showRegisterRetrieveInputFields();
+
+        finishBtn.onClick.RemoveAllListeners();
+        finishBtn.onClick.AddListener(retrieve);
+
     }
 
     #region 输入域控制
@@ -389,22 +389,16 @@ public class LoginWindow : BaseWindow {
     /// 显示登陆输入域
     /// </summary>
     void showLoginInputFields() {
-        username.SetActive(true);
-        password.SetActive(true);
-
-        usernameInput.startView();
-        passwordInput.startView();
+        loginUsernameInput.startView();
+        loginPasswordInput.startView();
     }
 
     /// <summary>
-    /// 显示所有的输入域
+    /// 显示注册和找回的输入域
     /// </summary>
-    void showAllInputFields() {
-        showLoginInputFields();
-
-        email.SetActive(true);
-        code.SetActive(true);
-
+    void showRegisterRetrieveInputFields() {
+        usernameInput.startView();
+        passwordInput.startView();
         emailInput.startView();
         codeInput.startView();
     }
@@ -413,15 +407,19 @@ public class LoginWindow : BaseWindow {
     /// 清除所有输入域
     /// </summary>
     void clearAllInputFields() {
+        loginUsernameInput.terminateView();
+        loginPasswordInput.terminateView();
+
         usernameInput.terminateView();
         passwordInput.terminateView();
         emailInput.terminateView();
         codeInput.terminateView();
 
-        username.SetActive(false);
-        password.SetActive(false);
-        email.SetActive(false);
-        code.SetActive(false);
+        retrievePattern.SetActive(false);
+        registerPattern.SetActive(false);
+
+        loginWindow.SetActive(false);
+        registerRetrieveWindow.SetActive(false);
     }
 
     #endregion
@@ -431,38 +429,16 @@ public class LoginWindow : BaseWindow {
     /// <summary>
     /// 显示登陆按钮
     /// </summary>
-    void showLoginButtons() {
-        loginBtn.SetActive(true);
-        registerBtn.SetActive(true);
-        forgetBtn.SetActive(true);
-        forgetBtnText.text = ForgetEntryBtnText;
-    }
-
-    /// <summary>
-    /// 显示注册按钮
-    /// </summary>
-    void showRegisterButtons() {
-        registerBtn.SetActive(true);
-        backBtn.SetActive(true);
-    }
-
-    /// <summary>
-    /// 显示忘记密码按钮
-    /// </summary>
-    void showForgetButtons() {
-        forgetBtn.SetActive(true);
-        backBtn.SetActive(true);
-        forgetBtnText.text = ForgetConfirmBtnText;
+    void showAllButtons() {
+        buttons.SetActive(true);
+       
     }
 
     /// <summary>
     /// 清除所有按钮
     /// </summary>
     void clearAllButtons() {
-        loginBtn.SetActive(false);
-        registerBtn.SetActive(false);
-        forgetBtn.SetActive(false);
-        backBtn.SetActive(false);
+        buttons.SetActive(false);
     }
 
     #endregion
@@ -471,7 +447,6 @@ public class LoginWindow : BaseWindow {
     /// 清除视窗
     /// </summary>
     protected override void clear() {
-        typeText.text = "";
         clearAllInputFields();
         clearAllButtons();
     }
