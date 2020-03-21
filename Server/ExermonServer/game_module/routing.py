@@ -6,6 +6,7 @@ from item_module.views import Service as Item
 from exermon_module.views import Service as Exermon
 from record_module.views import Service as Record
 from question_module.views import Service as Question
+from season_module.views import Service as Season
 from .consumer import ChannelLayerTag, GameConsumer
 
 websocket_urlpatterns = [
@@ -342,5 +343,40 @@ WEBSOCKET_METHOD_ROUTER = {
 		Question.get,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+
+	# 查询玩家题目反馈
+	'question/report/get': [[
+		['uid', 'int'],
+	],
+		Question.getReports,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+
+	# 提交题目反馈
+	'question/report/push': [[
+		['uid', 'int'],
+		['qid', 'int'],
+		['type', 'int'],
+		['description', 'str'],
+	],
+		Question.pushReport,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+
+	# 查询赛季记录
+	'season/record/get': [[
+		['uid', 'int'],
+		['sid', 'int'],
+	],
+		Season.getRecords,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+
+
+
+
+
+
+
 
 }

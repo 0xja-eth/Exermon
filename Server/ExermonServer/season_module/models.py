@@ -23,6 +23,7 @@ class CombatResult(GroupConfigure):
     lose = models.SmallIntegerField(default=0, verbose_name="失败增星数")
 
     def convertToDict(self):
+
         res = super(CombatResult, self).convertToDict()
 
         res['win'] = self.win

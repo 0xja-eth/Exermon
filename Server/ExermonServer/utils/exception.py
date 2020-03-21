@@ -122,6 +122,18 @@ class ErrorType(Enum):
 	QuestionNotStarted = 520  # 本题还没开始作答
 	InvalidTimeSpan = 521  # 作答时间有误
 
+	# QuestionGenerate
+	GenerateError = 530  # 题目生成有误
+
+	# QuesReport
+	FeedbackTooLong = 540  # 题目反馈太长
+	InvalidFeedbackType = 541  # 题目反馈类型不对
+	QuesReportNotExist = 542  # 查找不到反馈记录
+
+	# SeasonRecord
+	SeasonNotExist = 700  # 赛季不存在
+
+
 
 class GameException(Exception):
 
@@ -235,6 +247,17 @@ class GameException(Exception):
 		# QuestionSetRecord
 		ErrorType.QuestionNotStarted: "本题还没开始作答！",
 		ErrorType.InvalidTimeSpan: "作答时间有误！",
+
+		# QuestionGenerate
+		ErrorType.GenerateError: "题目生成有误！",
+
+		# QuesReport
+		ErrorType.QuesReportTooLong: "题目反馈太长！",
+		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
+		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
+
+		# SeasonRecord
+		ErrorType.SeasonNotExist: "赛季不存在！",
 
 	}
 

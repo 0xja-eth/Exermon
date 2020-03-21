@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import *
+from player_module.models import Player
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, GameException
 
@@ -23,6 +24,36 @@ class Service:
 
 		return {'questions': questions}
 
+	# 查询玩家题目反馈-lgy
+	@classmethod
+	async def getReports(cls, consumer, player: Player):
+		ViewUtils.getObject(QuesReport, ErrorType.QuesReportNotExist, player=player)
+
+	# 提交题目反馈-lgy
+	@classmethod
+	async def pushReport(cls, consumer, player: Player, qid: int, type: int, description: str ):
+
+		#检验题目是否存在
+		cls.ensureQuestionExist(qid)
+
+		#检验类型是否在枚举类型里面
+		cls.ensureQuestionTypeExist(type)
+
+		#检验描述是否超过字数限制
+		check.ensureFeedbackFormat(description)
+
+		QuesReport.create(player, qid, type, description)
+
+#====================
+# 题目校验类，封装管理题目模块的参数格式是否正确-lgy
+#====================
+class check:
+
+	# 校验题目反馈的长度-lgy
+	@classmethod
+	def ensureFeedbackFormat(cls, val:str):
+		if len(val) > QuesReport.MAX_DESC_LEN:
+			raise GameException(ErrorType.QuesReportTooLong)
 
 # =======================
 # 题目公用类，封装关于物品模块的公用函数
@@ -65,3 +96,8 @@ class Common:
 	@classmethod
 	def ensureQuesSugarExist(cls, error: ErrorType = ErrorType.QuesSugarNotExist, **kwargs):
 		return ViewUtils.ensureObjectExist(QuesSugar, error, **kwargs)
+
+	# 确保反馈类型是枚举类型-lgy
+	@classmethod
+	def ensureQuesReportExist(cls, val:int):
+		return ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidQuesReportType )
