@@ -448,11 +448,4 @@ WEBSOCKET_METHOD_ROUTER = {
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 
-
-
-
-
-
-
-
 }

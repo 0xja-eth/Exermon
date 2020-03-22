@@ -35,7 +35,6 @@ class SeasonRecord(models.Model):
 
 		return {
 			'id': self.id,
-			'player_id': self.player,
 			'season_id': self.season,
 			'star_num': self.star_num,
 			'point': self.point,

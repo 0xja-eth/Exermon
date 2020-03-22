@@ -166,8 +166,9 @@ class ErrorType(Enum):
 
 	# BattleResulting
 
-	# SeasonRecord
+	# SeasonCommon
 	SeasonNotExist = 700  # 赛季不存在
+	SeasonRecordNotExist = 701  # 赛季记录不存在
 
 
 class GameException(Exception):
@@ -326,9 +327,11 @@ class GameException(Exception):
 		# BattleActing
 
 		# BattleResulting
-    
-		# SeasonRecord
+
+		# SeasonCommon
 		ErrorType.SeasonNotExist: "赛季不存在！",
+		ErrorType.SeasonRecordNotExist: "赛季记录不存在！",
+
 	}
 
 	def __init__(self, error_type: ErrorType):

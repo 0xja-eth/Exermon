@@ -9,13 +9,36 @@ class Service:
     @classmethod
     async def getRecords(cls, consumer, player: Player, sid: int):
 
-        common.ensureSeasonExist(sid)
-        return ViewUtils.getObjects(SeasonRecord, player=player,season = sid)
+        rec = Common.getSeasonRecord(player, sid)
 
-class common:
+        return {"record": rec.convertToDict()}
+
+
+class Common:
+
+    @classmethod
+    def getSeasonRecord(cls, player: Player, sid: int, error: ErrorType = ErrorType.SeasonRecordNotExist) -> SeasonRecord:
+        """
+        获取赛季记录
+        Args:
+            player (Player): 玩家
+            sid (int): 赛季ID
+            error(ErrorType): 找不到时抛出的异常
+        Returns:
+            返回赛季记录
+        """
+        return ViewUtils.getObject(SeasonRecord, error, player=player, season_id=sid)
 
     # 确保赛季存在-lgy
     @classmethod
-    def ensureSeasonExist(cls, sid:CompSeason):
-        ViewUtils.ensureObjectExist(sid, ErrorType.SeasonNotExist)
+    def ensureSeasonExist(cls, sid: int):
+        """
+        确保赛季存在
+        Args:
+            sid (int): 赛季ID
+        Raises:
+            ErrorType.SeasonNotExist: 赛季不存在
+        """
+        ViewUtils.ensureObjectExist(CompSeason, ErrorType.SeasonNotExist, id=sid)
+
 

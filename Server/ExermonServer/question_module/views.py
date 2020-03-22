@@ -27,33 +27,43 @@ class Service:
 	# 查询玩家题目反馈-lgy
 	@classmethod
 	async def getReports(cls, consumer, player: Player):
-		ViewUtils.getObject(QuesReport, ErrorType.QuesReportNotExist, player=player)
+
+		reports = player.questionrecord_set.all()
+
+		return {"reports": ModelUtils.objectsToDict(reports)}
 
 	# 提交题目反馈-lgy
 	@classmethod
 	async def pushReport(cls, consumer, player: Player, qid: int, type: int, description: str ):
 
-		#检验题目是否存在
-		cls.ensureQuestionExist(qid)
+		# 检验题目是否存在
+		Common.ensureQuestionExist(qid)
 
-		#检验类型是否在枚举类型里面
-		cls.ensureQuestionTypeExist(type)
+		# 检验类型是否在枚举类型里面
+		Check.ensureQuestionTypeExist(type)
 
-		#检验描述是否超过字数限制
-		check.ensureFeedbackFormat(description)
+		# 检验描述是否超过字数限制
+		Check.ensureFeedbackFormat(description)
 
 		QuesReport.create(player, qid, type, description)
 
-#====================
+
+# ====================
 # 题目校验类，封装管理题目模块的参数格式是否正确-lgy
-#====================
-class check:
+# ====================
+class Check:
 
 	# 校验题目反馈的长度-lgy
 	@classmethod
-	def ensureFeedbackFormat(cls, val:str):
+	def ensureFeedbackFormat(cls, val: str):
 		if len(val) > QuesReport.MAX_DESC_LEN:
 			raise GameException(ErrorType.QuesReportTooLong)
+
+	# 校验题目反馈的长度-lgy
+	@classmethod
+	def ensureQuestionTypeExist(cls, val: int):
+		ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidFeedbackType)
+
 
 # =======================
 # 题目公用类，封装关于物品模块的公用函数
