@@ -138,6 +138,11 @@ class ErrorType(Enum):
 	# QuestionGenerate
 	GenerateError = 530  # 题目生成有误
 
+	# QuesReport
+	FeedbackTooLong = 540  # 题目反馈太长
+	InvalidFeedbackType = 541  # 题目反馈类型不对
+	QuesReportNotExist = 542  # 查找不到反馈记录
+
 	# BattleCommon
 	BattleNotExist = 600  # 对战不存在
 	BattleRecordNotExist = 601  # 对战记录不存在
@@ -160,6 +165,9 @@ class ErrorType(Enum):
 	# BattleActing
 
 	# BattleResulting
+
+	# SeasonRecord
+	SeasonNotExist = 700  # 赛季不存在
 
 
 class GameException(Exception):
@@ -291,6 +299,11 @@ class GameException(Exception):
 		# QuestionGenerate
 		ErrorType.GenerateError: "题目生成有误！",
 
+		# QuesReport
+		ErrorType.QuesReportTooLong: "题目反馈太长！",
+		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
+		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
+    
 		# BattleCommon
 		ErrorType.BattleNotExist: "对战不存在！",
 		ErrorType.BattleRecordNotExist: "对战记录不存在！",
@@ -313,7 +326,9 @@ class GameException(Exception):
 		# BattleActing
 
 		# BattleResulting
-
+    
+		# SeasonRecord
+		ErrorType.SeasonNotExist: "赛季不存在！",
 	}
 
 	def __init__(self, error_type: ErrorType):
