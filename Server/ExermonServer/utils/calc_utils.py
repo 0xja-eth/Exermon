@@ -97,9 +97,6 @@ class ExermonParamCalc:
 
 	# 基本属性值(BPV)	EPB*((实际属性成长率/R+1)*S)^(L-1)
 
-	# 艾瑟萌战斗力计算公式
-	# 战斗力(BV)			round((MHP+MMP*2+ATK*6*C*(1+CRI/100)+DEF*4)*(1+EVA/50))
-
 	S = 1.005
 	R = 233
 
@@ -126,20 +123,20 @@ class ExermonSlotLevelCalc:
 	def calcLevel(cls, exp):
 		return math.floor(pow(exp/cls.T, cls.A))+1
 
-	# 计算下一级经验
+	# 计算对应等级所需累计经验
 	@classmethod
-	def calcNext(cls, level):
-		return math.ceil(pow(level, 1/cls.A)*cls.T)
+	def calcExp(cls, level):
+		return math.ceil(pow(level-1, 1.0/cls.A)*cls.T)
 
 	# 计算玩家等级
 	@classmethod
 	def calcPlayerLevel(cls, exp):
 		return math.floor(pow(exp/cls.TP/cls.D, cls.AP))+1
 
-	# 计算玩家下一级经验
+	# 计算玩家对应等级所需累计经验
 	@classmethod
-	def calcPlayerNext(cls, level):
-		return math.ceil(pow(level, 1/cls.AP)*cls.TP*cls.D)
+	def calcPlayerExp(cls, level):
+		return math.ceil(pow(level-1, 1/cls.AP)*cls.TP*cls.D)
 
 
 # ================================
@@ -177,9 +174,6 @@ class ExerSlotItemParamCalc:
 	# 基础加成率(BR)		1
 	# 附加加成率(PR)		GPR*SPR（对战时还包括题目糖属性加成率）
 	# 追加属性值(APV)	SAPV
-
-	# 艾瑟萌战斗力计算公式
-	# 战斗力(BV)			round((MHP+MMP*2+ATK*6*C*(1+CRI/100)+DEF*4)*(1+EVA/50))
 
 	# 计算属性
 	@classmethod
@@ -260,49 +254,113 @@ class ExerSlotItemParamCalc:
 
 	# 调整值
 	def _adjustParamValue(self, val):
-		param = self._getParam()
+		param = self.getParam(**self.kwargs)
 
 		if param is None: return val
 
 		return param.clamp(val)
 
 	# 获取属性实例
-	def _getParam(self):
+	@classmethod
+	def getParam(cls, param_id=None, attr=None):
 		from game_module.models import BaseParam
 
-		if 'param_id' in self.kwargs:
-			return BaseParam.get(id=self.kwargs['param_id'])
-
-		if 'attr' in self.kwargs:
-			return BaseParam.get(attr=self.kwargs['attr'])
-
+		if param_id is not None:
+			return BaseParam.get(id=param_id)
+		if attr is not None:
+			return BaseParam.get(attr=attr)
 		return None
 
 
 # ================================
-# 刷题（单题）收益计算类
+# 装备属性计算类
+# ================================
+class EquipParamCalc:
+
+	# 计算属性
+	@classmethod
+	def calc(cls, equipslot_item, param_id=None, attr=None):
+		calc_obj = cls(equipslot_item, param_id, attr)
+		return calc_obj.value
+
+	def __init__(self, equipslot_item, param_id=None, attr=None):
+		from exermon_module.models import PlayerExermon, \
+			ExerSlotItem, ExerEquipSlotItem, ExerPackEquip
+
+		self.value = 0
+
+		self.equipslot_item: ExerEquipSlotItem = equipslot_item
+
+		self.pack_equip: ExerPackEquip = self.equipslot_item.pack_equip
+		if self.pack_equip is None: return
+
+		self.equip = self.pack_equip.item
+		if self.equip is None: return
+
+		self.exerslot_item: ExerSlotItem = \
+			self.equipslot_item.container.equipslot.exer_slot
+
+		self.player_exer: PlayerExermon = self.exerslot_item.player_exer
+		if self.player_exer is None: return
+
+		self.param = ExerSlotItemParamCalc.getParam(param_id, attr)
+		if self.param is None: return
+
+		self.value = self._calc()
+
+	def _calc(self):
+		from item_module.models import EquipParamType
+
+		value = self.pack_equip.param(param_id=self.param.id)
+
+		# 计算可变属性（攻击/防御）
+		if (self.param.attr == 'atk' and
+			self.equip.param_type == EquipParamType.Attack.value) or \
+			(self.param.attr == 'def' and
+			self.equip.param_type == EquipParamType.Defense.value):
+			value += self._calcVariableParam()
+
+		return value
+
+	# 计算可变属性值
+	def _calcVariableParam(self):
+		level = self.player_exer.level
+		return self.equip.param_rate * level
+
+
+# ================================
+# 战斗力计算类
 # ================================
 class BattlePointCalc:
-	# 暴击加成
-	C = 2
 
-	# 计算（object 是实现了 BaseParam 中 attr 属性的对象）
+	# 艾瑟萌战斗力计算公式
+	# 战斗力(BV)			round((MHP+MMP*2+ATK*6*C*(1+CRI/100)+DEF*4)*(1+EVA/50))
+
 	@classmethod
-	def calc(cls, func):
+	def calc(cls, func: callable):
+		"""
+		计算战斗力
+		Args:
+			func (callable): 一个可以传入属性ID获得相应属性值的函数 
+		Returns:
+			返回计算后的战斗力
+		"""
 		from game_module.models import BaseParam
 
 		kwargs = {}
 		params = BaseParam.objs()
 		for param in params:
-			kwargs[param.attr] = func(param.id)
+			attr = param.attr
+			if attr == 'def': attr = 'def_'
+			kwargs[attr] = func(param.id)
 
 		return cls.doCalc(**kwargs)
 
 	# 计算战斗力
 	@classmethod
 	def doCalc(cls, mhp, mmp, atk, def_, eva, cri):
-		return round((mhp + mmp*2 + atk*6*cls.C*(1+cri/100)
-					  + def_*4) * (1+eva/50))
+		return round((mhp + mmp*2 + atk*6*BattleAttackProcessor.C
+					  * (1+cri/100) + def_*4) * (1+eva/50))
 
 
 # ================================
@@ -926,7 +984,7 @@ class QuestionGenerator:
 # 计算最大星级类
 # player: Player
 # ===================================================
-class MaxStarCalc():
+class MaxStarCalc:
 
 	@classmethod
 	def calc(cls, level):
@@ -942,3 +1000,424 @@ class MaxStarCalc():
 			star_id += 1
 
 		return star_id
+
+
+# ===================================================
+# 物品效果处理类
+# ===================================================
+class ItemEffectProcessor:
+
+	@classmethod
+	def process(cls, item, player):
+		processor = ItemEffectProcessor(item, player)
+		processor._process()
+
+	def __init__(self, item, player):
+		from item_module.models import PackContItem
+		from battle_module.runtimes import \
+			RuntimeBattlePlayer, RuntimeBattleExermon
+
+		self.cont_item: PackContItem = item
+		# self.battle: RuntimeBattle = battle
+		self.player: RuntimeBattlePlayer = player
+		self.exermon: RuntimeBattleExermon = self.player.getCurrentExermon()
+
+	def _process(self):
+		"""
+		开始处理
+		"""
+		from item_module.models import UsableItem
+		from question_module.models import QuesSugar
+
+		item = self.cont_item.item
+
+		if isinstance(item, UsableItem):
+			self._processUsableItem(item)
+			self.player.addPrepareAction(item)
+
+		if isinstance(item, QuesSugar):
+			self._processQuesSugar(item)
+			self.player.addPrepareAction(item)
+
+	def _processUsableItem(self, item):
+		"""
+		处理 可使用物品 的使用效果
+		Args:
+			item (UsableItem): 可使用物品
+		"""
+		for effect in item.effects():
+			self.__processEffect(effect)
+
+	def __processEffect(self, effect):
+		"""
+		处理具体效果
+		Args:
+			effect (BaseEffect): 效果
+		"""
+		from item_module.models import ItemEffectCode
+
+		player = self.player
+		exermon = self.exermon
+
+		code = ItemEffectCode(effect.code)
+		params = effect.params
+
+		p_len = len(params)
+
+		if code == ItemEffectCode.RecoverHP:
+			if p_len == 1: player.recoverHP(params[0])
+			if p_len == 2: player.recoverHP(params[0], params[1]/100)
+
+		if code == ItemEffectCode.RecoverMP:
+			if p_len == 1: exermon.recoverMP(params[0])
+			if p_len == 2: exermon.recoverMP(params[0], params[1]/100)
+
+		if code == ItemEffectCode.BattleAddParam:
+			exermon.addParam(*params)
+
+	def _processQuesSugar(self, item):
+		"""
+		处理 题目糖 的使用效果
+		Args:
+			item (QuesSugar): 题目糖
+		"""
+		params = item.params()
+		exermon = self.player.getCurrentExermon()
+		exermon.addBuff(rate_params=list(params))
+
+
+# ===================================================
+# 对战攻击处理类
+# ===================================================
+class BattleAttackProcessor:
+
+	# 实际伤害点数(RD)
+	# round(((基础伤害 + 附加伤害) * 伤害加成 + 追加伤害) * 攻击结果修正 * 波动修正)
+	#
+	# 基础伤害(BD)
+	# AATK * 实际攻击比率 - BDEF * 实际防御比率 + 附加伤害
+	#
+	# 实际攻击比率
+	# AR * 技能攻击比率
+	#
+	# 实际防御比率
+	# DR * 技能防御比率
+	#
+	# 附加伤害
+	# 技能附加伤害公式
+	#
+	# 附加伤害(PD)
+	# 0（用于拓展）
+	#
+	# 伤害加成(DR)
+	# 1（用于拓展）
+	#
+	# 追加伤害(AD)
+	# 0（用于拓展）
+	#
+	# 攻击结果修正(RR)
+	# 回避修正 * 暴击修正
+	#
+	# 回避修正(MR)
+	# rand() < BEVA / 100 ? 0 : 1
+	#
+	# 暴击修正(CR)
+	# rand() < ACRI / 100 ? C : 1
+	#
+	# 波动修正(FR)
+	# 1 + rand(F * 2) - F
+
+	AR = 3  # 攻击比率
+	DR = 1  # 防御比率
+
+	C = 2  # 暴击伤害加成
+	F = 0.08  # 伤害波动
+
+	class TempParam:
+		"""
+		临时属性类
+		"""
+		MHP = MMP = ATK = DEF = EVA = CRI = 0
+
+		def __init__(self, exermon):
+			from battle_module.runtimes import RuntimeBattleExermon
+			self.exermon: RuntimeBattleExermon = exermon
+			self.load()
+
+		def load(self):
+			from game_module.models import BaseParam
+
+			params = BaseParam.objs()
+
+			for param in params:
+				attr = str(param.attr).upper()
+				if hasattr(self, attr):
+					val = self.exermon.paramVal(id=param.id)
+					setattr(self, attr, val.getValue())
+
+	@classmethod
+	def process(cls, attacker, oppo):
+		processor = BattleAttackProcessor(attacker, oppo)
+		processor._processSkill()
+		processor._processAction()
+
+	def __init__(self, attacker, oppo):
+		from exermon_module.models import ExerSkill, TargetType
+		from battle_module.models import HitResultType
+		from battle_module.runtimes import RuntimeBattlePlayer, RuntimeBattleExermon
+
+		self.a_player: RuntimeBattlePlayer = attacker
+		self.a_exer: RuntimeBattleExermon = self.a_player.getCurrentExermon()
+
+		self.o_player: RuntimeBattlePlayer = oppo
+		self.o_exer: RuntimeBattleExermon = self.o_player.getCurrentExermon()
+
+		self.skills = self.a_exer.getUsableSkills()
+		self.skill: ExerSkill = None
+
+		self.target_type: TargetType = TargetType.Enemy
+		self.hit_result: HitResultType = HitResultType.Unknown
+		self.hurt = 0
+
+	def _generateTargets(self, target_type=None):
+		"""
+		生成目标玩家
+		Args:
+			oppo (RuntimeBattlePlayer): 对方
+			target_type (TargetType): 目标类型
+		"""
+		from exermon_module.models import TargetType
+
+		if target_type is None:
+			if self.skill is None:
+				target_type = TargetType.Enemy
+			else:
+				target_type = TargetType(self.skill.target_type)
+
+		if target_type == TargetType.BothRandom:
+			target_type = random.choice([TargetType.Self, TargetType.Enemy])
+
+		self.target_type = target_type
+
+		if target_type == TargetType.Enemy:
+			return [self.o_player]
+
+		if target_type == TargetType.Self:
+			return [self.a_player]
+
+		if target_type == TargetType.Both:
+			return [self.a_player, self.o_player]
+
+		return []
+
+	def _processSkill(self):
+		"""
+		处理技能使用
+		"""
+		from battle_module.runtimes import RuntimeBattleExerSkill
+
+		skill: RuntimeBattleExerSkill = self._generateRandomSkill()
+
+		if skill is None: self.skill = None
+		else:
+			self.skill = skill.skill
+			skill.useSkill()
+
+	def _generateRandomSkill(self):
+		"""
+		生成随机使用技能
+		"""
+		for skill in self.skills:
+			rand = random.randint(1, 100)
+			if rand <= skill.skill.rate:
+				return skill
+
+		return None
+
+	def _processAction(self):
+		"""
+		处理行动
+		"""
+		for target in self._generateTargets():
+			self._processAttack(target)
+
+	def _processAttack(self, target):
+		"""
+		处理攻击
+		Args:
+			target (RuntimeBattlePlayer): 目标
+		"""
+		from battle_module.models import HitResultType, TargetType
+		from battle_module.runtimes import RuntimeBattlePlayer, RuntimeBattleExermon
+
+		target: RuntimeBattlePlayer = target
+		b_exer: RuntimeBattleExermon = target.getCurrentExermon()
+
+		a = self.TempParam(self.a_exer)
+		b = self.TempParam(b_exer)
+
+		self.hit_result = self._calcResultType(a, b)
+
+		if self.hit_result != HitResultType.Miss:
+
+			bd = self._baseDamage(a, b)
+			pd = self._plusDamage()
+			dr = self._damageRate()
+			ad = self._appendDamage()
+			fr = self._floatRate()
+
+			rd = ((bd+pd)*dr+ad)*fr
+
+			if self.hit_result == HitResultType.Critical:
+				rd *= self._criticalRate()
+
+			self.hurt = round(rd)
+
+		self._addAttackAction()
+		self._applyAttack(target)
+
+		target.round_result.processAttack(self.skill,
+			self.target_type, self.hit_result, self.hurt, False)
+
+		# 当目标类型为双方时，如果目标与自身一致，则不再处理攻击者（避免处理两次）
+		if not (self.target_type == TargetType.Both and target == self.a_player):
+			self.a_player.round_result.processAttack(self.skill,
+				self.target_type, self.hit_result, self.hurt, True)
+
+	def _addAttackAction(self):
+		"""
+		添加攻击行动
+		"""
+		self.a_player.addAttackAction(self.skill, self.target_type, self.hit_result, self.hurt)
+
+	def _applyAttack(self, target):
+		"""
+		应用攻击
+		Args:
+			target (RuntimeBattlePlayer): 目标
+		"""
+		from exermon_module.models import HitType
+		from battle_module.runtimes import RuntimeBattleExermon
+
+		if self.skill is None:
+			hit_type = HitType.HPDamage
+		else:
+			hit_type = HitType(self.skill.hit_type)
+
+		b_exer: RuntimeBattleExermon = target.getCurrentExermon()
+
+		if hit_type == HitType.HPDamage:
+			target.recoverHP(-self.hurt)
+
+		elif hit_type == HitType.HPRecover:
+			target.recoverHP(self.hurt)
+
+		elif hit_type == HitType.HPDrain:
+			target.recoverHP(-self.hurt)
+			drain_val = self.hurt * self.skill.drain_rate
+			self.a_player.recoverHP(drain_val)
+
+		elif hit_type == HitType.MPDamage:
+			b_exer.recoverMP(-self.hurt)
+
+		elif hit_type == HitType.MPRecover:
+			b_exer.recoverMP(self.hurt)
+
+		elif hit_type == HitType.MPDrain:
+			b_exer.recoverMP(-self.hurt)
+			drain_val = self.hurt * self.skill.drain_rate
+			self.a_exer.recoverMP(drain_val)
+
+	def _calcResultType(self, a, b):
+		"""
+		计算攻击结果
+		"""
+		from battle_module.models import HitResultType
+
+		rand = random.random()
+
+		if rand <= self._realEVA(a, b): return HitResultType.Miss
+		if rand <= self._realCRI(a, b): return HitResultType.Critical
+
+		return HitResultType.Hit
+
+	def _realEVA(self, a, b):
+		"""
+		实际回避率
+		"""
+		if self.skill is None: return b.EVA
+		return b.EVA - self.skill.hit_rate/100
+
+	def _realCRI(self, a, b):
+		"""
+		实际暴击率
+		"""
+		if self.skill is None: return a.CRI
+		return a.CRI + self.skill.cri_rate/100
+
+	def _criticalRate(self):
+		"""
+		暴击修正
+		"""
+		return self.C
+
+	def _baseDamage(self, a, b):
+		"""
+		基础伤害
+		"""
+		return a.ATK * self._realAttackRate() - b.DEF * self._realDefenseRate()
+
+	def _realAttackRate(self):
+		"""
+		实际攻击比率
+		"""
+		return self.AR * self._skillAttackRate()
+
+	def _skillAttackRate(self):
+		"""
+		技能攻击比率
+		"""
+		return 1 if self.skill is None else self.skill.atk_rate
+
+	def _realDefenseRate(self):
+		"""
+		实际防御比率
+		"""
+		return self.DR * self._skillDefenseRate()
+
+	def _skillDefenseRate(self):
+		"""
+		技能防御比率
+		"""
+		return 1 if self.skill is None else self.skill.def_rate
+
+	def _skillPlusDamage(self, a, b):
+		"""
+		技能附加伤害
+		"""
+		try: return eval(self.skill.plus_formula)
+		except: return 0
+
+	def _plusDamage(self):
+		"""
+		附加伤害
+		"""
+		return 0
+
+	def _damageRate(self):
+		"""
+		伤害加成
+		"""
+		return 1
+
+	def _appendDamage(self):
+		"""
+		追加伤害
+		"""
+		return 0
+
+	def _floatRate(self):
+		"""
+		波动修正
+		"""
+		return 1+random.randint(-self.F, self.F)/100.0

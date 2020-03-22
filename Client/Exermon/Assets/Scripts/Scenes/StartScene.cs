@@ -3,10 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 开始场景
-/// </summary>
-namespace StartScene {
+using Core.UI;
+using Core.UI.Utils;
+
+using PlayerModule.Data;
+
+using GameModule.Services;
+using PlayerModule.Services;
+using ExermonModule.Services;
+
+using UI.StartScene.Windows;
+
+namespace UI.StartScene {
 
     /// <summary>
     /// 开始场景
@@ -41,10 +49,9 @@ namespace StartScene {
         /// <summary>
         /// 内部系统声明
         /// </summary>
-        GameSystem gameSys;
         PlayerService playerSer;
         ExermonService exermonSer;
-        ExermonGameSystem exermonSys;
+        GameService gameSer;
 
         Step step;
 
@@ -63,8 +70,7 @@ namespace StartScene {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            gameSys = GameSystem.get();
-            exermonSys = ExermonGameSystem.get();
+            gameSer = GameService.get();
             playerSer = PlayerService.get();
             exermonSer = ExermonService.get();
         }
@@ -176,7 +182,7 @@ namespace StartScene {
         /// 处理创建完成
         /// </summary>
         void processFinished() {
-            exermonSys.startGame();
+            gameSer.startGame();
         }
 
         /// <summary>

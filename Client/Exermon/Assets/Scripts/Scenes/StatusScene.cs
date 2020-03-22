@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-/// <summary>
-/// 状态场景
-/// </summary>
-namespace StatusScene {
+using Core.UI;
+using Core.UI.Utils;
+
+using PlayerModule.Services;
+
+using UI.StatusScene.Windows;
+
+namespace UI.StatusScene {
 
     /// <summary>
     /// 状态场景
@@ -23,9 +25,7 @@ namespace StatusScene {
         /// 外部组件设置
         /// </summary>
         public StatusWindow statusWindow;
-
         public InfoEditWindow infoEditWindow;
-
         public Button confirm;
 
         /// <summary>

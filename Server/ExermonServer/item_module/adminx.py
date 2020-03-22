@@ -96,7 +96,10 @@ class EquipParamAdmin(object):
 class EquipableItemAdmin(LimitedItemAdmin):
 
 	list_display = LimitedItemAdmin.list_display + \
-				   ['adminParams']
+				   ['min_level', 'param_type', 'param_rate', 'adminParams']
+
+	list_editable = LimitedItemAdmin.list_editable + \
+					['min_level', 'param_type', 'param_rate']
 
 	# param_inlines = None
 

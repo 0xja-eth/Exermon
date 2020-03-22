@@ -543,3 +543,10 @@ class QuesSugarPackItem(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return QuesSugar
 
+	def isContItemUsable(self) -> bool:
+		"""
+		配置当前物品是否可用
+		Returns:
+			返回当前物品是否可用
+		"""
+		return True

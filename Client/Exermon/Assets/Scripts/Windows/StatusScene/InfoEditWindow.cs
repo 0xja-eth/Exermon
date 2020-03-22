@@ -1,18 +1,20 @@
-﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
-using LitJson;
-using Random = UnityEngine.Random;
+using Core.Systems;
+using Core.UI;
+using Core.UI.Utils;
+
+using GameModule.Services;
+
+using PlayerModule.Services;
+
+using UI.Common.Controls.InputFields;
 
 /// <summary>
-/// 状态场景
+/// 状态场景窗口
 /// </summary>
-namespace StatusScene {
+namespace UI.StatusScene.Windows {
 
     /// <summary>
     /// 信息修改窗口

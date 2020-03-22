@@ -4,10 +4,14 @@ from item_module.models import *
 from utils.model_utils import CacheableModel, \
 	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
-import os, base64
 from enum import Enum
+import os, base64, datetime
 
-import datetime
+import exermon_module.models as Exermon
+import question_module.models as Question
+import record_module.models as Record
+import season_module.models as Season
+import battle_module.models as Battle
 
 # Create your models here.
 
@@ -366,9 +370,6 @@ class Player(CacheableModel):
 	# 删除标志
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
-	# 是否战斗掉线
-	disconnect_battle = False
-
 	# 当前 LoginInfo
 	cur_login_info = None
 
@@ -392,86 +393,43 @@ class Player(CacheableModel):
 
 	adminMoney.short_description = "持有金钱"
 
-	# region 容器管理
-
-	# 获取相关容器
-	def getContainer(self, cla):
-		return self._getOneToOneCache(cla)
-
-	# 获取人类背包
-	def humanPack(self):
-		return self._getOneToOneCache(HumanPack)
-
-	# 获取艾瑟萌背包
-	def exerPack(self):
-		from exermon_module.models import ExerPack
-		return self._getOneToOneCache(ExerPack)
-
-	# 获取艾瑟萌碎片背包
-	def exerFragPack(self):
-		from exermon_module.models import ExerFragPack
-		return self._getOneToOneCache(ExerFragPack)
-
-	# 获取艾瑟萌天赋池
-	def exerGiftPool(self):
-		from exermon_module.models import ExerGiftPool
-		return self._getOneToOneCache(ExerGiftPool)
-
-	# 获取艾瑟萌仓库
-	def exerHub(self):
-		from exermon_module.models import ExerHub
-		return self._getOneToOneCache(ExerHub)
-
-	# 获取题目糖背包
-	def quesSugarPack(self):
-		from question_module.models import QuesSugarPack
-		return self._getOneToOneCache(QuesSugarPack)
-
-	# 获取艾瑟萌槽
-	def exerSlot(self):
-		from exermon_module.models import ExerSlot
-		return self._getOneToOneCache(ExerSlot)
-
-	# 获取装备槽
-	def humanEquipSlot(self):
-		return self._getOneToOneCache(HumanEquipSlot)
-
-	# 获取金钱
-	def playerMoney(self):
-		return self._getOneToOneCache(PlayerMoney)
+	# region 字典生成
 
 	def _packContainerIndices(self):
 
-		humanpack = ModelUtils.objectToDict(self.humanPack())
+		human_pack = ModelUtils.objectToDict(self.humanPack())
 
-		exerpack = ModelUtils.objectToDict(self.exerPack())
+		exer_pack = ModelUtils.objectToDict(self.exerPack())
 
-		exerfragpack = ModelUtils.objectToDict(self.exerFragPack())
+		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack())
 
-		exergiftpool = ModelUtils.objectToDict(self.exerGiftPool())
+		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool())
 
-		exerhub = ModelUtils.objectToDict(self.exerHub())
+		exer_hub = ModelUtils.objectToDict(self.exerHub())
 
-		quessugarpack = ModelUtils.objectToDict(self.quesSugarPack())
+		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack())
 
 		return {
-			'human_pack': humanpack,
-			'exer_pack': exerpack,
-			'exer_frag_pack': exerfragpack,
-			'exer_gift_pool': exergiftpool,
-			'exer_hub': exerhub,
-			'ques_sugar_pack': quessugarpack,
+			'human_pack': human_pack,
+			'exer_pack': exer_pack,
+			'exer_frag_pack': exer_frag_pack,
+			'exer_gift_pool': exer_gift_pool,
+			'exer_hub': exer_hub,
+			'ques_sugar_pack': ques_sugar_pack,
 		}
 
 	def _slotContainerIndices(self):
 
-		exerslot = ModelUtils.objectToDict(self.exerSlot())
+		exer_slot = ModelUtils.objectToDict(self.exerSlot())
 
-		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot())
+		human_equip_slot = ModelUtils.objectToDict(self.humanEquipSlot())
+
+		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
 
 		return {
-			'exer_slot': exerslot,
-			'human_equip_slot': humanequipslot,
+			'exer_slot': exer_slot,
+			'human_equip_slot': human_equip_slot,
+			'battle_item_slot': battle_item_slot,
 		}
 
 	def _slotContainerItems(self):
@@ -480,14 +438,72 @@ class Player(CacheableModel):
 
 		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
 
+		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+
 		return {
 			'exer_slot': exerslot,
 			'human_equip_slot': humanequipslot,
+			'battle_item_slot': battle_item_slot,
 		}
 
 	# 对战信息
 	def _battleInfo(self):
-		return {}
+
+		from battle_module.models import BattlePlayerResult
+
+		season_record = self.currentSeasonRecord()
+		battle_records = self.battlePlayerRecords()
+
+		rank, sub_rank = season_record.rank()
+
+		count = win_cnt = corr_cnt = 0
+		sum_hurt = sum_damage = sum_score = 0
+		max_hurt = max_damage = max_score = 0
+
+		for rec in battle_records:
+
+			if rec.result == BattlePlayerResult.Win.value:
+				win_cnt += 1
+
+			hurt = rec.sumHurt()
+			damage = rec.sumDamage()
+			score = rec.sumScore()
+
+			corr_cnt += rec.corrCount()
+
+			sum_hurt += hurt
+			sum_damage += damage
+			sum_score += score
+
+			max_hurt = max(max_hurt, hurt)
+			max_damage = max(max_damage, damage)
+			max_score = max(max_score, score)
+
+			count += 1
+
+		win_rate = win_cnt / count
+		corr_rate = corr_cnt / count
+
+		avg_hurt = sum_hurt / count
+		avg_damage = sum_damage / count
+		avg_score = sum_score / count
+
+		return {
+			'rank_id': rank.id,
+			'sub_rank': sub_rank,
+			'star_num': season_record.star_num,
+			'score': season_record.point,
+			'credit': self.credit,
+			'count': count,
+			'win_rate': win_rate,
+			'corr_rate': corr_rate,
+			'avg_hurt': avg_hurt,
+			'avg_damage': avg_damage,
+			'avg_score': avg_score,
+			'max_hurt': max_hurt,
+			'max_damage': max_damage,
+			'max_score': max_score,
+		}
 
 	# 做题信息
 	def _questionInfo(self):
@@ -526,8 +542,15 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def convertToDict(self, type=None):
-
+	def convertToDict(self, type: str = None, **kwargs) -> dict:
+		"""
+		转化为字典
+		Args:
+			type (str): 转化类型
+			**kwargs (**dict): 子类重载参数
+		Returns:
+			转化后的字典数据
+		"""
 		create_time = ModelUtils.timeToStr(self.create_time)
 		birth = ModelUtils.dateToStr(self.birth)
 		money = ModelUtils.objectToDict(self.playerMoney())
@@ -551,9 +574,26 @@ class Player(CacheableModel):
 			'status': self.status,
 			'type': self.type,
 			'create_time': create_time,
-			'pack_containers': self._packContainerIndices(),
-			'slot_containers': self._slotContainerIndices(),
 		}
+
+		if type == "matched":
+			season_record = self.currentSeasonRecord()
+
+			rank, sub_rank = season_record.rank()
+
+			exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
+			battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+
+			base["rank_id"] = rank.id
+			base['sub_rank'] = sub_rank
+			base['star_num'] = season_record.star_num
+			base['exer_slot'] = exer_slot
+			base['battle_item_slot'] = battle_item_slot
+
+			return base
+
+		base["pack_containers"] = self._packContainerIndices()
+		base["slot_containers"] = self._slotContainerIndices()
 
 		# 其他玩家
 		if type == "others":
@@ -586,6 +626,54 @@ class Player(CacheableModel):
 			base['slot_containers'] = self._slotContainerItems()
 
 		return base
+
+	# endregion
+
+	# region 容器管理
+
+	# 获取相关容器
+	def getContainer(self, cla):
+		return self._getOneToOneCache(cla)
+
+	# 获取人类背包
+	def humanPack(self) -> 'HumanPack':
+		return self._getOneToOneCache(HumanPack)
+
+	# 获取艾瑟萌背包
+	def exerPack(self) -> Exermon.ExerPack:
+		return self._getOneToOneCache(Exermon.ExerPack)
+
+	# 获取艾瑟萌碎片背包
+	def exerFragPack(self) -> Exermon.ExerFragPack:
+		return self._getOneToOneCache(Exermon.ExerFragPack)
+
+	# 获取艾瑟萌天赋池
+	def exerGiftPool(self) -> Exermon.ExerGiftPool:
+		return self._getOneToOneCache(Exermon.ExerGiftPool)
+
+	# 获取艾瑟萌仓库
+	def exerHub(self) -> Exermon.ExerHub:
+		return self._getOneToOneCache(Exermon.ExerHub)
+
+	# 获取题目糖背包
+	def quesSugarPack(self) -> Question.QuesSugarPack:
+		return self._getOneToOneCache(Question.QuesSugarPack)
+
+	# 获取艾瑟萌槽
+	def exerSlot(self) -> Exermon.ExerSlot:
+		return self._getOneToOneCache(Exermon.ExerSlot)
+
+	# 获取装备槽
+	def humanEquipSlot(self) -> 'HumanEquipSlot':
+		return self._getOneToOneCache(HumanEquipSlot)
+
+	# 获取对战物资槽
+	def battleItemSlot(self) -> Battle.BattleItemSlot:
+		return self._getOneToOneCache(Battle.BattleItemSlot)
+
+	# 获取金钱
+	def playerMoney(self) -> PlayerMoney:
+		return self._getOneToOneCache(PlayerMoney)
 
 	# endregion
 
@@ -705,7 +793,7 @@ class Player(CacheableModel):
 
 			player_gift = self._createPlayerGift(gifts[i])
 			exerslot.setPlayerGift(player_gift, slot_index=i+1, force=True)
-			# player_gift.save()
+		# player_gift.save()
 
 		self.status = PlayerStatus.GiftsCreated.value
 		self.save()
@@ -811,40 +899,99 @@ class Player(CacheableModel):
 
 	# endregion
 
-	# 等级（本等级, 下一级所需经验）
-	def level(self, calc_next=False):
+	# region 基本属性操作
+
+	def level(self, calc_next: bool = False) -> int or (int, int):
+		"""
+		获取玩家等级和下一级所需经验
+		Args:
+			calc_next (bool): 是否需要计算下一级经验
+		Returns:
+			如果 calc_next 为 True，返回等级以及下一级经验，否则仅返回当前等级
+		"""
 		from utils.calc_utils import ExermonSlotLevelCalc
 
 		level = ExermonSlotLevelCalc.calcPlayerLevel(self.exp)
 
 		if not calc_next: return level
 
-		next = ExermonSlotLevelCalc.calcPlayerNext(level)
+		next = ExermonSlotLevelCalc.calcPlayerExp(level+1)
 		return level, next
 
-	# 获取所选科目
-	def subjects(self):
+	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
+		"""
+		获得金钱
+		Args:
+			gold (int): 金币
+			ticket (int): 点券
+			bound_ticket (int): 绑定点券
+		"""
+		money = self.playerMoney()
+		if money is None: return
+
+		money.gain(gold, ticket, bound_ticket)
+
+	def gainExp(self, sum_exp: int, slot_exps: dict, exer_exps: dict):
+		"""
+		获得经验
+		Args:
+			sum_exp (int): 人类经验
+			slot_exps (dict): 槽经验
+			exer_exps (dict): 艾瑟萌经验
+		"""
+		exerslot = self.exerSlot()
+		if exerslot is None: return
+
+		self.exp += sum_exp
+		exerslot.gainExp(slot_exps, exer_exps)
+
+	def subjects(self) -> list:
+		"""
+		获取玩家所选科目
+		Returns:
+			玩家所选科目数组
+		"""
 		exerslot = self.exerSlot()
 		if exerslot is None: return []
 		slot_items = exerslot.contItems()
 		return ModelUtils.getObjectRelatedForAll(slot_items, 'subject')
 
-	# 获取题目记录
-	def questionRecords(self):
+	# endregion
+
+	# region 纪录操作
+
+	def questionRecords(self) -> QuerySet:
+		"""
+		获取所有题目记录
+		Returns:
+			所有与该玩家相关的题目记录 QuerySet 对象
+		"""
 		return self.questionrecord_set.all()
 
 	# 查询题目记录
-	def questionRecord(self, question_id):
+	def questionRecord(self, question_id: int) -> Record.QuestionRecord:
+		"""
+		通过题目ID查找题目记录
+		Args:
+			question_id (int): 题目ID
+		Returns:
+			若存在题目记录，返回之，否则返回 None
+		"""
 		res = self.questionRecords().filter(question_id=question_id)
 		if res.exists(): return res.first()
 		return None
 
 	# 获取刷题记录
-	def exerciseRecords(self):
+	def exerciseRecords(self) -> QuerySet:
+		"""
+		获取所有刷题记录
+		Returns:
+			所有与该玩家相关的刷题记录 QuerySet 对象
+		"""
 		return self.exerciserecord_set.all()
 
 	# 设置当前题目集
-	def setCurrentQuestionSet(self, ques_set):
+	def setCurrentQuestionSet(self, ques_set: Record.QuestionSetRecord):
 		self._cache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
 
 	# 设置当前题目集
@@ -855,20 +1002,62 @@ class Player(CacheableModel):
 	def clearCurrentQuestionSet(self):
 		self._clearCache(self.CUR_QUES_SET_CACHE_KEY)
 
-	# 获得金钱
-	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
-		money = self.playerMoney()
-		if money is None: return
+	# endregion
 
-		money.gain(gold, ticket, bound_ticket)
+	# region 赛季操作
 
-	# 获得经验
-	def gainExp(self, sum_exp, slot_exps, exer_exps):
-		exerslot = self.exerSlot()
-		if exerslot is None: return
+	def seasonRecords(self) -> QuerySet:
+		"""
+		获取所有赛季记录
+		Returns:
+			返回所有赛季记录（SeasonRecord） QuerySet 对象
+		"""
+		return self.seasonrecord_set.all()
 
-		self.exp += sum_exp
-		exerslot.gainExp(slot_exps, exer_exps)
+	def seasonRecord(self, **kwargs) -> Season.SeasonRecord:
+		"""
+		获取指定条件的赛季记录
+		Args:
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回指定条件的赛季记录
+		"""
+		return self.seasonRecords().filter(**kwargs)
+
+	def currentSeasonRecord(self) -> Season.SeasonRecord:
+		"""
+		获取当前赛季记录
+		Returns:
+			返回玩家当前赛季记录
+		"""
+		from season_module.runtimes import SeasonManager
+		season = SeasonManager.getCurrentSeason()
+		return self.seasonRecord(id=season.id)
+
+	# endregion
+
+	# region 对战操作
+
+	def battleRecords(self) -> list:
+		"""
+		获取对战记录
+		Returns:
+			返回对战记录列表
+		"""
+		return ModelUtils.getObjectRelatedForAll(
+			self.battlePlayerRecords(), 'record')
+
+	def battlePlayerRecords(self) -> QuerySet:
+		"""
+		获取对战玩家记录（对战结果）
+		Returns:
+			返回对战玩家记录（BattlePlayer） QuerySet 对象
+		"""
+		return self.battleplayer_set.all()
+
+	# endregion
+
+	""" 占位符 """
 
 
 # ===================================================
@@ -1057,6 +1246,14 @@ class HumanPackItem(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return HumanItem
 
+	def isContItemUsable(self) -> bool:
+		"""
+		配置当前物品是否可用
+		Returns:
+			返回当前物品是否可用
+		"""
+		return self.item.battle_use
+
 
 # ===================================================
 #  人类背包装备
@@ -1114,12 +1311,23 @@ class HumanEquipSlot(SlotContainer):
 	@classmethod
 	def defaultCapacity(cls): return HumanEquipType.count()
 
-	# 创建一个槽（创建角色时候执行）
-	def _create(self, player):
+	def _create(self, player: Player):
+		"""
+		创建对战物资容器（创建角色时候执行）
+		Args:
+			player (Player): 玩家
+		"""
 		super()._create()
 		self.player = player
 
-	def _equipContainer(self, index):
+	def _equipContainer(self, index: int) -> HumanPack:
+		"""
+		获取指定装备ID的所属容器
+		Args:
+			index (int): 装备ID
+		Returns:
+			指定装备ID的所属容器项
+		"""
 		return self.exactlyPlayer().humanPack()
 
 	# 保证装备类型与槽一致
@@ -1145,8 +1353,13 @@ class HumanEquipSlot(SlotContainer):
 
 		self.setEquip(equip_index=0, equip_item=pack_equip, e_type_id=e_type_id, force=force)
 
-	# 持有玩家
-	def owner(self): return self.player
+	def owner(self) -> Player:
+		"""
+		获取容器的持有者
+		Returns:
+			持有玩家
+		"""
+		return self.player
 
 
 # ===================================================

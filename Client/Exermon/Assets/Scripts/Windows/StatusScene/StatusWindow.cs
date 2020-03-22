@@ -1,18 +1,15 @@
-﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
+﻿using UnityEngine;
 
-using LitJson;
-using Random = UnityEngine.Random;
+using Core.UI;
+using Core.UI.Utils;
 
-/// <summary>
-/// 状态场景
-/// </summary>
-namespace StatusScene {
+using PlayerModule.Services;
+
+using UI.StatusScene.Controls;
+using PlayerStatus = UI.StatusScene.Controls.PlayerStatus;
+using ExermonStatus = UI.StatusScene.Controls.ExermonStatus;
+
+namespace UI.StatusScene.Windows {
 
     /// <summary>
     /// 状态窗口
@@ -58,9 +55,17 @@ namespace StatusScene {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (playerSer == null) playerSer = PlayerService.get();
             scene = (StatusScene)SceneUtils.getSceneObject("Scene");
         }
+
+        /// <summary>
+        /// 初始化系统/服务
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            playerSer = PlayerService.get();
+        }
+
 
         #endregion
 

@@ -89,7 +89,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_item = Common.getContItem(type=ci_type, player=player, id=contitem_id)
+		cont_item = Common.getContItem(type_=ci_type, player=player, id=contitem_id)
 
 		container.splitItem(cont_item, count)
 
@@ -105,7 +105,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_items = Common.getSameContItems(contitem_ids, type=ci_type, player=player)
+		cont_items = Common.getSameContItems(contitem_ids, type_=ci_type, player=player)
 
 		container.mergeItem(cont_items)
 
@@ -113,7 +113,14 @@ class Service:
 
 	# 槽容器装备
 	@classmethod
-	def slotContainerEquip(cls, player: Player, container: SlotContainer, equip_items: list, **kwargs):
+	def slotContainerEquip(cls, container: SlotContainer, equip_items: list, **kwargs):
+		"""
+		槽容器装备
+		Args:
+			container (SlotContainer): 对应槽容器
+			equip_items (list): 装备项数组
+			**kwargs (**dict): 其他装备参数（详见 SlotContainer.setEquip）
+		"""
 
 		ViewUtils.ensureObjectType(container, SlotContainer, ErrorType.IncorrectContainerType)
 
@@ -159,41 +166,72 @@ class Check:
 # =======================
 class Common:
 
-	# 获取物品
 	@classmethod
-	def getItem(cls, type=None, cla=None, error: ErrorType = ErrorType.ItemNotExist, **kwargs) -> BaseItem:
-
+	def getItem(cls, type_: int = None, cla: type = None,
+				error: ErrorType = ErrorType.ItemNotExist, **kwargs) -> BaseItem:
+		"""
+		获取一定条件的物品
+		Args:
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
+			error (ErrorType): 不存在时抛出异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回符合条件的物品（若有多个返回第一个）
+		"""
 		if cla is None:
-			Check.ensureItemType(type)
-			cla = eval(ItemType(type).name)
+			Check.ensureItemType(type_)
+			cla = eval(ItemType(type_).name)
 
 		return ViewUtils.getObject(cla, error, **kwargs)
 
-	# 获取容器
 	@classmethod
-	def getContainer(cls, type=None, cla=None, player: Player=None, error: ErrorType = ErrorType.ContainerNotExist,
-					 **kwargs) -> BaseContainer:
-
+	def getContainer(cls, type_: int = None, cla: type = None, player: Player = None,
+					 error: ErrorType = ErrorType.ContainerNotExist, **kwargs) -> BaseContainer:
+		"""
+		获取一定条件的容器
+		若传入 player，将会在指定玩家的缓存内进行搜索（返回的是玩家内缓存的数据）
+		Args:
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
+			player (Player): 所属玩家
+			error (ErrorType): 不存在时抛出异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回符合条件的容器（若有多个返回第一个）
+		"""
 		if cla is None:
-			Check.ensureContainerType(type)
-			cla = eval(ContainerType(type).name)
+			Check.ensureContainerType(type_)
+			cla = eval(ContainerType(type_).name)
 
 		if player is None:
 			return ViewUtils.getObject(cla, error, **kwargs)
 
 		return player.getContainer(cla)
 
-	# 获取容器项
 	@classmethod
-	def getContItem(cls, type=None, cla=None,
+	def getContItem(cls, type_: int = None, cla: type = None,
 					player: Player = None, container: BaseContainer = None,
 					error: ErrorType = ErrorType.ContItemNotExist, **kwargs) -> BaseContItem:
-
+		"""
+		获取一定条件的容器项
+		若传入 player，将会在指定玩家的对应容器内进行搜索（返回的是玩家内缓存的数据）
+		若传入 container 亦同理
+		Args:
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
+			player (Player): 所属玩家
+			container (BaseContainer): 所属容器
+			error (ErrorType): 不存在时抛出异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回符合条件的容器项（若有多个返回第一个）
+		"""
 		if container is None:
 
 			if cla is None:
-				Check.ensureContItemType(type)
-				cla = eval(ContItemType(type).name)
+				Check.ensureContItemType(type_)
+				cla = eval(ContItemType(type_).name)
 
 			if player is None:
 				return ViewUtils.getObject(cla, error, **kwargs)
@@ -210,9 +248,21 @@ class Common:
 
 	# 获取容器项（多个）
 	@classmethod
-	def getContItems(cls, ids, types=None, clas=None,
+	def getContItems(cls, ids: list, types: list = None, clas: list = None,
 					 player: Player = None, container: BaseContainer = None,
-					 error: ErrorType = ErrorType.ContItemNotExist) -> BaseContItem:
+					 error: ErrorType = ErrorType.ContItemNotExist) -> list:
+		"""
+		获取多个容器项（根据ID）
+		Args:
+			ids (list): 容器项ID列表
+			types (list): 容器项类型列表（枚举值）
+			clas (list): 容器项类型列表（类）
+			player (Player): 所属玩家
+			container (BaseContainer): 所属容器
+			error (ErrorType): 不存在时抛出异常类型
+		Returns:
+			返回指定ID集合的容器项数组
+		"""
 		res = []
 
 		for i in len(range(ids)):
@@ -220,7 +270,7 @@ class Common:
 
 			if types is not None:
 				cont_item = cls.getContItem(
-					type=types[i], player=player, container=container,
+					type_=types[i], player=player, container=container,
 					error=error, id=ids[i])
 
 			elif clas is not None:
@@ -236,15 +286,26 @@ class Common:
 
 	# 获取容器项（同种类型，多个）
 	@classmethod
-	def getSameContItems(cls, ids, type=None, cla=None,
-					 	 player: Player = None, container: BaseContainer = None,
-						 error: ErrorType = ErrorType.ContItemNotExist, **kwargs) -> BaseContItem:
-
+	def getSameContItems(cls, ids: list, type_: int = None, cla: type = None,
+						 player: Player = None, container: BaseContainer = None,
+						 error: ErrorType = ErrorType.ContItemNotExist, **kwargs) -> list:
+		"""
+		获取多个相同类型的容器项（根据ID）
+		Args:
+			ids (list): 容器项ID列表
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
+			player (Player): 所属玩家
+			container (BaseContainer): 所属容器
+			error (ErrorType): 不存在时抛出异常类型
+		Returns:
+			返回指定ID集合的容器项数组
+		"""
 		if container is None:
 
 			if cla is None:
-				Check.ensureContItemType(type)
-				cla = eval(ContItemType(type).name)
+				Check.ensureContItemType(type_)
+				cla = eval(ContItemType(type_).name)
 
 			if player is None:
 				return ViewUtils.getObject(cla, error, **kwargs)

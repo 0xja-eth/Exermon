@@ -7,6 +7,8 @@ from exermon_module.views import Service as Exermon
 from record_module.views import Service as Record
 from question_module.views import Service as Question
 from season_module.views import Service as Season
+from battle_module.views import Service as Battle
+
 from .consumer import ChannelLayerTag, GameConsumer
 
 websocket_urlpatterns = [
@@ -342,6 +344,80 @@ WEBSOCKET_METHOD_ROUTER = {
 	],
 		Question.get,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 装备对战物资槽
+	'battle/equip/item': [[
+		['uid', 'int'],
+		['index', 'int'],
+		['contitem_id', 'int'],
+	],
+		Battle.equipItem,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+
+	# 卸下对战物资槽
+	'battle/dequip/item': [[
+		['uid', 'int'],
+		['index', 'int'],
+	],
+		Battle.dequipItem,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+
+	# 对战开始匹配
+	'battle/match/start': [[
+		['uid', 'int'],
+		['mode', 'int'],
+	],
+		Battle.matchStart,  # 处理函数
+		ChannelLayerTag.NoLayer  # 是否需要响应
+	],
+	# 对战取消匹配
+	'battle/match/cancel': [[
+		['uid', 'int'],
+	],
+		Battle.matchCancel,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 对战匹配进度
+	'battle/match/progress': [[
+		['uid', 'int'],
+		['progress', 'int'],
+	],
+		Battle.matchProgress,  # 处理函数
+		ChannelLayerTag.NoLayer  # 是否需要响应
+	],
+	# 对战准备阶段完成
+	'battle/perpare/complete': [[
+		['uid', 'int'],
+		['type', 'var'],
+		['contitem_id', 'var'],
+	],
+		Battle.prepareComplete,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 对战作答题目
+	'battle/question/answer': [[
+		['uid', 'int'],
+		['selection', 'int[]'],
+		['timespan', 'int'],
+	],
+		Battle.questionAnswer,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 对战行动分镜播放完成
+	'battle/action/complete': [[
+		['uid', 'int'],
+	],
+		Battle.actionComplete,  # 处理函数
+		ChannelLayerTag.NoLayer  # 是否需要响应
+	],
+	# 对战结果播放完成
+	'battle/result/complete': [[
+		['uid', 'int'],
+	],
+		Battle.resultComplete,  # 处理函数
+		ChannelLayerTag.NoLayer  # 是否需要响应
 	],
 
 	# 查询玩家题目反馈

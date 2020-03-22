@@ -1,18 +1,21 @@
 ﻿
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
-
-using LitJson;
 using Random = UnityEngine.Random;
+using StartScene = UI.StartScene.StartScene;
+
+using Core.Systems;
+using Core.UI;
+using Core.UI.Utils;
+
+using GameModule.Services;
+using PlayerModule.Services;
+
+using UI.Common.Controls.InputFields;
+using UI.StartScene.Controls.Character;
 
 /// <summary>
-/// 开始场景
+/// 开始场景窗口
 /// </summary>
-namespace StartScene {
+namespace UI.StartScene.Windows {
 
     /// <summary>
     /// 创建人物窗口
@@ -62,11 +65,18 @@ namespace StartScene {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (gameSys == null) gameSys = GameSystem.get();
-            if (dataSer == null) dataSer = DataService.get();
-            if (playerSer == null) playerSer = PlayerService.get();
             scene = (StartScene)SceneUtils.getSceneObject("Scene");
             configureSubViews();
+        }
+
+        /// <summary>
+        /// 初始化系统/服务
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            gameSys = GameSystem.get();
+            playerSer = PlayerService.get();
+            dataSer = DataService.get();
         }
 
         /// <summary>

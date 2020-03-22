@@ -1,4 +1,7 @@
 from django.conf import settings
+
+from game_module.consumer import GameConsumer
+from game_module.models import Subject
 from .code_manager import *
 from .models import *
 from .runtimes import OnlinePlayer
@@ -352,7 +355,7 @@ class Service:
 
 		pack_equip = Common.getPackEquip(player, id=heid)
 
-		ItemService.slotContainerEquip(player, equip_slot, [pack_equip],
+		ItemService.slotContainerEquip(equip_slot, [pack_equip],
 									   e_type_id=pack_equip.item.e_type_id)
 
 
@@ -423,10 +426,16 @@ class Check:
 # =======================
 class Common:
 
-	# 获取玩家
 	@classmethod
 	def getPlayer(cls, error: ErrorType = ErrorType.PlayerNotExist, **kwargs) -> Player:
-
+		"""
+		获取玩家（优先考虑获取在线玩家）
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回指定条件下的玩家对象。若查询条件中存在id，则会优先从在线玩家中查询
+		"""
 		if 'id' in kwargs:
 			# 首先在在线玩家中查找
 			online_player: OnlinePlayer = cls.getOnlinePlayer(kwargs['id'])
@@ -434,91 +443,212 @@ class Common:
 
 		return ViewUtils.getObject(Player, error, **kwargs)
 
-	# 获取形象
 	@classmethod
 	def getCharacter(cls, error: ErrorType = ErrorType.CharacterNotExist,
 					 **kwargs) -> Character:
+		"""
+		获取形象
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回指定条件下的形象对象
+		"""
 		return ViewUtils.getObject(Character, error, **kwargs)
 
-	# 获取艾瑟萌装备槽
+	@classmethod
+	def getHumanPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanPack:
+		"""
+		获取人类背包
+		Args:
+			player (PLayer): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+		Returns:
+			返回对应玩家的人类背包对象
+		"""
+		return ItemCommon.getContainer(cla=HumanPack, player=player, error=error)
+
 	@classmethod
 	def getHumanEquipSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanEquipSlot:
+		"""
+		获取人类装备槽
+		Args:
+			player (PLayer): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+		Returns:
+			返回对应玩家的人类装备槽对象
+		"""
 		return ItemCommon.getContainer(cla=HumanEquipSlot, player=player, error=error)
 
-	# 获取玩家持有装备
+	@classmethod
+	def getPackItem(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
+					 **kwargs) -> HumanPackItem:
+		"""
+		获取玩家持有物品
+		Args:
+			player (Player): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件 
+		Returns:
+			返回一定条件下的玩家持有物品，如果有多个符合条件，返回第一个
+		"""
+		return ItemCommon.getContItem(cla=HumanPackItem, player=player, error=error, **kwargs)
+
 	@classmethod
 	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
 					 **kwargs) -> HumanPackEquip:
+		"""
+		获取玩家持有装备
+		Args:
+			player (Player): 所属玩家
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回一定条件下的玩家持有装备，如果有多个符合条件，返回第一个
+		"""
 		return ItemCommon.getContItem(cla=HumanPackEquip, player=player, error=error, **kwargs)
 
-	# 确保玩家存在
 	@classmethod
 	def ensurePlayerExist(cls, error: ErrorType = ErrorType.PlayerNotExist, **kwargs):
-		return ViewUtils.ensureObjectExist(Player, error, **kwargs)
+		"""
+		确保玩家存在
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件
+		"""
+		ViewUtils.ensureObjectExist(Player, error, **kwargs)
 
-	# 确保形象存在
 	@classmethod
 	def ensureCharacterExist(cls, error: ErrorType = ErrorType.CharacterNotExist, **kwargs):
-		return ViewUtils.ensureObjectExist(Character, error, **kwargs)
+		"""
+		确保形象存在
+		Args:
+			error (ErrorType): 错误时抛出的异常类型
+			**kwargs (**dict): 查询条件
+		"""
+		ViewUtils.ensureObjectExist(Character, error, **kwargs)
 
-	# 确保用户名存在（登陆可用）
 	@classmethod
 	def ensureUsernameExist(cls, un, pw=None):
+		"""
+		确保用户名已存在
+		Args:
+			un (str): 用户名
+			pw (str): 密码
+		Raises:
+			ErrorType.IncorrectLogin: 用户名或密码不正确
+			ErrorType.UsernameNotExist: 用户名不存在
+		"""
 		if pw is not None:
 			pw = Service.cryptoPassword(pw)
 			return cls.ensurePlayerExist(error=ErrorType.IncorrectLogin, username=un, password=pw)
 
 		return cls.ensurePlayerExist(error=ErrorType.UsernameNotExist, username=un)
 
-	# 确保玩家不存在
 	@classmethod
-	def ensurePlayerNotExist(cls, error: ErrorType=ErrorType.PlayerExist, **kwargs):
-		return ViewUtils.ensureObjectNotExist(Player, error, **kwargs)
+	def ensurePlayerNotExist(cls, error: ErrorType = ErrorType.PlayerExist, **kwargs):
+		"""
+		确保指定查询参数的玩家不存在
+		Args:
+			error (ErrorType): 玩家存在时需要抛出的异常类型
+			**kwargs (**dict): QuerySet 查询参数
+		"""
+		ViewUtils.ensureObjectNotExist(Player, error, **kwargs)
 
-	# 确保用户名不存在
 	@classmethod
-	def ensureUsernameNotExist(cls, un):
-		return cls.ensurePlayerNotExist(error=ErrorType.UsernameExist, username=un)
+	def ensureUsernameNotExist(cls, un: str):
+		"""
+		确保用户名不存在
+		Args:
+			un (str): 用户名
+		Raises:
+			ErrorType.UsernameExist: 用户名已存在
+		"""
+		cls.ensurePlayerNotExist(error=ErrorType.UsernameExist, username=un)
 
-	# 确保玩家正常状态
 	@classmethod
-	def ensurePlayerNormalState(cls, player):
+	def ensurePlayerNormalState(cls, player: Player):
+		"""
+		确保玩家状态正常（不是在封禁或者冻结状态）
+		Args:
+			player (Player): 玩家
+		Raises:
+			ErrorType.UserAbnormal: 玩家状态异常
+			ErrorType.UserFrozen: 玩家账号被冻结
+		"""
 		if player.isBanned():
 			raise GameException(ErrorType.UserAbnormal)
 		if player.isFrozen():
 			raise GameException(ErrorType.UserFrozen)
 
-	# 确保密码正确
 	@classmethod
-	def ensurePasswordCorrect(cls, player, pw):
+	def ensurePasswordCorrect(cls, player: Player, pw: str):
+		"""
+		确保密码正确
+		Args:
+			player (Player): 玩家
+			pw (str): 密码
+		Raises:
+			ErrorType.IncorrectPassword: 密码错误
+		"""
 		pw = Service.cryptoPassword(pw)
 		if player.password != pw:
 			raise GameException(ErrorType.IncorrectPassword)
 
-	# 确保选科
 	@classmethod
-	def ensureSubjectSelected(cls, player, subject):
+	def ensureSubjectSelected(cls, player: Player, subject: 'Subject'):
+		"""
+		确保玩家选中了指定科目
+		Args:
+			player (Player): 玩家
+			subject (Subject): 科目实例
+		Raises:
+			ErrorType.UnselectedSubject: 非法的选科
+		"""
 		subjects = player.subjects()
 		if subject not in subjects:
 			raise GameException(ErrorType.UnselectedSubject)
 
-	# 添加在线玩家
 	@classmethod
-	def addOnlinePlayer(cls, player, consumer):
-		RuntimeManager.add(OnlinePlayer, player.id, player=player, consumer=consumer)
+	def addOnlinePlayer(cls, player: Player, consumer: 'GameConsumer') -> OnlinePlayer:
+		"""
+		添加在线玩家
+		Args:
+			player (PLayer):
+			consumer (GameConsumer):
+		Returns:
+			返回添加的在线玩家
+		"""
+		return RuntimeManager.add(OnlinePlayer, player=player, consumer=consumer)
 
-	# 获取在线玩家
 	@classmethod
-	def getOnlinePlayer(cls, pid):
+	def getOnlinePlayer(cls, pid: int) -> OnlinePlayer:
+		"""
+		获取在线玩家
+		Args:
+			pid (int): 玩家ID
+		Returns:
+			在线玩家对象（OnlinePlayer）
+		"""
 		return RuntimeManager.get(OnlinePlayer, pid)
 
-	# 获取在线玩家
 	@classmethod
-	def deleteOnlinePlayer(cls, pid):
+	def deleteOnlinePlayer(cls, pid: int) -> OnlinePlayer:
+		"""
+		删除在线玩家
+		Args:
+			pid (int): 玩家ID
+		Returns:
+			返回所删除的在线玩家
+		"""
 		return RuntimeManager.delete(OnlinePlayer, pid)
 
-	# 获取所有在线玩家（返回：{pid: OnlinePlayer}）
 	@classmethod
-	def getOnlinePlayers(cls):
+	def getOnlinePlayers(cls) -> dict:
+		"""
+		获取所有在线玩家
+		Returns:
+			返回一个 dict ，键为玩家ID，值为 OnlinePlayer 对象
+		"""
 		return RuntimeManager.get(OnlinePlayer)
 

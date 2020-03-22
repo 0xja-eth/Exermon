@@ -84,6 +84,11 @@ class ErrorType(Enum):
 	IncorrectEquipType = 230  # 装备类型不正确
 	InvalidContainer = 231  # 无效容器
 
+	# UseItem
+	UnusableItem = 240  # 物品不可用
+	InvalidItemUsing = 241  # 无效的物品使用
+	ItemFrozen = 242  # 物品冻结中
+
 	# ExermonCommon
 	ExermonNotExist = 300  # 艾瑟萌不存在
 	ExerGiftNotExist = 301  # 艾瑟萌天赋不存在
@@ -101,6 +106,14 @@ class ErrorType(Enum):
 
 	# ExerSlot
 	IncorrectSubject = 320  # 科目不正确
+
+	# ExerEquipSlot
+	InsufficientLevel = 330  # 等级不足
+
+	# UseExerSkill
+	PassiveSkill = 340  # 被动技能
+	MPInsufficient = 341  # 精力值不足
+	NoUseCount = 342  # 无剩余使用次数
 
 	# QuestionCommon
 	QuestionNotExist = 400  # 题目不存在
@@ -130,9 +143,31 @@ class ErrorType(Enum):
 	InvalidFeedbackType = 541  # 题目反馈类型不对
 	QuesReportNotExist = 542  # 查找不到反馈记录
 
+	# BattleCommon
+	BattleNotExist = 600  # 对战不存在
+	BattleRecordNotExist = 601  # 对战记录不存在
+	NotInBattle = 602  # 未加入对战
+	AlreadlyInBattle = 603  # 已加入对战
+	BattleStarted = 604  # 对战已开始
+	BattleTerminated = 605  # 对战已结束
+
+	# BattleMatching
+	IsBanned = 610  # 账号被禁赛
+	AlreadyMatched = 611  # 已经匹配到对手
+
+	# BattlePreparing
+	ItemNotEquiped = 620  # 物品未装备
+	IncorrectTarget = 621  # 不正确的使用目标
+
+	# BattleQuesting
+	OpponentAnswered = 630  # 对方已抢答
+
+	# BattleActing
+
+	# BattleResulting
+
 	# SeasonRecord
 	SeasonNotExist = 700  # 赛季不存在
-
 
 
 class GameException(Exception):
@@ -210,6 +245,11 @@ class GameException(Exception):
 		ErrorType.IncorrectEquipType: "装备类型不正确！",
 		ErrorType.InvalidContainer: "找不到所属容器，无法进行装备操作！",
 
+		# UseItem
+		ErrorType.UnusableItem: "物品不可用！",
+		ErrorType.InvalidItemUsing: "无效的物品使用！",
+		ErrorType.ItemFrozen: "物品冻结中！",
+
 		# ExermonCommon
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",
 		ErrorType.ExerGiftNotExist: "艾瑟萌天赋不存在！",
@@ -227,6 +267,14 @@ class GameException(Exception):
 
 		# ExerSlot
 		ErrorType.IncorrectSubject: "艾瑟萌科目与槽科目不一致！",
+
+		# ExerEquipSlot
+		ErrorType.InsufficientLevel: "艾瑟萌等级不足！",
+
+		# UseExerSkill
+		ErrorType.PassiveSkill: "被动技能无法使用！",
+		ErrorType.MPInsufficient: "精力值不足！",
+		ErrorType.NoUseCount: "无剩余使用次数！",
 
 		# QuestionCommon
 		ErrorType.QuestionNotExist: "题目不存在！",
@@ -255,13 +303,40 @@ class GameException(Exception):
 		ErrorType.QuesReportTooLong: "题目反馈太长！",
 		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
 		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
+    
+		# BattleCommon
+		ErrorType.BattleNotExist: "对战不存在！",
+		ErrorType.BattleRecordNotExist: "对战记录不存在！",
+		ErrorType.NotInBattle: "尚未加入对战！",
+		ErrorType.AlreadlyInBattle: "已加入一场对战！",
+		ErrorType.BattleStarted: "对战已开始！",
+		ErrorType.BattleTerminated: "对战已结束！",
 
+		# BattleMatching
+		ErrorType.IsBanned: "您因信誉积分不足，暂时已被禁赛！如有疑问请联系管理员。",
+		ErrorType.AlreadyMatched: "已经匹配到对手！",
+
+		# BattlePreparing
+		ErrorType.ItemNotEquiped: "所使用的物品未被装备！",
+		ErrorType.IncorrectTarget: "不正确的使用目标！",
+
+		# BattleQuesting
+		ErrorType.OpponentAnswered: "对方已抢答！",
+
+		# BattleActing
+
+		# BattleResulting
+    
 		# SeasonRecord
 		ErrorType.SeasonNotExist: "赛季不存在！",
-
 	}
 
 	def __init__(self, error_type: ErrorType):
+		"""
+
+		Args:
+			error_type (ErrorType): 错误类型
+		"""
 		self.error_type = error_type
 		self.msg = GameException.ERROR_DICT[error_type]
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
@@ -130,12 +131,64 @@ class ParamValue(models.Model):
 		new_val = self.getValue()+value.getValue()
 		self.setValue(new_val, clamp)
 
+	def __add__(self, value) -> 'ParamValue':
+		if value is None: return self
+
+		if isinstance(value, ParamValue):
+			value = value.getValue()
+
+		res = ParamValue()
+		res.param_id = self.param_id
+		res.value = self.value
+		res.addValue(value)
+
+		return res
+
+	def __sub__(self, value) -> 'ParamValue':
+		if value is None: return self
+
+		if isinstance(value, ParamValue):
+			value = value.getValue()
+
+		res = ParamValue()
+		res.param_id = self.param_id
+		res.value = self.value
+		res.addValue(-value)
+
+		return res
+
 	# 值相乘
 	def multValue(self, rate, clamp=True):
 		# rate: ParamRate
 		if self.param_id != rate.param_id: return
 		new_val = self.getValue()*rate.getValue()
 		self.setValue(new_val, clamp)
+
+	def __mul__(self, rate) -> 'ParamValue':
+		if rate is None: return self
+
+		if isinstance(rate, ParamValue):
+			rate = rate.getValue()
+
+		res = ParamValue()
+		res.param_id = self.param_id
+		res.value = self.value
+		res.multValue(rate)
+
+		return res
+
+	def __truediv__(self, rate) -> 'ParamValue':
+		if rate is None: return self
+
+		if isinstance(rate, ParamValue):
+			rate = rate.getValue()
+
+		res = ParamValue()
+		res.param_id = self.param_id
+		res.value = self.value
+		res.multValue(1/rate)
+
+		return res
 
 	# Clamp 值
 	def _clampValue(self, value):
@@ -294,8 +347,12 @@ class GroupConfigure(models.Model):
 	def __str__(self):
 		return self.name
 
-	def convertToDict(self):
-
+	def convertToDict(self) -> dict:
+		"""
+		将数据转化为字典
+		Returns:
+			转化后的字典
+		"""
 		return {
 			'id': self.id,
 			'name': self.name,
@@ -304,7 +361,9 @@ class GroupConfigure(models.Model):
 
 	@classmethod
 	def load(cls):
-
+		"""
+		读取数据
+		"""
 		configure: GameConfigure = GameConfigure.get()
 
 		if configure is None:
@@ -313,35 +372,69 @@ class GroupConfigure(models.Model):
 		cls.Objects = ViewUtils.getObjects(cls, configure=configure)
 		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
 
-	# 获取单个
 	@classmethod
-	def get(cls, **kwargs):
-
+	def get(cls, **kwargs) -> 'GroupConfigure':
+		"""
+		根据条件获取单个数据
+		Args:
+			**kwargs (**dict): 查询条件
+		Returns:
+			按照条件返回指定数据（若有多个返回第一个）
+		Raises:
+			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+		Examples:
+			获取 id 为 3 的科目：
+			subject = Subject.get(id=3)
+			获取 属性缩写 为 mhp 的属性：
+			param = BaseParam.get(attr='mhp')
+		"""
 		if cls.Objects is None: cls.load()
 
 		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
 								   objects=cls.Objects, **kwargs)
 
-	# 确保存在
 	@classmethod
 	def ensure(cls, **kwargs):
-
+		"""
+		确保指定条件的数据存在
+		Args:
+			**kwargs (**dict): 查询条件
+		Raises:
+			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+		Examples:
+			确保 id 为 3 且名字为 英语 的科目存在：
+			Subject.ensure(id=3, name="英语")
+		"""
 		if cls.Objects is None: cls.load()
 
 		return ViewUtils.ensureObjectExist(cls, cls.NOT_EXIST_ERROR,
 										   objects=cls.Objects, **kwargs)
 
-	# 获取多个
 	@classmethod
-	def objs(cls, **kwargs):
-
+	def objs(cls, **kwargs) -> QuerySet:
+		"""
+		按照一定条件获取多个数据
+		Args:
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回符合指定条件的数据列表
+		Examples:
+			获取全部属性数据：
+			params = BaseParam.objs()
+			获取分值为 150 的所有科目数据：
+			subjects = Subject.objs(max_score=150)
+		"""
 		if cls.Objects is None: cls.load()
 
 		return ViewUtils.getObjects(cls, cls.Objects, **kwargs)
 
 	@classmethod
-	def count(cls):
-
+	def count(cls) -> int:
+		"""
+		获取数据的数量
+		Returns:
+			返回该数据在数据库中的数量
+		"""
 		if cls.Count is None: cls.load()
 		return cls.Count
 

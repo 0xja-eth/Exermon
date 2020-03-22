@@ -95,7 +95,7 @@ class Service:
 		# result: 刷题结果数据 => 刷题结果（可选）
 
 		exercise = player.currentQuestionSet()
-		exercise.answerQuestion(qid, selection, timespan)
+		exercise.answerQuestion(selection, timespan, question_id=qid)
 
 		if terminate:
 			exercise.terminate()
