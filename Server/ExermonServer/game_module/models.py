@@ -917,6 +917,7 @@ class GameConfigure(models.Model):
 		from exermon_module.models import Exermon, ExerSkill
 		from question_module.models import Question, QuesReport
 		from record_module.models import QuestionRecord, ExerciseRecord
+		from battle_module.models import BattleRecord, BattlePlayer, BattleRoundResult
 
 		subjects = ModelUtils.objectsToDict(self.subject_set.all())
 		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
@@ -927,6 +928,7 @@ class GameConfigure(models.Model):
 		exer_gift_stars = ModelUtils.objectsToDict(self.exergiftstar_set.all())
 		ques_stars = ModelUtils.objectsToDict(self.questionstar_set.all())
 		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
+		result_judges = ModelUtils.objectsToDict(self.battleresultjudge_set.all())
 
 		return {
 			'name': self.name,
@@ -960,6 +962,11 @@ class GameConfigure(models.Model):
 			'record_sources': QuestionRecord.SOURCES,
 			'exercise_gen_types': ExerciseRecord.GEN_TYPES,
 
+			# battle_module
+			'battle_modes': BattleRecord.MODES,
+			'round_result_types': BattleRoundResult.RESULT_TYPES,
+			'battle_result_types': BattlePlayer.RESULT_TYPES,
+
 			# 组合配置
 			'subjects': subjects,
 			'base_params': base_params,
@@ -970,6 +977,7 @@ class GameConfigure(models.Model):
 			'exer_gift_stars': exer_gift_stars,
 			'ques_stars': ques_stars,
 			'comp_ranks': comp_ranks,
+			'result_judges': result_judges,
 		}
 
 	def _convertDynamicDataToDict(self):

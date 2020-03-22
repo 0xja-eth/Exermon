@@ -14,6 +14,7 @@ using PlayerModule.Data;
 using ExermonModule.Data;
 using QuestionModule.Data;
 using SeasonModule.Data;
+using BattleModule.Data;
 
 namespace GameModule.Services {
 
@@ -341,6 +342,15 @@ namespace GameModule.Services {
         public Tuple<int, string> exerciseGenType(int id) {
             return get(staticData.configure.exerciseGenTypes, id);
         }
+        public Tuple<int, string> battleMode(int id) {
+            return get(staticData.configure.battleModes, id);
+        }
+        public Tuple<int, string> roundResultType(int id) {
+            return get(staticData.configure.roundResultTypes, id);
+        }
+        public Tuple<int, string> battleResultType(int id) {
+            return get(staticData.configure.battleResultTypes, id);
+        }
 
         /// <summary>
         /// 组合配置
@@ -374,6 +384,9 @@ namespace GameModule.Services {
         }
         public CompRank compRank(int id) {
             return get(staticData.configure.compRanks, id);
+        }
+        public ResultJudge resultJudge(int id) {
+            return get(staticData.configure.resultJudges, id);
         }
 
         /// <summary>

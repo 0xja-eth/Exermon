@@ -11,6 +11,7 @@ using PlayerModule.Data;
 using ExermonModule.Data;
 using QuestionModule.Data;
 using SeasonModule.Data;
+using BattleModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
 
@@ -395,6 +396,13 @@ namespace GameModule.Data {
         [AutoConvert]
         public Tuple<int, string>[] exerciseGenTypes { get; protected set; }
 
+        [AutoConvert]
+        public Tuple<int, string>[] battleModes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] roundResultTypes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] battleResultTypes { get; protected set; }
+
         /// <summary>
         /// 组合配置
         /// </summary>
@@ -418,6 +426,8 @@ namespace GameModule.Data {
         public QuesStar[] quesStars { get; protected set; }
         [AutoConvert]
         public CompRank[] compRanks { get; protected set; }
+        [AutoConvert]
+        public ResultJudge[] resultJudges { get; protected set; }
     }
 
     /// <summary>

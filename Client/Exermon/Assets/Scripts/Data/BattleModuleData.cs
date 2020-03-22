@@ -24,6 +24,140 @@ namespace BattleModule { }
 /// </summary>
 namespace BattleModule.Data {
 
+    #region 内存数据
+
+    /// <summary>
+    /// 评分数据
+    /// </summary>
+    public class ResultJudge : TypeData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int score { get; protected set; }
+        [AutoConvert]
+        public int win { get; protected set; }
+        [AutoConvert]
+        public int lose { get; protected set; }
+    }
+
+    /// <summary>
+    /// 对战记录
+    /// </summary>
+    public class BattleRecord : BaseData {
+
+    }
+
+    /// <summary>
+    /// 对战回合数据
+    /// </summary>
+    public class BattleRound : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int order { get; protected set; }
+        [AutoConvert]
+        public int subjectId { get; protected set; }
+        [AutoConvert]
+        public int starId { get; protected set; }
+        [AutoConvert]
+        public int questionId { get; protected set; }
+
+        /// <summary>
+        /// 是否读取
+        /// </summary>
+        public bool loaded { get; protected set; } = false;
+
+        /// <summary>
+        /// 科目对象
+        /// </summary>
+        /// <returns>返回本回合科目对象</returns>
+        public Subject subject() {
+            return DataService.get().subject(subjectId);
+        }
+
+        /// <summary>
+        /// 题目星级对象
+        /// </summary>
+        /// <returns>返回本回合题目星级对象</returns>
+        public QuesStar star() {
+            return DataService.get().quesStar(starId);
+        }
+
+        /// <summary>
+        /// 题目对象
+        /// </summary>
+        /// <returns>返回题目对象</returns>
+        public Question question() {
+            return QuestionService.get().getQuestion(questionId);
+        }
+
+        /// <summary>
+        /// 读取自定义数据
+        /// </summary>
+        /// <param name="json">数据</param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            QuestionService.get().loadQuestions(
+                new int[] { questionId }, () => loaded = true);
+        }
+    }
+
+    /// <summary>
+    /// 对战玩家记录
+    /// </summary>
+    public class BattlePlayer : QuestionSetRecord {
+
+        /// <summary>
+        /// 对战回合结果
+        /// </summary>
+        public class BattleRoundResult : PlayerQuestion {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int order { get; protected set; }
+            [AutoConvert]
+            public bool attack { get; protected set; }
+            [AutoConvert]
+            public int skillId { get; protected set; }
+            [AutoConvert]
+            public int targetType { get; protected set; }
+            [AutoConvert]
+            public int resultType { get; protected set; }
+            [AutoConvert]
+            public int hurt { get; protected set; }
+            [AutoConvert]
+            public int damage { get; protected set; }
+            [AutoConvert]
+            public int recover { get; protected set; }
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int scoreIncr { get; protected set; }
+        [AutoConvert]
+        public int timeScore { get; protected set; }
+        [AutoConvert]
+        public int hurtScore { get; protected set; }
+        [AutoConvert]
+        public int recoverScore { get; protected set; }
+        [AutoConvert]
+        public int correctScore { get; protected set; }
+        [AutoConvert]
+        public int plusScore { get; protected set; }
+        [AutoConvert]
+        public int result { get; protected set; }
+        [AutoConvert]
+        public int status { get; protected set; }
+    }
+
     /// <summary>
     /// 对战物资槽
     /// </summary>
@@ -79,71 +213,9 @@ namespace BattleModule.Data {
 
     }
 
-    /// <summary>
-    /// 对战记录
-    /// </summary>
-    public class BattleRecord : QuestionSetRecord {
+    #endregion
 
-    }
-
-    #region 运行时对象
-
-    /// <summary>
-    /// 对战回合数据
-    /// </summary>
-    public class RuntimeBattleRound : BaseData {
-
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
-        public int order { get; protected set; }
-        [AutoConvert]
-        public int subjectId { get; protected set; }
-        [AutoConvert]
-        public int starId { get; protected set; }
-        [AutoConvert]
-        public int questionId { get; protected set; }
-
-        /// <summary>
-        /// 是否读取
-        /// </summary>
-        public bool loaded { get; protected set; } = false;
-
-        /// <summary>
-        /// 科目对象
-        /// </summary>
-        /// <returns>返回本回合科目对象</returns>
-        public Subject subject() {
-            return DataService.get().subject(subjectId);
-        }
-
-        /// <summary>
-        /// 题目星级对象
-        /// </summary>
-        /// <returns>返回本回合题目星级对象</returns>
-        public QuesStar star() {
-            return DataService.get().quesStar(starId);
-        }
-
-        /// <summary>
-        /// 题目对象
-        /// </summary>
-        /// <returns>返回题目对象</returns>
-        public Question question() {
-            return QuestionService.get().getQuestion(questionId);
-        }
-
-        /// <summary>
-        /// 读取自定义数据
-        /// </summary>
-        /// <param name="json">数据</param>
-        protected override void loadCustomAttributes(JsonData json) {
-            base.loadCustomAttributes(json);
-            QuestionService.get().loadQuestions(
-                new int[] { questionId }, () => loaded = true);
-        }
-    }
+    #region 运行时数据
 
     /// <summary>
     /// 对战艾瑟萌BUFF

@@ -29,7 +29,7 @@ class BattleResultJudge(GroupConfigure):
 	class Meta:
 		verbose_name = verbose_name_plural = "对战评价表"
 
-	# 评价分数
+	# 评价要求分数
 	score = models.PositiveSmallIntegerField(default=0, verbose_name="评价分数")
 
 	# 胜利增加星星
@@ -617,7 +617,7 @@ class BattlePlayer(QuestionSetRecord):
 		(BattlePlayerStatus.Cancelled.value, "退出"),
 	]
 
-	RESULTS = [
+	RESULT_TYPES = [
 		(BattlePlayerResult.Win.value, "胜利"),
 		(BattlePlayerResult.Lose.value, "失败"),
 		(BattlePlayerResult.Tie.value, "平局"),
@@ -648,7 +648,7 @@ class BattlePlayer(QuestionSetRecord):
 	plus_score = models.PositiveSmallIntegerField(null=True, verbose_name="奖励分数")
 
 	# 战斗结果
-	result = models.PositiveSmallIntegerField(null=True, choices=RESULTS, verbose_name="战斗结果")
+	result = models.PositiveSmallIntegerField(null=True, choices=RESULT_TYPES, verbose_name="战斗结果")
 
 	# 战斗标志
 	status = models.PositiveSmallIntegerField(null=True, choices=STATUSES, verbose_name="战斗状态标志")
@@ -843,7 +843,7 @@ class BattleRoundResult(PlayerQuestion):
 	class Meta:
 		verbose_name = verbose_name_plural = "对战回合结果"
 
-	RESULTS = [
+	RESULT_TYPES = [
 		(HitResultType.Unknown.value, "未知"),
 		(HitResultType.Hit.value, "命中"),
 		(HitResultType.Critical.value, "暴击"),
@@ -868,8 +868,8 @@ class BattleRoundResult(PlayerQuestion):
 												   choices=ExerSkill.TARGET_TYPES, verbose_name="目标")
 
 	# 回合结果（本回合攻击方的结果）
-	result = models.PositiveSmallIntegerField(default=HitResultType.Unknown,
-											  choices=RESULTS, verbose_name="回合结果")
+	result_type = models.PositiveSmallIntegerField(default=HitResultType.Unknown,
+												   choices=RESULT_TYPES, verbose_name="回合结果")
 
 	# 伤害点数（自己对目标造成的HP伤害，小于0为恢复）
 	hurt = models.SmallIntegerField(default=0, verbose_name="伤害点数")
@@ -914,7 +914,7 @@ class BattleRoundResult(PlayerQuestion):
 		res['attack'] = self.attack
 		res['skill_id'] = self.skill_id
 		res['target_type'] = self.target_type
-		res['result'] = self.result
+		res['result_type'] = self.result_type
 		res['hurt'] = self.hurt
 		res['damage'] = self.damage
 		res['recover'] = self.recover
@@ -973,7 +973,7 @@ class BattleRoundResult(PlayerQuestion):
 		"""
 		self.skill = skill
 		self.target_type = target_type.value
-		self.result = result_type.value
+		self.result_type = result_type.value
 
 		self._processHurt(hurt, attacker)
 
