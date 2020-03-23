@@ -51,13 +51,13 @@ WEBSOCKET_METHOD_ROUTER = {
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 玩家忘记密码
-	'player/player/forget': [[
+	'player/player/retrieve': [[
 		['un', 'str'],
 		['pw', 'str'],
 		['email', 'str'],
 		['code', 'str']
 	],
-		Player.forget,  # 处理函数
+		Player.retrieve,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 发送验证码
@@ -370,7 +370,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		['mode', 'int'],
 	],
 		Battle.matchStart,  # 处理函数
-		ChannelLayerTag.NoLayer  # 是否需要响应
+		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 对战取消匹配
 	'battle/match/cancel': [[

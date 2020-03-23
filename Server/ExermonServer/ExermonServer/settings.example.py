@@ -178,6 +178,6 @@ CODE_LENGTH = 6
 CODE_SECOND = 60
 
 CODE_TEXT = {
-    'register' : ('Exermon','亲爱的%s，\n您的 Exermon 注册验证码为 %s \n验证码将在 %d 秒后失效。\n若非本人操作请忽略。',DEFAULT_FROM_EMAIL),
-    'forget' : ('Exermon','亲爱的%s，\n您的 Exermon 重置密码验证码为 %s \n验证码将在 %d 秒后失效。\n若非本人操作请忽略。',DEFAULT_FROM_EMAIL)
+    'register': ('Exermon','亲爱的%s，\n您的 Exermon 注册验证码为 %s \n验证码将在 %d 秒后失效。\n若非本人操作请忽略。',DEFAULT_FROM_EMAIL),
+    'retrieve': ('Exermon','亲爱的%s，\n您的 Exermon 重置密码验证码为 %s \n验证码将在 %d 秒后失效。\n若非本人操作请忽略。',DEFAULT_FROM_EMAIL)
 }

@@ -193,8 +193,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 351.81952, y: -28}
-  m_SizeDelta: {x: 639.63904, y: 48}
+  m_AnchoredPosition: {x: 352, y: -28}
+  m_SizeDelta: {x: 640, y: 48}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &65761972
 GameObject:
@@ -853,6 +853,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2325465904369734621, guid: c731fdc038c2fa14895046c63facbb72,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -7.9999924
       objectReference: {fileID: 0}
     - target: {fileID: 4223823816465424607, guid: c731fdc038c2fa14895046c63facbb72,
         type: 3}
@@ -3665,8 +3670,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 351.81952, y: -116}
-  m_SizeDelta: {x: 639.63904, y: 48}
+  m_AnchoredPosition: {x: 352, y: -116}
+  m_SizeDelta: {x: 640, y: 48}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &736932541
 GameObject:
@@ -7888,7 +7893,7 @@ PrefabInstance:
     - target: {fileID: 8130506248365518529, guid: c731fdc038c2fa14895046c63facbb72,
         type: 3}
       propertyPath: m_Text
-      value: "\u8BF7\u8F93\u5165\u4E0D\u8D85\u8FC78\u4E2A\u5B57\u7B26\u7684\u89D2\u8272\u6635\u79F0"
+      value: "\u8BF7\u8F93\u5165\u4E0D\u8D85\u8FC78\u4E2A\u5B57\u7B26\u7684\u6635\u79F0"
       objectReference: {fileID: 0}
     - target: {fileID: 8475750865226978680, guid: c731fdc038c2fa14895046c63facbb72,
         type: 3}
@@ -10195,6 +10200,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: "\u5E74\u7EA7"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7667525660993982386, guid: c1fc0256d0f3ec54a8392b15c9927da6,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c1fc0256d0f3ec54a8392b15c9927da6, type: 3}

@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 from item_module.models import BaseItem, BaseContainer
-from player_module.models import Player
+# from player_module.models import Player
 from utils.model_utils import CacheableModel, Common as ModelUtils
 from utils.calc_utils import QuestionGenerateType, QuestionGenerateConfigure, \
 	QuestionSetResultRewardCalc, QuestionSetSingleRewardCalc, \
@@ -750,7 +750,7 @@ class QuestionSetRecord(CacheableModel):
 		cache = self._getQuestionsCache()
 		if player_ques in cache: cache.remove(player_ques)
 
-	def exactlyPlayer(self) -> Player:
+	def exactlyPlayer(self): # -> Player:
 		"""
 		获取实际玩家在线信息
 		Returns:

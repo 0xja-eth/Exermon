@@ -1,8 +1,6 @@
 from django.db import models
 from utils.model_utils import Common as ModelUtils
 from game_module.models import GroupConfigure
-from player_module.views import Common
-from player_module.models import Player
 import datetime
 
 # Create your models here.
@@ -77,6 +75,7 @@ class SeasonRecord(models.Model):
 	# 发送段位变更信息
 	async def _emitRankChanged(self, rank, sub_rank):
 		from game_module.consumer import EmitType
+		from player_module.views import Common
 
 		# 生成返回信息，规范见接口文档
 		data = {'rank_id': rank, 'sub_rank': sub_rank, 'star_num': self.star_num}
@@ -87,7 +86,7 @@ class SeasonRecord(models.Model):
 		# data 为发送的信息，需要传一个 dict
 		await player.consumer.emit(EmitType.RankChanged, data=data)
 
-	def adjustCredit(self, player: Player, credit):
+	def adjustCredit(self, player: 'Player', credit):
 		player.credit += credit
 
 		count = self.suspensions().count()

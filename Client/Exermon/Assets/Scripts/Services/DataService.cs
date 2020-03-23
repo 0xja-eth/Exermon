@@ -351,6 +351,9 @@ namespace GameModule.Services {
         public Tuple<int, string> battleResultType(int id) {
             return get(staticData.configure.battleResultTypes, id);
         }
+        public Tuple<int, string> battleStatus(int id) {
+            return get(staticData.configure.battleStatuses, id);
+        }
 
         /// <summary>
         /// 组合配置

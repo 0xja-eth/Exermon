@@ -30,8 +30,10 @@ class Service:
 		Check.ensureEmailFormat(email)
 
 		CodeManager.ensureCode(un, email, code, 'register')
+		CodeManager.deleteCode(un, email, 'register')
 
 		pw = cls.cryptoPassword(pw)
+
 		player = Player.register(consumer, un, pw, email)
 
 		return {'id': player.id}
@@ -56,19 +58,20 @@ class Service:
 
 	# 玩家忘记密码
 	@classmethod
-	async def forget(cls, consumer, un: str, pw: str, email: str, code: str):
+	async def retrieve(cls, consumer, un: str, pw: str, email: str, code: str):
 		# 返回数据：无
 
 		Check.ensureUsernameFormat(un)
 		Check.ensurePasswordFormat(pw)
 		Check.ensureEmailFormat(email)
 
-		CodeManager.ensureCode(un, email, code, 'forget')
+		CodeManager.ensureCode(un, email, code, 'retrieve')
+		CodeManager.deleteCode(un, email, 'retrieve')
 
 		# 获取对应的 Player（程序会自动校验并报错）
-		player = Common.getPlayer(error=ErrorType.IncorrectForget, username=un, email=email)
+		player = Common.getPlayer(error=ErrorType.IncorrectRetrieve, username=un, email=email)
 
-		await cls._doForget(consumer, player, pw)
+		await cls._doRetrieve(consumer, player, pw)
 
 	# 发送验证码
 	@classmethod
@@ -78,8 +81,11 @@ class Service:
 		conf = settings.CODE_TEXT[type]
 		code = CodeManager.generateCode(un, email, type)
 
-		if not (type == 'register' or type == 'forget'):
+		if not (type == 'register' or type == 'retrieve'):
 			raise GameException(ErrorType.ParameterError)
+
+		if type == 'retrieve':
+			Common.ensurePlayerExist(error=ErrorType.IncorrectRetrieve, username=un, email=email)
 
 		print("sendCode to %s [%s]: %s" % (email, type, code))
 		cls._doSendCode(un, email, code, conf)
@@ -142,10 +148,12 @@ class Service:
 
 	# 实际执行重置密码的操作
 	@classmethod
-	async def _doForget(cls, consumer, player, pw):
+	async def _doRetrieve(cls, consumer, player, pw):
 
 		if player.isOnline():
-			await cls.processAnyOnline(consumer, player, 'forget')
+			await cls.processAnyOnline(consumer, player, 'retrieve')
+
+		pw = cls.cryptoPassword(pw)
 
 		player.resetPassword(consumer, pw)
 
@@ -173,7 +181,7 @@ class Service:
 			message = Player.DUPLICATED_LOGIN_KICKOUT_MSG
 
 		# 重置密码（忘记密码）时玩家在线
-		if type == 'forget':
+		if type == 'retrieve':
 			message = Player.CHANGE_PASSWORD_KICKOUT_MSG
 
 		await cls._doKickout(online_player, message)
@@ -488,7 +496,7 @@ class Common:
 		Args:
 			player (Player): 所属玩家
 			error (ErrorType): 错误时抛出的异常类型
-			**kwargs (**dict): 查询条件 
+			**kwargs (**dict): 查询条件
 		Returns:
 			返回一定条件下的玩家持有物品，如果有多个符合条件，返回第一个
 		"""
@@ -651,4 +659,5 @@ class Common:
 			返回一个 dict ，键为玩家ID，值为 OnlinePlayer 对象
 		"""
 		return RuntimeManager.get(OnlinePlayer)
+
 

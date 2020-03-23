@@ -1,4 +1,5 @@
 from utils.exception import GameException, ErrorType
+from utils.runtime_manager import RuntimeManager
 import datetime, random
 
 
@@ -37,7 +38,10 @@ class CodeManager:
     # 生成一个 CodeDatum 并存入 code_data 中
     @classmethod
     def generateCode(cls, un, email, type):
-        code = cls.getCode(un, email, type) or CodeDatum(un, email, type)
+        if cls.getCode(un, email, type) is not None:
+            raise GameException(ErrorType.CodeTooFrequent)
+
+        code = CodeDatum(un, email, type)
         cls.code_data[cls.getKey(un, email, type)] = code
 
         return code.code
@@ -74,7 +78,11 @@ class CodeManager:
 
     # 扫描 Code，如果过期就删去
     @classmethod
-    def scanCodes(cls):
-        for code in cls.code_data:
-            if datetime.datetime.now() > cls.code_data[code].token.out_time:
+    async def scanCodes(cls):
+        tmp_data = cls.code_data.copy()
+        for code in tmp_data:
+            if datetime.datetime.now() > tmp_data[code].out_time:
                 cls.code_data.pop(code)
+
+
+RuntimeManager.registerEvent(CodeManager.scanCodes)

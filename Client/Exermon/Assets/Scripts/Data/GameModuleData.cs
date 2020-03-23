@@ -402,6 +402,8 @@ namespace GameModule.Data {
         public Tuple<int, string>[] roundResultTypes { get; protected set; }
         [AutoConvert]
         public Tuple<int, string>[] battleResultTypes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] battleStatuses { get; protected set; }
 
         /// <summary>
         /// 组合配置

@@ -1,11 +1,9 @@
 ﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Networking;
-using BestHTTP;
+
 using BestHTTP.WebSocket;
 using LitJson;
 
@@ -33,8 +31,8 @@ namespace Core.Systems {
             /// <summary>
             /// 服务器地址配置
             /// </summary>
-            public const string ServerURL = "ws://111.230.227.84:8001/game/";
-            //public const string ServerURL = "ws://127.0.0.1:8000/game/";
+            //public const string ServerURL = "ws://111.230.227.84:8001/game/";
+            public const string ServerURL = "ws://127.0.0.1:8000/game/";
 
             /// <summary>
             /// 路由配置
@@ -227,6 +225,20 @@ namespace Core.Systems {
         public static class EmitDataHandler {
 
             /// <summary>
+            /// 处理发射信息事件字典
+            /// </summary>
+            static Dictionary<string, UnityAction<JsonData>> handlers = new Dictionary<string, UnityAction<JsonData>>();
+
+            /// <summary>
+            /// 添加发射处理事件
+            /// </summary>
+            /// <param name="type">类型</param>
+            /// <param name="handler">事件</param>
+            public static void addEmitHandler(string type, UnityAction<JsonData> handler) {
+                handlers.Add(type, handler);
+            }
+
+            /// <summary>
             /// 处理接收的发射信息
             /// </summary>
             /// <param name="data">接收发送数据</param>
@@ -247,7 +259,9 @@ namespace Core.Systems {
                 Debug.Log("processEmitData: " + type + ": " + data.ToJson());
                 Debug.Log("Self.socketName = " + get().socketName);
 
-                switch (type) {
+                if (handlers.ContainsKey(type))
+                    handlers[type]?.Invoke(data);
+                else switch (type) {
                     case "link": processLink(data); break;
                     case "disconnect": processDisconnect(data); break;
                 }
@@ -284,6 +298,7 @@ namespace Core.Systems {
             static void onSelfDisconnect(int code, string message) {
                 get().handleDisconnect(-1, message);
             }
+
             /// <summary>
             /// 断开他人连接
             /// </summary>
@@ -555,39 +570,18 @@ namespace Core.Systems {
         /// <param name="error">错误回调</param>
         /// <param name="show">是否显示加载</param>
         /// <param name="tips">加载提示文本</param>
+        /// <param name="emit">是否为发射数据</param>
         public void setupRequest(string route, JsonData data = null,
             RequestObject.SuccessAction success = null,
             RequestObject.ErrorAction error = null,
-            bool show = true, string tips = "") {
-            setup(success, error, show, tips);
-            postRequest(route, data);
-        }
-
-        /*
-        /// <summary>
-        /// 配置并发送请求对象（带用户检查）
-        /// </summary>
-        /// <param name="route">路由</param>
-        /// <param name="data">数据</param>
-        /// <param name="success">成功回调</param>
-        /// <param name="error">错误回调</param>
-        /// <param name="show">是否显示加载</param>
-        /// <param name="tips">加载提示文本</param>
-        public void setupWSUserRequest(string route, JsonData data = null,
-            RequestObject.SuccessAction success = null,
-            RequestObject.ErrorAction error = null,
-            bool show = true, string tips = "") {
-            if (data == null) data = new JsonData();
-            if (UserSystem.player == null) {
-                GameException e = new GameException(GameException.Type.UserUnlogin);
-                error.Invoke(e.getCode(), e.getMessage());
-            } else {
-                data["pid"] = UserSystem.player.getID();
-                setupWSRequest(route, data, success, error, show, tips);
+            bool show = true, string tips = "", bool emit = false) {
+            if (emit == true) postEmit(route, data);
+            else {
+                setup(success, error, show, tips);
+                postRequest(route, data);
             }
         }
-        */
-
+        
         /// <summary>
         /// 重发所有请求
         /// </summary>
@@ -700,6 +694,15 @@ namespace Core.Systems {
 
         // 逻辑处理
         #region 处理函数
+
+        /// <summary>
+        /// 添加发射处理事件
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="event_">事件</param>
+        public void addEmitHandler(string type, UnityAction<JsonData> event_) {
+            EmitDataHandler.addEmitHandler(type, event_);
+        }
 
         /// <summary>
         /// 处理处理错误（有action的错误）

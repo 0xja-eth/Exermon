@@ -40,7 +40,9 @@ namespace UI.Common.Controls.InputFields {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Text explainer; // 文本提示
+        public GameObject explainer; // 文本提示（物体）
+        public Text explainerText; // 文本提示（文本组件）
+
         public GameObject correct, wrong, attention; // 图标提示
         public GameObject current; // 当前箭头
         public Image inputBackground; // 输入背景
@@ -156,8 +158,7 @@ namespace UI.Common.Controls.InputFields {
         /// <param name="check">是否更新状态</param>
         /// <param name="emit">是否回调</param>
         public void setValue(T value, bool check = true, bool emit = true) {
-            if (assignValue(value))
-                onValueChanged(check, emit);
+            if (assignValue(value)) onValueChanged(check, emit);
         }
 
         /// <summary>
@@ -218,24 +219,24 @@ namespace UI.Common.Controls.InputFields {
         /// 清空状态
         /// </summary>
         public void clearStatus() {
-            correct?.SetActive(false);
-            wrong?.SetActive(false);
+            if (correct) correct.SetActive(false);
+            if (wrong) wrong.SetActive(false);
         }
 
         /// <summary>
         /// 显示正确
         /// </summary>
         public void showCorrect() {
-            correct?.SetActive(true);
-            wrong?.SetActive(false);
+            if (correct) correct.SetActive(true);
+            if (wrong) wrong.SetActive(false);
         }
 
         /// <summary>
         /// 显示正错误
         /// </summary>
         public void showWrong() {
-            correct?.SetActive(false);
-            wrong?.SetActive(true);
+            if (correct) correct.SetActive(false);
+            if (wrong) wrong.SetActive(true);
         }
 
         /// <summary>
@@ -252,7 +253,8 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="text">提示文本</param>
         public void setExplainerText(string text) {
-            if (explainer != null) explainer.text = text;
+            if (explainer) explainer.SetActive(text != "");
+            if (explainerText) explainerText.text = text;
         }
 
         /// <summary>
@@ -308,7 +310,7 @@ namespace UI.Common.Controls.InputFields {
         protected virtual void onFocus() {
             if (!isFocusEnable) return;
             focused = true;
-            current?.SetActive(true);
+            if (current) current.SetActive(true);
             if (inputBackground)
                 inputBackground.color = focusColor;
         }
@@ -319,7 +321,7 @@ namespace UI.Common.Controls.InputFields {
         protected virtual void onBlur() {
             if (!isFocusEnable) return;
             focused = false;
-            current?.SetActive(false);
+            if (current) current.SetActive(false);
             if (inputBackground)
                 inputBackground.color = blurColor;
         }

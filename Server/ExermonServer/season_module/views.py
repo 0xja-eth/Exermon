@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import *
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, GameException
+from player_module.models import Player
 
 
 class Service:

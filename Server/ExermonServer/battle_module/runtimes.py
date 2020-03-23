@@ -105,7 +105,7 @@ class MatchingManager:
 			cls.Queue = RuntimeManager.get(MatchingPlayer)
 
 	@classmethod
-	def process(cls):
+	async def process(cls):
 		"""
 		每帧处理
 		"""
@@ -1137,9 +1137,12 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回匹配信息字典
 		"""
+		online_player1 = self.getOnlinePlayer(self.player1)
+		online_player2 = self.getOnlinePlayer(self.player2)
+
 		return {
-			'player1': self.player1.convertToDict(type="matched"),
-			'player2': self.player2.convertToDict(type="matched"),
+			'player1': self.player1.convertToDict(type="matched", online_player=online_player1),
+			'player2': self.player2.convertToDict(type="matched", online_player=online_player2),
 		}
 
 	def _leaveBattleGroup(self):

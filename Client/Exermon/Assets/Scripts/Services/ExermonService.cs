@@ -316,6 +316,8 @@ namespace ExermonModule.Services {
             sendRequest(Oper.DequipExerEquip, data, onSuccess, onError, uid: true);
         }
 
+        #region 容器读取
+
         /// <summary>
         /// 读取艾瑟萌背包
         /// </summary>
@@ -368,18 +370,9 @@ namespace ExermonModule.Services {
             Player player = getPlayer();
             itemSer.getSlot(player.slotContainers.exerSlot, onSuccess, onError);
         }
-        /*
-        /// <summary>
-        /// 获取艾瑟萌
-        /// </summary>
-        /// <param name="cid">容器ID</param>
-        /// <param name="onSuccess">成功回调</param>
-        /// <param name="onError">失败回调</param>
-        public void loadExerHub(int cid = 0, UnityAction onSuccess = null, UnityAction onError = null) {
-            Player player = getPlayer();
-            itemSer.getPack(player.packContainers.exerHub, onSuccess, onError);
-        }
-        */
+
+        #endregion
+
         #endregion
     }
 }

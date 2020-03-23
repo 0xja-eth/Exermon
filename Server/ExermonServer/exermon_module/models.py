@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from game_module.models import BaseParam, ParamRate, Subject
+from game_module.models import BaseParam, ParamValue, ParamRate, Subject, ExerEquipType
 from item_module.models import *
 from utils.model_utils import SkillImageUpload, ExermonImageUpload, \
 	Common as ModelUtils

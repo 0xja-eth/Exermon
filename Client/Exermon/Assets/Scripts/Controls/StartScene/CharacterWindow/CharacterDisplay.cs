@@ -146,7 +146,8 @@ namespace UI.StartScene.Controls.Character {
         /// </summary>
         protected override void drawExactlyItem(Character character) {
             var bust = character.bust;
-            var rect = new Rect(0, 0, bust.width, Character.BustHeight);
+            var rect = new Rect(0, bust.height - Character.BustHeight, 
+                bust.width, Character.BustHeight);
             image.gameObject.SetActive(true);
             image.overrideSprite = Sprite.Create(
                 bust, rect, new Vector2(0.5f, 0.5f));

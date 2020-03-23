@@ -33,8 +33,9 @@ class ErrorType(Enum):
 	PlayerExist = 101  # 玩家已存在
 	IncorrectPassword = 102  # 密码错误
 	UnselectedSubject = 103  # 人物未选择该科目
+	CodeTooFrequent = 104  # 验证码发送太频繁
 
-	# PlayerRegister/Forget
+	# PlayerRegister/Retrieve
 	UsernameExist = 110  # 用户名已存在
 	InvalidUsername = 111  # 非法的用户名
 	InvalidPassword = 112  # 非法的密码
@@ -42,7 +43,7 @@ class ErrorType(Enum):
 	InvalidPhone = 114  # 非法的电话号码
 	EmailExist = 115  # 邮箱地址已存在
 	InvalidEmail = 116  # 非法的邮箱地址
-	IncorrectForget = 117  # 不正确的找回密码参数
+	IncorrectRetrieve = 117  # 不正确的找回密码参数
 	IncorrectCode = 118  # 验证码错误
 	EmailSendError = 119  # 邮件发送错误
 
@@ -139,8 +140,8 @@ class ErrorType(Enum):
 	GenerateError = 530  # 题目生成有误
 
 	# QuesReport
-	FeedbackTooLong = 540  # 题目反馈太长
-	InvalidFeedbackType = 541  # 题目反馈类型不对
+	QuesReportTooLong = 540  # 题目反馈太长
+	InvalidQuesReportType = 541  # 题目反馈类型不对
 	QuesReportNotExist = 542  # 查找不到反馈记录
 
 	# BattleCommon
@@ -195,8 +196,9 @@ class GameException(Exception):
 		ErrorType.PlayerExist: "玩家已存在！",
 		ErrorType.IncorrectPassword: "密码错误！",
 		ErrorType.UnselectedSubject: "人物未选择该科目！",
+		ErrorType.CodeTooFrequent: "验证码发送太频繁，请1分钟后重试！",
 
-		# PlayerRegister/Forget
+		# PlayerRegister/Retrieve
 		ErrorType.UsernameExist: "用户名已存在！",
 		ErrorType.InvalidUsername: "非法的用户名格式！",
 		ErrorType.InvalidPassword: "非法的密码格式！",
@@ -204,7 +206,7 @@ class GameException(Exception):
 		ErrorType.InvalidPhone: "非法的电话号码格式！",
 		ErrorType.EmailExist: "邮箱地址已存在！",
 		ErrorType.InvalidEmail: "非法的邮箱地址格式！",
-		ErrorType.IncorrectForget: "用户名不存在或邮箱错误！",
+		ErrorType.IncorrectRetrieve: "用户名不存在或邮箱错误！",
 		ErrorType.IncorrectCode: "验证码过时或不正确！",
 		ErrorType.EmailSendError: "邮件发送错误！",
 

@@ -12,8 +12,6 @@ from utils.exception import ErrorType, GameException
 from enum import Enum
 import random, datetime
 
-import battle_module.runtimes as Runtimes
-
 # Create your models here.
 
 
@@ -23,7 +21,6 @@ import battle_module.runtimes as Runtimes
 class BattleResultJudge(GroupConfigure):
 	"""
 	对战评价表，记录对战评价所需分数以及增加/扣除星星数的关系
-
 	"""
 
 	class Meta:
@@ -656,6 +653,20 @@ class BattlePlayer(QuestionSetRecord):
 	def __str__(self):
 		return str(self.player)
 
+	# admin 用
+	def adminScores(self):
+		from django.utils.html import format_html
+
+		res = "用时：%.2f，伤害：%.2f<br>" \
+			  "承伤：%.2f，回复：%.2f<br>" \
+			  "行动：%.2f，附加：%.2f<br>" \
+			  "总分：%.2f" % \
+			  (self.time_score, self.hurt_score, self.damage_score,
+			   self.recover_score, self.correct_score, self.plus_score,
+			   self.battleScore())
+
+		return format_html(res)
+
 	@classmethod
 	def playerQuesClass(cls) -> 'BattleRoundResult':
 		"""
@@ -707,12 +718,12 @@ class BattlePlayer(QuestionSetRecord):
 		res['sum_damage'] = self.sumDamage()
 		res['sum_recover'] = self.sumRecover()
 
-		res['time_score'] = self.time_score
-		res['hurt_score'] = self.hurt_score
-		res['damage_score'] = self.damage_score
-		res['recover_score'] = self.recover_score
-		res['correct_score'] = self.correct_score
-		res['plus_score'] = self.plus_score
+		res['time_score'] = self.time_score/100
+		res['hurt_score'] = self.hurt_score/100
+		res['damage_score'] = self.damage_score/100
+		res['recover_score'] = self.recover_score/100
+		res['correct_score'] = self.correct_score/100
+		res['plus_score'] = self.plus_score/100
 
 		res['result'] = self.result
 		res['status'] = self.status
@@ -899,7 +910,7 @@ class BattleRoundResult(PlayerQuestion):
 		return RecordSource.Battle
 
 	def convertToDict(self, type: str = None,
-					  runtime_battler: Runtimes.RuntimeBattlePlayer = None) -> dict:
+					  runtime_battler: 'RuntimeBattlePlayer' = None) -> dict:
 		"""
 		转化为字典
 		Args:

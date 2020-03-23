@@ -60,7 +60,7 @@ namespace UI.TitleScene.Windows {
         public GameObject loginUsername, loginPassword;
         public GameObject registerRetrieveUsername, registerRetrievePassword, registerRetrieveEmail, registerRetrieveCode;
         public GameObject registerPattern, retrievePattern; // 界面花纹
-        public GameObject loginWindow, registerRetrieveWindow, chooseWindow, buttons; // 界面
+        public GameObject loginPage, registerRetrievePage, welcomeButtons, buttons; // 界面
         public Button loginBtn, registerBtn, retrieveBtn, finishBtn; // 功能按钮
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace UI.TitleScene.Windows {
         /// <summary>ck
         /// 界面类型
         /// </summary>
-        private Type _type = Type.Login;
+        private Type _type = Type.Welcome;
         public Type type {
             get { return _type; }
             set {
@@ -100,7 +100,7 @@ namespace UI.TitleScene.Windows {
         protected override void initializeOnce() {
             base.initializeOnce();
             scene = (TitleScene)SceneUtils.getSceneObject("Scene");
-            state = State.Shown;
+            Debug.Log("initializeOnce");
             initializeInputItemFields();
             setupInputItemFields();
         }
@@ -134,10 +134,10 @@ namespace UI.TitleScene.Windows {
         /// 配置输入域
         /// </summary>
         void setupInputItemFields() {
-            /*
+            
             if (loginUsernameInput) loginUsernameInput.check = ValidateService.checkUsername;
             if (loginPasswordInput) loginPasswordInput.check = ValidateService.checkPassword;
-            */
+            
             if (usernameInput) usernameInput.check = ValidateService.checkUsername;
             if (passwordInput) passwordInput.check = ValidateService.checkPassword;
             if (emailInput) emailInput.check = ValidateService.checkEmail;
@@ -147,7 +147,7 @@ namespace UI.TitleScene.Windows {
         #endregion
 
         #region 更新控制
-
+        /*
         /// <summary>
         /// 更新
         /// </summary>
@@ -161,6 +161,19 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         void updateType() {
 
+        }
+        */
+        #endregion
+
+        #region 启动/结束控制
+
+        /// <summary>
+        /// 启动窗口
+        /// </summary>
+        public override void startWindow() {
+            base.startWindow();
+            welcomeButtons.SetActive(false);
+            gotoLogin();
         }
 
         #endregion
@@ -215,6 +228,17 @@ namespace UI.TitleScene.Windows {
         }
 
         /// <summary>
+        /// 完成按钮
+        /// </summary>
+        public void finish() {
+            switch (type) {
+                case Type.Login: login(); break;
+                case Type.Register: register(); break;
+                case Type.Retrieve: retrieve(); break;
+            }
+        }
+
+        /// <summary>
         /// 获取验证码
         /// </summary>
         public void send() {
@@ -260,7 +284,7 @@ namespace UI.TitleScene.Windows {
             var email = emailInput.getValue();
             var code = codeInput.getValue();
 
-            playerSer.retrieve(un, pw, email, code, onRegisterSuccess);
+            playerSer.retrieve(un, pw, email, code, onRetrieveSuccess);
         }
 
         /// <summary>
@@ -291,8 +315,8 @@ namespace UI.TitleScene.Windows {
         /// <param name="res">返回结果</param>
         void onLoginSuccess() {
             var config = gameSer.configure;
-            config.rememberUsername = usernameInput.getValue();
-            config.rememberPassword = passwordInput.getValue();
+            config.rememberUsername = loginUsernameInput.getValue();
+            config.rememberPassword = loginPasswordInput.getValue();
             scene.startGame();
         }
 
@@ -319,7 +343,7 @@ namespace UI.TitleScene.Windows {
         /// 检查是否可以登陆
         /// </summary>
         bool checkLogin() {
-            return usernameInput.isCorrect() && passwordInput.isCorrect();
+            return loginUsernameInput.isCorrect() && loginPasswordInput.isCorrect();
         }
 
         /// <summary>
@@ -347,10 +371,9 @@ namespace UI.TitleScene.Windows {
         /// 刷新视窗
         /// </summary>
         protected override void refresh() {
-            base.refresh();
-            clearAllInputFields();
+            base.refresh(); clear();
             switch (type) {
-                case Type.Welcome: refreshWelcome(); break;
+                //case Type.Welcome: refreshWelcome(); break;
                 case Type.Login: refreshLogin(); break;
                 case Type.Register: refreshRegister(); break;
                 case Type.Retrieve: refreshRetrieve(); break;
@@ -361,15 +384,20 @@ namespace UI.TitleScene.Windows {
         /// 欢迎界面
         /// </summary>
         void refreshWelcome() {
+            welcomeButtons.SetActive(true);
         }
 
         /// <summary>
         /// 登陆界面
         /// </summary>
         void refreshLogin() {
-            loginWindow.SetActive(true);
+            buttons.SetActive(true);
+            loginPage.SetActive(true);
+
+            registerBtn.interactable = true;
+            retrieveBtn.interactable = true;
+
             showLoginInputFields();
-            showAllButtons();
             autoComplete();
         }
 
@@ -377,28 +405,28 @@ namespace UI.TitleScene.Windows {
         /// 注册界面
         /// </summary>
         void refreshRegister() {
-            registerRetrieveWindow.SetActive(true);
+            buttons.SetActive(true);
+            registerRetrievePage.SetActive(true);
             registerPattern.SetActive(true);
 
+            registerBtn.interactable = false;
+            retrieveBtn.interactable = true;
+
             showRegisterRetrieveInputFields();
-
-            finishBtn.onClick.RemoveAllListeners();
-            finishBtn.onClick.AddListener(register);
-
         }
 
         /// <summary>
         /// 找回界面
         /// </summary>
         void refreshRetrieve() {
-            registerRetrieveWindow.SetActive(true);
+            buttons.SetActive(true);
+            registerRetrievePage.SetActive(true);
             retrievePattern.SetActive(true);
 
+            registerBtn.interactable = true;
+            retrieveBtn.interactable = false;
+
             showRegisterRetrieveInputFields();
-
-            finishBtn.onClick.RemoveAllListeners();
-            finishBtn.onClick.AddListener(retrieve);
-
         }
 
         #region 输入域控制
@@ -420,53 +448,18 @@ namespace UI.TitleScene.Windows {
             emailInput.startView();
             codeInput.startView();
         }
-
-        /// <summary>
-        /// 清除所有输入域
-        /// </summary>
-        void clearAllInputFields() {
-            loginUsernameInput.terminateView();
-            loginPasswordInput.terminateView();
-
-            usernameInput.terminateView();
-            passwordInput.terminateView();
-            emailInput.terminateView();
-            codeInput.terminateView();
-
-            retrievePattern.SetActive(false);
-            registerPattern.SetActive(false);
-
-            loginWindow.SetActive(false);
-            registerRetrieveWindow.SetActive(false);
-        }
-
+        
         #endregion
-
-        #region 按钮控制
-
-        /// <summary>
-        /// 显示登陆按钮
-        /// </summary>
-        void showAllButtons() {
-            buttons.SetActive(true);
-
-        }
-
-        /// <summary>
-        /// 清除所有按钮
-        /// </summary>
-        void clearAllButtons() {
-            buttons.SetActive(false);
-        }
-
-        #endregion
-
+     
         /// <summary>
         /// 清除视窗
         /// </summary>
         protected override void clear() {
-            clearAllInputFields();
-            clearAllButtons();
+            buttons.SetActive(false);
+            loginPage.SetActive(false);
+            retrievePattern.SetActive(false);
+            registerPattern.SetActive(false);
+            registerRetrievePage.SetActive(false);
         }
 
         /// <summary>
@@ -474,10 +467,13 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         void autoComplete() {
             var config = gameSer.configure;
-            if (config.rememberUsername.Length > 0 &&
+            Debug.Log("autoComplete: "+config.toJson().ToJson());
+            if (config.rememberUsername != null &&
+                config.rememberUsername.Length > 0 &&
+                config.rememberPassword != null && 
                 config.rememberPassword.Length > 0) {
-                usernameInput.setValue(config.rememberUsername);
-                passwordInput.setValue(config.rememberPassword);
+                loginUsernameInput.setValue(config.rememberUsername);
+                loginPasswordInput.setValue(config.rememberPassword);
             }
         }
 

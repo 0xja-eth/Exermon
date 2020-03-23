@@ -13,7 +13,7 @@ namespace PlayerModule.Services {
         /// 正则设定
         /// </summary>
         static readonly Regex UsernameReg = new Regex(@"^[a-z0-9A-Z_]{6,16}$");
-        static readonly Regex PasswordReg = new Regex(@"^[^\u4e00-\u9fa5].{8,24}$");
+        static readonly Regex PasswordReg = new Regex(@"^[^\u4e00-\u9fa5]{8,24}$");
         static readonly Regex PhoneReg = new Regex(@"^1[0-9]{10}$");
         static readonly Regex EmailReg = new Regex(@"^([\w]+\.*)([\w]+)\@[\w]+\.\w{3}(\.\w{2}|)$");
 
@@ -33,7 +33,7 @@ namespace PlayerModule.Services {
         /// <summary>
         /// 提示文本设定
         /// </summary>
-        public const string UsernameTips = "请输入6~16个英文字母或数字";
+        public const string UsernameTips = "请输入6~16个英文或数字";
         public const string PasswordTips = "请输入8~24个非中文字符";
         public const string PhoneTips = "请按正确的电话号码格式输入";
         public const string EmailTips = "请输入有效邮箱格式";

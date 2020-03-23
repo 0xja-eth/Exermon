@@ -4,14 +4,15 @@ from item_module.models import *
 from utils.model_utils import CacheableModel, \
 	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
+from game_module.models import ParamValue, HumanEquipType
+from season_module.models import SeasonRecord
+from season_module.runtimes import SeasonManager
 from enum import Enum
 import os, base64, datetime
 
 import exermon_module.models as Exermon
 import question_module.models as Question
 import record_module.models as Record
-import season_module.models as Season
-import battle_module.models as Battle
 
 # Create your models here.
 
@@ -542,12 +543,12 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def convertToDict(self, type: str = None, **kwargs) -> dict:
+	def convertToDict(self, type: str = None, online_player = None) -> dict:
 		"""
 		转化为字典
 		Args:
 			type (str): 转化类型
-			**kwargs (**dict): 子类重载参数
+			online_player (OnlinePlayer); 在线玩家信息
 		Returns:
 			转化后的字典数据
 		"""
@@ -575,6 +576,9 @@ class Player(CacheableModel):
 			'type': self.type,
 			'create_time': create_time,
 		}
+
+		if online_player is not None:
+			base["channel_name"] = online_player.consumer.channel_name
 
 		if type == "matched":
 			season_record = self.currentSeasonRecord()
@@ -668,8 +672,9 @@ class Player(CacheableModel):
 		return self._getOneToOneCache(HumanEquipSlot)
 
 	# 获取对战物资槽
-	def battleItemSlot(self) -> Battle.BattleItemSlot:
-		return self._getOneToOneCache(Battle.BattleItemSlot)
+	def battleItemSlot(self) -> 'BattleItemSlot':
+		from battle_module.models import BattleItemSlot
+		return self._getOneToOneCache(BattleItemSlot)
 
 	# 获取金钱
 	def playerMoney(self) -> PlayerMoney:
@@ -1014,7 +1019,7 @@ class Player(CacheableModel):
 		"""
 		return self.seasonrecord_set.all()
 
-	def seasonRecord(self, **kwargs) -> Season.SeasonRecord:
+	def seasonRecord(self, **kwargs) -> SeasonRecord:
 		"""
 		获取指定条件的赛季记录
 		Args:
@@ -1024,13 +1029,12 @@ class Player(CacheableModel):
 		"""
 		return self.seasonRecords().filter(**kwargs)
 
-	def currentSeasonRecord(self) -> Season.SeasonRecord:
+	def currentSeasonRecord(self) -> SeasonRecord:
 		"""
 		获取当前赛季记录
 		Returns:
 			返回玩家当前赛季记录
 		"""
-		from season_module.runtimes import SeasonManager
 		season = SeasonManager.getCurrentSeason()
 		return self.seasonRecord(id=season.id)
 

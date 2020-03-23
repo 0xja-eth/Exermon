@@ -7,7 +7,9 @@ using GameModule.Data;
 using GameModule.Services;
 
 using ItemModule.Data;
+
 using QuestionModule.Data;
+using QuestionModule.Services;
 
 /// <summary>
 /// 记录模块
@@ -132,6 +134,14 @@ namespace RecordModule.Data {
             public int goldIncr { get; protected set; }
             [AutoConvert]
             public bool isNew { get; protected set; }
+
+            /// <summary>
+            /// 获取题目对象
+            /// </summary>
+            /// <returns>返回题目对象</returns>
+            public Question question() {
+                return QuestionService.get().getQuestion(questionId);
+            }
         }
 
         /// <summary>

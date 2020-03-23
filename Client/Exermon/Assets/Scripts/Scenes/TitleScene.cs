@@ -119,8 +119,9 @@ namespace UI.TitleScene {
         /// 更新加载
         /// </summary>
         void updateLoading() {
+            /*
             if (gameSys.isLoaded() && !loginWindow.shown)
-                loginWindow.startWindow();
+                loginWindow.startWindow();*/
         }
 
         #endregion

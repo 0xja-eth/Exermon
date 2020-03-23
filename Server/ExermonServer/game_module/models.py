@@ -966,6 +966,7 @@ class GameConfigure(models.Model):
 			'battle_modes': BattleRecord.MODES,
 			'round_result_types': BattleRoundResult.RESULT_TYPES,
 			'battle_result_types': BattlePlayer.RESULT_TYPES,
+			'battle_statuses': BattlePlayer.STATUSES,
 
 			# 组合配置
 			'subjects': subjects,

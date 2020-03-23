@@ -1,21 +1,20 @@
 from django.db import models
-from django.db.models import Sum, F
-from django.conf import settings
 from django.db.models.query import QuerySet
 
-from game_module.models import ParamValue, GameConfigure, ExerEquipType, HumanEquipType
-from player_module.models import Player
+from game_module.models import GameConfigure
 from utils.model_utils import CacheableModel, ItemIconUpload, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, GameException
 from enum import Enum
-import jsonfield, os, math
+import jsonfield, math
 
+# import player_module.models as Player
 
 # ===================================================
 #  物品类型枚举
 # ===================================================
 class ItemType(Enum):
+
 	Unset = 0  # 未设置
 
 	# ===！！！！不能轻易修改序号！！！！===
@@ -709,7 +708,7 @@ class BaseContainer(CacheableModel):
 		raise NotImplementedError
 
 	# 持有玩家
-	def ownerPlayer(self) -> Player:
+	def ownerPlayer(self): # -> Player.Player:
 		"""
 		获取持有玩家
 		Returns:
@@ -718,7 +717,7 @@ class BaseContainer(CacheableModel):
 		return self.owner()
 
 	# 实际玩家（获取在线信息）
-	def exactlyPlayer(self) -> Player:
+	def exactlyPlayer(self): # -> Player.Player:
 		"""
 		获取实际的玩家（优先查找在线玩家）
 		Returns:
@@ -1028,7 +1027,7 @@ class PackContainer(BaseContainer):
 		"""
 		return super()._contItemsFromDb(listed, cla, equiped=False, **kwargs)
 
-	def owner(self) -> Player:
+	def owner(self): # -> Player.Player:
 		"""
 		获取容器的持有者
 		Returns:

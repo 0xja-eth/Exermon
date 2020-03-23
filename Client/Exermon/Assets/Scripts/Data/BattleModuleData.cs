@@ -1,7 +1,9 @@
-﻿
+﻿using System;
+
 using LitJson;
 
 using Core.Data;
+using Core.Data.Loaders;
 
 using GameModule.Data;
 using GameModule.Services;
@@ -11,8 +13,10 @@ using PlayerModule.Data;
 using QuestionModule.Data;
 using ExermonModule.Data;
 using SeasonModule.Data;
-using QuestionModule.Services;
 using RecordModule.Data;
+
+using QuestionModule.Services;
+using PlayerModule.Services;
 
 /// <summary>
 /// 对战模块
@@ -29,7 +33,7 @@ namespace BattleModule.Data {
     /// <summary>
     /// 评分数据
     /// </summary>
-    public class ResultJudge : TypeData {
+    public class ResultJudge : TypeData, IComparable<ResultJudge> {
 
         /// <summary>
         /// 属性
@@ -40,6 +44,15 @@ namespace BattleModule.Data {
         public int win { get; protected set; }
         [AutoConvert]
         public int lose { get; protected set; }
+
+        /// <summary>
+        /// 比较函数
+        /// </summary>
+        /// <param name="b">另一实例</param>
+        /// <returns>大小关系</returns>
+        public int CompareTo(ResultJudge b) {
+            return score.CompareTo(b.score);
+        }
     }
 
     /// <summary>
@@ -47,6 +60,37 @@ namespace BattleModule.Data {
     /// </summary>
     public class BattleRecord : BaseData {
 
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int mode { get; protected set; }
+        [AutoConvert]
+        public int seasonId { get; protected set; }
+        [AutoConvert]
+        public DateTime createTime { get; protected set; }
+        [AutoConvert]
+        public DateTime resultTime { get; protected set; }
+        [AutoConvert]
+        public BattlePlayer[] players { get; protected set; }
+        [AutoConvert]
+        public BattleRound[] rounds { get; protected set; }
+
+        /// <summary>
+        /// 获取赛季对象
+        /// </summary>
+        /// <returns>返回赛季对象</returns>
+        public CompSeason season() {
+            return DataService.get().season(seasonId);
+        }
+
+        /// <summary>
+        /// 获取赛季对象
+        /// </summary>
+        /// <returns>返回赛季对象</returns>
+        public string mdoeText() {
+            return DataService.get().battleMode(mode).Item2;
+        }
     }
 
     /// <summary>
@@ -112,6 +156,13 @@ namespace BattleModule.Data {
     public class BattlePlayer : QuestionSetRecord {
 
         /// <summary>
+        /// 对战玩家结果
+        /// </summary>
+        public enum Result {
+            Win = 1, Lose = 2, Tie = 3
+        }
+
+        /// <summary>
         /// 对战回合结果
         /// </summary>
         public class BattleRoundResult : PlayerQuestion {
@@ -135,6 +186,30 @@ namespace BattleModule.Data {
             public int damage { get; protected set; }
             [AutoConvert]
             public int recover { get; protected set; }
+
+            /// <summary>
+            /// 获取艾瑟萌技能
+            /// </summary>
+            /// <returns>返回艾瑟萌技能</returns>
+            public ExerSkill skill() {
+                return DataService.get().exerSkill(skillId);
+            }
+
+            /// <summary>
+            /// 目标类型文本
+            /// </summary>
+            /// <returns>返回目标类型文本</returns>
+            public string targetTypeText() {
+                return DataService.get().exerSkillTargetType(targetType).Item2;
+            }
+
+            /// <summary>
+            /// 命中结果类型文本
+            /// </summary>
+            /// <returns>返回命中结果类型文本</returns>
+            public string resultTypeText() {
+                return DataService.get().roundResultType(targetType).Item2;
+            }
         }
 
         /// <summary>
@@ -143,19 +218,90 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int scoreIncr { get; protected set; }
         [AutoConvert]
-        public int timeScore { get; protected set; }
+        public double timeScore { get; protected set; }
         [AutoConvert]
-        public int hurtScore { get; protected set; }
+        public double hurtScore { get; protected set; }
         [AutoConvert]
-        public int recoverScore { get; protected set; }
+        public double damageScore { get; protected set; }
         [AutoConvert]
-        public int correctScore { get; protected set; }
+        public double recoverScore { get; protected set; }
         [AutoConvert]
-        public int plusScore { get; protected set; }
+        public double correctScore { get; protected set; }
+        [AutoConvert]
+        public double plusScore { get; protected set; }
         [AutoConvert]
         public int result { get; protected set; }
         [AutoConvert]
         public int status { get; protected set; }
+
+        /// <summary>
+        /// 总分（缓存)
+        /// </summary>
+        double score_ = -1;
+
+        /// <summary>
+        /// 评价（缓存）
+        /// </summary>
+        ResultJudge judge_ = null;
+
+        /// <summary>
+        /// 最终评分
+        /// </summary>
+        /// <returns>返回最终评分</returns>
+        public double score() {
+            if (score_ < 0)
+                score_ = (timeScore + hurtScore + damageScore + 
+                    recoverScore + correctScore) / 5 + plusScore;
+            return score_;
+        }
+
+        /// <summary>
+        /// 获取评价
+        /// </summary>
+        /// <returns>返回评价</returns>
+        public ResultJudge judge() {
+            if (judge_ == null) {
+                var score = this.score();
+                var judges = DataService.get().staticData.configure.resultJudges;
+                judge_ = judges[0];
+                foreach (var judge in judges) 
+                    if (score >= judge_.score) judge_ = judge;
+            }
+            return judge_;
+        }
+
+        /// <summary>
+        /// 是否胜利
+        /// </summary>
+        /// <returns>返回是否胜利</returns>
+        public bool isWon() {
+            return result == (int)Result.Win;
+        }
+
+        /// <summary>
+        /// 是否失败
+        /// </summary>
+        /// <returns>返回是否失败</returns>
+        public bool isLost() {
+            return result == (int)Result.Lose;
+        }
+
+        /// <summary>
+        /// 是否平局
+        /// </summary>
+        /// <returns>返回是否平局</returns>
+        public bool isTie() {
+            return result == (int)Result.Tie;
+        }
+
+        /// <summary>
+        /// 对战状态文本
+        /// </summary>
+        /// <returns>返回对战状态文本</returns>
+        public string statusText() {
+            return DataService.get().battleStatus(status).Item2;
+        }
+
     }
 
     /// <summary>
@@ -368,6 +514,64 @@ namespace BattleModule.Data {
     }
 
     /// <summary>
+    /// 行动数据
+    /// </summary>
+    public class RuntimeAction : BaseData {
+
+        /// <summary>
+        /// 行动类型
+        /// </summary>
+        public enum Type {
+            Prepare = 0, Action = 1
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int type { get; protected set; }
+
+        [AutoConvert]
+        public int itemType { get; protected set; }
+        [AutoConvert]
+        public int itemId { get; protected set; }
+
+        [AutoConvert]
+        public int skillId { get; protected set; }
+        [AutoConvert]
+        public int targetType { get; protected set; }
+        [AutoConvert]
+        public int resultType { get; protected set; }
+        [AutoConvert]
+        public int hurt { get; protected set; }
+
+        /// <summary>
+        /// 获取使用的物品
+        /// </summary>
+        /// <returns>返回使用物品</returns>
+        public BaseItem item() {
+            if (type != (int)Type.Prepare) return null;
+            if (itemId <= 0) return null;
+            switch (itemType) {
+                case (int)BaseItem.Type.HumanItem:
+                    return DataService.get().humanItem(itemId);
+                case (int)BaseItem.Type.QuesSugar:
+                    return DataService.get().quesSugar(itemId);
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取使用的艾瑟萌技能
+        /// </summary>
+        /// <returns>返回使用的技能</returns>
+        public ExerSkill skill() {
+            if (type != (int)Type.Prepare) return null;
+            return DataService.get().exerSkill(skillId);
+        }
+    }
+
+    /// <summary>
     /// 对战玩家数据（回合结果时进行数据同步）
     /// </summary>
     public class RuntimeBattlePlayer : BaseData {
@@ -375,6 +579,8 @@ namespace BattleModule.Data {
         /// <summary>
         /// 基本数据
         /// </summary>
+        [AutoConvert]
+        public string channelName { get; protected set; }
         [AutoConvert]
         public string name { get; protected set; }
         [AutoConvert]
@@ -423,6 +629,21 @@ namespace BattleModule.Data {
         public int timespan { get; protected set; }
 
         /// <summary>
+        /// 进度
+        /// </summary>
+        public int progress { get; protected set; }
+
+        /// <summary>
+        /// 行动数据
+        /// </summary>
+        public RuntimeAction[] actions { get; protected set; }
+
+        /// <summary>
+        /// 结果数据
+        /// </summary>
+        public BattlePlayer result { get; protected set; }
+
+        /// <summary>
         /// 形象对象
         /// </summary>
         /// <returns>返回形象对象</returns>
@@ -448,6 +669,134 @@ namespace BattleModule.Data {
                 exermon.setPlayer(this);
             foreach (var battleItem in battleItems)
                 battleItem.setPlayer(this);
+        }
+
+        /// <summary>
+        /// 读取进度
+        /// </summary>
+        /// <param name="progress">进度</param>
+        public void loadProgress(int progress) {
+            this.progress = progress;
+        }
+
+        /// <summary>
+        /// 加载答作答
+        /// </summary>
+        /// <param name="correct">是否正确</param>
+        /// <param name="timespan">用时</param>
+        public void loadAnswer(bool correct, int timespan) {
+            this.correct = correct;
+            this.timespan = timespan;
+        }
+
+        /// <summary>
+        /// 加载行动
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadActions(JsonData json) {
+            actions = DataLoader.load<RuntimeAction[]>(json);
+        }
+
+        /// <summary>
+        /// 加载结果
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadResult(JsonData json) {
+            result = DataLoader.load<BattlePlayer>(json);
+        }
+    }
+
+    /// <summary>
+    /// 运行时对战
+    /// </summary>
+    public class RuntimeBattle : BaseData {
+
+        /// <summary>
+        /// 玩家1
+        /// </summary>
+        [AutoConvert]
+        public RuntimeBattlePlayer player1 { get; protected set; }
+        /// <summary>
+        /// 玩家2
+        /// </summary>
+        [AutoConvert]
+        public RuntimeBattlePlayer player2 { get; protected set; }
+        
+        /// <summary>
+        /// 当前回合
+        /// </summary>
+        [AutoConvert]
+        public BattleRound round { get; protected set; }
+
+        /// <summary>
+        /// 获取自身玩家运行时数据
+        /// </summary>
+        /// <returns>返回自身运行时数据</returns>
+        public RuntimeBattlePlayer self() {
+            return getPlayer(PlayerService.get().player.getID());
+        }
+
+        /// <summary>
+        /// 获取对方玩家运行时数据
+        /// </summary>
+        /// <returns>返回对方运行时数据</returns>
+        public RuntimeBattlePlayer oppo() {
+            return getPlayer(PlayerService.get().player.getID(), true);
+        }
+
+        /// <summary>
+        /// 获取运行时玩家
+        /// </summary>
+        /// <param name="pid">玩家ID</param>
+        /// <param name="oppo">获取对方玩家</param>
+        /// <returns>返回对应的运行时玩家</returns>
+        public RuntimeBattlePlayer getPlayer(int pid, bool oppo = false) {
+            if (player1.getID() == pid) return oppo ? player2 : player1;
+            if (player2.getID() == pid) return oppo ? player1 : player2;
+            return null;
+        }
+
+        /// <summary>
+        /// 读取匹配进度
+        /// </summary>
+        /// <param name="pid">玩家ID</param>
+        /// <param name="progress">进度</param>
+        public void loadProgress(int pid, int progress) {
+            var player = getPlayer(pid);
+            player.loadProgress(progress);
+        }
+
+        /// <summary>
+        /// 读取匹配进度
+        /// </summary>
+        /// <param name="pid">玩家ID</param>
+        /// <param name="correct">是否正确</param>
+        /// <param name="timespan">用时</param>
+        public void loadAnswer(int pid, bool correct, int timespan) {
+            var player = getPlayer(pid);
+            player.loadAnswer(correct, timespan);
+        }
+
+        /// <summary>
+        /// 加载行动
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadActions(JsonData json) {
+            var actions1 = DataLoader.load(json, "actions1");
+            var actions2 = DataLoader.load(json, "actions2");
+            player1.loadActions(actions1);
+            player2.loadActions(actions2);
+        }
+
+        /// <summary>
+        /// 加载对战结果
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadResults(JsonData json) {
+            var result1 = DataLoader.load(json, "player1");
+            var result2 = DataLoader.load(json, "player2");
+            player1.loadResult(result1);
+            player2.loadResult(result2);
         }
 
     }

@@ -63,6 +63,8 @@ class SeasonManager:
 
         season = cls.getCurrentSeason()
 
+        if season is None: return
+
         # 超过了目前赛季的终止日期
         if now >= season.end_time:
             await cls.onSeasonChanged()
