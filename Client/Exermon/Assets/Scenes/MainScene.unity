@@ -1427,7 +1427,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4bbe2919a91896346b7460feee967c5b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8454bf752e381564ab792ef55d5adbe7, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1891,6 +1891,7 @@ GameObject:
   - component: {fileID: 516645391}
   - component: {fileID: 516645390}
   - component: {fileID: 516645389}
+  - component: {fileID: 516645392}
   m_Layer: 5
   m_Name: FaceView
   m_TagString: Untagged
@@ -1969,6 +1970,60 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 516645387}
   m_CullTransparentMesh: 0
+--- !u!114 &516645392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516645387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 87439996}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1374717318}
+        m_MethodName: onBulidingsClick
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &672456734
 GameObject:
   m_ObjectHideFlags: 0
@@ -4133,8 +4188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88468a53d229a7a43b7d2041bb449698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frontImage: {fileID: 21300000, guid: 3a39c154c0108d2448b3ffe76f082a36, type: 3}
-  backImage: {fileID: 21300000, guid: caef0d5be36136f43a937471a8d0f9ef, type: 3}
 --- !u!1 &1479858815
 GameObject:
   m_ObjectHideFlags: 0
@@ -4841,8 +4894,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c45a5b61a4339d419399666081a678e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frontImage: {fileID: 21300000, guid: a058bd3ec7acb3b47ae960b00ca91f30, type: 3}
-  backImage: {fileID: 21300000, guid: 76d382ffa8872714ba3add68fc527939, type: 3}
 --- !u!1 &1682710569
 GameObject:
   m_ObjectHideFlags: 0
@@ -5729,6 +5780,7 @@ GameObject:
   - component: {fileID: 2070044985}
   - component: {fileID: 2070044987}
   - component: {fileID: 2070044986}
+  - component: {fileID: 2070044988}
   m_Layer: 5
   m_Name: StatusDisplay
   m_TagString: Untagged
@@ -5793,6 +5845,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2070044984}
   m_CullTransparentMesh: 0
+--- !u!114 &2070044988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2070044984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce489f457722204ab3e7de6b8b0fd8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  face: {fileID: 187732275}
+  name: {fileID: 750392468}
+  battlePoint: {fileID: 1312637380}
+  level: {fileID: 1581755525}
 --- !u!1 &2076725136
 GameObject:
   m_ObjectHideFlags: 0
