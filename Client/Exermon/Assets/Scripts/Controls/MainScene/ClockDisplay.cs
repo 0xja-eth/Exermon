@@ -72,7 +72,6 @@ namespace UI.MainScene.Controls {
             setClockArrowRot(this.minute, minRate);
             setClockArrowRot(this.second, secRate);
             */
-            Debug.Log(dateTime);
             this.dateTime.text = dateTime.ToString(dateTimeFormat);
         }
 
