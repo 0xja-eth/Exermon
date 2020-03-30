@@ -61,6 +61,7 @@ namespace UI.MainScene.Controls {
         /// </summary>
         /// <param name="dateTime">时间</param>
         void drawClock(DateTime dateTime) {
+            /*
             float hour = dateTime.Hour;
             float minute = dateTime.Minute;
             float second = dateTime.Second;
@@ -70,6 +71,8 @@ namespace UI.MainScene.Controls {
             setClockArrowRot(this.hour, hourRate);
             setClockArrowRot(this.minute, minRate);
             setClockArrowRot(this.second, secRate);
+            */
+            Debug.Log(dateTime);
             this.dateTime.text = dateTime.ToString(dateTimeFormat);
         }
 

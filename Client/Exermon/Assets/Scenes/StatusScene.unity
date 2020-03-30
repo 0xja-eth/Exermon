@@ -14349,6 +14349,7 @@ MonoBehaviour:
   previewable: 1
   onClickDequip: 0
   playerGiftDetail: {fileID: 1328166211}
+  packDisplay: {fileID: 0}
 --- !u!114 &1328166211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20132,7 +20133,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1479338779}
         m_MethodName: onEditClick
         m_Mode: 1
         m_Arguments:

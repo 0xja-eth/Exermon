@@ -646,6 +646,7 @@ class Player(CacheableModel):
 			base['battle_info'] = self._battleInfo()
 			base['question_info'] = self._questionInfo()
 
+			base['pack_containers'] = self._packContainerItems()
 			base['slot_containers'] = self._slotContainerItems()
 
 		# 当前玩家

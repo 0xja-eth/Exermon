@@ -129,7 +129,7 @@ class Service:
 		# 添加在线玩家
 		Common.addOnlinePlayer(player, consumer)
 
-		return {'player': player.convertToDict()}
+		return {'player': player.convertToDict("status")}
 
 	# 实际执行发送验证码操作
 	@classmethod

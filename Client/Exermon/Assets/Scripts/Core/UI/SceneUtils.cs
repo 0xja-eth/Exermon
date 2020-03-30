@@ -26,6 +26,11 @@ namespace Core.UI.Utils {
         public class GameScene {
 
             /// <summary>
+            /// 初始场景
+            /// </summary>
+            public const string FirstScene = TitleScene;
+
+            /// <summary>
             /// 常量设定
             /// </summary>
             public const string TitleScene = "TitleScene";

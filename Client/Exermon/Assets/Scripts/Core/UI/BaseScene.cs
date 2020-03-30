@@ -52,6 +52,17 @@ namespace Core.UI {
             initializeSceneUtils();
             initializeSystems();
             initializeOthers();
+            checkFirstScene();
+        }
+
+        /// <summary>
+        /// 检查初始场景
+        /// </summary>
+        /// <returns></returns>
+        public void checkFirstScene() {
+            var first = SceneUtils.GameScene.FirstScene;
+            if (gameSys.isConnectable() && sceneName() != first)
+                gameSys.requestChangeScene(first, GameSystem.SceneRequest.Type.Goto);
         }
 
         /// <summary>
