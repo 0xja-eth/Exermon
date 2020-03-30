@@ -4,7 +4,12 @@ using Core.Data;
 using Core.Services;
 
 using GameModule.Data;
+using ItemModule.Data;
 using ExermonModule.Data;
+using SeasonModule.Data;
+
+using SeasonModule.Services;
+using UnityEngine;
 
 /// <summary>
 /// 游戏模块服务
@@ -225,6 +230,74 @@ namespace GameModule.Services {
         }
 
         /// <summary>
+        /// 装备能力值计算
+        /// </summary>
+        public class EquipParamCalc {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            BaseParam param;
+
+            ExerEquipSlotItem slotItem;
+            ExerPackEquip packEquip;
+            ExerEquip equip;
+
+            PlayerExermon playerExer;
+
+            double value = 0;
+
+            /// <summary>
+            /// 计算
+            /// </summary>
+            /// <param name="slotItem">容器项</param>
+            /// <param name="paramId">属性ID</param>
+            /// <returns>返回属性值</returns>
+            public static double calc(ExerEquipSlotItem slotItem, int paramId) {
+                var calc = new EquipParamCalc(slotItem, paramId);
+                return calc.value;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="slotItem">容器项</param>
+            /// <param name="paramId">属性ID</param>
+            EquipParamCalc(ExerEquipSlotItem slotItem, int paramId) {
+                param = DataService.get().baseParam(paramId);
+                if (param == null) return;
+
+                if (slotItem.isNullItem()) return;
+                packEquip = slotItem.packEquip;
+                equip = slotItem.equip();
+
+                var exerSlotItem = slotItem.equipSlot.exerSlotItem;
+                playerExer = exerSlotItem.playerExer;
+                _calc();
+            }
+
+            /// <summary>
+            /// 计算
+            /// </summary>
+            void _calc() {
+                value = packEquip.getParam(param.getID()).value;
+                
+                if ((param.attr == "atk" && equip.paramType ==
+                    (int)EquipableItem.ParamType.Attack) ||
+                    (param.attr == "def" && equip.paramType ==
+                    (int)EquipableItem.ParamType.Defense))
+                    _calcVariableParam();
+            }
+            /// <summary>
+            /// 计算变化属性
+            /// </summary>
+            void _calcVariableParam() {
+                var level = playerExer.level;
+                value += equip.paramRate/100.0 * level;
+            }
+        }
+
+        /// <summary>
         /// 战斗力计算类
         /// </summary>
         public class BattlePointCalc {
@@ -257,6 +330,81 @@ namespace GameModule.Services {
             }
         }
 
+        /// <summary>
+        /// 段位星星与段位计算类
+        /// </summary>
+        public class RankCalc {
+
+            /// <summary>
+            /// 对应的罗马数字
+            /// </summary>
+            public static readonly string[] RomanNums = new string[] {
+                "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ"
+            };
+
+            /// <summary>
+            /// 执行计算
+            /// </summary>
+            /// <param name="starNum">段位星星数目</param>
+            /// <param name="rank">所在段位对象</param>
+            /// <param name="subRank">所在子段位数目</param>
+            /// <returns>剩余星星数目</returns>
+            /// <example>
+            /// 0 = > 学渣I(1, 0, 0)
+			/// 1 = > 学渣I(1, 0, 1)
+			/// 2 = > 学渣I(1, 0, 2)
+			/// 3 = > 学渣I(1, 0, 3)
+			/// 4 = > 学渣II(1, 1, 1)
+			/// 5 = > 学渣II(1, 1, 2)
+			/// 6 = > 学渣II(1, 1, 3)
+			/// 7 = > 学渣III(1, 2, 1)
+			/// 10 = > 学酥I(2, 1, 1)
+            /// </example>
+            public static int calc(int starNum, out CompRank rank, out int subRank) {
+                var ranks = SeasonService.get().compRanks();
+                var subNum = CompRank.StarsPerSubRank;
+                rank = ranks[0]; subRank = 0;
+
+                // 需要事先保证 ranks 有序
+                foreach (var rank_ in ranks) {
+                    rank = rank_; subRank = 0;
+                    var starCnt = rank_.starCount();
+
+                    // 最后一个段位，直接返回（out 变量已经赋值）
+                    if (starCnt == 0) return starNum;
+
+                    if (starNum > starCnt) 
+                        // 还没找到段位，继续找下一个
+                        starNum -= starCnt;
+                    else { // 找到所属的段位了
+                        var tmpStar = starNum - 1;
+                        // 如果此时星星数 -1 小于零，直接返回不需计算
+                        if (tmpStar < 0) return 0;
+
+                        // 否则正常计算
+                        subRank = tmpStar / subNum;
+                        starNum = (tmpStar % subNum) + 1;
+                        break;
+                    }
+                }
+                return starNum;
+            }
+
+            /// <summary>
+            /// 计算段位的文本
+            /// </summary>
+            /// <param name="starNum"></param>
+            /// <returns></returns>
+            public static string getText(int starNum) {
+                CompRank rank; int subRank;
+                calc(starNum, out rank, out subRank);
+                return getText(rank, subRank);
+            }
+            public static string getText(CompRank rank, int subRank) {
+                if (rank.subRankNum <= 0) return rank.name;
+                return rank.name + RomanNums[subRank];
+            }
+        }
     }
 
 }

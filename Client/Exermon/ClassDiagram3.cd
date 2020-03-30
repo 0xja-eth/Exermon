@@ -1,0 +1,792 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="UI.BattleStartScene.BattleStartScene" Collapsed="true">
+    <Position X="100.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAIACEAAgAIAEAAAAAAAAAEAAAAAEAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\BattleStartScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.BattleItemSlotDisplay" Collapsed="true">
+    <Position X="2.25" Y="2" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\MainWindow\BattleItemSlotDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.BattleItemSlotItemDisplay" Collapsed="true">
+    <Position X="11.25" Y="7.75" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAggAAAAEIAAAAAAAAAAACAAAAAAAEAAAQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\MainWindow\BattleItemSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.SmallExerSlotDisplay" Collapsed="true">
+    <Position X="11" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\MainWindow\SmallExerSlotDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.SmallExerSlotItemDisplay" Collapsed="true">
+    <Position X="36.75" Y="6.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\MainWindow\SmallExerSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.HumanPackItemDisplay" Collapsed="true">
+    <Position X="40" Y="7.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAEABAAAAAAAAAAAAAAAAQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\RightWindow\ItemContent\HumanPackItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.ItemContent" Collapsed="true">
+    <Position X="72.5" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\RightWindow\ItemContent\ItemContent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ExerPackDisplay" Collapsed="true">
+    <Position X="19.5" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAEAQAAAAAAAAAAAAgAAAAAAAABA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ExerPackDisplay.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Controls\Common\ItemDisplay\HumanPackDisplay.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.PackItemDetail" Collapsed="true">
+    <Position X="74.75" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAYAFEAAAIAEAIAAAAQAEQAAFAAAAEYAAAgAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\RightWindow\ItemContent\PackItemDetail.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.MainContent" Collapsed="true">
+    <Position X="77.5" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\RightWindow\MainContent\MainContent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.SeasonRecordDisplay" Collapsed="true">
+    <Position X="79.75" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAgQBAQAAAAEAAQQIAAkAAAAAiEAQAIAAAgAAggA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\RightWindow\MainContent\SeasonRecordDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Controls.TopInfoDisplay" Collapsed="true">
+    <Position X="82.5" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAAABAAAAAAEAAAAAAQEACAAEIEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\BattleStartScene\TopInfoDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Windows.MainWindow" Collapsed="true">
+    <Position X="105.75" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AUAAIMAABIAAEAAAAALEAIAAEAAEAEADAQBAAAQQAAg=</HashCode>
+      <FileName>Assets\Scripts\Windows\BattleStartScene\MainWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.BattleStartScene.Windows.RightWindow" Collapsed="true">
+    <Position X="102.25" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAACEAAAAAAEIQAAACAAIAAAAABAEAAgAAAAAAAAIg=</HashCode>
+      <FileName>Assets\Scripts\Windows\BattleStartScene\RightWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.BaseInputField&lt;T&gt;" Collapsed="true">
+    <Position X="18.75" Y="10.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BECBgECABABIJCAAAUaAUAIxlAAAYmABAAihwAAkAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\BaseInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DateTimeField" Collapsed="true">
+    <Position X="21.5" Y="12" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BAAkAEEAAAAAIAAAAgSAgQmAggQACJEAACCjAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DateTimeField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DateTimePicker" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="107.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BACACFAgCAABAAIAACrIEAAASCAhwCAABAIRQQQEAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DateTimePicker.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DateTimePickersPlane" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="98.75" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAABAAAAAAAAAAAAAAgAAAABAAAAQAEAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DateTimePickersPlane.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DropdownField" Collapsed="true">
+    <Position X="15.75" Y="12" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>BEABAAAAAEAAIAgAAAKBEAADQACoIAAABAAgAQAEACA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DropdownField.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.TextInputField" Collapsed="true">
+    <Position X="19" Y="12" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAAAAAAACAQAAAAAAAAAAAAAAggAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\TextInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.DraggableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="41.5" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAgUIEABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DraggableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.DroppableItemContainer&lt;T&gt;" Collapsed="true">
+    <Position X="22.5" Y="2" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DroppableItemContainer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ItemContaineDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="21" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>REhE4EQ4qQALsCRtAA6oYBAgQgoCkEBEAAo8ihAwAQA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemContainer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ItemDetail&lt;T&gt;" Collapsed="true">
+    <Position X="82" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAABBAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDetail.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="50.5" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAFAEQAAAIAEQAAQIAABAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotContainerDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="37" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAIAABAQAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotContainerDisplay.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Controls\Common\ItemDisplay\PackContainerDisplay.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SelectableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="30.25" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BEAAoEBagiAIgAgSAAEAIRIAwIZgAARA1AHQAQABJCI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SelectableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotContItemDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="22.5" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AigAAIIAQBCAAAAAAAAAACAAQAIAAEAAAAAAAAgAAAI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotContItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotItemDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="17.5" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEAoAEIgSgCACAQUBAADIAAAQAAgEIEIQAAQISAAUAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.CreditDisplay" Collapsed="true">
+    <Position X="105.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ABAAgAAAACCAACAAAAYAAQAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\CreditDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplay" Collapsed="true">
+    <Position X="100.5" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEgQgUBIMggAAJAUAUbFgSAAQQgCAagQAAgCCaAAQAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplaysGroup" Collapsed="true">
+    <Position X="102.25" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAA4AAAAAwAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplaysGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.RankStarsDisplay" Collapsed="true">
+    <Position X="100.5" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAiEApACCAACQAJBYAACAAAAAAAEACAAABAgAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\RankStarsDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.StarsDisplay" Collapsed="true">
+    <Position X="104" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAACAABAYAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\StarsDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.RadarDisplay.PolygonImage" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="104" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IESAABAAAUDQACkAAIAAAAAEAEBAQgAAQAAAAAAAAAM=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\RadarDisplay\PolygonImage.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UI.Common.Controls.RadarDisplay.RadarDiagram" Collapsed="true">
+    <Position X="98.75" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEEAAAIAAAAEIBQAAAKgAAAABAAAAIAgAAAgQAAFgAo=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\RadarDisplay\RadarDiagram.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.QuestionText" Collapsed="true">
+    <Position X="105.75" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AGCYAIAAgUDQggAACAAAACAAAEAEBEBAEAIRAQAIMBA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.TextHandler" Collapsed="true">
+    <Position X="3" Y="13.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEECISAQAEIAAAAAAAUAAAgAAAAAAAAEAAoCABAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.QuadImageHandler" Collapsed="true">
+    <Position X="0.75" Y="14.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>kEACISEAAAAAAkIAJAEAEAAABAAAIBAAAAACAAAAABA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.SizeTextHandler" Collapsed="true">
+    <Position X="4.25" Y="14.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.SupTextHandler" Collapsed="true">
+    <Position X="5.5" Y="16.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAIAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.SubTextHandler" Collapsed="true">
+    <Position X="3.25" Y="16.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAIAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.QuestionTextParser" Collapsed="true">
+    <Position X="107.5" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEIASAGhgIEAAQEABENAACQCQAAAAABUCIAAAAECAKA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.SystemExtend.QuestionText.FragmentData" Collapsed="true">
+    <Position X="104" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>gAIAAAAggAEAAAQgAIIAAAAAABEAAAEKQIAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\SystemExtend\QuestionText\QuestionTextParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Windows.AlertWindow" Collapsed="true">
+    <Position X="98.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AkAAAEIAkghgAAgAAACEAYCYAAABBQQIgCAAADAFAMQ=</HashCode>
+      <FileName>Assets\Scripts\Windows\Common\AlertWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Windows.LoadingWindow" Collapsed="true">
+    <Position X="100.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AUAAAEBQAAAAgAIAAACEAAAAAAAAAAAIAAQAgIAEAAA=</HashCode>
+      <FileName>Assets\Scripts\Windows\Common\LoadingWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.MainScene.MainScene" Collapsed="true">
+    <Position X="104" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEgAAAACEAAgAIAAAAAAAAAAAEQBAgAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\MainScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.MainScene.Controls.ClockDisplay" Collapsed="true">
+    <Position X="104" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAGAAAAAAAEAAAgAAAAAABAAAABAAAAIqAEAEAIA=</HashCode>
+      <FileName>Assets\Scripts\Controls\MainScene\ClockDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.MainScene.Controls.MapDisplay" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="107.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAABAAAABKAAAMAADIEAAAiAAAICAACFIAAJgHogA=</HashCode>
+      <FileName>Assets\Scripts\Controls\MainScene\MapDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UI.MainScene.Controls.StatusDisplay" Collapsed="true">
+    <Position X="107.5" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABCAAAAAAAAAAAABAAAAAAgAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\MainScene\StatusDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.StartScene" Collapsed="true">
+    <Position X="105.75" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IEAAAkgCAEACUAAwAIAAAAAAAAAgAEQFACBAABAEhAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\StartScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.Character.CharacterContainer" Collapsed="true">
+    <Position X="28.75" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AIgEAABAAFASIAAAIACAAAAAgAAEEABAEIAFkAAUAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\CharacterWindow\CharacterContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.Character.CharacterDisplay" Collapsed="true">
+    <Position X="49.5" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAQEACAAAAIRACEEIACAAIAgEAAAAAQAAAABAAAEhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\CharacterWindow\CharacterDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.Exermon.ExermonDetail" Collapsed="true">
+    <Position X="84.75" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CAQAIEAIQCAAAAEQAACgAECAAAAmAAAgABCQAAAIhQA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\ExermonsWindow\ExermonDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.Exermon.ExermonsContainer" Collapsed="true">
+    <Position X="34.5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EAAQAEAAABAAAAAAAAAICBAgAAAAUAABAAAIABAgBAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\ExermonsWindow\ExermonsContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.Exermon.InitExermonCard" Collapsed="true">
+    <Position X="55.75" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAACAAAAEAAAAQQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\ExermonsWindow\InitExermonCard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.InitExerGift" Collapsed="true">
+    <Position X="43.25" Y="7.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAEAEAAAAAAAAAAEAAAAAQCIAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\InitExerGift.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.ExerGiftDetail" Collapsed="true">
+    <Position X="67.75" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAEAIACAAAAAgAAEAAAAAAAAAQAIoAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\ExerGiftDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.ExerGiftsContainer" Collapsed="true">
+    <Position X="5.5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEABAAEAAAAAAAQAAAAAACAAAAAAAAgBAAAEA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\ExerGiftsContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.ExerSlotDetail" Collapsed="true">
+    <Position X="70" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAKQAAAAAEAAACAAAAAIAAWAAAAAAAAAAAIhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\ExerSlotDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.ExerSlotsContainer" Collapsed="true">
+    <Position X="13.75" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAEAAABAAAAAAAAAACBAAAAAAAABAAAAIgHAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\ExerSlotsContainer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Controls.ExerGift.InitExerSlotItemDisplay" Collapsed="true">
+    <Position X="15.25" Y="7.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAEABAAAAACAAAAUAAAIAQAAAAAAlAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StartScene\GiftsWindow\InitExerSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Windows.CharacterWindow" Collapsed="true">
+    <Position X="102.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAwAAAAAIFAAgAASAAIAAAAIAAEACAARABEgQAAg=</HashCode>
+      <FileName>Assets\Scripts\Windows\StartScene\CharacterWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Windows.ExermonsWindow" Collapsed="true">
+    <Position X="102.25" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ISAAAwAAAAAIECAgAACAAIAAAAAAAEACAABQAAgABAg=</HashCode>
+      <FileName>Assets\Scripts\Windows\StartScene\ExermonsWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Windows.GiftsWindow" Collapsed="true">
+    <Position X="105.75" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IQAAAwAAAAAIGAAgAACAAIAAABACAAACAABAAEoABAg=</HashCode>
+      <FileName>Assets\Scripts\Windows\StartScene\GiftsWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StartScene.Windows.InfoWindow" Collapsed="true">
+    <Position X="98.75" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAACAgAgAAAQEIAAAACAgIAAAAAAAACCAABAAAgAAAA=</HashCode>
+      <FileName>Assets\Scripts\Windows\StartScene\InfoWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.StatusScene" Collapsed="true">
+    <Position X="98.75" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAABCEABgEIAAAAAAAAAAAEAEAAAMACAAAIk=</HashCode>
+      <FileName>Assets\Scripts\Scenes\StatusScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.StatusTabController" Collapsed="true">
+    <Position X="100.5" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAgAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\StatusTabController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.PageTabController" Collapsed="true">
+    <Position X="98.75" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAgAAAAAAQCAAAAAAAgBggAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\PageTabController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonStatusSlotItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="22.25" Y="7.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAQAAAIAAAAAAAAEAAIAAAKAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonStatusSlotItemDisplay.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\PageTabController.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonStatusExerSlotDetail&lt;T&gt;" Collapsed="true">
+    <Position X="91" Y="6.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AIAAABABAAgAAAEQAAAQCAAAUAAACAIABEAEAAAAggI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonStatusExerSlotDetail.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\PageTabController.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.StatusDisplay" Collapsed="true">
+    <Position X="58.75" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAEAAIQAQEACAAACIAAAAAACAAAAAIAAAAIg=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\StatusDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.SubjectTabController" Collapsed="true">
+    <Position X="104" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAECAAAAAAAAAAAAAAQAAAAAgAgAAAAAAAQAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\SubjectTabController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.ExerEquipSlotDisplay" Collapsed="true">
+    <Position X="8" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\ExerEquipSlotDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.ExerEquipSlotItemDisplay" Collapsed="true">
+    <Position X="29.75" Y="6.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAECAAAAAAAAAAAFAAAAAQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\ExerEquipSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.ExerPackEquipDetail" Collapsed="true">
+    <Position X="91" Y="7.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIBAAAAAAAAAIAAQAAAAAABUCACABUAAAAAAEgI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\ExerPackEquipDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.ExerPackEquipDisplay" Collapsed="true">
+    <Position X="46.25" Y="6.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEABAAAAAAAAAgAAAAAAQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\ExerPackEquipDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.ExerSlotItemDisplay" Collapsed="true">
+    <Position X="18.5" Y="9.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAgACAgWAAAAAAAAEAAAACAAQAEQAECIAIAIAABAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\ExerSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.PackContainerDisplay" Collapsed="true">
+    <Position X="25.75" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAQAAAQAAAAAAABgAAIAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\PackContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerEquipPage.PageDisplay">
+    <Position X="7.5" Y="12.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAACAAAAABAAAAAAAAABAAAAkAAAAAJBAABI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerEquipPage\PageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerGiftPage.ExerSlotItemDisplay" Collapsed="true">
+    <Position X="22.25" Y="9.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAgAAAAAAAAAAAAAAAAAAAAAAEAAgAAIAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerGiftPage\ExerSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerGiftPage.PackContainerDisplay" Collapsed="true">
+    <Position X="40" Y="3.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerGiftPage\PackContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerGiftPage.PageDisplay" Collapsed="true">
+    <Position X="11" Y="12.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAkAAAAAIAAAAI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerGiftPage\PageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerGiftPage.PlayerExerGiftDetail" Collapsed="true">
+    <Position X="94.75" Y="7.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIBAAAAAAAAAIAAQAAAAAABECAAABQAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerGiftPage\PlayerExerGiftDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerGiftPage.PlayerExerGiftDisplay" Collapsed="true">
+    <Position X="52.5" Y="6.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAEAAAAAAAAAAAgEAAAAEQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerGiftPage\PlayerExerGiftDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonPage.ExerSlotItemDisplay" Collapsed="true">
+    <Position X="26" Y="9.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAgAAAAAAAAAAAAAAAABAAAAAEAAAAAIAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonPage\ExerSlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonPage.PackContainerDisplay" Collapsed="true">
+    <Position X="40" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAABAAAAAAAAAAAAAQAAAAAIAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonPage\PackContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonPage.PageDisplay">
+    <Position X="3.75" Y="12.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAQAAAAAAAAAAAAAAAkAAAAAIAAAAI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonPage\PageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonPage.PlayerExermonDetail" Collapsed="true">
+    <Position X="87.25" Y="7.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAIJAAAAAAAAAIAAUMFQAIAhjCAAABBAAAgAAAQA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonPage\PlayerExermonDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonPage.PlayerExermonDisplay" Collapsed="true">
+    <Position X="5" Y="6.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAEAAAAAAAAAAAkEAAAAEQAAAAAAhAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonPage\PlayerExermonDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerSkillPage.ExerSkillItemDetail" Collapsed="true">
+    <Position X="33.25" Y="6.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>QIASBBCAAAAAAAEAAAAAAAACgEBEAAAAAQAAAAAAgAE=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerSkillPage\ExerSkillItemDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerSkillPage.ExerSkillSlotDisplay" Collapsed="true">
+    <Position X="16.5" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerSkillPage\ExerSkillSlotDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExerSkillPage.PageDisplay">
+    <Position X="1.25" Y="7.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AgAAAEAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExerSkillPage\PageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.PlayerStatus.BaseInfoDisplay" Collapsed="true">
+    <Position X="61" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAEAAACEAAAAAAAEAAAIAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\PlayerStatus\BaseInfoDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.PlayerStatus.DetailInfoDisplay" Collapsed="true">
+    <Position X="63.25" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAEAAACoQAAAAAAAAAABAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\PlayerStatus\DetailInfoDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.PlayerStatus.EditButtonsController" Collapsed="true">
+    <Position X="100.5" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAgAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\PlayerStatus\EditButtonsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.PlayerStatus.StatusDisplay" Collapsed="true">
+    <Position X="65.5" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAEAEAAAEAAIAAQEAAAAAAAgAAAAACAAAAAIAAAAAg=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\PlayerStatus\StatusDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Windows.InfoEditWindow" Collapsed="true">
+    <Position X="107.5" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAIQAAQBAIEAEgKBWECogAABAFCAACIQAAAGAEAIo=</HashCode>
+      <FileName>Assets\Scripts\Windows\StatusScene\InfoEditWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Windows.StatusWindow" Collapsed="true">
+    <Position X="102.25" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAEBAAEAAEAAIIQCEAIAAAAAQAECAAQAAAAAAABA=</HashCode>
+      <FileName>Assets\Scripts\Windows\StatusScene\StatusWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.TitleScene.TitleScene" Collapsed="true">
+    <Position X="105.75" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIBAAYAAAACABAgAKAAAAAAAAADAEQBAgAAAAAEAAA=</HashCode>
+      <FileName>Assets\Scripts\Scenes\TitleScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.TitleScene.Windows.LoginWindow" Collapsed="true">
+    <Position X="102.25" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEWGSUKBgJgA0EQAIRzEAcAAAUUjCGBDAQ4KjCGAUYE=</HashCode>
+      <FileName>Assets\Scripts\Windows\TitleScene\LoginWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonStatusPageDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="10" Y="8.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAgAAgCCAACAAAAAAAAAAAAAAAJAAABI=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonStatusPageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.StatusScene.Controls.ExermonStatus.ExermonStatusPageDisplay">
+    <Position X="5.5" Y="7.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAgAAAAAAEAAAhCCAACAAAgBAAECEAAAAIIACAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\StatusScene\ExermonStatus\ExermonStatusPageDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="UI.Common.Controls.ItemDisplays.IDraggableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="13.75" Y="16.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DraggableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.IDroppableItemContainer&lt;T&gt;" Collapsed="true">
+    <Position X="0.5" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DroppableItemContainer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.IItemContainer&lt;T&gt;" Collapsed="true">
+    <Position X="0.75" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAQAAAAAAAAAIgAgAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemContainer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.IItemDetail&lt;T&gt;" Collapsed="true">
+    <Position X="8.75" Y="15" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDetail.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.IItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="11.5" Y="13.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEQAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.ISelectableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="12.25" Y="15" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SelectableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UI.Common.Controls.ItemDisplays.ISlotItemDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="11" Y="16.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

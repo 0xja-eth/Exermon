@@ -7,6 +7,10 @@ using LitJson;
 
 using Core.UI.Utils;
 
+using ItemModule.Data;
+using PlayerModule.Data;
+using ExermonModule.Data;
+
 namespace Core.Data.Loaders {
 
     /// <summary>
@@ -78,6 +82,7 @@ namespace Core.Data.Loaders {
                 return ignoreNull ? val : default;
             // 判断特殊类型
             if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData)) {
+                // 只有当值为空（默认）时才会创建对象
                 if (val == default) val = Activator.CreateInstance(type);
                 ((BaseData)val).load(data);
                 return val;
@@ -359,6 +364,32 @@ namespace Core.Data.Loaders {
         #endregion
 
         #region 其他工具
+
+        /// <summary>
+        /// 类型转化并判断
+        /// </summary>
+        /// <typeparam name="T">目标类型</typeparam>
+        /// <param name="obj">对象</param>
+        /// <returns>如果可以转换，返回转换后对象，否则返回 default</returns>
+        public static bool castPredicate<T>(object obj, Predicate<T> p) {
+            if (obj == default) return default;
+            Type ot = obj.GetType(), nt = typeof(T);
+            if (ot == nt || ot.IsSubclassOf(nt)) return p((T)obj);
+            return false;
+        }
+
+        /// <summary>
+        /// 类型转化
+        /// </summary>
+        /// <typeparam name="T">目标类型</typeparam>
+        /// <param name="obj">对象</param>
+        /// <returns>如果可以转换，返回转换后对象，否则返回 default</returns>
+        public static T cast<T>(object obj) {
+            if (obj == default) return default;
+            Type ot = obj.GetType(), nt = typeof(T);
+            if (ot == nt || ot.IsSubclassOf(nt)) return (T)obj;
+            return default;
+        }
 
         /// <summary>
         /// 下划线命名法转化为小驼峰命名法

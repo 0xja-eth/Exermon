@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Core.UI {
@@ -118,6 +119,7 @@ namespace Core.UI {
         void refreshChangeContent() {
             if (contents.Length <= 0) return;
             var index = getIndex();
+            Debug.Log("refreshChangeContent: " + index);
             foreach (var content in contents)
                 if (index >= 0)
                     showContent(content, index);
@@ -177,6 +179,7 @@ namespace Core.UI {
         /// 页变更回调
         /// </summary>
         protected virtual void onTabChanged(bool val) {
+            Debug.Log("onTabChanged: " + val);
             requestRefresh();
         }
 

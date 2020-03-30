@@ -10,10 +10,6 @@ from season_module.runtimes import SeasonManager
 from enum import Enum
 import os, base64, datetime
 
-import exermon_module.models as Exermon
-import question_module.models as Question
-import record_module.models as Record
-
 # Create your models here.
 
 
@@ -433,6 +429,29 @@ class Player(CacheableModel):
 			'battle_item_slot': battle_item_slot,
 		}
 
+	def _packContainerItems(self):
+
+		human_pack = ModelUtils.objectToDict(self.humanPack(), type='items')
+
+		exer_pack = ModelUtils.objectToDict(self.exerPack(), type='items')
+
+		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack(), type='items')
+
+		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool(), type='items')
+
+		exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
+
+		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack(), type='items')
+
+		return {
+			'human_pack': human_pack,
+			'exer_pack': exer_pack,
+			'exer_frag_pack': exer_frag_pack,
+			'exer_gift_pool': exer_gift_pool,
+			'exer_hub': exer_hub,
+			'ques_sugar_pack': ques_sugar_pack,
+		}
+
 	def _slotContainerItems(self):
 
 		exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
@@ -455,7 +474,7 @@ class Player(CacheableModel):
 		season_record = self.currentSeasonRecord()
 		battle_records = self.battlePlayerRecords()
 
-		rank, sub_rank = season_record.rank()
+		rank, sub_rank, _ = season_record.rank()
 
 		count = win_cnt = corr_cnt = 0
 		sum_hurt = sum_damage = sum_score = 0
@@ -482,12 +501,12 @@ class Player(CacheableModel):
 
 			count += 1
 
-		win_rate = win_cnt / count
-		corr_rate = corr_cnt / count
+		win_rate = win_cnt / count if count > 0 else 0
+		corr_rate = corr_cnt / count if count > 0 else 0
 
-		avg_hurt = sum_hurt / count
-		avg_damage = sum_damage / count
-		avg_score = sum_score / count
+		avg_hurt = sum_hurt / count if count > 0 else 0
+		avg_damage = sum_damage / count if count > 0 else 0
+		avg_score = sum_score / count if count > 0 else 0
 
 		return {
 			'rank_id': rank.id,
@@ -583,7 +602,7 @@ class Player(CacheableModel):
 		if type == "matched":
 			season_record = self.currentSeasonRecord()
 
-			rank, sub_rank = season_record.rank()
+			rank, sub_rank, _ = season_record.rank()
 
 			exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
 			battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
@@ -629,6 +648,20 @@ class Player(CacheableModel):
 
 			base['slot_containers'] = self._slotContainerItems()
 
+		# 当前玩家
+		if type == "battle":
+			season_record = ModelUtils.objectToDict(self.currentSeasonRecord())
+
+			base['exp'] = self.exp
+			base['next'] = next
+
+			base['season_record'] = season_record
+
+			base['battle_info'] = self._battleInfo()
+
+			base['pack_containers'] = self._packContainerItems()
+			base['slot_containers'] = self._slotContainerItems()
+
 		return base
 
 	# endregion
@@ -644,28 +677,34 @@ class Player(CacheableModel):
 		return self._getOneToOneCache(HumanPack)
 
 	# 获取艾瑟萌背包
-	def exerPack(self) -> Exermon.ExerPack:
-		return self._getOneToOneCache(Exermon.ExerPack)
+	def exerPack(self) -> 'ExerPack':
+		from exermon_module.models import ExerPack
+		return self._getOneToOneCache(ExerPack)
 
 	# 获取艾瑟萌碎片背包
-	def exerFragPack(self) -> Exermon.ExerFragPack:
-		return self._getOneToOneCache(Exermon.ExerFragPack)
+	def exerFragPack(self) -> 'ExerFragPack':
+		from exermon_module.models import ExerFragPack
+		return self._getOneToOneCache(ExerFragPack)
 
 	# 获取艾瑟萌天赋池
-	def exerGiftPool(self) -> Exermon.ExerGiftPool:
-		return self._getOneToOneCache(Exermon.ExerGiftPool)
+	def exerGiftPool(self) -> 'ExerGiftPool':
+		from exermon_module.models import ExerGiftPool
+		return self._getOneToOneCache(ExerGiftPool)
 
 	# 获取艾瑟萌仓库
-	def exerHub(self) -> Exermon.ExerHub:
-		return self._getOneToOneCache(Exermon.ExerHub)
+	def exerHub(self) -> 'ExerHub':
+		from exermon_module.models import ExerHub
+		return self._getOneToOneCache(ExerHub)
 
 	# 获取题目糖背包
-	def quesSugarPack(self) -> Question.QuesSugarPack:
-		return self._getOneToOneCache(Question.QuesSugarPack)
+	def quesSugarPack(self) -> 'QuesSugarPack':
+		from question_module.models import QuesSugarPack
+		return self._getOneToOneCache(QuesSugarPack)
 
 	# 获取艾瑟萌槽
-	def exerSlot(self) -> Exermon.ExerSlot:
-		return self._getOneToOneCache(Exermon.ExerSlot)
+	def exerSlot(self) -> 'ExerSlot':
+		from exermon_module.models import ExerSlot
+		return self._getOneToOneCache(ExerSlot)
 
 	# 获取装备槽
 	def humanEquipSlot(self) -> 'HumanEquipSlot':
@@ -699,16 +738,15 @@ class Player(CacheableModel):
 
 	# 登陆
 	def login(self, consumer):
-
+		"""
+		登陆操作
+		"""
 		self._setLoginInfo(
 			LoginInfo.create(self.id, consumer.ip_address)
 		)
-
 		self.online = True
 
-		# 如果是已经创建了角色的玩家，对容器进行检查并创建
-		if self.status >= PlayerStatus.CharacterCreated.value:
-			self._createContainers()
+		self.checkRelations()
 
 		self.save()
 
@@ -758,17 +796,19 @@ class Player(CacheableModel):
 
 		self.save()
 
-		self._createContainers()
+		self.checkRelations()
 
 	# 创建艾瑟萌槽
 	def createExermons(self, exers, enames):
-		from exermon_module.models import ExerSlot
+		from exermon_module.models import ExerSlot, PlayerExermon
 
 		player_exers = []
 
 		for i in range(len(exers)):
 
 			player_exers.append(self._createPlayerExer(exers[i], enames[i]))
+
+		# PlayerExermon.objects.bulk_create(player_exers)
 
 		if self.exerSlot(): self._deleteCache(ExerSlot)
 
@@ -780,13 +820,13 @@ class Player(CacheableModel):
 		self._cache(ExerSlot, exer_slot)
 
 		self.status = PlayerStatus.ExermonsCreated.value
-
 		self.save()
 
 		return exer_slot
 
 	# 创建艾瑟萌天赋
 	def createGifts(self, gifts):
+		from exermon_module.models import PlayerExerGift
 
 		exerslot = self.exerSlot()
 
@@ -797,8 +837,7 @@ class Player(CacheableModel):
 		for i in range(len(gifts)):
 
 			player_gift = self._createPlayerGift(gifts[i])
-			exerslot.setPlayerGift(player_gift, slot_index=i+1, force=True)
-		# player_gift.save()
+			exerslot.setPlayerGift(player_gift=player_gift, slot_index=i+1)
 
 		self.status = PlayerStatus.GiftsCreated.value
 		self.save()
@@ -815,49 +854,25 @@ class Player(CacheableModel):
 		self.status = PlayerStatus.Normal.value
 		self.save()
 
-	@classmethod
-	def _createPlayerExer(cls, exer, name):
-		from exermon_module.models import PlayerExermon
+	def _createPlayerExer(self, exer, name):
+		from exermon_module.models import PlayerExermon, ExerHub
 
-		player_exer = PlayerExermon.create(None, item=exer)
+		exer_hub: ExerHub = self.exerHub()
+
+		player_exer: PlayerExermon = exer_hub.gainItems(exer)[0]
 		player_exer.nickname = name
 
 		return player_exer
 
-	@classmethod
-	def _createPlayerGift(cls, gift):
-		from exermon_module.models import PlayerExerGift
+	def _createPlayerGift(self, gift):
+		from exermon_module.models import PlayerExerGift, ExerGiftPool
 
-		return PlayerExerGift.create(None, item=gift)
+		gift_pool: ExerGiftPool = self.exerGiftPool()
 
-	# 创建角色相关的容器
-	def _createContainers(self):
-		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
-		from question_module.models import QuesSugarPack
+		player_gift: PlayerExerGift = gift_pool.gainItems(gift)[0]
+		player_gift.save()
 
-		if self.humanPack() is None:
-			HumanPack.create(player=self)
-
-		if self.exerPack() is None:
-			ExerPack.create(player=self)
-
-		if self.exerHub() is None:
-			ExerHub.create(player=self)
-
-		if self.exerFragPack() is None:
-			ExerFragPack.create(player=self)
-
-		if self.exerGiftPool() is None:
-			ExerGiftPool.create(player=self)
-
-		if self.humanEquipSlot() is None:
-			HumanEquipSlot.create(player=self)
-
-		if self.quesSugarPack() is None:
-			QuesSugarPack.create(player=self)
-
-		if self.playerMoney() is None:
-			PlayerMoney.create(self)
+		return player_gift
 
 	# 修改人物名称
 	def editName(self, name):
@@ -904,6 +919,64 @@ class Player(CacheableModel):
 
 	# endregion
 
+	# region 检查关联数据
+
+	def checkRelations(self):
+		"""
+		检查关联数据（缺少数据时自动添加）
+		"""
+		# 如果是已经创建了角色的玩家，对容器进行检查并创建
+		if self.status >= PlayerStatus.CharacterCreated.value:
+			self._checkContainers()
+			self._checkSeasonRecord()
+
+	# 创建角色相关的容器
+	def _checkContainers(self):
+		"""
+		检查相关容器
+		"""
+		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
+		from question_module.models import QuesSugarPack
+		from battle_module.models import BattleItemSlot
+
+		if self.humanPack() is None:
+			HumanPack.create(player=self)
+
+		if self.exerPack() is None:
+			ExerPack.create(player=self)
+
+		if self.exerHub() is None:
+			ExerHub.create(player=self)
+
+		if self.exerFragPack() is None:
+			ExerFragPack.create(player=self)
+
+		if self.exerGiftPool() is None:
+			ExerGiftPool.create(player=self)
+
+		if self.humanEquipSlot() is None:
+			HumanEquipSlot.create(player=self)
+
+		if self.quesSugarPack() is None:
+			QuesSugarPack.create(player=self)
+
+		if self.battleItemSlot() is None:
+			BattleItemSlot.create(player=self)
+
+		if self.playerMoney() is None:
+			PlayerMoney.create(self)
+
+	def _checkSeasonRecord(self):
+		"""
+		检查赛季记录
+		"""
+		cur_rec = self.currentSeasonRecord()
+		if cur_rec is None:
+			season = SeasonManager.getCurrentSeason()
+			SeasonRecord.create(self, season)
+
+	# endregion
+
 	# region 基本属性操作
 
 	def level(self, calc_next: bool = False) -> int or (int, int):
@@ -922,6 +995,14 @@ class Player(CacheableModel):
 
 		next = ExermonSlotLevelCalc.calcPlayerExp(level+1)
 		return level, next
+
+	def battlePoint(self) -> int:
+		"""
+		获取战斗力
+		Returns:
+			返回战斗力点数
+		"""
+		return self.exerSlot().battlePoint()
 
 	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
 		"""
@@ -973,8 +1054,7 @@ class Player(CacheableModel):
 		"""
 		return self.questionrecord_set.all()
 
-	# 查询题目记录
-	def questionRecord(self, question_id: int) -> Record.QuestionRecord:
+	def questionRecord(self, question_id: int) -> 'QuestionRecord':
 		"""
 		通过题目ID查找题目记录
 		Args:
@@ -986,7 +1066,6 @@ class Player(CacheableModel):
 		if res.exists(): return res.first()
 		return None
 
-	# 获取刷题记录
 	def exerciseRecords(self) -> QuerySet:
 		"""
 		获取所有刷题记录
@@ -995,16 +1074,26 @@ class Player(CacheableModel):
 		"""
 		return self.exerciserecord_set.all()
 
-	# 设置当前题目集
-	def setCurrentQuestionSet(self, ques_set: Record.QuestionSetRecord):
+	def setCurrentQuestionSet(self, ques_set: 'QuestionSetRecord'):
+		"""
+		设置当前题目集
+		Args:
+			ques_set (QuestionSetRecord): 题目集
+		"""
 		self._cache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
 
-	# 设置当前题目集
-	def currentQuestionSet(self):
+	def currentQuestionSet(self) -> 'QuestionRecord':
+		"""
+		获取当前题目集记录
+		Returns:
+			返回当前题目集记录
+		"""
 		return self._getCache(self.CUR_QUES_SET_CACHE_KEY)
 
-	# 清除当前刷题
 	def clearCurrentQuestionSet(self):
+		"""
+		清除当前题目集记录
+		"""
 		self._clearCache(self.CUR_QUES_SET_CACHE_KEY)
 
 	# endregion
@@ -1027,7 +1116,9 @@ class Player(CacheableModel):
 		Returns:
 			返回指定条件的赛季记录
 		"""
-		return self.seasonRecords().filter(**kwargs)
+		rec = self.seasonRecords().filter(**kwargs)
+		if rec.exists(): return rec.first()
+		return None
 
 	def currentSeasonRecord(self) -> SeasonRecord:
 		"""
@@ -1036,7 +1127,7 @@ class Player(CacheableModel):
 			返回玩家当前赛季记录
 		"""
 		season = SeasonManager.getCurrentSeason()
-		return self.seasonRecord(id=season.id)
+		return self.seasonRecord(season_id=season.id)
 
 	# endregion
 
@@ -1209,7 +1300,7 @@ class HumanPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return HumanPackItem, HumanPackEquip
+	def acceptedContItemClasses(cls): return HumanPackItem, HumanPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod

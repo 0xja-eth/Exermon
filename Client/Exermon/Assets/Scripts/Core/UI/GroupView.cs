@@ -154,9 +154,8 @@ namespace Core.UI {
         /// <param name="sub">子视图</param>
         /// <param name="index">索引</param>
         protected virtual void onSubViewCreated(T sub, int index) {
-            Debug.Log(name + ".onSubViewCreated: " + sub + ", " + index);
             subViews.Add(sub);
-            Debug.Log(name + ".subViews: " + subViews.Count);
+            sub.transform.SetAsLastSibling();
         }
 
         /// <summary>

@@ -49,12 +49,8 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
             if (slotItem.isNullItem()) clearPackEquip();
             else {
                 var equip = slotItem.equip();
-                var icon = equip.icon;
-                var rect = new Rect(0, 0, icon.width, icon.height);
-                this.icon.gameObject.SetActive(true);
-                this.icon.overrideSprite = Sprite.Create(
-                    icon, rect, new Vector2(0.5f, 0.5f));
-                this.icon.overrideSprite.name = icon.name;
+                icon.gameObject.SetActive(true);
+                icon.overrideSprite = equip.icon;
 
                 if (name) name.text = equip.name;
             }

@@ -73,7 +73,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="objs">对象数组</param>
         public void setValues(ParamDisplay.DisplayDataConvertable[] objs,
             string type = "", bool force = false) {
-            for (int i = 0; i < subViewsCount(); i++)
+            for (int i = 0; i < objs.Length; i++)
                 setValue(i, objs[i], type, force);
         }
         /// <param name="obj">对象</param>
@@ -82,7 +82,7 @@ namespace UI.Common.Controls.ParamDisplays {
             if (obj == null) clearValues();
             else {
                 var infos = obj.convertToDisplayDataArray(type);
-                for (int i = 0; i < subViewsCount(); i++)
+                for (int i = 0; i < infos.Length; i++)
                     setValue(i, infos[i], force);
             }
         }
@@ -91,16 +91,22 @@ namespace UI.Common.Controls.ParamDisplays {
             string type = "", bool force = false) {
             if (objs == null || objs.Length <= 0) clearValues();
             else {
-                var count = subViewsCount();
-                var res = new JsonData[objs.Length][]; // 缓存所有 JsonData
-                for (int i = 0; i < objs.Length; i++)
+                int objLen = objs.Length, count = 0;
+                var res = new JsonData[objLen][]; // 缓存所有 JsonData
+                for (int i = 0; i < objLen; i++) {
                     res[i] = objs[i].convertToDisplayDataArray(type);
+                    count = Mathf.Max(res[i].Length, count);
+                }
+
+                // 合并两个 DisplayDataArrayConvertable 生成的 JsonData
+                // 对每个对象进行 setValue
                 for (int i = 0; i < count; ++i) {
                     var json = new JsonData();
-                    for (int j = 0; j < objs.Length; ++j)
+                    // 遍历每个物体的每个键并赋值到 JsonData
+                    for (int j = 0; j < objLen; ++j)
                         foreach (var key in res[j][i].Keys)
                             json[key] = res[j][i][key];
-                    Debug.Log("jsons[" + i + "] = " + json.ToJson());
+                    // Debug.Log("jsons[" + i + "] = " + json.ToJson());
                     setValue(i, json, force);
                 }
             }
@@ -111,18 +117,15 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="obj">对象/数据</param>
         public void setValue(int index, JsonData obj, bool force = false) {
-            if (index >= subViewsCount()) return;
-            subViews[index].setValue(obj, force);
+            createSubView(index).setValue(obj, force);
         }
         public void setValue(int index, ParamDisplay.DisplayDataConvertable obj,
             string type = "", bool force = false) {
-            if (index >= subViewsCount()) return;
-            subViews[index].setValue(obj, type, force);
+            createSubView(index).setValue(obj, type, force);
         }
         public void setValue(int index, ParamDisplay.DisplayDataConvertable[] objs,
             string type = "", bool force = false) {
-            if (index >= subViewsCount()) return;
-            subViews[index].setValue(objs, type, force);
+            createSubView(index).setValue(objs, type, force);
         }
 
         /// <summary>

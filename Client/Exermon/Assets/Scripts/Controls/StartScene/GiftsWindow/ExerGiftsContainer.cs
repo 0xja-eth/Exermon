@@ -10,7 +10,7 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌天赋卡片容器
     /// </summary>
-    public class ExerGiftsContainer : ItemContainer<ExerGift> {
+    public class ExerGiftsContainer : ContainerDisplay<ExerGift> {
 
         /// <summary>
         /// 常量设置
@@ -52,7 +52,7 @@ namespace UI.StartScene.Controls.ExerGift {
         protected override void onSubViewCreated(SelectableItemDisplay<ExerGift> item, int index) {
             base.onSubViewCreated(item, index);
             if (!inStartScene) return;
-            var giftCard = item as ExerGiftCard;
+            var giftCard = item as InitExerGiftDisplay;
             giftCard.draggingParent = draggingParent;
         }
 

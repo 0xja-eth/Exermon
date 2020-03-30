@@ -3,30 +3,31 @@ from enum import Enum
 
 class WebscoketCloseCode(Enum):
 
-	ServerClose			= 1000 # 服务器切断连接
-	ClientClose			= 1001 # 客户端切断连接
-	AbnormalClose		= 1006 # 非正常断开连接
+	ServerClose = 1000  # 服务器切断连接
+	ClientClose = 1001  # 客户端切断连接
+	AbnormalClose = 1006  # 非正常断开连接
 
-	Logout				= 3000 # 用户登出
-	Kickout				= 3001 # 用户踢出
+	Logout = 3000  # 用户登出
+	Kickout = 3001  # 用户踢出
 
 
 class ErrorType(Enum):
 	# Common
-	UnknownError = -1  # 未知错误
 	Success = 0  # 成功，无错误
 	InvalidRequest = 1  # 非法的请求方法
 	ParameterError = 2  # 参数错误
 	InvalidRoute = 3  # 非法路由
 	PermissionDenied = 4  # 无权操作
 	NoCurVersion = 5  # 未设置当前版本
-	NoCurConfigure = 6  # 当前版本无配置
-	RequestUpdate = 7  # 需要更新
-	ErrorVersion = 8  # 错误的游戏版本
+	RequestUpdate = 6  # 需要更新
+	ErrorVersion = 7  # 错误的游戏版本
 	InvalidUserOper = 10  # 无效的用户操作
 	SubjectNotExist = 20  # 科目不存在
 	BaseParamNotExist = 21  # 属性不存在
+	StarNotExist = 22  # 星级不存在
+	TypeNotExist = 23  # 类型不存在
 	DatabaseError = 30  # 数据库错误
+	UnknownError = 999  # 未知错误
 
 	# PlayerCommon
 	PlayerNotExist = 100  # 玩家不存在
@@ -82,8 +83,10 @@ class ErrorType(Enum):
 	InvalidContItem = 222  # 无效容器项
 
 	# Equip/DequipEquip
-	IncorrectEquipType = 230  # 装备类型不正确
-	InvalidContainer = 231  # 无效容器
+	SlotItemNotFound = 230  # 找不到装备槽
+	EquipIndexNotFound = 231  # 找不到装备索引
+	ContainerNotFound = 232  # 找不到所属容器
+	IncorrectEquipType = 233  # 装备类型不正确
 
 	# UseItem
 	UnusableItem = 240  # 物品不可用
@@ -148,7 +151,7 @@ class ErrorType(Enum):
 	BattleNotExist = 600  # 对战不存在
 	BattleRecordNotExist = 601  # 对战记录不存在
 	NotInBattle = 602  # 未加入对战
-	AlreadlyInBattle = 603  # 已加入对战
+	AlreadyInBattle = 603  # 已加入对战
 	BattleStarted = 604  # 对战已开始
 	BattleTerminated = 605  # 对战已结束
 
@@ -170,26 +173,29 @@ class ErrorType(Enum):
 	# SeasonCommon
 	SeasonNotExist = 700  # 赛季不存在
 	SeasonRecordNotExist = 701  # 赛季记录不存在
+	CompRankNotExist = 702  # 赛季排位不存在
+	ResultJudgeNotExist = 703  # 结果判断类型不存在
 
 
 class GameException(Exception):
 
 	ERROR_DICT = {
 		# Common
-		ErrorType.UnknownError: "服务器发生错误，请联系管理员！",
 		ErrorType.Success: "",
 		ErrorType.InvalidRequest: "非法的请求方法！",
 		ErrorType.ParameterError: "参数错误！",
 		ErrorType.InvalidRoute: "非法的请求路由！",
 		ErrorType.PermissionDenied: "无权操作！",
 		ErrorType.NoCurVersion: "未设置当前版本，请联系管理员！",
-		ErrorType.NoCurConfigure: "当前版本无游戏配置，请联系管理员！",
 		ErrorType.RequestUpdate: "当前客户端版本过旧，请更新游戏！",
 		ErrorType.ErrorVersion: "错误的客户端版本，请更新游戏！",
 		ErrorType.InvalidUserOper: "无效的用户操作！",
 		ErrorType.SubjectNotExist: "科目不存在！",
 		ErrorType.BaseParamNotExist: "属性不存在！",
+		ErrorType.StarNotExist: "星级不存在！",
+		ErrorType.TypeNotExist: "类型不存在！",
 		ErrorType.DatabaseError: "数据库错误！",
+		ErrorType.UnknownError: "服务器发生错误，请联系管理员！",
 
 		# PlayerCommon
 		ErrorType.PlayerNotExist: "玩家不存在！",
@@ -245,8 +251,10 @@ class GameException(Exception):
 		ErrorType.InvalidContItem: "无法对此物品进行操作！",
 
 		# Equip/DequipEquip
+		ErrorType.SlotItemNotFound: "找不到装备槽！",
+		ErrorType.EquipIndexNotFound: "找不到装备类型！",
+		ErrorType.ContainerNotFound: "找不到所属容器，无法进行装备操作！",
 		ErrorType.IncorrectEquipType: "装备类型不正确！",
-		ErrorType.InvalidContainer: "找不到所属容器，无法进行装备操作！",
 
 		# UseItem
 		ErrorType.UnusableItem: "物品不可用！",
@@ -306,12 +314,12 @@ class GameException(Exception):
 		ErrorType.QuesReportTooLong: "题目反馈太长！",
 		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
 		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
-    
+
 		# BattleCommon
 		ErrorType.BattleNotExist: "对战不存在！",
 		ErrorType.BattleRecordNotExist: "对战记录不存在！",
 		ErrorType.NotInBattle: "尚未加入对战！",
-		ErrorType.AlreadlyInBattle: "已加入一场对战！",
+		ErrorType.AlreadyInBattle: "已加入一场对战！",
 		ErrorType.BattleStarted: "对战已开始！",
 		ErrorType.BattleTerminated: "对战已结束！",
 
@@ -333,6 +341,8 @@ class GameException(Exception):
 		# SeasonCommon
 		ErrorType.SeasonNotExist: "赛季不存在！",
 		ErrorType.SeasonRecordNotExist: "赛季记录不存在！",
+		ErrorType.CompRankNotExist: "赛季排位不存在！",
+		ErrorType.ResultJudgeNotExist: "结果判断类型不存在！",
 
 	}
 

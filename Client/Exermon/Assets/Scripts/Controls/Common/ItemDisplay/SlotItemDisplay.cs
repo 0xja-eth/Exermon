@@ -16,7 +16,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 装备
         /// </summary>
         /// <param name="item">物品</param>
-        void setEquip(E item);
+        void setEquip(E item, bool force = false);
+        /// <param name="container">容器</param>
+        void setEquip(ContainerDisplay<E> container, E item);
 
         /// <summary>
         /// 获取装备
@@ -38,13 +40,32 @@ namespace UI.Common.Controls.ItemDisplays {
         public bool previewable = false;
 
         /// <summary>
+        /// 是否单击卸下装备（如果可以选择，则在选择状态下单击卸下装备）
+        /// </summary>
+        public bool onClickDequip = false;
+
+        /// <summary>
         /// 内部变量定义
         /// </summary>
         protected E equip; // 装备
+        protected E lastEquip; // 上个装备
         protected E previewingEquip = null; // 装备
 
-        #region 数据控制
+        // protected ContainerDisplay<E> packDisplay = null; // 装备容器
 
+        #region 初始化
+        /*
+        /// <summary>
+        /// 配置组件
+        /// </summary>
+        public override void configure(ContainerDisplay<T> container, int index) {
+            base.configure(container, index+1);
+        }
+        */
+        #endregion
+
+        #region 数据控制
+        
         /// <summary>
         /// 物品变更回调
         /// </summary>
@@ -62,11 +83,22 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 装备
         /// </summary>
         /// <param name="item">物品</param>
-        public void setEquip(E item) {
-            if (equip == item) return;
-            equip = item;
+        public virtual void setEquip(E item, bool force = false) {
+            if (!force && (!isEquippable(item) || equip == item)) return;
+            lastEquip = equip; equip = item;
             onEquipChanged();
         }
+        /// <param name="container">容器</param>
+        public virtual void setEquip(ContainerDisplay<E> container, E item) {
+            setEquip(item);
+        }
+        
+        /// <summary>
+        /// 能否装备
+        /// </summary>
+        /// <param name="item">装备项</param>
+        /// <returns></returns>
+        public virtual bool isEquippable(E item) { return true; }
 
         /// <summary>
         /// 设置预览
@@ -192,6 +224,17 @@ namespace UI.Common.Controls.ItemDisplays {
         public override void OnPointerExit(PointerEventData data) {
             base.OnPointerExit(data);
             clearPreview();
+        }
+
+        /// <summary>
+        /// 处理点击事件回调
+        /// </summary>
+        /// <param name="eventData">事件数据</param>
+        public override void OnPointerClick(PointerEventData data) {
+            if (onClickDequip) 
+                if (!isSelectable()) setEquip(null);
+                else if (isSelected()) setEquip(null);
+            base.OnPointerClick(data);
         }
 
         /// <summary>

@@ -102,6 +102,7 @@ namespace UI.MainScene {
             string sceneName = this.sceneName();
             switch (index) {
                 case 1: sceneName = SceneUtils.GameScene.StatusScene; break;
+                case 2: sceneName = SceneUtils.GameScene.BattleStartScene; break;
             }
             gameSys.requestChangeScene(sceneName, GameSystem.SceneRequest.Type.Push);
         }

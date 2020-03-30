@@ -29,10 +29,10 @@ class SeasonManager:
         now = datetime.datetime.now()
 
         # 按照时间顺序从将来往以前读取赛季信息
-        for i in seasons:
+        for season in seasons:
             # 当前日期和时间小于某个赛季的开始时间
-            if now <= i.start_time:
-                current_season = i-1
+            if season.start_time <= now < season.end_time:
+                current_season = season
                 return current_season
 
         return None

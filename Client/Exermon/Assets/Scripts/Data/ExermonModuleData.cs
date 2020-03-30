@@ -13,6 +13,7 @@ using GameModule.Data;
 using GameModule.Services;
 
 using ItemModule.Data;
+using PlayerModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
 
@@ -496,6 +497,10 @@ namespace ExermonModule.Data {
         /// <returns></returns>
         public override int capacity() { return item().maxCount(); }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerPackItem() : base() { }
     }
 
     /// <summary>
@@ -552,6 +557,11 @@ namespace ExermonModule.Data {
             if (equip == null) return new ParamData(paramId);
             return equip.getParam(paramId);
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerPackEquip() : base() { }
 
     }
 
@@ -835,9 +845,9 @@ namespace ExermonModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public PlayerExermon playerExer { get; protected set; }
+        public int playerExerId { get; protected set; }
         [AutoConvert]
-        public PlayerExerGift playerGift { get; protected set; }
+        public int playerGiftId { get; protected set; }
         [AutoConvert]
         public int subjectId { get; protected set; }
         [AutoConvert]
@@ -848,12 +858,52 @@ namespace ExermonModule.Data {
         public int level { get; protected set; }
 
         [AutoConvert]
-        public ExerEquipSlot exerEquipSlot { get; protected set; }
+        public ExerEquipSlot exerEquipSlot { get; protected set; } 
 
         [AutoConvert]
         public ParamData[] paramValues { get; protected set; }
         [AutoConvert]
         public ParamRateData[] rateParams { get; protected set; }
+
+        /// <summary>
+        /// 玩家艾瑟萌实例
+        /// </summary>
+        public PlayerExermon playerExer {
+            get {
+                var exerHub = exerSlot.player.packContainers.exerHub;
+                return exerHub.getItem(item => item.getID() == playerExerId);
+            }
+            set {
+                playerExerId = value.getID();
+            }
+        }
+
+        /// <summary>
+        /// 玩家艾瑟萌天赋实例
+        /// </summary>
+        public PlayerExerGift playerGift {
+            get {
+                var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
+                var playerGift = exerGiftPool.getItem(item => item.getID() == playerGiftId);
+                return playerGift ?? tmpPlayerGift;
+            }
+            set {
+                var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
+                var playerGift = exerGiftPool.getItem(item => item.getID() == playerGiftId);
+                if (playerGift == null) {
+                    tmpPlayerGift = value;
+                    playerGiftId = tmpPlayerGift.getID();
+                } else {
+                    tmpPlayerGift = null;
+                    playerGiftId = value.getID();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 临时玩家艾瑟萌天赋
+        /// </summary>
+        PlayerExerGift tmpPlayerGift;
 
         /// <summary>
         /// 装备
@@ -871,6 +921,11 @@ namespace ExermonModule.Data {
         /// 复制的对象，用于生成装备预览
         /// </summary>
         public ExerSlotItem previewObj { get; set; } = null;
+
+        /// <summary>
+        /// 艾瑟萌槽
+        /// </summary>
+        public ExerSlot exerSlot { get; set; }
 
         #region 属性显示数据生成
 
@@ -1109,7 +1164,7 @@ namespace ExermonModule.Data {
             if (playerGift == null) return null;
             return playerGift.exerGift();
         }
-
+        /*
         /// <summary>
         /// 设置艾瑟萌
         /// </summary>
@@ -1117,12 +1172,15 @@ namespace ExermonModule.Data {
         public void setExermon(Exermon exermon) {
             setEquip(new PlayerExermon(exermon.getID()));
         }
-
+        */
         /// <summary>
         /// 设置艾瑟萌天赋
         /// </summary>
         /// <param name="exerGift">艾瑟萌天赋</param>
         public void setExerGift(ExerGift exerGift) {
+            //var playerExer = new PlayerExerGift(exerGift.getID());
+            //var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
+            //exerGiftPool.pushItem(playerExer);
             setEquip(new PlayerExerGift(exerGift.getID()));
         }
 
@@ -1192,7 +1250,9 @@ namespace ExermonModule.Data {
         /// </summary>
         /// <returns></returns>
         public ExerSlotItem createPreviewObject() {
-            return previewObj = (ExerSlotItem)copy();
+            previewObj = (ExerSlotItem)copy();
+            previewObj.exerSlot = exerSlot;
+            return previewObj;
         }
 
         /// <summary>
@@ -1249,30 +1309,73 @@ namespace ExermonModule.Data {
             previewObj.recomputeParams();
         }
 
+        /// <summary>
+        /// 获取预览用的装备槽项
+        /// </summary>
+        /// <param name="index"></param>
+        public ExerEquipSlotItem getPreviewEquipSlotItem(int index) {
+            if (previewObj == null) return null;
+            return previewObj.exerEquipSlot.getSlotItem(index);
+        }
+
         #endregion
 
         #endregion
 
         /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json">数据</param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            exerEquipSlot.exerSlotItem = this;
+        }
+        
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public ExerSlotItem() {
-            exerEquipSlot = new ExerEquipSlot(this);
+        public ExerSlotItem() : base() {
+            // exerEquipSlot = new ExerEquipSlot(this);
         }
     }
 
     /// <summary>
     /// 艾瑟萌装备槽项
     /// </summary>
-    public class ExerEquipSlotItem : SlotContItem<ExerPackEquip> {
+    public class ExerEquipSlotItem : SlotContItem<ExerPackEquip>,
+        ParamDisplay.DisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
-        public ExerPackEquip packEquip { get; protected set; }
+        public int packEquipId { get; protected set; }
         [AutoConvert]
         public int eType { get; protected set; }
+
+        /// <summary>
+        /// 槽索引
+        /// </summary>
+        public override int slotIndex {
+            get { return eType; }
+            set { eType = value; }
+        }
+
+        /// <summary>
+        /// 艾瑟萌背包装备实例
+        /// </summary>
+        public ExerPackEquip packEquip {
+            get {
+                var exerPack = equipSlot.exerSlotItem.exerSlot.
+                    player.packContainers.exerPack;
+                return exerPack.getItem<ExerPackEquip>(
+                    item => item.getID() == packEquipId);
+            }
+            set {
+                packEquipId = value.getID();
+            }
+        }
+
         /// <summary>
         /// 装备
         /// </summary>
@@ -1280,6 +1383,35 @@ namespace ExermonModule.Data {
             get { return packEquip; }
             protected set { packEquip = value; }
         }
+
+        /// <summary>
+        /// 装备槽
+        /// </summary>
+        public ExerEquipSlot equipSlot { get; set; }
+
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData[] convertToDisplayDataArray(string type = "") {
+            var params_ = DataService.get().staticData.configure.baseParams;
+            var count = params_.Length;
+            var data = new JsonData[count];
+            for (int i = 0; i < count; ++i) {
+                var json = new JsonData();
+                var paramId = params_[i].getID();
+                var param = getParam(paramId);
+                var percent = param.param().isPercent();
+                json["equip_param"] = DataLoader.convertDouble(
+                    param.value, !percent, percent ? 4 : 2); 
+                data[i] = json;
+            }
+            return data;
+        }
+
+        #endregion
 
         /// <summary>
         /// 获取装备类型
@@ -1312,9 +1444,14 @@ namespace ExermonModule.Data {
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
         public ParamData getParam(int paramId) {
-            if (packEquip == null) return new ParamData(paramId);
-            return packEquip.getParam(paramId);
+            var val = CalcService.EquipParamCalc.calc(this, paramId);
+            return new ParamData(paramId, val);
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerEquipSlotItem() : base() { }
     }
 
     /// <summary>
@@ -1345,6 +1482,11 @@ namespace ExermonModule.Data {
         public ExerSkill skill() {
             return DataService.get().exerSkill(skillId);
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerSkillSlotItem() : base() { }
     }
 
     #endregion
@@ -1355,6 +1497,21 @@ namespace ExermonModule.Data {
     /// 艾瑟萌背包
     /// </summary>
     public class ExerPack : PackContainer<PackContItem> {
+
+        /// <summary>
+        /// 获得一个物品
+        /// </summary>
+        /// <param name="p">条件</param>
+        /// <returns>物品</returns>
+        public T getItem<T>(Predicate<T> p) where T : PackContItem {
+            if (typeof(T) == typeof(ExerPackItem))
+                return (T)getItem(item => item.type ==
+                    (int)BaseContItem.Type.ExerPackItem && p((T)item));
+            if (typeof(T) == typeof(ExerPackEquip))
+                return (T)getItem(item => item.type ==
+                    (int)BaseContItem.Type.ExerPackEquip && p((T)item));
+            return null;
+        }
 
         /// <summary>
         /// 读取单个物品
@@ -1368,7 +1525,7 @@ namespace ExermonModule.Data {
                 return DataLoader.load<ExerPackEquip>(json);
             return null;
         }
-
+        /*
         /// <summary>
         /// 获取所有装备
         /// </summary>
@@ -1392,6 +1549,11 @@ namespace ExermonModule.Data {
                     res.Add((ExerPackItem)item);
             return res;
         }
+        */
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerPack() : base() { }
     }
 
     /// <summary>
@@ -1408,6 +1570,11 @@ namespace ExermonModule.Data {
     /// 人类装备槽
     /// </summary>
     public class ExerSlot : SlotContainer<ExerSlotItem> {
+
+        /// <summary>
+        /// 所属玩家
+        /// </summary>
+        public Player player { get; set; } 
 
         #region 数据操作
 
@@ -1482,6 +1649,17 @@ namespace ExermonModule.Data {
             return null;
         }
 
+        /// <summary>
+        /// 读取物品
+        /// </summary>
+        /// <param name="json">数据</param>
+        /// <returns>物品对象</returns>
+        protected override ExerSlotItem loadItem(JsonData json) {
+            var slotItem = base.loadItem(json);
+            slotItem.exerSlot = this;
+            return slotItem;
+        }
+
         #endregion
     }
 
@@ -1493,19 +1671,21 @@ namespace ExermonModule.Data {
         /// <summary>
         /// 对应的艾瑟萌槽项
         /// </summary>
-        public ExerSlotItem exerSlotItem { get; protected set; } = null;
+        public ExerSlotItem exerSlotItem { get; set; } = null;
 
         /// <summary>
         /// 构造函数
         /// </summary>
+        /*
         /// <param name="exerSlotItem">所属的艾瑟萌槽项</param>
         public ExerEquipSlot(ExerSlotItem exerSlotItem) {
             this.exerSlotItem = exerSlotItem;
         }
-        public ExerEquipSlot() { }
+        */
+        public ExerEquipSlot() : base() { }
 
         #region 数据操作
-
+        /*
         /// <summary>
         /// 获取装备项
         /// </summary>
@@ -1514,7 +1694,7 @@ namespace ExermonModule.Data {
         public override ExerEquipSlotItem getSlotItem(int eType) {
             return getItem((item) => item.eType == eType);
         }
-
+        */
         /// <summary>
         /// 通过装备物品获取槽项
         /// </summary>
@@ -1566,6 +1746,17 @@ namespace ExermonModule.Data {
         }
 
         #endregion
+
+        /// <summary>
+        /// 读取单个物品
+        /// </summary>
+        /// <param name="json">数据</param>
+        protected override ExerEquipSlotItem loadItem(JsonData json) {
+            var slotItem = base.loadItem(json);
+            slotItem.equipSlot = this;
+            return slotItem;
+        }
+
     }
 
     /// <summary>

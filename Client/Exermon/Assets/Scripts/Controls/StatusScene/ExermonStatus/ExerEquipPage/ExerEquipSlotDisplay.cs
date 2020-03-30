@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using ItemModule.Data;
 using ExermonModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
@@ -31,12 +32,14 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
     /// <summary>
     /// 艾瑟萌装备槽显示
     /// </summary>
-    public class ExerEquipSlotDisplay : ItemContainer<ExerEquipSlotItem> {
+    public class ExerEquipSlotDisplay : SlotContainerDisplay<ExerEquipSlotItem, PackContItem> {
                 
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public ExerSlotItemDisplay exerSlotItemDisplay; // 帮助界面
+
+        public PackContainerDisplay packDisplay; // 背包容器显示组件
 
         /// <summary>
         /// 内部变量声明
@@ -48,10 +51,19 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetail<ExerEquipSlotItem> getItemDetail() {
+        protected override IItemDetailDisplay<ExerEquipSlotItem> getItemDetail() {
             return exerSlotItemDisplay;
         }
 
+        /// <summary>
+        /// 背包显示组件
+        /// </summary>
+        /// <returns></returns>
+        public override PackContainerDisplay<PackContItem> getPackDisplay() {
+            return packDisplay;
+        }
+
         #endregion
+
     }
 }

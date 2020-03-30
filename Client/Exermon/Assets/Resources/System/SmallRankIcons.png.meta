@@ -1,0 +1,619 @@
+fileFormatVersion: 2
+guid: 0939e6453d10774459a8f4b2d2842d39
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3441105088503940478
+    second: SmallRankIcons_0
+  - first:
+      213: 2786549450704299241
+    second: SmallRankIcons_1
+  - first:
+      213: 8691113303518243483
+    second: SmallRankIcons_2
+  - first:
+      213: -6311113748588100407
+    second: SmallRankIcons_3
+  - first:
+      213: -7236716230270577943
+    second: SmallRankIcons_4
+  - first:
+      213: 6081612223225496724
+    second: SmallRankIcons_5
+  - first:
+      213: -93046738224383937
+    second: SmallRankIcons_6
+  - first:
+      213: 1969655714903797489
+    second: SmallRankIcons_7
+  - first:
+      213: 2718405805935564729
+    second: SmallRankIcons_8
+  - first:
+      213: 8059980759415336648
+    second: SmallRankIcons_9
+  - first:
+      213: -5146700458080603500
+    second: SmallRankIcons_10
+  - first:
+      213: 5894438709243869025
+    second: SmallRankIcons_11
+  - first:
+      213: 5637782497371565864
+    second: SmallRankIcons_12
+  - first:
+      213: -536618072550555998
+    second: SmallRankIcons_13
+  - first:
+      213: -4587302812230288784
+    second: SmallRankIcons_14
+  - first:
+      213: 606709320309906088
+    second: SmallRankIcons_15
+  - first:
+      213: -1951255563242866531
+    second: SmallRankIcons_16
+  - first:
+      213: -4587079923526851910
+    second: SmallRankIcons_17
+  - first:
+      213: 7732586947740325710
+    second: SmallRankIcons_18
+  - first:
+      213: -2596605880664229408
+    second: SmallRankIcons_19
+  externalObjects: {}
+  serializedVersion: 10
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: -1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SmallRankIcons_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 240.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28afeec572dbe30d0800000000000000
+      internalID: -3441105088503940478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_1
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 240.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e42a4e26ffcba620800000000000000
+      internalID: 2786549450704299241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_2
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 240.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9a60e680890d9870800000000000000
+      internalID: 8691113303518243483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9c4825ebb7b6a68a0800000000000000
+      internalID: -6311113748588100407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_4
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 192.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e21b6a2ee4029b90800000000000000
+      internalID: -7236716230270577943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_5
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 192.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4948703681a366450800000000000000
+      internalID: 6081612223225496724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 144.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3870ac0c7e65bef0800000000000000
+      internalID: -93046738224383937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_7
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 144.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fea8a0ef6f955b10800000000000000
+      internalID: 1969655714903797489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_8
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 144.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b716228da7b9b520800000000000000
+      internalID: 2718405805935564729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_9
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 144.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ce2f6d0ccdcadf60800000000000000
+      internalID: 8059980759415336648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 492f3c6a33f3398b0800000000000000
+      internalID: -5146700458080603500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_11
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 96.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 167fac6a6c04dc150800000000000000
+      internalID: 5894438709243869025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_12
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 96.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82f2fb4af4d6d3e40800000000000000
+      internalID: 5637782497371565864
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_13
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 96.83333
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2aeb195c4bc8d88f0800000000000000
+      internalID: -536618072550555998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 48.833332
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07afcd79560a650c0800000000000000
+      internalID: -4587302812230288784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_15
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 48.833332
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8aa9dfe89e67b6800800000000000000
+      internalID: 606709320309906088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_16
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 48.833332
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9877e6476fbbe4e0800000000000000
+      internalID: -1951255563242866531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_17
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 48.833332
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab22bd9ec1b6750c0800000000000000
+      internalID: -4587079923526851910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_18
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 48.833332
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4752e62cdaaf4b60800000000000000
+      internalID: 7732586947740325710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SmallRankIcons_19
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0.83333206
+        width: 48
+        height: 48.166668
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e9715d75b007fbd0800000000000000
+      internalID: -2596605880664229408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

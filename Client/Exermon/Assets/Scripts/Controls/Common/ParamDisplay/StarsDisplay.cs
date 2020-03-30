@@ -7,7 +7,7 @@ using Core.UI;
 namespace UI.Common.Controls.ParamDisplays {
 
     /// <summary>
-    /// 星星组
+    /// 普通星星显示
     /// </summary>
     public class StarsDisplay : GroupView<Image> {
 

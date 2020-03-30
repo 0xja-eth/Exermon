@@ -37,33 +37,40 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
         /// <summary>
         /// 获取容器组件
         /// </summary>
-        protected override ItemContainer<PlayerExerGift>
+        public override PackContainerDisplay<PlayerExerGift> 
             getPackDisplay() { return packDisplay; }
 
         /// <summary>
         /// 获取艾瑟萌槽项显示组件
         /// </summary>
-        protected override ExermonStatusSlotItemDisplay<PlayerExerGift>
+        public override ExermonStatusSlotItemDisplay<PlayerExerGift>
             getSlotItemDisplay() { return slotItemDisplay; }
 
         #endregion
 
         #region 界面绘制
 
+        /// <summary>
+        /// 刷新背包容器
+        /// </summary>
+        void refreshPackContainer() {
+            if (item == null) return;
+            packDisplay.setEquipItem(item.playerGift);
+        }
+        
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        protected override void refresh() {
+            base.refresh();
+            refreshPackContainer();
+        }
+
         #endregion
 
         #region 流程控制
 
         #region 请求控制
-
-        /// <summary>
-        /// 装备请求函数
-        /// </summary>
-        /// <returns></returns>
-        protected override UnityAction<UnityAction> equipRequestFunc() {
-            var equip = slotItemDisplay.getEquip();
-            return action => exerSer.equipPlayerGift(item, equip, action);
-        }
 
         #endregion
 

@@ -156,4 +156,4 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
 
         #endregion
     }
-    }
+}

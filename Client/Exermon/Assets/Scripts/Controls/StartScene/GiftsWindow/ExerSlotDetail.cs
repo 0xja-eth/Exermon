@@ -14,13 +14,13 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌槽详细信息
     /// </summary>
-    public class ExerSlotDetail : ItemDetail<ExerSlotItem> {
+    public class ExerSlotDetail : ItemDetailDisplay<ExerSlotItem> {
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public Image full;
-        public ExerGiftCard gift; // 天赋卡片（装备的）
+        public InitExerGiftDisplay gift; // 天赋卡片（装备的）
         public Text name;
         public ParamDisplaysGroup paramsView;
 
@@ -49,8 +49,8 @@ namespace UI.StartScene.Controls.ExerGift {
         /// 获取容器
         /// </summary>
         /// <returns></returns>
-        public ExerSlotsContainer getContainer() {
-            return container as ExerSlotsContainer;
+        public new ExerSlotsContainer getContainer() {
+            return base.getContainer() as ExerSlotsContainer;
         }
 
         /// <summary>

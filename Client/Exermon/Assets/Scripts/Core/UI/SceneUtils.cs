@@ -32,6 +32,8 @@ namespace Core.UI.Utils {
             public const string StartScene = "StartScene";
             public const string MainScene = "MainScene";
             public const string StatusScene = "StatusScene";
+            public const string BattleStartScene = "BattleStartScene";
+            public const string BattleMatchingScene = "BattleMatchingScene";
             public const string BattleScene = "BattleScene";
             public const string HelpScene = "HelpScene";
         }
@@ -531,7 +533,7 @@ namespace Core.UI.Utils {
         /// <param name="span">TimeSpan实例</param>
         /// <returns>转换后字符串</returns>
         public static string time2StrWithDay(TimeSpan span) {
-            return String.Format("{0}天{1:00}时{2:00}分{3:00}秒", span.Days, span.Hours, span.Minutes, span.Seconds);
+            return string.Format("{0}天{1:00}时{2:00}分{3:00}秒", span.Days, span.Hours, span.Minutes, span.Seconds);
         }
 
         /// <summary>
@@ -540,7 +542,7 @@ namespace Core.UI.Utils {
         /// <param name="span">TimeSpan实例</param>
         /// <returns>转换后字符串</returns>
         public static string time2Str(TimeSpan span) {
-            return String.Format("{0:00}:{1:00}", Math.Floor(span.TotalMinutes), span.Seconds);
+            return string.Format("{0:00}:{1:00}", Math.Floor(span.TotalMinutes), span.Seconds);
         }
         /// <summary>
         /// 秒数转字符串（00:00 格式）
@@ -548,11 +550,11 @@ namespace Core.UI.Utils {
         /// <param name="span">TimeSpan实例</param>
         /// <returns>转换后字符串</returns>
         public static string time2Str(int sec) {
-            return String.Format("{0:00}:{1:00}", sec / 60, sec % 60);
+            return string.Format("{0:00}:{1:00}", sec / 60, sec % 60);
         }
         public static string time2Str(double sec) {
             sec = Math.Round(sec, 2);
-            return String.Format("{0:00}:{1:00.00}", (int)sec / 60, sec % 60);
+            return string.Format("{0:00}:{1:00.00}", (int)sec / 60, sec % 60);
         }
 
         /// <summary>
@@ -561,7 +563,7 @@ namespace Core.UI.Utils {
         /// <param name="span">TimeSpan实例</param>
         /// <returns>转换后字符串</returns>
         public static string time2StrWithHour(TimeSpan span) {
-            return String.Format("{0}:{1:00}:{2:00}", Math.Floor(span.TotalHours), span.Minutes, span.Seconds);
+            return string.Format("{0}:{1:00}:{2:00}", Math.Floor(span.TotalHours), span.Minutes, span.Seconds);
         }
         /// <summary>
         /// 秒数转字符串（00:00:00 格式）

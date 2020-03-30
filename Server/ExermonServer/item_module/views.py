@@ -27,7 +27,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		return cls._getContainerItems(container)
+		return cls.convertContainers(container)
 
 	# 获取背包类容器项数据
 	@classmethod
@@ -43,13 +43,14 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, SlotContainer, ErrorType.IncorrectContainerType)
 
-		return cls._getContainerItems(container)
+		return cls.convertContainers(container)
 
 	# 背包类容器获得物品
 	@classmethod
 	async def packContainerGain(cls, consumer, player: Player, type: int, i_type: int,
 								item_id: int, count: int, refresh: bool):
-		# 返回数据：无
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
 
 		container: PackContainer = Common.getContainer(type, player=player)
 
@@ -59,13 +60,52 @@ class Service:
 
 		container.gainItems(item, count)
 
-		if refresh: return cls._getContainerItems(container)
+		if refresh: return cls.convertContainers(container)
+
+	# 背包类容器获得容器项
+	@classmethod
+	async def packContainerGainContItems(cls, consumer, player: Player, type: int, ci_types: list,
+										 contitem_ids: list, fixed: bool, refresh: bool, ):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+
+		container: PackContainer = Common.getContainer(type, player=player)
+
+		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
+
+		cont_items = Common.getContItems(contitem_ids, types=ci_types, player=player)
+
+		container.gainContItems(cont_items, fixed)
+
+		if refresh: return cls.convertContainers(container)
+
+	# 背包类容器失去容器项
+	@classmethod
+	async def packContainerLostContItems(cls, consumer, player: Player, type: int, ci_types: list,
+										 contitem_ids: list, fixed: bool, refresh: bool, counts: list = None, ):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+		if counts:
+			counts = InterfaceCommon.convertDataType(counts, 'int[]')
+
+		container: PackContainer = Common.getContainer(type, player=player)
+
+		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
+
+		cont_items = Common.getContItems(contitem_ids, types=ci_types, player=player)
+
+		container.lostContItems(cont_items, counts, fixed)
+
+		if refresh: return cls.convertContainers(container)
 
 	# 背包类容器转移
 	@classmethod
 	async def packContainerTransfer(cls, consumer, player: Player, type: int, target_cid: int,
-									ci_types: list, contitem_ids: list, counts: list):
-		# 返回数据：无
+									ci_types: list, contitem_ids: list, counts: list = None):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+		if counts:
+			counts = InterfaceCommon.convertDataType(counts, 'int[]')
 
 		container: PackContainer = Common.getContainer(type, player=player)
 		target: PackContainer = Common.getContainer(type, id=target_cid)
@@ -77,13 +117,14 @@ class Service:
 
 		container.transferContItems(target, cont_items, counts)
 
-		return cls._getContainerItems(container)
+		return cls.convertContainers(container, target)
 
 	# 背包类容器拆分
 	@classmethod
 	async def packContainerSplit(cls, consumer, player: Player, type: int, ci_type: int,
 								 contitem_id: int, count: int):
-		# 返回数据：无
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
 
 		container: PackContainer = Common.getContainer(type, player=player)
 
@@ -93,13 +134,14 @@ class Service:
 
 		container.splitItem(cont_item, count)
 
-		return cls._getContainerItems(container)
+		return cls.convertContainers(container)
 
 	# 背包类容器组合
 	@classmethod
 	async def packContainerMerge(cls, consumer, player: Player, type: int,
 								 ci_type: int, contitem_ids: list):
-		# 返回数据：无
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
 
 		container: PackContainer = Common.getContainer(type, player=player)
 
@@ -109,29 +151,52 @@ class Service:
 
 		container.mergeItem(cont_items)
 
-		return cls._getContainerItems(container)
+		return cls.convertContainers(container)
 
 	# 槽容器装备
 	@classmethod
-	def slotContainerEquip(cls, container: SlotContainer, equip_items: list, **kwargs):
+	def slotContainerEquip(cls, slot_container: SlotContainer,
+						   equip_item: PackContItem, **kwargs) -> dict:
 		"""
 		槽容器装备
 		Args:
-			container (SlotContainer): 对应槽容器
-			equip_items (list): 装备项数组
+			slot_container (SlotContainer): 对应槽容器
+			equip_item (PackContItem): 装备项
 			**kwargs (**dict): 其他装备参数（详见 SlotContainer.setEquip）
+		Returns:
+			返回对应容器的返回数据
 		"""
 
-		ViewUtils.ensureObjectType(container, SlotContainer, ErrorType.IncorrectContainerType)
+		ViewUtils.ensureObjectType(slot_container, SlotContainer, ErrorType.IncorrectContainerType)
 
-		for equip_item in equip_items:
+		pack_container = slot_container.setEquip(equip_item=equip_item, **kwargs)
 
-			container.setEquip(equip_item=equip_item, **kwargs)
+		return cls.convertContainers(pack_container, slot=slot_container)
 
 	# 获取容器项
 	@classmethod
-	def _getContainerItems(cls, container):
-		return {'container': container.convertToDict(type='items')}
+	def convertContainers(cls, container: PackContainer,
+						  target: PackContainer = None, slot: SlotContainer = None,
+						  type: str = 'items'):
+		"""
+		获取返回的容器项数据
+		Args:
+			container (PackContainer): 容器
+			target (PackContainer): 目标容器
+			slot (PackContainer): 槽容器
+			type (str): 转换类型
+		Returns:
+			返回返回到前端的容器项数据
+		"""
+		res = {'container': container.convertToDict(type=type)}
+
+		if target is not None:
+			res['target'] = target.convertToDict(type=type)
+
+		if slot is not None:
+			res['slot'] = slot.convertToDict(type=type)
+
+		return res
 
 
 # =======================

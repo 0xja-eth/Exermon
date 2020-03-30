@@ -139,6 +139,14 @@ WEBSOCKET_METHOD_ROUTER = {
 		Player.getStatus,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 获取玩家对战界面信息
+	'player/get/battle': [[
+		['uid', 'int'],
+		['get_uid', 'int'],
+	],
+		Player.getBattle,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 玩家修改昵称
 	'player/edit/name': [[
 		['uid', 'int'],
@@ -153,6 +161,14 @@ WEBSOCKET_METHOD_ROUTER = {
 		['heid', 'int'],
 	],
 		Player.equipSlotEquip,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 人类装备槽卸下
+	'player/equipslot/dequip': [[
+		['uid', 'int'],
+		['type', 'int'],
+	],
+		Player.equipSlotDequip,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 玩家修改个人信息
@@ -198,6 +214,31 @@ WEBSOCKET_METHOD_ROUTER = {
 		Item.packContainerGain,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 背包类容器获得容器项
+	'item/packcontainer/gain_contitems': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['ci_types', 'int[]'],
+		['contitem_ids', 'int[]'],
+		['fixed', 'bool'],
+		['refresh', 'bool'],
+	],
+		Item.packContainerGainContItems,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 背包类容器失去容器项
+	'item/packcontainer/lost_contitems': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['ci_types', 'int[]'],
+		['contitem_ids', 'int[]'],
+		['counts', 'var'],
+		['fixed', 'bool'],
+		['refresh', 'bool'],
+	],
+		Item.packContainerLostContItems,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 背包类容器转移
 	'item/packcontainer/transfer': [[
 		['uid', 'int'],
@@ -205,7 +246,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		['target_cid', 'int'],
 		['ci_types', 'int[]'],
 		['contitem_id', 'int[]'],
-		['count', 'int[]'],
+		['count', 'var'],
 	],
 		Item.packContainerTransfer,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
@@ -444,7 +485,16 @@ WEBSOCKET_METHOD_ROUTER = {
 		['uid', 'int'],
 		['sid', 'int'],
 	],
-		Season.getRecords,  # 处理函数
+		Season.getRecord,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 查询赛季排行
+	'season/rank/get': [[
+		['uid', 'int'],
+		['sid', 'int'],
+		['count', 'int'],
+	],
+		Season.getRanks,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 

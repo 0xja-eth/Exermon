@@ -27,7 +27,7 @@ class Service:
 
 		pack_item, _ = human_pack.splitItem(pack_item, 1)
 
-		ItemService.slotContainerEquip(item_slot, [pack_item], index=index)
+		return ItemService.slotContainerEquip(item_slot, pack_item, index=index)
 
 	# 卸下对战物资槽
 	@classmethod
@@ -36,7 +36,7 @@ class Service:
 
 		item_slot = Common.getBattleItemSlot(player)
 
-		ItemService.slotContainerEquip(item_slot, [None], type=HumanPackItem, index=index)
+		return ItemService.slotContainerEquip(item_slot, None, type_=HumanPackItem, index=index)
 
 	# 对战开始匹配
 	@classmethod

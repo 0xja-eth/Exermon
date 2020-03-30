@@ -203,28 +203,6 @@ namespace Core.Data {
         public string name { get; protected set; }
         [AutoConvert]
         public string description { get; protected set; }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-            name = DataLoader.loadString(json, "name");
-            description = DataLoader.loadString(json, "description");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-            json["name"] = name;
-            json["description"] = description;
-            return json;
-        }
-        */
     }
 
     /// <summary>
@@ -462,28 +440,5 @@ namespace Core.Data {
         public BaseParam param() {
             return DataService.get().baseParam(paramId);
         }
-        /*
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        /// <param name="json">数据</param>
-        public override void load(JsonData json) {
-            base.load(json);
-            paramId = DataLoader.loadInt(json, "param_id");
-            minValue = DataLoader.loadDouble(json, "min_value");
-            maxValue = DataLoader.loadDouble(json, "max_value");
-        }
-
-        /// <summary>
-        /// 获取JSON数据
-        /// </summary>
-        /// <returns>JsonData</returns>
-        public override JsonData toJson() {
-            var json = base.toJson();
-            json["param_id"] = paramId;
-            json["min_value"] = minValue;
-            json["max_value"] = maxValue;
-            return json;
-        }*/
     }
 }

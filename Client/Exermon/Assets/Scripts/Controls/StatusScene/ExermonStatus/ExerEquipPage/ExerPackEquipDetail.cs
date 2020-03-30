@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using ItemModule.Data;
 using ExermonModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
@@ -11,7 +12,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
     /// <summary>
     /// 状态窗口艾瑟萌页属性信息显示
     /// </summary>
-    public class ExerPackEquipDetail : ExermonStatusExerSlotDetail<ExerPackEquip> {
+    public class ExerPackEquipDetail : ExermonStatusExerSlotDetail<PackContItem> {
 
         /// <summary>
         /// 外部组件设置
@@ -51,10 +52,12 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 绘制主体信息
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
-        protected override void drawMainInfo(ExerPackEquip packEquip) {
+        protected override void drawMainInfo(PackContItem packEquip) {
             base.drawMainInfo(packEquip);
-            drawIconImage(packEquip);
-            drawBaseInfo(packEquip);
+            if (packEquip.type == (int)BaseContItem.Type.ExerPackEquip) {
+                drawIconImage((ExerPackEquip)packEquip);
+                drawBaseInfo((ExerPackEquip)packEquip);
+            }
         }
 
         /// <summary>
@@ -63,13 +66,9 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawIconImage(ExerPackEquip packEquip) {
             var equip = packEquip.equip();
-            var icon = equip.icon;
-            var rect = new Rect(0, 0, icon.width, icon.height);
-            this.icon.color = new Color(1, 1, 1, 1);
-            this.icon.overrideSprite = Sprite.Create(
-                icon, rect, new Vector2(0.5f, 0.5f));
-            this.icon.overrideSprite.name = icon.name;
-
+            icon.color = new Color(1, 1, 1, 1);
+            icon.overrideSprite = equip.icon;
+            
             stars.setValue(equip.starId);
         }
 
@@ -87,7 +86,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 获取当前装备
         /// </summary>
         /// <returns></returns>
-        protected override ExerPackEquip currentEquip() {
+        protected override PackContItem currentEquip() {
             return equipSlotItem?.getEquip<ExerPackEquip>();
         }
 
@@ -95,32 +94,43 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 绘制当前属性数据
         /// </summary>
         /// <param name="contItem"></param>
-        protected override void drawCurrentParamsInfo(ExerPackEquip contItem) {
-            var objs = new ParamDisplay.DisplayDataArrayConvertable[]
-                { slotItem, contItem };
-            paramInfo.setValues(objs, "params");
-            battlePoint.setValue(slotItem, "battle_point");
+        protected override void drawCurrentParamsInfo(PackContItem contItem) {
+            if (contItem.type == (int)BaseContItem.Type.ExerPackEquip) {
+                // var packEquip = (ExerPackEquip)contItem;
+                var objs = new ParamDisplay.DisplayDataArrayConvertable[]
+                    { slotItem, equipSlotItem };
+                paramInfo.setValues(objs, "params");
+                battlePoint.setValue(slotItem, "battle_point");
+            }
         }
 
         /// <summary>
         /// 绘制预览属性数据
         /// </summary>
         /// <param name="contItem"></param>
-        protected override void drawPreviewParamsInfo(ExerPackEquip contItem) {
-            var objs = new ParamDisplay.DisplayDataArrayConvertable[]
-                { slotItem, contItem };
-            slotItem.setPackEquipPreview(equipSlotItem.index, contItem);
-            paramInfo?.setValues(objs, "preview_params");
-            battlePoint?.setValue(slotItem, "preview_battle_point");
-            slotItem.clearPreviewObject();
+        protected override void drawPreviewParamsInfo(PackContItem contItem) {
+            if (contItem.type == (int)BaseContItem.Type.ExerPackEquip) {
+                var packEquip = (ExerPackEquip)contItem;
+
+                slotItem.setPackEquipPreview(equipSlotItem.index, packEquip);
+                equipSlotItem = slotItem.getPreviewEquipSlotItem(equipSlotItem.index);
+
+                var objs = new ParamDisplay.DisplayDataArrayConvertable[]
+                    { slotItem, equipSlotItem };
+
+                paramInfo?.setValues(objs, "preview_params");
+                battlePoint?.setValue(slotItem, "preview_battle_point");
+                slotItem.clearPreviewObject();
+            }
         }
 
         /// <summary>
         /// 绘制纯物品属性数据
         /// </summary>
         /// <param name="contItem"></param>
-        protected override void drawContItemParamsInfo(ExerPackEquip contItem) {
-            paramInfo.setValues(contItem);
+        protected override void drawContItemParamsInfo(PackContItem contItem) {
+            if (contItem.type == (int)BaseContItem.Type.ExerPackEquip) 
+                paramInfo.setValues((ExerPackEquip)contItem);
         }
                 
         /// <summary>

@@ -778,7 +778,7 @@ class ExerSlot(SlotContainer):
 
 	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	@classmethod
-	def acceptedContItemClass(cls): return PlayerExerGift, PlayerExermon
+	def acceptedContItemClasses(cls): return PlayerExerGift, PlayerExermon
 
 	# 默认容器容量（0为无限）
 	@classmethod
@@ -817,23 +817,27 @@ class ExerSlot(SlotContainer):
 			self.ensureSubject(slot_item, equip_item)
 
 	# 设置艾瑟萌
-	def setPlayerExer(self, player_exer: PlayerExermon = None, subject_id=None, force=False):
+	def setPlayerExer(self, slot_item: 'SlotContItem' = None, player_exer: PlayerExermon = None, subject_id=None, force=False):
 
 		if player_exer is not None:
 			subject_id = player_exer.exermon().subject_id
 
-		self.setEquip(equip_index=0, equip_item=player_exer, subject_id=subject_id, force=force)
+		self.setEquip(slot_item=slot_item, equip_index=0, equip_item=player_exer, subject_id=subject_id, force=force)
 
 	# 设置艾瑟萌天赋
-	def setPlayerGift(self, player_gift: PlayerExerGift = None,
+	def setPlayerGift(self, slot_item: 'SlotContItem' = None, player_gift: PlayerExerGift = None,
 					  subject_id=None, slot_index=None, force=False):
 
 		if slot_index is not None:
-			self.setEquip(equip_index=1, equip_item=player_gift, index=slot_index, force=force)
-		if subject_id is not None:
-			self.setEquip(equip_index=1, equip_item=player_gift, subject_id=subject_id, force=force)
+			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
+						  index=slot_index, force=force)
+		elif subject_id is not None:
+			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
+						  subject_id=subject_id, force=force)
+		else:
+			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
+						  force=force)
 
-	# 获得经验
 	def gainExp(self, slot_exps: dict, exer_exps: dict):
 		"""
 		获得经验
@@ -851,19 +855,19 @@ class ExerSlot(SlotContainer):
 
 			slot_item.gainExp(slot_exp, exer_exp)
 
-	# def sumMHP(self) -> int:
-	# 	"""
-	# 	获取艾瑟萌槽项的总体力值
-	# 	Returns:
-	# 		返回总体力值
-	# 	"""
-	# 	sum = 0
-	#
-	# 	slot_items = self.contItems()
-	# 	for slot_item in slot_items:
-	# 		sum += slot_item.paramVal(attr='mhp')
-	#
-	# 	return sum
+	def battlePoint(self) -> int:
+		"""
+		获取战斗力
+		Returns:
+			返回战斗力点数
+		"""
+		sum = 0
+
+		slot_items = self.contItems()
+		for slot_item in slot_items:
+			sum += slot_item.battlePoint()
+
+		return sum
 
 
 # ===================================================
@@ -906,7 +910,7 @@ class ExerSlotItem(SlotContItem):
 	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
 
 	# 属性值（缓存）
-	cached_params = None
+	init_exer = None
 
 	# 所属容器的类
 	@classmethod
@@ -944,13 +948,13 @@ class ExerSlotItem(SlotContItem):
 
 		level, next = self.slotLevel(True)
 
-		exerequipslot = ModelUtils.objectToDict(self.exerEquipSlot(), type="items")
+		exer_equip_slot = ModelUtils.objectToDict(self.exerEquipSlot(), type="items")
 
 		res['subject_id'] = self.subject_id
 		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
-		res['exer_equip_slot'] = exerequipslot
+		res['exer_equip_slot'] = exer_equip_slot
 
 		self._convertParamsToDict(res)
 
@@ -958,6 +962,7 @@ class ExerSlotItem(SlotContItem):
 
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
+		self.container.setPlayerExer(self, self.init_exer)
 		self._cache(self.EQUIPSLOT_CACHE_KEY,
 					ExerEquipSlot.create(exer_slot=self))
 
@@ -970,7 +975,7 @@ class ExerSlotItem(SlotContItem):
 	def setupIndex(self, index, init_exer: PlayerExermon = None, **kwargs):
 		super().setupIndex(index, **kwargs)
 		self.subject = init_exer.exermon().subject
-		self.equip(0, init_exer)
+		self.init_exer = init_exer
 
 	# region 属性
 
@@ -1334,7 +1339,7 @@ class ExerSkillSlot(SlotContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return ()
+	def acceptedContItemClasses(cls): return ()
 
 	# 默认容器容量（0为无限）
 	@classmethod
@@ -1596,7 +1601,7 @@ class ExerPack(PackContainer):
 
 	# 所接受的容器项类
 	@classmethod
-	def acceptedContItemClass(cls): return ExerPackItem, ExerPackEquip
+	def acceptedContItemClasses(cls): return ExerPackItem, ExerPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod
@@ -1763,7 +1768,7 @@ class ExerEquipSlot(SlotContainer):
 
 		return sum
 
-	# 持有玩家
+	# 持有者
 	def owner(self): return self.exer_slot
 
 	# 持有玩家

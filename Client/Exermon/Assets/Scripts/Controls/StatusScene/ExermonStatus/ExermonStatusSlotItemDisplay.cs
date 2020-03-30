@@ -1,0 +1,83 @@
+﻿
+using ItemModule.Data;
+using ExermonModule.Data;
+
+using UI.Common.Controls.ItemDisplays;
+
+namespace UI.StatusScene.Controls.ExermonStatus {
+    
+    /// <summary>
+    /// 状态窗口艾瑟萌槽信息显示
+    /// </summary>
+    public class ExermonStatusSlotItemDisplay<T> : 
+        SlotContItemDisplay<ExerSlotItem, T>
+        where T : PackContItem, new() {
+
+        /// <summary>
+        /// 详情显示组件
+        /// </summary>
+        protected virtual ExermonStatusExerSlotDetail<T> detail { get; set; }
+
+        /// <summary>
+        /// 页显示组件
+        /// </summary>
+        protected ExermonStatusPageDisplay<T> pageDisplay;
+
+        #region 数据控制
+
+        /// <summary>
+        /// 设置页显示组件
+        /// </summary>
+        /// <param name="pageDisplay">页显示组件</param>
+        public void setPageDisplay(ExermonStatusPageDisplay<T> pageDisplay) {
+            this.pageDisplay = pageDisplay;
+        }
+
+        /// <summary>
+        /// 配置装备
+        /// </summary>
+        protected override void setupEquip() {
+            equip = (item == null ? equip : item.getEquip<T>());
+        }
+
+        /// <summary>
+        /// 装备变更回调
+        /// </summary>
+        protected override void onItemChanged() {
+            base.onItemChanged();
+            detail.setSlotItem(item);
+        }
+            
+        /// <summary>
+        /// 预览变更回调
+        /// </summary>
+        protected override void onPreviewChanged() {
+            base.onPreviewChanged();
+            detail.setItem(previewingEquip);
+        }
+
+        /// <summary>
+        /// 获取背包显示组件
+        /// </summary>
+        /// <returns></returns>
+        public override PackContainerDisplay<T> getPackDisplay() {
+            return pageDisplay.getPackDisplay();
+        }
+
+        #endregion
+
+        #region 界面绘制
+
+        /// <summary>
+        /// 绘制物品
+        /// </summary>
+        /// <param name="slotItem">艾瑟萌槽项</param>
+        protected override void drawExactlyEquip(T equipItem) {
+            base.drawExactlyEquip(equipItem);
+            detail.setItem(equipItem);
+        }
+
+        #endregion
+
+    }
+}

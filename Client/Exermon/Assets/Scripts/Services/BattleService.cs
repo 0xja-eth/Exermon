@@ -239,6 +239,7 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="slotItem">对战物资槽项</param>
         /// <param name="packItem">人类背包物品</param>
+        /*
         public void equipBattleItem(BattleItemSlotItem slotItem, HumanPackItem packItem) {
             var player = getPlayer();
             var itemSlot = player.slotContainers.battleItemSlot;
@@ -252,16 +253,18 @@ namespace BattleModule.Services {
             var humanPack = player.packContainers.humanPack;
             itemSlot.setEquip(humanPack, packItem);
         }
+        */
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void equipBattleItem(BattleItemSlotItem slotItem, HumanPackItem packItem,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
-
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipBattleItem(slotItem, packItem);
-                onSuccess?.Invoke();
-            };
+            
+            var player = getPlayer();
+            var itemSlot = player.slotContainers.battleItemSlot;
+            var humanPack = player.packContainers.humanPack;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                humanPack, itemSlot, onSuccess);
 
             var id = packItem == null ? 0 : packItem.getID();
 
@@ -270,10 +273,11 @@ namespace BattleModule.Services {
         public void equipBattleItem(int index, HumanPackItem packItem,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipBattleItem(index, packItem);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var itemSlot = player.slotContainers.battleItemSlot;
+            var humanPack = player.packContainers.humanPack;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                humanPack, itemSlot, onSuccess);
 
             var id = packItem == null ? 0 : packItem.getID();
 
@@ -293,6 +297,7 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="slotItem">对战物资槽项</param>
         /// <param name="index">槽索引</param>
+        /*
         public void dequipBattleItem(BattleItemSlotItem slotItem) {
             var player = getPlayer();
             var itemSlot = player.slotContainers.battleItemSlot;
@@ -306,26 +311,29 @@ namespace BattleModule.Services {
             var humanPack = player.packContainers.humanPack;
             itemSlot.setEquip(index, humanPack, null);
         }
+        */
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void dequipBattleItem(BattleItemSlotItem slotItem,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) dequipBattleItem(slotItem);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var itemSlot = player.slotContainers.battleItemSlot;
+            var humanPack = player.packContainers.humanPack;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                humanPack, itemSlot, onSuccess);
 
             dequipBattleItem(slotItem.index, _onSuccess, onError);
         }
         public void dequipBattleItem(int index,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) dequipBattleItem(index);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var itemSlot = player.slotContainers.battleItemSlot;
+            var humanPack = player.packContainers.humanPack;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                humanPack, itemSlot, onSuccess);
 
             dequipBattleItem(index, _onSuccess, onError);
         }

@@ -151,6 +151,8 @@ MonoBehaviour:
   checkedColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
   highlightColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
   disableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+  previewable: 0
+  onClickDequip: 0
   icon: {fileID: 1556136306850471621}
   gift: {fileID: 4107698052082807638}
   name: {fileID: 2238681233015948047}
@@ -493,6 +495,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3341413553330229618, guid: d102b05f2449df2489b287f25e2e66c4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5421958864095780453, guid: d102b05f2449df2489b287f25e2e66c4,
         type: 3}
       propertyPath: m_Name
@@ -571,12 +578,12 @@ PrefabInstance:
     - target: {fileID: 5421958864095780454, guid: d102b05f2449df2489b287f25e2e66c4,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 36
       objectReference: {fileID: 0}
     - target: {fileID: 5421958864095780454, guid: d102b05f2449df2489b287f25e2e66c4,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 36
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5421958864095780454, guid: d102b05f2449df2489b287f25e2e66c4,
         type: 3}

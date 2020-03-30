@@ -256,6 +256,9 @@ class LimitedItem(BaseItem):
 	# buy_price = models.OneToOneField('item_module.Currency', null=True, blank=True,
 	# 								 on_delete=models.CASCADE, verbose_name="购买价格")
 
+	# 图标索引
+	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
+
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
 
@@ -306,6 +309,7 @@ class LimitedItem(BaseItem):
 		buy_price = ModelUtils.objectToDict(self.buyPrice())
 
 		res['star_id'] = self.star_id
+		res['icon_index'] = self.icon_index
 		res['buy_price'] = buy_price
 		res['sell_price'] = self.sell_price
 		res['discardable'] = self.discardable
@@ -563,7 +567,7 @@ class BaseContainer(CacheableModel):
 		return BaseContItem
 
 	@classmethod
-	def acceptedContItemClass(cls) -> tuple:
+	def acceptedContItemClasses(cls) -> tuple:
 		"""
 		返回设定好的所接受的容器项类（返回多个，查询/判断时用）
 		Returns:
@@ -578,7 +582,7 @@ class BaseContainer(CacheableModel):
 		Returns:
 			数据库查询 容器项元组
 		"""
-		return cls.acceptedContItemClass()
+		return cls.acceptedContItemClasses()
 
 	# 获取对应的容器项类（返回单个，创建容器项时候调用）
 	# 可以根据参数获取实际的容器项类
@@ -632,7 +636,7 @@ class BaseContainer(CacheableModel):
 
 	def __str__(self):
 		name = self._meta.verbose_name
-		return '%d %s(%s)' % (self.id, name, self.owner())
+		return '%s %s(%s)' % (str(self.id), name, str(self.owner()))
 
 	def __getattr__(self, item):
 		raise AttributeError(item)
@@ -699,7 +703,7 @@ class BaseContainer(CacheableModel):
 	adminOwnerPlayer.short_description = "所属玩家"
 
 	# 持有者
-	def owner(self) -> object:
+	def owner(self) -> any:
 		"""
 		获取持有者（不一定是 Player )
 		Returns:
@@ -708,7 +712,7 @@ class BaseContainer(CacheableModel):
 		raise NotImplementedError
 
 	# 持有玩家
-	def ownerPlayer(self): # -> Player.Player:
+	def ownerPlayer(self):  # -> Player.Player:
 		"""
 		获取持有玩家
 		Returns:
@@ -717,7 +721,7 @@ class BaseContainer(CacheableModel):
 		return self.owner()
 
 	# 实际玩家（获取在线信息）
-	def exactlyPlayer(self): # -> Player.Player:
+	def exactlyPlayer(self):  # -> Player.Player:
 		"""
 		获取实际的玩家（优先查找在线玩家）
 		Returns:
@@ -747,7 +751,7 @@ class BaseContainer(CacheableModel):
 			返回该容器项/物品能否放入该容器
 		"""
 		if cont_item is not None:
-			return isinstance(cont_item, self.acceptedContItemClass())
+			return isinstance(cont_item, self.acceptedContItemClasses())
 
 		return False
 
@@ -819,6 +823,7 @@ class BaseContainer(CacheableModel):
 			res = ViewUtils.getObjects(
 				cla, container_id=self.id, **kwargs)
 
+			for obj in res: obj.container = self
 			return list(res) if listed else res
 
 		clas = self._databaseQueryClass()
@@ -828,12 +833,16 @@ class BaseContainer(CacheableModel):
 			for c in clas:
 				res += list(ViewUtils.getObjects(
 					c, container_id=self.id, **kwargs))
+
+			for obj in res: obj.container = self
 			return res
 		else:
 			res = {}
 			for c in clas:
-				res[c] = ViewUtils.getObjects(
+				objs = ViewUtils.getObjects(
 					c, container_id=self.id, **kwargs)
+				for obj in objs: obj.container = self
+				res[c] = objs
 			return res
 
 	# 以人类可理解的形式展示该容器
@@ -867,26 +876,67 @@ class BaseContainer(CacheableModel):
 		return self._getOrSetCache(self.CONTITEM_CACHE_KEY,
 								   lambda: self._contItemsFromDb(listed=True))
 
-	# 添加缓存容器项
-	def _addCachedContItem(self, cont_item):
-		self._cachedContItems().append(cont_item)
+	def _addCachedContItem(self, cont_item: 'BaseContItem'):
+		"""
+		添加缓存容器项
+		Args:
+			cont_item (BaseContItem): 容器项
+		"""
+		cache = self._cachedContItems()
+		index = self._findCachedContItem(cont_item)
+		if index == -1: cache.append(cont_item)
+		else: cache[index] = cont_item
 
-	# 移除缓存容器项
-	def _removeCachedContItem(self, cont_item):
-		self._cachedContItems().remove(cont_item)
-		self._getCache(self.REMOVED_CACHE_KEY).append(cont_item)
+	def _containCachedContItem(self, cont_item: 'BaseContItem') -> bool:
+		"""
+		是否包含某容器项（根据 ID 和 type 进行比较）
+		Args:
+			cont_item (BaseContItem): 容器项
+		Returns:
+			返回是否包含容器项
+		"""
+		return self._findCachedContItem(cont_item) >= 0
+
+	def _findCachedContItem(self, cont_item: 'BaseContItem') -> int:
+		"""
+		查找某容器项所在下标（根据 ID 和 type 进行比较）
+		Args:
+			cont_item (BaseContItem): 容器项
+		Returns:
+			返回容器项下标，找不到则返回 -1
+		"""
+		index = 0
+		cache = self._cachedContItems()
+		for item in cache:
+			if item == cont_item or (item.id == cont_item.id and
+				type(item) == type(cont_item)): return index
+			index += 1
+
+		return -1
+
+	def _removeCachedContItem(self, cont_item: 'BaseContItem'):
+		"""
+		移除缓存容器项
+		Args:
+			cont_item (BaseContItem): 容器项
+		"""
+		cache = self._cachedContItems()
+		index = self._findCachedContItem(cont_item)
+		if index > 0:
+			del cache[index]
+			self._getCache(self.REMOVED_CACHE_KEY).append(cont_item)
 
 	# 获取指定物品数量或所有物品总数（占用格子数）
 	def contItemCnt(self, db=False, cla=None, **kwargs):
-		return len(self.contItems(db=db, listed=True, cla=cla))
+		return len(self.contItems(db=db, listed=True, cla=cla, **kwargs))
 
 	# 获取指定物品数量或所有物品总数（总数）
 	def itemCnt(self, db=False, cla=None, **kwargs):
 		return self.contItemCnt(db=db, cla=cla, **kwargs)
 
-	# 容器是否存在指定物品或任意物品指定数量
 	def hasItem(self, count, db=False, cla=None, **kwargs):
 		return self.itemCnt(db=db, cla=cla, **kwargs) >= count
+	# 容器是否存在指定物品或任意物品指定数量
 
 	# 获取一个容器项
 	def contItem(self, db=False, listed=False, cla=None, **kwargs):
@@ -939,21 +989,22 @@ class BaseContainer(CacheableModel):
 			raise GameException(ErrorType.IncorrectItemType)
 
 	# 确保包含容器项
-	def ensureContItemContained(self, cont_item):
+	def ensureContItemContained(self, cont_item,
+								error: ErrorType = ErrorType.QuantityInsufficient):
 		if cont_item.container_id != self.id:
-			raise GameException(ErrorType.QuantityInsufficient)
+			raise GameException(error)
 
 	# 准备转移
-	def prepareTransfer(self, **kwargs) -> dict:
+	def prepareTransfer(self, container, **kwargs) -> dict:
 		return kwargs
 
 	# 接受转移
-	def acceptTransfer(self, **kwargs):
+	def acceptTransfer(self, container, **kwargs):
 		pass  # self.ensureItemAcceptable(**kwargs)
 
 	# 转移物品（从 self 转移到 container）
 	def transfer(self, container, **kwargs):
-		container.acceptTransfer(**self.prepareTransfer(**kwargs))
+		container.acceptTransfer(self, **self.prepareTransfer(container, **kwargs))
 
 
 # ===================================================
@@ -994,15 +1045,9 @@ class PackContainer(BaseContainer):
 		# 否则，返回该物品的对应容器项类型
 		return item.contItemClass()
 
-	# 所接受的物品类
-	# @classmethod
-	# def acceptedItemClass(cls):
-	# 	item_clas = ()
-	# 	clas = cls.acceptedContItemClass()
-	# 	for c in clas:
-	# 		# c: BaseContItem
-	# 		item_clas += (c.acceptedItemClass(),)
-	# 	return item_clas
+	# 转化容器项为 dict
+	def _convertItemsToDict(self):
+		return ModelUtils.objectsToDict(self.contItems(include_equipped=True))
 
 	def _create(self, **kwargs):
 		"""
@@ -1013,19 +1058,43 @@ class PackContainer(BaseContainer):
 		super()._create(**kwargs)
 		self.capacity = self.defaultCapacity()
 
-	def _contItemsFromDb(self, listed: bool = False, cla: type = None,
-						 **kwargs) -> list or QuerySet:
+	def contItems(self, db: bool = False, listed: bool = False, cla: type = None,
+				  cond: callable = None, map: callable = None,
+				  include_equipped: bool = False, **kwargs) -> list or QuerySet:
 		"""
-		从数据库获取所有的容器物项
+		获取满足一定条件的容器项（并载入缓存）
+		支持条件获取和映射获取
 		Args:
+			db (bool): 是否查找数据库
 			listed (bool): 是否以列表形式返回
 			cla (type): 类型
-			**kwargs (**dict): 查询参数
+			cond (callable): 条件函数
+			map (callable): 映射函数
+			include_equipped (bool): 包含装备
+			**kwargs (dict): 查询参数
 		Returns:
-			从数据库中读取的物品容器项数据表>
-			（若 listed 为 True，返回 list 类型列表，否则返回 QuerySet 对象
+			返回满足条件的所有容器项
 		"""
-		return super()._contItemsFromDb(listed, cla, equiped=False, **kwargs)
+		if include_equipped:
+			return super().contItems(db=db, listed=listed, cla=cla,
+									 cond=cond, map=map, **kwargs)
+
+		return super().contItems(db=db, listed=listed, cla=cla,
+								 cond=cond, map=map, equiped=False, **kwargs)
+
+	# def _contItemsFromDb(self, listed: bool = False, cla: type = None,
+	# 					 **kwargs) -> list or QuerySet:
+	# 	"""
+	# 	从数据库获取所有的容器物项
+	# 	Args:
+	# 		listed (bool): 是否以列表形式返回
+	# 		cla (type): 类型
+	# 		**kwargs (**dict): 查询参数
+	# 	Returns:
+	# 		从数据库中读取的物品容器项数据表>
+	# 		（若 listed 为 True，返回 list 类型列表，否则返回 QuerySet 对象
+	# 	"""
+	# 	return super()._contItemsFromDb(listed, cla, **kwargs)
 
 	def owner(self): # -> Player.Player:
 		"""
@@ -1050,7 +1119,8 @@ class PackContainer(BaseContainer):
 		# 	return isinstance(item, self.acceptedItemClass())
 
 		if cont_item is not None:
-			return isinstance(cont_item, self.acceptedContItemClass())
+			clas = self.acceptedContItemClasses()
+			return cont_item in clas or isinstance(cont_item, clas)
 
 		return False
 
@@ -1062,24 +1132,88 @@ class PackContainer(BaseContainer):
 		"""
 		return self.capacity
 
-	def itemCnt(self, db: bool = False, cla: type = None, **kwargs) -> int:
+	# 获取指定物品数量或所有物品总数（占用格子数）
+	def contItemCnt(self, db: bool = False, cla: type = None,
+					include_equipped: bool = False, **kwargs):
+		"""
+		获取容器项数目
+		Args:
+			db (bool): 是否要从数据库中读取
+			cla (type): 容器项类型
+			include_equipped (bool): 是否包含装备
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回符合条件的容器项数目
+		"""
+		cont_items = self.contItems(db=db, listed=True, cla=cla,
+									include_equipped=include_equipped, **kwargs)
+
+		return len(cont_items)
+
+	def itemCnt(self, db: bool = False, cla: type = None,
+				include_equipped: bool = False, **kwargs) -> int:
 		"""
 		获取指定物品数量或所有物品总数（总数）
 		Args:
 			db (bool): 是否要从数据库中读取
 			cla (type): 容器项类型
+			include_equipped (bool): 是否包含装备
 			**kwargs (**dict): 查询参数
 		Returns:
-			指定条件下的物品的总数
+			返回符合条件的物品数目
 		"""
 		cnt = 0
-		cont_items = self.contItems(db=db, listed=True, cla=cla, **kwargs)
+
+		cont_items = self.contItems(db=db, listed=True, cla=cla,
+									include_equipped=include_equipped, **kwargs)
+
 		for cont_item in cont_items:
 			cnt += cont_item.count
 		return cnt
 
+	def hasItem(self, count: int, db: bool = False, cla: type = None,
+				include_equipped: bool = False, **kwargs) -> bool:
+		"""
+		判断是否存在一定数量的物品
+		Args:
+			count (int): 数量
+			db (bool): 是否要从数据库中读取
+			cla (type): 容器项类型
+			include_equipped (bool): 是否包含装备
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回是否存在一定数量的物品
+		"""
+		return self.itemCnt(db=db, cla=cla,
+							include_equipped=include_equipped, **kwargs) >= count
 		# cnt = self.contItems(**kwargs).aggregate(sum=Sum('count'))['sum']
 
+	# 获取一个容器项
+	def contItem(self, db: bool = False, listed: bool = False, cla: type = None,
+				 include_equipped: bool = False, **kwargs) -> 'PackContItem':
+		"""
+		获取满足一定条件的容器项（单个）
+		Args:
+			db (bool): 是否查找数据库
+			listed (bool): 是否以列表形式返回
+			cla (type): 类型
+			include_equipped (bool): 包含装备
+			**kwargs (dict): 查询参数
+		Returns:
+			返回满足条件的第一个容器项
+		"""
+
+		if db and cla is None: return None
+
+		cont_items = self.contItems(db=db, listed=listed, cla=cla,
+									include_equipped=include_equipped, **kwargs)
+
+		if db and not listed:
+			if cont_items.exists(): return cont_items.first()
+		else:
+			if len(cont_items) > 0: return cont_items[0]
+		return None
+		
 	# 判断容器容量是否可用（格子数）
 	def isCapacityAvailable(self, count=1):
 		if count <= 0 or self.getCapacity() <= 0: return True
@@ -1143,8 +1277,8 @@ class PackContainer(BaseContainer):
 	# region EnsureFuncs
 
 	# 确保持有特定数量的物品（格子数）
-	def ensureHasItem(self, count, **kwargs):
-		if not self.hasItem(count, **kwargs):
+	def ensureHasItem(self, count, include_equipped: bool = False, **kwargs):
+		if not self.hasItem(count, include_equipped=include_equipped, **kwargs):
 			raise GameException(ErrorType.QuantityInsufficient)
 
 	# 确保容器容量可用（格子数）
@@ -1474,47 +1608,100 @@ class PackContainer(BaseContainer):
 
 		return old_items, new_items
 
-	# 获得一个容器项
-	def gainContItem(self, cont_item, **kwargs):
+	def gainContItem(self, cont_item: 'PackContItem', fixed: bool = False,
+					 combine_return: bool = True, **kwargs):
+		"""
+		获得一个容器项
+		Args:
+			cont_item (PackContItem): 容器项
+			fixed (bool): 对固定容器项进行操作
+			combine_return (bool): 是否组合返回
+			**kwargs (**dict): 附加参数
+		Returns:
+			如果 fixed 为 True 或容器项无法叠加，返回添加的容器项，否则返回与 getItems 一致
+		"""
 		if cont_item is None: return None
 
-		self.ensureGainContItemEnable(cont_item)
+		if fixed or cont_item.maxCount() == 1:
+			self.ensureGainContItemEnable(cont_item)
 
-		cont_item.transfer(self, **kwargs)
+			cont_item.transfer(self, **kwargs)
 
-		self._addCachedContItem(cont_item)
+			self._addCachedContItem(cont_item)
 
-		return cont_item
+			return cont_item
+		else:
+			return self.gainItems(cont_item.item, cont_item.count, combine_return)
 
-	# 失去一个容器项（count 为 None 则失去整个容器项）
-	def lostContItem(self, cont_item, count=None):
+	def lostContItem(self, cont_item: 'PackContItem', count=None,
+					 fixed: bool = True, combine_return: bool = True):
+		"""
+		失去一个容器项
+		Args:
+			cont_item (PackContItem): 容器项
+			count (int): 数量
+			fixed (bool): 对固定容器项进行操作
+			combine_return (bool): 是否组合返回
+		Returns:
+			如果容 fixed 为 True 或容器项无法叠加，返回失去的容器项，否则返回与 lostItems 一致
+		"""
 		if cont_item is None: return None
 
 		self.ensureLostContItemEnable(cont_item)
 
-		if count is not None:
-			cont_item, _ = self._splitItem(cont_item, count)
+		if fixed or cont_item.maxCount() == 1:
+			self.ensureLostContItemEnable(cont_item)
 
-		self._removeContItem(cont_item)
+			if count is not None:
+				cont_item, _ = self._splitItem(cont_item, count)
 
-		return cont_item
+			self._removeContItem(cont_item)
 
-	# 获得多个容器项
-	def gainContItems(self, cont_items, **kwargs):
-		if cont_items is None: return []
+			self._addCachedContItem(cont_item)
 
+			return cont_item
+		else:
+			if count is None: count = cont_item.count
+
+			return self.lostItems(cont_item.item, count, combine_return)
+
+		# if count is not None:
+		# 	cont_item, _ = self._splitItem(cont_item, count)
+		#
+		# self._removeContItem(cont_item)
+
+	def gainContItems(self, cont_items: list, fixed: bool = False,
+					  combine_return: bool = True, **kwargs):
+		"""
+		获得多个容器项
+		Args:
+			cont_items (list): 容器项列表
+			fixed (bool): 对固定容器项进行操作
+			combine_return (bool): 是否组合返回
+			**kwargs (**dict): 附加参数
+		Returns:
+			返回多次 gainContItem 的结果
+		"""
 		new_cont_items = []
 
 		for cont_item in cont_items:
 			new_cont_items.append(self.gainContItem(
-				cont_item, **kwargs))
+				cont_item, fixed, combine_return, **kwargs))
 
-		return cont_items
+		return new_cont_items
 
-	# 失去多个容器项
-	def lostContItems(self, cont_items, counts=None):
-		if cont_items is None: return []
-
+	def lostContItems(self, cont_items: list, counts: list = None,
+					  fixed: bool = True, combine_return: bool = True):
+		"""
+		失去多个容器项
+		Args:
+			cont_items (list): 容器项列表
+			counts (list): 每个容器项对应失去的数目
+			fixed (bool): 对固定容器项进行操作
+			combine_return (bool): 是否组合返回
+		Returns:
+			返回多次 lostContItem 的结果
+		"""
 		new_cont_items = []
 
 		for i in range(len(cont_items)):
@@ -1524,9 +1711,9 @@ class PackContainer(BaseContainer):
 				count = counts[i]
 
 			new_cont_items.append(self.lostContItem(
-				cont_item, count))
+				cont_item, count, fixed, combine_return))
 
-		return cont_items
+		return new_cont_items
 
 	# endregion
 
@@ -1545,21 +1732,29 @@ class PackContainer(BaseContainer):
 		self.transfer(container, cont_items=cont_items, counts=counts)
 
 	# 准备转移
-	def prepareTransfer(self, cont_item=None, cont_items=None,
+	def prepareTransfer(self, container, cont_item=None, cont_items=None,
 						item=None, count=None, counts=None, **kwargs) -> dict:
 		res = kwargs
 
-		if item is not None:
-			_, res['cont_items'] = self.lostItems(item, count, True)
-		elif cont_item is not None:
-			res['cont_item'] = self.lostContItem(cont_item, count)
-		elif cont_items is not None:
-			res['cont_items'] = self.lostContItems(cont_items, counts)
+		if isinstance(container, SlotContainer):
+			if cont_item is not None:
+				res['cont_item'] = cont_item
+			elif cont_items is not None:
+				res['cont_items'] = cont_items
+		elif isinstance(container, PackContainer):
+			if item is not None:
+				_, res['cont_items'] = self.lostItems(item, count, True)
+			elif cont_item is not None:
+				res['cont_item'] = self.lostContItem(cont_item, count)
+			elif cont_items is not None:
+				res['cont_items'] = self.lostContItems(cont_items, counts)
 
 		return res
 
 	# 接受转移
-	def acceptTransfer(self, cont_items=None, cont_item=None, **kwargs):
+	def acceptTransfer(self, container, cont_items=None, cont_item=None, **kwargs):
+
+		if isinstance(container, SlotContainer): return
 
 		if cont_item is not None:
 			self.gainContItem(cont_item)
@@ -1718,6 +1913,8 @@ class SlotContainer(BaseContainer):
 			equip_index (int): 装备索引
 			force (bool): 是否强制装备（不改变背包物品）
 			**kwargs (**dict): 其他用于查询槽项的参数
+		Returns:
+			返回对应容器实例
 		"""
 
 		# 强制装备（替换原有装备）
@@ -1731,22 +1928,30 @@ class SlotContainer(BaseContainer):
 			return
 
 		if slot_item is not None:
-			self.ensureContItemContained(slot_item)
+			self.ensureContItemContained(slot_item, ErrorType.InvalidContItem)
 
 		# 计算槽项
 		if slot_item is None:
 			slot_item: SlotContItem = self.contItem(**kwargs)
 
+		# 找不到槽项，抛出异常
+		if slot_item is None:
+			raise GameException(ErrorType.SlotItemNotFound)
+
 		# 计算装备索引
 		if equip_index is None:
 			equip_index = slot_item.getEquipItemIndex(equip_item=equip_item, type_=type_)
 
+		# 找不到装备索引，抛出异常
+		if equip_index is None:
+			raise GameException(ErrorType.EquipIndexNotFound)
+
 		# 找出容器
 		container: PackContainer = self.equipContainer(equip_index)
 
-		# 容器为空，操作错误
+		# 找不到所属容器，抛出异常
 		if container is None:
-			raise GameException(ErrorType.InvalidContainer)
+			raise GameException(ErrorType.ContainerNotFound)
 
 		equiped_item = slot_item.equipItem(equip_index)
 
@@ -1761,6 +1966,8 @@ class SlotContainer(BaseContainer):
 		# 装备不为空
 		if equip_item is not None:
 			container.transfer(self, slot_item=slot_item, cont_item=equip_item)
+
+		return container
 
 	# 槽装备（强制装备）
 	# 可以传入 index 参数指定槽的索引
@@ -1807,11 +2014,11 @@ class SlotContainer(BaseContainer):
 			return equip_item
 
 	# 接受转移
-	def acceptTransfer(self, slot_item=None, cont_item=None, **kwargs):
+	def acceptTransfer(self, container, slot_item=None, cont_item=None, **kwargs):
 		self._equipSlot(slot_item, equip_item=cont_item, **kwargs)
 
 	# 准备转移
-	def prepareTransfer(self, slot_item=None, type=None, index=None, **kwargs) -> dict:
+	def prepareTransfer(self, container, slot_item=None, type=None, index=None, **kwargs) -> dict:
 		res = kwargs
 
 		res['cont_item'] = self._dequipSlot(slot_item, type, index, **kwargs)
@@ -2400,7 +2607,7 @@ class SlotContItem(BaseContItem):
 		attrs = self.acceptedEquipItemAttr()
 
 		for i in range(equip_cnt):
-			res[attrs[i]] = ModelUtils.objectToDict(self.equipItem(i))
+			res[attrs[i] + '_id'] = self._equipItemId(i)
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
@@ -2492,9 +2699,32 @@ class SlotContItem(BaseContItem):
 		# 获取装备项的属性名称
 		attr = self.acceptedEquipItemAttr()[index]
 		# 判断并获取属性（必须为 Django model 中的外键）
-		if hasattr(self, attr): return getattr(self, attr)
+		if hasattr(self, attr):
+			obj: PackContItem = getattr(self, attr)
+			if obj is None: return None
+
+			container: PackContainer = self.container.equipContainer(index)
+			return container.contItem(cla=type(obj), include_equipped=True, id=obj.id)
 
 		return None
+
+	def _equipItemId(self, index) -> PackContItem:
+		"""
+		获取数据库中的装备项ID
+		Args:
+			index (int): 装备项索引
+		Returns:
+			返回指定索引的实际装备项ID（若找不到返回 0）
+		"""
+		# 获取装备项的属性名称
+		attr = self.acceptedEquipItemAttr()[index]
+		# 判断并获取属性（必须为 Django model 中的外键）
+		if hasattr(self, attr):
+			obj: PackContainer = getattr(self, attr)
+			if obj is None: return 0
+			return obj.id
+
+		return 0
 
 	# 设置装备项
 	def _setEquipItem(self, index: int, equip_item: PackContItem):

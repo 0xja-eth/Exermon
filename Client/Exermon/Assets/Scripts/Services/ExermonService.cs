@@ -103,6 +103,7 @@ namespace ExermonModule.Services {
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         /// <param name="playerExer">艾瑟萌仓库项</param>
+        /*
         public void equipPlayerExer(ExerSlotItem slotItem, PlayerExermon playerExer) {
             var player = getPlayer();
             var exerSlot = player.slotContainers.exerSlot;
@@ -116,16 +117,18 @@ namespace ExermonModule.Services {
             var exerHub = player.packContainers.exerHub;
             exerSlot.setEquip(exerHub, playerExer);
         }
+        */
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void equipPlayerExer(ExerSlotItem slotItem, PlayerExermon playerExer,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipPlayerExer(slotItem, playerExer);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
+            var exerHub = player.packContainers.exerHub;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerHub, exerSlot, onSuccess);
 
             var peid = playerExer == null ? 0 : playerExer.getID();
 
@@ -133,11 +136,12 @@ namespace ExermonModule.Services {
         }
         public void equipPlayerExer(int sid, PlayerExermon playerExer,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
-
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipPlayerExer(sid, playerExer);
-                onSuccess?.Invoke();
-            };
+            
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
+            var exerHub = player.packContainers.exerHub;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerHub, exerSlot, onSuccess);
 
             var peid = playerExer == null ? 0 : playerExer.getID();
 
@@ -157,6 +161,7 @@ namespace ExermonModule.Services {
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         /// <param name="playerGift">艾瑟萌天赋池项</param>
+        /*
         public void equipPlayerGift(ExerSlotItem slotItem, PlayerExerGift playerGift) {
             var player = getPlayer();
             var exerSlot = player.slotContainers.exerSlot;
@@ -170,16 +175,18 @@ namespace ExermonModule.Services {
             var exerGiftPool = player.packContainers.exerGiftPool;
             exerSlot.setEquip(sid, exerGiftPool, playerGift);
         }
+        */
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void equipPlayerGift(ExerSlotItem slotItem, PlayerExerGift playerGift,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipPlayerGift(slotItem, playerGift);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
+            var exerGiftPool = player.packContainers.exerGiftPool;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerGiftPool, exerSlot, onSuccess);
 
             var pgid = playerGift == null ? 0 : playerGift.getID();
 
@@ -188,10 +195,11 @@ namespace ExermonModule.Services {
         public void equipPlayerGift(int sid, PlayerExerGift playerGift,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipPlayerGift(sid, playerGift);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var exerSlot = player.slotContainers.exerSlot;
+            var exerGiftPool = player.packContainers.exerGiftPool;
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerGiftPool, exerSlot, onSuccess);
 
             var pgid = playerGift == null ? 0 : playerGift.getID();
 
@@ -210,6 +218,7 @@ namespace ExermonModule.Services {
         /// </summary>
         /// <param name="equipSlot">艾瑟萌装备槽</param>
         /// <param name="packEquip">背包装备</param>
+        /*
         public void equipExerEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip) {
             var player = getPlayer();
             var exerPack = player.packContainers.exerPack;
@@ -222,16 +231,23 @@ namespace ExermonModule.Services {
             var equipSlot = exerSlot.getSlotItem(sid).exerEquipSlot;
             equipExerEquip(equipSlot, packEquip);
         }
+        */
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void equipExerEquip(ExerEquipSlot equipSlot, ExerPackEquip packEquip,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
+            
+            var player = getPlayer();
+            var exerPack = player.packContainers.exerPack;
+            var exerSlot = player.slotContainers.exerSlot;
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipExerEquip(equipSlot, packEquip);
-                onSuccess?.Invoke();
-            };
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerPack, equipSlot, () => {
+                    var slotItem = equipSlot.exerSlotItem;
+                    slotItem.recomputeParams();
+                    onSuccess?.Invoke();
+                });
 
             equipExerEquip(equipSlot.exerSlotItem.subjectId, packEquip.getID(), _onSuccess, onError);
         }
@@ -242,11 +258,18 @@ namespace ExermonModule.Services {
         }
         public void equipExerEquip(int sid, ExerPackEquip packEquip,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
+            
+            var player = getPlayer();
+            var exerPack = player.packContainers.exerPack;
+            var exerSlot = player.slotContainers.exerSlot;
+            var equipSlot = exerSlot.getSlotItem(sid).exerEquipSlot;
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipExerEquip(sid, packEquip);
-                onSuccess?.Invoke();
-            };
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerPack, equipSlot, () => {
+                    var slotItem = equipSlot.exerSlotItem;
+                    slotItem.recomputeParams();
+                    onSuccess?.Invoke();
+                });
 
             equipExerEquip(sid, packEquip.getID(), _onSuccess, onError);
         }
@@ -266,6 +289,7 @@ namespace ExermonModule.Services {
         /// </summary>
         /// <param name="equipSlot">艾瑟萌装备槽</param>
         /// <param name="type">装备类型</param>
+        /*
         public void dequipExerEquip(ExerEquipSlot equipSlot, int type) {
             var player = getPlayer();
             var exerPack = player.packContainers.exerPack;
@@ -278,31 +302,44 @@ namespace ExermonModule.Services {
             var equipSlot = exerSlot.getSlotItem(sid).exerEquipSlot;
             dequipExerEquip(equipSlot, type);
         }
+        */
+        /// <param name="slotItem">艾瑟萌槽项</param>
+        public void dequipExerEquip(ExerSlotItem slotItem, int type,
+            UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
+            dequipExerEquip(slotItem.exerEquipSlot, type, onSuccess, onError, localChange);
+        }
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         /// <param name="localChange">本地数据是否改变</param>
         public void dequipExerEquip(ExerEquipSlot equipSlot, int type,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) dequipExerEquip(equipSlot, type);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var exerPack = player.packContainers.exerPack;
+
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerPack, equipSlot, () => {
+                    var slotItem = equipSlot.exerSlotItem;
+                    slotItem.recomputeParams();
+                    onSuccess?.Invoke();
+                });
 
             dequipExerEquip(equipSlot.exerSlotItem.subjectId, type, _onSuccess, onError);
-        }
-        /// <param name="slotItem">艾瑟萌槽项</param>
-        public void dequipExerEquip(ExerSlotItem slotItem, int type,
-            UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
-            dequipExerEquip(slotItem.exerEquipSlot, type, onSuccess, onError, localChange);
         }
         public void dequipExerEquip(int sid, int type,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) dequipExerEquip(sid, type);
-                onSuccess?.Invoke();
-            };
+            var player = getPlayer();
+            var exerPack = player.packContainers.exerPack;
+            var exerSlot = player.slotContainers.exerSlot;
+            var equipSlot = exerSlot.getSlotItem(sid).exerEquipSlot;
+
+            var _onSuccess = itemSer.slotOperationSuccess(
+                exerPack, equipSlot, () => {
+                    var slotItem = equipSlot.exerSlotItem;
+                    slotItem.recomputeParams();
+                    onSuccess?.Invoke();
+                });
 
             dequipExerEquip(sid, type, _onSuccess, onError);
         }

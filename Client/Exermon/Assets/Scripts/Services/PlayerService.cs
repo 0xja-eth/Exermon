@@ -33,6 +33,7 @@ namespace PlayerModule.Services {
 
         const string GetBasic = "拉取玩家基本信息";
         const string GetStatus = "拉取玩家状态信息";
+        const string GetBattle = "拉取玩家对战信息";
 
         const string CreateCharacter = "创建角色";
         const string CreateExermons = "装备艾瑟萌";
@@ -43,16 +44,17 @@ namespace PlayerModule.Services {
         const string EditInfo = "修改信息";
 
         const string EquipSlotEquip = "装备";
+        const string EquipSlotDequip = "卸下";
 
         /// <summary>
         /// 业务操作
         /// </summary>
         public enum Oper {
             Register, Login, Retrieve, Code, Logout,
-            GetBasic, GetStatus,
+            GetBasic, GetStatus, GetBattle,
             CreateCharacter, CreateExermons, CreateGifts, CreateInfo,
             EditName, EditInfo,
-            EquipSlotEquip,
+            EquipSlotEquip, EquipSlotDequip,
         }
 
         /// <summary>
@@ -111,6 +113,7 @@ namespace PlayerModule.Services {
 
             addOperDict(Oper.GetBasic, GetBasic, NetworkSystem.Interfaces.PlayerGetBasic);
             addOperDict(Oper.GetStatus, GetStatus, NetworkSystem.Interfaces.PlayerGetStatus);
+            addOperDict(Oper.GetBattle, GetBattle, NetworkSystem.Interfaces.PlayerGetBattle);
 
             addOperDict(Oper.CreateCharacter, CreateCharacter,
                 NetworkSystem.Interfaces.PlayerCreateCharacter);
@@ -126,6 +129,8 @@ namespace PlayerModule.Services {
 
             addOperDict(Oper.EquipSlotEquip, EquipSlotEquip,
                 NetworkSystem.Interfaces.PlayerEquipSlotEquip);
+            addOperDict(Oper.EquipSlotDequip, EquipSlotDequip,
+                NetworkSystem.Interfaces.PlayerEquipSlotDequip);
         }
 
         /// <summary>
@@ -139,6 +144,8 @@ namespace PlayerModule.Services {
         #endregion
 
         #region 操作控制
+
+        #region 登录注册
 
         /// <summary>
         /// 注册
@@ -239,6 +246,10 @@ namespace PlayerModule.Services {
 
         }
 
+        #endregion
+
+        #region 信息获取
+
         /// <summary>
         /// 获取玩家基本信息
         /// </summary>
@@ -264,6 +275,65 @@ namespace PlayerModule.Services {
             data["get_uid"] = uid;
             sendRequest(Oper.GetStatus, data, onSuccess, onError, uid: true);
         }
+
+        /// <summary>
+        /// 获取玩家对战信息
+        /// </summary>
+        /// <param name="uid">要获取信息的玩家ID</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getBattle(int uid,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData();
+            data["get_uid"] = uid;
+            sendRequest(Oper.GetBattle, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 获取玩家自身基础信息数据
+        /// </summary>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                player = DataLoader.load(player, res, "player");
+                onSuccess?.Invoke();
+            };
+
+            getBasic(player.getID(), _onSuccess, onError);
+        }
+
+        /// <summary>
+        /// 获取玩家自身状态信息数据
+        /// </summary>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getPlayerStatus(UnityAction onSuccess = null, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                player = DataLoader.load(player, res, "player");
+                onSuccess?.Invoke();
+            };
+
+            getStatus(player.getID(), _onSuccess, onError);
+        }
+
+        /// <summary>
+        /// 获取玩家自身对战信息数据
+        /// </summary>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getPlayerBattle(UnityAction onSuccess = null, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                player = DataLoader.load(player, res, "player");
+                onSuccess?.Invoke();
+            };
+
+            getBattle(player.getID(), _onSuccess, onError);
+        }
+
+        #endregion
+
+        #region 创建/修改操作
 
         /// <summary>
         /// 创建角色
@@ -406,53 +476,30 @@ namespace PlayerModule.Services {
             sendRequest(Oper.EditInfo, data, _onSuccess, onError, uid: true);
         }
 
-        /// <summary>
-        /// 获取玩家自身基础信息数据
-        /// </summary>
-        /// <param name="onSuccess">成功回调</param>
-        /// <param name="onError">失败回调</param>
-        public void getPlayerBasic(UnityAction onSuccess = null, UnityAction onError = null) {
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                player = DataLoader.load(player, res, "player");
-                onSuccess?.Invoke();
-            };
+        #endregion
 
-            getBasic(player.getID(), _onSuccess, onError);
-        }
-
-        /// <summary>
-        /// 获取玩家自身基础信息数据
-        /// </summary>
-        /// <param name="onSuccess">成功回调</param>
-        /// <param name="onError">失败回调</param>
-        public void getPlayerStatus(UnityAction onSuccess = null, UnityAction onError = null) {
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                player = DataLoader.load(player, res, "player");
-                onSuccess?.Invoke();
-            };
-
-            getStatus(player.getID(), _onSuccess, onError);
-        }
+        #region 装备操作
 
         /// <summary>
         /// 装备人物装备
         /// </summary>
         /// <param name="packEquip">人类背包装备</param>
+        /*
         public void equipSlotEquip(HumanPackEquip packEquip) {
             var humanPack = player.packContainers.humanPack;
             var equipSlot = player.slotContainers.humanEquipSlot;
             equipSlot.setEquip(humanPack, packEquip);
         }
+        */
         /// <param name="packEquip">人类背包装备</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void equipSlotEquip(HumanPackEquip packEquip,
             UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (localChange) equipSlotEquip(packEquip);
-                onSuccess?.Invoke();
-            };
+            var humanPack = player.packContainers.humanPack;
+            var equipSlot = player.slotContainers.humanEquipSlot;
+            var _onSuccess = itemSer.slotOperationSuccess(humanPack, equipSlot, onSuccess);
 
             equipSlotEquip(packEquip.getID(), _onSuccess, onError);
         }
@@ -461,6 +508,34 @@ namespace PlayerModule.Services {
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData(); data["heid"] = heid;
             sendRequest(Oper.EquipSlotEquip, data, onSuccess, onError, uid: true);
+        }
+        
+        /// <summary>
+        /// 装备人物装备
+        /// </summary>
+        /// <param name="type">装备类型</param>
+        /*
+        public void equipSlotDequip(int type) {
+            var humanPack = player.packContainers.humanPack;
+            var equipSlot = player.slotContainers.humanEquipSlot;
+            equipSlot.setEquip(type, humanPack, null);
+        }
+        */
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void equipSlotDequip(int type,
+            UnityAction onSuccess, UnityAction onError = null, bool localChange = true) {
+
+            var humanPack = player.packContainers.humanPack;
+            var equipSlot = player.slotContainers.humanEquipSlot;
+            var _onSuccess = itemSer.slotOperationSuccess(humanPack, equipSlot, onSuccess);
+
+            equipSlotDequip(type, _onSuccess, onError);
+        }
+        public void equipSlotDequip(int type,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type;
+            sendRequest(Oper.EquipSlotDequip, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>
@@ -482,6 +557,8 @@ namespace PlayerModule.Services {
         public void loadHumanEquipSlot(UnityAction onSuccess = null, UnityAction onError = null) {
             itemSer.getSlot(player.slotContainers.humanEquipSlot, onSuccess, onError);
         }
+
+        #endregion
 
         #endregion
     }

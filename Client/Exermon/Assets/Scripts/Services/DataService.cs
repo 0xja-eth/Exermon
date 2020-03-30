@@ -280,7 +280,7 @@ namespace GameModule.Services {
         }
         /// <param name="type">数据类型</param>
         public BaseData get(Type type, int id, int dataType = 0) {
-            var attrType = type.ToString();
+            var attrType = type.Name;
             var attrName = char.ToLower(attrType[0]).ToString();
             attrName += attrType.Substring(1) + "s";
             return get(attrName, id, dataType);

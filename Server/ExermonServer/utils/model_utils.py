@@ -51,7 +51,7 @@ class CacheableModel(models.Model):
 			if key is None: key = cla
 			attr_name = cla.__name__.lower()
 			return self._getOrSetCache(key,
-									   lambda: getattr(self, attr_name))
+				lambda: getattr(self, attr_name))
 		except cla.DoesNotExist: return None
 		except AttributeError: return None
 
@@ -75,10 +75,12 @@ class CacheableModel(models.Model):
 	# 保存缓存项
 	def __saveCacheItem(self, item):
 		if isinstance(item, (list, tuple)):
-			for val in item: self.__saveCacheItem(val)
+			tmp_item = item.copy()
+			for val in tmp_item: self.__saveCacheItem(val)
 
 		elif isinstance(item, dict):
-			for key in item: self.__saveCacheItem(item[key])
+			tmp_item = item.copy()
+			for key in tmp_item: self.__saveCacheItem(item[key])
 
 		elif hasattr(item, '__iter__'):
 			for val in item: self.__saveCacheItem(val)

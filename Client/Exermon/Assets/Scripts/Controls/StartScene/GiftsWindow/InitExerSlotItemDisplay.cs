@@ -21,7 +21,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// 外部组件设置
         /// </summary>
         public Image icon; // 图片
-        public ExerGiftCard gift; // 天赋卡片（装备的）
+        public InitExerGiftDisplay gift; // 天赋卡片（装备的）
         public Text name, subject;
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <returns></returns>
         public Exermon getExermon(ExerSlotItem item = null) {
             if (item == null) item = this.item;
-            if (item == null) return null;
+            if (item.isNullItem()) return null;
             return item.playerExer.exermon();
         }
 

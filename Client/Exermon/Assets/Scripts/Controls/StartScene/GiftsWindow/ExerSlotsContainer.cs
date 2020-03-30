@@ -11,7 +11,7 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌卡片容器（开始场景）
     /// </summary>
-    public class ExerSlotsContainer : ItemContainer<ExerSlotItem> {
+    public class ExerSlotsContainer : ContainerDisplay<ExerSlotItem> {
 
         /// <summary>
         /// 常量设置
@@ -37,7 +37,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetail<ExerSlotItem> getItemDetail() {
+        protected override IItemDetailDisplay<ExerSlotItem> getItemDetail() {
             return detail;
         }
 

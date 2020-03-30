@@ -22,7 +22,7 @@ class Service:
 
 		player_exer = Common.getPlayerExer(player, id=peid) if peid > 0 else None
 
-		ItemService.slotContainerEquip(exer_slot, [player_exer], subject_id=sid)
+		return ItemService.slotContainerEquip(exer_slot, player_exer, subject_id=sid)
 
 	# 艾瑟萌槽装备（艾瑟萌/艾瑟萌天赋）
 	@classmethod
@@ -35,7 +35,7 @@ class Service:
 
 		player_gift = Common.getPlayerGift(player, id=pgid) if pgid > 0 else None
 
-		ItemService.slotContainerEquip(exer_slot, [player_gift], subject_id=sid)
+		return ItemService.slotContainerEquip(exer_slot, player_gift, subject_id=sid)
 
 	# 艾瑟萌装备槽装备
 	@classmethod
@@ -46,7 +46,7 @@ class Service:
 
 		pack_equip = Common.getPackEquip(player, id=eeid)
 
-		ItemService.slotContainerEquip(equip_slot, [pack_equip], e_type_id=pack_equip.item.e_type_id)
+		return ItemService.slotContainerEquip(equip_slot, pack_equip, e_type_id=pack_equip.item.e_type_id)
 
 	# 艾瑟萌装备槽卸下装备
 	@classmethod
@@ -55,7 +55,7 @@ class Service:
 
 		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
 
-		ItemService.slotContainerEquip(equip_slot, [None], type=ExerPackEquip, e_type_id=type)
+		return ItemService.slotContainerEquip(equip_slot, None, type_=ExerPackEquip, e_type_id=type)
 
 	# 艾瑟萌改名
 	@classmethod

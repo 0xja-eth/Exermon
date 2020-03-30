@@ -5,7 +5,7 @@ from game_module.models import Subject
 from .code_manager import *
 from .models import *
 from .runtimes import OnlinePlayer
-from item_module.views import Common as ItemCommon
+from item_module.views import Service as ItemService, Common as ItemCommon
 from utils.view_utils import Common as ViewUtils
 from utils.runtime_manager import RuntimeManager
 from utils.exception import WebscoketCloseCode
@@ -254,9 +254,10 @@ class Service:
 		ExermonCommon.ensureExermonSubject(exers)
 		ExermonCommon.ensureExermonType(exers)
 
+		exer_hub = ExermonCommon.getExerHub(player)
 		exer_slot = player.createExermons(exers, enames)
 
-		return exer_slot.convertToDict()
+		return ItemService.convertContainers(exer_hub, slot=exer_slot, type=None)
 
 	# 选择艾瑟萌天赋
 	@classmethod
@@ -317,6 +318,16 @@ class Service:
 
 		return {'player': target_player.convertToDict(type="status")}
 
+	# 获取玩家状态界面信息
+	@classmethod
+	async def getBattle(cls, consumer, player: Player, get_uid: int, ):
+		# 返回数据：
+		# player: 玩家状态数据 => 玩家状态数据
+
+		target_player = Common.getPlayer(id=get_uid)
+
+		return {'player': target_player.convertToDict(type="battle")}
+
 	# 玩家修改昵称
 	@classmethod
 	async def editName(cls, consumer, player: Player, name: str, ):
@@ -363,8 +374,17 @@ class Service:
 
 		pack_equip = Common.getPackEquip(player, id=heid)
 
-		ItemService.slotContainerEquip(equip_slot, [pack_equip],
-									   e_type_id=pack_equip.item.e_type_id)
+		return ItemService.slotContainerEquip(equip_slot, pack_equip, e_type_id=pack_equip.item.e_type_id)
+
+	# 人类装备槽卸下
+	@classmethod
+	async def equipSlotDequip(cls, consumer, player: Player, type: int):
+		# 返回数据：无
+		from item_module.views import Service as ItemService
+
+		equip_slot = Common.getHumanEquipSlot(player)
+
+		return ItemService.slotContainerEquip(equip_slot, None, type_=HumanPackEquip, e_type_id=type)
 
 
 # =======================

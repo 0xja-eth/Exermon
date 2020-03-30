@@ -575,6 +575,8 @@ class UsableItemType(GroupConfigure):
 
 		verbose_name = verbose_name_plural = "可用物品类型"
 
+	NOT_EXIST_ERROR = ErrorType.TypeNotExist
+
 
 # ===================================================
 # 人类装备类型
@@ -591,6 +593,8 @@ class HumanEquipType(GroupConfigure):
 
 		verbose_name = verbose_name_plural = "人类装备类型"
 
+	NOT_EXIST_ERROR = ErrorType.TypeNotExist
+
 
 # ===================================================
 # 艾瑟萌装备类型
@@ -606,6 +610,8 @@ class ExerEquipType(GroupConfigure):
 	class Meta:
 
 		verbose_name = verbose_name_plural = "艾瑟萌装备类型"
+
+	NOT_EXIST_ERROR = ErrorType.TypeNotExist
 
 
 # ===================================================
@@ -640,6 +646,8 @@ class ExerStar(GroupConfigure):
 	class Meta:
 
 		verbose_name = verbose_name_plural = "艾瑟萌星级"
+
+	NOT_EXIST_ERROR = ErrorType.StarNotExist
 
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
@@ -755,6 +763,8 @@ class ExerGiftStar(GroupConfigure):
 
 		verbose_name = verbose_name_plural = "艾瑟萌天赋星级"
 
+	NOT_EXIST_ERROR = ErrorType.StarNotExist
+
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
 
@@ -825,6 +835,8 @@ class ItemStar(GroupConfigure):
 class QuestionStar(GroupConfigure):
 	class Meta:
 		verbose_name = verbose_name_plural = "题目星级"
+
+	NOT_EXIST_ERROR = ErrorType.StarNotExist
 
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
@@ -982,11 +994,14 @@ class GameConfigure(models.Model):
 		}
 
 	def _convertDynamicDataToDict(self):
+		from season_module.runtimes import SeasonManager
 
 		seasons = ModelUtils.objectsToDict(self.compseason_set.all())
+		cur_season_id = SeasonManager.getCurrentSeason().id
 
 		return {
 			'seasons': seasons,
+			'cur_season_id': cur_season_id
 		}
 
 	@classmethod

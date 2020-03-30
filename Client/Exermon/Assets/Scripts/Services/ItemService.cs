@@ -27,15 +27,17 @@ namespace ItemModule.Services {
 
         const string GainItem = "获得物品";
         const string LostItem = "失去物品";
-        const string TransferItem = "转移物品";
+        const string TransferItems = "转移物品";
         const string SplitItem = "分解物品";
-        const string MergeItem = "组合物品";
+        const string MergeItems = "组合物品";
 
         /// <summary>
         /// 业务操作
         /// </summary>
         public enum Oper {
-            GetPack, GetSlot, GainItem, LostItem, TransferItem, SplitItem, MergeItem
+            GetPack, GetSlot, GainItem, LostItem,
+            GainContItems, LostContItems,
+            TransferItems, SplitItem, MergeItems
         }
 
         #region 初始化
@@ -49,9 +51,11 @@ namespace ItemModule.Services {
             addOperDict(Oper.GetSlot, GetSlot, NetworkSystem.Interfaces.ItemGetSlot);
             addOperDict(Oper.GainItem, GainItem, NetworkSystem.Interfaces.ItemGainItem);
             addOperDict(Oper.LostItem, LostItem, NetworkSystem.Interfaces.ItemGainItem);
-            addOperDict(Oper.TransferItem, TransferItem, NetworkSystem.Interfaces.ItemTransferItem);
+            addOperDict(Oper.GainContItems, GainItem, NetworkSystem.Interfaces.ItemGainContItems);
+            addOperDict(Oper.LostContItems, LostItem, NetworkSystem.Interfaces.ItemLostContItems);
+            addOperDict(Oper.TransferItems, TransferItems, NetworkSystem.Interfaces.ItemTransferItems);
             addOperDict(Oper.SplitItem, SplitItem, NetworkSystem.Interfaces.ItemSplitItem);
-            addOperDict(Oper.MergeItem, MergeItem, NetworkSystem.Interfaces.ItemMergeItem);
+            addOperDict(Oper.MergeItems, MergeItems, NetworkSystem.Interfaces.ItemMergeItems);
         }
 
         #endregion
@@ -114,67 +118,215 @@ namespace ItemModule.Services {
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
         /// <param name="count">数量</param>
+        /// <param name="realTime">实时刷新</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void gainItem<T>(PackContainer<T> container, BaseItem item, int count,
+        public void gainItem<T>(PackContainer<T> container, BaseItem item, int count, bool realTime,
             UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
+            if (count == 0) { onSuccess?.Invoke(); return; }
+
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                if (container.realTime)
-                    container = DataLoader.load(container, res, "container");
+                if (realTime) container = DataLoader.load(container, res, "container");
                 onSuccess?.Invoke();
             };
 
-            gainItem(container.type, container.getID(), item.type, item.getID(), count,
-                container.realTime, _onSuccess, onError);
+            gainItem(container.type, container.getID(), item.type, item.getID(), 
+                count, realTime, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="cid">容器ID</param>
         /// <param name="iType">物品类型</param>
         /// <param name="itemId">物品ID</param>
-        /// <param name="realTime">实时刷新</param>
         public void gainItem(int type, int cid, int iType, int itemId, int count, bool realTime,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
             JsonData data = new JsonData();
             data["type"] = type; data["cid"] = cid;
             data["i_type"] = iType; data["item_id"] = itemId;
             data["count"] = count; data["refresh"] = realTime;
-            sendRequest(Oper.GainItem, data, onSuccess, onError, uid: true);
+            var oper = count >= 0 ? Oper.GainItem : Oper.LostItem;
+            sendRequest(oper, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>
-        /// 获得物品
+        /// 失去物品
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
         /// <param name="count">数量</param>
+        /// <param name="realTime">实时刷新</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void lostItem<T>(PackContainer<T> container, BaseItem item, int count,
+        public void lostItem<T>(PackContainer<T> container, BaseItem item, int count, bool realTime,
             UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
-            gainItem(container, item, -count, onSuccess, onError);
+            gainItem(container, item, -count, realTime, onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="cid">容器ID</param>
         /// <param name="iType">物品类型</param>
         /// <param name="itemId">物品ID</param>
-        /// <param name="realTime">实时刷新</param>
         public void lostItem(int type, int cid, int iType, int itemId, int count, bool realTime,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             gainItem(type, cid, iType, itemId, -count, realTime, onSuccess, onError);
         }
 
         /// <summary>
+        /// 获得容器项
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="realTime">实时刷新</param>
+        /// <param name="fixed_">整体操作</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void gainContItem<T>(PackContainer<T> container, T contItem,
+            bool realTime = true, bool fixed_ = false, UnityAction onSuccess = null,
+            UnityAction onError = null) where T : PackContItem, new() {
+            var contItems = new T[] { contItem };
+            gainContItems(container, contItems, realTime, fixed_, onSuccess, onError);
+        }
+        /// <param name="contItems">容器项集</param>
+        public void gainContItems<T>(PackContainer<T> container, T[] contItems,
+            bool realTime = true, bool fixed_ = false, UnityAction onSuccess = null,
+            UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                if (realTime) container = DataLoader.load(container, res, "container");
+                onSuccess?.Invoke();
+            };
+
+            var count = contItems.Length;
+            var ciTypes = new int[count];
+            var contItemIds = new int[count];
+            for (int i = 0; i < count; i++) {
+                ciTypes[i] = contItems[i].type;
+                contItemIds[i] = contItems[i].getID();
+            }
+
+            gainContItems(container.type, ciTypes, contItemIds,
+                realTime, fixed_, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        /// <param name="ciTypes">容器项类型集</param>
+        /// <param name="contItemIds">容器项ID集</param>
+        public void gainContItems(int type, int[] ciTypes, int[] contItemIds, bool realTime, bool fixed_,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+            JsonData data = new JsonData();
+            data["type"] = type; 
+            data["ci_types"] = DataLoader.convert(ciTypes);
+            data["contitem_ids"] = DataLoader.convert(contItemIds);
+            data["fixed"] = fixed_; data["refresh"] = realTime;
+
+            sendRequest(Oper.GainContItems, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 失去容器项
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="count">失去数目</param>
+        /// <param name="realTime">实时刷新</param>
+        /// <param name="fixed_">整体操作</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void lostContItem<T>(PackContainer<T> container, T contItem, int count = -1,
+            bool realTime = true, bool fixed_ = false, UnityAction onSuccess = null,
+            UnityAction onError = null) where T : PackContItem, new() {
+            var contItems = new T[] { contItem };
+            var counts = count >= 0 ? new int[] { count } : null;
+            lostContItems(container, contItems, counts, realTime, fixed_, onSuccess, onError);
+        }
+        /// <param name="contItems">容器项集</param>
+        /// <param name="counts">每个容器项失去的数目</param>
+        public void lostContItems<T>(PackContainer<T> container, T[] contItems, 
+            int[] counts = null, bool realTime = true, bool fixed_ = false, 
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                if (realTime) container = DataLoader.load(container, res, "container");
+                onSuccess?.Invoke();
+            };
+
+            var count = contItems.Length;
+            var ciTypes = new int[count];
+            var contItemIds = new int[count];
+            for (int i = 0; i < count; i++) {
+                ciTypes[i] = contItems[i].type;
+                contItemIds[i] = contItems[i].getID();
+            }
+
+            lostContItems(container.type, ciTypes, contItemIds, counts,
+                realTime, fixed_, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        /// <param name="ciTypes">容器项类型集</param>
+        /// <param name="contItemIds">容器项ID集</param>
+        public void lostContItems(int type, int[] ciTypes, int[] contItemIds, int[] counts, 
+            bool realTime, bool fixed_, NetworkSystem.RequestObject.SuccessAction onSuccess, 
+            UnityAction onError = null) {
+
+            JsonData data = new JsonData();
+            data["type"] = type;
+            data["ci_types"] = DataLoader.convert(ciTypes);
+            data["contitem_ids"] = DataLoader.convert(contItemIds);
+            data["fixed"] = fixed_; data["refresh"] = realTime;
+
+            if (counts != null) data["counts"] = DataLoader.convert(counts);
+
+            sendRequest(Oper.LostContItems, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
         /// 转移物品
         /// </summary>
         /// <param name="container">容器</param>
-        /// <param name="targetCid">目标容器ID</param>
-        /// <param name="contItems">容器项集</param>
-        /// <param name="counts">每个容器项转移的数量</param>
+        /// <param name="target">目标容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="count">转移数量</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void transferItem<T>(PackContainer<T> container, int targetCid, T[] contItems, int[] counts,
-            UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
+        public void transferItem<T>(PackContainer<T> container, PackContainer<T> target, T contItem, int count = 1,
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+            var contItems = new T[] { contItem };
+            var counts = count >= 0 ? new int[] { count } : null;
+            transferItems(container, target, contItems, counts, onSuccess, onError);
+        }
+        /// <param name="targetCid">目标容器ID</param>
+        public void transferItem<T>(PackContainer<T> container, int targetCid, T contItem, int count = -1,
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+            var contItems = new T[] { contItem };
+            var counts = count >= 0 ? new int[] { count } : null;
+            transferItems(container, targetCid, contItems, counts, onSuccess, onError);
+        }
+        /// <param name="contItems">容器项集</param>
+        /// <param name="counts">每个容器项转移的数量</param>
+        public void transferItems<T>(PackContainer<T> container, 
+            PackContainer<T> target, T[] contItems, int[] counts = null, 
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                target = DataLoader.load(target, res, "target");
+                onSuccess?.Invoke();
+            };
+
+            var count = contItems.Length;
+            var ciTypes = new int[count];
+            var contItemIds = new int[count];
+            for (int i = 0; i < count; i++) {
+                ciTypes[i] = contItems[i].type;
+                contItemIds[i] = contItems[i].getID();
+            }
+
+            transferItems(container.type, target.getID(), ciTypes,
+                contItemIds, counts, _onSuccess, onError);
+        }
+        public void transferItems<T>(PackContainer<T> container, 
+            int targetCid, T[] contItems, int[] counts = null,
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");
@@ -189,29 +341,30 @@ namespace ItemModule.Services {
                 contItemIds[i] = contItems[i].getID();
             }
 
-            transferItem(container.type, container.getID(), targetCid, ciTypes,
+            transferItems(container.type, targetCid, ciTypes,
                 contItemIds, counts, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
-        /// <param name="cid">容器ID</param>
         /// <param name="ciTypes">容器项类型集</param>
         /// <param name="contItemIds">容器项ID集</param>
-        public void transferItem(int type, int cid, int targetCid,
+        public void transferItems(int type, int targetCid,
             int[] ciTypes, int[] contItemIds, int[] counts,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
-            data["type"] = type; data["cid"] = cid;
+            data["type"] = type;
             data["target_cid"] = targetCid;
+            data["ci_types"] = DataLoader.convert(ciTypes);
             data["contitem_ids"] = DataLoader.convert(contItemIds);
-            data["counts"] = DataLoader.convert(counts);
-            sendRequest(Oper.TransferItem, data, onSuccess, onError, uid: true);
+
+            if (counts != null) data["counts"] = DataLoader.convert(counts);
+
+            sendRequest(Oper.TransferItems, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>
         /// 拆分物品
         /// </summary>
         /// <param name="container">容器</param>
-        /// <param name="targetCid">目标容器ID</param>
         /// <param name="contItem">容器项</param>
         /// <param name="count">拆分数量</param>
         /// <param name="onSuccess">成功回调</param>
@@ -224,18 +377,17 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            splitItem(container.type, container.getID(), contItem.type,
+            splitItem(container.type, contItem.type,
                 contItem.getID(), count, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
-        /// <param name="cid">容器ID</param>
         /// <param name="ciType">容器项类</param>
         /// <param name="contItemId">容器项ID</param>
-        public void splitItem(int type, int cid, int ciType, int contItemId, int count,
+        public void splitItem(int type, int ciType, int contItemId, int count,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
-            data["type"] = type; data["cid"] = cid;
-            data["count"] = count; data["contitem_id"] = contItemId;
+            data["type"] = type; data["count"] = count;
+            data["contitem_id"] = contItemId;
             sendRequest(Oper.SplitItem, data, onSuccess, onError, uid: true);
         }
 
@@ -246,7 +398,7 @@ namespace ItemModule.Services {
         /// <param name="contItems">容器项</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void mergeItem<T>(PackContainer<T> container, T[] contItems,
+        public void mergeItems<T>(PackContainer<T> container, T[] contItems,
             UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -262,19 +414,33 @@ namespace ItemModule.Services {
                 contItemIds[i] = contItems[i].getID();
             }
 
-            mergeItem(container.type, container.getID(),
-                ciTypes, contItemIds, _onSuccess, onError);
+            mergeItems(container.type, ciTypes, contItemIds, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
-        /// <param name="cid">容器ID</param>
         /// <param name="ciTypes">容器项类型集</param>
         /// <param name="contItemIds">容器项ID集</param>
-        public void mergeItem(int type, int cid, int[] ciTypes, int[] contItemIds,
+        public void mergeItems(int type, int[] ciTypes, int[] contItemIds,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
-            data["type"] = type; data["cid"] = cid;
+            data["type"] = type;
             data["contitem_ids"] = DataLoader.convert(contItemIds);
-            sendRequest(Oper.MergeItem, data, onSuccess, onError, uid: true);
+            sendRequest(Oper.MergeItems, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 槽操作
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="slot">槽</param>
+        /// <param name="onSuccess">成功回调</param>
+        public NetworkSystem.RequestObject.SuccessAction slotOperationSuccess<T, E>(
+            PackContainer<T> container, SlotContainer<E> slot, UnityAction onSuccess) 
+            where T: PackContItem, new() where E: SlotContItem, new() {
+            return (res) => {
+                container = DataLoader.load(container, res, "container");
+                slot = DataLoader.load(slot, res, "slot");
+                onSuccess?.Invoke();
+            };
         }
 
         #endregion

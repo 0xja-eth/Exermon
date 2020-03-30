@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using ItemModule.Data;
 using ExermonModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
@@ -11,7 +12,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
     /// <summary>
     /// 装备背包显示
     /// </summary
-    public class ExerPackEquipDisplay : SelectableItemDisplay<ExerPackEquip> {
+    public class ExerPackEquipDisplay : SelectableItemDisplay<PackContItem> {
 
         /// <summary>
         /// 常量定义
@@ -46,21 +47,26 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 绘制物品
         /// </summary>
-        protected override void drawExactlyItem(ExerPackEquip packEquip) {
-            if (packEquip.isNullItem()) clearItem();
-            else {
-                var equip = packEquip.equip();
-                var icon = equip.icon;
-                var rect = new Rect(0, 0, icon.width, icon.height);
-                this.icon.gameObject.SetActive(true);
-                this.icon.overrideSprite = Sprite.Create(
-                    icon, rect, new Vector2(0.5f, 0.5f));
-                this.icon.overrideSprite.name = icon.name;
+        protected override void drawExactlyItem(PackContItem contItem) {
+            base.drawExactlyItem(contItem);
 
-                if (count) count.text = packEquip.count > 1 ?
-                        packEquip.count.ToString() : "";
-                equipedFlag?.SetActive(packEquip.equiped);
-            }
+            if (contItem.isNullItem()) drawEmptyItem();
+            else if (contItem.type == (int)BaseContItem.Type.ExerPackEquip)
+                drawExerPackEquip((ExerPackEquip)contItem);
+        }
+
+        /// <summary>
+        /// 绘制艾瑟萌背包装备
+        /// </summary>
+        /// <param name="packEquip">艾瑟萌背包装备</param>
+        void drawExerPackEquip(ExerPackEquip packEquip) {
+            var equip = packEquip.equip();
+            icon.gameObject.SetActive(true);
+            icon.overrideSprite = equip.icon;
+
+            if (count) count.text = packEquip.count > 1 ?
+                    packEquip.count.ToString() : "";
+            equipedFlag?.SetActive(packEquip.equiped);
         }
 
         /// <summary>

@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.query import QuerySet
+
+from utils.exception import ErrorType
 from utils.model_utils import Common as ModelUtils
 from game_module.models import GroupConfigure
 import datetime
@@ -25,15 +28,60 @@ class SeasonRecord(models.Model):
 	# 赛季积分
 	point = models.PositiveSmallIntegerField(default=0, verbose_name="赛季积分")
 
-	# 段位星星
-	star_num = models.PositiveSmallIntegerField(default=0, verbose_name="段位星星")
+	# 段位星星（初始有一个，不可小于0）
+	star_num = models.PositiveSmallIntegerField(default=1, verbose_name="段位星星")
 
-	def convertToDict(self):
+	@classmethod
+	def create(cls, player: 'Player', season: 'CompSeason') -> 'SeasonRecord':
+		"""
+		创建记录
+		Args:
+			player (Player): 玩家
+			season (CompSeason): 赛季
+		Returns:
+			返回创建的记录
+		"""
+		rec = cls()
+		rec.player = player
+		rec.season = season
+		rec.save()
+
+		return rec
+
+	def onNewSeason(self, season: 'CompSeason'):
+		"""
+		新赛季回调
+		Args:
+			season (CompSeason): 新赛季数据
+		Returns:
+			返回新赛季的赛季记录
+		"""
+		new_rec = SeasonRecord()
+		new_rec.player_id = self.player_id
+		new_rec.season = season
+		# TODO: 在这里计算并设置 new_rec 的段位星星
+		#  （根据当前段位星星来计算新赛季的初始段位星星）
+		#  最好在 utils.calc_utils 创建一个专门计算这个的类
+		#  具体参考 utils.calc_utils 里面的其他算法
+
+		return new_rec
+
+	def convertToDict(self, type=None, order=None):
+
+		if type == "rank":
+			return {
+				'id': self.player_id,
+				'order': order,
+				'name': self.player.name,
+				'battle_point': self.player.battlePoint(),
+				'star_num': self.star_num
+			}
+
 		suspensions = ModelUtils.objectsToDict(self.suspensions())
 
 		return {
 			'id': self.id,
-			'season_id': self.season,
+			'season_id': self.season_id,
 			'star_num': self.star_num,
 			'point': self.point,
 
@@ -48,7 +96,7 @@ class SeasonRecord(models.Model):
 
 	# 增减星星数量
 	async def adjustStarNum(self, value):
-		rank, sub_rank = self.rank()
+		rank, sub_rank, _ = self.rank()
 
 		# 星星减少
 		while value < 0:
@@ -66,7 +114,10 @@ class SeasonRecord(models.Model):
 		# 情况3，星星数增加，段位可能改变
 		if value != 0:
 			self.star_num += value
-			new_rank, new_sub_rank = self.rank()
+			# 限制不小于 0
+			if self.star_num < 0: self.star_num = 0
+
+			new_rank, new_sub_rank, _ = self.rank()
 			if new_rank != rank or new_sub_rank != sub_rank:
 				await self._emitRankChanged(new_rank, new_sub_rank)
 
@@ -127,27 +178,46 @@ class SeasonRecord(models.Model):
 		"""
 		计算当前实际段位
 		Returns:
-			返回实际段位对象（CompRank）和子段位数目（从0开始）
+			返回实际段位对象（CompRank），子段位数目（从0开始）以及剩余星星数
+		Examples:
+			0 = > 学渣I(1, 0, 0)
+			1 = > 学渣I(1, 0, 1)
+			2 = > 学渣I(1, 0, 2)
+			3 = > 学渣I(1, 0, 3)
+			4 = > 学渣II(1, 1, 1)
+			5 = > 学渣II(1, 1, 2)
+			6 = > 学渣II(1, 1, 3)
+			7 = > 学渣III(1, 2, 1)
+			10 = > 学酥I(2, 1, 1)
 		"""
 		# ranks 储存了段位列表中的每一个段位的详细信息
 		ranks = CompRank.objs()
 
 		# 每个段位需要的星星数量相加
-		sum = 0
+		star_num = self.star_num
 
+		# 需要保证数据库的数据有序
 		for rank in ranks:
 			rank_stars = rank.rankStars()
 
-			# 如果段位是无限累计 或 星星数不足以进入下一段位
-			if rank_stars == 0 or self.star_num < sum+rank_stars:
-				# 计算子段位（还是从 0 开始计算吧）
-				sub_rank = (self.star_num-sum) / CompRank.STARS_PER_SUBRANK
+			# 判断最后一个段位
+			if rank_stars == 0:
+				return rank, 0, star_num
 
-				return rank, sub_rank
+			# 如果星星数目还可以扣
+			if star_num > rank_stars:
+				star_num -= rank_stars
+			else:
+				tmp_star = star_num - 1
+				if tmp_star < 0:
+					sub_rank = star_num = 0
+				else:
+					sub_rank = int(tmp_star / CompRank.STARS_PER_SUBRANK)
+					star_num = (tmp_star % CompRank.STARS_PER_SUBRANK) + 1
 
-			sum += rank_stars
+				return rank, sub_rank, star_num
 
-		return None, 0
+		return None, 0, star_num
 
 
 # =======================
@@ -198,13 +268,50 @@ class CompSeason(GroupConfigure):
 	class Meta:
 		verbose_name = verbose_name_plural = "赛季信息"
 
+	NOT_EXIST_ERROR = ErrorType.SeasonNotExist
+
+	# 排行最大值
+	MAX_RANK = 9999
+
 	# 开始时间
 	start_time = models.DateTimeField(verbose_name="开始时间")
 
 	# 结束时间
 	end_time = models.DateTimeField(verbose_name="结束时间")
 
-	def convertToDict(self):
+	def _convertRanksData(self, count=MAX_RANK, player=None):
+		"""
+		转化排行数据
+		Args:
+			count (int): 排行条数
+			player (Player): 对应玩家
+		Returns:
+			返回指定条数的排行数据
+		"""
+		res = []
+		records = self.sortedSeasonRecords(count)
+		count = min(count, len(records))
+
+		for i in range(count):
+			res.append(records[i].convertToDict('rank', i + 1))
+
+		record, order = self.getPlayerSeasonRecord(player)
+		record = record.convertToDict('rank', order)
+
+		now = datetime.datetime.now()
+		now = ModelUtils.timeToStr(now)
+
+		return {
+			'ranks': res,
+			'rank': record,
+			'update_time': now
+		}
+
+	def convertToDict(self, type=None, count=MAX_RANK, player=None):
+
+		if type == "ranks":
+			return self._convertRanksData(count, player)
+
 		res = super().convertToDict()
 
 		start_time = ModelUtils.timeToStr(self.start_time)
@@ -215,6 +322,44 @@ class CompSeason(GroupConfigure):
 
 		return res
 
+	def seasonRecords(self) -> QuerySet:
+		"""
+		获取赛季的所有玩家记录
+		Returns:
+			返回赛季玩家记录
+		"""
+		return self.seasonrecord_set.all()
+
+	def sortedSeasonRecords(self, count: int = MAX_RANK) -> QuerySet:
+		"""
+		获取排序后的赛季记录（根据段位星星排序）
+		Args:
+			count (int): 个数
+		Returns:
+			返回排序后的 QuerySet对 象
+		"""
+		return list(self.seasonRecords().order_by('-star_num'))[:count]
+
+	def getPlayerSeasonRecord(self, player: 'Player'):
+		"""
+		获取玩家的排行
+		Args:
+			player (Player): 玩家
+		Returns:
+			返回玩家在当前赛季的排行（如果没有排行返回 0）
+		"""
+		order = 1
+		record = None
+		records = self.sortedSeasonRecords()
+		for record in records:
+			if record.player_id == player.id: break
+			order += 1
+
+		# 如果不在排行榜内，置为0
+		if order >= self.MAX_RANK: order = 0
+
+		return record, order
+
 
 # =======================
 # 段位配置表
@@ -223,6 +368,8 @@ class CompRank(GroupConfigure):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "段位信息"
+
+	NOT_EXIST_ERROR = ErrorType.CompRankNotExist
 
 	# 每个小段位所需星星数
 	STARS_PER_SUBRANK = 3

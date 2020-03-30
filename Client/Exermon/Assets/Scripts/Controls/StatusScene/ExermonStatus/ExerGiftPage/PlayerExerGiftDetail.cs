@@ -79,4 +79,4 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
                 
         #endregion
     }
-    }
+}

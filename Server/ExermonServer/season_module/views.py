@@ -8,11 +8,20 @@ from player_module.models import Player
 class Service:
     # 查询赛季记录-lgy
     @classmethod
-    async def getRecords(cls, consumer, player: Player, sid: int):
+    async def getRecord(cls, consumer, player: Player, sid: int):
 
         rec = Common.getSeasonRecord(player, sid)
 
         return {"record": rec.convertToDict()}
+
+    # 查询赛季排行
+    @classmethod
+    async def getRanks(cls, consumer, player: Player, sid: int, count: int, ):
+        # 返回数据：
+        # ranks: 赛季排行数据（数组） => 赛季排行
+        season = CompSeason.get(id=sid)
+
+        return {'ranks': season.convertToDict('ranks', count, player)}
 
 
 class Common:

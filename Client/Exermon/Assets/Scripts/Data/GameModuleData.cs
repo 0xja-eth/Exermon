@@ -137,6 +137,8 @@ namespace GameModule.Data {
         /// </summary>
         [AutoConvert]
         public List<CompSeason> seasons { get; protected set; }
+        [AutoConvert]
+        public int curSeasonId { get; set; }
     }
 
     /// <summary>
@@ -164,7 +166,6 @@ namespace GameModule.Data {
         /// </summary>
         /// <returns>属性信息</returns>
         public JsonData convertToDisplayData(string type = "") {
-            Debug.Log("BaseParam.convertToDisplayData: " + toJson().ToJson());
             return toJson();
         }
 
@@ -182,6 +183,11 @@ namespace GameModule.Data {
     /// 基本能力数据
     /// </summary>
     public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
+
+        /// <summary>
+        /// 描述文本格式
+        /// </summary>
+        const string DescFormat = "{0}：{1}";
 
         /// <summary>
         /// 属性
@@ -204,8 +210,9 @@ namespace GameModule.Data {
         /// </summary>
         /// <returns>属性信息</returns>
         public JsonData convertToDisplayData(string type = "") {
-            Debug.Log("BaseParam.convertToDisplayData: " + toJson().ToJson());
-            return toJson();
+            var res = toJson();
+            res["description"] = string.Format(DescFormat, name, description);
+            return res;
         }
 
         /// <summary>

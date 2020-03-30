@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.Events;
 
+using ItemModule.Data;
+
 using ExermonModule.Data;
 using ExermonModule.Services;
 
@@ -11,7 +13,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
     /// <summary>
     /// 状态窗口艾瑟萌页信息显示
     /// </summary>
-    public class PageDisplay : ExermonStatusPageDisplay<ExerPackEquip> {
+    public class PageDisplay : ExermonStatusPageDisplay<PackContItem> {
 
         /// <summary>
         /// 外部组件设置
@@ -39,25 +41,24 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 获取容器组件
         /// </summary>
-        protected override ItemContainer<ExerPackEquip>
+        public override PackContainerDisplay<PackContItem> 
             getPackDisplay() { return packDisplay; }
 
         /// <summary>
         /// 获取艾瑟萌槽项显示组件
         /// </summary>
-        protected override ExermonStatusSlotItemDisplay<ExerPackEquip>
+        public override ExermonStatusSlotItemDisplay<PackContItem>
             getSlotItemDisplay() { return slotItemDisplay; }
-
+        
         /// <summary>
         /// 获取容器物品数据
         /// </summary>
         /// <returns></returns>
-        protected override ExerPackEquip getFirstItem() {
-            var equipSlotItem = slotItemDisplay.getEquipSlotItem();
-            if (equipSlotItem == null || equipSlotItem.isNullItem()) return null;
-            return equipSlotItem.packEquip;
+        protected override PackContainer<PackContItem> getPackContainer() {
+            return playerSer.player.packContainers.exerPack;
         }
-
+        
+        /*
         /// <summary>
         /// 获取容器物品数据
         /// </summary>
@@ -71,7 +72,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
             return exerPack.exerEquips().FindAll(e => !e.isNullItem() && 
                 (equipSlotItem != null && e.item().eType == equipSlotItem.eType));
         }
-
+        */
         #endregion
 
         #region 界面绘制
@@ -80,18 +81,28 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 刷新装备槽
         /// </summary>
         void refreshExerEquipSlot() {
-            var items = item.exerEquipSlot.items;
-            equipSlotDisplay.configure(items);
+            if (item == null) return;
+            equipSlotDisplay.configure(item.exerEquipSlot);
             equipSlotDisplay.selectLast();
+        }
+
+        /// <summary>
+        /// 刷新背包容器
+        /// </summary>
+        void refreshPackContainer() {
+            var slotItem = slotItemDisplay.getEquipSlotItem();
+            if (slotItem == null) return;
+            packDisplay.setEquipType(slotItem.eType);
+            packDisplay.setEquipItem(slotItem.packEquip);
         }
 
         /// <summary>
         /// 刷新
         /// </summary>
         protected override void refresh() {
-            if (item != null) refreshExerEquipSlot();
+            refreshExerEquipSlot();
             base.refresh();
-            packDisplay.deselect();
+            refreshPackContainer();
         }
 
         #endregion
@@ -109,14 +120,14 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         #region 请求控制
 
         /// <summary>
-        /// 卸下装备
+        /// 能否卸下装备
         /// </summary>
         /// <returns></returns>
         public override bool dequipable() {
             var equipSlotItem = slotItemDisplay.getEquipSlotItem();
             return base.dequipable() && equipSlotItem != null && !equipSlotItem.isNullItem();
         }
-
+        /*
         /// <summary>
         /// 装备请求函数
         /// </summary>
@@ -134,7 +145,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
             var equipItem = equipSlotDisplay.selectedItem();
             return action => exerSer.dequipExerEquip(item, equipItem.eType, action);
         }
-
+        */
         #endregion
 
         #endregion

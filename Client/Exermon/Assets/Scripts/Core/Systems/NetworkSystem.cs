@@ -49,6 +49,7 @@ namespace Core.Systems {
 
             public const string PlayerGetBasic = "player/get/basic";
             public const string PlayerGetStatus = "player/get/status";
+            public const string PlayerGetBattle = "player/get/battle";
 
             public const string PlayerCreateCharacter = "player/create/character";
             public const string PlayerCreateExermons = "player/create/exermons";
@@ -59,13 +60,16 @@ namespace Core.Systems {
             public const string PlayerEditInfo = "player/edit/info";
 
             public const string PlayerEquipSlotEquip = "player/equipslot/equip";
+            public const string PlayerEquipSlotDequip = "player/equipslot/dequip";
 
             public const string ItemGetPack = "item/packcontainer/get";
             public const string ItemGetSlot = "item/slotcontainer/get";
             public const string ItemGainItem = "item/packcontainer/gain";
-            public const string ItemTransferItem = "item/packcontainer/transfer";
+            public const string ItemGainContItems = "item/packcontainer/gain_contitems";
+            public const string ItemLostContItems = "item/packcontainer/lost_contitems";
+            public const string ItemTransferItems = "item/packcontainer/transfer";
             public const string ItemSplitItem = "item/packcontainer/split";
-            public const string ItemMergeItem = "item/packcontainer/merge";
+            public const string ItemMergeItems = "item/packcontainer/merge";
 
             public const string ExermonEquipPlayerExer = "exermon/equip/playerexer";
             public const string ExermonEquipPlayerGift = "exermon/equip/playergift";
@@ -88,6 +92,7 @@ namespace Core.Systems {
             public const string QuestionReportPush = "question/report/push";
 
             public const string SeasonRecordGet = "season/record/get";
+            public const string SeasonRankGet = "season/rank/get";
 
             public const string BattleEquipItem = "battle/equip/item";
             public const string BattleDequipItem = "battle/dequip/item";

@@ -139,18 +139,12 @@ namespace PlayerModule.Data {
             public HumanEquipSlot humanEquipSlot { get; protected set; } = new HumanEquipSlot();
             [AutoConvert]
             public BattleItemSlot battleItemSlot { get; protected set; } = new BattleItemSlot();
-
         }
 
         /// <summary>
         /// 对战信息
         /// </summary>
         public class BattleInfo : BaseData, ParamDisplay.DisplayDataConvertable {
-
-            /// <summary>
-            /// 子段位标志
-            /// </summary>
-            const string SubRankSign = "I";
 
             /// <summary>
             /// 属性
@@ -204,16 +198,11 @@ namespace PlayerModule.Data {
             }
 
             /// <summary>
-            /// 完整段位文本
+            /// 获取段位文本
             /// </summary>
-            /// <returns>段位文本</returns>
-            public string rankText() {
-                var rank = this.rank();
-                if (rank == null) return "无";
-                string res = rank.name + SubRankSign;
-                for (int i = 0; i < subRank; ++i)
-                    res += SubRankSign;
-                return res;
+            /// <returns></returns>
+            string rankText() {
+                return CalcService.RankCalc.getText(rank(), subRank);
             }
         }
 
@@ -328,6 +317,9 @@ namespace PlayerModule.Data {
         [AutoConvert]
         public QuestionInfo questionInfo { get; protected set; }
 
+        [AutoConvert]
+        public SeasonRecord seasonRecord { get; protected set; }
+
         #region 信息转换
 
         /// <summary>
@@ -373,7 +365,7 @@ namespace PlayerModule.Data {
             json["avg_def"] = exerSlot.avgParam(params_[3].getID()).value;
             json["avg_eva"] = exerSlot.avgParam(params_[4].getID()).value;
             json["avg_cri"] = exerSlot.avgParam(params_[5].getID()).value;
-            json["sum_bp"] = exerSlot.sumBattlePoint();
+            json["sum_bp"] = sumBattlePoint();
 
             return json;
         }
@@ -424,8 +416,9 @@ namespace PlayerModule.Data {
         /// 选择艾瑟萌
         /// </summary>
         /// <param name="cid">艾瑟萌槽容器ID</param>
-        public void createExermons(JsonData id) {
-            slotContainers.exerSlot.load(id);
+        public void createExermons(JsonData data) {
+            DataLoader.load(packContainers.exerHub, data, "container");
+            DataLoader.load(slotContainers.exerSlot, data, "slot");
             status = (int)Status.ExermonsCreated;
         }
 
@@ -590,7 +583,36 @@ namespace PlayerModule.Data {
             return exerSlot.getSlotItem(subject.getID());
         }
 
+        /// <summary>
+        /// 总战斗力
+        /// </summary>
+        /// <returns>返回玩家总战斗力</returns>
+        public int sumBattlePoint() {
+            var exerSlot = slotContainers.exerSlot;
+            return exerSlot.sumBattlePoint();
+        }
+
         #endregion
+
+        /// <summary>
+        /// 读取自定义数据
+        /// </summary>
+        /// <param name="json">数据</param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+
+            slotContainers.exerSlot.player = this;
+            slotContainers.humanEquipSlot.player = this;
+            slotContainers.battleItemSlot.player = this;
+        }
+
+        /// <summary>
+        /// 读取当前赛季记录
+        /// </summary>
+        /// <param name="json">数据</param>
+        public void loadCurrentSeasonRecord(JsonData json) {
+            seasonRecord = DataLoader.load<SeasonRecord>(json);
+        }
     }
 
     #region 物品
@@ -653,6 +675,21 @@ namespace PlayerModule.Data {
     public class HumanPack : PackContainer<PackContItem> {
 
         /// <summary>
+        /// 获得一个物品
+        /// </summary>
+        /// <param name="p">条件</param>
+        /// <returns>物品</returns>
+        public T getItem<T>(Predicate<T> p) where T : PackContItem {
+            if (typeof(T) == typeof(HumanPackItem))
+                return (T)getItem(item => item.type ==
+                    (int)BaseContItem.Type.HumanPackItem && p((T)item));
+            if (typeof(T) == typeof(HumanPackEquip))
+                return (T)getItem(item => item.type ==
+                    (int)BaseContItem.Type.HumanPackEquip && p((T)item));
+            return null;
+        }
+
+        /// <summary>
         /// 读取单个物品
         /// </summary>
         /// <param name="json"></param>
@@ -671,7 +708,12 @@ namespace PlayerModule.Data {
     /// 人类装备槽
     /// </summary>
     public class HumanEquipSlot : SlotContainer<HumanEquipSlotItem> {
-
+        
+        /// <summary>
+        /// 所属玩家
+        /// </summary>
+        public Player player { get; set; }
+        /*
         /// <summary>
         /// 获取装备项
         /// </summary>
@@ -680,7 +722,7 @@ namespace PlayerModule.Data {
         public override HumanEquipSlotItem getSlotItem(int eType) {
             return getItem((item) => item.eType == eType);
         }
-
+        */
         /// <summary>
         /// 通过装备物品获取槽项
         /// </summary>
@@ -693,6 +735,16 @@ namespace PlayerModule.Data {
                 return getSlotItem(eType);
             }
             return null;
+        }
+
+        /// <summary>
+        /// 读取单个物品
+        /// </summary>
+        /// <param name="json">数据</param>
+        protected override HumanEquipSlotItem loadItem(JsonData json) {
+            var slotItem = base.loadItem(json);
+            slotItem.equipSlot = this;
+            return slotItem;
         }
 
         /*
@@ -785,9 +837,32 @@ namespace PlayerModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public HumanPackEquip packEquip { get; protected set; }
+        public int packEquipId { get; protected set; }
         [AutoConvert]
         public int eType { get; protected set; }
+
+        /// <summary>
+        /// 槽索引
+        /// </summary>
+        public override int slotIndex {
+            get { return eType; }
+            set { eType = value; }
+        }
+
+        /// <summary>
+        /// 艾瑟萌背包装备实例
+        /// </summary>
+        public HumanPackEquip packEquip {
+            get {
+                var humanPack = equipSlot.player.
+                    packContainers.humanPack;
+                return humanPack.getItem<HumanPackEquip>(
+                    item => item.getID() == packEquipId);
+            }
+            set {
+                packEquipId = value.getID();
+            }
+        }
 
         /// <summary>
         /// 装备
@@ -796,6 +871,11 @@ namespace PlayerModule.Data {
             get { return packEquip; }
             protected set { packEquip = value; }
         }
+
+        /// <summary>
+        /// 装备槽
+        /// </summary>
+        public HumanEquipSlot equipSlot { get; set; }
 
         /// <summary>
         /// 获取装备类型

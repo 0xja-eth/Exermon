@@ -100,6 +100,8 @@ namespace ItemModule.Data {
         [AutoConvert]
         public int starId { get; protected set; }
         [AutoConvert]
+        public int iconIndex { get; protected set; }
+        [AutoConvert]
         public ItemPrice buyPrice { get; protected set; }
         [AutoConvert]
         public int sellPrice { get; protected set; }
@@ -108,7 +110,10 @@ namespace ItemModule.Data {
         [AutoConvert]
         public bool tradable { get; protected set; }
 
-        public Texture2D icon { get; protected set; }
+        /// <summary>
+        /// 物品图标
+        /// </summary>
+        public Sprite icon { get; protected set; }
 
         /// <summary>
         /// 获取星级实例
@@ -124,7 +129,7 @@ namespace ItemModule.Data {
         /// <param name="json"></param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            icon = AssetLoader.loadItemIcon(type, getID());
+            icon = AssetLoader.getItemIconSprite(iconIndex);
         }
     }
 
@@ -195,6 +200,15 @@ namespace ItemModule.Data {
     public class EquipableItem : LimitedItem {
 
         /// <summary>
+        /// 属性类型
+        /// </summary>
+        public enum ParamType {
+            NoType = 0, // 无类型
+            Attack = 1, // 攻击型
+            Defense = 2 // 防御型
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert("params")]
@@ -253,6 +267,9 @@ namespace ItemModule.Data {
             // Others 201+
             PlayerExerGift = 201,  // 玩家艾瑟萌天赋关系
             PlayerExermon = 202,  // 玩家艾瑟萌关系
+
+            // 对战物资槽 
+            BattleItemSlotItem = 301,  // 对战物资槽
         }
 
         /// <summary>
@@ -277,7 +294,7 @@ namespace ItemModule.Data {
         /// 构造函数
         /// </summary>
         public BaseContItem() {
-            var typeName = GetType().ToString();
+            var typeName = GetType().Name;
             var type = (Type)Enum.Parse(typeof(Type), typeName);
             this.type = (int)type;
         }
@@ -378,7 +395,7 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器项
     /// </summary>
-    public class PackContItem<T> : PackContItem where T : BaseItem {
+    public abstract class PackContItem<T> : PackContItem where T : BaseItem {
 
         /// <summary>
         /// 物品
@@ -426,6 +443,14 @@ namespace ItemModule.Data {
         public int index { get; protected set; }
 
         /// <summary>
+        /// 槽索引
+        /// </summary>
+        public virtual int slotIndex {
+            get { return index; }
+            set { index = value; }
+        }
+
+        /// <summary>
         /// 获取装备
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
@@ -439,6 +464,10 @@ namespace ItemModule.Data {
         /// <param name="equipItem">装备物品</param>
         public virtual void setEquip<E>(E equipItem) where E : PackContItem, new() { }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SlotContItem() : base() {}
     }
 
     /// <summary>
@@ -489,6 +518,10 @@ namespace ItemModule.Data {
         /// </summary>
         protected virtual void onEquipChanged() { }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SlotContItem() : base() { }
     }
 
     /// <summary>
@@ -535,6 +568,11 @@ namespace ItemModule.Data {
             } else base.setEquip(equipItem);
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SlotContItem() : base() { }
+
     }
 
     /// <summary>
@@ -552,11 +590,6 @@ namespace ItemModule.Data {
 
         //[AutoConvert]
         public List<T> items { get; protected set; } = new List<T>();
-
-        /// <summary>
-        /// 数据是否需要实时同步（在背包界面时需要实时同步）
-        /// </summary>
-        public bool realTime = false;
 
         #region 数据操作
 
@@ -600,7 +633,7 @@ namespace ItemModule.Data {
         /// <summary>
         /// 读取单个物品
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="json">数据</param>
         protected virtual T loadItem(JsonData json) {
             return DataLoader.load<T>(json);
         }
@@ -654,8 +687,7 @@ namespace ItemModule.Data {
         /// <summary>
         /// 拆分物品
         /// </summary>
-        /// <param name="item">物品</param>
-        /// <param name="count">数目</param>
+        /// <param name="items">物品数组</param>
         public void mergeItems(T[] items) {
             var leftIndex = 0;
             var leftItem = items[leftIndex];
@@ -704,8 +736,8 @@ namespace ItemModule.Data {
             if (oriEquip != null) oriEquip.doDequip();
             if (equipItem != null) equipItem.doEquip();
         }
-        public void setEquip<E>(int index, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
-            setEquip(getSlotItem(index), container, equipItem);
+        public void setEquip<E>(int slotIndex, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
+            setEquip(getSlotItem(slotIndex), container, equipItem);
         }
         public void setEquip<E>(E equipItem = null) where E : PackContItem, new() {
             setEquip(getSlotItemByEquipItem(equipItem), equipItem);
@@ -713,16 +745,25 @@ namespace ItemModule.Data {
         public void setEquip<E>(T slotItem, E equipItem = null) where E : PackContItem, new() {
             slotItem?.setEquip(equipItem);
         }
-        public void setEquip<E>(int index, E equipItem = null) where E : PackContItem, new() {
-            setEquip(getSlotItem(index), equipItem);
+        public void setEquip<E>(int slotIndex, E equipItem = null) where E : PackContItem, new() {
+            setEquip(getSlotItem(slotIndex), equipItem);
         }
 
         /// <summary>
         /// 通过索引获取槽
         /// </summary>
         /// <param name="index"></param>
-        /// <returns></returns>
-        public virtual T getSlotItem(int index) {
+        /// <returns>返回对应索引的装备槽项</returns>
+        public virtual T getSlotItem(int slotIndex) {
+            return getItem(item => item.slotIndex == slotIndex);
+        }
+
+        /// <summary>
+        /// 通过索引获取槽
+        /// </summary>
+        /// <param name="index">下标</param>
+        /// <returns>返回对应索引的<装备槽项/returns>
+        public virtual T getSlotItemByIndex(int index) {
             return getItem(item => item.index == index);
         }
 
@@ -733,6 +774,16 @@ namespace ItemModule.Data {
         /// <param name="equipItem">装备物品</param>
         /// <returns>槽ID</returns>
         public abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
+
+        /// <summary>
+        /// 查找一个空的容器项
+        /// </summary>
+        /// <returns>返回第一个空的容器项</returns>
+        public T emptySlotItem() {
+            foreach (var item in items)
+                if (item.isNullItem()) return item;
+            return items[0];
+        }
 
     }
 }

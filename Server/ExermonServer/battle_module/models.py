@@ -26,6 +26,8 @@ class BattleResultJudge(GroupConfigure):
 	class Meta:
 		verbose_name = verbose_name_plural = "对战评价表"
 
+	NOT_EXIST_ERROR = ErrorType.ResultJudgeNotExist
+
 	# 评价要求分数
 	score = models.PositiveSmallIntegerField(default=0, verbose_name="评价分数")
 

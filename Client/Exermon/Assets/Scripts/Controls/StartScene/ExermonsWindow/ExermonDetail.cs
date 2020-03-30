@@ -18,7 +18,7 @@ namespace UI.StartScene.Controls.Exermon {
     /// <summary>
     /// 艾瑟萌详细信息
     /// </summary>
-    public class ExermonDetail : ItemDetail<Exermon> {
+    public class ExermonDetail : ItemDetailDisplay<Exermon> {
 
         /// <summary>
         /// 常量设置
@@ -73,8 +73,8 @@ namespace UI.StartScene.Controls.Exermon {
         /// 获取容器
         /// </summary>
         /// <returns></returns>
-        public ExermonsContainer getContainer() {
-            return container as ExermonsContainer;
+        public new ExermonsContainer getContainer() {
+            return base.getContainer() as ExermonsContainer;
         }
 
         #endregion

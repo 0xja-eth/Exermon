@@ -51,10 +51,10 @@ class LimitedItemAdmin(BaseItemAdmin):
 
 	# 'adminBuyPrice',
 	list_display = BaseItemAdmin.list_display + \
-				   ['adminBuyPrice', 'sell_price', 'discardable', 'tradable']
+				   ['icon_index', 'adminBuyPrice', 'sell_price', 'discardable', 'tradable']
 
 	list_editable = BaseItemAdmin.list_editable + \
-					['sell_price', 'discardable', 'tradable']
+					['icon_index', 'sell_price', 'discardable', 'tradable']
 
 	field_set = [Fieldset('有限物品属性', 'sell_price', 'discardable',
 						 'tradable', 'icon')]

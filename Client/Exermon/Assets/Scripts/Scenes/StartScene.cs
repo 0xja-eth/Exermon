@@ -168,7 +168,9 @@ namespace UI.StartScene {
         /// 开始天赋选择窗口
         /// </summary>
         void startGiftsWindow() {
-            exermonSer.loadExerSlot(onSuccess: giftsWindow.startWindow);
+            exermonSer.loadExerHub(() =>
+                exermonSer.loadExerSlot(giftsWindow.startWindow)
+            );
         }
 
         /// <summary>

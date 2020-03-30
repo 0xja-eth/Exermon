@@ -298,7 +298,7 @@ class EquipParamCalc:
 		if self.equip is None: return
 
 		self.exerslot_item: ExerSlotItem = \
-			self.equipslot_item.container.equipslot.exer_slot
+			self.equipslot_item.container.exer_slot
 
 		self.player_exer: PlayerExermon = self.exerslot_item.player_exer
 		if self.player_exer is None: return
@@ -325,7 +325,7 @@ class EquipParamCalc:
 	# 计算可变属性值
 	def _calcVariableParam(self):
 		level = self.player_exer.level
-		return self.equip.param_rate * level
+		return self.equip.param_rate/100 * level
 
 
 # ================================

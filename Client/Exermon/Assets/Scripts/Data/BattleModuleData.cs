@@ -310,6 +310,11 @@ namespace BattleModule.Data {
     public class BattleItemSlot : SlotContainer<BattleItemSlotItem> {
 
         /// <summary>
+        /// 玩家
+        /// </summary>
+        public Player player { get; set; }
+
+        /// <summary>
         /// 通过装备物品获取槽项
         /// </summary>
         /// <typeparam name="E">装备物品类型</typeparam>
@@ -320,26 +325,42 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
-        /// 查找一个空的容器项
+        /// 读取单个物品
         /// </summary>
-        /// <returns></returns>
-        public BattleItemSlotItem emptySlotItem() {
-            foreach (var item in items)
-                if (item.isNullItem()) return item;
-            return items[0];
+        /// <param name="json">数据</param>
+        protected override BattleItemSlotItem loadItem(JsonData json) {
+            var slotItem = base.loadItem(json);
+            slotItem.equipSlot = this;
+            return slotItem;
         }
+
     }
 
     /// <summary>
     /// 对战物资槽项
     /// </summary>
     public class BattleItemSlotItem : SlotContItem<HumanPackItem> {
-
+        
         /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
-        public HumanPackItem packItem { get; protected set; }
+        public int packItemId { get; protected set; }
+
+        /// <summary>
+        /// 艾瑟萌背包装备实例
+        /// </summary>
+        public HumanPackItem packItem {
+            get {
+                var humanPack = equipSlot.player.
+                    packContainers.humanPack;
+                return humanPack.getItem<HumanPackItem>(
+                    item => item.getID() == packItemId);
+            }
+            set {
+                packItemId = value.getID();
+            }
+        }
 
         /// <summary>
         /// 装备
@@ -348,6 +369,11 @@ namespace BattleModule.Data {
             get { return packItem; }
             protected set { packItem = value; }
         }
+
+        /// <summary>
+        /// 装备槽
+        /// </summary>
+        public BattleItemSlot equipSlot { get; set; }
 
         /// <summary>
         /// 获取装备类型

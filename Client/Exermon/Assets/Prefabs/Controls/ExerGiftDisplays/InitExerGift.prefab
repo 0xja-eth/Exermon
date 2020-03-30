@@ -250,9 +250,9 @@ GameObject:
   - component: {fileID: 5421958864095780454}
   - component: {fileID: 5421958864095780456}
   - component: {fileID: 5645519506055835643}
-  - component: {fileID: 8022352979156327632}
+  - component: {fileID: 4372346453310836325}
   m_Layer: 5
-  m_Name: GiftCard
+  m_Name: InitExerGift
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,7 +277,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 160}
+  m_SizeDelta: {x: 160, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5421958864095780456
 CanvasRenderer:
@@ -321,9 +321,10 @@ MonoBehaviour:
   draggingAlpha: 0.75
   draggingColor: {r: 0, g: 0, b: 1, a: 0}
   icon: {fileID: 6331504541595695484}
+  name: {fileID: 5569445979637382699}
   detail: {fileID: 0}
   bigIcon: 0
---- !u!114 &8022352979156327632
+--- !u!114 &4372346453310836325
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -335,7 +336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AspectMode: 2
+  m_AspectMode: 1
   m_AspectRatio: 1
 --- !u!1 &6838921616328341754
 GameObject:

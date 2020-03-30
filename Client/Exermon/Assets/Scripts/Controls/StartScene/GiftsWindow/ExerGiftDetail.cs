@@ -12,7 +12,7 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌天赋详细信息
     /// </summary>
-    public class ExerGiftDetail : ItemDetail<ExerGift> {
+    public class ExerGiftDetail : ItemDetailDisplay<ExerGift> {
 
         /// <summary>
         /// 常量设置

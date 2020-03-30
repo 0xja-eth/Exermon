@@ -15,13 +15,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置窗口
         /// </summary>
-        void configure(ItemContainer<T> container, int index);
+        void configure(ContainerDisplay<T> container, int index);
 
         /// <summary>
         /// 获取容器
         /// </summary>
         /// <returns></returns>
-        ItemContainer<T> getContainer();
+        ContainerDisplay<T> getContainer();
 
     }
 
@@ -53,19 +53,19 @@ namespace UI.Common.Controls.ItemDisplays {
 
         public bool forceChecked = false; // 强制选中
 
-        public Color normalColor = new Color(1, 1, 1); // 默认背景颜色
-        public Color emptyColor = new Color(1, 1, 1); // 物品为空背景颜色
-        public Color selectedColor = new Color(1, 1, 0.75f); // 选择时背景颜色
-        public Color checkedColor = new Color(0.8f, 0.8f, 0.8f); // 选中时背景颜色
-        public Color highlightColor = new Color(0.8f, 0.8f, 0.8f); // 高亮颜色
-        public Color disableColor = new Color(0.5f, 0.5f, 0.5f); // 无效时颜色
+        public Color normalColor = new Color(1, 1, 1, 0); // 默认背景颜色
+        public Color emptyColor = new Color(1, 1, 1, 0); // 物品为空背景颜色
+        public Color selectedColor = new Color(1, 1, 0.75f, 0); // 选择时背景颜色
+        public Color checkedColor = new Color(0.8f, 0.8f, 0.8f, 0); // 选中时背景颜色
+        public Color highlightColor = new Color(0.8f, 0.8f, 0.8f, 0); // 高亮颜色
+        public Color disableColor = new Color(0.5f, 0.5f, 0.5f, 0); // 无效时颜色
 
         /// <summary>
         /// 内部变量声明
         /// </summary>
         bool highlighting = false; // 是否高亮中
 
-        protected ItemContainer<T> container = null;
+        protected ContainerDisplay<T> container = null;
 
         protected int index = -1;
 
@@ -74,7 +74,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置组件
         /// </summary>
-        public void configure(ItemContainer<T> container, int index) {
+        public virtual void configure(ContainerDisplay<T> container, int index) {
             this.container = container;
             this.index = index;
             configure();
@@ -90,7 +90,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品容器
         /// </summary>
         /// <returns>容器</returns>
-        public ItemContainer<T> getContainer() {
+        public ContainerDisplay<T> getContainer() {
             return container;
         }
 

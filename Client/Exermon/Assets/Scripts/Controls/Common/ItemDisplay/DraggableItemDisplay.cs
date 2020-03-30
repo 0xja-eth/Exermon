@@ -36,7 +36,7 @@ namespace UI.Common.Controls.ItemDisplays {
 
         public float draggingAlpha = 0.75f; // 拖拽时的不透明度
 
-        public Color draggingColor = new Color(0.8f, 0.8f, 0.8f); // 拖动时背景颜色
+        public Color draggingColor = new Color(0.8f, 0.8f, 0.8f, 0); // 拖动时背景颜色
 
         /// <summary>
         /// 内部变量声明
@@ -174,8 +174,9 @@ namespace UI.Common.Controls.ItemDisplays {
             var rt = go.transform as RectTransform;
 
             rt.SetParent(draggingParent);
-
             rt.SetAsLastSibling();
+
+            preventDraggingObjectSizeChange(rt);
         }
 
         /// <summary>
@@ -183,11 +184,11 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="go">变换</param>
         void preventDraggingObjectSizeChange(RectTransform rt) {
-            var size = rt.rect.size;
-            rt.anchorMin = draggingParent.anchorMin;
-            rt.anchorMax = draggingParent.anchorMax;
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = size;
+            var srt = transform as RectTransform;
+            //rt.anchorMin = draggingParent.anchorMin;
+            //rt.anchorMax = draggingParent.anchorMax;
+            //rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = srt.sizeDelta;
         }
 
         /// <summary>

@@ -1,5 +1,11 @@
 ﻿
+using UnityEngine.Events;
+
+using Core.Data.Loaders;
+
+using ItemModule.Data;
 using ExermonModule.Data;
+using ExermonModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
 
@@ -8,21 +14,40 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
     /// <summary>
     /// 状态窗口装备页信息显示
     /// </summary>
-    public class ExerSlotItemDisplay : ExermonStatusSlotItemDisplay<ExerPackEquip>, 
-        IItemDetail<ExerEquipSlotItem> {
+    public class ExerSlotItemDisplay : ExermonStatusSlotItemDisplay<PackContItem>,
+        IItemDetailDisplay<ExerEquipSlotItem> {
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public ExerPackEquipDetail exerPackEquipDetail;
 
+        public ExerEquipSlotDisplay slotDisplay;
+
         /// <summary>
         /// 详情显示组件
         /// </summary>
-        protected override ExermonStatusExerSlotDetail<ExerPackEquip> detail {
+        protected override ExermonStatusExerSlotDetail<PackContItem> detail {
             get { return exerPackEquipDetail; }
             set { exerPackEquipDetail = (ExerPackEquipDetail)value; }
         }
+
+        /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        ExermonService exermonSer;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            exermonSer = ExermonService.get();
+        }
+
+        #endregion
 
         #region 接口实现
 
@@ -47,7 +72,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 配置
         /// </summary>
         /// <param name="container"></param>
-        public void configure(ItemContainer<ExerEquipSlotItem> container) {
+        public void configure(IContainerDisplay<ExerEquipSlotItem> container) {
             equipSlotDisplay = (ExerEquipSlotDisplay)container;
         }
 
@@ -58,13 +83,15 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 开启视窗
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="index"></param>
-        /// <param name="refresh"></param>
-        void IItemDetail<ExerEquipSlotItem>.startView(ExerEquipSlotItem item, int index = -1, bool refresh = false) {
+        /// <param name="item">容器项</param>
+        /// <param name="index">容器项索引</param>
+        /// <param name="refresh">是否刷新</param>
+        void IItemDetailDisplay<ExerEquipSlotItem>.startView(
+            ExerEquipSlotItem item, int index = -1, bool refresh = false) {
             startView(); setItem(item, index, refresh);
         }
-        void IItemDisplay<ExerEquipSlotItem>.startView(ExerEquipSlotItem item, bool refresh = false) {
+        void IItemDisplay<ExerEquipSlotItem>.startView(
+            ExerEquipSlotItem item, bool refresh = false) {
             startView(); setItem(item, refresh);
         }
 
@@ -75,9 +102,9 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 设置物品
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="index"></param>
-        /// <param name="refresh"></param>
+        /// <param name="item">容器项</param>
+        /// <param name="index">容器项索引</param>
+        /// <param name="refresh">是否刷新</param>
         public void setItem(ExerEquipSlotItem item, int index = -1, bool refresh = false) {
             if (!refresh && equipSlotItem == item && equipIndex == index) return;
             equipSlotItem = item; equipIndex = index;
@@ -110,9 +137,15 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 获取装备槽项
         /// </summary>
-        /// <param name="slotItem"></param>
         public ExerEquipSlotItem getEquipSlotItem() {
             return equipSlotItem;
+        }
+
+        /// <summary>
+        /// 获取装备槽索引
+        /// </summary>
+        public int getEquipIndex() {
+            return equipIndex;
         }
 
         #endregion
@@ -120,7 +153,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         #endregion
 
         #region 数据控制
-
+        
         /// <summary>
         /// 配置装备
         /// </summary>
@@ -129,19 +162,47 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         }
         /*
         /// <summary>
-        /// 装备变更回调
+        /// 获取背包容器显示组件
         /// </summary>
-        protected override void onItemChanged() {
-            updateEquipSlotItem();
-            base.onItemChanged();
+        /// <returns>返回背包容器显示组件</returns>
+        public override PackContainerDisplay<PackContItem> getPackDisplay() {
+            return slotDisplay.getPackDisplay();
+        }
+        */
+        /// <summary>
+        /// 装备改变回调
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="equipItem">装备项</param>
+        protected override void onEquipChanged(PackContainerDisplay<PackContItem> container, PackContItem equipItem) {
+            base.onEquipChanged(container, equipItem);
+            slotDisplay.refreshItems();
+        }
+
+        #endregion
+
+        #region 请求控制
+
+        /// <summary>
+        /// 装备请求函数
+        /// </summary>
+        /// <param name="item">装备项</param>
+        /// <returns>返回装备时进行的请求函数</returns>
+        protected override UnityAction<UnityAction> equipRequestFunc(PackContItem item) {
+            if (item.type != (int)BaseContItem.Type.ExerPackEquip) return null;
+            return action => exermonSer.equipExerEquip(
+                this.item.exerEquipSlot, (ExerPackEquip)item, action);
         }
 
         /// <summary>
-        /// 更新装备槽物品
+        /// 卸下装备请求函数
         /// </summary>
-        void updateEquipSlotItem() {
+        /// <returns>返回卸下时进行的请求函数</returns>
+        protected override UnityAction<UnityAction> dequipRequestFunc() {
+            return action => exermonSer.dequipExerEquip(
+                item.exerEquipSlot, equipSlotItem.eType, action);
         }
-        */
+
         #endregion
     }
 }
