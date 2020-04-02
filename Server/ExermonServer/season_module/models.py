@@ -174,52 +174,6 @@ class SeasonRecord(models.Model):
 
 		return False
 
-	def rank(self) -> ('CompRank', int):
-		"""
-		计算当前实际段位
-		Returns:
-			返回实际段位对象（CompRank），子段位数目（从0开始）以及剩余星星数
-		Examples:
-			0 = > 学渣I(1, 0, 0)
-			1 = > 学渣I(1, 0, 1)
-			2 = > 学渣I(1, 0, 2)
-			3 = > 学渣I(1, 0, 3)
-			4 = > 学渣II(1, 1, 1)
-			5 = > 学渣II(1, 1, 2)
-			6 = > 学渣II(1, 1, 3)
-			7 = > 学渣III(1, 2, 1)
-			10 = > 学酥I(2, 1, 1)
-		"""
-		# ranks 储存了段位列表中的每一个段位的详细信息
-		ranks = CompRank.objs()
-
-		# 每个段位需要的星星数量相加
-		star_num = self.star_num
-
-		# 需要保证数据库的数据有序
-		for rank in ranks:
-			rank_stars = rank.rankStars()
-
-			# 判断最后一个段位
-			if rank_stars == 0:
-				return rank, 0, star_num
-
-			# 如果星星数目还可以扣
-			if star_num > rank_stars:
-				star_num -= rank_stars
-			else:
-				tmp_star = star_num - 1
-				if tmp_star < 0:
-					sub_rank = star_num = 0
-				else:
-					sub_rank = int(tmp_star / CompRank.STARS_PER_SUBRANK)
-					star_num = (tmp_star % CompRank.STARS_PER_SUBRANK) + 1
-
-				return rank, sub_rank, star_num
-
-		return None, 0, star_num
-
-
 # =======================
 # 禁赛记录表
 # =======================
@@ -342,7 +296,7 @@ class CompSeason(GroupConfigure):
 
 	def getPlayerSeasonRecord(self, player: 'Player'):
 		"""
-		获取玩家的排行
+		获取某个玩家的排行
 		Args:
 			player (Player): 玩家
 		Returns:
@@ -410,3 +364,4 @@ class CompRank(GroupConfigure):
 	# 计算每个段位需要的星星数量
 	def rankStars(self):
 		return self.sub_rank_num * self.STARS_PER_SUBRANK
+

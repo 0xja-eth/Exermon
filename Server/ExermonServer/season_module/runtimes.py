@@ -15,6 +15,12 @@ class SeasonManager:
     # 赛季切换回调事件列表
     OnSeasonChanged: list = None
 
+    # 当前赛季排名最高的 n 个用户-lgy4.2
+    TopRank : list = None
+
+    # TopRank的更新时间
+    TopRankUpdateTime : datetime.datetime = None
+
     @classmethod
     def computeSeason(cls) -> CompSeason:
         """
@@ -85,7 +91,29 @@ class SeasonManager:
         await GameConsumer.broadcast(EmitType.SeasonSwitch,
                                {'season_id': cls.CurrentSeason.id})
 
+    @classmethod
+    async def topRank(cls,server_on=False):
+        '''
+        管理赛季高分排行榜
+        '''
+        now = datetime.datetime.now()
+
+        if server_on==False or now.minute==0 or now.minute==30:
+
+            server_on = True
+
+            # TopRank是一个列表，里面每一条赛季记录是一个字典
+            # [ {},{},...,{} ]
+            cls.TopRank = CompSeason._convertRanksData(CompSeason.MAX_RANK)['ranks']
+            cls.TopRankUpdateTime = now
+
+    @classmethod
+    async def getTopRank(cls, num=None):
+
+        return cls.TopRank[:num+1]
+
 
 RuntimeManager.registerEvent(SeasonManager.maintainSeason)
+RuntimeManager.registerEvent(SeasonManager.topRankManager)
 
 
