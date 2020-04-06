@@ -1422,6 +1422,7 @@ class BattleAttackProcessor:
 		"""
 		return 1+random.randint(-self.F, self.F)/100.0
 
+
 # ===================================================
 # 根据星星数量计算出当前段位数和子段位
 # ===================================================
@@ -1445,7 +1446,6 @@ class CompRankCalc:
 			7 = > 学渣III(1, 2, 1)
 			10 = > 学酥I(2, 1, 1)
 		"""
-
 		from season_module.models import CompRank
 
 		# ranks 储存了段位列表中的每一个段位的详细信息

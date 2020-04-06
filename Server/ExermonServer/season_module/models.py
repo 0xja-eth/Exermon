@@ -91,6 +91,16 @@ class SeasonRecord(models.Model):
 			'suspensions': suspensions,
 		}
 
+	def rank(self) -> ('CompRank', int, int):
+		"""
+		计算当前实际段位
+		Returns:
+			返回实际段位对象（CompRank），子段位数目（从0开始）以及剩余星星数
+		"""
+		from utils.calc_utils import CompRankCalc
+
+		return CompRankCalc.calc(self.star_num)
+
 	# 增减赛季积分
 	def adjustPoint(self, value):
 		self.point = max(self.point+value, 0)
