@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
@@ -46,7 +47,7 @@ namespace UI.StatusScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneUtils.GameScene.StatusScene;
+            return SceneSystem.Scene.StatusScene;
         }
 
         /// <summary>

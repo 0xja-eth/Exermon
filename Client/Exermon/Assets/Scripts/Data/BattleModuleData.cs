@@ -398,9 +398,9 @@ namespace BattleModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public ParamData[] plusParams { get; protected set; }
+        public ParamData[] plusParams { get; protected set; } = new ParamData[] { };
         [AutoConvert]
-        public ParamRateData[] rateParams { get; protected set; }
+        public ParamRateData[] rateParams { get; protected set; } = new ParamRateData[] { };
         [AutoConvert]
         public int round { get; protected set; }
 
@@ -456,11 +456,11 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int mp { get; protected set; }
         [AutoConvert("params")]
-        public ParamData[] params_ { get; protected set; }
+        public ParamData[] params_ { get; protected set; } = new ParamData[] { };
         [AutoConvert("params")]
-        public RuntimeBattleBuff[] buffs { get; protected set; }
+        public RuntimeBattleBuff[] buffs { get; protected set; } = new RuntimeBattleBuff[] { };
         [AutoConvert("params")]
-        public RuntimeBattleExerSkill[] skills { get; protected set; }
+        public RuntimeBattleExerSkill[] skills { get; protected set; } = new RuntimeBattleExerSkill[] { };
 
         /// <summary>
         /// 对战玩家
@@ -632,9 +632,9 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int mhp { get; protected set; }
         [AutoConvert]
-        public RuntimeBattleExermon[] exermons { get; protected set; }
+        public RuntimeBattleExermon[] exermons { get; protected set; } = new RuntimeBattleExermon[] { };
         [AutoConvert]
-        public RuntimeBattleItem[] battleItems { get; protected set; }
+        public RuntimeBattleItem[] battleItems { get; protected set; } = new RuntimeBattleItem[] { };
 
         /// <summary>
         /// 上一回合结果数据
@@ -657,7 +657,7 @@ namespace BattleModule.Data {
         /// <summary>
         /// 进度
         /// </summary>
-        public int progress { get; protected set; }
+        public int progress { get; protected set; } = -1;
 
         /// <summary>
         /// 行动数据
@@ -730,6 +730,23 @@ namespace BattleModule.Data {
         public void loadResult(JsonData json) {
             result = DataLoader.load<BattlePlayer>(json);
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="player">玩家</param>
+        public RuntimeBattlePlayer() {}
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="player">玩家</param>
+        public RuntimeBattlePlayer(Player player) {
+            name = player.name;
+            characterId = player.characterId;
+            level = player.level;
+            starNum = player.battleInfo.starNum;
+        }
     }
 
     /// <summary>
@@ -741,18 +758,18 @@ namespace BattleModule.Data {
         /// 玩家1
         /// </summary>
         [AutoConvert]
-        public RuntimeBattlePlayer player1 { get; protected set; }
+        public RuntimeBattlePlayer player1 { get; protected set; } = new RuntimeBattlePlayer();
         /// <summary>
         /// 玩家2
         /// </summary>
         [AutoConvert]
-        public RuntimeBattlePlayer player2 { get; protected set; }
-        
+        public RuntimeBattlePlayer player2 { get; protected set; } = new RuntimeBattlePlayer();
+
         /// <summary>
         /// 当前回合
         /// </summary>
         [AutoConvert]
-        public BattleRound round { get; protected set; }
+        public BattleRound round { get; protected set; } = new BattleRound();
 
         /// <summary>
         /// 获取自身玩家运行时数据
@@ -768,6 +785,15 @@ namespace BattleModule.Data {
         /// <returns>返回对方运行时数据</returns>
         public RuntimeBattlePlayer oppo() {
             return getPlayer(PlayerService.get().player.getID(), true);
+        }
+
+        /// <summary>
+        /// 是否匹配完成
+        /// </summary>
+        /// <returns>返回当前是否匹配完成</returns>
+        public bool isMatchingCompleted() {
+            return player1.progress == 100 &&
+                player2.progress == 100;
         }
 
         /// <summary>

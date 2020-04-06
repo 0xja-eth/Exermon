@@ -34,6 +34,7 @@ namespace Core.UI {
         /// 内部系统声明
         /// </summary>
         protected GameSystem gameSys;
+        protected SceneSystem sceneSys;
 
         #region 初始化
 
@@ -56,16 +57,6 @@ namespace Core.UI {
         }
 
         /// <summary>
-        /// 检查初始场景
-        /// </summary>
-        /// <returns></returns>
-        public void checkFirstScene() {
-            var first = SceneUtils.GameScene.FirstScene;
-            if (gameSys.isConnectable() && sceneName() != first)
-                gameSys.requestChangeScene(first, GameSystem.SceneRequest.Type.Goto);
-        }
-
-        /// <summary>
         /// 初始化
         /// </summary>
         void initializeSceneUtils() {
@@ -77,6 +68,7 @@ namespace Core.UI {
         /// </summary>
         protected virtual void initializeSystems() {
             gameSys = GameSystem.get();
+            sceneSys = SceneSystem.get();
         }
 
         /// <summary>
@@ -84,6 +76,16 @@ namespace Core.UI {
         /// </summary>
         protected virtual void initializeOthers() {
 
+        }
+
+        /// <summary>
+        /// 检查初始场景
+        /// </summary>
+        /// <returns></returns>
+        public void checkFirstScene() {
+            var first = SceneSystem.Scene.FirstScene;
+            if (gameSys.isConnectable() && sceneName() != first)
+                sceneSys.gotoScene(first);
         }
 
         #endregion
@@ -110,7 +112,7 @@ namespace Core.UI {
         /// 返回场景
         /// </summary>
         public void popScene() {
-            gameSys.requestChangeScene(GameSystem.SceneRequest.Type.Pop);
+            sceneSys.popScene();
         }
 
         #endregion

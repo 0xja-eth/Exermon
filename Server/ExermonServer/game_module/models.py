@@ -108,6 +108,10 @@ class ParamValue(models.Model):
 	# 属性值/属性率
 	value = models.IntegerField(default=0, verbose_name="属性值")
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.attr = self.param.attr
+
 	def __str__(self):
 		val = self.getValue()
 		return "%s: %s" % (self.param.name, val)
@@ -134,11 +138,13 @@ class ParamValue(models.Model):
 	def __add__(self, value) -> 'ParamValue':
 		if value is None: return self
 
-		if isinstance(value, ParamValue):
-			value = value.getValue()
+		if not isinstance(value, ParamValue):
+			old_val = value
+			value = type(self)(param=self.param)
+			value.value = old_val
 
-		res = ParamValue()
-		res.param_id = self.param_id
+		res = type(self)(param=self.param)
+		# res.param_id = self.param_id
 		res.value = self.value
 		res.addValue(value)
 
@@ -147,11 +153,13 @@ class ParamValue(models.Model):
 	def __sub__(self, value) -> 'ParamValue':
 		if value is None: return self
 
-		if isinstance(value, ParamValue):
-			value = value.getValue()
+		if not isinstance(value, ParamValue):
+			old_val = value
+			value = type(self)(param=self.param)
+			value.value = old_val
 
-		res = ParamValue()
-		res.param_id = self.param_id
+		res = type(self)(param=self.param)
+		# res.param_id = self.param_id
 		res.value = self.value
 		res.addValue(-value)
 
@@ -167,11 +175,13 @@ class ParamValue(models.Model):
 	def __mul__(self, rate) -> 'ParamValue':
 		if rate is None: return self
 
-		if isinstance(rate, ParamValue):
-			rate = rate.getValue()
+		if not isinstance(rate, ParamValue):
+			old_rate = rate
+			rate = type(self)(param=self.param)
+			rate.value = old_rate
 
-		res = ParamValue()
-		res.param_id = self.param_id
+		res = type(self)(param=self.param)
+		# res.param_id = self.param_id
 		res.value = self.value
 		res.multValue(rate)
 
@@ -180,11 +190,13 @@ class ParamValue(models.Model):
 	def __truediv__(self, rate) -> 'ParamValue':
 		if rate is None: return self
 
-		if isinstance(rate, ParamValue):
-			rate = rate.getValue()
+		if not isinstance(rate, ParamValue):
+			old_rate = rate
+			rate = type(self)(param=self.param)
+			rate.value = old_rate
 
-		res = ParamValue()
-		res.param_id = self.param_id
+		res = type(self)(param=self.param)
+		# res.param_id = self.param_id
 		res.value = self.value
 		res.multValue(1/rate)
 

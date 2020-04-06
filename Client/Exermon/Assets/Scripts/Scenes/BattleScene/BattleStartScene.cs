@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+using Core.Systems;
+
 using Core.UI;
 using Core.UI.Utils;
 
@@ -52,7 +54,7 @@ namespace UI.BattleStartScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneUtils.GameScene.BattleStartScene;
+            return SceneSystem.Scene.BattleStartScene;
         }
 
         /// <summary>
@@ -78,7 +80,9 @@ namespace UI.BattleStartScene {
         /// </summary>
         protected override void start() {
             base.start();
-            refresh();
+            playerSer.getPlayerBattle(() => 
+                seasonSer.getCurrentSeasonRank(onSuccess: startWindows)
+            );
         }
 
         #endregion
@@ -94,9 +98,6 @@ namespace UI.BattleStartScene {
         /// 刷新场景
         /// </summary>
         public void refresh() {
-            playerSer.getPlayerBattle(
-                () => seasonSer.getCurrentSeasonRank(onSuccess: startWindows)
-            );
         }
 
         /// <summary>
@@ -112,6 +113,19 @@ namespace UI.BattleStartScene {
 
         #region 流程控制
         
+        /// <summary>
+        /// 开始
+        /// </summary>
+        public void startMatch() {
+            battleSer.startMatch(BattleService.Mode.Normal, onMatchingStarted);
+        }
+
+        /// <summary>
+        /// 开始匹配回调
+        /// </summary>
+        void onMatchingStarted() {
+            sceneSys.pushScene(SceneSystem.Scene.BattleMatchingScene);
+        }
 
         #endregion
     }

@@ -239,7 +239,7 @@ class BattleRecord(CacheableModel):
 	result_time = models.DateTimeField(null=True, verbose_name="结算时间")
 
 	def __str__(self):
-		return "%d. %s VS %s" % (self.id, self.adminPlayer1(), self.adminPlayer2())
+		return "%s. %s VS %s" % (str(self.id), self.adminPlayer1(), self.adminPlayer2())
 
 	# admin 显示玩家1
 	def adminPlayer1(self):
@@ -747,12 +747,6 @@ class BattlePlayer(QuestionSetRecord):
 			题目集奖励 QuerySet 对象
 		"""
 		return []
-
-	def __makeGenerateConfigure(self):
-		"""
-		获取题目生成配置信息，用于 _generateQuestions() 中进行题目生成
-		"""
-		return None
 
 	def battleScore(self) -> int:
 		"""

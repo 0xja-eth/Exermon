@@ -61,6 +61,9 @@ namespace Core.Systems {
             public UnityAction onOK { get; }
             public UnityAction onCancel { get; }
 
+            /// <summary>
+            /// 构造函数
+            /// </summary>
             /// <param name="btns">弹窗按钮文本</param>
             /// <param name="actions">弹窗按钮动作</param>
             public AlertRequest(string text,
@@ -96,56 +99,6 @@ namespace Core.Systems {
             }
             public LoadingRequest(bool start = true) {
                 this.start = start;
-            }
-        }
-
-        /// <summary>
-        /// 场景切换请求
-        /// </summary>
-        public class SceneRequest {
-
-            /// <summary>
-            /// 请求类型
-            /// </summary>
-            public enum Type {
-                /// <summary>
-                /// Push 操作，将新场景作为栈顶元素加入到场景栈中
-                /// </summary>
-                Push,
-                /// <summary>
-                /// Goto 操作，弹出整个场景栈，将新场景加入到空的场景栈中
-                /// </summary>
-                Goto,
-                /// <summary>
-                /// Change 操作，弹出栈顶场景（当前场景），将新场景加入到场景栈中
-                /// </summary>
-                Change,
-                /// <summary>
-                /// Pop 操作，弹出栈顶场景（当前场景）
-                /// </summary>
-                Pop,
-                /// <summary>
-                /// Clear 操作，清除整个场景栈，一般会导致游戏结束
-                /// </summary>
-                Clear
-            }
-
-            /// <summary>
-            /// 属性
-            /// </summary>
-            public string scene;
-            public Type type;
-
-            /// <summary>
-            /// 构造函数
-            /// </summary>
-            /// <param name="scene">场景</param>
-            /// <param name="type">切换类型</param>
-            public SceneRequest(string scene, Type type) {
-                this.scene = scene; this.type = type;
-            }
-            public SceneRequest(Type type) {
-                this.type = type;
             }
         }
 
@@ -221,53 +174,7 @@ namespace Core.Systems {
         public void clearRequestLoad() {
             loadingRequest = null;
         }
-
-        /// <summary>
-        /// 场景切换控制
-        /// </summary>
-        public SceneRequest changeScene { get; protected set; } = null;
-
-        /// <summary>
-        /// 请求场景切换
-        /// </summary>
-        /// <param name="scene">场景名</param>
-        /// <param name="type">切换类型</param>
-        /// <remarks>在下一帧进行指定方式的场景切换</remarks>
-        /// <example>例 1：登录后跳转到 MainScene
-        /// <code>
-        /// var gameSys = GameSystem.get();
-        /// gameSys.requestChangeScene(SceneUtils.GameScene.MainScene, GameSystem.SceneRequest.Type.Goto);
-        /// </code>
-        /// </example>
-        /// <example>例 2：进入状态场景（可返回）
-        /// <code>
-        /// var gameSys = GameSystem.get();
-        /// gameSys.requestChangeScene(SceneUtils.GameScene.StatusScene, GameSystem.SceneRequest.Type.Push);
-        /// </code>
-        /// </example>
-        public void requestChangeScene(string scene, SceneRequest.Type type) {
-            changeScene = new SceneRequest(scene, type);
-        }
-        /// <summary>
-        /// 请求场景切换
-        /// </summary>
-        /// <param name="type">切换类型</param>
-        /// <remarks>在下一帧进行指定方式的场景切换</remarks>
-        /// <example>例：返回到前一场景
-        /// <code>
-        /// var gameSys = GameSystem.get();
-        /// gameSys.requestChangeScene(GameSystem.SceneRequest.Type.Pop);
-        /// </code>
-        /// </example>
-        public void requestChangeScene(SceneRequest.Type type) {
-            changeScene = new SceneRequest(type);
-        }
-        /// <summary>
-        /// 清除场景切换请求
-        /// </summary>
-        /// <remarks>清空当前的场景切换请求（并不等于返回到上一场景，只是用于清除前一个操作的请求）</remarks>
-        public void clearChangeScene() { changeScene = null; }
-
+        
         /// <summary>
         /// 状态回调函数
         /// </summary>

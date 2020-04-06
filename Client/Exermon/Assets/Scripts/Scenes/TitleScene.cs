@@ -52,7 +52,7 @@ namespace UI.TitleScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneUtils.GameScene.TitleScene;
+            return SceneSystem.Scene.TitleScene;
         }
 
         /// <summary>

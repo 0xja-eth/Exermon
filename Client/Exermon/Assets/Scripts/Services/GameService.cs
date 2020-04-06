@@ -37,6 +37,7 @@ namespace GameModule.Services {
         /// <summary>
         /// 外部系统
         /// </summary>
+        SceneSystem sceneSys;
         StorageSystem storageSys;
         PlayerService playerSer;
 
@@ -45,6 +46,7 @@ namespace GameModule.Services {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
+            sceneSys = SceneSystem.get();
             storageSys = StorageSystem.get();
             playerSer = PlayerService.get();
             gameSys.reconnectedCallback = onReconnected;
@@ -66,16 +68,14 @@ namespace GameModule.Services {
         /// 新游戏（未有角色的玩家）
         /// </summary>
         public void newGame() {
-            gameSys.requestChangeScene(SceneUtils.GameScene.StartScene,
-                GameSystem.SceneRequest.Type.Push);
+            sceneSys.pushScene(SceneSystem.Scene.StartScene);
         }
 
         /// <summary>
         /// 继续游戏（已经有角色的玩家）
         /// </summary>
         public void loadGame() {
-            gameSys.requestChangeScene(SceneUtils.GameScene.MainScene,
-                GameSystem.SceneRequest.Type.Push);
+            sceneSys.pushScene(SceneSystem.Scene.MainScene);
         }
 
         /// <summary>
@@ -90,8 +90,7 @@ namespace GameModule.Services {
         /// </summary>
         public void backToMenu() {
             if (playerSer.isLogined()) logoutGame();
-            gameSys.requestChangeScene(SceneUtils.GameScene.TitleScene,
-                GameSystem.SceneRequest.Type.Goto);
+            sceneSys.gotoScene(SceneSystem.Scene.TitleScene);
         }
 
         /// <summary>

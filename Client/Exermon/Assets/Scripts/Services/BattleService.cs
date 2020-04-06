@@ -52,6 +52,28 @@ namespace BattleModule.Services {
         }
 
         /// <summary>
+        /// 对战状态
+        /// </summary>
+        public enum State {
+            NotInBattle = 0, // 不在对战中
+            Matching = 1, // 匹配中
+            Matched = 10, // 匹配完毕
+            Preparing = 2, // 准备中
+            Questing = 3, // 作答中
+            Acting = 4, // 行动中
+            Resulting = 5, // 结算中
+            Terminating = 6, // 结束中
+            Terminated = 7, // 已结束
+        }
+
+        /// <summary>
+        /// 游戏模式
+        /// </summary>
+        public enum Mode {
+            Normal = 0
+        }
+
+        /// <summary>
         /// 当前对战
         /// </summary>
         public RuntimeBattle battle { get; protected set; }
@@ -75,6 +97,21 @@ namespace BattleModule.Services {
             networkSys = NetworkSystem.get();
 
             initializeEmitHandlers();
+        }
+
+        /// <summary>
+        /// 初始化状态字典
+        /// </summary>
+        protected override void initializeStateDict() {
+            base.initializeStateDict();
+            addStateDict(State.NotInBattle);
+            addStateDict(State.Matching);
+            addStateDict(State.Preparing);
+            addStateDict(State.Questing);
+            addStateDict(State.Acting);
+            addStateDict(State.Resulting);
+            addStateDict(State.Terminating);
+            addStateDict(State.Terminated);
         }
 
         /// <summary>
@@ -108,6 +145,14 @@ namespace BattleModule.Services {
             addOperDict(Oper.ResultComplete, ResultComplete, NetworkSystem.Interfaces.BattleResultComplete, true);
         }
 
+        /// <summary>
+        /// 其他初始化工作
+        /// </summary>
+        protected override void initializeOthers() {
+            base.initializeOthers();
+            changeState(State.NotInBattle);
+        }
+
         #endregion
 
         #region 操作控制
@@ -118,14 +163,15 @@ namespace BattleModule.Services {
         /// <param name="mode">对战模式</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void startMatch(int mode,
+        public void startMatch(Mode mode,
             UnityAction onSuccess = null, UnityAction onError = null) {
-            
+
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                changeState(State.Matching);
                 onSuccess?.Invoke();
             };
 
-            startMatch(mode, _onSuccess, onError);
+            startMatch((int)mode, _onSuccess, onError);
         }
         public void startMatch(int mode,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
@@ -141,6 +187,7 @@ namespace BattleModule.Services {
         public void cancelMatch(UnityAction onSuccess = null, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                changeState(State.NotInBattle);
                 onSuccess?.Invoke();
             };
 
@@ -157,6 +204,9 @@ namespace BattleModule.Services {
         /// <param name="progress">进度</param>
         public void matchProgress(int progress) {
             JsonData data = new JsonData(); data["progress"] = progress;
+
+            battle.self().loadProgress(progress);
+
             sendRequest(Oper.MatchProgress, data, uid: true);
         }
 
@@ -201,7 +251,7 @@ namespace BattleModule.Services {
         /// <param name="timespan">用时</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void questionAnswer(int[] selection, int timespan, 
+        public void questionAnswer(int[] selection, int timespan,
             UnityAction onSuccess = null, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -259,7 +309,7 @@ namespace BattleModule.Services {
         /// <param name="localChange">本地数据是否改变</param>
         public void equipBattleItem(BattleItemSlotItem slotItem, HumanPackItem packItem,
             UnityAction onSuccess = null, UnityAction onError = null, bool localChange = true) {
-            
+
             var player = getPlayer();
             var itemSlot = player.slotContainers.battleItemSlot;
             var humanPack = player.packContainers.humanPack;
@@ -369,6 +419,7 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onMatched(JsonData data) {
             battle = DataLoader.load<RuntimeBattle>(data);
+            changeState(State.Matched);
         }
 
         /// <summary>
@@ -430,6 +481,14 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onBattleResult(JsonData data) {
             battle.loadResults(data);
+        }
+
+        /// <summary>
+        /// 是否匹配完成
+        /// </summary>
+        /// <returns>返回当前是否匹配完成</returns>
+        public bool isMatchingCompleted() {
+            return battle.isMatchingCompleted();
         }
 
         #endregion

@@ -48,9 +48,12 @@ namespace PlayerModule.Data {
         [AutoConvert]
         public string description { get; protected set; }
 
-        public Texture2D bust { get; protected set; }
-        public Texture2D face { get; protected set; }
-        public Texture2D battle { get; protected set; }
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public Sprite bust { get; protected set; }
+        public Sprite face { get; protected set; }
+        //public Sprite battle { get; protected set; }
 
         /// <summary>
         /// 获取性别文本
@@ -66,9 +69,9 @@ namespace PlayerModule.Data {
         /// <param name="json">数据</param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            bust = AssetLoader.loadCharacterBust(getID());
-            face = AssetLoader.loadCharacterFace(getID());
-            battle = AssetLoader.loadCharacterBattle(getID());
+            bust = AssetLoader.getCharacterBustSprite(getID());
+            face = AssetLoader.getCharacterFaceSprite(getID());
+            //battle = AssetLoader.getCharacterFaceSprite(getID());
         }
     }
 

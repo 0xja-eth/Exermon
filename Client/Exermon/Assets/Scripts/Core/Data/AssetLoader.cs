@@ -136,12 +136,35 @@ namespace Core.Data.Loaders {
         }
 
         /// <summary>
+        /// 获取指定高度的人物半身像
+        /// </summary>
+        /// <param name="id">人物ID</param>
+        /// <param name="height">高度</param>
+        /// <returns><返回对应的精灵/returns>
+        public static Sprite getCharacterBustSprite(int id,
+            int height = PlayerModule.Data.Character.BustHeight) {
+            var bust = loadCharacterBust(id);
+            var rect = new Rect(0, bust.height - height, bust.width, height);
+            return generateSprite(bust, rect);
+        }
+
+        /// <summary>
         /// 读取人物头像
         /// </summary>
         /// <param name="id">人物ID</param>
         /// <returns>2D纹理</returns>
         public static Texture2D loadCharacterFace(int id) {
             return loadTexture2D(CharacterFacePath, CharacterFileName, id);
+        }
+
+        /// <summary>
+        /// 获取指定高度的人物半身像
+        /// </summary>
+        /// <param name="id">人物ID</param>
+        /// <param name="height">高度</param>
+        /// <returns><返回对应的精灵/returns>
+        public static Sprite getCharacterFaceSprite(int id) {
+            return generateSprite(loadCharacterFace(id));
         }
 
         /// <summary>

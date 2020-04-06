@@ -26,7 +26,7 @@ namespace UI.Common.Controls.ItemDisplays {
     }
 
     /// <summary>
-    /// 物品详细信息
+    /// 物品详细信息，带有容器和索引功能
     /// </summary>
     public class ItemDetailDisplay<T> : ItemDisplay<T>, IItemDetailDisplay<T> where T : class {
 

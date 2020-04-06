@@ -62,13 +62,8 @@ namespace UI.MainScene.Controls {
         /// </summary>
         /// <param name="player">玩家</param>
         void drawPlayerFace(Player player) {
-            var character = player.character();
-            var face = character.face;
-            var rect = new Rect(0, 0, face.width, face.height);
-            this.face.gameObject.SetActive(true);
-            this.face.overrideSprite = Sprite.Create(
-                face, rect, new Vector2(0.5f, 0.5f));
-            this.face.overrideSprite.name = face.name;
+            face.gameObject.SetActive(true);
+            face.overrideSprite = player.character().face;
         }
 
         /// <summary>

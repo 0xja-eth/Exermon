@@ -45,7 +45,7 @@ namespace UI.MainScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneUtils.GameScene.MainScene;
+            return SceneSystem.Scene.MainScene;
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace UI.MainScene {
         public void onBulidingsClick(int index) {
             string sceneName = this.sceneName();
             switch (index) {
-                case 1: sceneName = SceneUtils.GameScene.StatusScene; break;
-                case 2: sceneName = SceneUtils.GameScene.BattleStartScene; break;
+                case 1: sceneName = SceneSystem.Scene.StatusScene; break;
+                case 2: sceneName = SceneSystem.Scene.BattleStartScene; break;
             }
-            gameSys.requestChangeScene(sceneName, GameSystem.SceneRequest.Type.Push);
+            sceneSys.pushScene(sceneName);
         }
 
         #endregion

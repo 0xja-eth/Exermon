@@ -18,7 +18,7 @@ namespace UI.BattleStartScene.Controls.Right.MainContent {
     /// <summary>
     /// 段位显示
     /// </summary>
-    public class RankDisplay : ItemDetailDisplay<SeasonRecord> {
+    public class RankDisplay : ItemDisplay<SeasonRecord> {
 
         /// <summary>
         /// 常量定义

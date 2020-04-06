@@ -187,7 +187,10 @@ namespace Core.Services {
             NetworkSystem.RequestObject.ErrorAction _onError = generateOnErrorFunc(failText,
                 () => sendRequest(route, data, waitText, failText,
                     onSuccess, onError, uid, emit), onError);
-            if (uid) data["uid"] = getPlayerID(); // 添加玩家信息
+            if (uid) {
+                if (data == null) data = new JsonData();
+                data["uid"] = getPlayerID(); // 添加玩家信息
+            }
             networkSys.setupRequest(route, data, onSuccess, _onError, true, waitText, emit);
         }
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
 using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
@@ -104,14 +105,17 @@ namespace UI.BattleStartScene.Windows {
             battlePoint.text = string.Format(BattlePointFormat, 
                 player.sumBattlePoint());
             expBar.setValue(player, "exp");
+            drawBust();
+        }
 
-            var bust = player.character().bust;
-            var rect = new Rect(0, bust.height - BustHeight,
-                bust.width, BustHeight);
+        /// <summary>
+        /// 绘制半身像
+        /// </summary>
+        void drawBust() {
+            var bust = AssetLoader.getCharacterBustSprite(
+                player.characterId, BustHeight);
             this.bust.gameObject.SetActive(true);
-            this.bust.overrideSprite = Sprite.Create(
-                bust, rect, new Vector2(0.5f, 0.5f));
-            this.bust.overrideSprite.name = bust.name;
+            this.bust.overrideSprite = bust;
         }
 
         /// <summary>

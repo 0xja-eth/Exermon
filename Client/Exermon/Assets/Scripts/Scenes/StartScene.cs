@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
@@ -62,7 +63,7 @@ namespace UI.StartScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneUtils.GameScene.StartScene;
+            return SceneSystem.Scene.StartScene;
         }
 
         /// <summary>

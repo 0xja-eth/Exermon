@@ -52,14 +52,8 @@ namespace UI.StatusScene.Controls.PlayerStatus {
         /// </summary>
         /// <param name="player">玩家</param>
         void drawPlayerBust(Player player) {
-            var character = player.character();
-            var bust = character.bust;
-            var rect = new Rect(0, bust.height - Character.BustHeight,
-                bust.width, Character.BustHeight);
-            this.bust.gameObject.SetActive(true);
-            this.bust.overrideSprite = Sprite.Create(
-                bust, rect, new Vector2(0.5f, 0.5f));
-            this.bust.overrideSprite.name = bust.name;
+            bust.gameObject.SetActive(true);
+            bust.overrideSprite = player.character().bust;
         }
 
         /// <summary>

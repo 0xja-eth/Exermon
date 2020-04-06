@@ -1032,16 +1032,16 @@ class Player(CacheableModel):
 		self.exp += sum_exp
 		exerslot.gainExp(slot_exps, exer_exps)
 
-	def subjects(self) -> list:
+	def subjects(self) -> set:
 		"""
 		获取玩家所选科目
 		Returns:
 			玩家所选科目数组
 		"""
 		exerslot = self.exerSlot()
-		if exerslot is None: return []
+		if exerslot is None: return set()
 		slot_items = exerslot.contItems()
-		return ModelUtils.getObjectRelatedForAll(slot_items, 'subject')
+		return set(ModelUtils.query(slot_items, lambda item: item.subject))
 
 	# endregion
 

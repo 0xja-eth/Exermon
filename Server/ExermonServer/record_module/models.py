@@ -803,7 +803,7 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			配置类对象
 		"""
-		raise NotImplementedError
+		return None
 
 	def terminate(self, **kwargs):
 		"""

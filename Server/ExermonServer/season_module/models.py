@@ -48,6 +48,9 @@ class SeasonRecord(models.Model):
 
 		return rec
 
+	def __str__(self):
+		return "%s - %s" % (self.player, self.season)
+
 	def onNewSeason(self, season: 'CompSeason'):
 		"""
 		新赛季回调
@@ -293,7 +296,8 @@ class CompSeason(GroupConfigure):
 		count = min(count, len(records))
 
 		for i in range(count):
-			res.append(records[i].convertToDict('rank', i + 1))
+			record: SeasonRecord = records[i]
+			res.append(record.convertToDict('rank', i + 1))
 
 		record, order = self.getPlayerSeasonRecord(player)
 		record = record.convertToDict('rank', order)

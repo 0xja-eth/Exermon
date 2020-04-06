@@ -1,4 +1,7 @@
 ﻿
+using System;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 using GameModule.Services;
@@ -113,10 +116,14 @@ namespace UI.StartScene.Controls.Exermon {
             var cnt = checkedIndices.Count;
             eids = new int[cnt];
             enames = new string[cnt];
+            for (int i = 0; i < cnt; ++i)
+                eids[i] = checkedIndices[i];
+
+            Array.Sort(eids);
+
             for (int i = 0; i < cnt; ++i) {
-                var index = checkedIndices[i];
-                eids[i] = items[index].getID();
-                enames[i] = this.enames[index];
+                eids[i] = items[eids[i]].getID();
+                enames[i] = this.enames[eids[i]];
             }
             return cnt;
         }
@@ -127,11 +134,13 @@ namespace UI.StartScene.Controls.Exermon {
         /// <returns>选择的所有艾瑟萌</returns>
         public Exermon[] getResult() {
             var cnt = checkedIndices.Count;
+            var eids = new int[cnt];
             var items = new Exermon[cnt];
-            for (int i = 0; i < cnt; ++i) {
-                var index = checkedIndices[i];
-                items[i] = this.items[index];
-            }
+            for (int i = 0; i < cnt; ++i) 
+                eids[i] = checkedIndices[i];
+            Array.Sort(eids);
+            for (int i = 0; i < cnt; ++i) 
+                items[i] = this.items[eids[i]];
             return items;
         }
 

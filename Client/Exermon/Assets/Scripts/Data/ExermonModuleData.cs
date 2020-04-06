@@ -1125,7 +1125,7 @@ namespace ExermonModule.Data {
             json["max"] = max;
             json["value"] = value;
             json["rate"] = value / max;
-            json["delta"] = delta;
+            json["delta"] = DataLoader.convertDouble(delta);
             json["delta_rate"] = deltaRate;
 
             json[ParamDisplay.TrueColorKey] = DataLoader.convert(color);

@@ -21,29 +21,6 @@ namespace Core.UI.Utils {
     public static class SceneUtils {
 
         /// <summary>
-        /// 游戏场景数据
-        /// </summary>
-        public class GameScene {
-
-            /// <summary>
-            /// 初始场景
-            /// </summary>
-            public const string FirstScene = TitleScene;
-
-            /// <summary>
-            /// 常量设定
-            /// </summary>
-            public const string TitleScene = "TitleScene";
-            public const string StartScene = "StartScene";
-            public const string MainScene = "MainScene";
-            public const string StatusScene = "StatusScene";
-            public const string BattleStartScene = "BattleStartScene";
-            public const string BattleMatchingScene = "BattleMatchingScene";
-            public const string BattleScene = "BattleScene";
-            public const string HelpScene = "HelpScene";
-        }
-
-        /// <summary>
         /// 常量设定
         /// </summary>
         public const string AlertWindowKey = "AlertWindow";
@@ -79,11 +56,6 @@ namespace Core.UI.Utils {
         public static string alertText { get; set; } = "";
 
         /// <summary>
-        /// 场景栈
-        /// </summary>
-        static Stack<string> sceneStack = new Stack<string>();
-
-        /// <summary>
         /// 场景物体托管
         /// </summary>
         static Dictionary<string, UnityEngine.Object> sceneObjectDeposit =
@@ -93,18 +65,42 @@ namespace Core.UI.Utils {
         /// 外部系统
         /// </summary>
         static GameSystem gameSys = null;
+        static SceneSystem sceneSys = null;
         static GameService gameSer = null;
 
         /// <summary>
         /// 初始化界面工具
         /// </summary>
+        /// <param name="scene">当前场景</param>
+        /// <param name="alertWindow">当前场景的提示弹窗</param>
+        /// <param name="loadingWindow">当前场景的加载窗口</param>
         public static void initialize(string scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null) {
-            Debug.Log("Initializing SceneUtils...");
+            Debug.Log("initialize Scene: " + scene);
+            initializeSystems();
+            initializeScene(scene, alertWindow, loadingWindow);
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        static void initializeSystems() {
             if (gameSys == null) gameSys = GameSystem.get();
+            if (sceneSys == null) sceneSys = SceneSystem.get();
             if (gameSer == null) gameSer = GameService.get();
-            Debug.Log("Systems loaded.");
-            if (currentScene() != scene) gotoScene(scene);
+        }
+
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        /// <param name="scene">当前场景</param>
+        /// <param name="alertWindow">当前场景的提示弹窗</param>
+        /// <param name="loadingWindow">当前场景的加载窗口</param>
+        static void initializeScene(string scene,
+            AlertWindow alertWindow = null, 
+            LoadingWindow loadingWindow = null) {
+            if (sceneSys.currentScene() != scene)
+                sceneSys.gotoScene(scene);
             SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
         }
@@ -120,7 +116,12 @@ namespace Core.UI.Utils {
         public static UnityEngine.Object depositSceneObject(string key, UnityEngine.Object obj) {
             //if (key == AlertWindowKey) alertWindow = (AlertWindow)obj;
             //if (key == LoadingWindowKey) loadingWindow = (LoadingWindow)obj;
-            sceneObjectDeposit.Add(key, obj); return obj;
+            Debug.Log("depositSceneObject: " + key + ", " + obj);
+            if (sceneObjectDeposit.ContainsKey(key))
+                sceneObjectDeposit[key] = obj;
+            else
+                sceneObjectDeposit.Add(key, obj);
+            return obj;
         }
         /*
         /// <summary>
@@ -164,84 +165,6 @@ namespace Core.UI.Utils {
         /// </summary>
         public static void clearSceneObjects() {
             sceneObjectDeposit.Clear();
-        }
-
-        /// <summary>
-        /// 当前场景名称
-        /// </summary>
-        /// <returns>场景名称</returns>
-        public static string currentScene() {
-            return sceneStack.Count > 0 ? sceneStack.Peek() : "";
-        }
-
-        /// <summary>
-        /// 真实当前场景名称
-        /// </summary>
-        /// <returns>场景名称</returns>
-        public static string realCurrentScene() {
-            return SceneManager.GetActiveScene().name;
-        }
-
-        /// <summary>
-        /// 是否出现场景分歧
-        /// </summary>
-        /// <returns>是否场景分歧</returns>
-        public static bool differentScene() {
-            return currentScene() != realCurrentScene();
-        }
-
-        /// <summary>
-        /// 返回上一场景（如果上一场景为空则退出游戏）
-        /// </summary>
-        /// <returns>当前场景名称</returns>
-        public static void popScene() {
-            sceneStack.Pop(); loadScene();
-        }
-
-        /// <summary>
-        /// 添加场景（往当前追加场景）
-        /// </summary>
-        /// <param name="scene">场景名称</param>
-        public static void pushScene(string scene) {
-            sceneStack.Push(scene); loadScene();
-        }
-
-        /// <summary>
-        /// 切换场景（替换掉当前场景）
-        /// </summary>
-        /// <param name="scene">场景名称</param>
-        public static void changeScene(string scene) {
-            if (sceneStack.Count > 0) sceneStack.Pop();
-            pushScene(scene);
-        }
-
-        /// <summary>
-        /// 转到场景（前面的场景将被清空）
-        /// </summary>
-        /// <param name="scene">场景名称</param>
-        public static void gotoScene(string scene) {
-            clearScene(); pushScene(scene);
-        }
-
-        /// <summary>
-        /// 清除场景
-        /// </summary>
-        public static void clearScene() {
-            sceneStack.Clear();
-        }
-
-        /// <summary>
-        /// 读取/重新读取当前场景（如果当前场景为空则退出游戏）
-        /// </summary>
-        /// <param name="reload">是否重载</param>
-        public static void loadScene(bool reload = false) {
-            string scene = currentScene();
-            if (scene == "") gameSer.exitGame();
-            // 如果需要重载（强制LoadScene）或者场景分歧
-            else if (reload || differentScene()) {
-                clearSceneObjects();
-                SceneManager.LoadScene(scene);
-            }
         }
 
         #endregion
@@ -318,8 +241,8 @@ namespace Core.UI.Utils {
         /// 更新GameSystem
         /// </summary>
         public static void updateGameSystem() {
-            updateAlert(); updateLoading();
-            updateSceneChanging();
+            updateAlert();
+            updateLoading();
             gameSys.update();
         }
 
@@ -342,24 +265,6 @@ namespace Core.UI.Utils {
                 gameSys.clearRequestLoad();
             }
         }
-
-        /// <summary>
-        /// 更新场景变换（GameSystem的）
-        /// </summary>
-        static void updateSceneChanging() {
-            var req = gameSys.changeScene;
-            if (req != null) {
-                switch (req.type) {
-                    case GameSystem.SceneRequest.Type.Push: pushScene(req.scene); break;
-                    case GameSystem.SceneRequest.Type.Goto: gotoScene(req.scene); break;
-                    case GameSystem.SceneRequest.Type.Change: changeScene(req.scene); break;
-                    case GameSystem.SceneRequest.Type.Pop: popScene(); break;
-                    case GameSystem.SceneRequest.Type.Clear: clearScene(); break;
-                }
-                gameSys.clearChangeScene();
-            }
-        }
-
 
         #endregion
 

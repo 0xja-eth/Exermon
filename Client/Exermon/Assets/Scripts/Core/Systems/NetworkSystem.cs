@@ -219,7 +219,7 @@ namespace Core.Systems {
                 if (req == null) throw new GameException(
                     GameException.Type.RequestObjectNotFound, onError);
                 if (status > 0) throw new GameException(status, errmsg, onError);
-                onSuccess.Invoke(data);
+                onSuccess?.Invoke(data);
             }
 
         }

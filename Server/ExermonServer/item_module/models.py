@@ -2084,7 +2084,8 @@ class BaseContItem(CacheableModel):
 	def __str__(self):
 		# name = type(self).__name__
 		name = self._meta.verbose_name
-		return '%d %s(%s)' % (self.id, name, self.container)
+		owner = self.container.owner() if self.container else None
+		return '%d %s(%s)' % (self.id, name, str(owner))
 
 	def __getattr__(self, item):
 		raise AttributeError(item)
@@ -2586,9 +2587,10 @@ class SlotContItem(BaseContItem):
 		equip_str = ""
 		for i in range(equip_cnt):
 			equip_item = self.equipItem(i)
-			equip_str += " "+str(equip_item)
+			item = equip_item.item if equip_item else None
+			equip_str += " "+str(item)
 
-		return '%s (%d:%s)' % (
+		return '%s (%d: %s)' % (
 			super().__str__(), self.index, equip_str)
 
 	# 用于获取装备
