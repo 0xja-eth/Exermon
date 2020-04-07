@@ -164,7 +164,7 @@ class WebSocket:
 		# 如果不需要返回数据
 		if tag == ChannelLayerTag.NoLayer:
 			print('No layer response:' + str(res))
-			return None
+			return None, tag
 
 		print('response: ' + str(res))
 

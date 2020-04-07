@@ -154,7 +154,7 @@ namespace Core.Systems {
         /// </summary>
         /// <param name="state">新状态</param>
         protected void changeState(int state, bool force = false) {
-            if ((force || hasState(state)) && this.state != state)
+            if ((force || hasState(state)) && this.state != state) 
                 this.state = state;
         }
         protected void changeState(Enum state, bool force = false) {

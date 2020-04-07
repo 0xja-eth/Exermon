@@ -82,18 +82,13 @@ class MatchingPlayer(RuntimeData):
 		"""
 		self.matched = oppo.matched = True
 
-		battle = RuntimeBattle(self.player, oppo.player, self.mode)
-
-		RuntimeManager.add(RuntimeBattle, battle)
-		RuntimeManager.delete(MatchingPlayer, self)
-		RuntimeManager.delete(MatchingPlayer, oppo)
+		RuntimeBattleManager.createBattle(self, oppo)
 
 
 class MatchingManager:
 	"""
 	匹配管理类
 	"""
-
 	Queue: dict = None
 
 	@classmethod
@@ -101,14 +96,15 @@ class MatchingManager:
 		"""
 		读取匹配队列
 		"""
-		if cls.Queue is None:
-			cls.Queue = RuntimeManager.get(MatchingPlayer)
+		cls.Queue = RuntimeManager.get(MatchingPlayer)
 
 	@classmethod
 	async def process(cls):
 		"""
 		每帧处理
 		"""
+		if cls.Queue is None: cls.loadQueue()
+
 		temp = cls.Queue.copy()
 		values = list(temp.values())
 
@@ -654,7 +650,7 @@ class RuntimeAction:
 		return res
 
 
-class RuntimeBattlePlayer:
+class RuntimeBattlePlayer(RuntimeData):
 	"""
 	运行时缓存的对战玩家类
 	"""
@@ -733,6 +729,14 @@ class RuntimeBattlePlayer:
 			self.battle_items.append(battle_item)
 
 	# endregion
+
+	def getKey(self) -> tuple:
+		"""
+		生成该项对应的键
+		Returns:
+			返回双方玩家ID组成的元组
+		"""
+		return self.player.id
 
 	def convertToDict(self, res: dict = None) -> dict:
 		"""
@@ -982,7 +986,7 @@ class RuntimeBattle(RuntimeData):
 	运行时缓存的对战类
 	"""
 	# 后台等待附加时长（秒）
-	BACKEND_DELTA_TIME = 5
+	BACKEND_DELTA_TIME = 15
 
 	# 准备阶段时长（秒）
 	PREPARE_TIME = 15
@@ -1304,7 +1308,7 @@ class RuntimeBattle(RuntimeData):
 
 		self._emit(EmitType.MatchProgress, data)
 
-		self.updateTransition()
+		# self.updateTransition()
 
 	def _generateProgressData(self, player: Player, progress: int) -> dict:
 		"""
@@ -1412,8 +1416,11 @@ class RuntimeBattle(RuntimeData):
 		elif self.status == BattleStatus.Acting:
 			if self.isActionCompleted(): self._startResulting()
 
-		elif self.status == BattleStatus.Acting:
+		elif self.status == BattleStatus.Resulting:
 			if self.isResultCompleted(): self._onRoundTerminated()
+
+		elif self.status == BattleStatus.Terminating:
+			self.status = BattleStatus.Terminated
 
 	# region 状态完成判断
 
@@ -1488,6 +1495,14 @@ class RuntimeBattle(RuntimeData):
 		"""
 		return self.runtime_battler1.hp <= 0 or \
 			self.runtime_battler2.hp <= 0
+
+	def isTerminated(self) -> bool:
+		"""
+		对战是否结束
+		Returns:
+			返回对战是否结束
+		"""
+		return self.status == BattleStatus.Terminated
 
 	# endregion
 
@@ -1578,6 +1593,18 @@ class RuntimeBattle(RuntimeData):
 				type="result", runtime_battler=self.runtime_battler2)
 		}
 
+	def _onRoundTerminated(self):
+		"""
+		回合结束回调
+		"""
+		self.resetRoundStatus()
+
+		self.runtime_battler1.onRoundTerminated()
+		self.runtime_battler2.onRoundTerminated()
+
+		if self.isBattleEnd(): self._startTerminating()
+		else: self._startPreparing()
+
 	def _startTerminating(self):
 		"""
 		开始结束对战
@@ -1599,18 +1626,6 @@ class RuntimeBattle(RuntimeData):
 			'player1': result1.convertToDict(type="result"),
 			'player2': result2.convertToDict(type="result")
 		}
-
-	def _onRoundTerminated(self):
-		"""
-		回合结束回调
-		"""
-		self.resetRoundStatus()
-
-		self.runtime_battler1.onRoundTerminated()
-		self.runtime_battler2.onRoundTerminated()
-
-		if self.isBattleEnd(): self._startTerminating()
-		else: self._startPreparing()
 
 	# endregion
 
@@ -1651,6 +1666,8 @@ class RuntimeBattleManager:
 	"""
 	运行时对战管理类
 	"""
+	Battles: dict = None
+
 	@classmethod
 	def createBattle(cls, player1: MatchingPlayer, player2: MatchingPlayer):
 		"""
@@ -1663,8 +1680,31 @@ class RuntimeBattleManager:
 
 		RuntimeManager.add(RuntimeBattle, battle)
 
-		RuntimeManager.delete(MatchingPlayer, player1)
-		RuntimeManager.delete(MatchingPlayer, player2)
+		RuntimeManager.delete(MatchingPlayer, data=player1)
+		RuntimeManager.delete(MatchingPlayer, data=player2)
+
+	@classmethod
+	def loadBattles(cls):
+		"""
+		读取匹配队列
+		"""
+		cls.Battles = RuntimeManager.get(RuntimeBattle)
+
+	@classmethod
+	def update(cls):
+		"""
+		更新所有对战
+		"""
+		if cls.Battles is None: cls.loadBattles()
+
+		temp = cls.Battles.copy()
+
+		for key in temp:
+			battle: RuntimeBattle = temp[key]
+			battle.updateTransition()
+
+			if battle.isTerminated():
+				RuntimeManager.delete(RuntimeBattle, key)
 
 
 RuntimeManager.register(MatchingPlayer)
@@ -1672,5 +1712,3 @@ RuntimeManager.register(RuntimeBattlePlayer)
 RuntimeManager.register(RuntimeBattle)
 
 RuntimeManager.registerEvent(MatchingManager.process)
-
-MatchingManager.loadQueue()

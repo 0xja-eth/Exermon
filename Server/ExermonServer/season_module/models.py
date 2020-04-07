@@ -187,6 +187,7 @@ class SeasonRecord(models.Model):
 
 		return False
 
+
 # =======================
 # 禁赛记录表
 # =======================
@@ -237,16 +238,13 @@ class CompSeason(GroupConfigure):
 
 	NOT_EXIST_ERROR = ErrorType.SeasonNotExist
 
-	# 排行最大值
-	MAX_RANK = 9999
-
 	# 开始时间
 	start_time = models.DateTimeField(verbose_name="开始时间")
 
 	# 结束时间
 	end_time = models.DateTimeField(verbose_name="结束时间")
 
-	def _convertRanksData(self, count=MAX_RANK, player=None):
+	def _convertRanksData(self, player, count=None):
 		"""
 		转化排行数据
 		Args:
@@ -255,30 +253,17 @@ class CompSeason(GroupConfigure):
 		Returns:
 			返回指定条数的排行数据
 		"""
-		res = []
-		records = self.sortedSeasonRecords(count)
-		count = min(count, len(records))
+		from .runtimes import RankListData, SeasonManager
+		if count is None: count = RankListData.MAX_RANK
 
-		for i in range(count):
-			record: SeasonRecord = records[i]
-			res.append(record.convertToDict('rank', i + 1))
+		rank_list = SeasonManager.getRankList(season=self)
 
-		record, order = self.getPlayerSeasonRecord(player)
-		record = record.convertToDict('rank', order)
+		return rank_list.convertToDict(player, count)
 
-		now = datetime.datetime.now()
-		now = ModelUtils.timeToStr(now)
-
-		return {
-			'ranks': res,
-			'rank': record,
-			'update_time': now
-		}
-
-	def convertToDict(self, type=None, count=MAX_RANK, player=None):
+	def convertToDict(self, type=None, player=None, count=None):
 
 		if type == "ranks":
-			return self._convertRanksData(count, player)
+			return self._convertRanksData(player, count)
 
 		res = super().convertToDict()
 
@@ -298,35 +283,15 @@ class CompSeason(GroupConfigure):
 		"""
 		return self.seasonrecord_set.all()
 
-	def sortedSeasonRecords(self, count: int = MAX_RANK) -> QuerySet:
+	def sortedSeasonRecords(self, count) -> QuerySet:
 		"""
 		获取排序后的赛季记录（根据段位星星排序）
 		Args:
 			count (int): 个数
 		Returns:
-			返回排序后的 QuerySet对 象
+			返回排序后的赛季记录列表
 		"""
 		return list(self.seasonRecords().order_by('-star_num'))[:count]
-
-	def getPlayerSeasonRecord(self, player: 'Player'):
-		"""
-		获取某个玩家的排行
-		Args:
-			player (Player): 玩家
-		Returns:
-			返回玩家在当前赛季的排行（如果没有排行返回 0）
-		"""
-		order = 1
-		record = None
-		records = self.sortedSeasonRecords()
-		for record in records:
-			if record.player_id == player.id: break
-			order += 1
-
-		# 如果不在排行榜内，置为0
-		if order >= self.MAX_RANK: order = 0
-
-		return record, order
 
 
 # =======================
@@ -377,5 +342,9 @@ class CompRank(GroupConfigure):
 
 	# 计算每个段位需要的星星数量
 	def rankStars(self):
+		"""
+		计算段位需要星星数
+		Returns:
+			返回计算后的升级所需段位星星数目
+		"""
 		return self.sub_rank_num * self.STARS_PER_SUBRANK
-

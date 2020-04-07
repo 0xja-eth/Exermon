@@ -67,6 +67,7 @@ namespace UI.BattleMatchingScene.Controls {
         /// <param name="battler">对战者</param>
         void drawBust(RuntimeBattlePlayer battler) {
             if (unknown) unknown.SetActive(false);
+            bust.gameObject.SetActive(true);
             bust.overrideSprite = battler.character().bust;
         }
 

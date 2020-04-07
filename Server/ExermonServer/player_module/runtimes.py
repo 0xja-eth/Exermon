@@ -29,9 +29,13 @@ class OnlinePlayer(RuntimeData):
 		"""
 		删除回调函数
 		"""
-		# RuntimeData.delete(self)
+		from battle_module.runtimes import MatchingPlayer
+
 		if self.consumer is None: return
 		self.consumer.setOnlineInfo(None)
+
+		# 清除对战匹配队列
+		RuntimeManager.delete(MatchingPlayer, self.getKey())
 
 	def getKey(self) -> object:
 		"""

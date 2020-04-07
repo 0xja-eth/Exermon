@@ -21,7 +21,7 @@ class Service:
         # ranks: 赛季排行数据（数组） => 赛季排行
         season = CompSeason.get(id=sid)
 
-        return {'ranks': season.convertToDict('ranks', count, player)}
+        return {'ranks': season.convertToDict('ranks', player, count)}
 
 
 class Common:

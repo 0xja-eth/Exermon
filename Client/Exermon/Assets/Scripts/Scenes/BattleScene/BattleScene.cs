@@ -15,33 +15,19 @@ using PlayerModule.Services;
 using SeasonModule.Services;
 using BattleModule.Services;
 
-using UI.BattleStartScene.Controls;
-using UI.BattleMatchingScene.Controls;
-
 /// <summary>
-/// 对战匹配场景
+/// 对战场景
 /// </summary>
-namespace UI.BattleMatchingScene {
+namespace UI.BattleScene {
 
     /// <summary>
-    /// 对战匹配场景
+    /// 对战场景
     /// </summary>
-    public class BattleMatchingScene : BaseScene {
-
-        /// <summary>
-        /// 文本定义
-        /// </summary>
-        public const string ProgressFormat = "匹配成功！正在加载对战场景… {0}%";
+    public class BattleScene : BaseScene {
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public TopInfoDisplay topInfoDisplay;
-        public BattlerDisplay selfBattler;
-        public BattlerDisplay oppoBattler;
-        public MatchingClock clock;
-
-        public Text progress;
 
         /// <summary>
         /// 内部系统声明
@@ -57,7 +43,7 @@ namespace UI.BattleMatchingScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneSystem.Scene.BattleMatchingScene;
+            return SceneSystem.Scene.BattleScene;
         }
 
         /// <summary>
@@ -83,10 +69,7 @@ namespace UI.BattleMatchingScene {
         /// </summary>
         protected override void start() {
             base.start();
-            clock.startTimer();
-            topInfoDisplay.startView(playerSer.player);
-            selfBattler.setItem(playerSer.player);
-            progress.text = "";
+            onPerparing();
         }
 
         #endregion
@@ -110,20 +93,7 @@ namespace UI.BattleMatchingScene {
         #endregion
 
         #region 流程控制
-
-        /// <summary>
-        /// 取消匹配
-        /// </summary>
-        public void cancelMatch() {
-            battleSer.cancelMatch(onMatchCancelled);
-        }
-
-        /// <summary>
-        /// 匹配取消回调
-        /// </summary>
-        void onMatchCancelled() {
-            popScene();
-        }
+        
 
         #region 状态回调处理
 
@@ -132,55 +102,55 @@ namespace UI.BattleMatchingScene {
         /// </summary>
         void onStateChanged() {
             switch ((BattleService.State)battleSer.state) {
-                case BattleService.State.Matched: onMatched(); break;
-                case BattleService.State.Preparing: onBattleStart(); break;
+                case BattleService.State.Preparing: onPerparing(); break;
+                case BattleService.State.Questing: onQuesting(); break;
+                case BattleService.State.Quested: onQuested(); break;
+                case BattleService.State.Acting: onActing(); break;
+                case BattleService.State.Resulting: onResulting(); break;
+                case BattleService.State.Terminating: onTerminating(); break;
             }
         }
 
         /// <summary>
-        /// 匹配完成
+        /// 准备状态
         /// </summary>
-        void onMatched() {
-            var battle = battleSer.battle;
-            selfBattler.setItem(battle.self());
-            oppoBattler.setItem(battle.oppo());
-            prepareBattleScene();
+        void onPerparing() {
+
         }
 
         /// <summary>
-        /// 发送进度
+        /// 答题状态
         /// </summary>
-        /// <param name="progress">设置进度</param>
-        void setProgress(float progress) {
-            int progress_ = (int)Mathf.Round(progress * 100);
-            battleSer.matchProgress(progress_);
-            onProgresss();
+        void onQuesting() {
+
         }
 
         /// <summary>
-        /// 匹配进度回调
+        /// 答题完毕
         /// </summary>
-        void onProgresss() {
-            var battle = battleSer.battle;
-            selfBattler.requestRefresh(true);
-            oppoBattler.requestRefresh(true);
-            progress.text = string.Format(
-                ProgressFormat, battle.self().progress);
+        void onQuested() {
+
         }
 
         /// <summary>
-        /// 匹配进度回调
+        /// 开始行动完毕
         /// </summary>
-        void onBattleStart() {
-            sceneSys.operReady = true;
+        void onActing() {
+
         }
 
         /// <summary>
-        /// 准备开始游戏
+        /// 回合结算
         /// </summary>
-        void prepareBattleScene() {
-            sceneSys.changeScene(SceneSystem.Scene.BattleScene, true);
-            createCoroutine(sceneSys.startAsync(setProgress));
+        void onResulting() {
+
+        }
+
+        /// <summary>
+        /// 对战结束
+        /// </summary>
+        void onTerminating() {
+
         }
 
         #endregion

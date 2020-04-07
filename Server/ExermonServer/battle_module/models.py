@@ -478,7 +478,7 @@ class BattleRecord(CacheableModel):
 
 	# endregion
 
-	def subjects(self) -> list:
+	def subjects(self) -> set:
 		"""
 		获取对战玩家所选的科目数据
 		Returns:
@@ -552,7 +552,7 @@ class BattleRound(models.Model):
 		Returns:
 			随机生成的科目, 题目星级
 		"""
-		return random.choice(self.record.subjects()), \
+		return random.choice(list(self.record.subjects())), \
 			   random.choice(QuestionStar.objs())
 
 	def _generateConfigurePlayer(self) -> Player:

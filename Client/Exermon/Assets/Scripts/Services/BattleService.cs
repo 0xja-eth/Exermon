@@ -60,6 +60,7 @@ namespace BattleModule.Services {
             Matched = 10, // 匹配完毕
             Preparing = 2, // 准备中
             Questing = 3, // 作答中
+            Quested = 11, // 作答完毕
             Acting = 4, // 行动中
             Resulting = 5, // 结算中
             Terminating = 6, // 结束中
@@ -106,8 +107,10 @@ namespace BattleModule.Services {
             base.initializeStateDict();
             addStateDict(State.NotInBattle);
             addStateDict(State.Matching);
+            addStateDict(State.Matched);
             addStateDict(State.Preparing);
             addStateDict(State.Questing);
+            addStateDict(State.Quested);
             addStateDict(State.Acting);
             addStateDict(State.Resulting);
             addStateDict(State.Terminating);
@@ -413,6 +416,8 @@ namespace BattleModule.Services {
 
         #region 接收发射信息
 
+        #region 状态控制
+
         /// <summary>
         /// 匹配成功回调
         /// </summary>
@@ -438,6 +443,7 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onNewRound(JsonData data) {
             battle = DataLoader.load<RuntimeBattle>(data);
+            changeState(State.Preparing);
         }
 
         /// <summary>
@@ -445,7 +451,7 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="data"></param>
         void onPrepareCompleted(JsonData data) {
-
+            changeState(State.Questing);
         }
 
         /// <summary>
@@ -457,6 +463,7 @@ namespace BattleModule.Services {
             var correct = DataLoader.load<bool>(data, "correct");
             var timespan = DataLoader.load<int>(data, "timespan");
             battle.loadAnswer(pid, correct, timespan);
+            changeState(State.Quested);
         }
 
         /// <summary>
@@ -465,6 +472,7 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onActionStart(JsonData data) {
             battle.loadActions(data);
+            changeState(State.Acting);
         }
 
         /// <summary>
@@ -473,6 +481,7 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onRoundResult(JsonData data) {
             battle = DataLoader.load<RuntimeBattle>(data);
+            changeState(State.Resulting);
         }
 
         /// <summary>
@@ -481,7 +490,12 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onBattleResult(JsonData data) {
             battle.loadResults(data);
+            changeState(State.Terminating);
         }
+
+        #endregion
+
+        #region 状态判断
 
         /// <summary>
         /// 是否匹配完成
@@ -490,6 +504,8 @@ namespace BattleModule.Services {
         public bool isMatchingCompleted() {
             return battle.isMatchingCompleted();
         }
+
+        #endregion
 
         #endregion
     }

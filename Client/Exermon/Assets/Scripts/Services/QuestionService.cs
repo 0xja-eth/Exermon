@@ -153,9 +153,13 @@ namespace QuestionModule.Services {
         /// <summary>
         /// 读取题目（先判断缓存）
         /// </summary>
-        /// <param name="qids">题目ID集</param>
+        /// <param name="qid">题目ID</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
+        public void loadQuestion(int qid, UnityAction onSuccess = null, UnityAction onError = null) {
+            loadQuestions(new int[] { qid }, onSuccess, onError);
+        }
+        /// <param name="qids">题目ID集</param>
         public void loadQuestions(int[] qids, UnityAction onSuccess = null, UnityAction onError = null) {
             var cnt = qids.Length;
             var reqIds = new List<int>(); // 需要请求的题目ID数组
