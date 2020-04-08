@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<style type="text/css">
+		body{
+			width: 100%;
+			height: 100%;
+		}
+		#form-block{
+			position: fixed;
+			right: 0;
+			top: 0;
+			height: 50%;
+			transform: translateY(50%);
+			width: 50%;
+			background: white;
+		}
+			#form-container{
+				position: absolute;
+				top: 24px;
+				left: 4px; right: 4px;
+				bottom: 4px;
+			}
+			#form{
+				width: 100%;
+				height: 100%;
+				border: none;
+			}
+		.block{
+			border-style: solid;
+			border-color: black;
+			margin: 4px;
+			padding: 4px;
+		}
+	</style>
+</head>
+<body>
+	<div class="block">
+		Upload<br>
+		<form id="local_push" enctype="multipart/form-data" target="form"
+              action="http://127.0.0.1:8000/question/upload" method="post">
+			auth: <input type="text" name="auth"><br>
+			<input type="submit" value="Submit">
+		</form>
+	</div>
+	<div id="form-block" class="block">
+		Respone:<br>
+		<div id="form-container">
+		<iframe id="form" name="form"></iframe>
+		</div>
+	</div>
+	<script type="text/javascript">
+	</script>
+</body>
+</html>

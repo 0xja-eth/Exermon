@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import JsonResponse
 from django.urls import path
+from django.shortcuts import render
 from utils.exception import ErrorType, GameException
 import json, datetime, traceback
 
@@ -25,7 +26,7 @@ class HTTP:
 
 	# 接收请求
 	@classmethod
-	def _receiveRequest(cls, request, func, method='POST', params=[], files=[]):
+	def _receiveRequest(cls, request, func, method='POST', params=[], files=[], render_=False):
 
 		res = dict()
 
@@ -33,8 +34,12 @@ class HTTP:
 			# 获取数据
 			data = cls._getRequestDict(request, method=method, params=params, files=files)
 
-			# 进行业务操作并返回结果到 res['data'] 中
-			res['data'] = func(**data)
+			if render_:
+				# 返回渲染的页面
+				return render(request, func(**data))
+			else:
+				# 进行业务操作并返回结果到 res['data'] 中
+				res['data'] = func(**data)
 
 		except GameException as exception:
 			# 打印错误路径
@@ -58,13 +63,10 @@ class HTTP:
 		if method.upper() != request.META['REQUEST_METHOD']:
 			raise GameException(ErrorType.InvalidRequest)
 
-		body = request.body.decode()
-
 		# 解析传入的 JSON 数据
-		if body:
-			request_data = json.loads(body)
-		else:
-			request_data = dict()
+		request_data = dict()
+		if method == "GET": request_data = dict(request.GET)
+		if method == "POST": request_data = dict(request.POST)
 
 		# 具体处理函数
 		data = Common.getRequestDict(request_data, params, data)

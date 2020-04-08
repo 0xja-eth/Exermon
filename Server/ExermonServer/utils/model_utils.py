@@ -286,7 +286,7 @@ class QuestionImageUpload(SystemImageUpload):
 		ext = os.path.splitext(filename)[1]
 
 		# 定义文件名
-		filename = "question_%d" % instance.id
+		filename = "question_%d" % instance.question.id
 
 		return filename+ext
 

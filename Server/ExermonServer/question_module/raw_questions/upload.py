@@ -8,7 +8,7 @@ def doPreprocess():
 
 	for sub_id in range(9):
 		try:
-			with open('subject_%d.que' % (sub_id + 1), 'r', encoding='utf-8') as file:
+			with open('question_module/raw_questions/subject_%d.json' % (sub_id + 1), 'r', encoding='utf-8') as file:
 				data = file.read()
 				data = json.loads(data)
 
@@ -117,7 +117,7 @@ def processType(choices):
 def processPictures(pictures):
 	files = []
 	for picture in pictures:
-		files.append(File(open('/' + picture, 'rb')))
+		files.append(File(open('question_module/raw_questions/' + picture, 'rb')))
 
 	return files
 

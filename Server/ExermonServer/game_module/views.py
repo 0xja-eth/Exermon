@@ -10,6 +10,14 @@ from utils.exception import ErrorType, GameException
 # =======================
 class Service:
 
+	# 进入简陋后台界面
+	@classmethod
+	def backend(cls, auth: str):
+		# 返回数据：无
+		ViewUtils.ensureAuth(auth[0])
+
+		return 'backend_admin.html'
+
 	# 获取静态数据
 	@classmethod
 	async def getStaticData(cls, consumer, main_version: str, sub_version: str, cached: bool):

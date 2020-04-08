@@ -47,6 +47,60 @@ class Service:
 
 		QuesReport.create(player, qid, type, description)
 
+	# 上传题目
+	@classmethod
+	def upload(cls, auth: str):
+		# 返回数据：无
+		ViewUtils.ensureAuth(auth[0])
+
+		from .raw_questions.upload import doPreprocess
+
+		questions = doPreprocess()
+
+		cnt = len(questions)
+		ques_index = 1
+
+		for q in questions:
+			print('saving: %d/%d' % (ques_index, cnt))
+			ques_index += 1
+			cls._upload(q)
+
+	@classmethod
+	def _upload(cls, q):
+		question = Question()
+		question.title = q['title']
+		question.score = q['score']
+		question.level_id = q['level'] + 1
+		question.subject_id = q['subjectId'] + 1
+		question.type = q['type'].value
+		question.save()
+
+		index = 1
+		for c in q['choices']:
+			cls.__uploadChoice(c, index, question)
+			index += 1
+
+		index = 1
+		for p in q['pictures']:
+			cls.__uploadPicture(p, index, question)
+			index += 1
+
+	@classmethod
+	def __uploadChoice(cls, c, index, question):
+		choice = QuesChoice()
+		choice.order = index
+		choice.text = c['text']
+		choice.answer = c['ans']
+		choice.question = question
+		choice.save()
+
+	@classmethod
+	def __uploadPicture(cls, p, index, question):
+		picture = QuesPicture()
+		picture.number = index
+		picture.file = p
+		picture.question = question
+		picture.save()
 
 # ====================
 # 题目校验类，封装管理题目模块的参数格式是否正确-lgy

@@ -12,7 +12,7 @@ namespace UI.BattleMatchingScene.Controls {
     /// <summary>
     /// 匹配用时显示
     /// </summary>
-    public class MatchingClock : BaseView{
+    public class MatchingClock : BaseView {
 
         /// <summary>
         /// 常量定义
