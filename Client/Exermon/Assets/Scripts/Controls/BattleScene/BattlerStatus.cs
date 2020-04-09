@@ -29,7 +29,7 @@ namespace UI.BattleScene.Controls {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Image bust;
+        public Image face;
         public Text name, hpText;
         public Image hpBar;
 
@@ -62,8 +62,8 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawBust(RuntimeBattlePlayer battler) {
-            bust.gameObject.SetActive(true);
-            bust.overrideSprite = battler.character().bust;
+            face.gameObject.SetActive(true);
+            face.overrideSprite = battler.character().face;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace UI.BattleScene.Controls {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
-            bust.gameObject.SetActive(false);
+            face.gameObject.SetActive(false);
             name.text = hpText.text = "";
             hpBar.fillAmount = 0;
         }

@@ -3,12 +3,15 @@ from utils.exception import ErrorType, GameException
 from question_module.models import QuestionType
 import os, json, re, random, traceback
 
+PATH_ROOT = "question_module/raw_questions/"
+
+
 def doPreprocess():
 	questions = []
 
 	for sub_id in range(9):
 		try:
-			with open('question_module/raw_questions/subject_%d.json' % (sub_id + 1), 'r', encoding='utf-8') as file:
+			with open(PATH_ROOT+'subject_%d.json' % (sub_id + 1), 'r', encoding='utf-8') as file:
 				data = file.read()
 				data = json.loads(data)
 
@@ -43,7 +46,7 @@ def processData(subject_id, data):
 def processQuestion(subject_id, question):
 	question['subjectId'] = subject_id
 	question['title'] = processTitle(question['title'])
-	question['level'] = processLevel(question['level'])
+	question['star'], question['level'] = processLevel(question['level'])
 	question['choices'] = processChoices(question['choices'])
 
 	if 'description' in question:
@@ -77,17 +80,19 @@ def processDescription(description):
 
 def processLevel(level):
 	if isinstance(level, int):
-		return level
+		star = level
 	else:
 		reg = r'\d\.\d+'
 		r = re.search(reg, level)
 		r = float(r.group(0))
-		if r >= 0.9: return random.randint(0, 1)
-		if r >= 0.8: return random.randint(1, 2)
-		if r >= 0.7: return random.randint(2, 3)
-		if r >= 0.6: return random.randint(3, 4)
-		if r >= 0.5: return random.randint(4, 5)
-		return 5
+		if r >= 0.9: star = random.randint(0, 1)
+		elif r >= 0.8: star = random.randint(1, 2)
+		elif r >= 0.7: star = random.randint(2, 3)
+		elif r >= 0.6: star = random.randint(3, 4)
+		elif r >= 0.5: star = random.randint(4, 5)
+		else: star = 5
+
+	return star, random.randint(-3, 3)
 
 
 def processChoices(choices):
@@ -117,7 +122,7 @@ def processType(choices):
 def processPictures(pictures):
 	files = []
 	for picture in pictures:
-		files.append(File(open('question_module/raw_questions/' + picture, 'rb')))
+		files.append(File(open(PATH_ROOT + picture, 'rb')))
 
 	return files
 

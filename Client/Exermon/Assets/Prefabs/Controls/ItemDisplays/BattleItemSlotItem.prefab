@@ -84,8 +84,8 @@ GameObject:
   - component: {fileID: 1103845097006138788}
   - component: {fileID: 1103845097006138810}
   - component: {fileID: 1103845097006138811}
-  - component: {fileID: 1071980280542611619}
   - component: {fileID: 7888392348774250312}
+  - component: {fileID: 4859427426383500716}
   m_Layer: 5
   m_Name: BattleItemSlotItem
   m_TagString: Untagged
@@ -154,41 +154,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1071980280542611619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1103845097006138789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9906b1de862851445a22e4c52fc18afb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  background: {fileID: 1103845097006138811}
-  selectedFlag: {fileID: 3399053764204373375}
-  checkedFlag: {fileID: 0}
-  highlightFlag: {fileID: 4031228269457962022}
-  actived: 1
-  selectable: 1
-  checkable: 0
-  highlightable: 1
-  forceChecked: 0
-  normalColor: {r: 1, g: 1, b: 1, a: 0}
-  emptyColor: {r: 1, g: 1, b: 1, a: 0}
-  selectedColor: {r: 1, g: 1, b: 1, a: 0}
-  checkedColor: {r: 1, g: 1, b: 1, a: 0}
-  highlightColor: {r: 1, g: 1, b: 1, a: 0}
-  disableColor: {r: 1, g: 1, b: 1, a: 0}
-  draggingFlag: {fileID: 0}
-  draggingParent: {fileID: 0}
-  draggable: 1
-  createDragObj: 1
-  draggingAlpha: 0.75
-  draggingColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
-  icon: {fileID: 1103845095285766788}
-  count: {fileID: 0}
 --- !u!114 &7888392348774250312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,6 +168,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 2
   m_AspectRatio: 1
+--- !u!114 &4859427426383500716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1103845097006138789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 825dbf53502ef9e4dbd66bb33ca2f730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 1103845097006138811}
+  selectedFlag: {fileID: 3399053764204373375}
+  checkedFlag: {fileID: 3360754674630921085}
+  highlightFlag: {fileID: 4031228269457962022}
+  actived: 1
+  selectable: 1
+  checkable: 0
+  highlightable: 1
+  forceChecked: 0
+  normalColor: {r: 1, g: 1, b: 1, a: 0}
+  emptyColor: {r: 1, g: 1, b: 1, a: 0}
+  selectedColor: {r: 1, g: 1, b: 0.75, a: 0}
+  checkedColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
+  highlightColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
+  disableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+  name: {fileID: 2090121384731482749}
+  freeze: {fileID: 4317723060075340163}
+  icon: {fileID: 1103845095285766788}
 --- !u!1 &3360754674630921085
 GameObject:
   m_ObjectHideFlags: 0

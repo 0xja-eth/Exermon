@@ -16,9 +16,7 @@ using BattleModule.Services;
 using UI.Common.Controls.ParamDisplays;
 
 using UI.BattleScene.Controls;
-using UI.BattleScene.Controls.Prepare;
-
-using UI.Common.Controls.ItemDisplays;
+using UI.BattleScene.Controls.Question;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -26,29 +24,25 @@ using UI.Common.Controls.ItemDisplays;
 namespace UI.BattleScene.Windows {
 
     /// <summary>
-    /// 准备窗口
+    /// 题目窗口
     /// </summary>
-    public class PrepareWindow : BaseWindow {
+    public class QuestionWindow : BaseWindow {
 
         /// <summary>
-        /// 半常量定义
+        /// 常量定义
         /// </summary>
-        public const int PrepareTime = 30; // 准备时间（秒）
-
-        /// <summary>
-        /// 文本常量定义
-        /// </summary>
+        public const string NotStartedAlertText = "尚未开始作答！";
+        public const string EmptyAlertText = "未选择答案！";
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public QuestionInfo questionInfo;
-        public ItemTabController tabController;
+        public QuestionDisplay questionDisplay;
         public BattleClock battleClock;
         public BattlerStatus selfStatus, oppoStatus;
-        public BattleItemSlotDisplay battleItemSlotDisplay;
 
-        public GameObject prepareControl;
+        public QuesChoiceContainer choiceContainer;
 
         /// <summary>
         /// 内部变量声明
@@ -104,7 +98,7 @@ namespace UI.BattleScene.Windows {
         /// 更新准备时间
         /// </summary>
         void updateBattleClock() {
-            if (battleClock.isTimeUp()) pass();
+            if (battleClock.isTimeUp()) pushAnswer(true);
         }
 
         #endregion
@@ -116,7 +110,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public override void startWindow() {
             base.startWindow();
-            prepareControl.SetActive(true);
+            choiceContainer.startView();
         }
 
         /// <summary>
@@ -124,11 +118,11 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public override void terminateWindow() {
             base.terminateWindow();
-            prepareControl.SetActive(false);
+            choiceContainer.terminateView();
         }
 
         #endregion
-
+        
         #region 数据控制
 
         #endregion
@@ -140,19 +134,18 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            var containerDisplays = new
-                IContainerDisplay[] { battleItemSlotDisplay };
-            tabController.configure(containerDisplays);
-
             var battle = battleSer.battle;
+            var question = battle.round.question();
+
             questionInfo.setItem(battle.round);
-            battleClock.startTimer(PrepareTime);
+
+            questionDisplay.setItem(question);
+            battleClock.startTimer(question.star().stdTime);
 
             selfStatus.setItem(battle.self());
             oppoStatus.setItem(battle.oppo());
 
-            var battleItems = battle.self().battleItems;
-            battleItemSlotDisplay.setItems(battleItems);
+            questionDisplay.startQuestion();
         }
 
         /// <summary>
@@ -163,28 +156,48 @@ namespace UI.BattleScene.Windows {
             questionInfo.requestClear(true);
             battleClock.requestClear(true);
 
+            questionDisplay.requestClear(true);
+
             selfStatus.requestClear(true);
             oppoStatus.requestClear(true);
-
-            battleItemSlotDisplay.clearItems();
         }
 
         #endregion
 
         #region 流程控制
-
+        
         /// <summary>
-        /// 跳过
+        /// 题目结果回调
         /// </summary>
-        public void pass() {
-
+        public void onQuested() {
+            var battle = battleSer.battle;
+            questionDisplay.result = battle.self();
         }
 
         /// <summary>
         /// 确认
         /// </summary>
         public void confirm() {
+            pushAnswer(false);
+        }
 
+        /// <summary>
+        /// 上传答案
+        /// </summary>
+        /// <param name="force">是否强制提交</param>
+        void pushAnswer(bool force = false) {
+            if (!questionDisplay.isStarted())
+                gameSys.requestAlert(NotStartedAlertText);
+            else {
+                var selection = questionDisplay.getSelectionIds();
+                var timespan = questionDisplay.getTimeSpan();
+
+                if (selection.Length <= 0 && !force)
+                    gameSys.requestAlert(EmptyAlertText);
+                else
+                    battleSer.questionAnswer(selection, timespan,
+                        questionDisplay.terminateQuestion);
+            }
         }
 
         #endregion

@@ -115,7 +115,25 @@ namespace RecordModule.Data {
         /// <summary>
         /// 玩家题目记录数据
         /// </summary>
-        public class PlayerQuestion : BaseData {
+        public interface IQuestionResult {
+
+            /// <summary>
+            /// 当前选择
+            /// </summary>
+            /// <returns>返回当前选择</returns>
+            int[] getSelection();
+
+            /// <summary>
+            /// 做题用时（毫秒）
+            /// </summary>
+            /// <returns>返回做题用时</returns>
+            int getTimespan();
+        }
+
+        /// <summary>
+        /// 玩家题目记录数据
+        /// </summary>
+        public class PlayerQuestion : BaseData, IQuestionResult {
 
             /// <summary>
             /// 属性
@@ -142,6 +160,18 @@ namespace RecordModule.Data {
             public Question question() {
                 return QuestionService.get().getQuestion(questionId);
             }
+
+            /// <summary>
+            /// 当前选择
+            /// </summary>
+            /// <returns>返回当前选择</returns>
+            public int[] getSelection() { return selection; }
+
+            /// <summary>
+            /// 做题用时（毫秒）
+            /// </summary>
+            /// <returns>返回做题用时</returns>
+            public int getTimespan() { return timespan; }
         }
 
         /// <summary>

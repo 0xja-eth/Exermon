@@ -38,6 +38,14 @@ namespace Core.UI {
                 t.onValueChanged.AddListener(onTabChanged);
         }
 
+        /// <summary>
+        /// 配置
+        /// </summary>
+        public void configure(T[] contents) {
+            this.contents = contents;
+            base.configure();
+        }
+
         #endregion
 
         #region 启动控制

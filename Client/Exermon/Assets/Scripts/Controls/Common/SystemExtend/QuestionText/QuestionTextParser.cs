@@ -219,9 +219,11 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <param name="text">文本</param>
         public void parseText(string text) {
             initialize();
+
             oriText = generateOriText(text);
             resText = generateResText(oriText);
             meshText = generateCharData(resText);
+
             configChars();
 
             QuestionText.TestLog("oriText: " + oriText);

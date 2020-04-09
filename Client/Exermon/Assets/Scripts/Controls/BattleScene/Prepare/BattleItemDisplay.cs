@@ -1,15 +1,10 @@
 ﻿
-using UnityEngine;
 using UnityEngine.UI;
-
-using ItemModule.Data;
-using PlayerModule.Data;
 
 using BattleModule.Data;
 using BattleModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
-using UnityEngine.Events;
 
 namespace UI.BattleScene.Controls.Prepare {
 
@@ -17,7 +12,7 @@ namespace UI.BattleScene.Controls.Prepare {
     /// 对战物资槽物品显示
     /// </summary
     public class BattleItemDisplay : 
-        ItemDisplay<RuntimeBattleItem> {
+        SelectableItemDisplay<RuntimeBattleItem> {
 
         /// <summary>
         /// 常量定义
@@ -43,6 +38,18 @@ namespace UI.BattleScene.Controls.Prepare {
         protected override void initializeSystems() {
             base.initializeSystems();
             battleSer = BattleService.get();
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 是否可以选中
+        /// </summary>
+        /// <returns>可否选中</returns>
+        public override bool isCheckable() {
+            return base.isCheckable() && item.freezeRound == 0;
         }
 
         #endregion

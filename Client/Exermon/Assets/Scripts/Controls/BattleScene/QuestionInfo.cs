@@ -9,7 +9,7 @@ using UI.Common.Controls.ParamDisplays;
 /// <summary>
 /// 准备状态控件
 /// </summary>
-namespace UI.BattleScene.Controls.Prepare {
+namespace UI.BattleScene.Controls {
 
     /// <summary>
     /// 题目信息控件

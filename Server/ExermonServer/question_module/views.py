@@ -70,7 +70,8 @@ class Service:
 		question = Question()
 		question.title = q['title']
 		question.score = q['score']
-		question.level_id = q['level'] + 1
+		question.star_id = q['star'] + 1
+		question.level = q['level']
 		question.subject_id = q['subjectId'] + 1
 		question.type = q['type'].value
 		question.save()

@@ -15,7 +15,7 @@ namespace UI.BattleScene.Controls.Prepare {
     /// 状态页控制组
     /// </summary>
     public class ItemTabController : 
-        TabView<ContainerDisplay<BaseContItem>> {
+        TabView<IContainerDisplay> {
 
         /// <summary>
         /// 常量定义
@@ -35,7 +35,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(
-            ContainerDisplay<BaseContItem> content, int index) {
+            IContainerDisplay content, int index) {
             content.startView(0);
         }
 
@@ -44,7 +44,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         /// <param name="content"></param>
         protected override void hideContent(
-            ContainerDisplay<BaseContItem> content, int index) {
+            IContainerDisplay content, int index) {
             content.terminateView();
         }
 
@@ -70,5 +70,4 @@ namespace UI.BattleScene.Controls.Prepare {
 
         #endregion
     }
-
 }

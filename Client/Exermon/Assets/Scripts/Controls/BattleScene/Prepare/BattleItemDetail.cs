@@ -1,16 +1,13 @@
 ﻿
-using UnityEngine;
 using UnityEngine.UI;
 
-using Core.Data.Loaders;
-
-using ItemModule.Data;
-using PlayerModule.Data;
 using BattleModule.Data;
 
-using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
+/// <summary>
+/// 对战界面准备窗口控件
+/// </summary>
 namespace UI.BattleScene.Controls.Prepare {
 
     /// <summary>
@@ -21,13 +18,13 @@ namespace UI.BattleScene.Controls.Prepare {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const string NameFormat = "名称：{0}";
-        const string DescFormat = "描述：{0}";
+        const string TitleText = "选择物资";
+        const string InfoFormat = "名称：{0}\n描述：{1}";
 
         /// <summary>
         /// 外部变量定义
         /// </summary>
-        public Text name, description;
+        public Text title, info;
 
         /// <summary>
         /// 内部变量定义
@@ -51,10 +48,11 @@ namespace UI.BattleScene.Controls.Prepare {
             base.drawExactlyItem(runtimeItem);
             var item = runtimeItem.battleItemSlotItem().item();
 
-            if (item != null) {
-                name.text = string.Format(NameFormat, item.name);
-                description.text = string.Format(DescFormat, item.description);
-            }
+            title.text = TitleText;
+
+            if (item != null) 
+                info.text = string.Format(InfoFormat, 
+                    item.name, item.description);
         }
         
         /// <summary>
@@ -62,7 +60,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         protected override void clearItem() {
             base.clearItem();
-            name.text = description.text = "";
+            title.text = info.text = "";
         }
 
         #endregion

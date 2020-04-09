@@ -1,13 +1,6 @@
 ﻿
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-
-using LitJson;
-using UnityEditor;
 
 using Core.Data;
 
@@ -15,6 +8,7 @@ using GameModule.Data;
 using GameModule.Services;
 
 using ItemModule.Data;
+using RecordModule.Data;
 
 /// <summary>
 /// 题目模块
@@ -30,6 +24,16 @@ namespace QuestionModule.Data {
     /// 题目数据
     /// </summary>
     public class Question : BaseData {
+
+        /// <summary>
+        /// 题目类型
+        /// </summary>
+        public enum Type {
+            Single = 0,  // 单选题
+            Multiple = 1,  // 多选题
+            Judge = 2,  // 判断题
+            Other = -1,  // 其他
+        }
 
         /// <summary>
         /// 题目选项数据
@@ -50,6 +54,22 @@ namespace QuestionModule.Data {
             public string text { get; protected set; }
             [AutoConvert]
             public bool answer { get; protected set; }
+
+            /// <summary>
+            /// 是否选择
+            /// </summary>
+            /// <param name="result">结果</param>
+            /// <returns>返回该选项是否在所给的选择中</returns>
+            public bool isInSelection(
+                QuestionSetRecord.IQuestionResult result) {
+                return isInSelection(result.getSelection());
+            }
+            /// <param name="selection">选择</param>
+            public bool isInSelection(int[] selection) {
+                for (int i = 0; i < selection.Length; ++i)
+                    if (selection[i] == order) return true;
+                return false;
+            }
         }
 
         /// <summary>
@@ -137,8 +157,43 @@ namespace QuestionModule.Data {
             return DataService.get().questionStatus(status).Item2;
         }
 
-        #endregion
+        /// <summary>
+        /// 是否多选
+        /// </summary>
+        /// <returns>返回当前题目是否多选</returns>
+        public bool isMultiple() {
+            return type == (int)Type.Multiple;
+        }
 
+        /// <summary>
+        /// 纹理数组
+        /// </summary>
+        /// <returns>返回纹理数组</returns>
+        public Texture2D[] textures() {
+            var res = new Texture2D[pictures.Length];
+            for (int i = 0; i < pictures.Length; ++i)
+                res[i] = pictures[i].data;
+            return res;
+        }
+
+        /// <summary>
+        /// 打乱的选项
+        /// </summary>
+        /// <returns>返回打乱的选项</returns>
+        public Choice[] shuffleChoices() {
+            int map = 0, cnt = choices.Length;
+            var res = new Choice[cnt];
+            for(int i = 0; i < cnt; ++i) {
+                int index = UnityEngine.Random.Range(0, cnt);
+                while ((map & (1 << index)) != 0)
+                    index = UnityEngine.Random.Range(0, cnt);
+                res[index] = choices[i];
+                map = map | (1 << index);
+            }
+            return res;
+        }
+
+        #endregion
     }
 
     /// <summary>

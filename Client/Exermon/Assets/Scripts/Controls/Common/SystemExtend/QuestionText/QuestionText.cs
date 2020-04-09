@@ -4,9 +4,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 using Core.Systems;
 using Core.UI.Utils;
+
+using UI.Common.Controls.ItemDisplays;
 
 /// <summary>
 /// 系统拓展控件
@@ -54,6 +57,22 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             /// <summary>
             /// 获取纹理
             /// </summary>
+            /// <returns>纹理数组</returns>
+            public static Texture2D[] getTextures() {
+                return textures;
+            }
+
+            /// <summary>
+            /// 获取纹理
+            /// </summary>
+            /// <returns>纹理数组</returns>
+            public static void clearTextures() {
+                textures = new Texture2D[0];
+            }
+
+            /// <summary>
+            /// 获取纹理
+            /// </summary>
             /// <param name="index">索引</param>
             /// <returns>纹理</returns>
             public static Texture2D getTexture(int index) {
@@ -76,6 +95,16 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         private List<TextHandler> handlers;
 
         /// <summary>
+        /// 嵌入图片
+        /// </summary>
+        [SerializeField]
+        private bool _embedImage;
+        public bool embedImage {
+            get { return _embedImage; }
+            set { _embedImage = value; }
+        }
+
+        /// <summary>
         /// 纹理
         /// </summary>
         [SerializeField]
@@ -95,6 +124,26 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             set { _imagePrefab = value; }
         }
 
+        /// <summary>
+        /// 图片链接点击回调
+        /// </summary>
+        [SerializeField]
+        private UnityAction<int> _onImageLinkClick = null;
+        public UnityAction<int> onImageLinkClick {
+            get { return _onImageLinkClick; }
+            set { _onImageLinkClick = value; }
+        }
+
+        /// <summary>
+        /// 图片容器控件
+        /// </summary>
+        [SerializeField]
+        private ContainerDisplay<Texture2D> _imageContainer = null;
+        public ContainerDisplay<Texture2D> imageContainer {
+            get { return _imageContainer; }
+            set { _imageContainer = value; }
+        }
+        
         /// <summary>
         /// 空格宽度
         /// </summary>
@@ -248,7 +297,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// 重载基类 SetVerticesDirty 函数
         /// </summary>
         public override void SetVerticesDirty() {
-            QuestionText.TestLog("SetVerticesDirty");
+            TestLog("SetVerticesDirty");
 
             base.SetVerticesDirty();
             //if (lastText != m_Text) {
@@ -539,9 +588,14 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         public const string QuadTagFormat = "<quad size={0} width={1}/>";
 
         /// <summary>
+        /// 图片文本
+        /// </summary>
+        public const string ImageFormat = "<color=blue>[图片{0}]</color>";
+
+        /// <summary>
         /// 未知图片文本
         /// </summary>
-        public const string UnknownImageText = "[未知图片]";
+        public const string UnknownImageText = "<color=grey>[未知图片]</color>";
 
         /// <summary>
         /// 图片前后各拓展的宽度（像素）
@@ -557,12 +611,13 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// 图片数量
         /// </summary>
         public int imageCnt = 0;
-
+        
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="textObj">文本对象</param>
-        public QuadImageHandler(QuestionText textObj) : base(textObj) { }
+        /// <param name="embedImage">是否嵌入显示图片</param>
+        public QuadImageHandler(QuestionText textObj) : base(textObj) {}
 
         /// <summary>
         /// 处理器标签
@@ -578,6 +633,14 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         }
 
         /// <summary>
+        /// 是否嵌入图片
+        /// </summary>
+        /// <returns>返回是否嵌入图片</returns>
+        bool embedImage() {
+            return textObj.embedImage;
+        }
+
+        /// <summary>
         /// 替换（去除标签文本）
         /// </summary>
         /// <param name="match">匹配结果</param>
@@ -588,22 +651,66 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         }
         /// <param name="maxWidth">最大宽度</param>
         public string replace(Match match, float maxWidth) {
-            Texture2D texture; float width, height;
-            getMatchInfo(match, maxWidth, out texture, out width, out height);
+            if (embedImage()) {
+                Texture2D texture; float width, height;
+                getMatchInfo(match, maxWidth, out texture, out width, out height);
 
-            if (texture == null) return UnknownImageText;
+                if (texture == null) return UnknownImageText;
 
-            var eWidth = width + widthDelta * 2;
-            var widthRate = eWidth / height;
+                var eWidth = width + widthDelta * 2;
+                var widthRate = eWidth / height;
 
-            return string.Format(QuadTagFormat, height, widthRate);
+                return string.Format(QuadTagFormat, height, widthRate);
+            } else
+                return replace(getTextureIndex(match));
+        }
+        /// <param name="index">图片索引</param>
+        public string replace(int index) {
+            char alph = (char)('A' + index);
+            return string.Format(ImageFormat, alph);
+        }
+
+        /// <summary>
+        /// 获取图片索引
+        /// </summary>
+        /// <param name="frag">片段</param>
+        /// <returns>返回索引</returns>
+        int getTextureIndex(FragmentData frag) {
+            var info = (FragmentData.MatchInfo)frag.info;
+            return getTextureIndex(info.match);
+        }
+        /// <param name="match">匹配信息</param>
+        int getTextureIndex(Match match) {
+            return int.Parse(match.Groups[1].Value);
+        }
+
+        /// <summary>
+        /// 获取图片尺寸
+        /// </summary>
+        /// <param name="frag">片段</param>
+        /// <returns>返回图片尺寸（宽度）</returns>
+        int getTextureSize(FragmentData frag) {
+            var info = (FragmentData.MatchInfo)frag.info;
+            return getTextureIndex(info.match);
+        }
+        /// <param name="match">匹配信息</param>
+        float getTextureSize(Match match) {
+            return float.Parse(match.Groups[2].Value);
         }
 
         /// <summary>
         /// 获取纹理
         /// </summary>
-        /// <param name="index">索引</param>
+        /// <param name="frag">片段</param>
         /// <returns>纹理</returns>
+        Texture2D getTexture(FragmentData frag) {
+            return getTexture(getTextureIndex(frag));
+        }
+        /// <param name="match">匹配信息</param>
+        Texture2D getTexture(Match match) {
+            return getTexture(getTextureIndex(match));
+        }
+        /// <param name="index">索引</param>
         Texture2D getTexture(int index) {
             var textures = textObj.textures;
             if (index < textures.Length) return textures[index];
@@ -613,22 +720,23 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <summary>
         /// 获取匹配的具体信息
         /// </summary>
-        /// <param name="cd">字符数据</param>
         /// <param name="frag">片段数据</param>
         /// <param name="maxWidth">最大宽度</param>
         /// <param name="texture">纹理</param>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
-        void getMatchInfo(QuestionTextParser.CharData cd, FragmentData frag,
-            float maxWidth, out Texture2D texture, out float width, out float height) {
+        void getMatchInfo(FragmentData frag, float maxWidth, 
+            out Texture2D texture, out float width, out float height) {
             var info = (FragmentData.MatchInfo)frag.info;
             getMatchInfo(info.match, maxWidth, out texture, out width, out height);
         }
         /// <param name="match">匹配数据</param>
         void getMatchInfo(Match match, float maxWidth,
             out Texture2D texture, out float width, out float height) {
-            width = Math.Min(maxWidth, float.Parse(match.Groups[2].Value));
-            texture = getTexture(int.Parse(match.Groups[1].Value));
+            var size = getTextureSize(match);
+
+            texture = getTexture(match);
+            width = Math.Min(maxWidth, size);
             var scale = width / texture.width; // 缩放比率
             height = texture.height * scale; // 根据缩放比率求出实际高度
         }
@@ -638,14 +746,30 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// </summary>
         public override void initialize() {
             base.initialize();
+            initializeImageObjs();
+            initializeImageContainer();
+        }
+
+        /// <summary>
+        /// 初始化图片对象
+        /// </summary>
+        void initializeImageObjs() {
             imageCnt = 0;
             imageObjs.RemoveAll(image => image == null);
-
+            // 自动读取
             if (imageObjs.Count == 0)
                 textObj.GetComponentsInChildren(imageObjs);
 
             QuestionText.TestLog("imageObjs.Count = " + imageObjs.Count);
+        }
 
+        /// <summary>
+        /// 初始化图片容器
+        /// </summary>
+        void initializeImageContainer() {
+            if (textObj.imageContainer == null) return;
+            textObj.imageContainer.setItems(
+                QuestionText.TexturePool.getTextures());
         }
 
         /// <summary>
@@ -665,19 +789,26 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         }
 
         /// <summary>
+        /// 创建默认图片对象
+        /// </summary>
+        /// <returns></returns>
+        GameObject createDefaultImageObject() {
+            var resources = new DefaultControls.Resources();
+            var obj = DefaultControls.CreateImage(resources);
+            textObj.attachImage(obj);
+            return obj;
+        }
+        
+        /// <summary>
         /// 创建图片对象
         /// </summary>
         /// <returns>图片对象</returns>
         Image createImageObject() {
-            GameObject obj;
-
-            if (textObj.imagePrefab == null) {
-                var resources = new DefaultControls.Resources();
-                obj = DefaultControls.CreateImage(resources);
-                textObj.attachImage(obj);
-            } else obj = textObj.createImagePrefab();
-
+            var obj = (textObj.imagePrefab == null ?
+                createDefaultImageObject() : 
+                textObj.createImagePrefab());
             var img = SceneUtils.image(obj);
+            var btn = obj.AddComponent<Button>();
             imageObjs.Add(img);
 
             return img;
@@ -704,22 +835,40 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <param name="height">高度</param>
         void setImageTexture(Image image, Texture2D texture, float width, float height) {
             var rect = new Rect(0, 0, texture.width, texture.height);
-            var rt = image.rectTransform;
+            image.color = new Color(1, 1, 1, 1);
             image.overrideSprite = Sprite.Create(
                 texture, rect, new Vector2(0.5f, 0.5f));
             image.overrideSprite.name = texture.name;
-            SceneUtils.setRectWidth(rt, width);
-            SceneUtils.setRectHeight(rt, height);
+        }
+
+        /// <summary>
+        /// 设置图片链接
+        /// </summary>
+        /// <param name="image">图片</param>
+        /// <param name="index">索引</param>
+        Vector2 setImageLink(Image image, int index) {
+            var obj = image.gameObject;
+            var btn = SceneUtils.button(obj);
+            // 隐藏
+            image.color = new Color(0.75f, 0.75f, 1, 0.5f);
+            btn.onClick.AddListener(() => {
+                if (textObj.onImageLinkClick != null)
+                    textObj.onImageLinkClick.Invoke(index);
+                else if (textObj.imageContainer != null)
+                    textObj.imageContainer.select(index);
+            }
+            );
+            return textObj.meansure(replace(index));
         }
 
         /// <summary>
         /// 设置图片RectTransform
         /// </summary>
-        /// <param name="image">图片对象</param>
-        /// <param name="cd">字符数据</param>
-        void setImageRectTransform(Image image) {
-            var rt = image.rectTransform;
+        /// <param name="rt">变换对象</param>
+        void setRectTransform(RectTransform rt, float width, float height) {
             rt.pivot = new Vector2(0, 1); // 左上角
+            SceneUtils.setRectWidth(rt, width);
+            SceneUtils.setRectHeight(rt, height);
             rt.anchorMin = textObj.rectTransform.pivot;
             rt.anchorMax = textObj.rectTransform.pivot;
         }
@@ -742,11 +891,17 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <param name="frag">片段数据</param>
         public override void config(QuestionTextParser.CharData cd, FragmentData frag) {
             var image = getImageObject(imageCnt++);
-            var mw = textObj.rectTransform.rect.width;
-            Texture2D texture; float width, height;
-            getMatchInfo(cd, frag, mw, out texture, out width, out height);
-            setImageTexture(image, texture, width, height);
-            setImageRectTransform(image);
+            if (embedImage()) {
+                Texture2D texture; float width, height;
+                var mw = textObj.rectTransform.rect.width;
+                getMatchInfo(frag, mw, out texture, out width, out height);
+                setImageTexture(image, texture, width, height);
+                setRectTransform(image.rectTransform, width, height);
+            } else {
+                var index = getTextureIndex(frag);
+                var size = setImageLink(image, index);
+                setRectTransform(image.rectTransform, size.x, size.y);
+            }
             base.config(cd, frag);
         }
 

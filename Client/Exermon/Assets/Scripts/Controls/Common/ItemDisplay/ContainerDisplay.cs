@@ -11,7 +11,18 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 物品容器接口
     /// </summary>
-    public interface IContainerDisplay<T> : IBaseView where T : class {
+    public interface IContainerDisplay : IBaseView {
+
+        /// <summary>
+        /// 启动视窗
+        /// </summary>
+        void startView(int index = 0);
+    }
+
+    /// <summary>
+    /// 物品容器接口
+    /// </summary>
+    public interface IContainerDisplay<T> : IContainerDisplay where T : class {
 
         /// <summary>
         /// 配置
@@ -19,11 +30,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="items">物品集</param>
         void configure(T[] items);
         void configure(List<T> items);
-
-        /// <summary>
-        /// 启动视窗
-        /// </summary>
-        void startView(int index = 0);
 
         /// <summary>
         /// 设置物品集

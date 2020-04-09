@@ -254,6 +254,17 @@ namespace BattleModule.Services {
         /// <param name="timespan">用时</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
+        public void questionAnswer(int[] selection, TimeSpan timespan,
+            UnityAction onSuccess = null, UnityAction onError = null) {
+            questionAnswer(selection, timespan.Seconds, onSuccess, onError);
+        }
+        /// <summary>
+        /// 回答问题
+        /// </summary>
+        /// <param name="selection">选择情况</param>
+        /// <param name="timespan">用时</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
         public void questionAnswer(int[] selection, int timespan,
             UnityAction onSuccess = null, UnityAction onError = null) {
 

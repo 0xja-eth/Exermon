@@ -20,6 +20,8 @@ using BattleModule.Services;
 /// </summary>
 namespace UI.BattleScene {
 
+    using Windows;
+
     /// <summary>
     /// 对战场景
     /// </summary>
@@ -28,6 +30,8 @@ namespace UI.BattleScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public PrepareWindow prepareWindow;
+        public QuestionWindow questionWindow;
 
         /// <summary>
         /// 内部系统声明
@@ -90,11 +94,33 @@ namespace UI.BattleScene {
 
         #region 场景控制
 
+        /// <summary>
+        /// 关闭所有窗口
+        /// </summary>
+        void clearWindows() {
+            prepareWindow.terminateWindow();
+            questionWindow.terminateWindow();
+        }
+
+        /// <summary>
+        /// 关闭所有控件
+        /// </summary>
+        void clearControls() {
+
+        }
+
+        /// <summary>
+        /// 清空场景
+        /// </summary>
+        void clear() {
+            clearWindows();
+            clearControls();
+        }
+
         #endregion
 
         #region 流程控制
         
-
         #region 状态回调处理
 
         /// <summary>
@@ -115,21 +141,23 @@ namespace UI.BattleScene {
         /// 准备状态
         /// </summary>
         void onPerparing() {
-
+            clear();
+            prepareWindow.startWindow();
         }
 
         /// <summary>
         /// 答题状态
         /// </summary>
         void onQuesting() {
-
+            clear();
+            questionWindow.startWindow();
         }
 
         /// <summary>
         /// 答题完毕
         /// </summary>
         void onQuested() {
-
+            questionWindow.onQuested();
         }
 
         /// <summary>

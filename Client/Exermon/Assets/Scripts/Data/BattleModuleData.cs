@@ -600,7 +600,8 @@ namespace BattleModule.Data {
     /// <summary>
     /// 对战玩家数据（回合结果时进行数据同步）
     /// </summary>
-    public class RuntimeBattlePlayer : BaseData {
+    public class RuntimeBattlePlayer : BaseData, 
+        QuestionSetRecord.IQuestionResult {
 
         /// <summary>
         /// 基本数据
@@ -653,6 +654,18 @@ namespace BattleModule.Data {
         public int[] selection { get; protected set; }
         [AutoConvert]
         public int timespan { get; protected set; }
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        public int[] getSelection() { return selection; }
+
+        /// <summary>
+        /// 做题用时（毫秒）
+        /// </summary>
+        /// <returns>返回做题用时</returns>
+        public int getTimespan() { return timespan; }
 
         /// <summary>
         /// 进度
