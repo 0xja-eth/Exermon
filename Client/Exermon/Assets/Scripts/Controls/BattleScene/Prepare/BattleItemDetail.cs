@@ -18,13 +18,12 @@ namespace UI.BattleScene.Controls.Prepare {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const string TitleText = "选择物资";
         const string InfoFormat = "名称：{0}\n描述：{1}";
 
         /// <summary>
         /// 外部变量定义
         /// </summary>
-        public Text title, info;
+        public Text info;
 
         /// <summary>
         /// 内部变量定义
@@ -46,13 +45,12 @@ namespace UI.BattleScene.Controls.Prepare {
         /// <param name="runtimeItem">运行时物品</param>
         protected override void drawExactlyItem(RuntimeBattleItem runtimeItem) {
             base.drawExactlyItem(runtimeItem);
-            var item = runtimeItem.battleItemSlotItem().item();
+            var item = runtimeItem.item();
 
-            title.text = TitleText;
-
-            if (item != null) 
-                info.text = string.Format(InfoFormat, 
+            if (item != null)
+                info.text = string.Format(InfoFormat,
                     item.name, item.description);
+            else drawEmptyItem();
         }
         
         /// <summary>
@@ -60,7 +58,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         protected override void clearItem() {
             base.clearItem();
-            title.text = info.text = "";
+            info.text = "";
         }
 
         #endregion

@@ -18,8 +18,7 @@ class SeasonRecordAdmin(object):
 @xadmin.sites.register(BattleItemSlot)
 class HumanEquipSlotAdmin(SlotContainerAdmin):
 
-	list_display = SlotContainerAdmin.list_display + \
-				   ['score', 'win', 'lose']
+	# list_display = SlotContainerAdmin.list_display
 
 	field_set = [Fieldset('对战物资槽属性', 'player')]
 

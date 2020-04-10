@@ -111,6 +111,9 @@ namespace UI.BattleScene.Windows {
         public override void startWindow() {
             base.startWindow();
             choiceContainer.startView();
+            battleClock.startView();
+            selfStatus.startView();
+            oppoStatus.startView();
         }
 
         /// <summary>
@@ -119,10 +122,13 @@ namespace UI.BattleScene.Windows {
         public override void terminateWindow() {
             base.terminateWindow();
             choiceContainer.terminateView();
+            battleClock.terminateView();
+            selfStatus.terminateView();
+            oppoStatus.terminateView();
         }
 
         #endregion
-        
+
         #region 数据控制
 
         #endregion
@@ -142,8 +148,8 @@ namespace UI.BattleScene.Windows {
             questionDisplay.setItem(question);
             battleClock.startTimer(question.star().stdTime);
 
-            selfStatus.setItem(battle.self());
-            oppoStatus.setItem(battle.oppo());
+            selfStatus.setItem(battle.self(), true);
+            oppoStatus.setItem(battle.oppo(), true);
 
             questionDisplay.startQuestion();
         }
@@ -170,6 +176,7 @@ namespace UI.BattleScene.Windows {
         /// 题目结果回调
         /// </summary>
         public void onQuested() {
+            onQuestionTerminated(false);
             var battle = battleSer.battle;
             questionDisplay.result = battle.self();
         }
@@ -196,8 +203,20 @@ namespace UI.BattleScene.Windows {
                     gameSys.requestAlert(EmptyAlertText);
                 else
                     battleSer.questionAnswer(selection, timespan,
-                        questionDisplay.terminateQuestion);
+                        onQuestionTerminated);
             }
+        }
+
+        /// <summary>
+        /// 准备完成回调
+        /// </summary>
+        void onQuestionTerminated() {
+            onQuestionTerminated(true);
+        }
+        void onQuestionTerminated(bool mask) {
+            questionDisplay.terminateQuestion();
+            battleClock.stopTimer();
+            if (mask) scene.showWaitingMask();
         }
 
         #endregion

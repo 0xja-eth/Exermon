@@ -840,7 +840,7 @@ class QuestionSetRecord(CacheableModel):
 
 		if calc is None: return None
 
-		calc = calc.calc(self.player_questions)
+		calc = calc.calc(self.playerQuestions())
 
 		self.exp_incr = calc.exer_exp_incr
 		self.slot_exp_incr = calc.exerslot_exp_incr
@@ -884,9 +884,6 @@ class QuestionSetRecord(CacheableModel):
 
 		player_ques = cla.create(self, question_id, **kwargs)
 
-		if self.player_questions is None:
-			self.player_questions = []
-
 		self._addQuestionToCache(player_ques)
 
 		return player_ques
@@ -919,6 +916,9 @@ class QuestionSetRecord(CacheableModel):
 		# 从缓存中读取
 		if player_ques is None:
 			player_ques = self.cachedPlayerQuestion(question_id)
+
+		if question_id is None:
+			question_id = player_ques.question_id
 
 		rec = QuestionRecord.create(self.player, question_id)
 

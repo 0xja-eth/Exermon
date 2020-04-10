@@ -861,7 +861,8 @@ class QuestionGenerator:
 			print("limiting id")
 
 			occur_questions = player.questionRecords()
-			occur_qids = ModelUtils.getObjectRelatedForFilter(occur_questions, 'question_id')
+			occur_qids = ModelUtils.getObjectRelatedForAll(
+				occur_questions, 'question', 'question_id')
 
 			id_limit = []
 			exclude = False

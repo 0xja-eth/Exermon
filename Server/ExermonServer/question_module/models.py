@@ -86,7 +86,7 @@ class QuesPicture(models.Model):
 	def convertToDict(self):
 		return {
 			'number': self.number,
-			'data': self.convertToBase64
+			'data': self.convertToBase64()
 		}
 
 

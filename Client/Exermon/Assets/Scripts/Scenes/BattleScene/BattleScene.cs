@@ -33,6 +33,8 @@ namespace UI.BattleScene {
         public PrepareWindow prepareWindow;
         public QuestionWindow questionWindow;
 
+        public GameObject waitingMask;
+
         /// <summary>
         /// 内部系统声明
         /// </summary>
@@ -106,7 +108,7 @@ namespace UI.BattleScene {
         /// 关闭所有控件
         /// </summary>
         void clearControls() {
-
+            hideWaitingMask();
         }
 
         /// <summary>
@@ -179,6 +181,24 @@ namespace UI.BattleScene {
         /// </summary>
         void onTerminating() {
 
+        }
+
+        #endregion
+
+        #region 具体流程处理
+
+        /// <summary>
+        /// 显示等待遮罩
+        /// </summary>
+        public void showWaitingMask() {
+            waitingMask.SetActive(true);
+        }
+
+        /// <summary>
+        /// 关闭等待遮罩
+        /// </summary>
+        public void hideWaitingMask() {
+            waitingMask.SetActive(false);
         }
 
         #endregion

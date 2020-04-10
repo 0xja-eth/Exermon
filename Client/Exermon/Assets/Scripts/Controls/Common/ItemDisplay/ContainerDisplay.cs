@@ -638,6 +638,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 绘制数目
         /// </summary>
         void clearCount() {
+            if (countText == null) return;
             countText.text = "";
         }
 

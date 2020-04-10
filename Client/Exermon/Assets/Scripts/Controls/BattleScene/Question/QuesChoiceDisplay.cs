@@ -22,7 +22,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const string TextFormat = "{0}. {1}";
+        const string TextFormat = "{0}." + QuestionText.SpaceEncode + "{1}";
 
         /// <summary>
         /// 外部组件设置
@@ -41,9 +41,11 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 配置
         /// </summary>
-        public override void configure() {
-            base.configure();
-            text.imageContainer = getContainer().pictureContaienr;
+        /// <param name="container">容器</param>
+        /// <param name="index">索引</param>
+        public override void configure(ContainerDisplay<Question.Choice> container, int index) {
+            base.configure(container, index);
+            if (text) text.imageContainer = getContainer().pictureContaienr;
         }
 
         #endregion
@@ -79,8 +81,8 @@ namespace UI.BattleScene.Controls.Question {
             var correct = result != null && choice.answer;
             var wrong = result != null && !correct && choice.isInSelection(result);
 
-            correctFlag?.SetActive(correct);
-            wrongFlag?.SetActive(wrong);
+            if (correctFlag) correctFlag.SetActive(correct);
+            if (wrongFlag) wrongFlag.SetActive(wrong);
 
             if (text) {
                 var color = normalFontColor;
@@ -104,8 +106,8 @@ namespace UI.BattleScene.Controls.Question {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
-            correctFlag?.SetActive(false);
-            wrongFlag?.SetActive(false);
+            if (correctFlag) correctFlag.SetActive(false);
+            if (wrongFlag) wrongFlag.SetActive(false);
             if (text) text.text = "";
         }
 

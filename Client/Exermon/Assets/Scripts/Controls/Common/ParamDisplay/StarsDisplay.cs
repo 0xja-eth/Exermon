@@ -16,6 +16,18 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         int count = -1;
 
+        #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            registerUpdateLayout(container);
+        }
+
+        #endregion
+
         #region 数据控制
 
         /// <summary>

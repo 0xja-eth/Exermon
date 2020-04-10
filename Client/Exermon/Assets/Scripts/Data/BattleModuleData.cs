@@ -417,6 +417,8 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int useCount { get; protected set; }
         [AutoConvert]
+        public int skillId { get; protected set; }
+        [AutoConvert]
         public int freezeRound { get; protected set; }
 
         /// <summary>
@@ -437,9 +439,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回艾瑟萌技能实例</returns>
         public ExerSkill skill() {
-            if (exermon == null) return null;
-            var skillSlotItem = exermon.exerSkillSlot().getSlotItem(getID());
-            return skillSlotItem.skill();
+            return DataService.get().exerSkill(skillId);
         }
     }
 
@@ -453,6 +453,8 @@ namespace BattleModule.Data {
         /// </summary>
         [AutoConvert]
         public int subjectId { get; protected set; }
+        [AutoConvert]
+        public int exermonId { get; protected set; }
         [AutoConvert]
         public int mp { get; protected set; }
         [AutoConvert("params")]
@@ -486,12 +488,22 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 获取艾瑟萌
+        /// </summary>
+        /// <returns>返回艾瑟萌实例</returns>
+        public Exermon exermon() {
+            return DataService.get().exermon(exermonId);
+        }
+
+        /// <summary>
         /// 获取对应的艾瑟萌槽项
         /// </summary>
         /// <returns>返回艾瑟萌槽项</returns>
         public ExerSlotItem exerSlotItem() {
-            if (player == null) return null;
-            return player.exerSlot.getSlotItem(subjectId);
+            var player = PlayerService.get().player;
+            if (player == null ||
+                this.player.getID() != player.getID()) return null;
+            return player.slotContainers.exerSlot.getSlotItem(subjectId);
         }
 
         /// <summary>
@@ -514,6 +526,8 @@ namespace BattleModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
+        public int itemId { get; protected set; }
+        [AutoConvert]
         public int freezeRound { get; protected set; }
 
         /// <summary>
@@ -530,12 +544,22 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 获取物品
+        /// </summary>
+        /// <returns>返回物品对象</returns>
+        public HumanItem item() {
+            return DataService.get().humanItem(itemId);
+        }
+
+        /// <summary>
         /// 获取对应的对战物资槽物品
         /// </summary>
-        /// <returns></returns>
+        /// <returns>当所属玩家为当前玩家时返回其物资槽对象，否则返回 null</returns>
         public BattleItemSlotItem battleItemSlotItem() {
-            if (player == null) return null;
-            return player.battleItemSlot.getSlotItem(getID());
+            var player = PlayerService.get().player;
+            if (player == null || 
+                this.player.getID() != player.getID()) return null;
+            return player.slotContainers.battleItemSlot.getSlotItem(getID());
         }
     }
 
@@ -620,10 +644,12 @@ namespace BattleModule.Data {
         public int subRank { get; protected set; }
         [AutoConvert]
         public int starNum { get; protected set; }
+        /*
         [AutoConvert]
         public ExerSlot exerSlot { get; protected set; } = new ExerSlot();
         [AutoConvert]
         public BattleItemSlot battleItemSlot { get; protected set; } = new BattleItemSlot();
+        */
 
         /// <summary>
         /// 每回合更新的状态数据

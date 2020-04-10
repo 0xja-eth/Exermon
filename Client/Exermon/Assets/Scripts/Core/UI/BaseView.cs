@@ -1,4 +1,10 @@
 ﻿
+using System.Collections;
+using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Core.UI {
 
     /// <summary>
@@ -44,6 +50,11 @@ namespace Core.UI {
     /// 一般来说，控件需要放在窗口内部，不过根据实际情况需要，一些特殊的控件也可以直接放在场景里，比如 MainScene
     /// </remarks>
     public class BaseView : BaseComponent, IBaseView {
+
+        /// <summary>
+        /// 布局稳定帧
+        /// </summary>
+        const int LayoutStableFrame = 2;
 
         /// <summary>
         /// 外部组件设置
@@ -123,6 +134,53 @@ namespace Core.UI {
             if (isRefreshRequested()) refresh();
             else if (isClearRequested()) clear();
             resetRequests();
+        }
+
+        /// <summary>
+        /// 注册布局更新（仅用于挂载 Layout 的物体）
+        /// </summary>
+        /// <param name="rect">物体 RectTransform</param>
+        public void registerUpdateLayout() {
+            registerUpdateLayout(transform);
+        }
+        public void registerUpdateLayout(Transform rect) {
+            registerUpdateLayout((RectTransform)rect);
+        }
+        public void registerUpdateLayout(RectTransform rect) {
+            StartCoroutine(updateLayout(rect));
+        }
+
+        /// <summary>
+        /// 更新布局（仅用于挂载 Layout 的物体）
+        /// </summary>
+        /// <param name="rect">物体 RectTransform</param>
+        /// <returns></returns>
+        IEnumerator updateLayout(RectTransform rect) {
+            /*
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            Debug.Log("first updateLayout:" + rect.rect.width);
+            yield return new WaitForEndOfFrame();
+            */
+            int cnt = 0;
+            bool active = rect.gameObject.activeInHierarchy;
+            float width = rect.rect.width, height = rect.rect.height;
+            while (true) {
+                Debug.Log("updateLayout: " + rect.gameObject.name + ": " + width + ", " + height);
+                if (++cnt <= LayoutStableFrame) {
+                    Debug.Log("rebuild:" + cnt);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                }
+
+                bool newActive = rect.gameObject.activeInHierarchy;
+                float newWidth = rect.rect.width, newHeight = rect.rect.height;
+                if (newActive != active || 
+                    newWidth != width || newHeight != height) {
+                    cnt = 0; newActive = active;
+                    newWidth = width; newHeight = height;
+                }
+
+                yield return new WaitForEndOfFrame();
+            }
         }
 
         #endregion

@@ -117,6 +117,9 @@ namespace UI.BattleScene.Windows {
         public override void startWindow() {
             base.startWindow();
             prepareControl.SetActive(true);
+            battleClock.startView();
+            selfStatus.startView();
+            oppoStatus.startView();
         }
 
         /// <summary>
@@ -125,6 +128,9 @@ namespace UI.BattleScene.Windows {
         public override void terminateWindow() {
             base.terminateWindow();
             prepareControl.SetActive(false);
+            battleClock.terminateView();
+            selfStatus.terminateView();
+            oppoStatus.terminateView();
         }
 
         #endregion
@@ -140,16 +146,16 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            var containerDisplays = new
-                IContainerDisplay[] { battleItemSlotDisplay };
+            var containerDisplays = new IPrepareContainerDisplay[] {
+                battleItemSlotDisplay, /* quesSugarPackDisplay */};
             tabController.configure(containerDisplays);
 
             var battle = battleSer.battle;
             questionInfo.setItem(battle.round);
             battleClock.startTimer(PrepareTime);
 
-            selfStatus.setItem(battle.self());
-            oppoStatus.setItem(battle.oppo());
+            selfStatus.setItem(battle.self(), true);
+            oppoStatus.setItem(battle.oppo(), true);
 
             var battleItems = battle.self().battleItems;
             battleItemSlotDisplay.setItems(battleItems);
@@ -177,14 +183,24 @@ namespace UI.BattleScene.Windows {
         /// 跳过
         /// </summary>
         public void pass() {
-
+            battleSer.prepareComplete(onPrepareCompleted);
         }
 
         /// <summary>
         /// 确认
         /// </summary>
         public void confirm() {
+            battleSer.prepareComplete(
+                tabController.itemToUse(), onPrepareCompleted);
+        }
 
+        /// <summary>
+        /// 准备完成回调
+        /// </summary>
+        void onPrepareCompleted() {
+            prepareControl.SetActive(false);
+            battleClock.stopTimer();
+            scene.showWaitingMask();
         }
 
         #endregion

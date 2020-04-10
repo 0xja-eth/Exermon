@@ -189,8 +189,13 @@ class RuntimeBattleItem:
 		Returns:
 			返回转化后的字典
 		"""
+		item_id = 0
+		if self.slot_item.pack_item is not None:
+			item_id = self.slot_item.pack_item.item_id
+
 		return {
 			'id': self.slot_item.index,
+			'item_id': item_id,
 			'freeze_round': self.freeze_round
 		}
 
@@ -287,8 +292,11 @@ class RuntimeBattleExerSkill:
 		Returns:
 			返回转化后的字典
 		"""
+		skill_id = 0 if self.skill is None else self.skill.id
+		
 		return {
 			'id': self.skill_item.index,
+			'skill_id': skill_id,
 			'use_count': self.use_count,
 			'freeze_round': self.freeze_round
 		}
@@ -440,8 +448,13 @@ class RuntimeBattleExermon:
 		buffs = ModelUtils.objectsToDict(self.buffs)
 		skills = ModelUtils.objectsToDict(self.skills)
 
+		exermon_id = 0
+		if self.exermon.player_exer is not None:
+			exermon_id = self.exermon.player_exer.item_id
+
 		return {
 			'subject_id': self.subject.id,
+			'exermon_id': exermon_id,
 			'mp': self.mp,
 			'params': params,
 			'buffs': buffs,
@@ -986,10 +999,10 @@ class RuntimeBattle(RuntimeData):
 	运行时缓存的对战类
 	"""
 	# 后台等待附加时长（秒）
-	BACKEND_DELTA_TIME = 15
+	BACKEND_DELTA_TIME = 30
 
 	# 准备阶段时长（秒）
-	PREPARE_TIME = 15
+	PREPARE_TIME = 30
 
 	# 最大行动时长（秒）（仅后台计时）
 	MAX_ACTION_TIME = 60
@@ -1145,8 +1158,12 @@ class RuntimeBattle(RuntimeData):
 		online_player2 = self.getOnlinePlayer(self.player2)
 
 		return {
-			'player1': self.player1.convertToDict(type="matched", online_player=online_player1),
-			'player2': self.player2.convertToDict(type="matched", online_player=online_player2),
+			'player1': self.player1.convertToDict(
+				type="matched", online_player=online_player1,
+				battle_player=self.runtime_battler1),
+			'player2': self.player2.convertToDict(
+				type="matched", online_player=online_player2,
+				battle_player=self.runtime_battler2),
 		}
 
 	def _leaveBattleGroup(self):
@@ -1353,8 +1370,10 @@ class RuntimeBattle(RuntimeData):
 
 		battler.battler.answerCurrentRound(selection, timespan)
 		battler.round_result = battler.battler.currentRound()
+		correct = battler.round_result.correct()
 
-		self._emit(EmitType.QuesResult, self._generateQuesResultData(player, selection, timespan))
+		self._emit(EmitType.QuesResult,
+				   self._generateQuesResultData(player, correct, timespan))
 
 	def _generateQuesResultData(self, player: Player, correct: bool, timespan: int) -> dict:
 		"""
@@ -1691,7 +1710,7 @@ class RuntimeBattleManager:
 		cls.Battles = RuntimeManager.get(RuntimeBattle)
 
 	@classmethod
-	def update(cls):
+	async def update(cls):
 		"""
 		更新所有对战
 		"""
@@ -1712,3 +1731,4 @@ RuntimeManager.register(RuntimeBattlePlayer)
 RuntimeManager.register(RuntimeBattle)
 
 RuntimeManager.registerEvent(MatchingManager.process)
+RuntimeManager.registerEvent(RuntimeBattleManager.update)

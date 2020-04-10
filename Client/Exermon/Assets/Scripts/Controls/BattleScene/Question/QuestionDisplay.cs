@@ -38,6 +38,8 @@ namespace UI.BattleScene.Controls.Question {
         public Image collectImg;
         public GameObject resultObj;
 
+        public RectTransform content;
+
         /// <summary>
         /// 外部变量设置
         /// </summary>
@@ -66,7 +68,15 @@ namespace UI.BattleScene.Controls.Question {
         }
 
         #region 初始化
-
+        
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            // if (content) registerUpdateLayout(content);
+        }
+        
         /// <summary>
         /// 初始化外部系统
         /// </summary>

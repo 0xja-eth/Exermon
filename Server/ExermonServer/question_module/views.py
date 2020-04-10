@@ -136,7 +136,20 @@ class Common:
 
 	# 获取多个题目
 	@classmethod
-	def getQuestions(cls, ids, error: ErrorType = ErrorType.QuestionNotExist):
+	def getQuestions(cls, ids=None, error: ErrorType = ErrorType.QuestionNotExist,
+					 **kwargs) -> list:
+		"""
+		获取多个题目
+		Args:
+			ids (list): 题目ID集
+			error (ErrorType): 抛出异常
+			**kwargs (**dict): 查询参数
+		Returns:
+			当 ids 不为 None 时，返回指定 ID 的题目
+			否则只返回满足条件的题目
+		"""
+		if ids is None:
+			return ViewUtils.getObjects(Question, **kwargs)
 
 		unique_ids = list(set(ids))
 

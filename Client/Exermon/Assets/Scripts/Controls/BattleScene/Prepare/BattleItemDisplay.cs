@@ -62,7 +62,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// <param name="runtimeItem">运行时物品</param>
         protected override void drawExactlyItem(RuntimeBattleItem runtimeItem) {
             base.drawExactlyItem(runtimeItem);
-            var item = runtimeItem.battleItemSlotItem().item();
+            var item = runtimeItem.item();
 
             if (item != null) {
                 icon.gameObject.SetActive(true);
@@ -78,7 +78,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
-            icon.gameObject.SetActive(true);
+            icon.gameObject.SetActive(false);
             name.text = freeze.text = "";
         }
 

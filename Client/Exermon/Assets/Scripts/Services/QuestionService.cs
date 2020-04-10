@@ -47,6 +47,15 @@ namespace QuestionModule.Services {
             public void addQuestions(Question[] questions) {
                 this.questions.AddRange(questions);
             }
+
+            /// <summary>
+            /// 读取自定义属性
+            /// </summary>
+            /// <param name="json">数据</param>
+            protected override void loadCustomAttributes(JsonData json) {
+                base.loadCustomAttributes(json);
+                if (questions == null) questions = new List<Question>();
+            }
         }
 
         /// <summary>
@@ -79,12 +88,12 @@ namespace QuestionModule.Services {
         /// </summary>
         protected override void initializeOperDict() {
             base.initializeOperDict();
-            addOperDict(Oper.Get, Get, NetworkSystem.Interfaces.RecordGet);
+            addOperDict(Oper.Get, Get, NetworkSystem.Interfaces.QuestionGet);
 
             addOperDict(Oper.GetReports, GetReports,
-                NetworkSystem.Interfaces.RecordQuestionCollect);
+                NetworkSystem.Interfaces.QuestionReportGet);
             addOperDict(Oper.PushReport, PushReport,
-                NetworkSystem.Interfaces.RecordQeestionUnwrong);
+                NetworkSystem.Interfaces.QuestionReportPush);
         }
 
         #endregion

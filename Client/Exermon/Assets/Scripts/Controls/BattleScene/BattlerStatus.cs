@@ -72,7 +72,7 @@ namespace UI.BattleScene.Controls {
         /// <param name="battler">对战者</param>
         void drawBaseInfo(RuntimeBattlePlayer battler) {
             int max = battler.mhp, val = battler.hp;
-            float rate = val * 1.0f / max;
+            float rate = max == 0 ? 0 : val * 1.0f / max;
 
             name.text = battler.name;
             hpText.text = string.Format(HPFormat, val, max);

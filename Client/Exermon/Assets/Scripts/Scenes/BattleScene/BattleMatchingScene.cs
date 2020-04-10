@@ -153,8 +153,10 @@ namespace UI.BattleMatchingScene {
         /// <param name="progress">设置进度</param>
         void setProgress(float progress) {
             int progress_ = (int)Mathf.Round(progress * 100);
-            battleSer.matchProgress(progress_);
-            onProgresss();
+            if (battleSer.battle.self().progress != progress_) {
+                battleSer.matchProgress(progress_);
+                onProgresss();
+            }
         }
 
         /// <summary>

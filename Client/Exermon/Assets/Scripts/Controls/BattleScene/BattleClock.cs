@@ -22,7 +22,7 @@ namespace UI.BattleScene.Controls {
         static readonly Color NormalColor =
             new Color(0.3921569f, 0.8156863f, 0.8470588f);
         static readonly Color CriticalColor =
-            new Color(0.3921569f, 0.8156863f, 0.8470588f);
+            new Color(0.9294118f, 0.3098039f, 0.1411765f);
 
         /// <summary>
         /// 外部组件设置
@@ -84,17 +84,17 @@ namespace UI.BattleScene.Controls {
         public void stopTimer(bool timeUp = false) {
             timing = false;
             this.timeUp = timeUp;
+            refresh();
         }
 
         #endregion
 
         #region 界面绘制
-        
+
         /// <summary>
-        /// 刷新
+        /// 绘制时间
         /// </summary>
-        protected override void refresh() {
-            base.refresh();
+        void drawTimer() {
             var now = DateTime.Now;
             var delta = endTime - now;
             var seconds = delta.TotalSeconds;
@@ -102,7 +102,18 @@ namespace UI.BattleScene.Controls {
             time.color = (seconds < CriticalSecond) ?
                 CriticalColor : NormalColor;
             time.text = SceneUtils.time2Str(delta);
-            bar.fillAmount = delta.Ticks / this.delta.Ticks;
+
+            bar.fillAmount = (this.delta.Ticks == 0 ? 0 :
+                delta.Ticks * 1.0f / this.delta.Ticks);
+        }
+
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        protected override void refresh() {
+            base.refresh();
+            if (timing) drawTimer();
+            else clear();
         }
 
         /// <summary>

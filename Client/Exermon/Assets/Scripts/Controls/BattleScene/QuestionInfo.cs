@@ -85,7 +85,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         /// <param name="round">对战回合</param>
         void drawBaseInfo(BattleRound round) {
-            num.text = round.order.ToString();
+            num.text = (round.order+1).ToString();
             subject.text = round.subject().name;
             star.setValue(round.starId);
         }
@@ -97,7 +97,7 @@ namespace UI.BattleScene.Controls {
         void drawType(BattleRound round) {
             var ques = round.question();
             if (ques == null) return;
-            type.text = ques.typeText();
+            if (type) type.text = ques.typeText();
         }
 
         /// <summary>
@@ -105,6 +105,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         protected override void clearItem() {
             num.text = subject.text = "";
+            if (type) type.text = "";
             star.clearValue();
         }
 

@@ -61,6 +61,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <param name="index"></param>
         /// <param name="refresh"></param>
         public void setItem(Question item, int index = -1, bool refresh = false) {
+            question = item;
             setItems(item.shuffleChoices());
             if (item.isMultiple()) maxCheck = 0;
             else maxCheck = 1;

@@ -156,7 +156,7 @@ class BattleItemSlot(SlotContainer):
 class BattleItemSlotItem(SlotContItem):
 
 	class Meta:
-		verbose_name = verbose_name_plural = "人类装备槽项"
+		verbose_name = verbose_name_plural = "对战物资槽项"
 
 	# 容器项类型
 	TYPE = ContItemType.BattleItemSlotItem
@@ -561,8 +561,10 @@ class BattleRound(models.Model):
 		Returns:
 			题目生成配置所需的玩家对象
 		"""
-		return self.record.firstPlayer() if self.order % 2 == 1 \
+		battler = self.record.firstPlayer() if self.order % 2 == 1 \
 			else self.record.secondPlayer()
+
+		return battler.player
 
 	def generateQuestion(self):
 		"""
@@ -578,8 +580,9 @@ class BattleRound(models.Model):
 											  gen_type=QuestionGenerateType.NotOccurFirst.value)
 
 		gen = QuestionGenerator.generate(configure, True)
+		result = gen.result
 
-		if len(gen) > 0: self.question = gen[0]
+		if len(result) > 0: self.question_id = result[0]
 		# 没有题目生成
 		else: raise GameException(ErrorType.GenerateError)
 
@@ -875,7 +878,7 @@ class BattleRoundResult(PlayerQuestion):
 												   choices=ExerSkill.TARGET_TYPES, verbose_name="目标")
 
 	# 回合结果（本回合攻击方的结果）
-	result_type = models.PositiveSmallIntegerField(default=HitResultType.Unknown,
+	result_type = models.PositiveSmallIntegerField(default=HitResultType.Unknown.value,
 												   choices=RESULT_TYPES, verbose_name="回合结果")
 
 	# 伤害点数（自己对目标造成的HP伤害，小于0为恢复）

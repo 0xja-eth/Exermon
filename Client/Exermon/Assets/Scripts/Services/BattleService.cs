@@ -77,7 +77,7 @@ namespace BattleModule.Services {
         /// <summary>
         /// 当前对战
         /// </summary>
-        public RuntimeBattle battle { get; protected set; }
+        public RuntimeBattle battle { get; protected set; } = null;
 
         /// <summary>
         /// 外部系统
@@ -228,6 +228,8 @@ namespace BattleModule.Services {
         /// <param name="contItem">物品</param>
         public void prepareComplete(BaseContItem contItem,
             UnityAction onSuccess = null, UnityAction onError = null) {
+
+            if (contItem == null) prepareComplete(onSuccess, onError);
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 onSuccess?.Invoke();
@@ -453,7 +455,7 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="data"></param>
         void onNewRound(JsonData data) {
-            battle = DataLoader.load<RuntimeBattle>(data);
+            battle = DataLoader.load(battle, data);
             changeState(State.Preparing);
         }
 
@@ -491,7 +493,7 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="data"></param>
         void onRoundResult(JsonData data) {
-            battle = DataLoader.load<RuntimeBattle>(data);
+            battle = DataLoader.load(battle, data);
             changeState(State.Resulting);
         }
 

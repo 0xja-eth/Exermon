@@ -335,12 +335,14 @@ class Common:
 		return result
 
 	@classmethod
-	def getObjectRelatedForAll(cls, objects: QuerySet, key: str, unique=False) -> list:
+	def getObjectRelatedForAll(cls, objects: QuerySet, select_key: str,
+							   key: str = None, unique: bool = False) -> list:
 		"""
 		通过 all() 获取一个 QuerySet 的相关属性
 		Args:
 			objects (QuerySet): 源 QuerySet
-			key (str): 要寻找的关联的键名
+			select_key (str): 用于 select_related 的关联的键名
+			key (str): 要获取的关联的键名
 			unique (bool): 元素是否唯一
 		Returns:
 			返回所有转化后的由对应键的值组成的数组
@@ -352,17 +354,19 @@ class Common:
 				# 最后通过该函数获取科目
 				subjects = ModelUtils.getObjectRelatedForAll(slot_items, 'subject')
 		"""
-		temp = objects.select_related(key).all()
+		if key is None: key = select_key
+		temp = objects.select_related(select_key).all()
 		return cls.getObjectRelated(temp, key, unique)
 
 	@classmethod
-	def getObjectRelatedForFilter(cls, objects: QuerySet, key: str,
-								  unique=False, **kwargs) -> list:
+	def getObjectRelatedForFilter(cls, objects: QuerySet, select_key: str,
+								  key: str = None, unique: bool = False, **kwargs) -> list:
 		"""
 		通过 filter() 获取一个 QuerySet 的相关属性
 		Args:
 			objects (QuerySet): 源 QuerySet
-			key (str): 要寻找的关联的键名
+			select_key (str): 用于 select_related 的关联的键名
+			key (str): 要获取的关联的键名
 			unique (bool): 元素是否唯一
 			**kwargs (**dict): 过滤参数（与 QuerySet.filter 的参数一致）
 		Returns:
@@ -375,7 +379,8 @@ class Common:
 				# 最后通过该函数获取科目
 				subjects = ModelUtils.getObjectRelatedForFilter(slot_items, 'subject', level_gt=10)
 		"""
-		temp = objects.select_related(key).filter(**kwargs)
+		if key is None: key = select_key
+		temp = objects.select_related(select_key).filter(**kwargs)
 		return cls.getObjectRelated(temp, key, unique)
 
 	# 物体集转化为字典

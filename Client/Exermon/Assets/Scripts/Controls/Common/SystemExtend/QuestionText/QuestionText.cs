@@ -747,7 +747,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         public override void initialize() {
             base.initialize();
             initializeImageObjs();
-            initializeImageContainer();
+            // initializeImageContainer();
         }
 
         /// <summary>
@@ -763,6 +763,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             QuestionText.TestLog("imageObjs.Count = " + imageObjs.Count);
         }
 
+        /*
         /// <summary>
         /// 初始化图片容器
         /// </summary>
@@ -771,6 +772,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             textObj.imageContainer.setItems(
                 QuestionText.TexturePool.getTextures());
         }
+        */
 
         /// <summary>
         /// 清除缓存

@@ -531,7 +531,7 @@ class Player(CacheableModel):
 		question_records = self.questionRecords()
 
 		cnt = count = corr_cnt = corr_rate = 0
-		sum_timespan = avg_timespan = corr_timespan = 0
+		sum_timespan = avg_timespan = 0 # corr_timespan = 0
 		sum_exp = sum_gold = 0
 
 		for rec in question_records:
@@ -540,7 +540,7 @@ class Player(CacheableModel):
 			corr_cnt += rec.correct
 			sum_timespan += rec.count*rec.avg_time
 			avg_timespan += rec.avg_time
-			corr_timespan += rec.corr_time
+			# corr_timespan += rec.corr_time
 			sum_exp += rec.sum_exp
 			sum_gold += rec.sum_gold
 
@@ -549,7 +549,7 @@ class Player(CacheableModel):
 
 		if cnt > 0:
 			avg_timespan /= cnt
-			corr_timespan /= cnt
+			# corr_timespan /= cnt
 
 		return {
 			'count': count,
@@ -557,17 +557,18 @@ class Player(CacheableModel):
 			'corr_rate': corr_rate,
 			'sum_timespan': sum_timespan,
 			'avg_timespan': avg_timespan,
-			'corr_timespan': corr_timespan,
+			# 'corr_timespan': corr_timespan,
 			'sum_exp': sum_exp,
 			'sum_gold': sum_gold,
 		}
 
-	def convertToDict(self, type: str = None, online_player = None) -> dict:
+	def convertToDict(self, type: str = None, online_player=None, battle_player=None) -> dict:
 		"""
 		转化为字典
 		Args:
 			type (str): 转化类型
 			online_player (OnlinePlayer); 在线玩家信息
+			battle_player (RuntimeBattlePlayer); 在线玩家信息
 		Returns:
 			转化后的字典数据
 		"""
@@ -610,8 +611,11 @@ class Player(CacheableModel):
 			base["rank_id"] = rank.id
 			base['sub_rank'] = sub_rank
 			base['star_num'] = season_record.star_num
-			base['exer_slot'] = exer_slot
-			base['battle_item_slot'] = battle_item_slot
+			# base['exer_slot'] = exer_slot
+			# base['battle_item_slot'] = battle_item_slot
+
+			# 运行时数据
+			battle_player.convertToDict(base)
 
 			return base
 
