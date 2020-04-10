@@ -67,6 +67,8 @@ class Service:
 
 	@classmethod
 	def _upload(cls, q):
+		print(q)
+
 		question = Question()
 		question.title = q['title']
 		question.score = q['score']

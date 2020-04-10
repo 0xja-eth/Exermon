@@ -25,7 +25,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         public Texture2D[] textures; // 每个选项的按钮图片
 
-        public Image image;
+        public Image image, override_;
 
         #region 界面控制
 
@@ -36,7 +36,9 @@ namespace UI.BattleScene.Controls.Question {
         protected override void drawExactlyItem(Question.Choice choice) {
             base.drawExactlyItem(choice);
             image.gameObject.SetActive(true);
-            image.overrideSprite = AssetLoader.generateSprite(textures[index]);
+            override_.gameObject.SetActive(true);
+            override_.overrideSprite = image.overrideSprite = 
+                AssetLoader.generateSprite(textures[index]);
         }
 
         /// <summary>
@@ -45,6 +47,7 @@ namespace UI.BattleScene.Controls.Question {
         protected override void clearItem() {
             base.clearItem();
             image.gameObject.SetActive(false);
+            override_.gameObject.SetActive(false);
         }
 
         #endregion

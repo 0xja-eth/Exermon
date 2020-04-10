@@ -3,7 +3,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
+
 using RecordModule.Data;
+using RecordModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.SystemExtend.QuestionText;
@@ -20,25 +23,35 @@ namespace UI.BattleScene.Controls.Question {
         /// 常量设置
         /// </summary>
         const string AnswerTextFormat = "正确答案：{0}";
+        const string CollectOnText = "已收藏";
+        const string CollectOffText = "收藏";
 
         /// <summary>
         /// 外部组件设置
         /// </summary>        
-        public Color normalFontColor = new Color(0, 0, 0);
-        public Color descriptionColor = new Color(0.2627451f, 0.3960784f, 0.7294118f);
-
         public QuestionText title, description;
         public QuesPictureContainer pictureContaienr; // 图片容器
         public QuesChoiceContainer choiceContainer; // 选项容器
         public ChoiceButtonContainer buttonContainer; // 按钮容器
 
-        public Text answerText;
+        public Text answerText, collectText;
+        public Image collectImg;
         public GameObject resultObj;
+
+        /// <summary>
+        /// 外部变量设置
+        /// </summary>
+        public Texture2D collectOn, collectOff;
+
+        /// <summary>
+        /// 外部系统定义
+        /// </summary>
+        RecordService recordSer;
 
         /// <summary>
         /// 内部变量定义
         /// </summary>
-        bool started = false;
+        bool quesStarted = false;
         DateTime startTime;
 
         QuestionSetRecord.IQuestionResult _result = null; // 是否显示答案
@@ -53,6 +66,14 @@ namespace UI.BattleScene.Controls.Question {
         }
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            recordSer = RecordService.get();
+        }
 
         /// <summary>
         /// 配置
@@ -71,7 +92,7 @@ namespace UI.BattleScene.Controls.Question {
         /// 开始答题
         /// </summary>
         public void startQuestion() {
-            started = true;
+            quesStarted = true;
             startTime = DateTime.Now;
         }
 
@@ -79,21 +100,21 @@ namespace UI.BattleScene.Controls.Question {
         /// 开始答题
         /// </summary>
         public void terminateQuestion() {
-            started = false;
+            quesStarted = false;
         }
 
         /// <summary>
         /// 是否已经开始作答
         /// </summary>
         /// <returns></returns>
-        public bool isStarted() { return started; }
+        public bool isStarted() { return quesStarted; }
 
         /// <summary>
         /// 获取答题时长
         /// </summary>
         /// <returns></returns>
         public TimeSpan getTimeSpan() {
-            if (!started) return default;
+            if (!quesStarted) return default;
             return DateTime.Now - startTime;
         }
 
@@ -136,25 +157,59 @@ namespace UI.BattleScene.Controls.Question {
         protected override void drawExactlyItem(Question question) {
             base.drawExactlyItem(question);
 
+            drawTitle(question);
+            drawPictruesAndChoices(question);
+            if (result != null) drawResult(question);
+            else resultObj?.SetActive(false);
+
+
+        }
+
+        /// <summary>
+        /// 绘制题干
+        /// </summary>
+        /// <param name="question">题目</param>
+        void drawTitle(Question question) {
             QuestionText.TexturePool.setTextures(question.textures());
-
             title.text = question.title;
-            title.color = normalFontColor;
+        }
 
-            if (result != null && description) {
-                description.text = question.description;
-                description.color = descriptionColor;
-            }
-
-            if (result != null && answerText)
-                answerText.text = string.Format(
-                    AnswerTextFormat, generateAnswerText());
-
-            resultObj?.SetActive(result != null);
-
+        /// <summary>
+        /// 绘制图片和选项
+        /// </summary>
+        /// <param name="question">题目</param>
+        void drawPictruesAndChoices(Question question) { 
             pictureContaienr.setItem(question, true);
             choiceContainer.setItem(question, true);
             buttonContainer.setItem(question, true);
+        }
+
+        /// <summary>
+        /// 绘制结果
+        /// </summary>
+        /// <param name="question">题目</param>
+        void drawResult(Question question) {
+            if (description) 
+                description.text = question.description;
+            if (answerText)
+                answerText.text = string.Format(
+                    AnswerTextFormat, generateAnswerText());
+
+            resultObj?.SetActive(true);
+        }
+
+        /// <summary>
+        /// 绘制收藏情况
+        /// </summary>
+        /// <param name="question"></param>
+        void drawCollect(Question question) {
+            var record = recordSer.recordData.
+                getQuestionRecord(question.getID());
+            var collected = record.collected;
+            var texture = collected ? collectOn : collectOff;
+            var text = collected ? CollectOnText : CollectOffText;
+            collectImg.overrideSprite = AssetLoader.generateSprite(texture);
+            collectText.text = text;
         }
 
         /// <summary>

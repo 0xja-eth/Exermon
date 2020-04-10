@@ -80,7 +80,7 @@ def processDescription(description):
 
 def processLevel(level):
 	if isinstance(level, int):
-		star = level
+		star = level-1
 	else:
 		reg = r'\d\.\d+'
 		r = re.search(reg, level)
