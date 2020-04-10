@@ -34,6 +34,7 @@ namespace UI.BattleScene.Controls.Question {
         protected override void drawExactlyItem(Texture2D texture) {
             base.drawExactlyItem(texture);
             picture.gameObject.SetActive(true);
+            picture.preserveAspect = true;
             picture.overrideSprite = AssetLoader.generateSprite(texture);
 
             alph.text = ((char)('A' + index)).ToString();

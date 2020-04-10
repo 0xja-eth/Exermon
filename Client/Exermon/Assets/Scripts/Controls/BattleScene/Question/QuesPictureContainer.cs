@@ -19,7 +19,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public QuesPictureDetail detail; // 帮助界面
+        public QuesBigPicture detail; // 帮助界面
         
         #region 接口实现
 

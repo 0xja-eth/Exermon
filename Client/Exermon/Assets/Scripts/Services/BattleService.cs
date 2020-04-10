@@ -271,6 +271,7 @@ namespace BattleModule.Services {
             UnityAction onSuccess = null, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                battle.self().setSelection(selection);
                 onSuccess?.Invoke();
             };
 

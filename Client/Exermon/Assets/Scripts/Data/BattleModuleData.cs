@@ -688,6 +688,13 @@ namespace BattleModule.Data {
         public int[] getSelection() { return selection; }
 
         /// <summary>
+        /// 设置选择
+        /// </summary>
+        public void setSelection(int[] selection) {
+            this.selection = selection;
+        }
+
+        /// <summary>
         /// 做题用时（毫秒）
         /// </summary>
         /// <returns>返回做题用时</returns>

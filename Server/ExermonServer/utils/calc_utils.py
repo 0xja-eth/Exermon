@@ -514,6 +514,7 @@ class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
 
 	# 艾瑟萌等级惩罚
 	def _levelPunish(self, delta):
+		delta = max(delta, 0)
 		return (1-Common.sigmoid(math.sqrt(delta)/self.K2))*2
 
 	# 艾瑟萌等级奖励

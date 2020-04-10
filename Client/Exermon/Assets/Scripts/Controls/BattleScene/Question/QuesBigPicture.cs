@@ -4,11 +4,6 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
-using ItemModule.Data;
-using PlayerModule.Data;
-using BattleModule.Data;
-
-using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.BattleScene.Controls.Question {
@@ -16,7 +11,7 @@ namespace UI.BattleScene.Controls.Question {
     /// <summary>
     /// 题目大图片显示
     /// </summary>
-    public class QuesPictureDetail : ItemDetailDisplay<Texture2D> {
+    public class QuesBigPicture : ItemDetailDisplay<Texture2D> {
 
         /// <summary>
         /// 常量定义
@@ -41,6 +36,7 @@ namespace UI.BattleScene.Controls.Question {
         protected override void drawExactlyItem(Texture2D texture) {
             base.drawExactlyItem(texture);
             picture.gameObject.SetActive(true);
+            picture.preserveAspect = true;
             picture.overrideSprite = AssetLoader.generateSprite(texture);
 
             alph.text = ((char)('A' + index)).ToString();
