@@ -519,6 +519,7 @@ class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
 
 	# 艾瑟萌等级奖励
 	def _levelReward(self, delta, ql):
+		if ql <= 0: return 1
 		return 1-delta/ql
 
 	# 结果修正
@@ -1133,7 +1134,7 @@ class BattleAttackProcessor:
 	DR = 1  # 防御比率
 
 	C = 2  # 暴击伤害加成
-	F = 0.08  # 伤害波动
+	F = 8  # 伤害波动（*100）
 
 	class TempParam:
 		"""
@@ -1154,7 +1155,7 @@ class BattleAttackProcessor:
 			for param in params:
 				attr = str(param.attr).upper()
 				if hasattr(self, attr):
-					val = self.exermon.paramVal(id=param.id)
+					val = self.exermon.paramVal(param_id=param.id)
 					setattr(self, attr, val.getValue())
 
 	@classmethod

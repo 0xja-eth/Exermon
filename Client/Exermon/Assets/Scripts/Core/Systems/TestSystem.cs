@@ -18,7 +18,7 @@ namespace Core.Systems {
         /// <summary>
         /// 启用测试
         /// </summary>
-        public const bool Enable = true;
+        public const bool Enable = false;
 
         /// <summary>
         /// 测试用计时器

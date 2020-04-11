@@ -34,6 +34,8 @@ namespace UI.BattleScene.Windows {
         public const string NotStartedAlertText = "尚未开始作答！";
         public const string EmptyAlertText = "未选择答案！";
 
+        const string WrongtWaitText = "回答错误，等待对方作答……";
+
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -111,7 +113,6 @@ namespace UI.BattleScene.Windows {
         public override void startWindow() {
             base.startWindow();
             choiceContainer.startView();
-            battleClock.startView();
             selfStatus.startView();
             oppoStatus.startView();
         }
@@ -143,10 +144,12 @@ namespace UI.BattleScene.Windows {
             var battle = battleSer.battle;
             var question = battle.round.question();
 
-            questionInfo.setItem(battle.round);
+            questionInfo.setItem(battle.round, true);
 
+            Debug.LogError("Refresh: " + question.getID());
             questionDisplay.setItem(question);
-            battleClock.startTimer(question.star().stdTime);
+
+            battleClock.startView(question.star().stdTime);
 
             selfStatus.setItem(battle.self(), true);
             oppoStatus.setItem(battle.oppo(), true);
@@ -176,9 +179,23 @@ namespace UI.BattleScene.Windows {
         /// 题目结果回调
         /// </summary>
         public void onQuested() {
-            onQuestionTerminated(false);
             var battle = battleSer.battle;
-            questionDisplay.result = battle.self();
+            var selfResult = battle.self();
+            
+            if (battle.isQuestCompleted()) {
+                onQuestionTerminated(false);
+                battleClock.stopTimer();
+                questionDisplay.showAnswer = true;
+            }
+            if (selfResult.isAnswered()) {
+                onQuestionTerminated(false);
+                questionDisplay.result = selfResult;
+
+                if (!selfResult.correct)
+                    scene.showWaitingMask(WrongtWaitText);
+                else 
+                    battleClock.stopTimer();
+            }
         }
 
         /// <summary>
@@ -193,18 +210,15 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         /// <param name="force">是否强制提交</param>
         void pushAnswer(bool force = false) {
-            if (!questionDisplay.isStarted())
-                gameSys.requestAlert(NotStartedAlertText);
-            else {
-                var selection = questionDisplay.getSelectionIds();
-                var timespan = questionDisplay.getTimeSpan();
+            if (!questionDisplay.isStarted()) return;
 
-                if (selection.Length <= 0 && !force)
-                    gameSys.requestAlert(EmptyAlertText);
-                else
-                    battleSer.questionAnswer(selection, timespan,
-                        onQuestionTerminated);
-            }
+            var selection = questionDisplay.getSelectionIds();
+            var timespan = questionDisplay.getTimeSpan();
+
+            if (selection.Length <= 0 && !force)
+                gameSys.requestAlert(EmptyAlertText);
+            else battleSer.questionAnswer(selection, timespan,
+                    onQuestionTerminated);
         }
 
         /// <summary>
@@ -215,8 +229,9 @@ namespace UI.BattleScene.Windows {
         }
         void onQuestionTerminated(bool mask) {
             questionDisplay.terminateQuestion();
-            battleClock.stopTimer();
+
             if (mask) scene.showWaitingMask();
+            else scene.hideWaitingMask();
         }
 
         #endregion

@@ -75,7 +75,9 @@ class Service:
 
 		battle = Common.getRuntimeBattle(player)
 
-		if type == ContItemType.QuesSugarPackItem or type == ContItemType.BattleItemSlotItem:
+		if type is None: cont_item = None
+
+		elif type == ContItemType.QuesSugarPackItem.value or type == ContItemType.BattleItemSlotItem.value:
 
 			cont_item = ItemCommon.getContItem(player=player, type_=type, id=contitem_id)
 

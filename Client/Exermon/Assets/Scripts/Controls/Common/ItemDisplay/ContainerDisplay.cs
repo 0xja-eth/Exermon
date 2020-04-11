@@ -316,6 +316,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 清空物品
         /// </summary>
         public void clearItems() {
+            if (gameObject.name == "Choices") 
+                Debug.Log("Choices: clearItems");
             items.Clear();
             deselect(); clearChecks();
             requestRefresh();
@@ -416,6 +418,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选择
         /// </summary>
         /// <param name="index">索引</param>
+        public virtual void select(T item) {
+            select(items.IndexOf(item));
+        }
         public virtual void select(int index) {
             //Debug.Log("select: " + index);
 
@@ -533,6 +538,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选中
         /// </summary>
         /// <param name="index">索引</param>
+        public virtual void check(T item) {
+            check(items.IndexOf(item));
+        }
         public virtual void check(int index) {
             //Debug.Log("check: " + index);
 
@@ -648,6 +656,15 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 创建物品显示组件
         /// </summary>
         void refreshItemDisplays() {
+
+            if (gameObject.name == "Choices") {
+                Debug.Log("Choices: itemsCount: " + itemsCount() + "\n" +
+                    "itemDisplaysCount: " + itemDisplaysCount() + "\n" +
+                    "maxItemDisplaysCount: " + maxItemDisplaysCount());
+                Debug.Log("Choices: items: " + string.Join(",", items));
+                Debug.Log("Choices: subViews: " + string.Join(",", subViews));
+            }
+
             for (int i = 0; i < maxItemDisplaysCount(); ++i) {
                 T item = (i < itemsCount() ? items[i] : null);
                 createSubView(item, i);

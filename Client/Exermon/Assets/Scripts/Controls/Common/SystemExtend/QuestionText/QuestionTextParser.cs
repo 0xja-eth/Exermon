@@ -47,6 +47,11 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             /// <summary>
             /// 测试
             /// </summary>
+            public void display() {
+                QuestionText.TestLog("CharData(index: " + index + ", " +
+                    ", m: " + midPoint() + ", left: " + left() + ", top: " + top() +
+                    ", right: " + right() + ", bottom: " + bottom() + ")");
+            }
             public void display(string text) {
                 QuestionText.TestLog("CharData(index: " + index + ", char: " + text[index] +
                     ", m: " + midPoint() + ", left: " + left() + ", top: " + top() +
@@ -63,7 +68,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             /// <param name="v4">顶点4</param>
             public bool setVertices(int vIndex, UIVertex v1, UIVertex v2,
                 UIVertex v3, UIVertex v4, bool force = false) {
-                if (!force && v1.position == v3.position) return false;
+                if (!force && v1.position.y == v3.position.y) return false;
                 verts = new UIVertex[4] { v1, v2, v3, v4 };
                 this.vIndex = vIndex; return true;
             }
@@ -768,8 +773,10 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         public void configChars() {
             var handler = info?.handler;
             if (handler != null)
-                foreach (var cd in charData)
+                foreach (var cd in charData) {
                     handler.config(cd, this);
+                    if (handler.block()) break;
+                }
             foreach (var c in children)
                 c.configChars();
         }
@@ -780,8 +787,10 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         public void adjustChars() {
             var handler = info?.handler;
             if (handler != null)
-                foreach (var cd in charData)
+                foreach (var cd in charData) {
                     handler.adjust(cd, this);
+                    if (handler.block()) break;
+                }
             foreach (var c in children)
                 c.adjustChars();
         }
@@ -792,8 +801,10 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         public void handleChars() {
             var handler = info?.handler;
             if (handler != null)
-                foreach (var cd in charData)
+                foreach (var cd in charData) {
                     handler.handle(cd, this);
+                    if (handler.block()) break;
+                }
             foreach (var c in children)
                 c.handleChars();
         }

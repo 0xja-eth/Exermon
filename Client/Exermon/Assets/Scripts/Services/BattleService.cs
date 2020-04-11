@@ -246,7 +246,7 @@ namespace BattleModule.Services {
                 data["type"] = type;
                 data["contitem_id"] = contItemId;
             }
-            sendRequest(Oper.MatchCancel, data, onSuccess, onError, uid: true);
+            sendRequest(Oper.PrepareComplete, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace BattleModule.Services {
         /// <param name="onError">失败回调</param>
         public void questionAnswer(int[] selection, TimeSpan timespan,
             UnityAction onSuccess = null, UnityAction onError = null) {
-            questionAnswer(selection, timespan.Seconds, onSuccess, onError);
+            questionAnswer(selection, (int)timespan.TotalMilliseconds, onSuccess, onError);
         }
         /// <summary>
         /// 回答问题
@@ -457,6 +457,7 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onNewRound(JsonData data) {
             battle = DataLoader.load(battle, data);
+            battle.onNewRound();
             changeState(State.Preparing);
         }
 

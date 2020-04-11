@@ -51,6 +51,34 @@ namespace UI.BattleScene.Controls {
 
         #endregion
 
+        #region 开启/关闭视窗
+
+        /// <summary>
+        /// 启动视窗
+        /// </summary>
+        public void startView(TimeSpan timespan) {
+            base.startView();
+            startTimer(timespan);
+        }
+        public void startView(int seconds) {
+            base.startView();
+            startTimer(seconds);
+        }
+
+        /// <summary>
+        /// 结束视窗
+        /// </summary>
+        public override void terminateView() {
+            base.terminateView();
+            stopTimer();
+        }
+        public void terminateView(bool timeUp) {
+            base.terminateView();
+            stopTimer(timeUp);
+        }
+
+        #endregion
+
         #region 数据控制
 
         /// <summary>
@@ -69,6 +97,7 @@ namespace UI.BattleScene.Controls {
         /// 开始
         /// </summary>
         public void startTimer(TimeSpan timespan) {
+
             timing = true;
             timeUp = false;
             delta = timespan;

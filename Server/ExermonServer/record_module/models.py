@@ -139,7 +139,7 @@ class QuestionRecord(models.Model):
 		timespan = player_ques.timespan
 
 		if player_ques.correct():
-			if self.corr_time <= 0:
+			if self.corr_time is None:
 				self.corr_time = timespan
 			self.correct += 1
 

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import *
 from player_module.models import *
 from exermon_module.models import *
+from battle_module.models import *
 from question_module.models import *
 from utils.interface_manager import Common as InterfaceCommon
 from utils.exception import ErrorType, GameException

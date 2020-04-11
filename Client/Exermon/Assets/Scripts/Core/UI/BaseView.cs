@@ -165,9 +165,9 @@ namespace Core.UI {
             bool active = rect.gameObject.activeInHierarchy;
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
-                Debug.Log("updateLayout: " + rect.gameObject.name + ": " + width + ", " + height);
+                //Debug.Log("updateLayout: " + rect.gameObject.name + ": " + width + ", " + height);
                 if (++cnt <= LayoutStableFrame) {
-                    Debug.Log("rebuild:" + cnt);
+                    //Debug.Log("rebuild:" + cnt);
                     LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
                 }
 

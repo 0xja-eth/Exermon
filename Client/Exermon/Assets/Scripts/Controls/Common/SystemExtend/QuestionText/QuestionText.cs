@@ -464,6 +464,11 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         protected int handleCnt = 0;
 
         /// <summary>
+        /// 是否作为区块处理
+        /// </summary>
+        public virtual bool block() { return false; }
+
+        /// <summary>
         /// 处理器标签
         /// </summary>
         public virtual string tag() { return ""; }
@@ -583,6 +588,11 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
     public class QuadImageHandler : TextHandler {
 
         /// <summary>
+        /// 是否作为区块处理
+        /// </summary>
+        public override bool block() { return true; }
+
+        /// <summary>
         /// Quad标签格式
         /// </summary>
         public const string QuadTagFormat = "<quad size={0} width={1}/>";
@@ -629,7 +639,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// </summary>
         /// <returns></returns>
         protected override string regexStr() {
-            return @"<img id=(\d+?) size=(\d*\.?\d+%?)/>";
+            return @"<img id=(\d+?) size=(\d*\.?\d+%?)(.+?)/>";
         }
 
         /// <summary>
@@ -665,9 +675,9 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
                 return replace(getTextureIndex(match));
         }
         /// <param name="index">图片索引</param>
-        public string replace(int index) {
-            char alph = (char)('A' + index);
-            return string.Format(ImageFormat, alph);
+        public string replace(int index, bool mensure=false) {
+            var res = string.Format(ImageFormat, index+1);
+            return mensure ? res : " " + res + " ";
         }
 
         /// <summary>
@@ -860,7 +870,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
                     textObj.imageContainer.select(index);
             }
             );
-            return textObj.meansure(replace(index));
+            return textObj.meansure(replace(index, true));
         }
 
         /// <summary>
@@ -881,8 +891,10 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <param name="image">图片对象</param>
         /// <param name="cd">字符数据</param>
         void setImagePosition(Image image, UIVertex[] verts) {
-            image.rectTransform.anchoredPosition = new Vector2(
-                verts[0].position.x + widthDelta, verts[0].position.y);
+            float x = verts[0].position.x, y = verts[0].position.y;
+            if (embedImage()) x += widthDelta;
+
+            image.rectTransform.anchoredPosition = new Vector2(x, y);
             image.gameObject.SetActive(true);
         }
 
@@ -913,6 +925,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// <param name="cd">字符数据</param>
         /// <param name="frag">片段数据</param>
         public override void handle(QuestionTextParser.CharData cd, FragmentData frag) {
+            QuestionText.TestLog("handle: "); cd.display();
             var image = getImageObject(handleCnt);
             setImagePosition(image, cd.verts);
             base.handle(cd, frag);

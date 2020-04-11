@@ -67,6 +67,30 @@ namespace UI.BattleScene.Controls.Question {
             return getContainer().result;
         }
 
+        /// <summary>
+        /// 是否显示答案
+        /// </summary>
+        /// <returns></returns>
+        public bool showAnswer() {
+            return getContainer().showAnswer;
+        }
+
+        /// <summary>
+        /// 题目是否已关闭
+        /// </summary>
+        /// <returns>返回题目是否已经终止</returns>
+        public bool isTerminated() {
+            return showAnswer() || getResult() != null;
+        }
+
+        /// <summary>
+        /// 能否选中
+        /// </summary>
+        /// <returns></returns>
+        public override bool isCheckable() {
+            return base.isCheckable() && !isTerminated();
+        }
+
         #endregion
 
         #region 界面控制
@@ -78,11 +102,16 @@ namespace UI.BattleScene.Controls.Question {
         protected override void drawExactlyItem(Question.Choice choice) {
             base.drawExactlyItem(choice);
             var result = getResult();
-            var correct = result != null && choice.answer;
-            var wrong = result != null && !correct && choice.isInSelection(result);
+            bool correct = false, wrong = false;
 
-            if (correctFlag) correctFlag.SetActive(correct);
-            if (wrongFlag) wrongFlag.SetActive(wrong);
+            if (showAnswer()) {
+                correct = result != null && choice.answer;
+                wrong = result != null && !correct &&
+                    choice.isInSelection(result);
+
+                if (correctFlag) correctFlag.SetActive(correct);
+                if (wrongFlag) wrongFlag.SetActive(wrong);
+            } 
 
             if (text) {
                 var color = normalFontColor;

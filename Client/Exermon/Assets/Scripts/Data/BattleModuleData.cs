@@ -677,7 +677,7 @@ namespace BattleModule.Data {
         [AutoConvert]
         public bool correct { get; protected set; }
         [AutoConvert]
-        public int[] selection { get; protected set; }
+        public int[] selection { get; protected set; } = null;
         [AutoConvert]
         public int timespan { get; protected set; }
 
@@ -699,6 +699,14 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回做题用时</returns>
         public int getTimespan() { return timespan; }
+
+        /// <summary>
+        /// 是否作答
+        /// </summary>
+        /// <returns></returns>
+        public bool isAnswered() {
+            return selection != null;
+        }
 
         /// <summary>
         /// 进度
@@ -730,6 +738,17 @@ namespace BattleModule.Data {
         public CompRank rank() {
             return DataService.get().compRank(rankId);
         }
+
+        /// <summary>
+        /// 清除回合状态数据
+        /// </summary>
+        public void clearRoundStatus() {
+            selection = null;
+            correct = false;
+            timespan = 0;
+        }
+
+        #region 数据读取
 
         /// <summary>
         /// 读取自定义属性
@@ -776,6 +795,8 @@ namespace BattleModule.Data {
         public void loadResult(JsonData json) {
             result = DataLoader.load<BattlePlayer>(json);
         }
+
+        #endregion
 
         /// <summary>
         /// 构造函数
@@ -834,15 +855,6 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
-        /// 是否匹配完成
-        /// </summary>
-        /// <returns>返回当前是否匹配完成</returns>
-        public bool isMatchingCompleted() {
-            return player1.progress == 100 &&
-                player2.progress == 100;
-        }
-
-        /// <summary>
         /// 获取运行时玩家
         /// </summary>
         /// <param name="pid">玩家ID</param>
@@ -853,6 +865,33 @@ namespace BattleModule.Data {
             if (player2.getID() == pid) return oppo ? player1 : player2;
             return null;
         }
+
+        /// <summary>
+        /// 是否匹配完成
+        /// </summary>
+        /// <returns>返回当前是否匹配完成</returns>
+        public bool isMatchingCompleted() {
+            return player1.progress == 100 && player2.progress == 100;
+        }
+
+        /// <summary>
+        /// 答题阶段是否结束
+        /// </summary>
+        /// <returns>返回答题阶段是否结束</returns>
+        public bool isQuestCompleted() {
+            return player1.correct || player2.correct ||
+                (player1.isAnswered() && player2.isAnswered());
+        }
+
+        /// <summary>
+        /// 新回合
+        /// </summary>
+        public void onNewRound() {
+            player1.clearRoundStatus();
+            player2.clearRoundStatus();
+        }
+
+        #region 数据读取
 
         /// <summary>
         /// 读取匹配进度
@@ -896,6 +935,8 @@ namespace BattleModule.Data {
             player1.loadResult(result1);
             player2.loadResult(result2);
         }
+
+        #endregion
 
     }
 

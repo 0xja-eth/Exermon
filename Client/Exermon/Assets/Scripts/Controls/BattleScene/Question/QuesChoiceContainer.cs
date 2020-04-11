@@ -24,16 +24,44 @@ namespace UI.BattleScene.Controls.Question {
         public QuesPictureContainer pictureContaienr; // 图片容器
 
         /// <summary>
-        /// 内部变量定义
+        /// 显示结果
         /// </summary>
         QuestionSetRecord.IQuestionResult _result = null; // 是否显示答案
         public QuestionSetRecord.IQuestionResult result {
             get { return _result; }
             set {
                 _result = value;
+                setupSelection();
                 requestRefresh();
             }
         }
+
+        /// <summary>
+        /// 显示答案解析
+        /// </summary>
+        bool _showAnswer = false;
+        public bool showAnswer {
+            get { return _showAnswer; }
+            set {
+                _showAnswer = value;
+                requestRefresh();
+            }
+        }
+
+        #region 数据控制
+
+        /// <summary>
+        /// 同步选择
+        /// </summary>
+        void setupSelection() {
+            clearChecks();
+            if (result == null) return;
+            var selection = result.getSelection();
+            foreach (var sel in selection)
+                check(items.Find(c => c.order == sel));
+        }
+
+        #endregion
 
         #region 接口实现
 

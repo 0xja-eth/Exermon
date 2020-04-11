@@ -429,7 +429,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		ChannelLayerTag.NoLayer  # 是否需要响应
 	],
 	# 对战准备阶段完成
-	'battle/perpare/complete': [[
+	'battle/prepare/complete': [[
 		['uid', 'int'],
 		['type', 'var'],
 		['contitem_id', 'var'],

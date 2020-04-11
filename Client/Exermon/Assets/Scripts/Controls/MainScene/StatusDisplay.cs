@@ -22,7 +22,7 @@ namespace UI.MainScene.Controls {
         /// <summary>
         /// 等级经验文本格式
         /// </summary>
-        const string LevelExpFormat = "Lv{0}: {1}/{2}";
+        const string LevelExpFormat = "<size=18>Lv{0}: </size>{1}/{2}";
 
         /// <summary>
         /// 外部组件设置

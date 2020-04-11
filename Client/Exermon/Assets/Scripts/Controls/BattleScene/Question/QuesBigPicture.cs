@@ -16,8 +16,9 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 常量定义
         /// </summary>
+        const string ImageTextFormat = "图片{0}";
 
-            /// <summary>
+        /// <summary>
         /// 外部变量定义
         /// </summary>
         public Text alph;
@@ -39,7 +40,7 @@ namespace UI.BattleScene.Controls.Question {
             picture.preserveAspect = true;
             picture.overrideSprite = AssetLoader.generateSprite(texture);
 
-            alph.text = ((char)('A' + index)).ToString();
+            alph.text = string.Format(ImageTextFormat, index + 1);
         }
 
         /// <summary>

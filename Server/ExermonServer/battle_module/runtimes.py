@@ -715,6 +715,8 @@ class RuntimeBattlePlayer(RuntimeData):
 		self.initBattleItems()
 		self.initParams()
 
+		self.actions = []
+
 	def initParams(self):
 		"""
 		初始化属性
@@ -811,6 +813,13 @@ class RuntimeBattlePlayer(RuntimeData):
 	# endregion
 
 	# region 数据操作
+
+	def setupRoundResult(self):
+		"""
+		配置回合结果
+		"""
+		if self.round_result is not None: return
+		self.round_result = self.battler.currentRound()
 
 	def getExermons(self) -> list:
 		"""
@@ -937,7 +946,7 @@ class RuntimeBattlePlayer(RuntimeData):
 			result_type (HitResultType): 命中结果类型
 			hurt (int): 伤害点数
 		"""
-		action = RuntimeAction(ActionType.Action)
+		action = RuntimeAction(ActionType.Attack)
 		action.skill_id = 0 if skill is None else skill.id
 		action.target_type = target_type
 		action.result_type = result_type
@@ -1216,28 +1225,44 @@ class RuntimeBattle(RuntimeData):
 		"""
 		return self.player1.id, self.player2.id
 
-	def getBattler(self, player: Player) -> RuntimeBattlePlayer:
+	def getBattler(self, player: Player = None,
+					   runtime_battler: RuntimeBattlePlayer = None) -> RuntimeBattlePlayer:
 		"""
 		获取对战玩家
 		Args:
 			player (Player): 玩家实例
+			runtime_battler (RuntimeBattlePlayer): 对战玩家实例
 		Returns:
 			玩家对应的运行时对战玩家
 		"""
-		if player == self.player1: return self.runtime_battler1
-		if player == self.player2: return self.runtime_battler2
+		if player and player == self.player1: return self.runtime_battler1
+		if player and player == self.player2: return self.runtime_battler2
+
+		if runtime_battler and runtime_battler == self.runtime_battler1:
+			return self.runtime_battler1
+		if runtime_battler and runtime_battler == self.runtime_battler2:
+			return self.runtime_battler2
+
 		return None
 
-	def getOppoBattler(self, player: Player) -> RuntimeBattlePlayer:
+	def getOppoBattler(self, player: Player = None,
+					   runtime_battler: RuntimeBattlePlayer = None) -> RuntimeBattlePlayer:
 		"""
 		获取对方对战玩家
 		Args:
 			player (Player): 玩家实例
+			runtime_battler (RuntimeBattlePlayer): 对战玩家实例
 		Returns:
 			玩家对应的运行时对战玩家
 		"""
-		if player == self.player1: return self.runtime_battler2
-		if player == self.player2: return self.runtime_battler1
+		if player and player == self.player1: return self.runtime_battler2
+		if player and player == self.player2: return self.runtime_battler1
+
+		if runtime_battler and runtime_battler == self.runtime_battler1:
+			return self.runtime_battler2
+		if runtime_battler and runtime_battler == self.runtime_battler2:
+			return self.runtime_battler1
+
 		return None
 
 	def getOnlinePlayer(self, player: Player) -> OnlinePlayer:
@@ -1298,10 +1323,7 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回当前回合的数据
 		"""
-		round = self.record.currentRound()
-		round = ModelUtils.objectToDict(round)
-
-		return {'round': round}
+		return {'round': self.record.currentRound().convertToDict()}
 
 	# endregion
 
@@ -1369,7 +1391,8 @@ class RuntimeBattle(RuntimeData):
 		battler = self.getBattler(player)
 
 		battler.battler.answerCurrentRound(selection, timespan)
-		battler.round_result = battler.battler.currentRound()
+		battler.setupRoundResult()
+
 		correct = battler.round_result.correct()
 
 		self._emit(EmitType.QuesResult,
@@ -1673,7 +1696,10 @@ class RuntimeBattle(RuntimeData):
 		"""
 		执行攻击行动
 		"""
-		oppo = self.getOppoBattler(self.attacker)
+		oppo = self.getOppoBattler(runtime_battler=self.attacker)
+		if oppo.round_result is None:
+			oppo.setupRoundResult()
+
 		self.attacker.processAttack(oppo)
 
 	# endregion

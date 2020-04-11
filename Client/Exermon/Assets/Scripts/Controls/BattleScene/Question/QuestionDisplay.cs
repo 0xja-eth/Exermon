@@ -38,6 +38,8 @@ namespace UI.BattleScene.Controls.Question {
         public Image collectImg;
         public GameObject resultObj;
 
+        public GameObject confirmBtn;
+
         public RectTransform content;
 
         /// <summary>
@@ -56,13 +58,30 @@ namespace UI.BattleScene.Controls.Question {
         bool quesStarted = false;
         DateTime startTime;
 
-        QuestionSetRecord.IQuestionResult _result = null; // 是否显示答案
+        /// <summary>
+        /// 显示结果
+        /// </summary>
+        QuestionSetRecord.IQuestionResult _result = null;
         public QuestionSetRecord.IQuestionResult result {
             get { return _result; }
             set {
                 choiceContainer.result = value;
                 buttonContainer.result = value;
                 _result = value;
+                requestRefresh();
+            }
+        }
+
+        /// <summary>
+        /// 显示答案解析
+        /// </summary>
+        bool _showAnswer = false;
+        public bool showAnswer {
+            get { return _showAnswer; }
+            set {
+                choiceContainer.showAnswer = value;
+                buttonContainer.showAnswer = value;
+                _showAnswer = value;
                 requestRefresh();
             }
         }
@@ -74,7 +93,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            // if (content) registerUpdateLayout(content);
+            if (content) registerUpdateLayout(content);
         }
         
         /// <summary>
@@ -102,7 +121,7 @@ namespace UI.BattleScene.Controls.Question {
         /// 开始答题
         /// </summary>
         public void startQuestion() {
-            quesStarted = true;
+            confirmBtn.SetActive(quesStarted = true);
             startTime = DateTime.Now;
         }
 
@@ -110,7 +129,7 @@ namespace UI.BattleScene.Controls.Question {
         /// 开始答题
         /// </summary>
         public void terminateQuestion() {
-            quesStarted = false;
+            confirmBtn.SetActive(quesStarted = false);
         }
 
         /// <summary>
@@ -153,7 +172,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            result = null;
+            result = null; showAnswer = false;
         }
 
         #endregion
@@ -169,7 +188,7 @@ namespace UI.BattleScene.Controls.Question {
 
             drawTitle(question);
             drawPictruesAndChoices(question);
-            if (result != null) drawResult(question);
+            if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
 
 
@@ -189,9 +208,9 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         /// <param name="question">题目</param>
         void drawPictruesAndChoices(Question question) { 
-            pictureContaienr.setItem(question, true);
-            choiceContainer.setItem(question, true);
-            buttonContainer.setItem(question, true);
+            pictureContaienr.setItem(question, false);
+            choiceContainer.setItem(question, false);
+            buttonContainer.setItem(question, false);
         }
 
         /// <summary>

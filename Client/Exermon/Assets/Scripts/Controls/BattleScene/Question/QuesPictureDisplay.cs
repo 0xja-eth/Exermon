@@ -37,7 +37,7 @@ namespace UI.BattleScene.Controls.Question {
             picture.preserveAspect = true;
             picture.overrideSprite = AssetLoader.generateSprite(texture);
 
-            alph.text = ((char)('A' + index)).ToString();
+            alph.text = (index + 1).ToString();
         }
 
         /// <summary>

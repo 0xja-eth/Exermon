@@ -2837,6 +2837,22 @@ class SlotContItem(BaseContItem):
 
 		return equip_item
 
+	def ensureContItemUsable(self, index: int = 0, type_: type = None, count: int = 1, **kwargs):
+		"""
+		确保物品可用
+		Args:
+			index (int): 装备类型索引
+			type_ (type): 装备类型（类）
+			count (int): 使用数量
+			**kwargs (**dict): 拓展参数
+		"""
+		if type_ is not None:
+			index = self.getEquipItemIndex(type_=type_)
+
+		equip_item = self.equipItem(index)
+		if equip_item is not None:
+			equip_item.ensureContItemUsable(count, **kwargs)
+
 	def useItem(self, index: int = 0, type_: type = None, count: int = 1, **kwargs):
 		"""
 		使用物品
@@ -2850,7 +2866,8 @@ class SlotContItem(BaseContItem):
 			index = self.getEquipItemIndex(type_=type_)
 
 		equip_item = self.equipItem(index)
-		equip_item.useItem(count, **kwargs)
+		if equip_item is not None:
+			equip_item.useItem(count, **kwargs)
 
 	# endregion
 

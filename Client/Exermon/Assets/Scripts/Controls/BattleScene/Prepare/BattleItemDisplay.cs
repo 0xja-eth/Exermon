@@ -48,8 +48,9 @@ namespace UI.BattleScene.Controls.Prepare {
         /// 是否可以选中
         /// </summary>
         /// <returns>可否选中</returns>
-        public override bool isCheckable() {
-            return base.isCheckable() && item.freezeRound == 0;
+        public override bool isSelectable() {
+            return base.isSelectable() && item != null && 
+                item.item() != null && item.freezeRound == 0;
         }
 
         #endregion

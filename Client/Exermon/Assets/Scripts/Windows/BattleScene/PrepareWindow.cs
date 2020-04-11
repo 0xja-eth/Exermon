@@ -117,7 +117,6 @@ namespace UI.BattleScene.Windows {
         public override void startWindow() {
             base.startWindow();
             prepareControl.SetActive(true);
-            battleClock.startView();
             selfStatus.startView();
             oppoStatus.startView();
         }
@@ -151,8 +150,9 @@ namespace UI.BattleScene.Windows {
             tabController.configure(containerDisplays);
 
             var battle = battleSer.battle;
-            questionInfo.setItem(battle.round);
-            battleClock.startTimer(PrepareTime);
+            questionInfo.setItem(battle.round, true);
+
+            battleClock.startView(PrepareTime);
 
             selfStatus.setItem(battle.self(), true);
             oppoStatus.setItem(battle.oppo(), true);
