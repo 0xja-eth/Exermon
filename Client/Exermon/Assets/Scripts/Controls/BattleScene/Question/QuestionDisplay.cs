@@ -93,7 +93,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (content) registerUpdateLayout(content);
+            //if (content) registerUpdateLayout(content);
         }
         
         /// <summary>

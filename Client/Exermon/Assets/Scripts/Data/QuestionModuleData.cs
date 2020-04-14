@@ -123,6 +123,11 @@ namespace QuestionModule.Data {
         [AutoConvert]
         public Picture[] pictures { get; protected set; }
 
+        /// <summary>
+        /// 打乱的选项
+        /// </summary>
+        Choice[] _shuffleChoices { get; set; } = null;
+
         #region 数据操作
 
         /// <summary>
@@ -181,16 +186,26 @@ namespace QuestionModule.Data {
         /// </summary>
         /// <returns>返回打乱的选项</returns>
         public Choice[] shuffleChoices() {
-            int map = 0, cnt = choices.Length;
-            var res = new Choice[cnt];
-            for(int i = 0; i < cnt; ++i) {
-                int index = UnityEngine.Random.Range(0, cnt);
-                while ((map & (1 << index)) != 0)
-                    index = UnityEngine.Random.Range(0, cnt);
-                res[index] = choices[i];
-                map = map | (1 << index);
+            if (_shuffleChoices == null) {
+                int map = 0, cnt = choices.Length;
+                var res = new Choice[cnt];
+                for (int i = 0; i < cnt; ++i) {
+                    int index = UnityEngine.Random.Range(0, cnt);
+                    while ((map & (1 << index)) != 0)
+                        index = UnityEngine.Random.Range(0, cnt);
+                    res[index] = choices[i];
+                    map = map | (1 << index);
+                }
+                _shuffleChoices = res;
             }
-            return res;
+            return _shuffleChoices;
+        }
+
+        /// <summary>
+        /// 清空打乱题目
+        /// </summary>
+        public void clearShuffleChoices() {
+            _shuffleChoices = null;
         }
 
         #endregion

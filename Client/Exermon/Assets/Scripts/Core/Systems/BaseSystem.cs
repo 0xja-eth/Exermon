@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
@@ -154,6 +156,7 @@ namespace Core.Systems {
         /// </summary>
         /// <param name="state">新状态</param>
         protected void changeState(int state, bool force = false) {
+            Debug.Log("changeState: " + this.state + " -> " + state);
             if ((force || hasState(state)) && this.state != state) 
                 this.state = state;
         }

@@ -96,9 +96,10 @@ class QuesPicture(models.Model):
 class QuesReportType(Enum):
 	QuestionError = 1  # 题目错误（题目显示错误/题目内容错误/空白题目）
 	PictureError = 2  # 图片错误（图片显示错误/图片不对应/图片不显示）
-	AnswerError = 3  # 答案错误（无正确答案/正确答案错误/答案题目不匹配）
-	SubjectError = 4  # 科目错误（题目科目不匹配）
-	DifficultyError = 5  # 难度分配错误（题目难度等级不合适）
+	AnswerError = 3  # 答案错误（无正确答案/正确答案错误）
+	DescError = 4  # 解析错误（解析内容错误/解析与答案不匹配/无解析）
+	SubjectError = 5  # 科目错误（题目科目不匹配）
+	DifficultyError = 6  # 星级难度错误（题目难度等级不合适）
 	Other = 0  # 其他错误
 
 

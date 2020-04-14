@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
+
 using GameModule.Services;
 
 using UI.Common.Controls.InputFields;
@@ -96,11 +98,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// </summary>
         /// <param name="exermon">物品</param>
         void drawFull(Exermon exermon) {
-            var full = exermon.full;
-            var rect = new Rect(0, 0, full.width, full.height);
-            this.full.overrideSprite = Sprite.Create(
-                full, rect, new Vector2(0.5f, 0.5f));
-            this.full.overrideSprite.name = full.name;
+            full.overrideSprite = AssetLoader.generateSprite(exermon.full);
         }
 
         /// <summary>

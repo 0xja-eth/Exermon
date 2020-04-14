@@ -763,7 +763,7 @@ class RuntimeBattlePlayer(RuntimeData):
 		"""
 		if res is None: res = {}
 
-		exermons = ModelUtils.objectsToDict(self.exermons)
+		exermons = ModelUtils.objectsToDict(list(self.exermons.values()))
 		battle_items = ModelUtils.objectsToDict(self.battle_items)
 
 		res['id'] = self.player.id
@@ -1013,6 +1013,9 @@ class RuntimeBattle(RuntimeData):
 	# 准备阶段时长（秒）
 	PREPARE_TIME = 30
 
+	# 准备阶段结束数据发射时差（秒）
+	PREPARE_END_WAIT_TIME = 2
+
 	# 最大行动时长（秒）（仅后台计时）
 	MAX_ACTION_TIME = 60
 
@@ -1020,10 +1023,13 @@ class RuntimeBattle(RuntimeData):
 	RESULT_TIME = 5
 
 	# 对战开始前等待时长（秒）
-	BATTLE_START_WAIT_TIME = 3
+	BATTLE_START_WAIT_TIME = 2
 
 	# 行动开始前等待时长（秒）
-	ACTION_START_WAIT_TIME = 5
+	ACTION_START_WAIT_TIME = 4
+
+	# 答题结果数据发射时差（秒）
+	ROUND_RESULT_WAIT_TIME = 2
 
 	# 当前回合数据
 	cur_round: BattleRound = None
@@ -1059,7 +1065,7 @@ class RuntimeBattle(RuntimeData):
 
 	# region 基本操作封装
 
-	def _emit(self, type: EmitType, data: dict = None, timespan: int = 0,  player: Player = None):
+	def _emit(self, type: EmitType, data: dict = None, timespan: int = 0, player: Player = None):
 		"""
 		发射数据，player 参数默认为 None，为 None 时将向对战中所有玩家发送信息
 		若 player 不为 None，则只对指定的玩家发送信息
@@ -1571,7 +1577,8 @@ class RuntimeBattle(RuntimeData):
 		"""
 		from question_module.models import Question
 
-		self._emit(EmitType.PrepareCompleted)
+		self._emit(EmitType.PrepareCompleted,
+				   None, self.PREPARE_END_WAIT_TIME)
 
 		self.status = BattleStatus.Questing
 		self.record.startCurrentRound()
@@ -1614,7 +1621,8 @@ class RuntimeBattle(RuntimeData):
 		"""
 		行动状态改变回调
 		"""
-		self._emit(EmitType.RoundResult, self._generateRoundResultData())
+		self._emit(EmitType.RoundResult, self._generateRoundResultData(),
+				   self.ROUND_RESULT_WAIT_TIME)
 
 		self.status = BattleStatus.Resulting
 		self.setTimer(self.RESULT_TIME)

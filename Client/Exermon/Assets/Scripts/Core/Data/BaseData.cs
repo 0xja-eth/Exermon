@@ -93,7 +93,7 @@ namespace Core.Data {
         /// <param name="json">数据</param>
         public void load(JsonData json) {
             rawData = json;
-            Debug.Log("load: " + json.ToJson());
+            //Debug.Log("load: " + json.ToJson());
             loadAutoAttributes(json);
             loadCustomAttributes(json);
         }

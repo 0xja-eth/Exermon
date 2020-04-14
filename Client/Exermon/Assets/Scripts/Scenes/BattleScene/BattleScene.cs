@@ -140,10 +140,12 @@ namespace UI.BattleScene {
         /// 状态改变回调
         /// </summary>
         void onStateChanged() {
+            Debug.Log("onStateChanged: " + battleSer.state);
             switch ((BattleService.State)battleSer.state) {
                 case BattleService.State.Preparing: onPerparing(); break;
                 case BattleService.State.Questing: onQuesting(); break;
-                case BattleService.State.Quested: onQuested(); break;
+                case BattleService.State.OneQuested: onQuested(); break;
+                case BattleService.State.BothQuested: onQuested(true); break;
                 case BattleService.State.Acting: onActing(); break;
                 case BattleService.State.Resulting: onResulting(); break;
                 case BattleService.State.Terminating: onTerminating(); break;
@@ -169,7 +171,7 @@ namespace UI.BattleScene {
         /// <summary>
         /// 答题完毕
         /// </summary>
-        void onQuested() {
+        void onQuested(bool both = false) {
             questionWindow.onQuested();
         }
 
@@ -177,14 +179,12 @@ namespace UI.BattleScene {
         /// 开始行动完毕
         /// </summary>
         void onActing() {
-            clear();
         }
 
         /// <summary>
         /// 回合结算
         /// </summary>
         void onResulting() {
-            clear();
         }
 
         /// <summary>

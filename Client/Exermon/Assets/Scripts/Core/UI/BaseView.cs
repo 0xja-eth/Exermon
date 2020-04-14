@@ -147,7 +147,7 @@ namespace Core.UI {
             registerUpdateLayout((RectTransform)rect);
         }
         public void registerUpdateLayout(RectTransform rect) {
-            StartCoroutine(updateLayout(rect));
+            doRoutine(updateLayout(rect));
         }
 
         /// <summary>
@@ -156,20 +156,12 @@ namespace Core.UI {
         /// <param name="rect">物体 RectTransform</param>
         /// <returns></returns>
         IEnumerator updateLayout(RectTransform rect) {
-            /*
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            Debug.Log("first updateLayout:" + rect.rect.width);
-            yield return new WaitForEndOfFrame();
-            */
             int cnt = 0;
             bool active = rect.gameObject.activeInHierarchy;
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
-                //Debug.Log("updateLayout: " + rect.gameObject.name + ": " + width + ", " + height);
-                if (++cnt <= LayoutStableFrame) {
-                    //Debug.Log("rebuild:" + cnt);
+                if (++cnt <= LayoutStableFrame) 
                     LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-                }
 
                 bool newActive = rect.gameObject.activeInHierarchy;
                 float newWidth = rect.rect.width, newHeight = rect.rect.height;

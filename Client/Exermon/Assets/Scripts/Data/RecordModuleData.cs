@@ -128,6 +128,12 @@ namespace RecordModule.Data {
             /// </summary>
             /// <returns>返回做题用时</returns>
             int getTimespan();
+
+            /// <summary>
+            /// 是否作答
+            /// </summary>
+            /// <returns></returns>
+            bool isAnswered();
         }
 
         /// <summary>
@@ -141,7 +147,7 @@ namespace RecordModule.Data {
             [AutoConvert]
             public int questionId { get; protected set; }
             [AutoConvert]
-            public int[] selection { get; protected set; }
+            public int[] selection { get; protected set; } = null;
             [AutoConvert]
             public int timespan { get; protected set; }
             [AutoConvert]
@@ -172,6 +178,13 @@ namespace RecordModule.Data {
             /// </summary>
             /// <returns>返回做题用时</returns>
             public int getTimespan() { return timespan; }
+
+            /// <summary>
+            /// 当前选择
+            /// </summary>
+            /// <returns>返回当前选择</returns>
+            public bool isAnswered() { return selection != null; }
+
         }
 
         /// <summary>

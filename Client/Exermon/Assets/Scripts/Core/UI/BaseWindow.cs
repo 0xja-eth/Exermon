@@ -84,12 +84,13 @@ namespace Core.UI {
         /// 显示窗口（视窗）
         /// </summary>
         protected override void showView() {
-            base.showView();
-            changeState(State.Showing);
-            if (animation) {
+            gameObject.SetActive(shown = true);
+            if (animation && animation.GetClip(showWindowAniText) != null) {
+                changeState(State.Showing);
+
                 animation.Play(showWindowAniText);
                 animation.wrapMode = WrapMode.Once;
-            }
+            } else onWindowShown();
         }
 
         /// <summary>
@@ -103,11 +104,12 @@ namespace Core.UI {
         /// 隐藏窗口（视窗）
         /// </summary>
         protected override void hideView() {
-            changeState(State.Hiding);
-            if (animation) {
+            if (animation && animation.GetClip(hideWindowAniText) != null) {
+                changeState(State.Hiding);
+
                 animation.Play(hideWindowAniText);
                 animation.wrapMode = WrapMode.Once;
-            }
+            } else onWindowHidden();
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace Core.UI {
         /// </summary>
         void onWindowShown() {
             changeState(State.Shown);
-            refresh();
+            requestRefresh(true);
         }
 
         /// <summary>

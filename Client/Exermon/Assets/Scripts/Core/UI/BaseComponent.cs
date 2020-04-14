@@ -1,4 +1,6 @@
 ﻿
+using System.Collections;
+
 using UnityEngine;
 
 namespace Core.UI {
@@ -63,6 +65,20 @@ namespace Core.UI {
         /// </summary>
         protected virtual void update() { }
 
+        #endregion
+
+        #region 协程控制
+
+        /// <summary>
+        /// 协程
+        /// </summary>
+        protected Coroutine doRoutine(string methodName) {
+            return StartCoroutine(methodName);
+        }
+        protected Coroutine doRoutine(IEnumerator routine) {
+            return StartCoroutine(routine);
+        }
+        
         #endregion
     }
 }

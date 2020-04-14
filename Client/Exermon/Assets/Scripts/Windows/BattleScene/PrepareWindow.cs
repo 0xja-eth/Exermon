@@ -6,19 +6,16 @@ using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
-using PlayerModule.Data;
-
 using GameModule.Services;
 
 using PlayerModule.Services;
-using BattleModule.Services;
 
-using UI.Common.Controls.ParamDisplays;
+using BattleModule.Data;
+using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
-
-using UI.Common.Controls.ItemDisplays;
+using UI.BattleScene.Controls.Waiting;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -45,7 +42,11 @@ namespace UI.BattleScene.Windows {
         public QuestionInfo questionInfo;
         public ItemTabController tabController;
         public BattleClock battleClock;
+
         public BattlerStatus selfStatus, oppoStatus;
+
+        public BattlerPrepareStatus selfPStatus;//, oppoPStatus;
+
         public BattleItemSlotDisplay battleItemSlotDisplay;
 
         public GameObject prepareControl;
@@ -53,6 +54,7 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 内部变量声明
         /// </summary>
+        RuntimeBattle battle;
 
         /// <summary>
         /// 场景组件引用
@@ -141,15 +143,56 @@ namespace UI.BattleScene.Windows {
         #region 界面控制
 
         /// <summary>
+        /// 显示上个玩家的答题状态
+        /// </summary>
+        void showPStatus(RuntimeBattlePlayer battler) {
+            if (battler == battle.self()) showSelfPStatus();
+            //if (battler == battle.oppo()) showOppoPStatus();
+        }
+
+        /// <summary>
+        /// 显示自身答题状态
+        /// </summary>
+        void showSelfPStatus(RuntimeBattlePlayer battler = null) {
+            if (battler == null) battler = battle.self();
+            selfPStatus.startView(battler);
+        }
+
+        ///// <summary>
+        ///// 显示对方答题状态
+        ///// </summary>
+        //void showOppoPStatus(RuntimeBattlePlayer battler = null) {
+        //    if (battler == null) battler = battle.oppo();
+        //    oppoPStatus.startView(battler);
+        //}
+
+        /// <summary>
+        /// 清空答题状态
+        /// </summary>
+        void showPStatuses() {
+            showSelfPStatus();
+            //showOppoPStatus();
+        }
+
+        /// <summary>
+        /// 清空答题状态
+        /// </summary>
+        void clearPStatuses() {
+            selfPStatus.terminateView();
+            //oppoPStatus.terminateView();
+        }
+
+        /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
+            battle = battleSer.battle;
+
             var containerDisplays = new IPrepareContainerDisplay[] {
                 battleItemSlotDisplay, /* quesSugarPackDisplay */};
             tabController.configure(containerDisplays);
 
-            var battle = battleSer.battle;
             questionInfo.setItem(battle.round, true);
 
             battleClock.startView(PrepareTime);
@@ -173,6 +216,8 @@ namespace UI.BattleScene.Windows {
             oppoStatus.requestClear(true);
 
             battleItemSlotDisplay.clearItems();
+
+            clearPStatuses();
         }
 
         #endregion
@@ -194,13 +239,17 @@ namespace UI.BattleScene.Windows {
                 tabController.itemToUse(), onPrepareCompleted);
         }
 
+        #endregion
+
+        #region 回调控制
+
         /// <summary>
         /// 准备完成回调
         /// </summary>
         void onPrepareCompleted() {
+            showSelfPStatus();
             prepareControl.SetActive(false);
             battleClock.stopTimer();
-            scene.showWaitingMask();
         }
 
         #endregion

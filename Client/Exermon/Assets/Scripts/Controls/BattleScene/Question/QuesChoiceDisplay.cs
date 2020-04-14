@@ -31,6 +31,9 @@ namespace UI.BattleScene.Controls.Question {
         public Color correctFontColor = new Color(0.2705882f, 0.6078432f, 0.372549f);
         public Color wrongFontColor = new Color(0.9372549f, 0.2666667f, 0.1137255f);
 
+        public CanvasGroup canvasGroup;
+        public float noAnswerAlpha = 0.4f; // 非正确答案时的透明度
+
         public GameObject correctFlag; // 正确答案标志
         public GameObject wrongFlag; // 错误答案标志
 
@@ -105,18 +108,28 @@ namespace UI.BattleScene.Controls.Question {
             bool correct = false, wrong = false;
 
             if (showAnswer()) {
-                correct = result != null && choice.answer;
-                wrong = result != null && !correct &&
-                    choice.isInSelection(result);
+                if (canvasGroup)
+                    canvasGroup.alpha = choice.answer ? 1 : noAnswerAlpha;
 
-                if (correctFlag) correctFlag.SetActive(correct);
-                if (wrongFlag) wrongFlag.SetActive(wrong);
-            } 
+                if (result != null && result.isAnswered()) {
+                    correct = choice.answer && choice.isInSelection(result);
+                    wrong = !choice.answer && choice.isInSelection(result);
+
+                    if (correctFlag) correctFlag.SetActive(correct);
+                    if (wrongFlag) wrongFlag.SetActive(wrong);
+                }
+            } else {
+                if (canvasGroup) canvasGroup.alpha = 1;
+                if (correctFlag) correctFlag.SetActive(false);
+                if (wrongFlag) wrongFlag.SetActive(false);
+            }
 
             if (text) {
                 var color = normalFontColor;
                 if (correct) color = correctFontColor;
                 if (wrong) color = wrongFontColor;
+
+                text.color = color;
                 text.text = generateChoiceText(choice);
             }
         }
@@ -135,6 +148,7 @@ namespace UI.BattleScene.Controls.Question {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
+            if (canvasGroup) canvasGroup.alpha = 1;
             if (correctFlag) correctFlag.SetActive(false);
             if (wrongFlag) wrongFlag.SetActive(false);
             if (text) text.text = "";

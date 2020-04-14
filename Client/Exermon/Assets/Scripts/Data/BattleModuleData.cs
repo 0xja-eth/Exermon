@@ -682,6 +682,11 @@ namespace BattleModule.Data {
         public int timespan { get; protected set; }
 
         /// <summary>
+        /// 对战实例
+        /// </summary>
+        public RuntimeBattle battle { get; set; } = null;
+
+        /// <summary>
         /// 当前选择
         /// </summary>
         /// <returns>返回当前选择</returns>
@@ -701,12 +706,10 @@ namespace BattleModule.Data {
         public int getTimespan() { return timespan; }
 
         /// <summary>
-        /// 是否作答
+        /// 当前选择
         /// </summary>
-        /// <returns></returns>
-        public bool isAnswered() {
-            return selection != null;
-        }
+        /// <returns>返回当前选择</returns>
+        public bool isAnswered() { return selection != null; }
 
         /// <summary>
         /// 进度
@@ -737,6 +740,35 @@ namespace BattleModule.Data {
         /// <returns>返回段位对象</returns>
         public CompRank rank() {
             return DataService.get().compRank(rankId);
+        }
+
+        /// <summary>
+        /// 获取当前回合
+        /// </summary>
+        /// <returns>返回当前对战回合</returns>
+        public BattleRound currentRound() {
+            return battle.round;
+        }
+
+        /// <summary>
+        /// 获取当前回合
+        /// </summary>
+        /// <returns>返回当前对战回合</returns>
+        public RuntimeBattleExermon currentExermon() {
+            var round = battle.round;
+            return exermon(round.subjectId);
+        }
+
+        /// <summary>
+        /// 获取指定科目的艾瑟萌
+        /// </summary>
+        /// <param name="subjectId">科目ID</param>
+        /// <returns>返回指定科目的为什么</returns>
+        public RuntimeBattleExermon exermon(int subjectId) {
+            foreach (var exermon in exermons)
+                if (exermon.subjectId == subjectId)
+                    return exermon;
+            return null;
         }
 
         /// <summary>
@@ -778,6 +810,7 @@ namespace BattleModule.Data {
         public void loadAnswer(bool correct, int timespan) {
             this.correct = correct;
             this.timespan = timespan;
+            selection = new int[0];
         }
 
         /// <summary>
@@ -839,6 +872,11 @@ namespace BattleModule.Data {
         public BattleRound round { get; protected set; } = new BattleRound();
 
         /// <summary>
+        /// 上次更新的玩家
+        /// </summary>
+        public RuntimeBattlePlayer lastPlayer { get; protected set; } = null;
+
+        /// <summary>
         /// 获取自身玩家运行时数据
         /// </summary>
         /// <returns>返回自身运行时数据</returns>
@@ -887,6 +925,7 @@ namespace BattleModule.Data {
         /// 新回合
         /// </summary>
         public void onNewRound() {
+            lastPlayer = null;
             player1.clearRoundStatus();
             player2.clearRoundStatus();
         }
@@ -910,8 +949,14 @@ namespace BattleModule.Data {
         /// <param name="correct">是否正确</param>
         /// <param name="timespan">用时</param>
         public void loadAnswer(int pid, bool correct, int timespan) {
-            var player = getPlayer(pid);
-            player.loadAnswer(correct, timespan);
+            lastPlayer = getPlayer(pid);
+            lastPlayer.loadAnswer(correct, timespan);
+
+            if (correct) { // 如果是某方作答正确
+                var oppo = getPlayer(pid, true);
+                if (oppo != null && !oppo.isAnswered()) // 对方没有作答
+                    oppo.loadAnswer(false, 0); // 直接设置其作答
+            }
         }
 
         /// <summary>
@@ -934,6 +979,15 @@ namespace BattleModule.Data {
             var result2 = DataLoader.load(json, "player2");
             player1.loadResult(result1);
             player2.loadResult(result2);
+        }
+
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            player1.battle = player2.battle = this;
         }
 
         #endregion

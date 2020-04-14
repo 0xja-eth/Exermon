@@ -60,7 +60,8 @@ namespace BattleModule.Services {
             Matched = 10, // 匹配完毕
             Preparing = 2, // 准备中
             Questing = 3, // 作答中
-            Quested = 11, // 作答完毕
+            OneQuested = 11, // 一方作答完毕
+            BothQuested = 12, // 双方作答完毕
             Acting = 4, // 行动中
             Resulting = 5, // 结算中
             Terminating = 6, // 结束中
@@ -110,7 +111,8 @@ namespace BattleModule.Services {
             addStateDict(State.Matched);
             addStateDict(State.Preparing);
             addStateDict(State.Questing);
-            addStateDict(State.Quested);
+            addStateDict(State.OneQuested);
+            addStateDict(State.BothQuested);
             addStateDict(State.Acting);
             addStateDict(State.Resulting);
             addStateDict(State.Terminating);
@@ -458,6 +460,9 @@ namespace BattleModule.Services {
         void onNewRound(JsonData data) {
             battle = DataLoader.load(battle, data);
             battle.onNewRound();
+
+            Debug.Log("onNewRound: " + battle.toJson().ToJson());
+
             changeState(State.Preparing);
         }
 
@@ -478,7 +483,13 @@ namespace BattleModule.Services {
             var correct = DataLoader.load<bool>(data, "correct");
             var timespan = DataLoader.load<int>(data, "timespan");
             battle.loadAnswer(pid, correct, timespan);
-            changeState(State.Quested);
+
+            Debug.Log("onQuesResult: "+battle.toJson().ToJson());
+
+            if (state == (int)State.Questing)
+                changeState(State.OneQuested);
+            else if (state == (int)State.OneQuested)
+                changeState(State.BothQuested);
         }
 
         /// <summary>
@@ -487,6 +498,9 @@ namespace BattleModule.Services {
         /// <param name="data"></param>
         void onActionStart(JsonData data) {
             battle.loadActions(data);
+
+            Debug.Log("onActionStart: " + battle.toJson().ToJson());
+
             changeState(State.Acting);
         }
 
