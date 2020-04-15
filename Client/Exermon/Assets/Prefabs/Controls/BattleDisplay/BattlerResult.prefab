@@ -360,6 +360,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7838362881129747067}
   - component: {fileID: 7838362881129747066}
+  - component: {fileID: 4418567823930039090}
   m_Layer: 5
   m_Name: BattlerResult
   m_TagString: Untagged
@@ -418,6 +419,90 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &4418567823930039090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7838362881129747064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcad9d5743933584ea7b9a9e2951b800, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trigger: {fileID: 0}
+  displayItems:
+  - key: name
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: result
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: hurt
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: "\u9020\u6210\u4F24\u5BB3\uFF1A{0}"
+    trigger: 
+  - key: damage
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: "\u627F\u53D7\u4F24\u5BB3\uFF1A{0}"
+    trigger: 
+  - key: recover
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: "\u9053\u5177\u6062\u590D\uFF1A{0}"
+    trigger: 
+  - key: rest_hp
+    obj: {fileID: 0}
+    type: Text
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: timespan
+    obj: {fileID: 0}
+    type: TimeSpan
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: color
+    obj: {fileID: 7838362881568949420}
+    type: Color
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: color
+    obj: {fileID: 7838362881233601087}
+    type: Color
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
+  - key: color
+    obj: {fileID: 0}
+    type: Color
+    animated: 0
+    configData: 0
+    format: 
+    trigger: 
 --- !u!1 &7838362881233601087
 GameObject:
   m_ObjectHideFlags: 0

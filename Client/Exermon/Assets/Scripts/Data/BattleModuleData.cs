@@ -1,5 +1,7 @@
 ﻿using System;
 
+using UnityEngine;
+
 using LitJson;
 
 using Core.Data;
@@ -17,6 +19,8 @@ using RecordModule.Data;
 
 using QuestionModule.Services;
 using PlayerModule.Services;
+
+using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
 /// 对战模块
@@ -625,7 +629,16 @@ namespace BattleModule.Data {
     /// 对战玩家数据（回合结果时进行数据同步）
     /// </summary>
     public class RuntimeBattlePlayer : BaseData, 
-        QuestionSetRecord.IQuestionResult {
+        QuestionSetRecord.IQuestionResult, ParamDisplay.DisplayDataConvertable {
+
+        /// <summary>
+        /// 常量设置
+        /// </summary>
+        const string CorrectText = "AC";
+        const string WrongText = "WA";
+
+        static readonly Color CorrectColor = new Color(1, 0.1647059f, 0.3921569f);
+        static readonly Color WrongColor = new Color(0.5450981f, 0.9647059f, 1);
 
         /// <summary>
         /// 基本数据
@@ -712,6 +725,17 @@ namespace BattleModule.Data {
         public bool isAnswered() { return selection != null; }
 
         /// <summary>
+        /// 使用的物品
+        /// </summary>
+        /// <returns></returns>
+        public BaseItem roundItem() {
+            if (actions == null) return null;
+            if (actions[0].type == (int)RuntimeAction.Type.Prepare) 
+                return actions[0].item();
+            return null;
+        }
+
+        /// <summary>
         /// 进度
         /// </summary>
         public int progress { get; protected set; } = -1;
@@ -719,12 +743,47 @@ namespace BattleModule.Data {
         /// <summary>
         /// 行动数据
         /// </summary>
-        public RuntimeAction[] actions { get; protected set; }
+        public RuntimeAction[] actions { get; protected set; } = null;
 
         /// <summary>
         /// 结果数据
         /// </summary>
         public BattlePlayer result { get; protected set; }
+
+        #region 数据转换
+
+        /// <summary>
+        /// 转换为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public JsonData convertToDisplayData(string type = "") {
+            switch(type) {
+                case "round_result": return convertRoundResultData();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化回合结算数据
+        /// </summary>
+        /// <returns>返回数据</returns>
+        JsonData convertRoundResultData() {
+            var res = new JsonData();
+            var color = correct ? CorrectColor : WrongColor;
+
+            res["hurt"] = hurt;
+            res["damage"] = damage;
+            res["recover"] = recover;
+            res["color"] = DataLoader.convert(color);
+            res["result"] = correct ? CorrectText : WrongText;
+            res["rest_hp"] = string.Format("{0}/{1}", hp, mhp);
+            res["name"] = name;
+
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 形象对象
@@ -810,7 +869,7 @@ namespace BattleModule.Data {
         public void loadAnswer(bool correct, int timespan) {
             this.correct = correct;
             this.timespan = timespan;
-            selection = new int[0];
+            if (selection == null) selection = new int[0];
         }
 
         /// <summary>

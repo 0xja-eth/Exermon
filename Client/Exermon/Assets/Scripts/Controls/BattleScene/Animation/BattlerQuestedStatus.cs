@@ -9,7 +9,7 @@ using BattleModule.Data;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Waiting {
+namespace UI.BattleScene.Controls.Animation {
 
     /// <summary>
     /// 玩家准备显示
@@ -42,10 +42,11 @@ namespace UI.BattleScene.Controls.Waiting {
 
             //var texture = correct ? correctBackground : wrongBackground;
             //statusBackground.overrideSprite = AssetLoader.generateSprite(texture);
-
+            /*
             if (humanBlackLine) humanBlackLine.SetActive(!correct);
             if (exermonBlackLine) exermonBlackLine.SetActive(!correct);
             if (lightEffect) lightEffect.SetActive(correct);
+            */
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace UI.BattleScene.Controls.Waiting {
         protected override void clearItem() {
             base.clearItem();
             exermon.gameObject.SetActive(false);
-
+            
             if (humanBlackLine) humanBlackLine.SetActive(false);
             if (exermonBlackLine) exermonBlackLine.SetActive(false);
             if (lightEffect) lightEffect.SetActive(false);

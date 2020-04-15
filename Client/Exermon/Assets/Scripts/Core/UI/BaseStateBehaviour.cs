@@ -49,6 +49,20 @@ namespace Core.UI {
         int layerIndex;
         int stateMachinePathHash;
 
+        GameObject gameObject;
+
+        #region 初始化
+
+        /// <summary>
+        ///初始化
+        /// </summary>
+        /// <param name="go">游戏物体</param>
+        protected virtual void setup(GameObject go) {
+            gameObject = go;
+        }
+
+        #endregion
+
         /// <summary>
         /// 状态进入
         /// </summary>
@@ -59,13 +73,14 @@ namespace Core.UI {
             this.stateInfo = stateInfo;
             this.layerIndex = layerIndex;
 
-            onStatusEnter(animator.gameObject);
+            setup(animator.gameObject);
+            onStatusEnter();
         }
 
         /// <summary>
         /// 状态进入
         /// </summary>
-        protected virtual void onStatusEnter(GameObject go) {}
+        protected virtual void onStatusEnter() {}
 
         /// <summary>
         /// 状态更新
@@ -77,13 +92,14 @@ namespace Core.UI {
             this.stateInfo = stateInfo;
             this.layerIndex = layerIndex;
 
-            onStatusUpdate(animator.gameObject);
+            setup(animator.gameObject);
+            onStatusUpdate();
         }
 
         /// <summary>
         /// 状态更新
         /// </summary>
-        protected virtual void onStatusUpdate(GameObject go) { }
+        protected virtual void onStatusUpdate() { }
 
         /// <summary>
         /// 状态结束
@@ -95,12 +111,13 @@ namespace Core.UI {
             this.stateInfo = stateInfo;
             this.layerIndex = layerIndex;
 
-            onStatusExit(animator.gameObject);
+            setup(animator.gameObject);
+            onStatusExit();
         }
         /// <summary>
         /// 状态结束
         /// </summary>
-        protected virtual void onStatusExit(GameObject go) { }
+        protected virtual void onStatusExit() { }
         
     }
 

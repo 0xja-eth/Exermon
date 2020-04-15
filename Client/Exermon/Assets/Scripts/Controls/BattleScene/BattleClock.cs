@@ -44,9 +44,17 @@ namespace UI.BattleScene.Controls {
         /// 更新
         /// </summary>
         protected override void update() {
-            base.update();
+            base.update(); updateTimer();
+        }
+
+        /// <summary>
+        /// 更新准备时间
+        /// </summary>
+        void updateTimer() {
+            if (!timing) return;
             var now = DateTime.Now;
-            if (timing && now <= endTime) refresh();
+            if (now < endTime) refresh();
+            else stopTimer(true);
         }
 
         #endregion

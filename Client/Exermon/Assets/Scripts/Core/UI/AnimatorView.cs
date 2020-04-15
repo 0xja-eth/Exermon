@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-using UnityEditor.Animations;
+//using UnityEditor.Animations;
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -27,10 +27,11 @@ namespace Core.UI {
         /// <summary>
         /// 内部变量设置
         /// </summary>
+        /*
         AnimatorController controller = null;
         AnimatorControllerLayer layer = null;
         AnimatorStateMachine machine = null;
-
+        */
         int layerIndex;
 
         string eventState; // 当前事件状态
@@ -60,7 +61,7 @@ namespace Core.UI {
         /// </summary>
         void initAnimator() {
             if (animator == null) return;
-            controller = (AnimatorController)animator.runtimeAnimatorController;
+            //controller = (AnimatorController)animator.runtimeAnimatorController;
             switchLayer();
             initializeStates();
         }
@@ -73,7 +74,7 @@ namespace Core.UI {
         #endregion
 
         #region 状态机配置
-
+        
         /// <summary>
         /// 添加状态行为脚本
         /// </summary>
@@ -81,12 +82,13 @@ namespace Core.UI {
         /// <param name="layerIndex">层ID</param>
         /// <param name="stateName">状态名</param>
         protected T addStateBehaviour<T>(int layerIndex, string stateName) where T : StateMachineBehaviour {
+            /*
             if (animator == null) return null;
             if (this.layerIndex != layerIndex) switchLayer(layerIndex);
             foreach (var state in machine.states)
                 if (state.state.name == stateName)
                     return state.state.AddStateMachineBehaviour<T>();
-
+            */
             return null;
         }
         protected T addStateBehaviour<T>(string stateName) where T : StateMachineBehaviour {
@@ -137,8 +139,8 @@ namespace Core.UI {
         public void switchLayer(int layerIndex = 0) {
             if (animator == null) return;
             this.layerIndex = layerIndex;
-            layer = controller.layers[layerIndex];
-            machine = layer.stateMachine;
+            //layer = controller.layers[layerIndex];
+            //machine = layer.stateMachine;
         }
 
         #endregion

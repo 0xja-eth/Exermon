@@ -297,7 +297,7 @@ namespace BattleModule.Services {
         /// <summary>
         /// 结算完成
         /// </summary>
-        public void resultComplete(int progress) {
+        public void resultComplete() {
             sendRequest(Oper.ResultComplete, uid: true);
         }
 

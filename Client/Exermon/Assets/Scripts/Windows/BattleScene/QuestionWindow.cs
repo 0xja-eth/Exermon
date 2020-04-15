@@ -21,7 +21,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Question;
-using UI.BattleScene.Controls.Waiting;
+using UI.BattleScene.Controls.Animation;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -59,6 +59,7 @@ namespace UI.BattleScene.Windows {
         /// 内部变量声明
         /// </summary>
         RuntimeBattle battle;
+        bool passed = false;
 
         /// <summary>
         /// 场景组件引用
@@ -110,7 +111,7 @@ namespace UI.BattleScene.Windows {
         /// 更新准备时间
         /// </summary>
         void updateBattleClock() {
-            if (battleClock.isTimeUp()) pushAnswer(true);
+            if (!passed && battleClock.isTimeUp()) pushAnswer(true);
         }
 
         #endregion
@@ -204,6 +205,8 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
+
+            passed = false;
             battle = battleSer.battle;
 
             var question = battle.round.question();
@@ -246,6 +249,11 @@ namespace UI.BattleScene.Windows {
         /// 题目状态动画显示时间差
         /// </summary>
         const float QStatusDeltaSeconds = 1;
+        
+        /// <summary>
+        /// 题目状态动画显示时间
+        /// </summary>
+        const float QStatusShowSeconds = 1;
 
         /// <summary>
         /// 显示正确方的题目状态动画
@@ -256,7 +264,8 @@ namespace UI.BattleScene.Windows {
             var oppo = battle.getPlayer(corr.getID(), true);
             CoroutineUtils.resetActions();
             CoroutineUtils.addAction(() => showQStatus(corr), QStatusDeltaSeconds);
-            CoroutineUtils.addAction(() => showQStatus(oppo, false), QStatusDeltaSeconds);
+            CoroutineUtils.addAction(() => showQStatus(oppo, false), QStatusShowSeconds);
+            CoroutineUtils.addAction(clearQStatuses);
             return CoroutineUtils.generateCoroutine();
         }
 
@@ -331,6 +340,8 @@ namespace UI.BattleScene.Windows {
         /// <param name="force">是否强制提交</param>
         void pushAnswer(bool force = false) {
             if (!questionDisplay.isStarted()) return;
+
+            passed = true;
 
             var selection = questionDisplay.getSelectionIds();
             var timespan = questionDisplay.getTimeSpan();

@@ -72,6 +72,9 @@ namespace Core.UI.Utils {
         public static void addAction(UnityAction action, float duration) {
             addAction(action, CoroutineAction.WaitType.WaitForSeconds, duration);
         }
+        public static void addAction(UnityAction action) {
+            addAction(action, CoroutineAction.WaitType.Null);
+        }
 
         /// <summary>
         /// 重置行动列表

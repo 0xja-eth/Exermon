@@ -15,7 +15,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
-using UI.BattleScene.Controls.Waiting;
+using UI.BattleScene.Controls.Animation;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -55,6 +55,7 @@ namespace UI.BattleScene.Windows {
         /// 内部变量声明
         /// </summary>
         RuntimeBattle battle;
+        bool passed = false;
 
         /// <summary>
         /// 场景组件引用
@@ -106,7 +107,7 @@ namespace UI.BattleScene.Windows {
         /// 更新准备时间
         /// </summary>
         void updateBattleClock() {
-            if (battleClock.isTimeUp()) pass();
+            if (!passed && battleClock.isTimeUp()) pass();
         }
 
         #endregion
@@ -187,6 +188,8 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
+
+            passed = false;
             battle = battleSer.battle;
 
             var containerDisplays = new IPrepareContainerDisplay[] {
@@ -228,6 +231,7 @@ namespace UI.BattleScene.Windows {
         /// 跳过
         /// </summary>
         public void pass() {
+            passed = true;
             battleSer.prepareComplete(onPrepareCompleted);
         }
 
@@ -235,6 +239,7 @@ namespace UI.BattleScene.Windows {
         /// 确认
         /// </summary>
         public void confirm() {
+            passed = true;
             battleSer.prepareComplete(
                 tabController.itemToUse(), onPrepareCompleted);
         }

@@ -11,7 +11,7 @@ using BattleModule.Data;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Waiting {
+namespace UI.BattleScene.Controls.Animation {
 
     /// <summary>
     /// 玩家准备显示
