@@ -6318,16 +6318,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e83da2575088e49b1f0a42500259ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 909161674}
   background: {fileID: 0}
   shownState: Shown
   hiddenState: Hidden
   shownAttr: shown
   selfResult: {fileID: 7838362880236467626}
   oppoResult: {fileID: 2140802760}
-  selfItem: {fileID: 0}
-  oppoItem: {fileID: 0}
-  timer: {fileID: 0}
+  selfItem: {fileID: 1052318420}
+  oppoItem: {fileID: 1632758649}
+  timer: {fileID: 262450972}
 --- !u!1 &926514252
 GameObject:
   m_ObjectHideFlags: 0
