@@ -100,7 +100,6 @@ namespace UI.TitleScene.Windows {
         protected override void initializeOnce() {
             base.initializeOnce();
             scene = (TitleScene)SceneUtils.getSceneObject("Scene");
-            Debug.Log("initializeOnce");
             initializeInputItemFields();
             setupInputItemFields();
         }

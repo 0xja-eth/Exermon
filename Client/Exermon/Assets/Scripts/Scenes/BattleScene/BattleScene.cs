@@ -38,12 +38,9 @@ namespace UI.BattleScene {
         public PrepareWindow prepareWindow;
         public QuestionWindow questionWindow;
 
-        public GameObject waitingMask;
-
         /// <summary>
         /// 内部组件设置
         /// </summary>
-        Text waitText;
 
         /// <summary>
         /// 内部系统声明
@@ -78,7 +75,6 @@ namespace UI.BattleScene {
         protected override void initializeOthers() {
             base.initializeOthers();
             SceneUtils.depositSceneObject("Scene", this);
-            waitText = SceneUtils.find<Text>(waitingMask, "Text");
         }
 
         /// <summary>
@@ -119,7 +115,6 @@ namespace UI.BattleScene {
         /// 关闭所有控件
         /// </summary>
         void clearControls() {
-            hideWaitingMask();
         }
 
         /// <summary>
@@ -195,26 +190,7 @@ namespace UI.BattleScene {
         }
 
         #endregion
-
-        #region 具体流程处理
-
-        /// <summary>
-        /// 显示等待遮罩
-        /// </summary>
-        public void showWaitingMask(string text = WaitingOppoText) {
-            waitingMask.SetActive(true);
-            waitText.text = text;
-        }
-
-        /// <summary>
-        /// 关闭等待遮罩
-        /// </summary>
-        public void hideWaitingMask() {
-            waitingMask.SetActive(false);
-        }
-
-        #endregion
-
+        
         #endregion
 
     }

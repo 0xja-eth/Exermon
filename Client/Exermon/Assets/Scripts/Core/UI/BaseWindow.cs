@@ -1,4 +1,6 @@
 ﻿
+using UnityEditor.Animations;
+
 using UnityEngine;
 
 namespace Core.UI {
@@ -10,8 +12,8 @@ namespace Core.UI {
     /// 游戏所有窗口的基类，实际上几乎是一个带有打开动画和关闭动画的视图
     /// 一般用于控制管理一个窗口下的组件，也用于进行不同窗口间的交互
     /// </remarks>
-    public class BaseWindow : BaseView {
-
+    public class BaseWindow : AnimatorView {
+        /*
         /// <summary>
         /// 窗口状态
         /// </summary>
@@ -22,24 +24,38 @@ namespace Core.UI {
             Hiding, // 关闭中
             Hidden, // 已关闭
         }
-
+        */
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public GameObject background; // 窗口背景
 
-        public new Animation animation; // 动画组件
-
         /// <summary>
         /// 外部变量设置
         /// </summary>
-        public string showWindowAniText = "ShowWindow"; // 显示窗口动画名
-        public string hideWindowAniText = "HideWindow"; // 隐藏窗口动画名
+        public string shownState = "Shown"; // 显示状态名称
+        public string hiddenState = "Hidden"; // 隐藏状态名称
 
+        public string shownAttr = "shown"; // 显示状态属性
+
+        /*
         /// <summary>
         /// 内部变量声明
         /// </summary>
         protected State state = State.None; // 窗口状态（可以在子类自定义）
+        */
+
+        #region 初始化
+            
+        /// <summary>
+        /// 初始化状态
+        /// </summary>
+        protected override void initializeStates() {
+            addChangeEvent(shownState, onWindowShown);
+            addChangeEvent(hiddenState, onWindowHidden);
+        }
+
+        #endregion
 
         #region 更新控制
 
@@ -49,7 +65,6 @@ namespace Core.UI {
         protected override void update() {
             base.update();
             updateBackground();
-            updateWindowState();
         }
 
         /// <summary>
@@ -58,17 +73,7 @@ namespace Core.UI {
         void updateBackground() {
             if (background != null) background.SetActive(isBackgroundVisible());
         }
-
-        /// <summary>
-        /// 更新窗口状态
-        /// </summary>
-        void updateWindowState() {
-            switch (state) {
-                case State.Showing: if (!isPlaying(showWindowAniText)) onWindowShown(); break;
-                case State.Hiding: if (!isPlaying(hideWindowAniText)) onWindowHidden(); break;
-            }
-        }
-
+        
         #endregion
 
         #region 启动/结束控制
@@ -85,12 +90,8 @@ namespace Core.UI {
         /// </summary>
         protected override void showView() {
             gameObject.SetActive(shown = true);
-            if (animation && animation.GetClip(showWindowAniText) != null) {
-                changeState(State.Showing);
-
-                animation.Play(showWindowAniText);
-                animation.wrapMode = WrapMode.Once;
-            } else onWindowShown();
+            if (!animator) onWindowShown();
+            else animator.SetBool(shownAttr, true);
         }
 
         /// <summary>
@@ -104,92 +105,38 @@ namespace Core.UI {
         /// 隐藏窗口（视窗）
         /// </summary>
         protected override void hideView() {
-            if (animation && animation.GetClip(hideWindowAniText) != null) {
-                changeState(State.Hiding);
-
-                animation.Play(hideWindowAniText);
-                animation.wrapMode = WrapMode.Once;
-            } else onWindowHidden();
+            if (!animator) onWindowHidden();
+            else animator.SetBool(shownAttr, false);
         }
 
         /// <summary>
         /// 窗口完全显示回调
         /// </summary>
-        void onWindowShown() {
-            changeState(State.Shown);
+        protected virtual void onWindowShown() {
             requestRefresh(true);
         }
 
         /// <summary>
         /// 窗口完全隐藏回调
         /// </summary>
-        void onWindowHidden() {
+        protected virtual void onWindowHidden() {
             base.hideView();
-            changeState(State.Hidden);
             updateBackground();
         }
 
         #endregion
 
-        #region 状态控制
-
-        /// <summary>
-        /// 改变状态
-        /// </summary>
-        /// <param name="state">新状态</param>
-        public void changeState(State state) {
-            this.state = state;
-        }
-
-        /// <summary>
-        /// 获取状态
-        /// </summary>
-        /// <returns>当前状态</returns>
-        public State getState() { return state; }
+        #region 数据控制
 
         /// <summary>
         /// 判断是否处于可视状态
         /// </summary>
         /// <returns>是否可视状态</returns>
         protected virtual bool isBackgroundVisible() {
-            return isVisibleState();
-        }
-
-        /// <summary>
-        /// 判断是否处于可视状态
-        /// </summary>
-        /// <returns>是否可视状态</returns>
-        protected bool isVisibleState() {
-            return state != State.None && state != State.Hidden;
-        }
-
-        /// <summary>
-        /// 是否在播放动画
-        /// </summary>
-        /// <param name="aniName">动画名称</param>
-        /// <returns>是否播放</returns>
-        bool isPlaying(string aniName) {
-            return animation && animation.IsPlaying(aniName);
+            return shown;
         }
 
         #endregion
 
-        #region 界面控制
-        /*
-        /// <summary>
-        /// 刷新窗口
-        /// </summary>
-        public new virtual void refresh() {
-            clear(); Debug.Log(name + " refresh");
-        }
-
-        /// <summary>
-        /// 清除窗口
-        /// </summary>
-        public new virtual void clear() {
-            Debug.Log(name + " clear");
-        }
-        */
-        #endregion
     }
 }

@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 5914496368812360518}
   - component: {fileID: 5914496368812360519}
   - component: {fileID: 1726545518403691965}
-  - component: {fileID: 4632605292670820609}
+  - component: {fileID: 7413121504598840238}
   - component: {fileID: 5914496368812360517}
   - component: {fileID: 6543845847679870881}
   - component: {fileID: 5187330406042870057}
@@ -531,23 +531,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 1
   m_AspectRatio: 2.7462687
---- !u!111 &4632605292670820609
-Animation:
+--- !u!95 &7413121504598840238
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5914496368812360513}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations:
-  - {fileID: 7400000, guid: bd0e2fcdb8a20c14dbe6c352bdb409c3, type: 2}
-  - {fileID: 7400000, guid: 850f3823946cb1349b59ea082bb1025a, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 28d68a165f525b441909b1d19243b42d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &5914496368812360517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -561,10 +563,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 818bae488cdc91e499348bb35bef1556, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 7413121504598840238}
   background: {fileID: 0}
-  animation: {fileID: 4632605292670820609}
-  showWindowAniText: ShowAlertWindow
-  hideWindowAniText: HideAlertWindow
+  shownState: Shown
+  hiddenState: Hidden
+  shownAttr: shown
   alertText: {fileID: 5914496367801729779}
   yesButton: {fileID: 5914496369003018431}
   retryButton: {fileID: 1434889416210066337}
