@@ -156,29 +156,31 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 显示上个玩家的答题状态
         /// </summary>
-        void showQStatus(RuntimeBattlePlayer battler) {
-            if (battler == battle.self()) showSelfQStatus();
-            if (battler == battle.oppo()) showOppoQStatus();
+        void showQStatus(RuntimeBattlePlayer battler, bool setLast = true) {
+            if (battler == battle.self()) showSelfQStatus(setLast, battler);
+            if (battler == battle.oppo()) showOppoQStatus(setLast, battler);
         }
 
         /// <summary>
         /// 显示自身答题状态
         /// </summary>
-        void showSelfQStatus(RuntimeBattlePlayer battler = null) {
+        void showSelfQStatus(bool setLast = true,
+            RuntimeBattlePlayer battler = null) {
             if (battler == null) battler = battle.self();
             if (selfQStatus.shown) return;
             selfQStatus.startView(battler);
-            selfQStatus.transform.SetAsLastSibling();
+            if (setLast) selfQStatus.transform.SetAsLastSibling();
         }
 
         /// <summary>
         /// 显示对方答题状态
         /// </summary>
-        void showOppoQStatus(RuntimeBattlePlayer battler = null) {
+        void showOppoQStatus(bool setLast = true,
+            RuntimeBattlePlayer battler = null) {
             if (battler == null) battler = battle.oppo();
             if (oppoQStatus.shown) return;
             oppoQStatus.startView(battler);
-            selfQStatus.transform.SetAsLastSibling();
+            if (setLast) oppoQStatus.transform.SetAsLastSibling();
         }
 
         /// <summary>
@@ -243,7 +245,7 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 题目状态动画显示时间差
         /// </summary>
-        const float QStatusDeltaSeconds = 2;
+        const float QStatusDeltaSeconds = 1;
 
         /// <summary>
         /// 显示正确方的题目状态动画
@@ -254,7 +256,7 @@ namespace UI.BattleScene.Windows {
             var oppo = battle.getPlayer(corr.getID(), true);
             CoroutineUtils.resetActions();
             CoroutineUtils.addAction(() => showQStatus(corr), QStatusDeltaSeconds);
-            CoroutineUtils.addAction(() => showQStatus(oppo), QStatusDeltaSeconds);
+            CoroutineUtils.addAction(() => showQStatus(oppo, false), QStatusDeltaSeconds);
             return CoroutineUtils.generateCoroutine();
         }
 
