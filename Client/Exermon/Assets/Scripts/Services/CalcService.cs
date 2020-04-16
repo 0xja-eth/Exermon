@@ -1,6 +1,9 @@
 ﻿using System;
 
+using UnityEngine;
+
 using Core.Data;
+using Core.Data.Loaders;
 using Core.Services;
 
 using GameModule.Data;
@@ -9,7 +12,6 @@ using ExermonModule.Data;
 using SeasonModule.Data;
 
 using SeasonModule.Services;
-using UnityEngine;
 
 /// <summary>
 /// 游戏模块服务
@@ -403,6 +405,78 @@ namespace GameModule.Services {
             public static string getText(CompRank rank, int subRank) {
                 if (rank.subRankNum <= 0) return rank.name;
                 return rank.name + RomanNums[subRank];
+            }
+        }
+
+        /// <summary>
+        /// 物品效果处理类
+        /// </summary>
+        public class ItemEffectProcessor {
+
+            /// <summary>
+            /// 处理
+            /// </summary>
+            /// <param name="target">目标</param>
+            /// <param name="effects">效果</param>
+            public static void process(IItemUseTarget target, IEffectsConvertable item) {
+                process(target, item.convertToEffectData());
+            }
+            public static void process(IItemUseTarget target, EffectData[] effects) {
+                foreach (var effect in effects)
+                    processEffect(target, effect);
+            }
+
+            /// <summary>
+            /// 处理单个效果
+            /// </summary>
+            /// <param name="target">目标</param>
+            /// <param name="effect">效果</param>
+            static void processEffect(IItemUseTarget target, EffectData effect) {
+                int p, a; double b;
+                var params_ = effect.params_;
+                if (params_ == null && params_.Count <= 0) return;
+
+                switch ((EffectData.Code)effect.code) {
+                    case EffectData.Code.RecoverHP:
+                        a = DataLoader.load<int>(params_[0]);
+                        target.changeHP(a);
+
+                        if (params_.Count > 1) { // 处理百分比
+                            b = DataLoader.load<double>(params_[1]);
+                            target.changePercentMP(b);
+                        }
+                        break;
+                    case EffectData.Code.RecoverMP:
+                        a = DataLoader.load<int>(params_[0]);
+                        target.changeMP(a);
+
+                        if (params_.Count > 1) { // 处理百分比
+                            b = DataLoader.load<double>(params_[1]);
+                            target.changePercentMP(b);
+                        }
+                        break;
+                    case EffectData.Code.AddParam:
+                        p = DataLoader.load<int>(params_[0]);
+                        a = DataLoader.load<int>(params_[1]);
+                        target.changeParam(p, a);
+
+                        if (params_.Count > 2) { // 处理百分比
+                            b = DataLoader.load<double>(params_[2]);
+                            target.changePercentParam(p, b);
+                        }
+                        break;
+                    case EffectData.Code.TempAddParam:
+                    case EffectData.Code.BattleAddParam:
+                        p = DataLoader.load<int>(params_[0]);
+                        a = DataLoader.load<int>(params_[2]);
+                        target.changeParam(p, a);
+
+                        if (params_.Count > 3) { // 处理百分比
+                            b = DataLoader.load<double>(params_[3]);
+                            target.changePercentParam(p, b);
+                        }
+                        break;
+                }
             }
         }
     }

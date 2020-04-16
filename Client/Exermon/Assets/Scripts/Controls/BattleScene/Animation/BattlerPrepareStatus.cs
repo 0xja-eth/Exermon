@@ -31,7 +31,7 @@ namespace UI.BattleScene.Controls.Animators {
         /// <summary>
         /// 内部变量定义
         /// </summary>
-        BaseWindow selfWindow;
+        protected BaseWindow selfWindow;
 
         bool _waiting = true; // 是否等待中
         public bool waiting {

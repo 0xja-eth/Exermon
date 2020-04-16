@@ -134,6 +134,18 @@ namespace ItemModule.Data {
     }
 
     /// <summary>
+    /// 可转化为效果数据的接口
+    /// </summary>
+    public interface IEffectsConvertable {
+
+        /// <summary>
+        /// 转化为效果数据数组（用于对战中显示）
+        /// </summary>
+        /// <returns>返回对应的效果数据数组</returns>
+        EffectData[] convertToEffectData();
+    }
+
+    /// <summary>
     /// 使用效果数据
     /// </summary>
     public class EffectData : BaseData {
@@ -202,11 +214,55 @@ namespace ItemModule.Data {
             this.shortDescription = shortDescription;
         }
     }
+    
+    /// <summary>
+    /// 物品使用目标接口
+    /// </summary>
+    public interface IItemUseTarget {
 
+        /// <summary>
+        /// 修改HP
+        /// </summary>
+        /// <param name="value">HP</param>
+        void changeHP(int value);
+
+        /// <summary>
+        /// 修改HP（百分比）
+        /// </summary>
+        /// <param name="rate">HP百分比</param>
+        void changePercentHP(double rate);
+
+        /// <summary>
+        /// 修改MP
+        /// </summary>
+        /// <param name="value">MP</param>
+        void changeMP(int value);
+
+        /// <summary>
+        /// 修改MP（百分比）
+        /// </summary>
+        /// <param name="rate">MP百分比</param>
+        void changePercentMP(double rate);
+
+        /// <summary>
+        /// 添加属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">属性值</param>
+        void changeParam(int paramId, double value);
+
+        /// <summary>
+        /// 添加属性值（百分比）
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="rate">属性值（百分比）</param>
+        void changePercentParam(int paramId, double rate);
+
+    }
     /// <summary>
     /// 可用物品数据
     /// </summary>
-    public class UsableItem : LimitedItem {
+    public class UsableItem : LimitedItem, IEffectsConvertable {
 
         /// <summary>
         /// 属性
@@ -245,7 +301,14 @@ namespace ItemModule.Data {
         /// </summary>
         /// <returns></returns>
         public override int maxCount() { return maxCount_; }
-
+        
+        /// <summary>
+        /// 转化为效果数据数组（用于对战中显示）
+        /// </summary>
+        /// <returns>返回对应的效果数据数组</returns>
+        public EffectData[] convertToEffectData() {
+            return effects.ToArray();
+        }
     }
 
     /// <summary>

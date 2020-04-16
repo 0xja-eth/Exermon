@@ -4,6 +4,11 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using GameModule.Services;
+
+using ItemModule.Data;
+using PlayerModule.Data;
+using QuestionModule.Data;
 using BattleModule.Data;
 
 using UI.BattleScene.Controls.ItemDisplays;
@@ -22,7 +27,20 @@ namespace UI.BattleScene.Controls.Animators {
         /// 外部组件设置
         /// </summary>
         public UsingItemDisplay itemDisplay;
-        
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            selfWindow.addChangeEvent(
+                selfWindow.shownState, onShown);
+        }
+
+        #endregion
+
         #region 界面绘制
 
         /// <summary>
@@ -40,6 +58,38 @@ namespace UI.BattleScene.Controls.Animators {
         protected override void clearItem() {
             base.clearItem();
             itemDisplay.requestClear(true);
+        }
+
+        #endregion
+
+        #region 动画事件
+
+        /// <summary>
+        /// 物品使用效果
+        /// </summary>
+        public void onItemUse() {
+            var item = this.item.roundItem();
+            IEffectsConvertable effectItem = null;
+
+            switch ((BaseItem.Type)item.type) {
+                case BaseItem.Type.HumanItem:
+                    effectItem = (HumanItem)item; break;
+                case BaseItem.Type.QuesSugar:
+                    effectItem = (QuesSugar)item; break;
+                default: return;
+            }
+
+            CalcService.ItemEffectProcessor.
+                process(this.item, effectItem);
+
+            requestRefresh(true);
+        }
+
+        /// <summary>
+        /// 完全显示
+        /// </summary>
+        public void onShown() {
+            selfWindow.terminateWindow();
         }
 
         #endregion

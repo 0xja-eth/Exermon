@@ -217,7 +217,7 @@ namespace QuestionModule.Data {
     /// <summary>
     /// 有限物品数据
     /// </summary>
-    public class QuesSugar : BaseItem {
+    public class QuesSugar : BaseItem, IEffectsConvertable {
 
         /// <summary>
         /// 效果描述文本格式定义

@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.UI;
 
 using PlayerModule.Data;
@@ -6,6 +7,7 @@ using QuestionModule.Data;
 
 using BattleModule.Data;
 using BattleModule.Services;
+using ItemModule.Data;
 
 namespace UI.BattleScene.Controls.ItemDisplays {
 
@@ -18,12 +20,15 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// 常量定义
         /// </summary>
 
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
-        public ItemEffectList effects;
-        
         #region 界面控制
+
+        /// <summary>
+        /// 绘制物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override void drawExactlyItem(BaseItem item) {
+            base.drawExactlyItem(item);
+        }
 
         /// <summary>
         /// 绘制人类物品

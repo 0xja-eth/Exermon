@@ -37,6 +37,7 @@ namespace UI.BattleScene {
         /// </summary>
         public PrepareWindow prepareWindow;
         public QuestionWindow questionWindow;
+        public ActionWindow actionWindow;
         public RoundResultWindow roundResultWindow;
 
         /// <summary>
@@ -111,6 +112,7 @@ namespace UI.BattleScene {
             prepareWindow.terminateWindow();
             questionWindow.terminateWindow();
             roundResultWindow.terminateWindow();
+            actionWindow.terminateWindow();
         }
 
         /// <summary>
@@ -176,6 +178,7 @@ namespace UI.BattleScene {
         /// 开始行动完毕
         /// </summary>
         void onActing() {
+            actionWindow.startWindow();
         }
 
         /// <summary>

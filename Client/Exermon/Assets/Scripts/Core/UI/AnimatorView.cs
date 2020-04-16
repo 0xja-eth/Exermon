@@ -74,14 +74,14 @@ namespace Core.UI {
         #endregion
 
         #region 状态机配置
-        
+
         /// <summary>
         /// 添加状态行为脚本
         /// </summary>
         /// <typeparam name="T">脚本类</typeparam>
         /// <param name="layerIndex">层ID</param>
         /// <param name="stateName">状态名</param>
-        protected T addStateBehaviour<T>(int layerIndex, string stateName) where T : StateMachineBehaviour {
+        public T addStateBehaviour<T>(int layerIndex, string stateName) where T : StateMachineBehaviour {
             /*
             if (animator == null) return null;
             if (this.layerIndex != layerIndex) switchLayer(layerIndex);
@@ -91,7 +91,7 @@ namespace Core.UI {
             */
             return null;
         }
-        protected T addStateBehaviour<T>(string stateName) where T : StateMachineBehaviour {
+        public T addStateBehaviour<T>(string stateName) where T : StateMachineBehaviour {
             return addStateBehaviour<T>(layerIndex, stateName);
         }
         /// <summary>
@@ -99,7 +99,7 @@ namespace Core.UI {
         /// </summary>
         /// <param name="stateName">状态名</param>
         /// <param name="action">事件</param>
-        protected void addChangeEvent(string stateName, UnityAction action) {
+        public void addChangeEvent(string stateName, UnityAction action) {
             changeEvents.Add(stateName, action);
         }
 
@@ -107,7 +107,7 @@ namespace Core.UI {
         /// 移除状态切换事件
         /// </summary>
         /// <param name="stateName">状态名</param>
-        protected void removeChangeEvent(string stateName) {
+        public void removeChangeEvent(string stateName) {
             changeEvents.Remove(stateName);
         }
 
@@ -116,7 +116,7 @@ namespace Core.UI {
         /// </summary>
         /// <param name="stateName">状态名</param>
         /// <param name="action">事件</param>
-        protected void addUpdateEvent(string stateName, UnityAction action) {
+        public void addUpdateEvent(string stateName, UnityAction action) {
             updateEvents.Add(stateName, action);
         }
 
@@ -124,7 +124,7 @@ namespace Core.UI {
         /// 移除状态更新事件
         /// </summary>
         /// <param name="stateName">状态名</param>
-        protected void removeUpdateEvent(string stateName) {
+        public void removeUpdateEvent(string stateName) {
             updateEvents.Remove(stateName);
         }
 

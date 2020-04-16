@@ -500,6 +500,44 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 修改MP
+        /// </summary>
+        /// <param name="value">MP</param>
+        public void changeMP(int value) {
+            var mmp = (int)Math.Round(param(1).value);
+            mp = Mathf.Clamp(mp + value, 0, mmp);
+        }
+
+        /// <summary>
+        /// 修改MP（百分比）
+        /// </summary>
+        /// <param name="rate">MP百分比</param>
+        public void changePercentMP(double rate) {
+            var mmp = param(1).value;
+            changeMP((int)Math.Round(mmp * rate));
+        }
+        
+        /// <summary>
+        /// 添加属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">属性值</param>
+        public void changeParam(int paramId, double value) {
+            var param = this.param(paramId);
+            param += value;
+        }
+
+        /// <summary>
+        /// 添加属性值（百分比）
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="rate">属性值（百分比）</param>
+        public void changePercentParam(int paramId, double rate) {
+            var param = this.param(paramId);
+            param *= rate;
+        }
+
+        /// <summary>
         /// 获取属性基础值
         /// </summary>
         /// <param name="paramId">属性ID</param>
@@ -640,7 +678,9 @@ namespace BattleModule.Data {
     /// 对战玩家数据（回合结果时进行数据同步）
     /// </summary>
     public class RuntimeBattlePlayer : BaseData, 
-        QuestionSetRecord.IQuestionResult, ParamDisplay.DisplayDataConvertable {
+        QuestionSetRecord.IQuestionResult, 
+        ParamDisplay.DisplayDataConvertable,
+        IItemUseTarget {
 
         /// <summary>
         /// 常量设置
@@ -919,6 +959,68 @@ namespace BattleModule.Data {
         /// <param name="json">数据</param>
         public void loadResult(JsonData json) {
             result = DataLoader.load<BattlePlayer>(json);
+        }
+
+        #endregion
+
+        #region 实现接口
+        
+        /// <summary>
+        /// 修改HP
+        /// </summary>
+        /// <param name="value">HP</param>
+        public void changeHP(int value) {
+            hp = Mathf.Clamp(hp + value, 0, mhp);
+        }
+
+        /// <summary>
+        /// 修改HP（百分比）
+        /// </summary>
+        /// <param name="hp">HP百分比</param>
+        public void changePercentHP(double rate) {
+            changeHP((int)Math.Round(mhp * rate));
+        }
+
+        /// <summary>
+        /// 修改MP
+        /// </summary>
+        /// <param name="value">MP</param>
+        public void changeMP(int value) {
+            var exermon = currentExermon();
+            if (exermon == null) return;
+            exermon.changeMP(value);
+        }
+
+        /// <summary>
+        /// 修改MP（百分比）
+        /// </summary>
+        /// <param name="rate">MP百分比</param>
+        public void changePercentMP(double rate) {
+            var exermon = currentExermon();
+            if (exermon == null) return;
+            exermon.changePercentMP(rate);
+        }
+
+        /// <summary>
+        /// 添加属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">属性值</param>
+        public void changeParam(int paramId, double value) {
+            var exermon = currentExermon();
+            if (exermon == null) return;
+            exermon.changeParam(paramId, value);
+        }
+
+        /// <summary>
+        /// 添加属性值（百分比）
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="rate">属性值（百分比）</param>
+        public void changePercentParam(int paramId, double rate) {
+            var exermon = currentExermon();
+            if (exermon == null) return;
+            exermon.changePercentParam(paramId, rate);
         }
 
         #endregion

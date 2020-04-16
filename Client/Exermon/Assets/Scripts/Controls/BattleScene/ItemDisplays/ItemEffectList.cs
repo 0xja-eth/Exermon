@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
+
 using Core.UI;
 using Core.UI.Utils;
 
@@ -23,6 +25,15 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// </summary>
         const float DeltaShowTime = 0.25f;
 
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public ItemEffectList effects;
+
+        public Image effectArrows;
+
+        public Texture2D recoveryArrows, promotionArrows;
+
         #region 初始化
 
         /// <summary>
@@ -41,16 +52,31 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// 设置物品
         /// </summary>
         /// <param name="count">数目</param>
-        public void setItem(HumanItem item) {
-            setItems(item.effects);
-        }
-        public void setItem(QuesSugar item) {
+        public void setItem(IEffectsConvertable item) {
             setItems(item.convertToEffectData());
         }
 
         #endregion
 
         #region 界面绘制
+        
+        /// <summary>
+        /// 绘制提升箭头
+        /// </summary>
+        void drawArrows() {
+            if (items.Count <= 0) clearArrows();
+
+            var effect = items[0];
+            Texture2D texture = null;
+            if (effect.isRecovery()) texture = recoveryArrows;
+            if (effect.isPromotion()) texture = promotionArrows;
+
+            if (texture == null) clearArrows();
+            else {
+                effectArrows.gameObject.SetActive(true);
+                effectArrows.overrideSprite = AssetLoader.generateSprite(texture);
+            }
+        }
 
         /// <summary>
         /// 创建子视图
@@ -70,6 +96,29 @@ namespace UI.BattleScene.Controls.ItemDisplays {
             var subView = createSubView(index);
             CoroutineUtils.addAction(() =>
                 subView.startView(item), DeltaShowTime);
+        }
+
+        /// <summary>
+        /// 清除提升箭头
+        /// </summary>
+        void clearArrows() {
+            effectArrows.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        protected override void refresh() {
+            base.refresh();
+            drawArrows();
+        }
+
+        /// <summary>
+        /// 清除
+        /// </summary>
+        protected override void clear() {
+            base.clear();
+            clearArrows();
         }
 
         #endregion
