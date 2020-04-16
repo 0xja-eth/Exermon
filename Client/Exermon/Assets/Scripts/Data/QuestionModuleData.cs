@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 using Core.Data;
@@ -9,6 +11,7 @@ using GameModule.Services;
 
 using ItemModule.Data;
 using RecordModule.Data;
+using LitJson;
 
 /// <summary>
 /// 题目模块
@@ -217,6 +220,12 @@ namespace QuestionModule.Data {
     public class QuesSugar : BaseItem {
 
         /// <summary>
+        /// 效果描述文本格式定义
+        /// </summary>
+        const string EffectDescFormat = "当前回合属性 {0} 增加 {1} %";
+        const string EffectShortDescFormat = "{0} +{1}%";
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -242,6 +251,43 @@ namespace QuestionModule.Data {
             foreach (var param in params_)
                 if (param.paramId == paramId) return param;
             return new ParamData(paramId);
+        }
+
+        /// <summary>
+        /// 转化为效果数据数组（用于对战中显示）
+        /// </summary>
+        /// <returns>返回对应的效果数据数组</returns>
+        public EffectData[] convertToEffectData() {
+            var res = new List<EffectData>();
+            foreach(var param in params_) {
+                if (param.value == 0) continue;
+                res.Add(generateEffectData(param));
+            }
+            return res.ToArray();
+        }
+
+        /// <summary>
+        /// 生成效果数据
+        /// </summary>
+        /// <param name="param">效果</param>
+        /// <returns>返回效果数据</returns>
+        EffectData generateEffectData(ParamData param) {
+            var code = EffectData.Code.BattleAddParam;
+            var params_ = new JsonData();
+            params_.SetJsonType(JsonType.Array);
+            params_.Add(param.paramId); // p
+            params_.Add(1); params_.Add(0); // t, a
+            params_.Add(param.value); // b
+
+            var baseParam = param.param();
+            var value = Math.Round((param.value - 1) * 100);
+
+            var desc = string.Format(
+                EffectDescFormat, baseParam.name, value);
+            var shortDesc = string.Format(
+                EffectShortDescFormat, baseParam.name[0], value);
+
+            return new EffectData(code, params_, desc, shortDesc);
         }
     }
 

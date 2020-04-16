@@ -139,6 +139,28 @@ namespace ItemModule.Data {
     public class EffectData : BaseData {
 
         /// <summary>
+        /// 效果代码枚举
+        /// </summary>
+        public enum Code {
+            Unset = 0, // 空
+
+            RecoverHP = 10, // 回复体力值
+            RecoverMP = 11, // 回复精力值
+            AddParam = 20, // 增加能力值
+            TempAddParam = 21, // 临时增加能力值
+            BattleAddParam = 22, // 战斗中增加能力值
+
+            GainItem = 30, // 获得物品
+            GainGold = 31, // 获得金币
+            GainBoundTicket = 32, // 获得绑定点券
+            GainExermonExp = 40, // 指定艾瑟萌获得经验
+            GainExerSlotItemExp = 41, // 指定艾瑟萌槽项获得经验
+            GainPlayerExp = 42, // 玩家获得经验
+
+            Eval = 99, // 执行程序        
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -147,6 +169,38 @@ namespace ItemModule.Data {
         public JsonData params_ { get; protected set; } // 参数（数组）
         [AutoConvert]
         public string description { get; protected set; }
+        [AutoConvert]
+        public string shortDescription { get; protected set; }
+
+        /// <summary>
+        /// 是否为恢复效果
+        /// </summary>
+        /// <returns>返回当前效果是否为恢复效果</returns>
+        public bool isRecovery() {
+            return code == (int)Code.RecoverHP || code == (int)Code.RecoverMP;
+        }
+
+        /// <summary>
+        /// 是否为提升效果
+        /// </summary>
+        /// <returns>返回当前效果是否为提升效果</returns>
+        public bool isPromotion() {
+            return code == (int)Code.AddParam || 
+                code == (int)Code.TempAddParam || 
+                code == (int)Code.BattleAddParam;
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public EffectData() { }
+        public EffectData(Code code, JsonData params_, 
+            string description, string shortDescription) {
+            this.code = (int)code;
+            this.params_ = params_;
+            this.description = description;
+            this.shortDescription = shortDescription;
+        }
     }
 
     /// <summary>
@@ -295,8 +349,7 @@ namespace ItemModule.Data {
         /// </summary>
         public BaseContItem() {
             var typeName = GetType().Name;
-            var type = (Type)Enum.Parse(typeof(Type), typeName);
-            this.type = (int)type;
+            type = (int)Enum.Parse(typeof(Type), typeName);
         }
     }
 

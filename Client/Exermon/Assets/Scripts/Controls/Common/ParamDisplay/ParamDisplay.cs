@@ -85,7 +85,7 @@ namespace UI.Common.Controls.ParamDisplays {
             // 对应显示的类型： 
             // Text, Sign, Percent, SignPercent, 
             // TimeSpan, TimeSpanWithHour, Show, Hide
-            // Date, DateTime, Color, ScaleX, ScaleY
+            // Date, DateTime, Color, ScaleX, ScaleY, Fill
             public string type;
             // 是否有动画效果
             public bool animated;
@@ -328,6 +328,7 @@ namespace UI.Common.Controls.ParamDisplays {
                 case "Color": processColorDisplayItem(item, value); break;
                 case "ScaleX": processScaleXDisplayItem(item, value); break;
                 case "ScaleY": processScaleYDisplayItem(item, value); break;
+                case "Fill": processFillDisplayItem(item, value); break;
                 default: processExtended(item, value); break;
             }
         }
@@ -537,6 +538,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="item">显示项</param>
         /// <param name="value">值</param>
         void processScaleXDisplayItem(DisplayItem item, JsonData value) {
+            if (!item.obj.activeSelf) return;
             var transform = item.obj.transform;
             if (transform == null) return;
 
@@ -558,6 +560,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="item">显示项</param>
         /// <param name="value">值</param>
         void processScaleYDisplayItem(DisplayItem item, JsonData value) {
+            if (!item.obj.activeSelf) return;
             var transform = item.obj.transform;
             if (transform == null) return;
 
@@ -571,6 +574,28 @@ namespace UI.Common.Controls.ParamDisplays {
                 tmpAni.setupAnimation(ani);
             } else
                 transform.localScale = new Vector3(ori.x, rate, ori.z);
+        }
+
+        /// <summary>
+        /// 处理填充类型的显示项
+        /// </summary>
+        /// <param name="item">显示项</param>
+        /// <param name="value">值</param>
+        void processFillDisplayItem(DisplayItem item, JsonData value) {
+            if (!item.obj.activeSelf) return;
+            var image = SceneUtils.image(item.obj);
+            if (image == null) return;
+
+            var rate = DataLoader.load<float>(value);
+            var ani = SceneUtils.ani(item.obj);
+            var ori = image.fillAmount;
+
+            if (!force && item.animated && ani != null) {
+                var tmpAni = AnimationUtils.createAnimation();
+                tmpAni.addCurve(typeof(Image), "m_FillAmount", ori, rate);
+                tmpAni.setupAnimation(ani);
+            } else
+                image.fillAmount = rate;
         }
 
         /// <summary>

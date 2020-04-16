@@ -37,6 +37,7 @@ namespace UI.BattleScene {
         /// </summary>
         public PrepareWindow prepareWindow;
         public QuestionWindow questionWindow;
+        public RoundResultWindow roundResultWindow;
 
         /// <summary>
         /// 内部组件设置
@@ -109,6 +110,7 @@ namespace UI.BattleScene {
         void clearWindows() {
             prepareWindow.terminateWindow();
             questionWindow.terminateWindow();
+            roundResultWindow.terminateWindow();
         }
 
         /// <summary>
@@ -180,17 +182,18 @@ namespace UI.BattleScene {
         /// 回合结算
         /// </summary>
         void onResulting() {
+            roundResultWindow.startWindow();
         }
 
         /// <summary>
         /// 对战结束
         /// </summary>
         void onTerminating() {
-
+            clear();
         }
 
         #endregion
-        
+
         #endregion
 
     }

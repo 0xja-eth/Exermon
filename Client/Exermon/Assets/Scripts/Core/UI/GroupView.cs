@@ -142,8 +142,8 @@ namespace Core.UI {
         /// </summary>
         /// <param name="index"></param>
         protected void destroySubView(int index) {
-            if (gameObject.name == "Choices")
-                Debug.Log("Choices: destroySubView: " + index);
+            //if (gameObject.name == "Choices")
+            //    Debug.Log("Choices: destroySubView: " + index);
             if (index < subViews.Count) {
                 Destroy(subViews[index].gameObject);
                 onSubViewDestroyed(index);

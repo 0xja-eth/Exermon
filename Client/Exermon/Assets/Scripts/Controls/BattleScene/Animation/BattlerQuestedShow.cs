@@ -6,7 +6,7 @@ using UnityEngine.Animations;
 using Core.UI;
 using Core.UI.Utils;
 
-namespace UI.BattleScene.Controls.Animation {
+namespace UI.BattleScene.Controls.Animators {
 
     /// <summary>
     /// 基本状态行为

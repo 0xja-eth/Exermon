@@ -500,6 +500,17 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 获取属性基础值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public ParamData param(int paramId) {
+            foreach (var param in params_)
+                if (param.paramId == paramId) return param;
+            return new ParamData(paramId);
+        }
+
+        /// <summary>
         /// 获取对应的艾瑟萌槽项
         /// </summary>
         /// <returns>返回艾瑟萌槽项</returns>
@@ -759,9 +770,31 @@ namespace BattleModule.Data {
         /// <returns></returns>
         public JsonData convertToDisplayData(string type = "") {
             switch(type) {
+                case "base_status": return convertBaseStatusData();
                 case "round_result": return convertRoundResultData();
                 default: return toJson();
             }
+        }
+
+        /// <summary>
+        /// 转化基本状态数据
+        /// </summary>
+        /// <returns>返回数据</returns>
+        JsonData convertBaseStatusData() {
+            var res = new JsonData();
+            var exermon = currentExermon();
+            if (exermon != null) {
+                var mp = exermon.mp;
+                var mmp = exermon.param(1).value;
+                res["mp"] = string.Format("{0}/{1}", mp, mmp);
+                res["mp_rate"] = mp * 1.0 / mmp;
+            }
+
+            res["name"] = name;
+            res["hp"] = string.Format("{0}/{1}", hp, mhp);
+            res["hp_rate"] = hp * 1.0 / mhp;
+
+            return res;
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using PlayerModule.Data;
 using BattleModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
 /// 对战匹配场景控件
@@ -30,8 +31,8 @@ namespace UI.BattleScene.Controls {
         /// 外部组件设置
         /// </summary>
         public Image face, status;
-        public Text name, hpText;
-        public Image hpBar;
+
+        public ParamDisplay baseStatus;
 
         public Texture2D correctStatus, wrongStatus;
 
@@ -139,12 +140,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawBaseInfo(RuntimeBattlePlayer battler) {
-            int max = battler.mhp, val = battler.hp;
-            float rate = max == 0 ? 0 : val * 1.0f / max;
-
-            name.text = battler.name;
-            hpText.text = string.Format(HPFormat, val, max);
-            hpBar.fillAmount = rate;
+            baseStatus.setValue(battler, "base_status");
         }
 
         /// <summary>
@@ -153,8 +149,7 @@ namespace UI.BattleScene.Controls {
         protected override void clearItem() {
             if (status) status.enabled = false;
             face.gameObject.SetActive(false);
-            name.text = hpText.text = "";
-            hpBar.fillAmount = 0;
+            baseStatus.clearValue();
         }
 
         #endregion

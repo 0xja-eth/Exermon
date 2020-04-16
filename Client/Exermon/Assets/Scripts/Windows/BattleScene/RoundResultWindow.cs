@@ -21,7 +21,7 @@ using PlayerModule.Services;
 using BattleModule.Data;
 using BattleModule.Services;
 
-using UI.BattleScene.Controls.Result;
+using UI.BattleScene.Controls.ItemDisplays;
 
 using UI.Common.Controls.ParamDisplays;
 
@@ -46,7 +46,7 @@ namespace UI.BattleScene.Windows {
         /// 外部组件设置
         /// </summary>
         public ParamDisplay selfResult, oppoResult;
-        public BattleItemDisplay selfItem, oppoItem;
+        public UsedItemDisplay selfItem, oppoItem;
         public Text timer;
 
         /// <summary>
@@ -143,8 +143,8 @@ namespace UI.BattleScene.Windows {
         /// 绘制对战状态
         /// </summary>
         void drawBattlerResult() {
-            selfResult.setValue(battle.self());
-            oppoResult.setValue(battle.oppo());
+            selfResult.setValue(battle.self(), "round_result");
+            oppoResult.setValue(battle.oppo(), "round_result");
         }
 
         /// <summary>

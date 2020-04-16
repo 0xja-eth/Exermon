@@ -15,7 +15,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
-using UI.BattleScene.Controls.Animation;
+using UI.BattleScene.Controls.Animators;
 
 /// <summary>
 /// 对战开始场景窗口

@@ -43,7 +43,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 启动窗口
         /// </summary>
         /// <param name="item">物品</param>
-        /// <param name="index">所在索引</param>
         /// <param name="refresh">强制刷新</param>
         public void startView(T item, bool refresh = false) {
             startView();
@@ -58,7 +57,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 设置物品
         /// </summary>
         /// <param name="item">物品</param>
-        /// <param name="index">所在索引</param>
         /// <param name="refresh">强制刷新</param>
         public void setItem(T item, bool refresh = false) {
             if (!refresh && this.item == item) return;

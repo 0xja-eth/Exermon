@@ -643,7 +643,7 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         /// <summary>
-        /// 绘制数目
+        /// 清除数目
         /// </summary>
         void clearCount() {
             if (countText == null) return;
@@ -656,7 +656,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 创建物品显示组件
         /// </summary>
         void refreshItemDisplays() {
-
+            /*
             if (gameObject.name == "Choices") {
                 Debug.Log("Choices: itemsCount: " + itemsCount() + "\n" +
                     "itemDisplaysCount: " + itemDisplaysCount() + "\n" +
@@ -664,11 +664,25 @@ namespace UI.Common.Controls.ItemDisplays {
                 Debug.Log("Choices: items: " + string.Join(",", items));
                 Debug.Log("Choices: subViews: " + string.Join(",", subViews));
             }
+            */
+            createSubViews();
+            destroyRedundantSubViews();
+        }
 
+        /// <summary>
+        /// 创建子视图
+        /// </summary>
+        protected virtual void createSubViews() {
             for (int i = 0; i < maxItemDisplaysCount(); ++i) {
                 T item = (i < itemsCount() ? items[i] : null);
                 createSubView(item, i);
             }
+        }
+
+        /// <summary>
+        /// 移除冗余子视图
+        /// </summary>
+        protected virtual void destroyRedundantSubViews() {
             for (int i = itemDisplaysCount() - 1; i >= maxItemDisplaysCount(); --i)
                 destroySubView(i);
         }
@@ -677,7 +691,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 创建物品显示组件
         /// </summary>
         /// <param name="item">物品</param>
-        void createSubView(T item, int index) {
+        protected virtual void createSubView(T item, int index) {
             createSubView(index).startView(item);
         }
 
@@ -739,7 +753,7 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         /// <summary>
-        /// 清除描述
+        /// 清除视窗
         /// </summary>
         protected override void clear() {
             base.clear();

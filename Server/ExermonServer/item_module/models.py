@@ -2942,6 +2942,126 @@ class ItemEffectCode(Enum):
 
 
 # ===================================================
+#  使用效果描述格式
+# ===================================================
+class EffectDescriptionFormat:
+
+	DefaultFormat = None
+	ShortFormat = None
+
+	def __init__(self, short=False, **kwargs):
+		from game_module.models import BaseParam, GameConfigure
+
+		hp_name = BaseParam.get(attr="mhp").name
+		mp_name = BaseParam.get(attr="mmp").name
+
+		conf: GameConfigure = GameConfigure.get()
+
+		self.short = short
+
+		self.kwargs = kwargs
+
+		self.empty = self.get("empty", "无效果")
+
+		self.second = self.get("second", "秒")
+		self.round = self.get("round", "回合")
+
+		self.gold = self.get("gold", conf.gold)
+		self.bound_ticket = self.get("bound_ticket", conf.bound_ticket)
+
+		self.exermon = self.get("exermon", "艾瑟萌")
+		self.exer_slot = self.get("exer_slot", "艾瑟萌槽")
+
+		self.hp_attr = self.get("hp_attr", hp_name)
+		self.mp_attr = self.get("mp_attr", mp_name)
+
+		self.recover1 = self.get("recover1", "%s 回复 %s 点")
+		self.recover2 = self.get("recover2", "%s 回复 %s %%")
+		self.recover3 = self.get("recover3", "%s 回复 %s 点，%s%%")
+
+		self.promote1 = self.get("promote1", "属性 %s 增加 %s 点")
+		self.promote2 = self.get("promote2", "属性 %s 增加 %s %%")
+		self.promote3 = self.get("promote3", "属性 %s 增加 %s 点，%s%%")
+
+		self.tmp_promote1 = self.get("tmp_promote1", "属性 %s 增加 %s 点，持续 %s %s")
+		self.tmp_promote2 = self.get("tmp_promote2", "属性 %s 增加%s%%，持续 %s %s")
+		self.tmp_promote3 = self.get("tmp_promote3", "属性 %s 增加 %s 点，%s%%，持续 %s %s")
+
+		self.gain_item1 = self.get("gain_item1", "物品 %s 增加 %s 个")
+		self.gain_item2 = self.get("gain_item2", "物品 %s 增加 %s~%s 个")
+
+		self.gain_gold1 = self.get("gain_gold1", "%s 增加 %s")
+		self.gain_gold2 = self.get("gain_gold2", "%s 增加 %s~%s")
+
+		self.gain_exp1 = self.get("gain_exp1", "%s %s经验值增加 %s")
+		self.gain_exp2 = self.get("gain_exp2", "%s %s经验值增加 %s~%s")
+
+		self.player_gain_exp1 = self.get("player_gain_exp1", "玩家经验值增加 %s")
+		self.player_gain_exp2 = self.get("player_gain_exp2", "玩家经验值增加 %s~%s")
+
+		self.eval = self.get("eval", "执行程序：%s")
+
+	def get(self, key, default=""):
+		"""
+		获取参数
+		Args:
+			key (str): 参数名
+			default (str): 默认值
+		Returns:
+			返回参数值
+		"""
+		if key in self.kwargs:
+			return self.kwargs[key]
+		else: return default
+
+	@classmethod
+	def defaultFormat(cls) -> 'EffectDescriptionFormat':
+		"""
+		默认格式
+		Returns:
+			返回默认描述格式
+		"""
+		if cls.DefaultFormat is None:
+			cls.DefaultFormat = EffectDescriptionFormat()
+		return cls.DefaultFormat
+
+	@classmethod
+	def shortFormat(cls) -> 'EffectDescriptionFormat':
+		"""
+		简要格式
+		Returns:
+			返回简要描述格式
+		"""
+		return EffectDescriptionFormat(True,
+			empty="无",
+
+			second="s", round="回",
+
+			hp_attr="HP", mp_attr="MP",
+
+			gold="金", bound_ticket="绑点",
+
+			exermon="萌", exer_slot="槽",
+
+			recover1="%s +%s", recover2="%s +%s%%", recover3="%s +%s, %s%%",
+
+			promote1="%s +%s", promote2="%s +%s%%", promote3="%s +%s, %s%%",
+
+			tmp_promote1="%s +%s %s%s", tmp_promote2="%s +%s%% %s%s", tmp_promote3="%s +%s, %s%% %s%s",
+
+			gain_item1="%s +%s", gain_item2="%s +%s~%s",
+
+			gain_gold1="%s +%s", gain_gold2="%s +%s~%s",
+
+			gain_exp1="%s%s经验 +%s", gain_exp2="%s%s经验 +%s~%s",
+
+			player_gain_exp1="玩家经验 +%s", player_gain_exp2="玩家经验 +%s~%s",
+
+			eval=""
+		)
+
+
+# ===================================================
 #  使用效果表
 # ===================================================
 class BaseEffect(models.Model):
@@ -2983,104 +3103,114 @@ class BaseEffect(models.Model):
 
 	adminDescribe.short_description = "描述"
 
-	def describe(self):
-		from game_module.models import BaseParam, GameConfigure, Subject
+	def describe(self, format: EffectDescriptionFormat = None):
+		from game_module.models import BaseParam, Subject
+
+		if format is None: format = EffectDescriptionFormat.defaultFormat()
 
 		if not isinstance(self.params, list):
 			raise GameException(ErrorType.DatabaseError)
 
-		conf: GameConfigure = GameConfigure.get()
 		code = ItemEffectCode(self.code)
 		params = tuple(self.params)
 		p_len = len(params)
 
-		if code == ItemEffectCode.Unset: return '无效果'
-
 		if code == ItemEffectCode.RecoverHP or \
 			code == ItemEffectCode.RecoverMP:
-			name = "体力值" if code == ItemEffectCode.RecoverHP else "精力值"
+
+			name = format.hp_attr if code == ItemEffectCode.RecoverHP \
+				else format.mp_attr
 
 			a = params[0]
 			if p_len < 2:  # 如果只有 a 参数
-				return "%s 回复 %s 点" % (name, a)
+				return format.recover1 % (name, a)
 
 			b = params[1]
-			if a == 0: return "%s 回复 %s %%" % (name, b)
-			return "%s 回复 %s 点，%s%%" % (name, a, b)
+			if a == 0: return format.recover2 % (name, b)
+			return format.recover3 % (name, a, b)
 
-		if code == ItemEffectCode.AddParam:
+		elif code == ItemEffectCode.AddParam:
 			p, a = params[0], params[1]
 			name = BaseParam.get(id=p).name
+			if format.short: name = name[0]
 
 			if p_len < 3:  # 如果只有 a 参数
-				return "属性 %s 增加 %s 点" % (name, a)
+				return format.promote1 % (name, a)
 
-			b = params[2]
-			if a == 0: return "属性 %s 增加 %s %%" % (name, b)
-			return "属性 %s 增加 %s 点，%s%%" % (name, a, b)
+			b = params[2] - 1
+			if a == 0: return format.promote2 % (name, b)
+			return format.promote3 % (name, a, b)
 
-		if code == ItemEffectCode.TempAddParam or \
+		elif code == ItemEffectCode.TempAddParam or \
 			code == ItemEffectCode.BattleAddParam:
 			p, t, a = params[0], params[1], params[2]
 			name = BaseParam.get(id=p).name
-			time = "秒" if code == ItemEffectCode.TempAddParam else "回合"
+			if format.short: name = name[0]
+			
+			time = format.second if code == ItemEffectCode.TempAddParam \
+				else format.round
 
 			if p_len < 4:  # 如果只有 a 参数
-				return "属性 %s 增加 %s 点，持续 %s %s" % (name, a, t, time)
+				return format.tmp_promote1 % (name, a, t, time)
 
-			b = params[3]
-			if a == 0: return "属性 %s 增加%s%%，持续 %s %s" % (name, b, t, time)
-			return "属性 %s 增加 %s 点，%s%%，持续 %s %s" % (name, a, b, t, time)
+			b = params[3] - 1
+			if a == 0: return format.tmp_promote2 % (name, b, t, time)
+			return format.tmp_promote3 % (name, a, b, t, time)
 
-		if code == ItemEffectCode.GainItem:
+		elif code == ItemEffectCode.GainItem:
 			from .views import Common
 
 			i, m = params[0], params[1]
 			name = Common.getItem(id=i).name
 
 			if p_len < 3:  # 如果只有 m 参数
-				return "物品 %s 增加 %s 个" % (name, m)
+				return format.gain_item1 % (name, m)
 
 			n = params[2]
-			return "物品 %s 增加 %s~%s 个" % (name, m, n)
+			return format.gain_item2 % (name, m, n)
 
-		if code == ItemEffectCode.GainGold or \
+		elif code == ItemEffectCode.GainGold or \
 			code == ItemEffectCode.GainBoundTicket:
 
 			m = params[0]
-			name = conf.gold if code == ItemEffectCode.GainGold else conf.bound_ticket
+			name = format.gold if code == ItemEffectCode.GainGold else format.bound_ticket
 
 			if p_len < 2:  # 如果只有 m 参数
-				return "%s 增加 %s" % (name, m)
+				return format.gain_gold1 % (name, m)
 
 			n = params[1]
-			return "%s 增加 %s~%s" % (name, m, n)
+			return format.gain_gold2 % (name, m, n)
 
-		if code == ItemEffectCode.GainExermonExp or \
+		elif code == ItemEffectCode.GainExermonExp or \
 			code == ItemEffectCode.GainExerSlotItemExp:
 
 			s, m = params[0], params[1]
 			name = Subject.get(id=s).name
-			exer = "艾瑟萌" if code == ItemEffectCode.GainExermonExp else "艾瑟萌槽"
+			if format.short: name = name[0]
+
+			exer = format.exermon if code == ItemEffectCode.GainExermonExp \
+				else format.exer_slot
 
 			if p_len < 3:  # 如果只有 m 参数
-				return "%s %s经验值增加 %s" % (name, exer, m)
+				return format.gain_exp1 % (name, exer, m)
 
 			n = params[2]
-			return "%s %s经验值增加 %s~%s" % (name, exer, m, n)
+			return format.gain_exp2 % (name, exer, m, n)
 
-		if code == ItemEffectCode.GainPlayerExp:
+		elif code == ItemEffectCode.GainPlayerExp:
 
 			m = params[0]
 
 			if p_len < 2:  # 如果只有 m 参数
-				return "玩家经验值增加 %s" % (m)
+				return format.player_gain_exp1 % (m)
 
 			n = params[1]
-			return "玩家经验值增加 %s~%s" % (m, n)
+			return format.player_gain_exp2 % (m, n)
 
-		if code == ItemEffectCode.Eval:
-			return "执行程序：%s" % params[0]
+		elif code == ItemEffectCode.Eval:
+			return format.eval % params[0]
+
+		return format.empty
 
 	# 转化为字典
 	def convertToDict(self):
@@ -3088,7 +3218,9 @@ class BaseEffect(models.Model):
 		return {
 			'code': self.code,
 			'params': self.params,
-			'description': self.describe()
+			'description': self.describe(),
+			'short_description': self.describe(
+				EffectDescriptionFormat.shortFormat()),
 		}
 
 

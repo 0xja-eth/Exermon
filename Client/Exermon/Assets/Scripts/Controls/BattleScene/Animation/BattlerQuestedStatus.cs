@@ -9,7 +9,7 @@ using BattleModule.Data;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Animation {
+namespace UI.BattleScene.Controls.Animators {
 
     /// <summary>
     /// 玩家准备显示
