@@ -20,6 +20,11 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// 常量定义
         /// </summary>
 
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public ItemEffectList effects;
+
         #region 界面控制
 
         /// <summary>

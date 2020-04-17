@@ -6,17 +6,17 @@ using UnityEngine.Animations;
 using Core.UI;
 using Core.UI.Utils;
 
-namespace UI.BattleScene.Controls.Animators {
+namespace UI.BattleScene.Controls.Storyboards {
 
     /// <summary>
     /// 基本状态行为
     /// </summary>
-    public class BattlerQuestedShow : BaseStateBehaviour {
+    public class BattlerQuestedShowState : BaseStateBehaviour {
 
         /// <summary>
         /// 内部变量
         /// </summary>
-        BattlerQuestedStatus status;
+        BattlerQuestedStoryboard status;
 
         GameObject humanBlackLine, exermonBlackLine;
         GameObject lightEffect;
@@ -27,7 +27,7 @@ namespace UI.BattleScene.Controls.Animators {
         /// <param name="go"></param>
         protected override void setup(GameObject go) {
             base.setup(go);
-            status = SceneUtils.get<BattlerQuestedStatus>(go);
+            status = SceneUtils.get<BattlerQuestedStoryboard>(go);
 
             humanBlackLine = status ? status.humanBlackLine : null;
             exermonBlackLine = status ? status.exermonBlackLine : null;

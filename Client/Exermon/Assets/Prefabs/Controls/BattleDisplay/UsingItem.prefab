@@ -237,6 +237,9 @@ MonoBehaviour:
   countText: {fileID: 0}
   maxCheck: 0
   defaultCapacity: 0
+  effectArrows: {fileID: 0}
+  recoveryArrows: {fileID: 2800000, guid: 8725efeeab65ad44bb7bdb88e4c14b25, type: 3}
+  promotionArrows: {fileID: 2800000, guid: 44c87979d8bdaff44bc60fd6de11858d, type: 3}
 --- !u!1 &1889334130958414649
 GameObject:
   m_ObjectHideFlags: 0

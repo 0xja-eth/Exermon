@@ -21,7 +21,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Question;
-using UI.BattleScene.Controls.Animators;
+using UI.BattleScene.Controls.Storyboards;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -31,7 +31,7 @@ namespace UI.BattleScene.Windows {
     /// <summary>
     /// 题目窗口
     /// </summary>
-    public class QuestionWindow : BaseWindow {
+    public class QuestionWindow : BaseBattleWindow {
 
         /// <summary>
         /// 常量定义
@@ -46,76 +46,14 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public QuestionInfo questionInfo;
         public QuestionDisplay questionDisplay;
-        public BattleClock battleClock;
         public BattlerStatus selfStatus, oppoStatus;
 
-        public BattlerQuestedStatus selfQStatus, oppoQStatus;
+        public BattlerQuestedStoryboard selfQStatus, oppoQStatus;
 
         public Animation oppoPromptAni;
 
         public QuesChoiceContainer choiceContainer;
-
-        /// <summary>
-        /// 内部变量声明
-        /// </summary>
-        RuntimeBattle battle;
-        bool passed = false;
-
-        /// <summary>
-        /// 场景组件引用
-        /// </summary>
-        BattleScene scene;
-
-        /// <summary>
-        /// 外部系统引用
-        /// </summary>
-        GameSystem gameSys = null;
-        DataService dataSer = null;
-        PlayerService playerSer = null;
-        BattleService battleSer = null;
-
-        #region 初始化
-
-        /// <summary>
-        /// 初次初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            scene = (BattleScene)SceneUtils.getSceneObject("Scene");
-        }
-
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
-            base.initializeSystems();
-            gameSys = GameSystem.get();
-            dataSer = DataService.get();
-            playerSer = PlayerService.get();
-            battleSer = BattleService.get();
-        }
-
-        #endregion
-
-        #region 更新控制
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        protected override void update() {
-            base.update();
-            updateBattleClock();
-        }
-
-        /// <summary>
-        /// 更新准备时间
-        /// </summary>
-        void updateBattleClock() {
-            if (!passed && battleClock.isTimeUp()) pushAnswer(true);
-        }
-
-        #endregion
-
+        
         #region 启动/结束窗口
 
         /// <summary>
@@ -143,6 +81,22 @@ namespace UI.BattleScene.Windows {
 
         #region 数据控制
 
+        /// <summary>
+        /// 获取自身分镜
+        /// </summary>
+        /// <returns>返回自身分镜</returns>
+        protected override BattlerPrepareStoryboard selfStoryboard() {
+            return selfQStatus;
+        }
+
+        /// <summary>
+        /// 获取对方分镜
+        /// </summary>
+        /// <returns>返回对方分镜</returns>
+        protected override BattlerPrepareStoryboard oppoStoryboard() {
+            return oppoQStatus;
+        }
+
         #endregion
 
         #region 界面控制
@@ -155,59 +109,10 @@ namespace UI.BattleScene.Windows {
         }
 
         /// <summary>
-        /// 显示上个玩家的答题状态
-        /// </summary>
-        void showQStatus(RuntimeBattlePlayer battler, bool setLast = true) {
-            if (battler == battle.self()) showSelfQStatus(setLast, battler);
-            if (battler == battle.oppo()) showOppoQStatus(setLast, battler);
-        }
-
-        /// <summary>
-        /// 显示自身答题状态
-        /// </summary>
-        void showSelfQStatus(bool setLast = true,
-            RuntimeBattlePlayer battler = null) {
-            if (battler == null) battler = battle.self();
-            if (selfQStatus.shown) return;
-            selfQStatus.startView(battler);
-            if (setLast) selfQStatus.transform.SetAsLastSibling();
-        }
-
-        /// <summary>
-        /// 显示对方答题状态
-        /// </summary>
-        void showOppoQStatus(bool setLast = true,
-            RuntimeBattlePlayer battler = null) {
-            if (battler == null) battler = battle.oppo();
-            if (oppoQStatus.shown) return;
-            oppoQStatus.startView(battler);
-            if (setLast) oppoQStatus.transform.SetAsLastSibling();
-        }
-
-        /// <summary>
-        /// 清空答题状态
-        /// </summary>
-        void showQStatuses() {
-            showSelfQStatus();
-            showOppoQStatus();
-        }
-
-        /// <summary>
-        /// 清空答题状态
-        /// </summary>
-        void clearQStatuses() {
-            selfQStatus.terminateView();
-            oppoQStatus.terminateView();
-        }
-
-        /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
-
-            passed = false;
-            battle = battleSer.battle;
 
             var question = battle.round.question();
             question.clearShuffleChoices();
@@ -237,8 +142,6 @@ namespace UI.BattleScene.Windows {
 
             selfStatus.requestClear(true);
             oppoStatus.requestClear(true);
-
-            clearQStatuses();
         }
 
         #endregion
@@ -263,9 +166,9 @@ namespace UI.BattleScene.Windows {
         IEnumerator correctQStatusAni(RuntimeBattlePlayer corr) {
             var oppo = battle.getPlayer(corr.getID(), true);
             CoroutineUtils.resetActions();
-            CoroutineUtils.addAction(() => showQStatus(corr), QStatusDeltaSeconds);
-            CoroutineUtils.addAction(() => showQStatus(oppo, false), QStatusShowSeconds);
-            CoroutineUtils.addAction(clearQStatuses);
+            CoroutineUtils.addAction(() => showStoryboard(corr), QStatusDeltaSeconds);
+            CoroutineUtils.addAction(() => showStoryboard(oppo, false), QStatusShowSeconds);
+            CoroutineUtils.addAction(clearStoryboards);
             return CoroutineUtils.generateCoroutine();
         }
 
@@ -291,7 +194,7 @@ namespace UI.BattleScene.Windows {
                 onQuestionTerminated();
             } else if (lastPlayer == selfPlayer) {
                 // 如果是自己答题（答错）
-                showSelfQStatus();
+                showSelfStoryboard();
                 onQuestionTerminated(false, false);
             } else // 否则是对方答题（答错）
                 showOppoPrompt();
@@ -328,10 +231,17 @@ namespace UI.BattleScene.Windows {
         #region 流程控制
 
         /// <summary>
+        /// 跳过
+        /// </summary>
+        public override void pass() {
+            pushAnswer(true);
+        }
+
+        /// <summary>
         /// 确认
         /// </summary>
         public void confirm() {
-            pushAnswer(false);
+            pushAnswer();
         }
 
         /// <summary>

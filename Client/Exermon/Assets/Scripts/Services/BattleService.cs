@@ -232,11 +232,12 @@ namespace BattleModule.Services {
             UnityAction onSuccess = null, UnityAction onError = null) {
 
             if (contItem == null) prepareComplete(onSuccess, onError);
-
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                onSuccess?.Invoke();
-            };
-            prepareComplete(contItem.type, contItem.getID(), _onSuccess, onError);
+            else {
+                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                    onSuccess?.Invoke();
+                };
+                prepareComplete(contItem.type, contItem.getID(), _onSuccess, onError);
+            }
         }
         /// <param name="type">使用物品类型</param>
         /// <param name="contItemId">容器项ID</param>

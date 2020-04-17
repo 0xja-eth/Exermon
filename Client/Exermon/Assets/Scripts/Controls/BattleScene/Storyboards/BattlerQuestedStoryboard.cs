@@ -9,12 +9,12 @@ using BattleModule.Data;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Animators {
+namespace UI.BattleScene.Controls.Storyboards {
 
     /// <summary>
     /// 玩家准备显示
     /// </summary>
-    public class BattlerQuestedStatus : BattlerPrepareStatus {
+    public class  BattlerQuestedStoryboard : BattlerPrepareStoryboard {
 
         /// <summary>
         /// 外部组件设置

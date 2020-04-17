@@ -11,12 +11,12 @@ using BattleModule.Data;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Animators {
+namespace UI.BattleScene.Controls.Storyboards {
 
     /// <summary>
     /// 玩家准备显示
     /// </summary>
-    public class BattlerPrepareStatus : BattlerStatus {
+    public class BattlerPrepareStoryboard : BattlerStatus {
 
         /// <summary>
         /// 半身像高度
@@ -55,7 +55,7 @@ namespace UI.BattleScene.Controls.Animators {
         #endregion
 
         //#region 更新控制
-        
+
         ///// <summary>
         ///// 更新
         ///// </summary>
@@ -64,7 +64,7 @@ namespace UI.BattleScene.Controls.Animators {
         //    if (!selfWindow.shown && shown)
         //        base.terminateView(); 
         //}
-        
+
         //#endregion
 
         #region 启动/结束控制
@@ -76,6 +76,10 @@ namespace UI.BattleScene.Controls.Animators {
             base.startView();
             if (selfWindow) selfWindow.startWindow();
         }
+        /// <param name="force">强制（无过渡动画）</param>
+        public void startView(bool force) {
+            if (force) base.startView(); else startView();
+        }
 
         /// <summary>
         /// 结束视窗
@@ -85,6 +89,10 @@ namespace UI.BattleScene.Controls.Animators {
             if (waitingText) waitingText.SetActive(false);
             if (selfWindow) selfWindow.terminateWindow();
             else base.terminateView();
+        }
+        /// <param name="force">强制（无过渡动画）</param>
+        public void terminateView(bool force) {
+            if (force) base.terminateView(); else terminateView();
         }
 
         #endregion

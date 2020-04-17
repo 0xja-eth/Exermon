@@ -16,12 +16,13 @@ using UI.BattleScene.Controls.ItemDisplays;
 /// <summary>
 /// 对战匹配场景控件
 /// </summary>
-namespace UI.BattleScene.Controls.Animators {
+namespace UI.BattleScene.Controls.Storyboards {
 
     /// <summary>
     /// 玩家准备动作
     /// </summary>
-    public class BattlerPrepareAction : BattlerQuestedStatus {
+    public class BattlerPrepareActionStoryboard : 
+        BattlerQuestedStoryboard {
 
         /// <summary>
         /// 外部组件设置

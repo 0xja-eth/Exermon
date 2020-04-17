@@ -28,8 +28,6 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public ItemEffectList effects;
-
         public Image effectArrows;
 
         public Texture2D recoveryArrows, promotionArrows;

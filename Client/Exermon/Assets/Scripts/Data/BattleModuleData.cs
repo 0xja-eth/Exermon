@@ -625,7 +625,7 @@ namespace BattleModule.Data {
         /// 行动类型
         /// </summary>
         public enum Type {
-            Prepare = 0, Action = 1
+            Prepare = 0, Attack = 1
         }
 
         /// <summary>
@@ -669,7 +669,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回使用的技能</returns>
         public ExerSkill skill() {
-            if (type != (int)Type.Prepare) return null;
+            if (type != (int)Type.Attack) return null;
             return DataService.get().exerSkill(skillId);
         }
     }
@@ -751,42 +751,6 @@ namespace BattleModule.Data {
         public RuntimeBattle battle { get; set; } = null;
 
         /// <summary>
-        /// 当前选择
-        /// </summary>
-        /// <returns>返回当前选择</returns>
-        public int[] getSelection() { return selection; }
-
-        /// <summary>
-        /// 设置选择
-        /// </summary>
-        public void setSelection(int[] selection) {
-            this.selection = selection;
-        }
-
-        /// <summary>
-        /// 做题用时（毫秒）
-        /// </summary>
-        /// <returns>返回做题用时</returns>
-        public int getTimespan() { return timespan; }
-
-        /// <summary>
-        /// 当前选择
-        /// </summary>
-        /// <returns>返回当前选择</returns>
-        public bool isAnswered() { return selection != null; }
-
-        /// <summary>
-        /// 使用的物品
-        /// </summary>
-        /// <returns></returns>
-        public BaseItem roundItem() {
-            if (actions == null) return null;
-            if (actions[0].type == (int)RuntimeAction.Type.Prepare) 
-                return actions[0].item();
-            return null;
-        }
-
-        /// <summary>
         /// 进度
         /// </summary>
         public int progress { get; protected set; } = -1;
@@ -858,6 +822,8 @@ namespace BattleModule.Data {
 
         #endregion
 
+        #region 数据操作
+
         /// <summary>
         /// 形象对象
         /// </summary>
@@ -910,7 +876,69 @@ namespace BattleModule.Data {
             selection = null;
             correct = false;
             timespan = 0;
+            actions = null;
         }
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        public int[] getSelection() { return selection; }
+
+        /// <summary>
+        /// 设置选择
+        /// </summary>
+        public void setSelection(int[] selection) {
+            this.selection = selection;
+        }
+
+        /// <summary>
+        /// 做题用时（毫秒）
+        /// </summary>
+        /// <returns>返回做题用时</returns>
+        public int getTimespan() { return timespan; }
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        public bool isAnswered() { return selection != null; }
+
+        /// <summary>
+        /// 使用的物品
+        /// </summary>
+        /// <returns></returns>
+        public BaseItem roundItem() {
+            var action = perpareAction();
+            if (action == null) return null;
+            return action.item();
+        }
+
+        /// <summary>
+        /// 准备行动
+        /// </summary>
+        /// <returns>返回当前回合的准备行动</returns>
+        public RuntimeAction perpareAction() {
+            if (actions == null) return null;
+            foreach (var action in actions)
+                if (action.type == (int)RuntimeAction.Type.Prepare)
+                    return action;
+            return null;
+        }
+
+        /// <summary>
+        /// 攻击行动
+        /// </summary>
+        /// <returns>返回当前回合的准备行动</returns>
+        public RuntimeAction attackAction() {
+            if (actions == null) return null;
+            foreach (var action in actions)
+                if (action.type == (int)RuntimeAction.Type.Attack)
+                    return action;
+            return null;
+        }
+
+        #endregion
 
         #region 数据读取
 

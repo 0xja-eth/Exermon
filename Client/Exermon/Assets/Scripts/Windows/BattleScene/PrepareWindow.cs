@@ -15,7 +15,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
-using UI.BattleScene.Controls.Animators;
+using UI.BattleScene.Controls.Storyboards;
 
 /// <summary>
 /// 对战开始场景窗口
@@ -25,7 +25,7 @@ namespace UI.BattleScene.Windows {
     /// <summary>
     /// 准备窗口
     /// </summary>
-    public class PrepareWindow : BaseWindow {
+    public class PrepareWindow : BaseBattleWindow {
 
         /// <summary>
         /// 半常量定义
@@ -41,76 +41,14 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public QuestionInfo questionInfo;
         public ItemTabController tabController;
-        public BattleClock battleClock;
 
         public BattlerStatus selfStatus, oppoStatus;
 
-        public BattlerPrepareStatus selfPStatus;//, oppoPStatus;
+        public BattlerPrepareStoryboard selfPStatus;//, oppoPStatus;
 
         public BattleItemSlotDisplay battleItemSlotDisplay;
 
         public GameObject prepareControl;
-
-        /// <summary>
-        /// 内部变量声明
-        /// </summary>
-        RuntimeBattle battle;
-        bool passed = false;
-
-        /// <summary>
-        /// 场景组件引用
-        /// </summary>
-        BattleScene scene;
-
-        /// <summary>
-        /// 外部系统引用
-        /// </summary>
-        GameSystem gameSys = null;
-        DataService dataSer = null;
-        PlayerService playerSer = null;
-        BattleService battleSer = null;
-
-        #region 初始化
-
-        /// <summary>
-        /// 初次初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            scene = (BattleScene)SceneUtils.getSceneObject("Scene");
-        }
-
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
-            base.initializeSystems();
-            gameSys = GameSystem.get();
-            dataSer = DataService.get();
-            playerSer = PlayerService.get();
-            battleSer = BattleService.get();
-        }
-
-        #endregion
-
-        #region 更新控制
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        protected override void update() {
-            base.update();
-            updateBattleClock();
-        }
-
-        /// <summary>
-        /// 更新准备时间
-        /// </summary>
-        void updateBattleClock() {
-            if (!passed && battleClock.isTimeUp()) pass();
-        }
-
-        #endregion
 
         #region 启动/结束窗口
 
@@ -139,58 +77,31 @@ namespace UI.BattleScene.Windows {
 
         #region 数据控制
 
+        /// <summary>
+        /// 获取自身分镜
+        /// </summary>
+        /// <returns>返回自身分镜</returns>
+        protected override BattlerPrepareStoryboard selfStoryboard() {
+            return selfPStatus;
+        }
+
+        /// <summary>
+        /// 获取对方分镜
+        /// </summary>
+        /// <returns>返回对方分镜</returns>
+        protected override BattlerPrepareStoryboard oppoStoryboard() {
+            return null;
+        }
+
         #endregion
 
         #region 界面控制
-
-        /// <summary>
-        /// 显示上个玩家的答题状态
-        /// </summary>
-        void showPStatus(RuntimeBattlePlayer battler) {
-            if (battler == battle.self()) showSelfPStatus();
-            //if (battler == battle.oppo()) showOppoPStatus();
-        }
-
-        /// <summary>
-        /// 显示自身答题状态
-        /// </summary>
-        void showSelfPStatus(RuntimeBattlePlayer battler = null) {
-            if (battler == null) battler = battle.self();
-            selfPStatus.startView(battler);
-        }
-
-        ///// <summary>
-        ///// 显示对方答题状态
-        ///// </summary>
-        //void showOppoPStatus(RuntimeBattlePlayer battler = null) {
-        //    if (battler == null) battler = battle.oppo();
-        //    oppoPStatus.startView(battler);
-        //}
-
-        /// <summary>
-        /// 清空答题状态
-        /// </summary>
-        void showPStatuses() {
-            showSelfPStatus();
-            //showOppoPStatus();
-        }
-
-        /// <summary>
-        /// 清空答题状态
-        /// </summary>
-        void clearPStatuses() {
-            selfPStatus.terminateView();
-            //oppoPStatus.terminateView();
-        }
 
         /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
-
-            passed = false;
-            battle = battleSer.battle;
 
             var containerDisplays = new IPrepareContainerDisplay[] {
                 battleItemSlotDisplay, /* quesSugarPackDisplay */};
@@ -219,8 +130,6 @@ namespace UI.BattleScene.Windows {
             oppoStatus.requestClear(true);
 
             battleItemSlotDisplay.clearItems();
-
-            clearPStatuses();
         }
 
         #endregion
@@ -230,8 +139,8 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 跳过
         /// </summary>
-        public void pass() {
-            passed = true;
+        public override void pass() {
+            base.pass();
             battleSer.prepareComplete(onPrepareCompleted);
         }
 
@@ -252,7 +161,7 @@ namespace UI.BattleScene.Windows {
         /// 准备完成回调
         /// </summary>
         void onPrepareCompleted() {
-            showSelfPStatus();
+            showSelfStoryboard();
             prepareControl.SetActive(false);
             battleClock.stopTimer();
         }
