@@ -178,6 +178,7 @@ namespace UI.BattleScene {
         /// 开始行动完毕
         /// </summary>
         void onActing() {
+            questionWindow.showStoryboards(true);
             actionWindow.startWindow();
         }
 

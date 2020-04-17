@@ -166,6 +166,5 @@ namespace UI.BattleScene.Windows {
         }
 
         #endregion
-
     }
 }
