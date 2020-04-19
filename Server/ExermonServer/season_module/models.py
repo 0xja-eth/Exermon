@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from utils.exception import ErrorType
 from utils.model_utils import Common as ModelUtils
 from game_module.models import GroupConfigure
-from utils.calc_utils import rankOnNewSeason
+from utils.calc_utils import NewSeasonStarNumCalc
 import datetime
 
 # Create your models here.
@@ -64,7 +64,8 @@ class SeasonRecord(models.Model):
 		new_rec.player_id = self.player_id
 		new_rec.season = season
 		new_rec.point = 0
-		new_rec.star_num = rankOnNewSeason.calc(self.star_num)
+		new_rec.star_num = NewSeasonStarNumCalc.calc(self.star_num)
+		
 		# TODO: 在这里计算并设置 new_rec 的段位星星
 		#  （根据当前段位星星来计算新赛季的初始段位星星）
 		#  最好在 utils.calc_utils 创建一个专门计算这个的类
@@ -102,7 +103,7 @@ class SeasonRecord(models.Model):
 		"""
 		from utils.calc_utils import CompRankCalc
 
-		return CompRankCalc.calc(self.star_num)
+		return CompRankCalc.starNum2Rank(self.star_num)
 
 	# 增减赛季积分
 	def adjustPoint(self, value):

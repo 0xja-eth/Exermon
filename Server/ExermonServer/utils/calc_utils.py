@@ -1439,10 +1439,10 @@ class BattleAttackProcessor:
 class CompRankCalc:
 
 	@classmethod
-	def calc(cls, star_num):
+	def starNum2Rank(cls, star_num) -> ('CompRank', int, int):
 		"""
 		原来：#def rank(self) -> ('CompRank', int):
-		计算当前实际段位
+		根据星星数计算当前实际段位
 		Returns:
 			返回实际段位对象（CompRank），子段位数目（从0开始）以及剩余星星数
 		Examples:
@@ -1484,66 +1484,61 @@ class CompRankCalc:
 
 		return None, 0, star_num
 
-# ===================================================
-# 赛季切换，根据当前的段位星星计算新赛季的初始段位星星-lgy4.15
-# ===================================================
-class rankOnNewSeason:
-
 	@classmethod
-	def calc(cls,star_num):
-
-		rank = CompRankCalc.cal(star_num)
-
-		# 段位元组第三位，不满三个的星星直接清零了
-		if rank[0:2]< (3,2): pass
-		elif rank[0:2] <(3,4): newRank= (3,2,0)
-		elif rank[0:2] <(4,2): newRank = (3,3,0)
-		elif rank[0:2] < (4,4): newRank = (3,4,0)
-		elif rank[0:2] < (5,2): newRank = (4,3,0)
-		elif rank[0:2] < (5,5): newRank = (4,4,0)
-		else: newRank = (4,5,0)
-
-		star_num = RankToStarNum.cal(newRank)
-
-		return star_num
-
-# ===================================================
-# 根据当前段位，反推星星数量-lgy4.15
-# ===================================================
-class RankToStarNum:
-
-	@classmethod
-	def cal(cls, rank:tuple):
-		'''
-
+	def rank2StarNum(cls, sub_rank: int, star_num: int = 0,
+					 rank: 'CompRank' = None, rank_id: int = None) -> int:
+		"""
+		根据段位信息计算星星数
 		Args:
-			rank: 以元组表示的段位（x,x,x)，见CompRankCalc中的定义
+			sub_rank (int): 子短位数
+			star_num (int): 剩余星星数
+			rank (CompRank): 段位实例
+			rank_id (int): 段位ID
 		Returns:
 			返回由段位计算出来的星星数量
-		'''
+		"""
 		from season_module.models import CompRank
+
+		if rank_id is None: rank_id = rank.id
 
 		# ranks 储存了段位列表中的每一个段位的详细信息
 		ranks = CompRank.objs()
-		star_num = 0
-		j = 1 # 用于标识大段位
+		rank_id_ = 1  # 用于标识大段位
+		# star_num = star_num
 
-		for i in ranks:
-			if j < rank[0]:
-				star_num += i.rankStars()
-				j +=1
+		for rank_ in ranks:
+			if rank_id_ < rank_id:
+				star_num += rank_.rankStars()
+				rank_id_ += 1
 
 			# 大段位计算好了，剩下小段位
-			if j == rank[0]:
-				star_num += rank[1] * CompRank.STARS_PER_SUBRANK
+			if rank_id_ == rank_id:
+				star_num += sub_rank * CompRank.STARS_PER_SUBRANK
 				break
 
 		return star_num
 
 
+# ===================================================
+# 赛季切换，根据当前的段位星星计算新赛季的初始段位星星-lgy4.15
+# ===================================================
+class NewSeasonStarNumCalc:
 
+	@classmethod
+	def calc(cls, star_num):
 
+		rank, sub_rank, star_num = CompRankCalc.starNum2Rank(star_num)
+		data = (rank.id, sub_rank)
 
+		# 段位元组第三位，不满三个的星星直接清零了
+		if data < (3, 2): new_rank = (1, 1, 0)
+		elif data < (3, 4): new_rank = (3, 2, 0)
+		elif data < (4, 2): new_rank = (3, 3, 0)
+		elif data < (4, 4): new_rank = (3, 4, 0)
+		elif data < (5, 2): new_rank = (4, 3, 0)
+		elif data < (5, 5): new_rank = (4, 4, 0)
+		else: new_rank = (4, 5, 0)
 
+		star_num = CompRankCalc.rank2StarNum(new_rank)
 
-
+		return star_num
