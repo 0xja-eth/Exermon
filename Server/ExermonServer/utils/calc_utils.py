@@ -1483,3 +1483,67 @@ class CompRankCalc:
 				return rank, sub_rank, star_num
 
 		return None, 0, star_num
+
+# ===================================================
+# 赛季切换，根据当前的段位星星计算新赛季的初始段位星星-lgy4.15
+# ===================================================
+class rankOnNewSeason:
+
+	@classmethod
+	def calc(cls,star_num):
+
+		rank = CompRankCalc.cal(star_num)
+
+		# 段位元组第三位，不满三个的星星直接清零了
+		if rank[0:2]< (3,2): pass
+		elif rank[0:2] <(3,4): newRank= (3,2,0)
+		elif rank[0:2] <(4,2): newRank = (3,3,0)
+		elif rank[0:2] < (4,4): newRank = (3,4,0)
+		elif rank[0:2] < (5,2): newRank = (4,3,0)
+		elif rank[0:2] < (5,5): newRank = (4,4,0)
+		else: newRank = (4,5,0)
+
+		star_num = RankToStarNum.cal(newRank)
+
+		return star_num
+
+# ===================================================
+# 根据当前段位，反推星星数量-lgy4.15
+# ===================================================
+class RankToStarNum:
+
+	@classmethod
+	def cal(cls, rank:tuple):
+		'''
+
+		Args:
+			rank: 以元组表示的段位（x,x,x)，见CompRankCalc中的定义
+		Returns:
+			返回由段位计算出来的星星数量
+		'''
+		from season_module.models import CompRank
+
+		# ranks 储存了段位列表中的每一个段位的详细信息
+		ranks = CompRank.objs()
+		star_num = 0
+		j = 1 # 用于标识大段位
+
+		for i in ranks:
+			if j < rank[0]:
+				star_num += i.rankStars()
+				j +=1
+
+			# 大段位计算好了，剩下小段位
+			if j == rank[0]:
+				star_num += rank[1] * CompRank.STARS_PER_SUBRANK
+				break
+
+		return star_num
+
+
+
+
+
+
+
+
