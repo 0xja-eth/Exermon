@@ -115,7 +115,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: AttackActionAnimator
+  m_Name: SelfAttackActionAnimator
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: shown
@@ -192,7 +192,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 025bbaf3aef5cca4e8f67c805ed79866, type: 2}
+  m_Motion: {fileID: 7400000, guid: 5c4df5fcd99c6d243bf365edbcf032b4, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

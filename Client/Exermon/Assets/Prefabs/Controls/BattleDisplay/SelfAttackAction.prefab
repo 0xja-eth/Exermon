@@ -414,6 +414,7 @@ GameObject:
   - component: {fileID: 4124286637438506050}
   - component: {fileID: 4124286637438506053}
   - component: {fileID: 4124286637438506051}
+  - component: {fileID: 548704960371492010}
   m_Layer: 5
   m_Name: SelfAttackAction
   m_TagString: Untagged
@@ -494,6 +495,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 1
   m_AspectRatio: 2.1219964
+--- !u!114 &548704960371492010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4124286637438506055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8c8b890edef414e83d3a35de726eaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  face: {fileID: 4124286637770764514}
+  status: {fileID: 0}
+  baseStatus: {fileID: 0}
+  correctStatus: {fileID: 0}
+  wrongStatus: {fileID: 0}
+  waitingText: {fileID: 0}
+  exermon: {fileID: 4124286635992760116}
+  humanBlackLine: {fileID: 0}
+  exermonBlackLine: {fileID: 0}
+  lightEffect: {fileID: 0}
+  hurtText: {fileID: 8411663145046380709}
 --- !u!1 &4124286637493382601
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,8 +730,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 256, y: 64}
+  m_AnchoredPosition: {x: 32, y: 0}
+  m_SizeDelta: {x: 292, y: 64}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &8834974991962348201
 CanvasRenderer:
@@ -730,7 +754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.2555, b: 0.787, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -742,13 +766,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 2
     m_MaxSize: 40
-    m_Alignment: 4
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: -999HP
+  m_Text: -199HP
 --- !u!114 &6461576617282166140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -762,5 +786,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
-  m_EffectDistance: {x: 4, y: -4}
+  m_EffectDistance: {x: 3, y: -3}
   m_UseGraphicAlpha: 1

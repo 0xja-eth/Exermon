@@ -15,7 +15,7 @@ namespace UI.StartScene.Controls.Exermon {
     /// <summary>
     /// 艾瑟萌卡片容器
     /// </summary>
-    public class ExermonsContainer : ContainerDisplay<Exermon> {
+    public class ExermonsContainer : SelectableContainerDisplay<Exermon> {
 
         /// <summary>
         /// 常量设置

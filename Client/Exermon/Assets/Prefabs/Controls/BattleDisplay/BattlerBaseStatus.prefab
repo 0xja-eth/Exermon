@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6188067951127225054}
   - component: {fileID: 3325729042876853258}
   - component: {fileID: 3316294113039531746}
+  - component: {fileID: 649257191652067405}
   m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
@@ -73,6 +74,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!111 &649257191652067405
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260051383810625442}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &3837375286477252257
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,6 +100,7 @@ GameObject:
   - component: {fileID: 7439566601424303291}
   - component: {fileID: 4533706424664784232}
   - component: {fileID: 4577892466126925076}
+  - component: {fileID: 7127561767545201009}
   m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
@@ -146,6 +163,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!111 &7127561767545201009
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3837375286477252257}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &4304503383720702245
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,7 +190,7 @@ GameObject:
   - component: {fileID: 8123173560319209721}
   - component: {fileID: 7258482994860457914}
   m_Layer: 5
-  m_Name: MP
+  m_Name: Mp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -492,7 +524,7 @@ GameObject:
   - component: {fileID: 5673444731018706506}
   - component: {fileID: 5673444731018706505}
   m_Layer: 5
-  m_Name: HP
+  m_Name: Hp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

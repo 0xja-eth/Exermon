@@ -995,7 +995,7 @@ class BattleRoundResult(PlayerQuestion):
 			attacker (bool): 自己是否为攻击方
 		"""
 		if self.skill is None:
-			hit_type = HitType.MPDamage
+			hit_type = HitType.HPDamage
 		else:
 			hit_type = HitType(self.skill.hit_type)
 
@@ -1014,6 +1014,9 @@ class BattleRoundResult(PlayerQuestion):
 		# 对己攻击，如果是攻击方计入承伤点数，不计入伤害点数
 		if target_type == TargetType.Self:
 			if attacker: self.damage += hurt
+
+		print("self.hurt: "+str(self.hurt))
+		print("self.damage: "+str(self.damage))
 
 	def hurtPoint(self) -> int:
 		"""

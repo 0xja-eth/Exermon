@@ -1294,6 +1294,7 @@ class ExerSkill(BaseItem):
 		res['max_use_count'] = self.max_use_count
 		res['target'] = self.target_type
 		res['hit_type'] = self.hit_type
+		res['drain_rate'] = self.drain_rate
 		res['atk_rate'] = self.atk_rate
 		res['def_rate'] = self.def_rate
 		res['plus_formula'] = self.plus_formula

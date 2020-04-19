@@ -25,8 +25,7 @@ namespace UI.BattleScene.Controls {
         /// <summary>
         /// 常量定义
         /// </summary>
-        public const string HPFormat = "HP {0}/{1}";
-
+        
         /// <summary>
         /// 外部组件设置
         /// </summary>

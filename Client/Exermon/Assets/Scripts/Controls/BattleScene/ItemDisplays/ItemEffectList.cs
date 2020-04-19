@@ -63,16 +63,17 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// </summary>
         void drawArrows() {
             if (items.Count <= 0) clearArrows();
-
-            var effect = items[0];
-            Texture2D texture = null;
-            if (effect.isRecovery()) texture = recoveryArrows;
-            if (effect.isPromotion()) texture = promotionArrows;
-
-            if (texture == null) clearArrows();
             else {
-                effectArrows.gameObject.SetActive(true);
-                effectArrows.overrideSprite = AssetLoader.generateSprite(texture);
+                var effect = items[0];
+                Texture2D texture = null;
+                if (effect.isRecovery()) texture = recoveryArrows;
+                if (effect.isPromotion()) texture = promotionArrows;
+
+                if (texture == null) clearArrows();
+                else {
+                    effectArrows.gameObject.SetActive(true);
+                    effectArrows.overrideSprite = AssetLoader.generateSprite(texture);
+                }
             }
         }
 

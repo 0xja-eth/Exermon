@@ -144,6 +144,7 @@ namespace Core.Data.Loaders {
         public static Sprite getCharacterBustSprite(int id,
             int height = PlayerModule.Data.Character.BustHeight) {
             var bust = loadCharacterBust(id);
+            if (height == 0) height = bust.height;
             var rect = new Rect(0, bust.height - height, bust.width, height);
             return generateSprite(bust, rect);
         }

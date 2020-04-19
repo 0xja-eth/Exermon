@@ -345,6 +345,30 @@ namespace ExermonModule.Data {
         ParamDisplay.DisplayDataConvertable {
 
         /// <summary>
+        /// 目标类型
+        /// </summary>
+        public enum TargetType {
+            Empty = 0, // 无
+            Self = 1, // 己方
+            Enemy = 2, // 敌方
+            BothRandom = 3, // 双方随机
+            Both = 4 // 双方全部
+        }
+
+        /// <summary>
+        /// 命中类型枚举
+        /// </summary>
+        public enum HitType {
+            Empty = 0, // 无
+            HPDamage = 1, // 体力值伤害
+	        HPRecover = 2, // 体力值回复
+	        HPDrain = 3, // 体力值吸收
+	        MPDamage = 4, // 精力值伤害
+	        MPRecover = 5, // 精力值回复
+	        MPDrain = 6, // 精力值吸收
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -367,6 +391,8 @@ namespace ExermonModule.Data {
         public int target { get; protected set; }
         [AutoConvert]
         public int hitType { get; protected set; }
+        [AutoConvert]
+        public int drainRate { get; protected set; }
         [AutoConvert]
         public int atkRate { get; protected set; }
         [AutoConvert]

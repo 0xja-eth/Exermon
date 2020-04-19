@@ -40,9 +40,11 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// </summary>
         /// <param name="item"></param>
         protected virtual void drawHumanItem(HumanItem item) {
-            name.text = item.name;
-            icon.gameObject.SetActive(true);
-            icon.overrideSprite = item.icon;
+            if (name) name.text = item.name;
+            if (icon) {
+                icon.gameObject.SetActive(true);
+                icon.overrideSprite = item.icon;
+            }
         }
 
         /// <summary>

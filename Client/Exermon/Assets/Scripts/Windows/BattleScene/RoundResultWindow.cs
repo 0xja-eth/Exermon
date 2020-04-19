@@ -134,6 +134,8 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
+            battle = battleSer.battle;
+
             drawBattlerResult();
             drawUsedItems();
             setupTimer();
@@ -162,8 +164,8 @@ namespace UI.BattleScene.Windows {
         /// 绘制倒计时
         /// </summary>
         void drawTimer() {
-            var now = DateTime.Now;
-            timer.text = (endTime - now).TotalSeconds.ToString();
+            var delta = endTime - DateTime.Now;
+            timer.text = ((int)delta.TotalSeconds).ToString();
         }
 
         /// <summary>

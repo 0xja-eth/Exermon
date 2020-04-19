@@ -10,7 +10,7 @@ namespace UI.BattleScene.Controls.Question {
     /// 题目图片容器
     /// </summary>
     public class QuesPictureContainer :
-        ContainerDisplay<Texture2D>, IItemDetailDisplay<Question> {
+        SelectableContainerDisplay<Texture2D>, IItemDetailDisplay<Question> {
 
         /// <summary>
         /// 常量设置

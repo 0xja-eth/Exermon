@@ -99,6 +99,7 @@ namespace UI.BattleScene.Controls.ItemDisplays {
             if (effect.isPromotion()) texture = promotionTag;
             if (texture == null) drawEmptyItem();
             else {
+                tagImage.gameObject.SetActive(true);
                 tagImage.overrideSprite =
                     AssetLoader.generateSprite(texture);
                 shortDesc.text = effect.shortDescription;

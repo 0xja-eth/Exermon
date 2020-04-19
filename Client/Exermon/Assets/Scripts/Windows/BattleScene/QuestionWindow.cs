@@ -36,10 +36,12 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 常量定义
         /// </summary>
-        public const string NotStartedAlertText = "尚未开始作答！";
-        public const string EmptyAlertText = "未选择答案！";
+        const string NotStartedAlertText = "尚未开始作答！";
+        const string EmptyAlertText = "未选择答案！";
 
         const string AnswerUploadWaitText = "作答中……";
+
+        const int ResultShowingSeconds = 10;
 
         /// <summary>
         /// 外部组件设置
@@ -53,7 +55,12 @@ namespace UI.BattleScene.Windows {
         public Animation oppoPromptAni;
 
         public QuesChoiceContainer choiceContainer;
-        
+
+        /// <summary>
+        /// 内部变量定义
+        /// </summary>
+        bool completed = false;
+
         #region 启动/结束窗口
 
         /// <summary>
@@ -78,6 +85,14 @@ namespace UI.BattleScene.Windows {
         }
 
         #endregion
+
+        /// <summary>
+        /// 更新准备时间
+        /// </summary>
+        protected override void updateBattleClock() {
+            if (!questionDisplay.showAnswer) base.updateBattleClock();
+            if (!completed && battleClock.isTimeUp()) complete();
+        }
 
         #region 数据控制
 
@@ -113,6 +128,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
+            completed = false;
 
             var question = battle.round.question();
             question.clearShuffleChoices();
@@ -151,12 +167,12 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 题目状态动画显示时间差
         /// </summary>
-        const float QStatusDeltaSeconds = 1;
+        const float QStatusDeltaSeconds = 1f;
         
         /// <summary>
         /// 题目状态动画显示时间
         /// </summary>
-        const float QStatusShowSeconds = 1;
+        const float QStatusShowSeconds = 2.5f;
 
         /// <summary>
         /// 显示正确方的题目状态动画
@@ -164,7 +180,7 @@ namespace UI.BattleScene.Windows {
         /// <param name="corr"></param>
         /// <returns></returns>
         IEnumerator correctQStatusAni(RuntimeBattlePlayer corr) {
-            var oppo = battle.getPlayer(corr.getID(), true);
+            var oppo = battle.getOppo(corr);
             CoroutineUtils.resetActions();
             CoroutineUtils.addAction(() => showStoryboard(corr), QStatusDeltaSeconds);
             CoroutineUtils.addAction(() => showStoryboard(oppo, false), QStatusShowSeconds);
@@ -204,7 +220,7 @@ namespace UI.BattleScene.Windows {
         /// 当前玩家答题结束
         /// </summary>
         void onSelfQuested() {
-            gameSys.requestLoadEnd(); // 关闭 Loading
+            //gameSys.requestLoadEnd(); // 关闭 Loading
             questionDisplay.result = battle.self();
         }
 
@@ -214,7 +230,7 @@ namespace UI.BattleScene.Windows {
         void onAnswerPushed() {
             questionDisplay.terminateQuestion();
             // 开始 Loading
-            gameSys.requestLoadStart(AnswerUploadWaitText);
+            //gameSys.requestLoadStart(AnswerUploadWaitText);
         }
 
         /// <summary>
@@ -223,6 +239,8 @@ namespace UI.BattleScene.Windows {
         void onQuestionTerminated(bool stopTimer = true, bool showAnswer = true) {
             questionDisplay.terminateQuestion();
             if (stopTimer) battleClock.stopTimer();
+            if (showAnswer)
+                battleClock.startTimer(ResultShowingSeconds);
             questionDisplay.showAnswer = showAnswer;
         }
 
@@ -242,6 +260,14 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public void confirm() {
             pushAnswer();
+        }
+
+        /// <summary>
+        /// 完成
+        /// </summary>
+        public void complete() {
+            completed = true;
+            battleSer.questionComplete();
         }
 
         /// <summary>

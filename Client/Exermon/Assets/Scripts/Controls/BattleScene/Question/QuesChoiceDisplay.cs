@@ -46,7 +46,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="index">索引</param>
-        public override void configure(ContainerDisplay<Question.Choice> container, int index) {
+        public override void configure(SelectableContainerDisplay<Question.Choice> container, int index) {
             base.configure(container, index);
             if (text) text.imageContainer = getContainer().pictureContaienr;
         }

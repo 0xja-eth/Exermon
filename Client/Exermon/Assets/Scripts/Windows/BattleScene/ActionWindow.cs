@@ -41,12 +41,12 @@ namespace UI.BattleScene.Windows {
         /// 外部组件设置
         /// </summary>
         public BattlerPrepareActionStoryboard selfPAction, oppoPAction;
-        public BattlerAttackActionStoryboard selfAAction, oppoAAction;
+        public AttackActionAnimation selfAAction, oppoAAction;
 
         /// <summary>
         /// 内部变量定义
         /// </summary>
-        int stage = 0; // 0 => 准备, 1 => 攻击, 2 => 结束
+        AttackActionAnimation currentAction = null;
 
         #region 数据控制
 
@@ -55,7 +55,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         /// <returns>返回自身分镜</returns>
         protected override BattlerPrepareStoryboard selfStoryboard() {
-            return stage == 0 ? selfPAction : (BattlerPrepareStoryboard)selfAAction;
+            return selfPAction;
         }
 
         /// <summary>
@@ -63,30 +63,35 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         /// <returns>返回对方分镜</returns>
         protected override BattlerPrepareStoryboard oppoStoryboard() {
-            return stage == 0 ? oppoPAction : (BattlerPrepareStoryboard)oppoAAction;
+            return oppoPAction;
         }
 
         /// <summary>
         /// 清空所有准备行动
         /// </summary>
         public void clearPActions() {
-            var lastStage = stage;
-            stage = 0; clearStoryboards();
-            stage = lastStage;
+            clearStoryboards();
         }
 
         /// <summary>
         /// 清空所有攻击行动
         /// </summary>
         public void clearAActions() {
-            var lastStage = stage;
-            stage = 1; clearStoryboards();
-            stage = lastStage;
+            selfAAction.terminateView();
+            oppoAAction.terminateView();
         }
 
         #endregion
 
         #region 界面控制
+
+        /// <summary>
+        /// 显示动画
+        /// </summary>
+        public void startAction(AttackActionAnimation action) {
+            action.startView(battle);
+            currentAction = action;
+        }
 
         /// <summary>
         /// 刷新窗口
@@ -111,12 +116,12 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 准备行动动画显示时间差
         /// </summary>
-        const float PActionDeltaSeconds = 1;
+        const float PActionDeltaSeconds = 2;
 
         /// <summary>
         /// 攻击行动动画显示时间
         /// </summary>
-        const float AActionShowSeconds = 1.5f;
+        const float AActionShowSeconds = 2.5f;
 
         /// <summary>
         /// 显示正确方的题目状态动画
@@ -127,6 +132,7 @@ namespace UI.BattleScene.Windows {
             CoroutineUtils.resetActions();
             setupPerpareAction(battle.self());
             setupPerpareAction(battle.oppo());
+            CoroutineUtils.addAction(clearPActions);
             setupAttackAction(battle.self());
             setupAttackAction(battle.oppo());
             CoroutineUtils.addAction(pass);
@@ -148,9 +154,26 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         /// <param name="battler">行动玩家</param>
         void setupAttackAction(RuntimeBattlePlayer battler) {
-            if (battler.attackAction() != null)
-                CoroutineUtils.addAction(() =>
-                    showStoryboard(battler), AActionShowSeconds);
+            if (battler.attackAction() == null) return;
+
+            AttackActionAnimation action = null;
+            if (battler == battle.self()) action = selfAAction;
+            if (battler == battle.oppo()) action = oppoAAction;
+            if (action == null) return;
+            CoroutineUtils.addAction(() => 
+                startAction(action), AActionShowSeconds);
+        }
+
+        #endregion
+
+        #region 动画回调
+
+        /// <summary>
+        /// 攻击
+        /// </summary>
+        public void onAttack() {
+            if (currentAction == null) return;
+            currentAction.onAttack();
         }
 
         #endregion

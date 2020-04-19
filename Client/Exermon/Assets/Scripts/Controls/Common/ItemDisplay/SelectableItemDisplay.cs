@@ -15,13 +15,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置窗口
         /// </summary>
-        void configure(ContainerDisplay<T> container, int index);
+        void configure(SelectableContainerDisplay<T> container, int index);
 
         /// <summary>
         /// 获取容器
         /// </summary>
         /// <returns></returns>
-        ContainerDisplay<T> getContainer();
+        SelectableContainerDisplay<T> getContainer();
 
     }
 
@@ -65,7 +65,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         bool highlighting = false; // 是否高亮中
 
-        protected ContainerDisplay<T> container = null;
+        protected SelectableContainerDisplay<T> container = null;
 
         protected int index = -1;
 
@@ -74,7 +74,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置组件
         /// </summary>
-        public virtual void configure(ContainerDisplay<T> container, int index) {
+        public virtual void configure(SelectableContainerDisplay<T> container, int index) {
             this.container = container;
             this.index = index;
             configure();
@@ -90,7 +90,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品容器
         /// </summary>
         /// <returns>容器</returns>
-        public ContainerDisplay<T> getContainer() {
+        public SelectableContainerDisplay<T> getContainer() {
             return container;
         }
 

@@ -10,8 +10,10 @@ using GameModule.Data;
 using ItemModule.Data;
 using ExermonModule.Data;
 using SeasonModule.Data;
+using BattleModule.Data;
 
 using SeasonModule.Services;
+using System.Collections.Generic;
 
 /// <summary>
 /// 游戏模块服务
@@ -478,6 +480,63 @@ namespace GameModule.Services {
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// 对战伤害处理器
+        /// </summary>
+        public class AttackActionProceessor {
+
+            /// <summary>
+            /// 处理
+            /// </summary>
+            /// <param name="self">发动者</param>
+            /// <param name="target">目标</param>
+            /// <param name="action">行动</param>
+            public static void process(RuntimeAction action) {
+                var self = action.player;
+                var target = generateTargets(action);
+
+                var hurt = action.hurt;
+                var skill = action.skill();
+                var rate = skill == null ? 1 : (skill.drainRate / 100.0);
+
+                switch ((ExerSkill.HitType)action.hitType()) {
+                    case ExerSkill.HitType.HPDamage:
+                        target?.changeHP(-hurt); break;
+                    case ExerSkill.HitType.MPDamage:
+                        target?.changeMP(-hurt); break;
+                    case ExerSkill.HitType.HPRecover:
+                        target?.changeHP(hurt); break;
+                    case ExerSkill.HitType.MPRecover:
+                        target?.changeMP(hurt); break;
+                    case ExerSkill.HitType.HPDrain:
+                        target?.changeHP(-hurt);
+                        self.changeHP((int)(hurt * rate));
+                        break;
+                    case ExerSkill.HitType.MPDrain:
+                        target?.changeHP(-hurt);
+                        self.changeHP((int)(hurt * rate));
+                        break;
+                }
+            }
+
+            /// <summary>
+            /// 生成目标（仅单个目标0）
+            /// </summary>
+            /// <param name="action">攻击行动</param>
+            /// <returns>返回目标对战玩家数组</returns>
+            public static RuntimeBattlePlayer generateTargets(
+                RuntimeAction action) {
+                var self = action.player;
+                var oppo = self.getOppo();
+                switch ((ExerSkill.TargetType)action.targetType) {
+                    case ExerSkill.TargetType.Self: return self;
+                    case ExerSkill.TargetType.Enemy: return oppo;
+                }
+                return null;
+            }
+
         }
     }
 

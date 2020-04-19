@@ -36,8 +36,29 @@ namespace UI.BattleScene.Controls.Storyboards {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            selfWindow.addChangeEvent(
-                selfWindow.shownState, onShown);
+            //selfWindow.addChangeEvent(
+            //    selfWindow.shownState, onShown);
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 获取效果转化对象
+        /// </summary>
+        /// <returns></returns>
+        IEffectsConvertable getEffectConvertableItem() {
+            var item = this.item.roundItem();
+            if (item == null) return null;
+
+            switch ((BaseItem.Type)item.type) {
+                case BaseItem.Type.HumanItem:
+                    return (HumanItem)item;
+                case BaseItem.Type.QuesSugar:
+                    return (QuesSugar)item;
+                default: return null;
+            }
         }
 
         #endregion
@@ -69,19 +90,12 @@ namespace UI.BattleScene.Controls.Storyboards {
         /// 物品使用效果
         /// </summary>
         public void onItemUse() {
-            var item = this.item.roundItem();
-            IEffectsConvertable effectItem = null;
+            var effectItem = getEffectConvertableItem();
+            if (effectItem == null) return;
 
-            switch ((BaseItem.Type)item.type) {
-                case BaseItem.Type.HumanItem:
-                    effectItem = (HumanItem)item; break;
-                case BaseItem.Type.QuesSugar:
-                    effectItem = (QuesSugar)item; break;
-                default: return;
-            }
+            itemDisplay.showEffect = true;
 
-            CalcService.ItemEffectProcessor.
-                process(this.item, effectItem);
+            CalcService.ItemEffectProcessor.process(item, effectItem);
 
             requestRefresh(true);
         }

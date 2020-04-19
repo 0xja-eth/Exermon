@@ -446,6 +446,13 @@ WEBSOCKET_METHOD_ROUTER = {
 		Battle.questionAnswer,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 题目结果查看完成
+	'battle/question/complete': [[
+		['uid', 'int'],
+	],
+		Battle.questionComplete,  # 处理函数
+		ChannelLayerTag.NoLayer  # 是否需要响应
+],
 	# 对战行动分镜播放完成
 	'battle/action/complete': [[
 		['uid', 'int'],

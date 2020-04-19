@@ -8,7 +8,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerSkillPage {
     /// <summary>
     /// 艾瑟萌装备槽显示
     /// </summary>
-    public class ExerSkillSlotDisplay : ContainerDisplay<ExerSkillSlotItem> {
+    public class ExerSkillSlotDisplay : SelectableContainerDisplay<ExerSkillSlotItem> {
                 
         /// <summary>
         /// 内部变量声明

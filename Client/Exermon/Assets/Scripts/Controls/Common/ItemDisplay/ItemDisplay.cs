@@ -44,7 +44,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="item">物品</param>
         /// <param name="refresh">强制刷新</param>
-        public void startView(T item, bool refresh = false) {
+        public virtual void startView(T item, bool refresh = false) {
             startView();
             setItem(item, refresh);
         }

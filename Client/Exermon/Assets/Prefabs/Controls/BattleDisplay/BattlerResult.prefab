@@ -477,10 +477,10 @@ MonoBehaviour:
     trigger: 
   - key: timespan
     obj: {fileID: 0}
-    type: TimeSpan
+    type: Text
     animated: 0
     configData: 0
-    format: 
+    format: '{0} s'
     trigger: 
   - key: color
     obj: {fileID: 7838362881568949420}

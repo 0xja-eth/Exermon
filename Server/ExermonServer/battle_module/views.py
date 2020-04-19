@@ -85,6 +85,7 @@ class Service:
 
 		battle.completePrepare(player, cont_item)
 
+	# 题目回答完成
 	@classmethod
 	async def questionAnswer(cls, consumer, player: Player, selection: list, timespan: int, ):
 		# 返回数据：无
@@ -92,6 +93,15 @@ class Service:
 		battle = Common.getRuntimeBattle(player)
 
 		battle.answerQuestion(player, selection, timespan)
+
+	# 题目结果查看完成
+	@classmethod
+	async def questionComplete(cls, consumer, player: Player, ):
+		# 返回数据：
+
+		battle = Common.getRuntimeBattle(player)
+
+		battle.completeQuestion(player)
 
 	@classmethod
 	async def actionComplete(cls, consumer, player: Player, ):

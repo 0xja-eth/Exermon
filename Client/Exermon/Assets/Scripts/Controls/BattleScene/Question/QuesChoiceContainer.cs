@@ -12,7 +12,7 @@ namespace UI.BattleScene.Controls.Question {
     /// 题目选项容器
     /// </summary>
     public class QuesChoiceContainer :
-        ContainerDisplay<Question.Choice>, IItemDetailDisplay<Question> {
+        SelectableContainerDisplay<Question.Choice>, IItemDetailDisplay<Question> {
 
         /// <summary>
         /// 常量设置

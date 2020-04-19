@@ -45,7 +45,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置
         /// </summary>
-        public virtual void configure(ContainerDisplay<T> container, int index,
+        public virtual void configure(SelectableContainerDisplay<T> container, int index,
             SlotContainer<T> slotContainer, int slotIndex) {
             base.configure(container, index);
             setSlotData(slotContainer, slotIndex);
@@ -119,7 +119,7 @@ namespace UI.Common.Controls.ItemDisplays {
             return slotDisplay.getPackDisplay();
         }
         public PackContainerDisplay<E> getPackDisplay(
-            ContainerDisplay<E> container) {
+            SelectableContainerDisplay<E> container) {
             if (container == null) return getPackDisplay();
             return DataLoader.cast<PackContainerDisplay<E>>(container);
         }
@@ -133,7 +133,7 @@ namespace UI.Common.Controls.ItemDisplays {
             return DataLoader.cast<SlotContainerDisplay<T, E>>(container);
         }
         public SlotContainerDisplay<T, E> getSlotDisplay(
-            ContainerDisplay<T> container) {
+            SelectableContainerDisplay<T> container) {
             if (container == null) return getSlotDisplay();
             return DataLoader.cast<SlotContainerDisplay<T, E>>(container);
         }
@@ -168,7 +168,7 @@ namespace UI.Common.Controls.ItemDisplays {
             }
         }
         /// <param name="container">容器</param>
-        public override void setEquip(ContainerDisplay<E> container, E equipItem) {
+        public override void setEquip(SelectableContainerDisplay<E> container, E equipItem) {
             if (!isEquippable(equipItem)) return;
             // 判断传入的 container 是否为 packContainer
             var packContainer = getPackDisplay(container);

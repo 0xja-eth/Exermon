@@ -1276,7 +1276,12 @@ class BattleAttackProcessor:
 
 			self.hurt = round(rd)
 
-		self._addAttackAction()
+		target_type = self.target_type
+		if target_type == TargetType.Both:
+			if target == self.a_player: target_type = TargetType.Self
+			if target == self.o_player: target_type = TargetType.Enemy
+
+		self._addAttackAction(target_type)
 		self._applyAttack(target)
 
 		target.round_result.processAttack(self.skill,
@@ -1287,11 +1292,13 @@ class BattleAttackProcessor:
 			self.a_player.round_result.processAttack(self.skill,
 				self.target_type, self.hit_result, self.hurt, True)
 
-	def _addAttackAction(self):
+	def _addAttackAction(self, target_type=None):
 		"""
 		添加攻击行动
 		"""
-		self.a_player.addAttackAction(self.skill, self.target_type, self.hit_result, self.hurt)
+		if target_type is None: target_type = self.target_type
+
+		self.a_player.addAttackAction(self.skill, target_type, self.hit_result, self.hurt)
 
 	def _applyAttack(self, target):
 		"""

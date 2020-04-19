@@ -7,6 +7,8 @@ using LitJson;
 using Core.Data;
 using Core.Data.Loaders;
 
+using Core.UI.Utils;
+
 using GameModule.Data;
 using GameModule.Services;
 
@@ -629,6 +631,11 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 默认攻击类型
+        /// </summary>
+        const ExerSkill.HitType DefaultHitType = ExerSkill.HitType.HPDamage;
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -647,6 +654,19 @@ namespace BattleModule.Data {
         public int resultType { get; protected set; }
         [AutoConvert]
         public int hurt { get; protected set; }
+
+        /// <summary>
+        /// 对战玩家
+        /// </summary>
+        public RuntimeBattlePlayer player { get; protected set; } = null;
+
+        /// <summary>
+        /// 设置对战玩家
+        /// </summary>
+        /// <param name="player">对战玩家</param>
+        public void setPlayer(RuntimeBattlePlayer player) {
+            this.player = player;
+        }
 
         /// <summary>
         /// 获取使用的物品
@@ -672,6 +692,16 @@ namespace BattleModule.Data {
             if (type != (int)Type.Attack) return null;
             return DataService.get().exerSkill(skillId);
         }
+
+        /// <summary>
+        /// 命中类型
+        /// </summary>
+        /// <returns></returns>
+        public int hitType() {
+            var skill = this.skill();
+            if (skill == null) return (int)DefaultHitType;
+            return skill.hitType;
+        }
     }
 
     /// <summary>
@@ -688,8 +718,8 @@ namespace BattleModule.Data {
         const string CorrectText = "AC";
         const string WrongText = "WA";
 
-        static readonly Color CorrectColor = new Color(1, 0.1647059f, 0.3921569f);
-        static readonly Color WrongColor = new Color(0.5450981f, 0.9647059f, 1);
+        static readonly Color CorrectColor = new Color(0.5450981f, 0.9647059f, 1);
+        static readonly Color WrongColor = new Color(1, 0.1647059f, 0.3921569f);
 
         /// <summary>
         /// 基本数据
@@ -808,7 +838,9 @@ namespace BattleModule.Data {
         JsonData convertRoundResultData() {
             var res = new JsonData();
             var color = correct ? CorrectColor : WrongColor;
+            var time = DataLoader.convertDouble(timespan / 1000.0);
 
+            res["timespan"] = time;
             res["hurt"] = hurt;
             res["damage"] = damage;
             res["recover"] = recover;
@@ -877,6 +909,15 @@ namespace BattleModule.Data {
             correct = false;
             timespan = 0;
             actions = null;
+        }
+
+        /// <summary>
+        /// 获取对方玩家
+        /// </summary>
+        /// <returns></returns>
+        public RuntimeBattlePlayer getOppo() {
+            if (battle == null) return null;
+            return battle.getOppo(this);
         }
 
         /// <summary>
@@ -979,6 +1020,7 @@ namespace BattleModule.Data {
         /// <param name="json">数据</param>
         public void loadActions(JsonData json) {
             actions = DataLoader.load<RuntimeAction[]>(json);
+            foreach (var action in actions) action.setPlayer(this);
         }
 
         /// <summary>
@@ -1127,6 +1169,17 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
+        /// 获取对方玩家
+        /// </summary>
+        /// <param name="player">当前玩家</param>
+        /// <returns>返回当前玩家的对方玩家</returns>
+        public RuntimeBattlePlayer getOppo(RuntimeBattlePlayer player) {
+            if (player1 == player) return player2;
+            if (player2 == player) return player1;
+            return null;
+        }
+
+        /// <summary>
         /// 是否匹配完成
         /// </summary>
         /// <returns>返回当前是否匹配完成</returns>
@@ -1150,6 +1203,14 @@ namespace BattleModule.Data {
             lastPlayer = null;
             player1.clearRoundStatus();
             player2.clearRoundStatus();
+        }
+
+        /// <summary>
+        /// 返回当前回合的攻击行动
+        /// </summary>
+        /// <returns></returns>
+        public RuntimeAction attackAction() {
+            return player1.attackAction() ?? player2.attackAction();
         }
 
         #region 数据读取

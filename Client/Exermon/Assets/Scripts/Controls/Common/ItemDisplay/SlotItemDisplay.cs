@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 using Core.UI.Utils;
@@ -18,7 +19,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         void setEquip(E item, bool force = false);
         /// <param name="container">容器</param>
-        void setEquip(ContainerDisplay<E> container, E item);
+        void setEquip(SelectableContainerDisplay<E> container, E item);
 
         /// <summary>
         /// 获取装备
@@ -89,7 +90,7 @@ namespace UI.Common.Controls.ItemDisplays {
             onEquipChanged();
         }
         /// <param name="container">容器</param>
-        public virtual void setEquip(ContainerDisplay<E> container, E item) {
+        public virtual void setEquip(SelectableContainerDisplay<E> container, E item) {
             setEquip(item);
         }
         
@@ -242,7 +243,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="data">事件数据</param>
         public void OnDrop(PointerEventData data) {
-            processItemDrop(getDraggingItemDisplay(data));
+            Debug.Log("OnDrop: " + data.pointerDrag);
+
+            processItemDrop(getDraggingItemDisplay(data), data);
         }
 
         /// <summary>
@@ -270,12 +273,12 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 处理物品放下
         /// </summary>
         protected virtual void processItemDrop(
-            DraggableItemDisplay<E> display) {
-            if (display != null && display.isDraggable()) {
-                var container = display.getContainer();
-                var item = display.getItem();
-                container.transferItem(this, item);
-            }
+            DraggableItemDisplay<E> display, PointerEventData data) {
+            if (display == null && !display.isDraggable()) return;
+            var container = display.getContainer();
+            var item = display.getItem();
+            container.transferItem(this, item);
+            display.OnEndDrag(data);
         }
 
         #endregion

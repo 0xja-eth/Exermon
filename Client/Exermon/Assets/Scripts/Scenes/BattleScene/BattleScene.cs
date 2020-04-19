@@ -156,6 +156,7 @@ namespace UI.BattleScene {
         /// </summary>
         void onPerparing() {
             clear();
+            questionWindow.clearStoryboards(true);
             prepareWindow.startWindow();
         }
 

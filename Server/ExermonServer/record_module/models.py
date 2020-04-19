@@ -364,7 +364,8 @@ class PlayerQuestion(CacheableModel):
 		if now <= start_time:
 			raise GameException(ErrorType.InvalidTimeSpan)
 
-		backend_timespan = (now - start_time).microseconds
+		backend_timespan = (now - start_time).total_seconds()
+		backend_timespan = int(backend_timespan*1000)
 
 		self.timespan = self._realTimespan(timespan, backend_timespan)
 		self.selection = selection

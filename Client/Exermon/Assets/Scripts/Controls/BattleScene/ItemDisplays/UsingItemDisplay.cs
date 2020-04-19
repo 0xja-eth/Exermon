@@ -25,8 +25,21 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// </summary>
         public ItemEffectList effects;
 
+        /// <summary>
+        /// 显示效果
+        /// </summary>
+        bool _showEffect = false;
+        public bool showEffect {
+            get { return _showEffect; }
+            set {
+                _showEffect = value;
+                requestRefresh();
+            }
+        }
+
         #region 界面控制
 
+        /*
         /// <summary>
         /// 绘制物品
         /// </summary>
@@ -34,14 +47,15 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         protected override void drawExactlyItem(BaseItem item) {
             base.drawExactlyItem(item);
         }
-
+        */
         /// <summary>
         /// 绘制人类物品
         /// </summary>
         /// <param name="item"></param>
         protected override void drawHumanItem(HumanItem item) {
             base.drawHumanItem(item);
-            effects.setItem(item);
+            if (showEffect) effects.setItem(item);
+            else effects.clearItems();
         }
 
         /// <summary>
@@ -50,7 +64,8 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// <param name="item"></param>
         protected override void drawQuesSugar(QuesSugar item) {
             base.drawQuesSugar(item);
-            effects.setItem(item);
+            if (showEffect) effects.setItem(item);
+            else effects.clearItems();
         }
 
         /// <summary>
@@ -59,6 +74,14 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         protected override void clearItem() {
             base.clearItem();
             effects.clearItems();
+        }
+
+        /// <summary>
+        /// 清除
+        /// </summary>
+        protected override void clear() {
+            _showEffect = false;
+            base.clear();
         }
 
         #endregion

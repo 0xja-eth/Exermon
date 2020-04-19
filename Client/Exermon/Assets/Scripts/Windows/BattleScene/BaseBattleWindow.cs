@@ -93,7 +93,7 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 更新准备时间
         /// </summary>
-        void updateBattleClock() {
+        protected virtual void updateBattleClock() {
             if (!passed && battleClock.isTimeUp()) pass();
         }
 
@@ -168,8 +168,8 @@ namespace UI.BattleScene.Windows {
         }
         /// <param name="force">是否强制显示（忽略动画）</param>
         public void showStoryboards(bool force = false) {
-            showSelfStoryboard(force);
-            showOppoStoryboard(force);
+            showSelfStoryboard(force: force);
+            showOppoStoryboard(force: force);
         }
 
         /// <summary>
@@ -180,8 +180,8 @@ namespace UI.BattleScene.Windows {
         }
         /// <param name="force">是否强制显示（忽略动画）</param>
         public void clearStoryboards(bool force) {
-            selfStoryboard().terminateView(force);
-            oppoStoryboard().terminateView(force);
+            selfStoryboard()?.terminateView(force);
+            oppoStoryboard()?.terminateView(force);
         }
 
         #endregion

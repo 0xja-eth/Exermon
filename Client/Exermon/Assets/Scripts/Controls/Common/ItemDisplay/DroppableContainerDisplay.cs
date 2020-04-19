@@ -14,7 +14,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 物品容器（实现IDropHandler）
     /// </summary>
-    public class DroppableContainerDisplay<T> : ContainerDisplay<T>, 
+    public class DroppableContainerDisplay<T> : SelectableContainerDisplay<T>, 
         IDroppableContainerDisplay<T> where T : class {
 
         #region 事件控制
@@ -54,7 +54,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 物品容器（实现IDropHandler）
     /// </summary>
-    public class DroppableContainerDisplay<T, E> : ContainerDisplay<T>, 
+    public class DroppableContainerDisplay<T, E> : SelectableContainerDisplay<T>, 
         IDroppableContainerDisplay<T> where T : class where E : class {
 
         #region 事件控制
@@ -64,7 +64,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="data">事件数据</param>
         public void OnDrop(PointerEventData data) {
-            processItemDrop(getDraggingItemDisplay(data));
+            processItemDrop(getDraggingItemDisplay(data), data);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
-        public virtual void acceptTransfer(ContainerDisplay<E> container, E item) {
+        public virtual void acceptTransfer(SelectableContainerDisplay<E> container, E item) {
         }
 
         /// <summary>
@@ -89,10 +89,12 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 处理物品放下
         /// </summary>
-        protected virtual void processItemDrop(DraggableItemDisplay<E> display) {
-            if (display == null) return;
+        protected virtual void processItemDrop(
+            DraggableItemDisplay<E> display, PointerEventData data) {
+            if (display == null && !display.isDraggable()) return;
             var container = display.getContainer();
             container.transferItem(this, display.getItem());
+            display.OnEndDrag(data);
         }
 
         #endregion

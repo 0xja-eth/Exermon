@@ -54,7 +54,7 @@ namespace UI.Common.Controls.ItemDisplays {
             return null;
         }
         public PackContainerDisplay<E> getPackDisplay(
-            ContainerDisplay<E> container) {
+            SelectableContainerDisplay<E> container) {
             if (container == null) return getPackDisplay();
             return DataLoader.cast<PackContainerDisplay<E>>(container);
         }
@@ -149,7 +149,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
-        public override void acceptTransfer(ContainerDisplay<E> container, E item) {
+        public override void acceptTransfer(SelectableContainerDisplay<E> container, E item) {
             setEquip(container, item);
         }
 
@@ -174,7 +174,7 @@ namespace UI.Common.Controls.ItemDisplays {
             setEquip(equipItem, slotItem.slotIndex);
         }
         /// <param name="container">背包容器</param>
-        public void setEquip(ContainerDisplay<E> container, E equipItem) {
+        public void setEquip(SelectableContainerDisplay<E> container, E equipItem) {
             var slotData = getSlotData();
             if (slotData == null) return;
             var slotItem = slotData.getSlotItemByEquipItem(equipItem);
@@ -187,7 +187,7 @@ namespace UI.Common.Controls.ItemDisplays {
             if (slotItemDisplay != null) slotItemDisplay.setEquip(equipItem);
             else _setEquip(equipItem, slotIndex);
         }
-        public void setEquip(ContainerDisplay<E> container, E equipItem, int slotIndex) {
+        public void setEquip(SelectableContainerDisplay<E> container, E equipItem, int slotIndex) {
             // 判断有没有对应的 SlotContItemDisplay 项
             var slotItemDisplay = getSlotItemDisplay(slotIndex);
             if (slotItemDisplay != null)
@@ -211,7 +211,7 @@ namespace UI.Common.Controls.ItemDisplays {
                 action.Invoke(refreshItems);
             }
         }
-        void _setEquip(ContainerDisplay<E> container, E equipItem, int slotIndex) {
+        void _setEquip(SelectableContainerDisplay<E> container, E equipItem, int slotIndex) {
             if (!isEquippable(equipItem, slotIndex)) return;
 
             // 判断传入的 container 是否为 packContainer

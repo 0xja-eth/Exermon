@@ -11,7 +11,7 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌卡片容器（开始场景）
     /// </summary>
-    public class ExerSlotsContainer : ContainerDisplay<ExerSlotItem> {
+    public class ExerSlotsContainer : SelectableContainerDisplay<ExerSlotItem> {
 
         /// <summary>
         /// 常量设置

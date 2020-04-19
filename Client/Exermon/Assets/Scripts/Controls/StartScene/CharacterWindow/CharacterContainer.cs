@@ -26,7 +26,7 @@ namespace UI.StartScene.Controls.Character {
     /// <summary>
     /// 人物容器
     /// </summary>
-    public class CharacterContainer : ContainerDisplay<Character> {
+    public class CharacterContainer : SelectableContainerDisplay<Character> {
 
         /// <summary>
         /// 常量设置

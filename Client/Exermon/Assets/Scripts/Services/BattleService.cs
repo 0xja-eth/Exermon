@@ -39,8 +39,9 @@ namespace BattleModule.Services {
         const string MatchProgress = "匹配进度";
         const string PrepareComplete = "准备完成";
         const string QuestionAnswer = "题目作答";
-        const string ActionComplete = "行动完成";
-        const string ResultComplete = "结算完成";
+        const string QuestionComplete = "";
+        const string ActionComplete = "回合结算";
+        const string ResultComplete = "回合结算";
 
         /// <summary>
         /// 业务操作
@@ -48,7 +49,9 @@ namespace BattleModule.Services {
         public enum Oper {
             EquipItem, DequipItem,
             MatchStart, MatchCancel, MatchProgress,
-            PrepareComplete, QuestionAnswer, ActionComplete, ResultComplete
+            PrepareComplete,
+            QuestionAnswer, QuestionComplete,
+            ActionComplete, ResultComplete
         }
 
         /// <summary>
@@ -146,6 +149,7 @@ namespace BattleModule.Services {
             addOperDict(Oper.MatchProgress, MatchProgress, NetworkSystem.Interfaces.BattleMatchProgress, true);
             addOperDict(Oper.PrepareComplete, PrepareComplete, NetworkSystem.Interfaces.BattlePrepareComplete);
             addOperDict(Oper.QuestionAnswer, QuestionAnswer, NetworkSystem.Interfaces.BattleQuestionAnswer);
+            addOperDict(Oper.QuestionComplete, QuestionComplete, NetworkSystem.Interfaces.BattleQuestionComplete, true);
             addOperDict(Oper.ActionComplete, ActionComplete, NetworkSystem.Interfaces.BattleActionComplete, true);
             addOperDict(Oper.ResultComplete, ResultComplete, NetworkSystem.Interfaces.BattleResultComplete, true);
         }
@@ -286,6 +290,13 @@ namespace BattleModule.Services {
             data["selection"] = DataLoader.convert(selection);
             data["timespan"] = timespan;
             sendRequest(Oper.QuestionAnswer, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 行动完成
+        /// </summary>
+        public void questionComplete() {
+            sendRequest(Oper.QuestionComplete, uid: true);
         }
 
         /// <summary>

@@ -683,10 +683,12 @@ class RuntimeBattlePlayer(RuntimeData):
 
 	# 准备阶段
 	prepared = False
+	slot_item: SlotContItem = None
 	pack_item: PackContItem = None
 
 	# 作答阶段
 	round_result: BattleRoundResult = None
+	question_completed = False
 
 	# 行动阶段
 	actions = None
@@ -794,9 +796,11 @@ class RuntimeBattlePlayer(RuntimeData):
 		重置回合状态
 		"""
 		self.prepared = False
+		self.question_completed = False
 		self.action_completed = False
 		self.result_completed = False
 
+		self.slot_item = None
 		self.pack_item = None
 		self.round_result = None
 
@@ -872,26 +876,43 @@ class RuntimeBattlePlayer(RuntimeData):
 
 		# 如果是对战物资
 		if isinstance(cont_item, BattleItemSlotItem):
-			runtime_item = self.getRuntimeItem(cont_item)
-			runtime_item.useItem()
+			# runtime_item = self.getRuntimeItem(cont_item)
+			# runtime_item.useItem()
 
+			self.slot_item = cont_item
 			self.pack_item = cont_item.pack_item
 
 		# 如果是题目糖
 		elif isinstance(cont_item, QuesSugarPackItem):
-			cont_item.useItem()
+			# cont_item.useItem()
 
 			self.pack_item = cont_item
 
 		else: raise GameException(ErrorType.IncorrectContItemType)
 
+	def useItem(self):
+		"""
+		使用当前设置好的物品
+		"""
+		if self.slot_item is not None:
+			if isinstance(self.slot_item, BattleItemSlotItem):
+				runtime_item = self.getRuntimeItem(self.slot_item)
+				runtime_item.useItem()
+
+		elif self.pack_item is not None:
+			from question_module.models import QuesSugarPackItem
+
+			if isinstance(self.pack_item, QuesSugarPackItem):
+				self.pack_item.useItem()
+
 	def processItem(self):
 		"""
 		处理物品使用
 		"""
-		if self.pack_item is None:
-			self.addPrepareAction()
-			return
+		if self.pack_item is None: return
+			# self.addPrepareAction()
+
+		self.useItem()
 
 		from utils.calc_utils import ItemEffectProcessor
 
@@ -927,6 +948,9 @@ class RuntimeBattlePlayer(RuntimeData):
 		if item is not None:
 			item_type = item.TYPE
 			item_id = item.id
+
+		# if item_id == 0 or item_type == ItemType.Unset:
+		# 	return
 
 		action = RuntimeAction(ActionType.Prepare)
 		action.item_type = item_type
@@ -1016,8 +1040,11 @@ class RuntimeBattle(RuntimeData):
 	# 准备阶段结束数据发射时差（秒）
 	PREPARE_END_WAIT_TIME = 2
 
+	# 准备阶段结束数据发射时差（秒）
+	QUESTION_TIME_RATE = 1.5
+
 	# 最大行动时长（秒）（仅后台计时）
-	MAX_ACTION_TIME = 60
+	MAX_ACTION_TIME = 30
 
 	# 结算时长（秒）
 	RESULT_TIME = 5
@@ -1026,7 +1053,7 @@ class RuntimeBattle(RuntimeData):
 	BATTLE_START_WAIT_TIME = 2
 
 	# 行动开始前等待时长（秒）
-	ACTION_START_WAIT_TIME = 4
+	ACTION_START_WAIT_TIME = 2
 
 	# 答题结果数据发射时差（秒）
 	ROUND_RESULT_WAIT_TIME = 2
@@ -1420,6 +1447,15 @@ class RuntimeBattle(RuntimeData):
 			'timespan': timespan
 		}
 
+	def completeQuestion(self, player: Player):
+		"""
+		行动完成
+		Args:
+			player (Player): 玩家
+		"""
+		battler = self.getBattler(player)
+		battler.question_completed = True
+
 	def completeAction(self, player: Player):
 		"""
 		行动完成
@@ -1456,10 +1492,11 @@ class RuntimeBattle(RuntimeData):
 
 		elif self.status == BattleStatus.Questing:
 			# 准备完成
-			corr_battler = self.getCorrectBattler()
+			if self.isQuestionCompleted():
+				corr_battler = self.getCorrectBattler()
 
-			if corr_battler or self.isQuested():
-				self._startActing(corr_battler)
+				if corr_battler or self.isQuested():
+					self._startActing(corr_battler)
 
 		elif self.status == BattleStatus.Acting:
 			if self.isActionCompleted(): self._startResulting()
@@ -1497,9 +1534,18 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回是否作答完毕
 		"""
-		if self.checkTimer(): return True
 		return self.runtime_battler1.round_result and \
 			self.runtime_battler2.round_result
+
+	def isQuestionCompleted(self) -> bool:
+		"""
+		题目答案是否查看完成
+		Returns:
+			返回题目结果是否查看完成
+		"""
+		if self.checkTimer(): return True
+		return self.runtime_battler1.question_completed and \
+			self.runtime_battler2.question_completed
 
 	def getCorrectBattler(self) -> RuntimeBattlePlayer:
 		"""
@@ -1584,8 +1630,8 @@ class RuntimeBattle(RuntimeData):
 		self.record.startCurrentRound()
 
 		question: Question = self.cur_round.question
-		delta = question.star.std_time
-		self.setTimer(delta)
+		time = question.star.std_time
+		self.setTimer(time*self.QUESTION_TIME_RATE)
 
 	def _startActing(self, corr_battler: RuntimeBattlePlayer):
 		"""
@@ -1593,6 +1639,8 @@ class RuntimeBattle(RuntimeData):
 		Args:
 			corr_battler (RuntimeBattlePlayer): 行动方
 		"""
+		self.__setupCurrentRound()
+
 		if corr_battler is None:
 			self._startResulting()
 		else:
@@ -1633,8 +1681,11 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回回合结果数据
 		"""
-		result1 = self.runtime_battler1.battler.currentRound()
-		result2 = self.runtime_battler2.battler.currentRound()
+		result1 = self.runtime_battler1.round_result  # battler.currentRound()
+		result2 = self.runtime_battler2.round_result  # battler.currentRound()
+
+		if result1 is None: result1 = self.runtime_battler1.battler.currentRound()
+		if result2 is None: result2 = self.runtime_battler2.battler.currentRound()
 
 		return {
 			'player1': result1.convertToDict(
@@ -1692,6 +1743,13 @@ class RuntimeBattle(RuntimeData):
 
 		self._emit(EmitType.ActionStart, self._generateActionData(),
 				   self.ACTION_START_WAIT_TIME)
+
+	def __setupCurrentRound(self):
+		"""
+		配置当前回合（如果没配置）
+		"""
+		self.runtime_battler1.setupRoundResult()
+		self.runtime_battler2.setupRoundResult()
 
 	def __processPrepareAction(self):
 		"""

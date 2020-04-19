@@ -101,6 +101,7 @@ namespace Core.Systems {
             public const string BattleMatchProgress = "battle/match/progress";
             public const string BattlePrepareComplete = "battle/prepare/complete";
             public const string BattleQuestionAnswer = "battle/question/answer";
+            public const string BattleQuestionComplete = "battle/question/complete";
             public const string BattleActionComplete = "battle/action/complete";
             public const string BattleResultComplete = "battle/result/complete";
         }
