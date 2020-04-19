@@ -1539,6 +1539,7 @@ class NewSeasonStarNumCalc:
 		elif data < (5, 5): new_rank = (4, 4, 0)
 		else: new_rank = (4, 5, 0)
 
-		star_num = CompRankCalc.rank2StarNum(new_rank)
+		star_num = CompRankCalc.rank2StarNum(
+			new_rank[1], new_rank[2], rank_id=new_rank[0])
 
 		return star_num

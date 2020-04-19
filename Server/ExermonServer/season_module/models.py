@@ -65,7 +65,7 @@ class SeasonRecord(models.Model):
 		new_rec.season = season
 		new_rec.point = 0
 		new_rec.star_num = NewSeasonStarNumCalc.calc(self.star_num)
-		
+
 		# TODO: 在这里计算并设置 new_rec 的段位星星
 		#  （根据当前段位星星来计算新赛季的初始段位星星）
 		#  最好在 utils.calc_utils 创建一个专门计算这个的类
