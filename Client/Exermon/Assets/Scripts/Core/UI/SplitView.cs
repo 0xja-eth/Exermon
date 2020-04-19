@@ -116,7 +116,10 @@ namespace Core.UI {
 
         #region 事件处理
 
-        //当鼠标拖动时调用   对应接口 IDragHandler
+        /// <summary>
+        /// 拖拽回调
+        /// </summary>
+        /// <param name="eventData"></param>
         public void OnDrag(PointerEventData eventData) {
             setRate(calcRate(eventData));
         }
@@ -129,25 +132,14 @@ namespace Core.UI {
         float calcRate(PointerEventData eventData) {
             // transform the screen point to world point int rectangle
             Vector2 realPos;
-            /*
-            var rt = dragObj.transform as RectTransform;
-            Vector2 realPos;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                draggingParent, eventData.position, eventData.pressEventCamera, out realPos))
-                rt.localPosition = realPos; // eventData.position;
-            else rt.localPosition = eventData.position;
-            */
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 container, eventData.position, eventData.pressEventCamera, out realPos)) ;
             else realPos = eventData.position;
             // 成功输出的 realPos 为鼠标在 container 内的相对于自己的 RectTransform 的 pivot 点的坐标差
-            Debug.Log("realPos: " + realPos);
 
             // rect.position 为 自身 RectTransform 左下角坐标相对于 pivot 坐标的坐标差
             // realPos - rect.position 即可得出鼠标位置在 container 下相对于其左下角的坐标
             realPos -= container.rect.position;
-
-            Debug.Log("realPos2: " + realPos);
 
             // 返回比率
             return realPos.x / container.rect.width;
