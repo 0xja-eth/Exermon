@@ -144,7 +144,7 @@ namespace GameModule.Data {
     /// <summary>
     /// 科目数据
     /// </summary>
-    public class Subject : TypeData, ParamDisplay.DisplayDataConvertable {
+    public class Subject : TypeData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 强制选择数量
@@ -182,7 +182,7 @@ namespace GameModule.Data {
     /// <summary>
     /// 基本能力数据
     /// </summary>
-    public class BaseParam : TypeData, ParamDisplay.DisplayDataConvertable {
+    public class BaseParam : TypeData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 描述文本格式

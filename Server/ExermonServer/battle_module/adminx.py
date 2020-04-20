@@ -68,8 +68,8 @@ class BattlePlayerAdmin(QuestionSetRecordAdmin):
 class BattleRoundResultAdmin(PlayerQuestionAdmin):
 	list_display = PlayerQuestionAdmin.list_display + \
 				   ['round', 'battle_player', 'attack', 'skill', 'target_type'
-					   'result_type', 'hurt', 'damage', 'recover']
+					   'result_type', 'hurt', 'damage', 'recovery']
 
 	list_editable = PlayerQuestionAdmin.list_editable + \
 					['attack', 'skill', 'target_type'
-					 'result_type', 'hurt', 'damage', 'recover']
+					 'result_type', 'hurt', 'damage', 'recovery']

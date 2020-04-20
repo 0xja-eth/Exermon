@@ -61,8 +61,8 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 显示结果
         /// </summary>
-        QuestionSetRecord.IQuestionResult _result = null;
-        public QuestionSetRecord.IQuestionResult result {
+        IQuestionResult _result = null;
+        public IQuestionResult result {
             get { return _result; }
             set {
                 choiceContainer.result = value;

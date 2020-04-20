@@ -32,7 +32,7 @@ namespace ExermonModule.Data {
     /// <summary>
     /// 艾瑟萌数据
     /// </summary>
-    public class Exermon : BaseItem, ParamDisplay.DisplayDataArrayConvertable {
+    public class Exermon : BaseItem, ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
@@ -220,7 +220,7 @@ namespace ExermonModule.Data {
     /// 艾瑟萌碎片数据
     /// </summary>
     public class ExerGift : BaseItem,
-        ParamDisplay.DisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
@@ -342,7 +342,7 @@ namespace ExermonModule.Data {
     /// 艾瑟萌碎片数据
     /// </summary>
     public class ExerSkill : BaseItem,
-        ParamDisplay.DisplayDataConvertable {
+        ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 目标类型
@@ -533,7 +533,7 @@ namespace ExermonModule.Data {
     /// 艾瑟萌背包装备
     /// </summary>
     public class ExerPackEquip : PackContItem<ExerEquip>,
-        ParamDisplay.DisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         #region 属性显示数据生成
 
@@ -600,8 +600,8 @@ namespace ExermonModule.Data {
     /// 艾瑟萌
     /// </summary>
     public class PlayerExermon : PackContItem<Exermon>,
-        ParamDisplay.DisplayDataConvertable,
-        ParamDisplay.DisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataConvertable,
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
@@ -864,8 +864,8 @@ namespace ExermonModule.Data {
     /// 艾瑟萌装备槽项
     /// </summary>
     public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
-        ParamDisplay.DisplayDataConvertable,
-        ParamDisplay.DisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataConvertable,
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
@@ -1369,7 +1369,7 @@ namespace ExermonModule.Data {
     /// 艾瑟萌装备槽项
     /// </summary>
     public class ExerEquipSlotItem : SlotContItem<ExerPackEquip>,
-        ParamDisplay.DisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性

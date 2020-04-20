@@ -560,16 +560,16 @@ class QuestionSetResultRewardCalc:
 	def __init__(self, player_queses):
 
 		self.exer_exp_incr = 0
-		self.exerslot_exp_incr = 0
+		self.slot_exp_incr = 0
 		self.gold_incr = 0
 
 		self.exer_exp_incrs = {}
-		self.exerslot_exp_incrs = {}
+		self.slot_exp_incrs = {}
 
 		self.player_queses = player_queses
 
-		self.exer_exp_incrs, self.exerslot_exp_incrs, \
-			self.exer_exp_incr, self.exerslot_exp_incr, \
+		self.exer_exp_incrs, self.slot_exp_incrs, \
+			self.exer_exp_incr, self.slot_exp_incr, \
 			self.gold_incr = self._calcSumReward()
 
 	# 计算总收益
@@ -1431,6 +1431,13 @@ class BattleAttackProcessor:
 		波动修正
 		"""
 		return 1+random.randint(-self.F, self.F)/100.0
+
+
+# ===================================================
+# 对战结果计算类
+# ===================================================
+class BattleResultCalc:
+	pass
 
 
 # ===================================================

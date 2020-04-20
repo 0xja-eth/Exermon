@@ -78,7 +78,7 @@ namespace PlayerModule.Data {
     /// <summary>
     /// 玩家数据
     /// </summary>
-    public class Player : BaseData, ParamDisplay.DisplayDataConvertable {
+    public class Player : BaseData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 背包类容器数据		
@@ -147,7 +147,7 @@ namespace PlayerModule.Data {
         /// <summary>
         /// 对战信息
         /// </summary>
-        public class BattleInfo : BaseData, ParamDisplay.DisplayDataConvertable {
+        public class BattleInfo : BaseData, ParamDisplay.IDisplayDataConvertable {
 
             /// <summary>
             /// 属性
@@ -212,7 +212,7 @@ namespace PlayerModule.Data {
         /// <summary>
         /// 做题信息
         /// </summary>
-        public class QuestionInfo : BaseData, ParamDisplay.DisplayDataConvertable {
+        public class QuestionInfo : BaseData, ParamDisplay.IDisplayDataConvertable {
 
             /// <summary>
             /// 属性

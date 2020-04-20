@@ -70,7 +70,7 @@ namespace UI.BattleMatchingScene.Controls {
             base.refresh();
             var now = DateTime.Now;
             var delta = now - startTime;
-            time.text = SceneUtils.time2Str(delta);
+            time.text = string.Format(TimeFormat, SceneUtils.time2Str(delta));
         }
 
         /// <summary>

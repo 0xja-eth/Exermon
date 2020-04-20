@@ -729,6 +729,8 @@ namespace ItemModule.Data {
 
         #endregion
 
+        #region 数据读取
+
         /// <summary>
         /// 读取自定义属性
         /// </summary>
@@ -762,6 +764,8 @@ namespace ItemModule.Data {
             base.convertCustomAttributes(ref json);
             json["items"] = DataLoader.convert(items);
         }
+
+        #endregion
     }
 
     /// <summary>

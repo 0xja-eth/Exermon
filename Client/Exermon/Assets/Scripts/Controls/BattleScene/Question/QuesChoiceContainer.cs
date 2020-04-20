@@ -26,8 +26,8 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 显示结果
         /// </summary>
-        QuestionSetRecord.IQuestionResult _result = null; // 是否显示答案
-        public QuestionSetRecord.IQuestionResult result {
+        IQuestionResult _result = null; // 是否显示答案
+        public IQuestionResult result {
             get { return _result; }
             set {
                 _result = value;

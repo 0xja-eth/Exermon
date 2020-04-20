@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -23,6 +24,7 @@ using QuestionModule.Services;
 using PlayerModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
+using UI.Common.Controls.RadarDisplay;
 
 /// <summary>
 /// 对战模块
@@ -157,9 +159,61 @@ namespace BattleModule.Data {
     }
 
     /// <summary>
+    /// 对战回合结果
+    /// </summary>
+    public class BattleRoundResult : PlayerQuestion {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int order { get; protected set; }
+        [AutoConvert]
+        public bool attack { get; protected set; }
+        [AutoConvert]
+        public int skillId { get; protected set; }
+        [AutoConvert]
+        public int targetType { get; protected set; }
+        [AutoConvert]
+        public int resultType { get; protected set; }
+        [AutoConvert]
+        public int hurt { get; protected set; }
+        [AutoConvert]
+        public int damage { get; protected set; }
+        [AutoConvert]
+        public int recovery { get; protected set; }
+
+        /// <summary>
+        /// 获取艾瑟萌技能
+        /// </summary>
+        /// <returns>返回艾瑟萌技能</returns>
+        public ExerSkill skill() {
+            return DataService.get().exerSkill(skillId);
+        }
+
+        /// <summary>
+        /// 目标类型文本
+        /// </summary>
+        /// <returns>返回目标类型文本</returns>
+        public string targetTypeText() {
+            return DataService.get().exerSkillTargetType(targetType).Item2;
+        }
+
+        /// <summary>
+        /// 命中结果类型文本
+        /// </summary>
+        /// <returns>返回命中结果类型文本</returns>
+        public string resultTypeText() {
+            return DataService.get().roundResultType(targetType).Item2;
+        }
+    }
+
+    /// <summary>
     /// 对战玩家记录
     /// </summary>
-    public class BattlePlayer : QuestionSetRecord {
+    public class BattlePlayer : QuestionSetRecord
+        <BattleRoundResult, QuestionSetReward>,
+        RadarDiagram.IRadarDataConvertable {
 
         /// <summary>
         /// 对战玩家结果
@@ -169,54 +223,21 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
-        /// 对战回合结果
+        /// 结果颜色
         /// </summary>
-        public class BattleRoundResult : PlayerQuestion {
+        static readonly Color[] ResultColor = new Color[] {
+            Color.white,
+            new Color(1, 0.8078431f, 0.2627451f),
+            RuntimeBattlePlayer.WrongColor,
+            Color.white,
+        };
 
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int order { get; protected set; }
-            [AutoConvert]
-            public bool attack { get; protected set; }
-            [AutoConvert]
-            public int skillId { get; protected set; }
-            [AutoConvert]
-            public int targetType { get; protected set; }
-            [AutoConvert]
-            public int resultType { get; protected set; }
-            [AutoConvert]
-            public int hurt { get; protected set; }
-            [AutoConvert]
-            public int damage { get; protected set; }
-            [AutoConvert]
-            public int recover { get; protected set; }
-
-            /// <summary>
-            /// 获取艾瑟萌技能
-            /// </summary>
-            /// <returns>返回艾瑟萌技能</returns>
-            public ExerSkill skill() {
-                return DataService.get().exerSkill(skillId);
-            }
-
-            /// <summary>
-            /// 目标类型文本
-            /// </summary>
-            /// <returns>返回目标类型文本</returns>
-            public string targetTypeText() {
-                return DataService.get().exerSkillTargetType(targetType).Item2;
-            }
-
-            /// <summary>
-            /// 命中结果类型文本
-            /// </summary>
-            /// <returns>返回命中结果类型文本</returns>
-            public string resultTypeText() {
-                return DataService.get().roundResultType(targetType).Item2;
-            }
-        }
+        /// <summary>
+        /// 结果文本
+        /// </summary>
+        static readonly string[] ResultText = new string[] {
+            "", "胜利", "失败", "平局"
+        };
 
         /// <summary>
         /// 属性
@@ -230,7 +251,7 @@ namespace BattleModule.Data {
         [AutoConvert]
         public double damageScore { get; protected set; }
         [AutoConvert]
-        public double recoverScore { get; protected set; }
+        public double recoveryScore { get; protected set; }
         [AutoConvert]
         public double correctScore { get; protected set; }
         [AutoConvert]
@@ -240,10 +261,89 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int status { get; protected set; }
 
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            switch(type) {
+                case "score": return convertScoreData();
+                default: return base.convertToDisplayData(type);
+            }
+        }
+
+        /// <summary>
+        /// 转换为统计数据
+        /// </summary>
+        /// <returns></returns>
+        protected override JsonData convertResultData() {
+            var res = base.convertResultData();
+
+            res["result"] = ResultText[result];
+            res["color"] = DataLoader.convert(ResultColor[result]);
+
+            res["sum_hurt"] = sumHurt();
+            res["sum_damage"] = sumDamage();
+            res["sum_recovery"] = sumRecovery();
+
+            res["score_incr"] = scoreIncr;
+            res["star_incr"] = starIncr();
+
+            return res;
+        }
+
+        /// <summary>
+        /// 转换为分数数据
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertScoreData() {
+            var res = new JsonData();
+
+            res["time_score"] = timeScore;
+            res["hurt_score"] = hurtScore;
+            res["damage_score"] = damageScore;
+            res["recovery_score"] = recoveryScore;
+            res["correct_score"] = correctScore;
+            res["plus_score"] = timeScore;
+            res["sum_score"] = score();
+
+            res["judge"] = judge().name;
+
+            return res;
+        }
+
+        /// <summary>
+        /// 转化为雷达数据
+        /// </summary>
+        /// <returns></returns>
+        public List<float> convertToRadarData(string type = "") {
+            var res = new List<float>();
+
+            res.Add((float)timeScore / 100);
+            res.Add((float)hurtScore / 100);
+            res.Add((float)damageScore / 100);
+            res.Add((float)recoveryScore / 100);
+            res.Add((float)correctScore / 100);
+
+            return res;
+        }
+
+        #endregion
+
+        #region 数据控制
+
         /// <summary>
         /// 总分（缓存)
         /// </summary>
         double score_ = -1;
+
+        /// <summary>
+        /// 星星增量（缓存)
+        /// </summary>
+        int starIncr_ = -9999;
 
         /// <summary>
         /// 评价（缓存）
@@ -257,7 +357,7 @@ namespace BattleModule.Data {
         public double score() {
             if (score_ < 0)
                 score_ = (timeScore + hurtScore + damageScore + 
-                    recoverScore + correctScore) / 5 + plusScore;
+                    recoveryScore + correctScore) / 5 + plusScore;
             return score_;
         }
 
@@ -275,6 +375,56 @@ namespace BattleModule.Data {
             }
             return judge_;
         }
+
+        /// <summary>
+        /// 获取星星奖励量
+        /// </summary>
+        /// <returns></returns>
+        public int starIncr() {
+            if (starIncr_ == -9999) {
+                var judge = this.judge();
+                var win = result == (int)Result.Win;
+                starIncr_ = win ? judge.win : judge.lose;
+            }
+            return starIncr_;
+        }
+        
+        #region 统计量
+
+        /// <summary>
+        /// 总伤害
+        /// </summary>
+        /// <returns></returns>
+        public int sumHurt() {
+            var res = 0;
+            foreach (var round in questions)
+                res += round.hurt;
+            return res;
+        }
+
+        /// <summary>
+        /// 总承伤
+        /// </summary>
+        /// <returns></returns>
+        public int sumDamage() {
+            var res = 0;
+            foreach (var round in questions)
+                res += round.damage;
+            return res;
+        }
+
+        /// <summary>
+        /// 总回复
+        /// </summary>
+        /// <returns></returns>
+        public int sumRecovery() {
+            var res = 0;
+            foreach (var round in questions)
+                res += round.recovery;
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 是否胜利
@@ -308,6 +458,13 @@ namespace BattleModule.Data {
             return DataService.get().battleStatus(status).Item2;
         }
 
+        #endregion
+
+        #region 数据读取
+
+
+
+        #endregion
     }
 
     /// <summary>
@@ -708,8 +865,8 @@ namespace BattleModule.Data {
     /// 对战玩家数据（回合结果时进行数据同步）
     /// </summary>
     public class RuntimeBattlePlayer : BaseData, 
-        QuestionSetRecord.IQuestionResult, 
-        ParamDisplay.DisplayDataConvertable,
+        IQuestionResult, 
+        ParamDisplay.IDisplayDataConvertable,
         IItemUseTarget {
 
         /// <summary>
@@ -718,8 +875,8 @@ namespace BattleModule.Data {
         const string CorrectText = "AC";
         const string WrongText = "WA";
 
-        static readonly Color CorrectColor = new Color(0.5450981f, 0.9647059f, 1);
-        static readonly Color WrongColor = new Color(1, 0.1647059f, 0.3921569f);
+        public static readonly Color CorrectColor = new Color(0.5450981f, 0.9647059f, 1);
+        public static readonly Color WrongColor = new Color(1, 0.1647059f, 0.3921569f);
 
         /// <summary>
         /// 基本数据

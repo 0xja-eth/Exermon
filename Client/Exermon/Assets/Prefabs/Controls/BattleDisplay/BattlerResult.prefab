@@ -480,7 +480,7 @@ MonoBehaviour:
     type: Text
     animated: 0
     configData: 0
-    format: '{0} s'
+    format: '{0}s'
     trigger: 
   - key: color
     obj: {fileID: 7838362881568949420}

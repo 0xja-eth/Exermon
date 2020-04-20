@@ -45,7 +45,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 能转化为属性显示数据的接口
         /// </summary>
-        public interface DisplayDataConvertable {
+        public interface IDisplayDataConvertable {
 
             /// <summary>
             /// 转化为属性信息集
@@ -57,7 +57,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 能转化为属性显示数据的接口
         /// </summary>
-        public interface DisplayDataArrayConvertable {
+        public interface IDisplayDataArrayConvertable {
 
             /// <summary>
             /// 转化为属性信息集
@@ -213,7 +213,7 @@ namespace UI.Common.Controls.ParamDisplays {
             setValue(initData, true);
         }
         /// <param name="obj">对象</param>
-        public void configure(DisplayDataConvertable obj, string type = "") {
+        public void configure(IDisplayDataConvertable obj, string type = "") {
             configure(obj.convertToDisplayData(type));
         }
 
@@ -245,11 +245,11 @@ namespace UI.Common.Controls.ParamDisplays {
             rawData = value;
         }
         /// <param name="obj">值对象</param>
-        public void setValue(DisplayDataConvertable obj, string type = "", bool force = false) {
+        public void setValue(IDisplayDataConvertable obj, string type = "", bool force = false) {
             setValue(obj.convertToDisplayData(type), force);
         }
         /// <param name="objs">值对象组</param>
-        public void setValue(DisplayDataConvertable[] objs, string type = "", bool force = false) {
+        public void setValue(IDisplayDataConvertable[] objs, string type = "", bool force = false) {
             var json = new JsonData();
             foreach (var obj in objs) {
                 var res = obj.convertToDisplayData(type);

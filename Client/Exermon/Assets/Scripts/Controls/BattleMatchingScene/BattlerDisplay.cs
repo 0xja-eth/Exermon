@@ -86,6 +86,7 @@ namespace UI.BattleMatchingScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawProgress(RuntimeBattlePlayer battler) {
+            if (!progress) return;
             if (battler.progress >= 0)
                 progress.text = string.Format(ProgressFormat, battler.progress);
             else
@@ -100,7 +101,8 @@ namespace UI.BattleMatchingScene.Controls {
             bust.gameObject.SetActive(false);
             rankDisplay.requestClear(true);
             name.text = UnknownName;
-            progress.text = level.text = "";
+            level.text = "";
+            if (progress) progress.text = "";
         }
 
         /// <summary>
@@ -110,7 +112,8 @@ namespace UI.BattleMatchingScene.Controls {
             if (unknown) unknown.SetActive(false);
             bust.gameObject.SetActive(false);
             rankDisplay.requestClear(true);
-            name.text = progress.text = level.text = "";
+            name.text = level.text = "";
+            if (progress) progress.text = "";
         }
 
         #endregion

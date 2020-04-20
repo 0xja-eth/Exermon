@@ -66,7 +66,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 获取答题结果
         /// </summary>
-        public QuestionSetRecord.IQuestionResult getResult() {
+        public IQuestionResult getResult() {
             return getContainer().result;
         }
 

@@ -1,7 +1,13 @@
 ﻿
 using System;
+using System.Collections.Generic;
+
+using UnityEngine;
+
+using LitJson;
 
 using Core.Data;
+using Core.Data.Loaders;
 
 using GameModule.Data;
 using GameModule.Services;
@@ -10,6 +16,8 @@ using ItemModule.Data;
 
 using QuestionModule.Data;
 using QuestionModule.Services;
+
+using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
 /// 记录模块
@@ -108,117 +116,121 @@ namespace RecordModule.Data {
     }
 
     /// <summary>
+    /// 玩家题目记录数据
+    /// </summary>
+    public interface IQuestionResult {
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        int[] getSelection();
+
+        /// <summary>
+        /// 做题用时（毫秒）
+        /// </summary>
+        /// <returns>返回做题用时</returns>
+        int getTimespan();
+
+        /// <summary>
+        /// 是否作答
+        /// </summary>
+        /// <returns></returns>
+        bool isAnswered();
+    }
+
+    /// <summary>
+    /// 玩家题目记录数据
+    /// </summary>
+    public class PlayerQuestion : BaseData, IQuestionResult {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int questionId { get; protected set; }
+        [AutoConvert]
+        public int[] selection { get; protected set; } = null;
+        [AutoConvert]
+        public int timespan { get; protected set; }
+        [AutoConvert]
+        public int expIncr { get; protected set; }
+        [AutoConvert]
+        public int slotExpIncr { get; protected set; }
+        [AutoConvert]
+        public int goldIncr { get; protected set; }
+        [AutoConvert]
+        public bool correct { get; protected set; }
+        [AutoConvert]
+        public bool isNew { get; protected set; }
+
+        /// <summary>
+        /// 获取题目对象
+        /// </summary>
+        /// <returns>返回题目对象</returns>
+        public Question question() {
+            return QuestionService.get().getQuestion(questionId);
+        }
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        public int[] getSelection() { return selection; }
+
+        /// <summary>
+        /// 做题用时（毫秒）
+        /// </summary>
+        /// <returns>返回做题用时</returns>
+        public int getTimespan() { return timespan; }
+
+        /// <summary>
+        /// 当前选择
+        /// </summary>
+        /// <returns>返回当前选择</returns>
+        public bool isAnswered() { return selection != null; }
+
+    }
+
+    /// <summary>
+    /// 题目集奖励数据
+    /// </summary>
+    public class QuestionSetReward : BaseData {
+
+        /// <summary>
+        /// 是否需要ID
+        /// </summary>
+        protected override bool idEnable() { return false; }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int type { get; protected set; }
+        [AutoConvert]
+        public int itemId { get; protected set; }
+        [AutoConvert]
+        public int count { get; protected set; }
+
+        /// <summary>
+        /// 获取物品实例
+        /// </summary>
+        /// <returns></returns>
+        public BaseItem item() {
+            if (this.type == 0 || !Enum.IsDefined(
+                typeof(BaseItem.Type), this.type)) return null;
+            var name = ((BaseItem.Type)this.type).ToString();
+            var type = Type.GetType(name);
+            return (BaseItem)DataService.get().get(type, itemId);
+        }
+    }
+
+    /// <summary>
     /// 题目集记录数据
     /// </summary>
-    public class QuestionSetRecord : BaseData {
-
-        /// <summary>
-        /// 玩家题目记录数据
-        /// </summary>
-        public interface IQuestionResult {
-
-            /// <summary>
-            /// 当前选择
-            /// </summary>
-            /// <returns>返回当前选择</returns>
-            int[] getSelection();
-
-            /// <summary>
-            /// 做题用时（毫秒）
-            /// </summary>
-            /// <returns>返回做题用时</returns>
-            int getTimespan();
-
-            /// <summary>
-            /// 是否作答
-            /// </summary>
-            /// <returns></returns>
-            bool isAnswered();
-        }
-
-        /// <summary>
-        /// 玩家题目记录数据
-        /// </summary>
-        public class PlayerQuestion : BaseData, IQuestionResult {
-
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int questionId { get; protected set; }
-            [AutoConvert]
-            public int[] selection { get; protected set; } = null;
-            [AutoConvert]
-            public int timespan { get; protected set; }
-            [AutoConvert]
-            public int expIncr { get; protected set; }
-            [AutoConvert]
-            public int slotExpIncr { get; protected set; }
-            [AutoConvert]
-            public int goldIncr { get; protected set; }
-            [AutoConvert]
-            public bool isNew { get; protected set; }
-
-            /// <summary>
-            /// 获取题目对象
-            /// </summary>
-            /// <returns>返回题目对象</returns>
-            public Question question() {
-                return QuestionService.get().getQuestion(questionId);
-            }
-
-            /// <summary>
-            /// 当前选择
-            /// </summary>
-            /// <returns>返回当前选择</returns>
-            public int[] getSelection() { return selection; }
-
-            /// <summary>
-            /// 做题用时（毫秒）
-            /// </summary>
-            /// <returns>返回做题用时</returns>
-            public int getTimespan() { return timespan; }
-
-            /// <summary>
-            /// 当前选择
-            /// </summary>
-            /// <returns>返回当前选择</returns>
-            public bool isAnswered() { return selection != null; }
-
-        }
-
-        /// <summary>
-        /// 题目集奖励数据
-        /// </summary>
-        public class Reward : BaseData {
-
-            /// <summary>
-            /// 是否需要ID
-            /// </summary>
-            protected override bool idEnable() { return false; }
-
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int type { get; protected set; }
-            [AutoConvert]
-            public int itemId { get; protected set; }
-            [AutoConvert]
-            public int count { get; protected set; }
-
-            /// <summary>
-            /// 获取物品实例
-            /// </summary>
-            /// <returns></returns>
-            public BaseItem item() {
-                if (this.type == 0 || !Enum.IsDefined(
-                    typeof(BaseItem.Type), this.type)) return null;
-                var name = ((BaseItem.Type)this.type).ToString();
-                var type = Type.GetType(name);
-                return (BaseItem)DataService.get().get(type, itemId);
-            }
-        }
+    public class QuestionSetRecord<Q, R> : BaseData,
+        ParamDisplay.IDisplayDataConvertable, ParamDisplay.IDisplayDataArrayConvertable
+        where Q : PlayerQuestion where R : QuestionSetReward {
 
         /// <summary>
         /// 属性
@@ -228,11 +240,12 @@ namespace RecordModule.Data {
         [AutoConvert]
         public int seasonId { get; protected set; }
         [AutoConvert]
-        public int expIncr { get; protected set; }
-        [AutoConvert]
-        public int slotExpIncr { get; protected set; }
-        [AutoConvert]
         public int goldIncr { get; protected set; }
+
+        //[AutoConvert]
+        public Dictionary<int, int> exerExpIncrs { get; protected set; } = new Dictionary<int, int>();
+        //[AutoConvert]
+        public Dictionary<int, int> slotExpIncrs { get; protected set; } = new Dictionary<int, int>();
 
         [AutoConvert]
         public bool finished { get; protected set; }
@@ -241,9 +254,105 @@ namespace RecordModule.Data {
         public DateTime createTime { get; protected set; }
 
         [AutoConvert]
-        public PlayerQuestion[] questions { get; protected set; }
+        public Q[] questions { get; protected set; } = null;
         [AutoConvert]
-        public Reward[] rewards { get; protected set; }
+        public R[] rewards { get; protected set; } = null;
+
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual JsonData convertToDisplayData(string type = "") {
+            switch (type) {
+                case "result": return convertResultData();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化为显示数据数组
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public JsonData[] convertToDisplayDataArray(string type = "") {
+            switch (type) {
+                case "exer_exp": return generateExerExpDataArray();
+                case "slot_exp": return generateSlotExpDataArray();
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// 转换为统计数据
+        /// </summary>
+        /// <returns></returns>
+        protected virtual JsonData convertResultData() {
+            var res = toJson();
+
+            res["name"] = name;
+
+            res["exp_incr"] = playerExpIncr();
+            res["gold_incr"] = goldIncr;
+
+            res["finished"] = finished;
+            res["create_time"] = DataLoader.convert(createTime);
+
+            res["count"] = questions.Length;
+
+            res["sum_time"] = sumTime();
+
+            res["corr_cnt"] = corrCnt();
+            res["corr_rate"] = corrRate();
+            res["new_cnt"] = newCnt();
+            res["new_rate"] = newRate();
+
+            return res;
+        }
+
+        /// <summary>
+        /// 生成经验数据数组
+        /// </summary>
+        protected virtual JsonData[] generateExerExpDataArray() {
+            int cnt = exerExpIncrs.Count, index = 0;
+            var res = new JsonData[cnt];
+
+            foreach (var pair in exerExpIncrs) {
+                var data = new JsonData();
+
+                data["subject_id"] = pair.Key;
+                data["exp_incr"] = pair.Value;
+
+                res[index++] = data;
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// 生成槽经验数据数组
+        /// </summary>
+        protected virtual JsonData[] generateSlotExpDataArray() {
+            int cnt = slotExpIncrs.Count, index = 0;
+            var res = new JsonData[cnt];
+
+            foreach (var pair in slotExpIncrs) {
+                var data = new JsonData();
+
+                data["subject_id"] = pair.Key;
+                data["exp_incr"] = pair.Value;
+
+                res[index++] = data;
+            }
+
+            return res;
+        }
+
+        #endregion
+
+        #region 数据控制
 
         /// <summary>
         /// 获取所有题目的ID
@@ -256,8 +365,111 @@ namespace RecordModule.Data {
                 ids[i] = questions[i].questionId;
             return ids;
         }
+
+        /// <summary>
+        /// 总用时
+        /// </summary>
+        /// <returns></returns>
+        public int sumTime() {
+            var res = 0;
+            foreach (var ques in questions)
+                res += ques.timespan;
+            return res;
+        }
+
+        /// <summary>
+        /// 正确数
+        /// </summary>
+        /// <returns></returns>
+        public int corrCnt() {
+            var res = 0;
+            foreach (var ques in questions)
+                if (ques.correct) ++res;
+            return res;
+        }
+
+        /// <summary>
+        /// 新题目数
+        /// </summary>
+        /// <returns></returns>
+        public int newCnt() {
+            var res = 0;
+            foreach (var ques in questions)
+                if (ques.isNew) ++res;
+            return res;
+        }
+
+        /// <summary>
+        /// 正确率
+        /// </summary>
+        /// <returns></returns>
+        public double corrRate() {
+            return corrCnt() / questions.Length;
+        }
+
+        /// <summary>
+        /// 新题目率
+        /// </summary>
+        /// <returns></returns>
+        public int newRate() {
+            return newCnt() / questions.Length;
+        }
+
+        /// <summary>
+        /// 玩家经验增量
+        /// </summary>
+        /// <returns>返回玩家经验获得量</returns>
+        public int playerExpIncr() {
+            var res = 0;
+            foreach (var pair in slotExpIncrs)
+                res += pair.Value;
+            return res;
+        }
+
+        #endregion
+
+        
+        #region 数据读取
+
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+
+            this.exerExpIncrs.Clear();
+            this.slotExpIncrs.Clear();
+
+            var exerExpIncrs = DataLoader.load(json, "exer_exp_incrs");
+            var slotExpIncrs = DataLoader.load(json, "slot_exp_incr");
+
+            Debug.Log("Load expIncrs:");
+
+            foreach (var key in exerExpIncrs) {
+                Debug.Log("Key: " + key);
+                var data = DataLoader.load<int>(exerExpIncrs, key.ToString());
+                this.exerExpIncrs.Add((int)key, data);
+            }
+            foreach (var key in slotExpIncrs) {
+                var data = DataLoader.load<int>(slotExpIncrs, key.ToString());
+                this.slotExpIncrs.Add((int)key, data);
+            }
+            
+        }
+
+        #endregion
+
     }
 
+    /// <summary>
+    /// 题目集记录数据
+    /// </summary>
+    public class QuestionSetRecord : QuestionSetRecord
+        <PlayerQuestion, QuestionSetReward> {
+
+    }
+    
     /// <summary>
     /// 刷题记录数据
     /// </summary>

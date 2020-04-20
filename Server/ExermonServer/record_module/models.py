@@ -558,14 +558,14 @@ class QuestionSetRecord(CacheableModel):
 	# 开始时间
 	create_time = models.DateTimeField(auto_now_add=True, verbose_name="开始时间")
 
-	# 经验增加（总）
-	exp_incr = models.SmallIntegerField(null=True, verbose_name="经验增加")
+	# 艾瑟萌经验增加（{subject_id: value}）
+	exer_exp_incrs = jsonfield.JSONField(default={}, null=True, verbose_name="经验增加")
+
+	# 槽经验增加（{subject_id: value}）
+	slot_exp_incrs = jsonfield.JSONField(default={}, null=True, verbose_name="槽经验增加")
 
 	# 金币增加（总）
 	gold_incr = models.SmallIntegerField(null=True, verbose_name="金币增加")
-
-	# 槽经验增加（总）
-	slot_exp_incr = models.SmallIntegerField(null=True, verbose_name="槽经验增加")
 
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
@@ -661,8 +661,8 @@ class QuestionSetRecord(CacheableModel):
 		if type == 'result':
 			rewards = ModelUtils.objectsToDict(self.rewards())
 
-			base['exp_incr'] = self.exp_incr
-			base['slot_exp_incr'] = self.slot_exp_incr
+			base['exer_exp_incrs'] = self.exer_exp_incrs
+			base['slot_exp_incrs'] = self.slot_exp_incrs
 			base['gold_incr'] = self.gold_incr
 			base['rewards'] = rewards
 
@@ -843,8 +843,8 @@ class QuestionSetRecord(CacheableModel):
 
 		calc = calc.calc(self.playerQuestions())
 
-		self.exp_incr = calc.exer_exp_incr
-		self.slot_exp_incr = calc.exerslot_exp_incr
+		self.exer_exp_incrs = calc.exer_exp_incrs
+		self.slot_exp_incrs = calc.exerslot_exp_incrs
 		self.gold_incr = calc.gold_incr
 
 		return calc
@@ -859,10 +859,9 @@ class QuestionSetRecord(CacheableModel):
 
 		player = self.exactlyPlayer()
 
-		player.gainMoney(self.gold_incr)
-		player.gainExp(self.slot_exp_incr,
-							calc.exer_exp_incrs,
-							calc.exerslot_exp_incrs)
+		player.gainMoney(calc.gold_incr)
+		player.gainExp(calc.slot_exp_incr, calc.exer_exp_incrs,
+					   calc.slot_exp_incrs)
 
 		rewards = self.rewards()
 

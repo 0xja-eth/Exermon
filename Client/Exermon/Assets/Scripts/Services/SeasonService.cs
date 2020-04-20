@@ -57,8 +57,8 @@ namespace SeasonModule.Services {
         /// 赛季排行信息
         /// </summary>
         public class SeasonRank : BaseData,
-            ParamDisplay.DisplayDataConvertable,
-            ParamDisplay.DisplayDataArrayConvertable {
+            ParamDisplay.IDisplayDataConvertable,
+            ParamDisplay.IDisplayDataArrayConvertable {
 
             /// <summary>
             /// 最大排行
@@ -69,7 +69,7 @@ namespace SeasonModule.Services {
             /// 排行项
             /// </summary>
             public class RankItem : BaseData, 
-                ParamDisplay.DisplayDataConvertable {
+                ParamDisplay.IDisplayDataConvertable {
 
                 /// <summary>
                 /// 属性

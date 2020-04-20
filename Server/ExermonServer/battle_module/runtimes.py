@@ -1003,9 +1003,9 @@ class RuntimeBattlePlayer(RuntimeData):
 
 		old_hp = self.hp
 		new_hp = self.hp + val + value * rate
-		self.hp = max(min(new_hp, value), param.param.min_value)
+		self.hp = max(min(new_hp, value), 0)
 
-		self.round_result.processRecover(self.hp - old_hp)
+		self.round_result.processRecovery(self.hp - old_hp)
 
 	# endregion
 
@@ -1703,8 +1703,15 @@ class RuntimeBattle(RuntimeData):
 		self.runtime_battler1.onRoundTerminated()
 		self.runtime_battler2.onRoundTerminated()
 
-		if self.isBattleEnd(): self._startTerminating()
+		if self.isBattleEnd(): self._onBattleTermined()
 		else: self._startPreparing()
+
+	def _onBattleTermined(self):
+		"""
+		对战结束回调
+		"""
+
+		self._startTerminating()
 
 	def _startTerminating(self):
 		"""

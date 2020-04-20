@@ -63,8 +63,7 @@ namespace QuestionModule.Data {
             /// </summary>
             /// <param name="result">结果</param>
             /// <returns>返回该选项是否在所给的选择中</returns>
-            public bool isInSelection(
-                QuestionSetRecord.IQuestionResult result) {
+            public bool isInSelection(IQuestionResult result) {
                 return isInSelection(result.getSelection());
             }
             /// <param name="selection">选择</param>

@@ -641,7 +641,7 @@ class BattlePlayer(QuestionSetRecord):
 	damage_score = models.PositiveSmallIntegerField(null=True, verbose_name="承伤评分")
 
 	# 恢复评分（*100）
-	recover_score = models.PositiveSmallIntegerField(null=True, verbose_name="恢复评分")
+	recovery_score = models.PositiveSmallIntegerField(null=True, verbose_name="恢复评分")
 
 	# 行动评分（*100）
 	correct_score = models.PositiveSmallIntegerField(null=True, verbose_name="行动评分")
@@ -667,7 +667,7 @@ class BattlePlayer(QuestionSetRecord):
 			  "行动：%.2f，附加：%.2f<br>" \
 			  "总分：%.2f" % \
 			  (self.time_score, self.hurt_score, self.damage_score,
-			   self.recover_score, self.correct_score, self.plus_score,
+			   self.recovery_score, self.correct_score, self.plus_score,
 			   self.battleScore())
 
 		return format_html(res)
@@ -719,14 +719,14 @@ class BattlePlayer(QuestionSetRecord):
 		res['pid'] = self.player_id
 		res['score_incr'] = self.score_incr
 
-		res['sum_hurt'] = self.sumHurt()
-		res['sum_damage'] = self.sumDamage()
-		res['sum_recover'] = self.sumRecover()
+		# res['sum_hurt'] = self.sumHurt()
+		# res['sum_damage'] = self.sumDamage()
+		# res['sum_recover'] = self.sumRecover()
 
 		res['time_score'] = self.time_score/100
 		res['hurt_score'] = self.hurt_score/100
 		res['damage_score'] = self.damage_score/100
-		res['recover_score'] = self.recover_score/100
+		res['recovery_score'] = self.recovery_score/100
 		res['correct_score'] = self.correct_score/100
 		res['plus_score'] = self.plus_score/100
 
@@ -758,7 +758,7 @@ class BattlePlayer(QuestionSetRecord):
 			对战评分
 		"""
 		return (self.time_score + self.hurt_score + self.damage_score +
-				self.recover_score + self.correct_score) / 5 + self.plus_score
+				self.recovery_score + self.correct_score) / 5 + self.plus_score
 
 	def currentRound(self) -> 'BattleRoundResult':
 		"""
@@ -831,7 +831,7 @@ class BattlePlayer(QuestionSetRecord):
 		Returns:
 			返回对战总回复
 		"""
-		return self._sumData('recover', lambda d: d.recover, player_queses)
+		return self._sumData('recovery', lambda d: d.recovery, player_queses)
 
 	# endregion
 
@@ -888,7 +888,7 @@ class BattleRoundResult(PlayerQuestion):
 	damage = models.SmallIntegerField(default=0, verbose_name="承伤点数")
 
 	# 回复点数（通过物品的HP回复，若物品需要扣除HP则不算入内）
-	recover = models.PositiveSmallIntegerField(default=0, verbose_name="回复点数")
+	recovery = models.PositiveSmallIntegerField(default=0, verbose_name="回复点数")
 
 	@classmethod
 	def rewardCalculator(cls) -> ExerciseSingleRewardCalc:
@@ -927,7 +927,7 @@ class BattleRoundResult(PlayerQuestion):
 		res['result_type'] = self.result_type
 		res['hurt'] = self.hurt
 		res['damage'] = self.damage
-		res['recover'] = self.recover
+		res['recovery'] = self.recovery
 
 		if runtime_battler is not None:
 			runtime_battler.convertToDict(res)
@@ -960,15 +960,15 @@ class BattleRoundResult(PlayerQuestion):
 
 	def start(self):
 		super().start()
-		self.hurt = self.damage = self.recover = 0
+		self.hurt = self.damage = self.recovery = 0
 
-	def processRecover(self, recover: int):
+	def processRecovery(self, recovery: int):
 		"""
 		处理道具回复
 		Args:
-			recover (int): 道具回复量
+			recovery (int): 道具回复量
 		"""
-		if recover > 0: self.recover += recover
+		if recovery > 0: self.recovery += recovery
 
 	def processAttack(self, skill: ExerSkill, target_type: TargetType,
 				  result_type: HitResultType, hurt: int, attacker: bool):
