@@ -421,6 +421,9 @@ namespace UI.Common.Controls.ParamDisplays {
                 var val = DataLoader.load<int>(value); // 单位须为秒
                 var txtVal = hour ? SceneUtils.time2StrWithHour(val) : SceneUtils.time2Str(val);
                 text.text = string.Format(format, txtVal);
+            } else if (value != null && value.IsString) {
+                var txtVal = DataLoader.load<string>(value); // 读取字符串
+                text.text = string.Format(format, txtVal);
             } else
                 text.text = string.Format(format, value);
         }

@@ -701,16 +701,16 @@ class RuntimeBattlePlayer(RuntimeData):
 
 	# region 初始化
 
-	def __init__(self, battle: 'RuntimeBattle', battler: BattlePlayer):
+	def __init__(self, battle: 'RuntimeBattle', battle_player: BattlePlayer):
 		"""
 		初始化
 		Args:
-			battler (BattlePlayer): 玩家
+			battle_player (BattlePlayer): 玩家
 		"""
 		self.battle = battle
 
-		self.battler = battler
-		self.player = battler.player  # 只读
+		self.battle_player = battle_player
+		self.player = battle_player.player  # 只读
 		self.exer_slot = self.player.exerSlot()  # 只读
 		self.battle_item_slot = self.player.battleItemSlot()  # 只读
 		self.initExermons()
@@ -818,12 +818,20 @@ class RuntimeBattlePlayer(RuntimeData):
 
 	# region 数据操作
 
+	def isDead(self):
+		"""
+		是否已死亡
+		Returns:
+			返回当前玩家是否已死亡
+		"""
+		return self.hp <= 0
+
 	def setupRoundResult(self):
 		"""
 		配置回合结果
 		"""
 		if self.round_result is not None: return
-		self.round_result = self.battler.currentRound()
+		self.round_result = self.battle_player.currentRound()
 
 	def getExermons(self) -> list:
 		"""
@@ -1258,18 +1266,24 @@ class RuntimeBattle(RuntimeData):
 		"""
 		return self.player1.id, self.player2.id
 
-	def getBattler(self, player: Player = None,
+	def getBattler(self, player: Player = None, battle_player: BattlePlayer = None,
 					   runtime_battler: RuntimeBattlePlayer = None) -> RuntimeBattlePlayer:
 		"""
 		获取对战玩家
 		Args:
 			player (Player): 玩家实例
+			battle_player (BattlePlayer): 对战玩家
 			runtime_battler (RuntimeBattlePlayer): 对战玩家实例
 		Returns:
 			玩家对应的运行时对战玩家
 		"""
-		if player and player == self.player1: return self.runtime_battler1
-		if player and player == self.player2: return self.runtime_battler2
+		if player and player.id == self.player1.id: return self.runtime_battler1
+		if player and player.id == self.player2.id: return self.runtime_battler2
+
+		if battle_player and battle_player.player_id == self.player1.id:
+			return self.runtime_battler1
+		if battle_player and battle_player.player_id == self.player2.id:
+			return self.runtime_battler2
 
 		if runtime_battler and runtime_battler == self.runtime_battler1:
 			return self.runtime_battler1
@@ -1278,18 +1292,24 @@ class RuntimeBattle(RuntimeData):
 
 		return None
 
-	def getOppoBattler(self, player: Player = None,
+	def getOppoBattler(self, player: Player = None, battle_player: BattlePlayer = None,
 					   runtime_battler: RuntimeBattlePlayer = None) -> RuntimeBattlePlayer:
 		"""
 		获取对方对战玩家
 		Args:
 			player (Player): 玩家实例
+			battle_player (BattlePlayer): 对战玩家
 			runtime_battler (RuntimeBattlePlayer): 对战玩家实例
 		Returns:
 			玩家对应的运行时对战玩家
 		"""
 		if player and player == self.player1: return self.runtime_battler2
 		if player and player == self.player2: return self.runtime_battler1
+
+		if battle_player and battle_player.player_id == self.player1.id:
+			return self.runtime_battler2
+		if battle_player and battle_player.player_id == self.player2.id:
+			return self.runtime_battler1
 
 		if runtime_battler and runtime_battler == self.runtime_battler1:
 			return self.runtime_battler2
@@ -1423,7 +1443,7 @@ class RuntimeBattle(RuntimeData):
 
 		battler = self.getBattler(player)
 
-		battler.battler.answerCurrentRound(selection, timespan)
+		battler.battle_player.answerCurrentRound(selection, timespan)
 		battler.setupRoundResult()
 
 		correct = battler.round_result.correct()
@@ -1627,6 +1647,7 @@ class RuntimeBattle(RuntimeData):
 				   None, self.PREPARE_END_WAIT_TIME)
 
 		self.status = BattleStatus.Questing
+		# 开始答题
 		self.record.startCurrentRound()
 
 		question: Question = self.cur_round.question
@@ -1684,8 +1705,8 @@ class RuntimeBattle(RuntimeData):
 		result1 = self.runtime_battler1.round_result  # battler.currentRound()
 		result2 = self.runtime_battler2.round_result  # battler.currentRound()
 
-		if result1 is None: result1 = self.runtime_battler1.battler.currentRound()
-		if result2 is None: result2 = self.runtime_battler2.battler.currentRound()
+		if result1 is None: result1 = self.runtime_battler1.battle_player.currentRound()
+		if result2 is None: result2 = self.runtime_battler2.battle_player.currentRound()
 
 		return {
 			'player1': result1.convertToDict(
@@ -1703,14 +1724,14 @@ class RuntimeBattle(RuntimeData):
 		self.runtime_battler1.onRoundTerminated()
 		self.runtime_battler2.onRoundTerminated()
 
-		if self.isBattleEnd(): self._onBattleTermined()
+		if self.isBattleEnd(): self._onBattleTerminated()
 		else: self._startPreparing()
 
-	def _onBattleTermined(self):
+	def _onBattleTerminated(self):
 		"""
 		对战结束回调
 		"""
-
+		self.record.terminate(self)
 		self._startTerminating()
 
 	def _startTerminating(self):
@@ -1727,8 +1748,8 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回对战结果数据
 		"""
-		result1 = self.runtime_battler1.battler
-		result2 = self.runtime_battler2.battler
+		result1 = self.runtime_battler1.battle_player
+		result2 = self.runtime_battler2.battle_player
 
 		return {
 			'player1': result1.convertToDict(type="result"),

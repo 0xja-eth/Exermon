@@ -6,7 +6,7 @@ from item_module.models import *
 from exermon_module.models import ExerSkill, HitType, TargetType
 from player_module.models import Player, HumanPackItem, HumanPack
 from record_module.models import QuestionSetRecord, PlayerQuestion, RecordSource
-from utils.calc_utils import ExerciseSingleRewardCalc
+from utils.calc_utils import ExerciseSingleRewardCalc, BattleResultRewardCalc
 from utils.model_utils import CacheableModel, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 from enum import Enum
@@ -313,28 +313,18 @@ class BattleRecord(CacheableModel):
 		self.addPlayer(player1)
 		self.addPlayer(player2)
 
-	def terminate(self):
+	def terminate(self, battle):
 		"""
 		结束对战
+		Args:
+			battle (RuntimeBattle): 运行时对战
 		"""
-		self._generateResult()
-		self._processResult()
+		self.firstPlayer().terminate(battle=battle)
+		self.secondPlayer().terminate(battle=battle)
 
 		self.result_time = datetime.datetime.now()
 
 		self.save()
-
-	def _generateResult(self):
-		"""
-		生成对战结果
-		"""
-		pass
-
-	def _processResult(self):
-		"""
-		处理对战结果
-		"""
-		pass
 
 	def _initCaches(self):
 		"""
@@ -384,6 +374,54 @@ class BattleRecord(CacheableModel):
 		players = self.battlePlayers()
 		if players.count() >= 2:
 			return players[1]
+		return None
+
+	def getBattlePlayer(self, player: Player = None, battle_player: 'BattlePlayer' = None):
+		"""
+		获取对战玩家
+		Args:
+			player (Player): 玩家实例
+			battle_player (BattlePlayer): 对战玩家实例
+		Returns:
+			返回自身对战玩家
+		"""
+		battle_player1 = self.firstPlayer()
+		battle_player2 = self.secondPlayer()
+
+		if player and player.id == battle_player1.player_id:
+			return battle_player1
+		if player and player.id == battle_player2.player_id:
+			return battle_player2
+
+		if battle_player and battle_player == battle_player1:
+			return battle_player1
+		if battle_player and battle_player == battle_player2:
+			return battle_player2
+
+		return None
+
+	def getOppoBattlePlayer(self, player: Player = None, battle_player: 'BattlePlayer' = None):
+		"""
+		获取对方对战玩家
+		Args:
+			player (Player): 玩家实例
+			battle_player (BattlePlayer): 对战玩家实例
+		Returns:
+			返回自身对战玩家
+		"""
+		battle_player1 = self.firstPlayer()
+		battle_player2 = self.secondPlayer()
+
+		if player and player.id == battle_player1.player_id:
+			return battle_player2
+		if player and player.id == battle_player2.player_id:
+			return battle_player1
+
+		if battle_player and battle_player == battle_player1:
+			return battle_player2
+		if battle_player and battle_player == battle_player2:
+			return battle_player1
+
 		return None
 
 	def addPlayer(self, player: Player) -> 'BattlePlayer':
@@ -643,7 +681,7 @@ class BattlePlayer(QuestionSetRecord):
 	# 恢复评分（*100）
 	recovery_score = models.PositiveSmallIntegerField(null=True, verbose_name="恢复评分")
 
-	# 行动评分（*100）
+	# 正确评分（*100）
 	correct_score = models.PositiveSmallIntegerField(null=True, verbose_name="行动评分")
 
 	# 奖励分数（*100）
@@ -664,13 +702,24 @@ class BattlePlayer(QuestionSetRecord):
 
 		res = "用时：%.2f，伤害：%.2f<br>" \
 			  "承伤：%.2f，回复：%.2f<br>" \
-			  "行动：%.2f，附加：%.2f<br>" \
+			  "正确：%.2f，附加：%.2f<br>" \
 			  "总分：%.2f" % \
 			  (self.time_score, self.hurt_score, self.damage_score,
 			   self.recovery_score, self.correct_score, self.plus_score,
 			   self.battleScore())
 
 		return format_html(res)
+
+	# region 配置
+
+	@classmethod
+	def rewardCalculator(cls) -> BattleResultRewardCalc:
+		"""
+		奖励计算类
+		Returns:
+			返回对应的奖励计算类类对象
+		"""
+		return BattleResultRewardCalc
 
 	@classmethod
 	def playerQuesClass(cls) -> 'BattleRoundResult':
@@ -689,6 +738,24 @@ class BattlePlayer(QuestionSetRecord):
 			返回为空
 		"""
 		return None
+
+	def _playerQuestions(self) -> QuerySet:
+		"""
+		获取所有题目关系（数据库）
+		Returns:
+			题目关系 QuerySet 对象
+		"""
+		return self.battleroundresult_set.all()
+
+	def _rewards(self) -> QuerySet:
+		"""
+		获取所有奖励（数据库）
+		Returns:
+			题目集奖励 QuerySet 对象
+		"""
+		return []
+
+	# endregion
 
 	def generateName(self) -> str:
 		"""
@@ -735,22 +802,6 @@ class BattlePlayer(QuestionSetRecord):
 
 		return res
 
-	def _playerQuestions(self) -> QuerySet:
-		"""
-		获取所有题目关系（数据库）
-		Returns:
-			题目关系 QuerySet 对象
-		"""
-		return self.battleroundresult_set.all()
-
-	def _rewards(self) -> QuerySet:
-		"""
-		获取所有奖励（数据库）
-		Returns:
-			题目集奖励 QuerySet 对象
-		"""
-		return []
-
 	def battleScore(self) -> int:
 		"""
 		获取最终对战评分
@@ -771,6 +822,8 @@ class BattlePlayer(QuestionSetRecord):
 		cache = self._getQuestionsCache()
 		if len(cache) > 0: return cache[-1]
 		return None
+
+	# region 回合操作
 
 	def addRound(self, round: BattleRound):
 		"""
@@ -801,6 +854,47 @@ class BattlePlayer(QuestionSetRecord):
 
 		self.answerQuestion(selection, timespan, player_ques=cur_round)
 
+	# endregion
+
+	# region 对战结束
+
+	def _applyBaseResult(self, calc: BattleResultRewardCalc):
+		"""
+		应用基本结果
+		Args:
+			calc (BattleResultRewardCalc): 结果
+		"""
+		super()._applyBaseResult(calc)
+
+		self.result = calc.result.value
+		self.status = calc.status.value
+		self.score_incr = calc.score_incr
+
+		self.time_score = calc.battle_scores.time_score
+		self.hurt_score = calc.battle_scores.hurt_score
+		self.damage_score = calc.battle_scores.damage_score
+		self.recovery_score = calc.battle_scores.recovery_score
+		self.correct_score = calc.battle_scores.correct_score
+		self.plus_score = calc.battle_scores.plus_score
+
+	def _applyPlayerResult(self, calc: BattleResultRewardCalc):
+		"""
+		应用玩家结果
+		Args:
+			calc (BattleResultRewardCalc): 结果
+		"""
+		super()._applyPlayerResult(calc)
+
+		player = self.exactlyPlayer()
+
+		season_record = player.currentSeasonRecord()
+
+		season_record.adjustCredit(calc.credit_incr)
+		season_record.adjustPoint(calc.score_incr)
+		season_record.adjustStarNum(calc.star_incr)
+
+	# endregion
+
 	# region 统计数据
 
 	def sumHurt(self, player_queses: QuerySet = None) -> int:
@@ -823,7 +917,7 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		return self._sumData('damage', lambda d: d.damagePoint(), player_queses)
 
-	def sumRecover(self, player_queses: QuerySet = None) -> int:
+	def sumRecovery(self, player_queses: QuerySet = None) -> int:
 		"""
 		获取对战总回复
 		Args:
@@ -834,6 +928,8 @@ class BattlePlayer(QuestionSetRecord):
 		return self._sumData('recovery', lambda d: d.recovery, player_queses)
 
 	# endregion
+
+	"""占位符"""
 
 
 # ===================================================
@@ -1014,9 +1110,6 @@ class BattleRoundResult(PlayerQuestion):
 		# 对己攻击，如果是攻击方计入承伤点数，不计入伤害点数
 		if target_type == TargetType.Self:
 			if attacker: self.damage += hurt
-
-		print("self.hurt: "+str(self.hurt))
-		print("self.damage: "+str(self.damage))
 
 	def hurtPoint(self) -> int:
 		"""

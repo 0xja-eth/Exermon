@@ -44,6 +44,14 @@ class RuntimeManager:
 	event_processors = []
 
 	@classmethod
+	def show(cls):
+		"""
+		显示所有运行时对象
+		"""
+		print("Runtime objects:")
+		print(str(cls.objects))
+
+	@classmethod
 	def register(cls, type_: type):
 		"""
 		注册一个类型，之后可以对该类型进行 add, get, contains, delete 等操作

@@ -112,7 +112,7 @@ class SeasonRecord(models.Model):
 		self.save()
 
 	# 增减星星数量
-	async def adjustStarNum(self, value):
+	def adjustStarNum(self, value):
 		rank, sub_rank, _ = self.rank()
 
 		# 星星减少
@@ -136,26 +136,60 @@ class SeasonRecord(models.Model):
 
 			new_rank, new_sub_rank, _ = self.rank()
 			if new_rank != rank or new_sub_rank != sub_rank:
-				await self._emitRankChanged(new_rank, new_sub_rank)
+				self._emitRankChanged(new_rank, new_sub_rank)
 
-		self.save()
+		# self.save()
 
 	# 发送段位变更信息
-	async def _emitRankChanged(self, rank, sub_rank):
+	def _emitRankChanged(self, rank: 'CompRank', sub_rank: int):
+		"""
+		发射段位变化数据
+		Args:
+			rank (CompRank): 新段位
+			sub_rank (int): 新子段位
+		"""
+
 		from game_module.consumer import EmitType
+		from game_module.runtimes import AsyncOper
+		from utils.runtime_manager import RuntimeManager
 		from player_module.views import Common
 
 		# 生成返回信息，规范见接口文档
-		data = {'rank_id': rank, 'sub_rank': sub_rank, 'star_num': self.star_num}
+		data = self.__generateEmitData(rank, sub_rank)
 
 		player = Common.getOnlinePlayer(self.player_id)
+
 		# 使用 emit 函数发送信息，type 为发送信息的类型，
 		# tag 为发送信息的标签（按照默认值即可）
 		# data 为发送的信息，需要传一个 dict
-		await player.consumer.emit(EmitType.RankChanged, data=data)
+		oper = AsyncOper(player.consumer.emit,
+						 type=EmitType.RankChanged, data=data)
+		RuntimeManager.add(AsyncOper, oper)
+
+	def __generateEmitData(self, rank: 'CompRank', sub_rank: int):
+		"""
+		生成发射数据
+		Args:
+			rank (CompRank): 段位
+			sub_rank (int): 子段位
+		Returns:
+			返回需要发射的数据
+		"""
+		return {
+			'rank_id': rank.id,
+			'sub_rank': sub_rank,
+			'star_num': self.star_num
+		}
 
 	def adjustCredit(self, player: 'Player', credit):
-		player.credit += credit
+		"""
+		修改信誉积分
+		Args:
+			player (Player): 玩家
+			credit (int): 信誉积分
+		"""
+
+		player.addCredit(credit)
 
 		count = self.suspensions().count()
 		now = datetime.datetime.now()
@@ -170,7 +204,7 @@ class SeasonRecord(models.Model):
 		elif player.credit < self.SUSPEN_SCORE and count == 0:
 			SuspensionRecord.create(self.id, now, 3)
 
-		player.save()
+		# player.save()
 
 	# 所有的禁赛纪录
 	def suspensions(self):

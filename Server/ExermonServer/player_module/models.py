@@ -267,6 +267,8 @@ class Player(CacheableModel):
 
 	SUCCESSFUL_LOGOUT_MSG = '您已成功退出登录！'
 
+	MAX_CREDIT = 100
+
 	GRADES = [
 		(PlayerGrades.Unset.value, '不详'),
 		(PlayerGrades.Before.value, '初中及以下'),
@@ -1104,6 +1106,14 @@ class Player(CacheableModel):
 	# endregion
 
 	# region 赛季操作
+
+	def addCredit(self, value):
+		"""
+		修改信誉积分
+		Args:
+			value (int): 添加的信誉积分
+		"""
+		self.credit = min(self.credit + value, self.MAX_CREDIT)
 
 	def seasonRecords(self) -> QuerySet:
 		"""

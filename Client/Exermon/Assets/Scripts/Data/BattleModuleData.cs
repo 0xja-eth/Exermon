@@ -875,6 +875,8 @@ namespace BattleModule.Data {
         const string CorrectText = "AC";
         const string WrongText = "WA";
 
+        const string EmptyTimespanText = "-";
+
         public static readonly Color CorrectColor = new Color(0.5450981f, 0.9647059f, 1);
         public static readonly Color WrongColor = new Color(1, 0.1647059f, 0.3921569f);
 
@@ -995,9 +997,12 @@ namespace BattleModule.Data {
         JsonData convertRoundResultData() {
             var res = new JsonData();
             var color = correct ? CorrectColor : WrongColor;
-            var time = DataLoader.convertDouble(timespan / 1000.0);
 
-            res["timespan"] = time;
+            if (timespan > 0)
+                res["timespan"] = DataLoader.convertDouble(timespan / 1000.0);
+            else
+                res["timespan"] = EmptyTimespanText;
+
             res["hurt"] = hurt;
             res["damage"] = damage;
             res["recover"] = recover;

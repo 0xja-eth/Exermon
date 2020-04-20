@@ -419,7 +419,6 @@ class ExerciseQuestion(PlayerQuestion):
 		Returns:
 			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
 		"""
-		from utils.calc_utils import ExerciseSingleRewardCalc
 		return ExerciseSingleRewardCalc
 
 	@classmethod
@@ -767,6 +766,8 @@ class QuestionSetRecord(CacheableModel):
 
 		return online_player.player or player
 
+	# region 开始题目集
+
 	def start(self, **kwargs):
 		"""
 		开始一个题目集，在调用 create() 的时候会调用，进行缓存的初始化、当前题目集设置以及题目生成
@@ -806,32 +807,25 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		return None
 
+	# endregion
+
+	# region 结束题目集
+	
 	def terminate(self, **kwargs):
 		"""
 		结束刷题
 		Args:
-			**kwargs (**dict): 子类重载参数
+			**kwargs (**dict): 子类重载参数（用于奖励计算）
 		"""
 
 		self.finished = True
 
-		self._applyResult(self._calcResult())
+		self._applyResult(self._calcResult(**kwargs))
 
 		# 会自动保存
 		self.exactlyPlayer().clearCurrentQuestionSet()
 
-	def shrinkQuestions(self):
-		"""
-		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
-		"""
-
-		player_queses = self._getQuestionsCache()
-
-		for player_ques in player_queses:
-			if not player_ques.answer:
-				self._removeQuestionFromCache(player_ques)
-
-	def _calcResult(self) -> QuestionSetResultRewardCalc:
+	def _calcResult(self, **kwargs) -> QuestionSetResultRewardCalc:
 		"""
 		计算题目集结果
 		Returns:
@@ -841,13 +835,7 @@ class QuestionSetRecord(CacheableModel):
 
 		if calc is None: return None
 
-		calc = calc.calc(self.playerQuestions())
-
-		self.exer_exp_incrs = calc.exer_exp_incrs
-		self.slot_exp_incrs = calc.exerslot_exp_incrs
-		self.gold_incr = calc.gold_incr
-
-		return calc
+		return calc.calc(self, self.playerQuestions(), **kwargs)
 
 	def _applyResult(self, calc: QuestionSetResultRewardCalc):
 		"""
@@ -857,18 +845,50 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		if calc is None: return
 
+		self._applyBaseResult(calc)
+		self._applyPlayerResult(calc)
+		self._applyRewardsResult(calc)
+
+	def _applyBaseResult(self, calc: QuestionSetResultRewardCalc):
+		"""
+		应用基本结果
+		Args:
+			calc (QuestionSetResultRewardCalc): 结果
+		"""
+		self.exer_exp_incrs = calc.exer_exp_incrs
+		self.slot_exp_incrs = calc.slot_exp_incrs
+		self.gold_incr = calc.gold_incr
+
+	def _applyPlayerResult(self, calc: QuestionSetResultRewardCalc):
+		"""
+		应用玩家结果
+		Args:
+			calc (QuestionSetResultRewardCalc): 结果
+		"""
 		player = self.exactlyPlayer()
 
 		player.gainMoney(calc.gold_incr)
 		player.gainExp(calc.slot_exp_incr, calc.exer_exp_incrs,
 					   calc.slot_exp_incrs)
 
-		rewards = self.rewards()
+	def _applyRewardsResult(self, calc: QuestionSetResultRewardCalc):
+		"""
+		应用物品奖励结果
+		Args:
+			calc (QuestionSetResultRewardCalc): 结果
+		"""
+		for reward in calc.item_rewards: self.addReward(**reward)
 
-		for reward in rewards:
+		player = self.exactlyPlayer()
+
+		for reward in self.rewards():
 			cla = reward.containerType()
 			container = player.getContainer(cla)
 			container.gainItems(reward.item(), reward.count)
+
+	# endregion
+
+	# region 题目集过程
 
 	def addQuestion(self, question_id: int, **kwargs) -> PlayerQuestion:
 		"""
@@ -905,7 +925,7 @@ class QuestionSetRecord(CacheableModel):
 	def answerQuestion(self, selection: list, timespan: int,
 					   question_id: int = None, player_ques: PlayerQuestion = None):
 		"""
-		回答题目
+		回答指定题目
 		Args:
 			question_id (int): 题目ID
 			player_ques (PlayerQuestion): 玩家题目关系对象
@@ -925,6 +945,8 @@ class QuestionSetRecord(CacheableModel):
 		player_ques.answer(selection, timespan, rec)
 
 		rec.updateRecord(player_ques)
+
+	# endregion
 
 	# region 统计数据
 
@@ -1050,6 +1072,17 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		return self._sumData('timespans', lambda d: d.timespan, player_queses)
 
+	def sumStdTime(self, player_queses: QuerySet = None) -> int:
+		"""
+		获取题目集总标准用时
+		Args:
+			player_queses (QuerySet): 玩家题目关系集合，默认情况下为所有题目关系
+		Returns:
+			题目集总标准用时
+		"""
+		return self._sumData('std_time', lambda d: d.question.star.std_time,
+							 player_queses)
+
 	def sumScore(self, player_queses: QuerySet = None) -> int:
 		"""
 		获取题目集总得分
@@ -1088,7 +1121,8 @@ class QuestionSetRecord(CacheableModel):
 
 	# endregion
 
-	# 添加奖励
+	# region 奖励操作
+
 	def addReward(self, item: BaseItem, count: int):
 		"""
 		添加结算奖励
@@ -1103,7 +1137,6 @@ class QuestionSetRecord(CacheableModel):
 
 		self._addCachedReward(reward)
 
-	# 添加一个缓存奖励
 	def _addCachedReward(self, reward: QuestionSetReward):
 		"""
 		添加奖励到缓存中
@@ -1112,7 +1145,6 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		self._getCache(self.REWARD_CACHE_KEY).append(reward)
 
-	# 获取奖励
 	def rewards(self) -> list:
 		"""
 		获取所有奖励（缓存）
@@ -1122,7 +1154,6 @@ class QuestionSetRecord(CacheableModel):
 		return self._getOrSetCache(self.REWARD_CACHE_KEY,
 								   lambda: list(self._rewards()))
 
-	# 实际获取奖励
 	def _rewards(self) -> QuerySet:
 		"""
 		获取所有奖励（数据库）
@@ -1130,6 +1161,10 @@ class QuestionSetRecord(CacheableModel):
 			题目集奖励 QuerySet 对象
 		"""
 		raise NotImplementedError
+
+	# endregion
+
+	"""占位符"""
 
 
 # ===================================================
@@ -1229,7 +1264,18 @@ class ExerciseRecord(QuestionSetRecord):
 		return QuestionGenerateConfigure(self, self.player, self.subject,
 										 gen_type=self.gen_type, count=self.count)
 
+	def _shrinkQuestions(self):
+		"""
+		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
+		"""
+
+		player_queses = self._getQuestionsCache()
+
+		for player_ques in player_queses:
+			if not player_ques.answered:
+				self._removeQuestionFromCache(player_ques)
+
 	# 终止答题
 	def terminate(self, **kwargs):
-		self.shrinkQuestions()
+		self._shrinkQuestions()
 		super().terminate(**kwargs)
