@@ -270,8 +270,8 @@ class LimitedItem(BaseItem):
 	tradable = models.BooleanField(default=True, verbose_name="可交易")
 
 	# 物品图标
-	icon = models.ImageField(upload_to=ItemIconUpload(),
-							 null=True, blank=True, verbose_name="图标")
+	# icon = models.ImageField(upload_to=ItemIconUpload(),
+	# 						 null=True, blank=True, verbose_name="图标")
 
 	# 管理界面用：显示购入价格
 	def adminBuyPrice(self):

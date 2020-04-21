@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 ('is_new', models.BooleanField(default=False, verbose_name='新题标志')),
                 ('attack', models.BooleanField(null=True, verbose_name='是否进攻')),
                 ('target_type', models.PositiveSmallIntegerField(choices=[(0, '无'), (1, '己方'), (2, '敌方'), (3, '双方随机'), (4, '双方全部')], default=2, verbose_name='目标')),
-                ('result_type', models.PositiveSmallIntegerField(choices=[(0, '未知'), (1, '命中'), (2, '暴击'), (3, '回避')], default=battle_module.models.HitResultType(0), verbose_name='回合结果')),
+                ('result_type', models.PositiveSmallIntegerField(choices=[(0, '未知'), (1, '命中'), (2, '暴击'), (3, '回避')], default=0, verbose_name='回合结果')),
                 ('hurt', models.SmallIntegerField(default=0, verbose_name='伤害点数')),
                 ('damage', models.SmallIntegerField(default=0, verbose_name='承伤点数')),
                 ('recover', models.PositiveSmallIntegerField(default=0, verbose_name='回复点数')),
