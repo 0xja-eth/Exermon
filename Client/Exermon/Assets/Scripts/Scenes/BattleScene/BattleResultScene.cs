@@ -1,10 +1,6 @@
 ﻿
-using System;
-using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 using Core.Data.Loaders;
 
@@ -13,8 +9,6 @@ using Core.UI.Utils;
 
 using Core.Systems;
 
-using PlayerModule.Services;
-using SeasonModule.Services;
 using BattleModule.Services;
 
 using BattleModule.Data;
@@ -22,7 +16,6 @@ using BattleModule.Data;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.RadarDisplay;
 
-using UI.BattleStartScene.Controls;
 using UI.BattleMatchingScene.Controls;
 
 /// <summary>
@@ -82,14 +75,6 @@ namespace UI.BattleResultScene {
         protected override void initializeSystems() {
             base.initializeSystems();
             battleSer = BattleService.get();
-        }
-
-        /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            SceneUtils.depositSceneObject("Scene", this);
         }
 
         /// <summary>
