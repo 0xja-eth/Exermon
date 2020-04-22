@@ -180,7 +180,7 @@ namespace UI.BattleAnswerScene.Windows {
         /// </summary>
         void refreshIndexText() {
             indexText.text = string.Format(
-                IndexTextFormat, index, roundCount());
+                IndexTextFormat, index+1, roundCount());
         }
 
         /// <summary>

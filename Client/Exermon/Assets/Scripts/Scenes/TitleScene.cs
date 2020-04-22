@@ -8,6 +8,7 @@ using Core.UI;
 using Core.UI.Utils;
 
 using GameModule.Services;
+using RecordModule.Services;
 
 using UI.TitleScene.Windows;
 
@@ -44,6 +45,7 @@ namespace UI.TitleScene {
         /// 内部系统声明
         /// </summary>
         GameService gameSer;
+        RecordService recordSer;
 
         #region 初始化
 
@@ -61,6 +63,7 @@ namespace UI.TitleScene {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSer = GameService.get();
+            recordSer = RecordService.get();
 
             gameSys.start();
         }
@@ -125,7 +128,7 @@ namespace UI.TitleScene {
         /// 登陆成功回调
         /// </summary>
         public void startGame() {
-            gameSer.startGame();
+            recordSer.get(gameSer.startGame);
         }
 
         #endregion

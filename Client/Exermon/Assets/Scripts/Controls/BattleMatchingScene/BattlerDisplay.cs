@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Core.Data.Loaders;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +29,8 @@ namespace UI.BattleMatchingScene.Controls {
         public const string UnknownName = "旗鼓相当的对手";
         public const string LevelFormat = "Lv. {0}";
         public const string ProgressFormat = "{0}%";
+
+        const int BustHeight = 384;
 
         /// <summary>
         /// 外部组件设置
@@ -67,8 +71,11 @@ namespace UI.BattleMatchingScene.Controls {
         /// <param name="battler">对战者</param>
         void drawBust(RuntimeBattlePlayer battler) {
             if (unknown) unknown.SetActive(false);
-            bust.gameObject.SetActive(true);
-            bust.overrideSprite = battler.character().bust;
+            var bust = AssetLoader.getCharacterBustSprite(
+                battler.characterId, BustHeight);
+            this.bust.gameObject.SetActive(true);
+            this.bust.overrideSprite = bust;
+            //bust.overrideSprite = battler.character().bust;
         }
 
         /// <summary>

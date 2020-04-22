@@ -12,6 +12,7 @@ using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Storyboards;
+using UnityEngine;
 
 namespace UI.BattleScene.Windows {
 
@@ -192,6 +193,7 @@ namespace UI.BattleScene.Windows {
         /// 重置状态
         /// </summary>
         protected virtual void resetStatus() {
+            Debug.Log("resetStatus");
             passed = false;
             battle = battleSer.battle;
         }

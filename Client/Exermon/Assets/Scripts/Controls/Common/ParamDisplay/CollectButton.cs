@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
@@ -60,6 +61,9 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <returns></returns>
         public override bool isChecked() {
+            return isChecked(item);
+        }
+        public bool isChecked(Question item) {
             if (item == null) return false;
             return recordSer.recordData.isQuestionCollected(item.getID());
         }
@@ -84,6 +88,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 反转
         /// </summary>
         public override void toggle() {
+            Debug.Log("toggle");
             if (isChecked()) uncheck();
             else check();
         }
@@ -98,8 +103,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="item"></param>
         protected override void drawExactlyItem(Question item) {
             base.drawExactlyItem(item);
-            var rec = recordSer.recordData.getQuestionRecord(item.getID(), true);
-            if (rec.collected) collectText.text = CollectedText;
+            if (isChecked(item)) collectText.text = CollectedText;
             else collectText.text = UncollectedText;
         }
 
@@ -111,7 +115,9 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 收藏题目
         /// </summary>
         public void collect() {
+            Debug.Log("collect");
             if (item == null) return;
+            Debug.Log("doCollect");
             recordSer.collect(item.getID(), onCollected);
         }
 

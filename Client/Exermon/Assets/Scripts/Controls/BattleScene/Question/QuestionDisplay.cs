@@ -189,6 +189,7 @@ namespace UI.BattleScene.Controls.Question {
             base.drawExactlyItem(question);
 
             drawTitle(question);
+            drawCollect(question);
             drawPictruesAndChoices(question);
             if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
@@ -249,7 +250,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <returns></returns>
         string generateAnswerText(Question question) {
             string res = "";
-            var choices = question.choices;
+            var choices = question.shuffleChoices();
             for (int i = 0; i < choices.Length; ++i)
                 if (choices[i].answer)
                     res += (char)('A' + i);

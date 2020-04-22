@@ -54,7 +54,7 @@ namespace Core.UI {
         /// <summary>
         /// 布局稳定帧
         /// </summary>
-        const int LayoutStableFrame = 8;
+        const int LayoutStableFrame = 4;
 
         /// <summary>
         /// 外部组件设置
