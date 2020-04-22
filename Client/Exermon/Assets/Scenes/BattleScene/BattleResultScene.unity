@@ -2893,7 +2893,7 @@ MonoBehaviour:
     type: Text
     animated: 0
     configData: 0
-    format: "\u7528\u65F6\uFF1A{0}"
+    format: "\u6B63\u786E\uFF1A{0}"
     trigger: 
   - key: sum_score
     obj: {fileID: 0}

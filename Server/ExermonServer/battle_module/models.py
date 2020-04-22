@@ -298,8 +298,8 @@ class BattleRecord(CacheableModel):
 		create_time = ModelUtils.timeToStr(self.create_time)
 		result_time = ModelUtils.timeToStr(self.result_time)
 
-		players = ModelUtils.objectsToDict(self.battlePlayers())
-		rounds = ModelUtils.objectsToDict(self.battleRounds(), type="result")
+		players = ModelUtils.objectsToDict(self.battlePlayers(), type=type)
+		rounds = ModelUtils.objectsToDict(self.battleRounds(), type=type)
 
 		res = {
 			'id': self.id,

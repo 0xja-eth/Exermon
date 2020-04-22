@@ -64,6 +64,7 @@ namespace UI.BattleAnswerScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
+            battle = battleSer.battle;
             record = battle.record;
         }
 
