@@ -239,7 +239,15 @@ class BattleRecord(CacheableModel):
 	result_time = models.DateTimeField(null=True, verbose_name="结算时间")
 
 	def __str__(self):
-		return "%s. %s VS %s" % (str(self.id), self.adminPlayer1(), self.adminPlayer2())
+		return "%s. %s" % (str(self.id), self.generateName())
+
+	def generateName(self):
+		"""
+		生成名称
+		Returns:
+			返回对战记录名称
+		"""
+		return "%s VS %s" % (self.adminPlayer1(), self.adminPlayer2())
 
 	# admin 显示玩家1
 	def adminPlayer1(self):
@@ -266,9 +274,16 @@ class BattleRecord(CacheableModel):
 		Returns:
 			本对战记录实例
 		"""
+		from season_module.runtimes import SeasonManager
+
 		rec = cls()
 		rec.mode = mode
+		rec.season_id = SeasonManager.getCurrentSeason().id
+
+		rec.save()
+
 		rec.start(player1, player2)
+
 		return rec
 
 	def convertToDict(self, type: str = None, **kwargs) -> dict:
@@ -284,7 +299,7 @@ class BattleRecord(CacheableModel):
 		result_time = ModelUtils.timeToStr(self.result_time)
 
 		players = ModelUtils.objectsToDict(self.battlePlayers())
-		rounds = ModelUtils.objectsToDict(self.battleRounds())
+		rounds = ModelUtils.objectsToDict(self.battleRounds(), type="result")
 
 		res = {
 			'id': self.id,
@@ -296,7 +311,7 @@ class BattleRecord(CacheableModel):
 			'players': players,
 		}
 
-		if type == "record":
+		if type == "record" or type == "result":
 			res['rounds'] = rounds
 
 		return res
@@ -319,6 +334,9 @@ class BattleRecord(CacheableModel):
 		Args:
 			battle (RuntimeBattle): 运行时对战
 		"""
+		# self.save()
+		# self._saveCache(self.BATTLE_ROUNDS_CACHE_KEY)
+
 		self.firstPlayer().terminate(battle=battle)
 		self.secondPlayer().terminate(battle=battle)
 
@@ -355,7 +373,8 @@ class BattleRecord(CacheableModel):
 		"""
 		# 结算时间为空，表示正在对战中
 		if self.result_time is None:
-			return self._getCachedBattlePlayers()[0]
+			players = self._getCachedBattlePlayers()
+			return players[0] if players is not None else None
 
 		players = self.battlePlayers()
 		if players.count() >= 1:
@@ -369,7 +388,8 @@ class BattleRecord(CacheableModel):
 			如果有第二个玩家，则返回其实例，否则返回 None
 		"""
 		if self.result_time is None:
-			return self._getCachedBattlePlayers()[1]
+			players = self._getCachedBattlePlayers()
+			return players[1] if players is not None else None
 
 		players = self.battlePlayers()
 		if players.count() >= 2:
@@ -579,6 +599,9 @@ class BattleRound(models.Model):
 		round = cls()
 		round.order = order
 		round.record = battle
+
+		round.save()
+
 		round.generateQuestion()
 
 		return round
@@ -763,7 +786,7 @@ class BattlePlayer(QuestionSetRecord):
 		Returns:
 			生成的名字
 		"""
-		return '%s对战记录' % str(self.record)
+		return self.record.generateName()
 
 	def _create(self, record: 'BattleRecord'):
 		"""
@@ -870,12 +893,12 @@ class BattlePlayer(QuestionSetRecord):
 		self.status = calc.status.value
 		self.score_incr = calc.score_incr
 
-		self.time_score = calc.battle_scores.time_score
-		self.hurt_score = calc.battle_scores.hurt_score
-		self.damage_score = calc.battle_scores.damage_score
-		self.recovery_score = calc.battle_scores.recovery_score
-		self.correct_score = calc.battle_scores.correct_score
-		self.plus_score = calc.battle_scores.plus_score
+		self.time_score = calc.battle_scores.time_score*100
+		self.hurt_score = calc.battle_scores.hurt_score*100
+		self.damage_score = calc.battle_scores.damage_score*100
+		self.recovery_score = calc.battle_scores.recovery_score*100
+		self.correct_score = calc.battle_scores.correct_score*100
+		self.plus_score = calc.battle_scores.plus_score*100
 
 	def _applyPlayerResult(self, calc: BattleResultRewardCalc):
 		"""
@@ -892,6 +915,8 @@ class BattlePlayer(QuestionSetRecord):
 		season_record.adjustCredit(calc.credit_incr)
 		season_record.adjustPoint(calc.score_incr)
 		season_record.adjustStarNum(calc.star_incr)
+
+		season_record.save()
 
 	# endregion
 

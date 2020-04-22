@@ -65,8 +65,14 @@ namespace UI.StartScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            scene = (StartScene)SceneUtils.getSceneObject("Scene");
             configureSubViews();
+        }
+
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        protected override void initializeScene() {
+            scene = (StartScene)SceneUtils.getSceneObject("Scene");
         }
 
         /// <summary>

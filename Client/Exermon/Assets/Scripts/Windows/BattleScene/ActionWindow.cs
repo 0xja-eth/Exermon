@@ -24,7 +24,7 @@ using UI.BattleScene.Controls.Question;
 using UI.BattleScene.Controls.Storyboards;
 
 /// <summary>
-/// 对战开始场景窗口
+/// 对战场景窗口
 /// </summary>
 namespace UI.BattleScene.Windows {
 

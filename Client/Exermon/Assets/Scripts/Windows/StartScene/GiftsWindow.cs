@@ -60,11 +60,24 @@ namespace UI.StartScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (gameSys == null) gameSys = GameSystem.get();
-            if (playerSer == null) playerSer = PlayerService.get();
-            if (dataSer == null) dataSer = DataService.get();
-            scene = (StartScene)SceneUtils.getSceneObject("Scene");
             configureSubViews();
+        }
+
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        protected override void initializeScene() {
+            scene = (StartScene)SceneUtils.getSceneObject("Scene");
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            gameSys = GameSystem.get();
+            dataSer = DataService.get();
+            playerSer = PlayerService.get();
         }
 
         /// <summary>

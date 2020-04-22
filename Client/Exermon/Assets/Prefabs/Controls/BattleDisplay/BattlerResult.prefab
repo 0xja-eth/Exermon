@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7838362880162775618}
   - component: {fileID: 7838362880162775619}
   m_Layer: 5
-  m_Name: Recover
+  m_Name: Recovery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -461,7 +461,7 @@ MonoBehaviour:
     configData: 0
     format: "\u627F\u53D7\u4F24\u5BB3\uFF1A{0}"
     trigger: 
-  - key: recover
+  - key: recovery
     obj: {fileID: 0}
     type: Text
     animated: 0

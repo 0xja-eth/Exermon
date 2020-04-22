@@ -372,12 +372,12 @@ namespace UI.Common.Controls.ParamDisplays {
                 var val = DataLoader.load<double>(value);
                 var valTxt = percent ? SceneUtils.double2Perc(val, true) : val.ToString();
                 if (val >= 0) signText = DefaultTrueSign;
-                text.text = signText + string.Format(format, valTxt);
+                text.text = string.Format(format, signText + valTxt);
             } else if (value != null && value.IsInt) {
                 var val = DataLoader.load<int>(value);
                 var valTxt = percent ? val + "%" : val.ToString();
                 if (val >= 0) signText = DefaultTrueSign;
-                text.text = signText + string.Format(format, valTxt);
+                text.text = string.Format(format, signText + valTxt);
             } else if (value != null && value.IsBoolean) {
                 var val = DataLoader.load<bool>(value);
                 signText = val ? DefaultTrueSign : DefaultFalseSign;

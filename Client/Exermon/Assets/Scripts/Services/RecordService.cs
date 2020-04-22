@@ -88,6 +88,26 @@ namespace RecordModule.Services {
             }
 
             /// <summary>
+            /// 题目是否已收藏
+            /// </summary>
+            /// <param name="qid">题目ID</param>
+            /// <returns></returns>
+            public bool isQuestionCollected(int qid) {
+                var rec = getQuestionRecord(qid);
+                return rec != null && rec.collected;
+            }
+
+            /// <summary>
+            /// 题目是否在错题本中
+            /// </summary>
+            /// <param name="qid">题目ID</param>
+            /// <returns></returns>
+            public bool isQuestionWrong(int qid) {
+                var rec = getQuestionRecord(qid);
+                return rec != null && rec.wrong;
+            }
+
+            /// <summary>
             /// 收藏/解除收藏题目
             /// </summary>
             /// <param name="qid">题目ID</param>

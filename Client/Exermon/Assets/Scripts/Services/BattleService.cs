@@ -39,9 +39,9 @@ namespace BattleModule.Services {
         const string MatchProgress = "匹配进度";
         const string PrepareComplete = "准备完成";
         const string QuestionAnswer = "题目作答";
-        const string QuestionComplete = "";
+        const string QuestionComplete = "行动";
         const string ActionComplete = "回合结算";
-        const string ResultComplete = "回合结算";
+        const string ResultComplete = "准备新回合";
 
         /// <summary>
         /// 业务操作
@@ -530,7 +530,8 @@ namespace BattleModule.Services {
         /// </summary>
         /// <param name="data"></param>
         void onBattleResult(JsonData data) {
-            battle.loadResults(data);
+            battle = DataLoader.load(battle, data);
+            //battle.loadResults(data);
             changeState(State.Terminating);
         }
 

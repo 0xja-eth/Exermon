@@ -59,14 +59,6 @@ namespace UI.StatusScene {
         }
 
         /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            SceneUtils.depositSceneObject("Scene", this);
-        }
-
-        /// <summary>
         /// 开始
         /// </summary>
         protected override void start() {

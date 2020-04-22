@@ -99,9 +99,15 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            scene = (TitleScene)SceneUtils.getSceneObject("Scene");
             initializeInputItemFields();
             setupInputItemFields();
+        }
+        
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        protected override void initializeScene() {
+            scene = (TitleScene)SceneUtils.getSceneObject("Scene");
         }
 
         /// <summary>

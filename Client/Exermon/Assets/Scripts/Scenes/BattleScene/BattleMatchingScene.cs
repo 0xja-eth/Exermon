@@ -48,7 +48,6 @@ namespace UI.BattleMatchingScene {
         /// </summary>
         PlayerService playerSer;
         BattleService battleSer;
-        SeasonService seasonSer;
 
         #region 初始化
 
@@ -67,15 +66,6 @@ namespace UI.BattleMatchingScene {
             base.initializeSystems();
             playerSer = PlayerService.get();
             battleSer = BattleService.get();
-            seasonSer = SeasonService.get();
-        }
-
-        /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            SceneUtils.depositSceneObject("Scene", this);
         }
 
         /// <summary>
@@ -83,9 +73,12 @@ namespace UI.BattleMatchingScene {
         /// </summary>
         protected override void start() {
             base.start();
+
+            var player = playerSer.player;
+
             clock.startTimer();
-            topInfoDisplay.startView(playerSer.player);
-            selfBattler.setItem(playerSer.player);
+            topInfoDisplay.startView(player);
+            selfBattler.setItem(player);
             progress.text = "";
         }
 

@@ -49,12 +49,11 @@ namespace UI.StatusScene.Windows {
         PlayerService playerSer = null;
 
         #region 初始化
-
+        
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeScene() {
             scene = (StatusScene)SceneUtils.getSceneObject("Scene");
         }
 
@@ -65,8 +64,7 @@ namespace UI.StatusScene.Windows {
             base.initializeSystems();
             playerSer = PlayerService.get();
         }
-
-
+        
         #endregion
 
         #region 开启控制

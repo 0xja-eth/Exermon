@@ -1,25 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-
-using Core.Data.Loaders;
-using Core.Systems;
-using Core.UI;
-using Core.UI.Utils;
-
-using GameModule.Services;
-
-using PlayerModule.Services;
-
-using BattleModule.Data;
-using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
 using UI.BattleScene.Controls.Storyboards;
 
-/// <summary>
-/// 对战开始场景窗口
-/// </summary>
 namespace UI.BattleScene.Windows {
 
     /// <summary>
@@ -39,16 +23,34 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public QuestionInfo questionInfo;
         public ItemTabController tabController;
-
-        public BattlerStatus selfStatus, oppoStatus;
 
         public BattlerPrepareStoryboard selfPStatus;//, oppoPStatus;
 
         public BattleItemSlotDisplay battleItemSlotDisplay;
 
         public GameObject prepareControl;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            configureContainers();
+        }
+
+        /// <summary>
+        /// 配置容器
+        /// </summary>
+        void configureContainers() {
+            var containerDisplays = new IPrepareContainerDisplay[] {
+                battleItemSlotDisplay, /* quesSugarPackDisplay */};
+            tabController.configure(containerDisplays);
+        }
+
+        #endregion
 
         #region 启动/结束窗口
 
@@ -93,29 +95,32 @@ namespace UI.BattleScene.Windows {
             return null;
         }
 
+        /// <summary>
+        /// 等待秒数
+        /// </summary>
+        /// <returns></returns>
+        protected override int waitSeconds() {
+            return PrepareTime;
+        }
+
         #endregion
 
         #region 界面控制
+
+        /// <summary>
+        /// 刷新容器
+        /// </summary>
+        void refreshContainers() {
+            var battleItems = battle.self().battleItems;
+            battleItemSlotDisplay.setItems(battleItems);
+        }
 
         /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
-
-            var containerDisplays = new IPrepareContainerDisplay[] {
-                battleItemSlotDisplay, /* quesSugarPackDisplay */};
-            tabController.configure(containerDisplays);
-
-            questionInfo.setItem(battle.round, true);
-
-            battleClock.startView(PrepareTime);
-
-            selfStatus.setItem(battle.self(), true);
-            oppoStatus.setItem(battle.oppo(), true);
-
-            var battleItems = battle.self().battleItems;
-            battleItemSlotDisplay.setItems(battleItems);
+            refreshContainers();
         }
 
         /// <summary>
@@ -123,12 +128,6 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            questionInfo.requestClear(true);
-            battleClock.requestClear(true);
-
-            selfStatus.requestClear(true);
-            oppoStatus.requestClear(true);
-
             battleItemSlotDisplay.clearItems();
         }
 

@@ -1,18 +1,11 @@
 ﻿
-using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
 using System;
 
 using UnityEngine.UI;
 
-using Core.Data.Loaders;
 using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
-
-using PlayerModule.Data;
 
 using GameModule.Services;
 
@@ -25,9 +18,6 @@ using UI.BattleScene.Controls.ItemDisplays;
 
 using UI.Common.Controls.ParamDisplays;
 
-/// <summary>
-/// 对战开始场景窗口
-/// </summary>
 namespace UI.BattleScene.Windows {
 
     /// <summary>
@@ -64,18 +54,14 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 外部系统引用
         /// </summary>
-        GameSystem gameSys = null;
-        DataService dataSer = null;
-        PlayerService playerSer = null;
         BattleService battleSer = null;
 
         #region 初始化
 
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeScene() {
             scene = (BattleScene)SceneUtils.getSceneObject("Scene");
         }
 
@@ -84,9 +70,6 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            gameSys = GameSystem.get();
-            dataSer = DataService.get();
-            playerSer = PlayerService.get();
             battleSer = BattleService.get();
         }
 

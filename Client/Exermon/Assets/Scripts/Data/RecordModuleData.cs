@@ -302,7 +302,7 @@ namespace RecordModule.Data {
 
             res["count"] = questions.Length;
 
-            res["sum_time"] = sumTime();
+            res["sum_time"] = sumTime()/1000.0;
 
             res["corr_cnt"] = corrCnt();
             res["corr_rate"] = corrRate();
@@ -442,20 +442,26 @@ namespace RecordModule.Data {
             this.slotExpIncrs.Clear();
 
             var exerExpIncrs = DataLoader.load(json, "exer_exp_incrs");
-            var slotExpIncrs = DataLoader.load(json, "slot_exp_incr");
+            var slotExpIncrs = DataLoader.load(json, "slot_exp_incrs");
 
             Debug.Log("Load expIncrs:");
 
-            foreach (var key in exerExpIncrs) {
-                Debug.Log("Key: " + key);
-                var data = DataLoader.load<int>(exerExpIncrs, key.ToString());
-                this.exerExpIncrs.Add((int)key, data);
-            }
-            foreach (var key in slotExpIncrs) {
-                var data = DataLoader.load<int>(slotExpIncrs, key.ToString());
-                this.slotExpIncrs.Add((int)key, data);
-            }
-            
+            if (exerExpIncrs != null) 
+                foreach (KeyValuePair<string, JsonData> pair in exerExpIncrs) {
+                    Debug.Log("type: " + pair.GetType());
+                    Debug.Log("pair: " + pair);
+                    var key = int.Parse(pair.Key);
+                    var data = DataLoader.load<int>(pair.Value);
+                    Debug.Log("key: " + key + ", data: " + data);
+                    this.exerExpIncrs.Add(key, data);
+                }
+            if (slotExpIncrs != null)
+                foreach (KeyValuePair<string, JsonData> pair in slotExpIncrs) {
+                    var key = int.Parse(pair.Key);
+                    var data = DataLoader.load<int>(pair.Value);
+                    Debug.Log("key: " + key + ", data: " + data);
+                    this.slotExpIncrs.Add(key, data);
+                }
         }
 
         #endregion

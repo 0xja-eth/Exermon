@@ -802,6 +802,7 @@ class RuntimeBattlePlayer(RuntimeData):
 
 		self.slot_item = None
 		self.pack_item = None
+
 		self.round_result = None
 
 		self.actions = []
@@ -826,11 +827,17 @@ class RuntimeBattlePlayer(RuntimeData):
 		"""
 		return self.hp <= 0
 
-	def setupRoundResult(self):
+	def setupRoundResult(self, selection: list = [], timespan: int = -1):
 		"""
 		配置回合结果
+		Args:
+			selection (list): 选择情况
+			timespan (int): 作答时长
 		"""
 		if self.round_result is not None: return
+
+		self.battle_player.answerCurrentRound(selection, timespan)
+
 		self.round_result = self.battle_player.currentRound()
 
 	def getExermons(self) -> list:
@@ -1145,7 +1152,7 @@ class RuntimeBattle(RuntimeData):
 		"""
 		consumer = self.getOnlinePlayer(player).consumer
 
-		oper = AsyncOper(consumer.leaveGroup, ChannelLayerTag.Battle)
+		oper = AsyncOper(consumer.leaveGroup, 0, ChannelLayerTag.Battle)
 		RuntimeManager.add(AsyncOper, oper)
 
 	# endregion
@@ -1442,9 +1449,7 @@ class RuntimeBattle(RuntimeData):
 		if oppo_battler.isCorrect(): return
 
 		battler = self.getBattler(player)
-
-		battler.battle_player.answerCurrentRound(selection, timespan)
-		battler.setupRoundResult()
+		battler.setupRoundResult(selection, timespan)
 
 		correct = battler.round_result.correct()
 
@@ -1748,12 +1753,13 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回对战结果数据
 		"""
-		result1 = self.runtime_battler1.battle_player
-		result2 = self.runtime_battler2.battle_player
+		# result1 = self.runtime_battler1.battle_player
+		# result2 = self.runtime_battler2.battle_player
 
 		return {
-			'player1': result1.convertToDict(type="result"),
-			'player2': result2.convertToDict(type="result")
+			'record': self.record.convertToDict(type="result")
+			# 'player1': result1.convertToDict(type="result"),
+			# 'player2': result2.convertToDict(type="result")
 		}
 
 	# endregion
@@ -1791,8 +1797,8 @@ class RuntimeBattle(RuntimeData):
 		执行攻击行动
 		"""
 		oppo = self.getOppoBattler(runtime_battler=self.attacker)
-		if oppo.round_result is None:
-			oppo.setupRoundResult()
+		# if oppo.round_result is None:
+		# 	oppo.setupRoundResult()
 
 		self.attacker.processAttack(oppo)
 

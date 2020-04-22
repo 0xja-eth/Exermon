@@ -48,13 +48,19 @@ namespace UI.StartScene.Windows {
         #region 初始化
 
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            if (gameSys == null) gameSys = GameSystem.get();
-            if (playerSer == null) playerSer = PlayerService.get();
+        protected override void initializeScene() {
             scene = (StartScene)SceneUtils.getSceneObject("Scene");
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            gameSys = GameSystem.get();
+            playerSer = PlayerService.get();
         }
 
         #endregion

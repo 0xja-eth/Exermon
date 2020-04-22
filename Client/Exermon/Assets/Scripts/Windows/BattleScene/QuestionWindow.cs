@@ -1,31 +1,17 @@
 ﻿
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.UI;
 
-using Core.Data.Loaders;
-using Core.Systems;
-using Core.UI;
 using Core.UI.Utils;
 
-using PlayerModule.Data;
-
-using GameModule.Services;
-
-using PlayerModule.Services;
-
+using QuestionModule.Data;
 using BattleModule.Data;
-using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Question;
 using UI.BattleScene.Controls.Storyboards;
 
-/// <summary>
-/// 对战开始场景窗口
-/// </summary>
 namespace UI.BattleScene.Windows {
 
     /// <summary>
@@ -46,20 +32,18 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public QuestionInfo questionInfo;
         public QuestionDisplay questionDisplay;
-        public BattlerStatus selfStatus, oppoStatus;
-
-        public BattlerQuestedStoryboard selfQStatus, oppoQStatus;
+        public ChoiceButtonContainer buttonContainer; // 按钮容器
 
         public Animation oppoPromptAni;
-
-        public QuesChoiceContainer choiceContainer;
+        public BattlerQuestedStoryboard selfQStatus, oppoQStatus;
 
         /// <summary>
         /// 内部变量定义
         /// </summary>
         bool completed = false;
+
+        Question question;
 
         #region 启动/结束窗口
 
@@ -68,7 +52,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public override void startWindow() {
             base.startWindow();
-            choiceContainer.startView();
+            buttonContainer.startView();
             selfStatus.startView();
             oppoStatus.startView();
         }
@@ -78,7 +62,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public override void terminateWindow() {
             base.terminateWindow();
-            choiceContainer.terminateView();
+            buttonContainer.terminateView();
             battleClock.terminateView();
             selfStatus.terminateView();
             oppoStatus.terminateView();
@@ -112,6 +96,14 @@ namespace UI.BattleScene.Windows {
             return oppoQStatus;
         }
 
+        /// <summary>
+        /// 等待秒数
+        /// </summary>
+        /// <returns></returns>
+        protected override int waitSeconds() {
+            return battle.round.star().stdTime;
+        }
+
         #endregion
 
         #region 界面控制
@@ -124,40 +116,32 @@ namespace UI.BattleScene.Windows {
         }
 
         /// <summary>
-        /// 刷新窗口
+        /// 重置状态
         /// </summary>
-        protected override void refresh() {
-            base.refresh();
+        protected override void resetStatus() {
+            base.resetStatus();
+            question = battle.round.question();
             completed = false;
-
-            var question = battle.round.question();
-            question.clearShuffleChoices();
-
-            questionInfo.setItem(battle.round, true);
-
-            Debug.LogError("Refresh: " + question.getID());
-            questionDisplay.setItem(question);
-
-            battleClock.startView(question.star().stdTime);
-
-            selfStatus.setItem(battle.self(), true);
-            oppoStatus.setItem(battle.oppo(), true);
-
-            questionDisplay.startQuestion();
         }
 
+        /// <summary>
+        /// 刷新题目
+        /// </summary>
+        /// <param name="question">题目</param>
+        protected override void refreshQuestion() {
+            base.refreshQuestion();
+
+            question.clearShuffleChoices();
+            questionDisplay.setItem(question);
+            questionDisplay.startQuestion();
+        }
+        
         /// <summary>
         /// 清除窗口
         /// </summary>
         protected override void clear() {
             base.clear();
-            questionInfo.requestClear(true);
-            battleClock.requestClear(true);
-
             questionDisplay.requestClear(true);
-
-            selfStatus.requestClear(true);
-            oppoStatus.requestClear(true);
         }
 
         #endregion

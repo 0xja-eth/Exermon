@@ -275,6 +275,8 @@ class PlayerQuestion(CacheableModel):
 		ques._updateIsNew(question_set)
 		ques._create(**kwargs)
 
+		ques.save()
+
 		return ques
 
 	@classmethod
@@ -367,7 +369,11 @@ class PlayerQuestion(CacheableModel):
 		backend_timespan = (now - start_time).total_seconds()
 		backend_timespan = int(backend_timespan*1000)
 
-		self.timespan = self._realTimespan(timespan, backend_timespan)
+		if timespan >= 0:
+			self.timespan = self._realTimespan(timespan, backend_timespan)
+		else:
+			self.timespan = self.question.star.std_time*1000
+
 		self.selection = selection
 		self.answered = True
 
@@ -397,7 +403,7 @@ class PlayerQuestion(CacheableModel):
 		calc = self.rewardCalculator().calc(self, record)
 
 		self.exp_incr = calc.exer_exp_incr
-		self.slot_exp_incr = calc.exerslot_exp_incr
+		self.slot_exp_incr = calc.slot_exp_incr
 		self.gold_incr = calc.gold_incr
 
 
@@ -592,6 +598,8 @@ class QuestionSetRecord(CacheableModel):
 		record._create(**kwargs)
 		record.start(**kwargs)
 
+		record.save()
+
 		return record
 
 	# 奖励计算类
@@ -676,6 +684,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		cache = self._getCache(self.QUES_CACHE_KEY)
 
+		# 如果已有的缓存为 list 保存并删除之再重新读取
 		if isinstance(cache, list):
 			self._deleteCache(self.QUES_CACHE_KEY)
 		
@@ -730,7 +739,18 @@ class QuestionSetRecord(CacheableModel):
 			题目关系数组
 		"""
 		cache = self._getCache(self.QUES_CACHE_KEY)
+
 		if cache is None: return []
+
+		# 如果已有的缓存为 QuerySet 保存并删除并重新缓存
+		if isinstance(cache, QuerySet):
+			cache_list = list(cache)
+
+			self._deleteCache(self.QUES_CACHE_KEY)
+			self._cache(self.QUES_CACHE_KEY, cache_list)
+			
+			return cache_list
+
 		return cache
 
 	def _addQuestionToCache(self, player_ques: PlayerQuestion):
@@ -1253,6 +1273,10 @@ class ExerciseRecord(QuestionSetRecord):
 
 	# 开始刷题
 	def _create(self, subject, count, gen_type):
+		from season_module.runtimes import SeasonManager
+
+		self.season_id = SeasonManager.getCurrentSeason().id
+
 		self.subject = subject
 		self.count = count
 		self.gen_type = gen_type

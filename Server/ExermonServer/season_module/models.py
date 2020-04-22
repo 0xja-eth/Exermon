@@ -181,27 +181,26 @@ class SeasonRecord(models.Model):
 			'star_num': self.star_num
 		}
 
-	def adjustCredit(self, player: 'Player', credit):
+	def adjustCredit(self, credit):
 		"""
 		修改信誉积分
 		Args:
-			player (Player): 玩家
 			credit (int): 信誉积分
 		"""
 
-		player.addCredit(credit)
+		self.player.addCredit(credit)
 
 		count = self.suspensions().count()
 		now = datetime.datetime.now()
 
 		# 针对第1，2，>=3次禁赛，分别设置3，7，30天的禁赛期
-		if player.credit < self.SUSPEN_SCORE and count >= 2:
+		if self.player.credit < self.SUSPEN_SCORE and count >= 2:
 			SuspensionRecord.create(self.id, now, 30)
 
-		elif player.credit < self.SUSPEN_SCORE and count == 1:
+		elif self.player.credit < self.SUSPEN_SCORE and count == 1:
 			SuspensionRecord.create(self.id, now, 7)
 
-		elif player.credit < self.SUSPEN_SCORE and count == 0:
+		elif self.player.credit < self.SUSPEN_SCORE and count == 0:
 			SuspensionRecord.create(self.id, now, 3)
 
 		# player.save()

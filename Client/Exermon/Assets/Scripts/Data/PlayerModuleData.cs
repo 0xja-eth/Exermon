@@ -349,7 +349,7 @@ namespace PlayerModule.Data {
             json["exp"] = exp;
             json["next"] = next;
             json["level"] = level;
-            json["rate"] = next == 0 ? 0 : exp / next;
+            json["rate"] = next == 0 ? 0 : exp*1.0 / next;
             return json;
         }
 

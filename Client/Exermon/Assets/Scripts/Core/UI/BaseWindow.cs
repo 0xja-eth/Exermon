@@ -44,7 +44,20 @@ namespace Core.UI {
         */
 
         #region 初始化
-            
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            initializeScene();
+        }
+
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        protected virtual void initializeScene() {}
+
         /// <summary>
         /// 初始化状态
         /// </summary>

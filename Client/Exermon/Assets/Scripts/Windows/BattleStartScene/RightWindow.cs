@@ -70,10 +70,9 @@ namespace UI.BattleStartScene.Windows {
         #region 初始化
 
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeScene() {
             scene = (BattleStartScene)SceneUtils.getSceneObject("Scene");
         }
 

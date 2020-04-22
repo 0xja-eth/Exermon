@@ -61,6 +61,7 @@ namespace Core.UI {
         /// </summary>
         void initializeSceneUtils() {
             SceneUtils.initialize(sceneName(), alertWindow, loadingWindow);
+            SceneUtils.depositSceneObject("Scene", this);
         }
 
         /// <summary>

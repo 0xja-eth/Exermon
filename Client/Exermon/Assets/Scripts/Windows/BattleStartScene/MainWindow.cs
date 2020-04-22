@@ -60,18 +60,14 @@ namespace UI.BattleStartScene.Windows {
         /// <summary>
         /// 外部系统引用
         /// </summary>
-        GameSystem gameSys = null;
-        DataService dataSer = null;
         PlayerService playerSer = null;
-        BattleService battleSer = null;
 
         #region 初始化
 
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeScene() {
             scene = (BattleStartScene)SceneUtils.getSceneObject("Scene");
         }
 
@@ -80,8 +76,6 @@ namespace UI.BattleStartScene.Windows {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            gameSys = GameSystem.get();
-            dataSer = DataService.get();
             playerSer = PlayerService.get();
         }
 

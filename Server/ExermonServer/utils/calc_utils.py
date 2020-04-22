@@ -380,7 +380,7 @@ class QuestionSetSingleRewardCalc:
 		from exermon_module.models import ExerSlot, ExerSlotItem
 
 		self.exer_exp_incr = 0
-		self.exerslot_exp_incr = 0
+		self.slot_exp_incr = 0
 		self.gold_incr = 0
 
 		self.player_ques: PlayerQuestion = player_ques
@@ -402,8 +402,12 @@ class QuestionSetSingleRewardCalc:
 
 		if self.exerslot_item is None: return
 
-		self.exer_exp_incr, self.exerslot_exp_incr = self._calcExerExpIncr()
+		self.exer_exp_incr, self.slot_exp_incr = self._calcExerExpIncr()
 		self.gold_incr = self._calcGoldIncr()
+
+		self.exer_exp_incr = max(0, round(self.exer_exp_incr))
+		self.slot_exp_incr = max(0, round(self.slot_exp_incr))
+		self.gold_incr = max(0, round(self.gold_incr))
 
 	# 计算艾瑟萌经验值收益
 	def _calcExerExpIncr(self):
@@ -497,8 +501,8 @@ class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
 		err = self._applyExpResult(self.corr)
 		efr = self._applyExpFloat()
 
-		eer = round(base*cr*elr*err*efr)
-		eser = round(base*cr*eslr*err*efr)
+		eer = base*cr*elr*err*efr
+		eser = base*cr*eslr*err*efr
 
 		return eer, eser
 
@@ -536,7 +540,7 @@ class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
 		grr = self._applyGoldResult(self.corr)
 		gfr = self._applyGoldFloat()
 
-		return round(base*grr*gfr)
+		return base*grr*gfr
 
 	# 结果修正
 	def _applyGoldResult(self, corr):
@@ -575,6 +579,15 @@ class QuestionSetResultRewardCalc:
 		self.exer_exp_incrs, self.slot_exp_incrs, \
 			self.exer_exp_incr, self.slot_exp_incr, \
 			self.gold_incr = self._calcSumReward()
+
+		for sid in self.exer_exp_incrs:
+			self.exer_exp_incrs[sid] = max(0, round(self.exer_exp_incrs[sid]))
+		for sid in self.slot_exp_incrs:
+			self.slot_exp_incrs[sid] = max(0, round(self.slot_exp_incrs[sid]))
+
+		self.exer_exp_incr = max(0, round(self.exer_exp_incr))
+		self.slot_exp_incr = max(0, round(self.slot_exp_incr))
+		self.gold_incr = max(0, round(self.gold_incr))
 
 		self.item_rewards = self._calcItemReward()
 
@@ -1508,9 +1521,10 @@ class BattleResultRewardCalc(ExerciseResultRewardCalc):
 		self.status = self._calcStatus()
 
 		self.credit_incr = self._calcCreditIncr()
-		self.judge, self.star_incr = self._calcJudgeAndStarIncr()
 
 		self.battle_scores, self.score_incr = self._calcScores()
+
+		self.judge, self.star_incr = self._calcJudgeAndStarIncr()
 
 	# 艾瑟萌经验奖励加成
 	def _exerExpRewardRate(self, corr_rate):
@@ -1529,10 +1543,10 @@ class BattleResultRewardCalc(ExerciseResultRewardCalc):
 		from battle_module.models import BattlePlayerResult
 
 		if self.self_runtime_battler.isDead():
-			return BattlePlayerResult.Win
+			return BattlePlayerResult.Lose
 
 		if self.oppo_runtime_battler.isDead():
-			return BattlePlayerResult.Lose
+			return BattlePlayerResult.Win
 
 		return BattlePlayerResult.Tie
 
@@ -1566,11 +1580,16 @@ class BattleResultRewardCalc(ExerciseResultRewardCalc):
 
 		return battle_scores, score_incr
 
+	def __battleScore(self):
+		return (self.battle_scores.time_score + self.battle_scores.hurt_score +
+				self.battle_scores.damage_score + self.battle_scores.recovery_score +
+				self.battle_scores.correct_score) / 5 + self.battle_scores.plus_score
+
 	# 计算评价结果及星星奖励
 	def _calcJudgeAndStarIncr(self):
 		from battle_module.models import BattleResultJudge, BattlePlayerResult
 
-		score = self.self_battle_player.battleScore()
+		score = self.__battleScore()
 		judges = BattleResultJudge.objs()
 
 		battle_judge: BattleResultJudge = None
@@ -1657,7 +1676,7 @@ class BattleScoreCalc:
 		at = self.battler.sumTimespan()
 		st = self.battler.sumStdTime() * 1000
 
-		return -100*(at/st)*(at/st)*100
+		return -100*(at/st)*(at/st)+100
 
 	# 计算伤害分数
 	def _calcHurtScore(self):
@@ -1706,7 +1725,7 @@ class BattleScoreCalc:
 
 	# 计算正确分数
 	def _calcCorrectScore(self):
-		cr = self.battler.corrRate()
+		cr = self.battler.corrRate()*100
 		return -0.01*cr*(cr-200)
 
 	# 计算奖励分数

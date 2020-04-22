@@ -1,8 +1,4 @@
 ﻿
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine.Events;
-
 using Core.Systems;
 
 using Core.UI;
@@ -68,14 +64,6 @@ namespace UI.BattleStartScene {
         }
 
         /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            SceneUtils.depositSceneObject("Scene", this);
-        }
-
-        /// <summary>
         /// 开始
         /// </summary>
         protected override void start() {
@@ -87,19 +75,8 @@ namespace UI.BattleStartScene {
 
         #endregion
 
-        #region 请求项控制
-        
-
-        #endregion
-
         #region 场景控制
-
-        /// <summary>
-        /// 刷新场景
-        /// </summary>
-        public void refresh() {
-        }
-
+        
         /// <summary>
         /// 启动窗口
         /// </summary>

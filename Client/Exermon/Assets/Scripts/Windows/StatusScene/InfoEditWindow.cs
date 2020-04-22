@@ -73,11 +73,24 @@ namespace UI.StatusScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
+            configureSubViews();
+        }
+
+        /// <summary>
+        /// 初始化场景
+        /// </summary>
+        protected override void initializeScene() {
+            scene = (StatusScene)SceneUtils.getSceneObject("Scene");
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
             gameSys = GameSystem.get();
             dataSer = DataService.get();
             playerSer = PlayerService.get();
-            scene = (StatusScene)SceneUtils.getSceneObject("Scene");
-            configureSubViews();
         }
 
         /// <summary>

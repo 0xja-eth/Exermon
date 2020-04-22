@@ -126,7 +126,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 是否选择
         /// </summary>
         /// <returns>是否选择</returns>
-        public bool isSelected() {
+        public virtual bool isSelected() {
             if (!container) return false;
             if (!isSelectable()) return false;
             return container.getSelectedIndex() == index;
@@ -144,7 +144,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 是否选中
         /// </summary>
         /// <returns>是否选中</returns>
-        public bool isChecked() {
+        public virtual bool isChecked() {
             if (!container) return false;
             if (!isCheckable()) return false;
             if (isForceChecked()) return true;
@@ -178,7 +178,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 选择
         /// </summary>
-        public void select() {
+        public virtual void select() {
             if (container == null) return;
             if (!isSelectable()) return;
             container.select(index);
@@ -187,7 +187,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 取消选择
         /// </summary>
-        public void deselect() {
+        public virtual void deselect() {
             if (container == null) return;
             container.deselect();
         }
@@ -195,7 +195,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 选中
         /// </summary>
-        public void check() {
+        public virtual void check() {
             if (container == null) return;
             if (!isCheckable()) return;
             container.check(index);
@@ -204,7 +204,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 取消选中
         /// </summary>
-        public void uncheck() {
+        public virtual void uncheck() {
             if (container == null) return;
             if (!isUncheckable()) return;
             container.uncheck(index);
@@ -213,7 +213,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 反转
         /// </summary>
-        public void toggle() {
+        public virtual void toggle() {
             if (container == null) return;
             if (!isActived()) return;
             container.toggle(index);
@@ -230,7 +230,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 改变背景颜色
         /// </summary>
-        protected void changeBackgroundColor(Color color) {
+        protected virtual void changeBackgroundColor(Color color) {
             if (!background) return;
             if (color.a <= 0) return;
             background.color = color;

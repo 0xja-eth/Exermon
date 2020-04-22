@@ -1,16 +1,7 @@
 ﻿
-using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
-using UnityEngine.UI;
-
-using Core.Data.Loaders;
 using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
-
-using PlayerModule.Data;
 
 using GameModule.Services;
 
@@ -20,12 +11,8 @@ using BattleModule.Data;
 using BattleModule.Services;
 
 using UI.BattleScene.Controls;
-using UI.BattleScene.Controls.Question;
 using UI.BattleScene.Controls.Storyboards;
 
-/// <summary>
-/// 对战开始场景窗口
-/// </summary>
 namespace UI.BattleScene.Windows {
 
     /// <summary>
@@ -36,7 +23,11 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public QuestionInfo questionInfo;
+
         public BattleClock battleClock;
+
+        public BattlerStatus selfStatus, oppoStatus;
 
         /// <summary>
         /// 内部变量声明
@@ -60,10 +51,9 @@ namespace UI.BattleScene.Windows {
         #region 初始化
 
         /// <summary>
-        /// 初次初始化
+        /// 初始化场景
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeScene() {
             scene = (BattleScene)SceneUtils.getSceneObject("Scene");
         }
 
@@ -112,6 +102,22 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         /// <returns>返回对方分镜</returns>
         protected abstract BattlerPrepareStoryboard oppoStoryboard();
+
+        /// <summary>
+        /// 等待秒数
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int waitSeconds() {
+            return 0;
+        }
+
+        /// <summary>
+        /// 当前回合
+        /// </summary>
+        /// <returns>返回当前回合</returns>
+        public virtual BattleRound round() {
+            return battle.round;
+        }
 
         #endregion
 
@@ -187,13 +193,54 @@ namespace UI.BattleScene.Windows {
         #endregion
 
         /// <summary>
+        /// 重置状态
+        /// </summary>
+        protected virtual void resetStatus() {
+            passed = false;
+            battle = battleSer.battle;
+        }
+
+        /// <summary>
+        /// 刷新题目
+        /// </summary>
+        /// <param name="question">题目</param>
+        protected virtual void refreshQuestion() {
+            if (questionInfo) questionInfo.setItem(round(), true);
+        }
+
+        /// <summary>
+        /// 刷新对战时钟
+        /// </summary>
+        /// <param name="seconds">时间</param>
+        protected virtual void refreshBattleClock(int seconds) {
+            if (!battleClock || seconds <= 0) return;
+            battleClock.startView(seconds);
+        }
+
+        /// <summary>
+        /// 刷新双方状态 
+        /// </summary>
+        void refreshBattlerStatuses() {
+            if (selfStatus) selfStatus.setItem(battle.self(), true);
+            if (oppoStatus) oppoStatus.setItem(battle.oppo(), true);
+        }
+
+        /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
+            resetStatus();
+            refreshQuestion();
+            refreshBattleClock(waitSeconds());
+        }
 
-            passed = false;
-            battle = battleSer.battle;
+        /// <summary>
+        /// 清除双方状态
+        /// </summary>
+        void clearBattlerStatues() {
+            if (selfStatus) selfStatus.requestClear(true);
+            if (oppoStatus) oppoStatus.requestClear(true);
         }
 
         /// <summary>
@@ -202,6 +249,10 @@ namespace UI.BattleScene.Windows {
         protected override void clear() {
             base.clear();
 
+            if (questionInfo) questionInfo.requestClear(true);
+            if (battleClock) battleClock.requestClear(true);
+
+            clearBattlerStatues();
             clearStoryboards();
         }
 

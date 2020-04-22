@@ -9,13 +9,14 @@ using RecordModule.Data;
 using RecordModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.SystemExtend.QuestionText;
 
 namespace UI.BattleScene.Controls.Question {
     using Question = QuestionModule.Data.Question;
 
     /// <summary>
-    /// 题目图片容器
+    /// 题目显示组件
     /// </summary>
     public class QuestionDisplay : ItemDetailDisplay<Question> {
 
@@ -23,8 +24,8 @@ namespace UI.BattleScene.Controls.Question {
         /// 常量设置
         /// </summary>
         const string AnswerTextFormat = "正确答案：{0}";
-        const string CollectOnText = "已收藏";
-        const string CollectOffText = "收藏";
+        const string DescriptionFormat = "解析：{0}";
+        const string EmptyDescriptionText = "暂无";
 
         /// <summary>
         /// 外部组件设置
@@ -34,8 +35,9 @@ namespace UI.BattleScene.Controls.Question {
         public QuesChoiceContainer choiceContainer; // 选项容器
         public ChoiceButtonContainer buttonContainer; // 按钮容器
 
-        public Text answerText, collectText;
-        public Image collectImg;
+        public CollectButton collectButton;
+
+        public Text answerText;
         public GameObject resultObj;
 
         public GameObject confirmBtn;
@@ -93,7 +95,7 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            //if (content) registerUpdateLayout(content);
+            if (content) registerUpdateLayout(content);
         }
         
         /// <summary>
@@ -218,13 +220,11 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         /// <param name="question">题目</param>
         void drawResult(Question question) {
-            if (description) 
-                description.text = question.description;
-            if (answerText)
-                answerText.text = string.Format(
-                    AnswerTextFormat, generateAnswerText());
-
-            resultObj?.SetActive(true);
+            if (description) description.text = string.Format(
+                DescriptionFormat, generateDescription(question));
+            if (answerText) answerText.text = string.Format(
+                AnswerTextFormat, generateAnswerText(question));
+            if (resultObj) resultObj.SetActive(true);
         }
 
         /// <summary>
@@ -232,22 +232,26 @@ namespace UI.BattleScene.Controls.Question {
         /// </summary>
         /// <param name="question"></param>
         void drawCollect(Question question) {
-            var record = recordSer.recordData.
-                getQuestionRecord(question.getID());
-            var collected = record.collected;
-            var texture = collected ? collectOn : collectOff;
-            var text = collected ? CollectOnText : CollectOffText;
-            collectImg.overrideSprite = AssetLoader.generateSprite(texture);
-            collectText.text = text;
+            if (collectButton) collectButton.setItem(question);
+        }
+
+        /// <summary>
+        /// 生成题解文本
+        /// </summary>
+        /// <returns></returns>
+        string generateDescription(Question question) {
+            if (question.description == "")
+                return EmptyDescriptionText;
+            return question.description;
         }
 
         /// <summary>
         /// 生成答案文本
         /// </summary>
         /// <returns></returns>
-        string generateAnswerText() {
+        string generateAnswerText(Question question) {
             string res = "";
-            var choices = choiceContainer.getItems();
+            var choices = question.choices;
             for (int i = 0; i < choices.Length; ++i)
                 if (choices[i].answer)
                     res += (char)('A' + i);
@@ -264,9 +268,12 @@ namespace UI.BattleScene.Controls.Question {
             buttonContainer.clearItems();
             title.text = "";
 
-            resultObj?.SetActive(false);
+            if (resultObj) resultObj.SetActive(false);
+
             if (description) description.text = "";
             if (answerText) answerText.text = "";
+
+            if (collectButton) collectButton.requestClear(true);
         }
 
         #endregion

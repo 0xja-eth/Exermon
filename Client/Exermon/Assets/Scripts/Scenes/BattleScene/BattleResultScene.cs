@@ -58,9 +58,7 @@ namespace UI.BattleResultScene {
         /// <summary>
         /// 内部系统声明
         /// </summary>
-        PlayerService playerSer;
         BattleService battleSer;
-        SeasonService seasonSer;
 
         /// <summary>
         /// 内部变量定义
@@ -83,9 +81,7 @@ namespace UI.BattleResultScene {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            playerSer = PlayerService.get();
             battleSer = BattleService.get();
-            seasonSer = SeasonService.get();
         }
 
         /// <summary>
@@ -102,7 +98,7 @@ namespace UI.BattleResultScene {
         protected override void start() {
             base.start();
             battle = battleSer.battle;
-            result = battle.self().result;
+            result = battle.record.self();
 
             setupBattlers();
             setupResultDetail();
@@ -133,7 +129,7 @@ namespace UI.BattleResultScene {
         /// 配置分数详情
         /// </summary>
         void setupScoreDetail() {
-            resultDetail.setValue(result, "score");
+            scoreDetail.setValue(result, "score");
         }
 
         /// <summary>

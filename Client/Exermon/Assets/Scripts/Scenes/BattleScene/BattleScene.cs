@@ -1,18 +1,11 @@
 ﻿
-using System;
-using System.Collections.Generic;
-
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
 
 using Core.UI;
 using Core.UI.Utils;
 
 using Core.Systems;
 
-using PlayerModule.Services;
-using SeasonModule.Services;
 using BattleModule.Services;
 
 /// <summary>
@@ -30,7 +23,6 @@ namespace UI.BattleScene {
         /// <summary>
         /// 文本常量定义
         /// </summary>
-        const string WaitingOppoText = "等待对方行动中……";
 
         /// <summary>
         /// 外部组件设置
@@ -47,9 +39,7 @@ namespace UI.BattleScene {
         /// <summary>
         /// 内部系统声明
         /// </summary>
-        PlayerService playerSer;
         BattleService battleSer;
-        SeasonService seasonSer;
 
         #region 初始化
 
@@ -66,17 +56,7 @@ namespace UI.BattleScene {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            playerSer = PlayerService.get();
             battleSer = BattleService.get();
-            seasonSer = SeasonService.get();
-        }
-
-        /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            SceneUtils.depositSceneObject("Scene", this);
         }
 
         /// <summary>
@@ -139,7 +119,6 @@ namespace UI.BattleScene {
         /// 状态改变回调
         /// </summary>
         void onStateChanged() {
-            Debug.Log("onStateChanged: " + battleSer.state);
             switch ((BattleService.State)battleSer.state) {
                 case BattleService.State.Preparing: onPerparing(); break;
                 case BattleService.State.Questing: onQuesting(); break;
@@ -194,7 +173,7 @@ namespace UI.BattleScene {
         /// 对战结束
         /// </summary>
         void onTerminating() {
-            clear();
+            sceneSys.changeScene(SceneSystem.Scene.BattleResultScene);
         }
 
         #endregion

@@ -35,8 +35,21 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         bool timing = false;
         bool timeUp = false;
+
         DateTime endTime;
-        TimeSpan delta;
+        TimeSpan duration;
+
+        /// <summary>
+        /// 时间显示是否显示已过去的时间
+        /// </summary>
+        bool _reverse = false;
+        public bool reverse {
+            get { return _reverse; }
+            set {
+                _reverse = value;
+                requestRefresh();
+            }
+        }
 
         #region 更新控制
 
@@ -104,24 +117,52 @@ namespace UI.BattleScene.Controls {
         /// <summary>
         /// 开始
         /// </summary>
+        /// <param name="timespan">时间</param>
         public void startTimer(TimeSpan timespan) {
-
-            timing = true;
-            timeUp = false;
-            delta = timespan;
-            endTime = DateTime.Now + timespan;
+            timing = true; timeUp = false;
+            setDuration(timespan);
+            setTimer(timespan);
         }
+        /// <param name="seconds">秒数</param>
         public void startTimer(int seconds) {
             startTimer(new TimeSpan(0, 0, seconds));
         }
 
         /// <summary>
+        /// 设置总时长
+        /// </summary>
+        /// <param name="timespan">时间</param>
+        public void setDuration(TimeSpan timespan) {
+            duration = timespan;
+            requestRefresh();
+        }
+        /// <param name="seconds">秒数</param>
+        public void setDuration(int seconds) {
+            setDuration(new TimeSpan(0, 0, seconds));
+        }
+
+        /// <summary>
+        /// 设置剩余/过去时间
+        /// </summary>
+        /// <param name="timespan">时间</param>
+        /// <param name="reverse">为false则设置剩余时间，否则设置已过时间</param>
+        public void setTimer(TimeSpan timespan, bool reverse = false) {
+            if (!reverse) endTime = DateTime.Now + timespan;
+            else endTime = DateTime.Now - duration + timespan;
+            requestRefresh();
+        }
+        /// <param name="seconds">秒数</param>
+        public void setTimer(int seconds, bool reverse = false) {
+            setTimer(new TimeSpan(0, 0, seconds), reverse);
+        }
+
+        /// <summary>
         /// 停止
         /// </summary>
+        /// <param name="timeUp">是否设置timeUp标志</param>
         public void stopTimer(bool timeUp = false) {
-            timing = false;
-            this.timeUp = timeUp;
-            refresh();
+            timing = false; this.timeUp = timeUp;
+            requestRefresh(true);
         }
 
         #endregion
@@ -134,14 +175,16 @@ namespace UI.BattleScene.Controls {
         void drawTimer() {
             var now = DateTime.Now;
             var delta = endTime - now;
+            if (reverse) delta = duration - delta;
+
             var seconds = delta.TotalSeconds;
 
             time.color = (seconds < CriticalSecond) ?
                 CriticalColor : NormalColor;
             time.text = SceneUtils.time2Str(delta);
 
-            bar.fillAmount = (this.delta.Ticks == 0 ? 0 :
-                delta.Ticks * 1.0f / this.delta.Ticks);
+            bar.fillAmount = (duration.Ticks == 0 ? 0 :
+                delta.Ticks * 1.0f / duration.Ticks);
         }
 
         /// <summary>

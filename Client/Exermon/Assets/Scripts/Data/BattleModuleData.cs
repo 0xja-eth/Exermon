@@ -85,6 +85,57 @@ namespace BattleModule.Data {
         public BattleRound[] rounds { get; protected set; }
 
         /// <summary>
+        /// 双方玩家
+        /// </summary>
+        public BattlePlayer player1 {
+            get { return players[0]; }
+            protected set { players[0] = value; }
+        }
+        public BattlePlayer player2 {
+            get { return players[1]; }
+            protected set { players[1] = value; }
+        }
+
+        /// <summary>
+        /// 获取自身玩家运行时数据
+        /// </summary>
+        /// <returns>返回自身运行时数据</returns>
+        public BattlePlayer self() {
+            return getPlayer(PlayerService.get().player.getID());
+        }
+
+        /// <summary>
+        /// 获取对方玩家运行时数据
+        /// </summary>
+        /// <returns>返回对方运行时数据</returns>
+        public BattlePlayer oppo() {
+            return getPlayer(PlayerService.get().player.getID(), true);
+        }
+
+        /// <summary>
+        /// 获取运行时玩家
+        /// </summary>
+        /// <param name="pid">玩家ID</param>
+        /// <param name="oppo">获取对方玩家</param>
+        /// <returns>返回对应的运行时玩家</returns>
+        public BattlePlayer getPlayer(int pid, bool oppo = false) {
+            if (player1.pid == pid) return oppo ? player2 : player1;
+            if (player2.pid == pid) return oppo ? player1 : player2;
+            return null;
+        }
+
+        /// <summary>
+        /// 获取对方玩家
+        /// </summary>
+        /// <param name="player">当前玩家</param>
+        /// <returns>返回当前玩家的对方玩家</returns>
+        public BattlePlayer getOppo(BattlePlayer player) {
+            if (player1 == player) return player2;
+            if (player2 == player) return player1;
+            return null;
+        }
+
+        /// <summary>
         /// 获取赛季对象
         /// </summary>
         /// <returns>返回赛季对象</returns>
@@ -96,7 +147,7 @@ namespace BattleModule.Data {
         /// 获取赛季对象
         /// </summary>
         /// <returns>返回赛季对象</returns>
-        public string mdoeText() {
+        public string modeText() {
             return DataService.get().battleMode(mode).Item2;
         }
     }
@@ -233,15 +284,10 @@ namespace BattleModule.Data {
         };
 
         /// <summary>
-        /// 结果文本
-        /// </summary>
-        static readonly string[] ResultText = new string[] {
-            "", "胜利", "失败", "平局"
-        };
-
-        /// <summary>
         /// 属性
         /// </summary>
+        [AutoConvert]
+        public int pid { get; protected set; }
         [AutoConvert]
         public int scoreIncr { get; protected set; }
         [AutoConvert]
@@ -282,7 +328,7 @@ namespace BattleModule.Data {
         protected override JsonData convertResultData() {
             var res = base.convertResultData();
 
-            res["result"] = ResultText[result];
+            res["result"] = resultText();
             res["color"] = DataLoader.convert(ResultColor[result]);
 
             res["sum_hurt"] = sumHurt();
@@ -387,6 +433,14 @@ namespace BattleModule.Data {
                 starIncr_ = win ? judge.win : judge.lose;
             }
             return starIncr_;
+        }
+
+        /// <summary>
+        /// 结果文本
+        /// </summary>
+        /// <returns></returns>
+        public string resultText() {
+            return DataService.get().battleResultType(result).Item2;
         }
         
         #region 统计量
@@ -926,7 +980,7 @@ namespace BattleModule.Data {
         [AutoConvert]
         public int damage { get; protected set; }
         [AutoConvert]
-        public int recover { get; protected set; }
+        public int recovery { get; protected set; }
         [AutoConvert]
         public bool correct { get; protected set; }
         [AutoConvert]
@@ -952,7 +1006,7 @@ namespace BattleModule.Data {
         /// <summary>
         /// 结果数据
         /// </summary>
-        public BattlePlayer result { get; protected set; }
+        //public BattlePlayer result { get; protected set; }
 
         #region 数据转换
 
@@ -1005,7 +1059,7 @@ namespace BattleModule.Data {
 
             res["hurt"] = hurt;
             res["damage"] = damage;
-            res["recover"] = recover;
+            res["recovery"] = recovery;
             res["color"] = DataLoader.convert(color);
             res["result"] = correct ? CorrectText : WrongText;
             res["rest_hp"] = string.Format("{0}/{1}", hp, mhp);
@@ -1185,13 +1239,13 @@ namespace BattleModule.Data {
             foreach (var action in actions) action.setPlayer(this);
         }
 
-        /// <summary>
-        /// 加载结果
-        /// </summary>
-        /// <param name="json">数据</param>
-        public void loadResult(JsonData json) {
-            result = DataLoader.load<BattlePlayer>(json);
-        }
+        ///// <summary>
+        ///// 加载结果
+        ///// </summary>
+        ///// <param name="json">数据</param>
+        //public void loadResult(JsonData json) {
+        //    result = DataLoader.load<BattlePlayer>(json);
+        //}
 
         #endregion
 
@@ -1297,6 +1351,12 @@ namespace BattleModule.Data {
         [AutoConvert]
         public BattleRound round { get; protected set; } = new BattleRound();
 
+        /// <summary>
+        /// 对战记录
+        /// </summary>
+        [AutoConvert]
+        public BattleRecord record { get; protected set; } = null;
+        
         /// <summary>
         /// 上次更新的玩家
         /// </summary>
@@ -1414,7 +1474,7 @@ namespace BattleModule.Data {
             player1.loadActions(actions1);
             player2.loadActions(actions2);
         }
-
+        /*
         /// <summary>
         /// 加载对战结果
         /// </summary>
@@ -1422,10 +1482,11 @@ namespace BattleModule.Data {
         public void loadResults(JsonData json) {
             var result1 = DataLoader.load(json, "player1");
             var result2 = DataLoader.load(json, "player2");
+            record = DataLoader.load<BattleRecord>(json, "record");
             player1.loadResult(result1);
             player2.loadResult(result2);
         }
-
+        */
         /// <summary>
         /// 读取自定义属性
         /// </summary>
