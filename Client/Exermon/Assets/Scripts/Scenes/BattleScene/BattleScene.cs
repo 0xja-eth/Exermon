@@ -2,7 +2,6 @@
 using UnityEngine;
 
 using Core.UI;
-using Core.UI.Utils;
 
 using Core.Systems;
 
@@ -14,6 +13,7 @@ using BattleModule.Services;
 namespace UI.BattleScene {
 
     using Windows;
+    using Controls;
 
     /// <summary>
     /// 对战场景
@@ -27,6 +27,8 @@ namespace UI.BattleScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public BattleStartAni startAni;
+
         public PrepareWindow prepareWindow;
         public QuestionWindow questionWindow;
         public ActionWindow actionWindow;
@@ -64,7 +66,7 @@ namespace UI.BattleScene {
         /// </summary>
         protected override void start() {
             base.start();
-            onPerparing();
+            startAni.setItem(battleSer.battle);
         }
 
         #endregion
@@ -76,6 +78,24 @@ namespace UI.BattleScene {
         /// </summary>
         protected override void update() {
             base.update();
+            updateStartAnimation();
+            updateStateChanged();
+        }
+
+        /// <summary>
+        /// 更新开始动画
+        /// </summary>
+        void updateStartAnimation() {
+            if (startAni.isAnimationEnd()) {
+                startAni.terminateView();
+                onPerparing();
+            }
+        }
+
+        /// <summary>
+        /// 更新状态变化
+        /// </summary>
+        void updateStateChanged() {
             if (battleSer.isStateChanged())
                 onStateChanged();
             battleSer.update();
@@ -134,6 +154,7 @@ namespace UI.BattleScene {
         /// 准备状态
         /// </summary>
         void onPerparing() {
+            Debug.Log("onPerparing");
             clear();
             questionWindow.clearStoryboards(true);
             prepareWindow.startWindow();

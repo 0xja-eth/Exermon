@@ -59,6 +59,14 @@ namespace UI.BattleAnswerScene.Windows {
             scene = (BattleAnswerScene)SceneUtils.getSceneObject("Scene");
         }
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            record = battle.record;
+        }
+
         #endregion
 
         #region 启动/结束窗口

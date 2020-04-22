@@ -1740,6 +1740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alertWindow: {fileID: 1151065919}
   loadingWindow: {fileID: 1701561422}
+  startAni: {fileID: 1253343443}
   prepareWindow: {fileID: 1453049233}
   questionWindow: {fileID: 1651515326}
   actionWindow: {fileID: 1196623023}
@@ -4090,7 +4091,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 12, y: 0}
+  m_SizeDelta: {x: 8, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &407125459
 MonoBehaviour:
@@ -4166,7 +4167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.050980393}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6223,7 +6224,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 360, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &641399499
 MonoBehaviour:
@@ -9354,6 +9355,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1030833360}
+  - component: {fileID: 1030833362}
+  - component: {fileID: 1030833361}
   m_Layer: 5
   m_Name: OppoPlayer
   m_TagString: Untagged
@@ -9382,6 +9385,36 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1030833361
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030833359}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1030833362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030833359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af8017e8a8997e4896b319773380a0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bust: {fileID: 641399500}
+  unknown: {fileID: 0}
+  name: {fileID: 2095070696}
+  level: {fileID: 0}
+  progress: {fileID: 0}
+  rankDisplay: {fileID: 0}
 --- !u!1 &1046533786
 GameObject:
   m_ObjectHideFlags: 0
@@ -10627,17 +10660,17 @@ PrefabInstance:
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -117.999985
+      value: -118
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
@@ -11317,6 +11350,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1209140317}
+  - component: {fileID: 1209140319}
+  - component: {fileID: 1209140318}
   m_Layer: 5
   m_Name: SelfPlayer
   m_TagString: Untagged
@@ -11345,6 +11380,36 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1209140318
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209140316}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1209140319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209140316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af8017e8a8997e4896b319773380a0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bust: {fileID: 1683819139}
+  unknown: {fileID: 0}
+  name: {fileID: 1174916757}
+  level: {fileID: 0}
+  progress: {fileID: 0}
+  rankDisplay: {fileID: 0}
 --- !u!1 &1213124673
 GameObject:
   m_ObjectHideFlags: 0
@@ -11725,13 +11790,16 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1253343440}
+  - component: {fileID: 1253343443}
+  - component: {fileID: 1253343442}
+  - component: {fileID: 1253343441}
   m_Layer: 5
   m_Name: StartAni
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1253343440
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11754,6 +11822,49 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1253343441
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253343439}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!111 &1253343442
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253343439}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 666a420fb2f96304e82ed8cf5c89bcd7, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 666a420fb2f96304e82ed8cf5c89bcd7, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
+--- !u!114 &1253343443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253343439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe135fb067577ca439cbe9fc5e0e46eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selfPlayer: {fileID: 1209140319}
+  oppoPlayer: {fileID: 1030833362}
+  animation: {fileID: 1253343442}
 --- !u!1 &1253993943
 GameObject:
   m_ObjectHideFlags: 0
@@ -13983,9 +14094,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1453049232}
-  - component: {fileID: 1453049233}
   - component: {fileID: 1453049234}
-  - component: {fileID: 1453049235}
+  - component: {fileID: 1453049233}
   m_Layer: 5
   m_Name: PrepareStep
   m_TagString: Untagged
@@ -14059,18 +14169,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!225 &1453049235
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1453049231}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!224 &1463986130 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7838362881129747067, guid: 4e650c466be316e4b94daacbebea30f5,
@@ -15032,9 +15130,8 @@ GameObject:
   - component: {fileID: 1651515323}
   - component: {fileID: 1651515325}
   - component: {fileID: 1651515324}
-  - component: {fileID: 1651515326}
-  - component: {fileID: 1651515328}
   - component: {fileID: 1651515327}
+  - component: {fileID: 1651515326}
   m_Layer: 5
   m_Name: QuestionStep
   m_TagString: Untagged
@@ -15146,18 +15243,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!225 &1651515328
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1651515322}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1673681334
 GameObject:
   m_ObjectHideFlags: 0
@@ -15317,7 +15402,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 360, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1683819138
 MonoBehaviour:
@@ -16335,17 +16420,17 @@ PrefabInstance:
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -117.999985
+      value: -118
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
@@ -19048,22 +19133,22 @@ PrefabInstance:
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 204.00005
+      value: 204
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -117.999985
+      value: -118
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 179.99997
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1103845097006138788, guid: 26b621ed375c3184f84b7716076de7b8,
         type: 3}

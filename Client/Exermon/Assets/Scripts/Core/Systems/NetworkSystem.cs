@@ -666,7 +666,7 @@ namespace Core.Systems {
         void doSendRequest(JsonData sendData) {
             Debug.Log("Send:" + sendData.ToJson());
             webSocket.Send(sendData.ToJson());
-            if (showLoading) gameSys.requestLoadStart(tipsText);
+            //if (showLoading) gameSys.requestLoadStart(tipsText);
         }
 
         #endregion

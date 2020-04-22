@@ -158,6 +158,7 @@ namespace Core.Systems {
         /// </example>
         /// <param name="text">等待文本</param>
         public void requestLoadStart(string text) {
+            Debug.Log("requestLoadStart: " + text);
             loadingRequest = new LoadingRequest(text);
         }
         /// <summary>

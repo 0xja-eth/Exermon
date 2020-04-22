@@ -76,9 +76,9 @@ namespace UI.BattleMatchingScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawBaseInfo(RuntimeBattlePlayer battler) {
-            rankDisplay.setStarNum(battler.starNum);
             name.text = battler.name;
-            level.text = string.Format(LevelFormat, battler.level);
+            if (rankDisplay) rankDisplay.setStarNum(battler.starNum);
+            if (level) level.text = string.Format(LevelFormat, battler.level);
         }
 
         /// <summary>
@@ -97,11 +97,11 @@ namespace UI.BattleMatchingScene.Controls {
         /// 绘制空物品
         /// </summary>
         protected override void drawEmptyItem() {
-            if(unknown) unknown.SetActive(true);
-            bust.gameObject.SetActive(false);
-            rankDisplay.requestClear(true);
             name.text = UnknownName;
-            level.text = "";
+            bust.gameObject.SetActive(false);
+            if (level) level.text = "";
+            if (unknown) unknown.SetActive(true);
+            if (rankDisplay) rankDisplay.requestClear(true);
             if (progress) progress.text = "";
         }
 
@@ -109,10 +109,11 @@ namespace UI.BattleMatchingScene.Controls {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
-            if (unknown) unknown.SetActive(false);
+            name.text = "";
             bust.gameObject.SetActive(false);
-            rankDisplay.requestClear(true);
-            name.text = level.text = "";
+            if (level) level.text = "";
+            if (unknown) unknown.SetActive(false);
+            if (rankDisplay) rankDisplay.requestClear(true);
             if (progress) progress.text = "";
         }
 

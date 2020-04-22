@@ -44,8 +44,6 @@ namespace UI.BattleScene.Windows {
         /// 外部系统引用
         /// </summary>
         protected GameSystem gameSys = null;
-        protected DataService dataSer = null;
-        protected PlayerService playerSer = null;
         protected BattleService battleSer = null;
 
         #region 初始化
@@ -63,8 +61,6 @@ namespace UI.BattleScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
-            dataSer = DataService.get();
-            playerSer = PlayerService.get();
             battleSer = BattleService.get();
         }
 
@@ -233,6 +229,7 @@ namespace UI.BattleScene.Windows {
             resetStatus();
             refreshQuestion();
             refreshBattleClock(waitSeconds());
+            refreshBattlerStatuses();
         }
 
         /// <summary>

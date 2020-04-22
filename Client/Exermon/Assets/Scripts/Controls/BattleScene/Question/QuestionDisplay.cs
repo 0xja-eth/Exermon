@@ -192,8 +192,6 @@ namespace UI.BattleScene.Controls.Question {
             drawPictruesAndChoices(question);
             if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
-
-
         }
 
         /// <summary>

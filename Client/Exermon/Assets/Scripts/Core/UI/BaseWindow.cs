@@ -93,7 +93,7 @@ namespace Core.UI {
         /// 启动窗口
         /// </summary>
         public virtual void startWindow() {
-            base.startView();
+            if (!shown) base.startView();
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Core.UI {
         /// 结束窗口
         /// </summary>
         public virtual void terminateWindow() {
-            base.terminateView();
+            if (shown) base.terminateView();
         }
 
         /// <summary>

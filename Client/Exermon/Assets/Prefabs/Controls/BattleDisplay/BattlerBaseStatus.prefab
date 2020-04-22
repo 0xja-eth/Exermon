@@ -502,14 +502,14 @@ MonoBehaviour:
     obj: {fileID: 1260051383810625442}
     type: Fill
     animated: 1
-    configData: 0
+    configData: 1
     format: 
     trigger: 
   - key: mp_rate
     obj: {fileID: 3837375286477252257}
     type: Fill
     animated: 1
-    configData: 0
+    configData: 1
     format: 
     trigger: 
 --- !u!1 &5673444731018706511

@@ -67,6 +67,7 @@ namespace UI.Common.Windows {
         /// </summary>
         /// <param name="text">提示文本</param>
         public void startWindow(string text) {
+            Debug.LogError("startWindow: " + text);
             this.text = text; base.startWindow();
         }
 
