@@ -112,7 +112,7 @@ namespace RecordModule.Services {
             /// </summary>
             /// <param name="qid">题目ID</param>
             public void collect(int qid) {
-                var rec = getQuestionRecord(qid);
+                var rec = getQuestionRecord(qid, true);
                 rec.collect();
             }
 
@@ -122,7 +122,7 @@ namespace RecordModule.Services {
             /// <param name="qid">题目ID</param>
             /// <param name="val">值</param>
             public void setWrong(int qid, bool val) {
-                var rec = getQuestionRecord(qid);
+                var rec = getQuestionRecord(qid, true);
                 rec.setWrong(val);
             }
 
@@ -132,7 +132,7 @@ namespace RecordModule.Services {
             /// <param name="qid">题目ID</param>
             /// <param name="note">备注</param>
             public void setNote(int qid, string note) {
-                var rec = getQuestionRecord(qid);
+                var rec = getQuestionRecord(qid, true);
                 rec.setNote(note);
             }
 
@@ -195,9 +195,9 @@ namespace RecordModule.Services {
          */
 
         /// <summary>
-        /// 当前题目集记录（刷题时用）
+        /// 当前刷题记录（刷题时用）
         /// </summary>
-        public QuestionSetRecord currentRecord { get; protected set; } = null;
+        public ExerciseRecord exerciseRecord { get; protected set; } = null;
 
         /// <summary>
         /// 记录数据
@@ -372,8 +372,8 @@ namespace RecordModule.Services {
             UnityAction onSuccess, UnityAction onError = null) {
             return (res) => {
                 changeState(State.Generated);
-                currentRecord = DataLoader.load(currentRecord, res, "record");
-                var qids = currentRecord.getQuestionIds();
+                exerciseRecord = DataLoader.load(exerciseRecord, res, "record");
+                var qids = exerciseRecord.getQuestionIds();
                 quesSer.loadQuestions(qids, onSuccess, onError);
             };
         }
@@ -413,7 +413,7 @@ namespace RecordModule.Services {
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 if (terminate) {
                     changeState(State.Terminated);
-                    currentRecord = DataLoader.load(currentRecord, res, "record");
+                    exerciseRecord = DataLoader.load(exerciseRecord, res, "record");
                 } else
                     changeState(State.Answered);
                 onSuccess?.Invoke();

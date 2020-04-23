@@ -383,6 +383,7 @@ MonoBehaviour:
   level: {fileID: 7793582853310525067}
   progress: {fileID: 0}
   rankDisplay: {fileID: 8257618409697330111}
+  winFlag: {fileID: 3297302391059826891}
 --- !u!1 &7793582854969008586
 GameObject:
   m_ObjectHideFlags: 0

@@ -416,8 +416,9 @@ namespace BattleModule.Data {
                 var score = this.score();
                 var judges = DataService.get().staticData.configure.resultJudges;
                 judge_ = judges[0];
-                foreach (var judge in judges) 
-                    if (score >= judge_.score) judge_ = judge;
+                foreach (var judge in judges)
+                    if (score >= judge.score) judge_ = judge;
+                    else break;
             }
             return judge_;
         }
@@ -515,8 +516,6 @@ namespace BattleModule.Data {
         #endregion
 
         #region 数据读取
-
-
 
         #endregion
     }
@@ -1115,6 +1114,15 @@ namespace BattleModule.Data {
                 if (exermon.subjectId == subjectId)
                     return exermon;
             return null;
+        }
+
+        /// <summary>
+        /// 获取对战玩家结果对象
+        /// </summary>
+        /// <returns></returns>
+        public BattlePlayer result() {
+            if (battle.record == null) return null;
+            return battle.record.getPlayer(getID());
         }
 
         /// <summary>

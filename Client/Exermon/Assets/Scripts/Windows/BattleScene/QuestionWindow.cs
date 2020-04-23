@@ -9,7 +9,7 @@ using QuestionModule.Data;
 using BattleModule.Data;
 
 using UI.BattleScene.Controls;
-using UI.BattleScene.Controls.Question;
+using UI.Common.Controls.QuestionDisplay;
 using UI.BattleScene.Controls.Storyboards;
 
 namespace UI.BattleScene.Windows {

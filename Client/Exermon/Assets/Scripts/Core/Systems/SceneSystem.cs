@@ -38,6 +38,8 @@ namespace Core.Systems {
             public const string MainScene = "MainScene";
             public const string StatusScene = "StatusScene";
 
+            public const string ExerciseScene = "ExerciseScene";
+
             public const string BattleStartScene = "BattleStartScene";
             public const string BattleMatchingScene = "BattleMatchingScene";
             public const string BattleScene = "BattleScene";

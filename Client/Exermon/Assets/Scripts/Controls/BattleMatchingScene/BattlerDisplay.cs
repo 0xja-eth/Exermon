@@ -39,6 +39,7 @@ namespace UI.BattleMatchingScene.Controls {
         public GameObject unknown;
         public Text name, level, progress;
         public SmallRankDisplay rankDisplay;
+        public GameObject winFlag;
 
         #region 数据控制
 
@@ -75,6 +76,10 @@ namespace UI.BattleMatchingScene.Controls {
                 battler.characterId, BustHeight);
             this.bust.gameObject.SetActive(true);
             this.bust.overrideSprite = bust;
+
+            if (winFlag) 
+                winFlag.SetActive(battler.result().isWon());
+
             //bust.overrideSprite = battler.character().bust;
         }
 
@@ -110,6 +115,7 @@ namespace UI.BattleMatchingScene.Controls {
             if (unknown) unknown.SetActive(true);
             if (rankDisplay) rankDisplay.requestClear(true);
             if (progress) progress.text = "";
+            if (winFlag) winFlag.SetActive(false);
         }
 
         /// <summary>
@@ -122,6 +128,7 @@ namespace UI.BattleMatchingScene.Controls {
             if (unknown) unknown.SetActive(false);
             if (rankDisplay) rankDisplay.requestClear(true);
             if (progress) progress.text = "";
+            if (winFlag) winFlag.SetActive(false);
         }
 
         #endregion

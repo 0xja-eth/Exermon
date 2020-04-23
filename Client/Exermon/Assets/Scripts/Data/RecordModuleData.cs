@@ -472,9 +472,7 @@ namespace RecordModule.Data {
     /// 题目集记录数据
     /// </summary>
     public class QuestionSetRecord : QuestionSetRecord
-        <PlayerQuestion, QuestionSetReward> {
-
-    }
+        <PlayerQuestion, QuestionSetReward> { }
     
     /// <summary>
     /// 刷题记录数据

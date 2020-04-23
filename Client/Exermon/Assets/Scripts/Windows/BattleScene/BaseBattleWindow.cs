@@ -3,16 +3,15 @@ using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
-using GameModule.Services;
-
-using PlayerModule.Services;
+using UnityEngine;
 
 using BattleModule.Data;
 using BattleModule.Services;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Storyboards;
-using UnityEngine;
+
+using UI.Common.Controls.QuestionDisplay;
 
 namespace UI.BattleScene.Windows {
 
@@ -26,7 +25,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         public QuestionInfo questionInfo;
 
-        public BattleClock battleClock;
+        public QuestionTimer battleClock;
 
         public BattlerStatus selfStatus, oppoStatus;
 

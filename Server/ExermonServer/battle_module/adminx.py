@@ -10,9 +10,9 @@ class BattleItemSlotItemsInline(BaseContItemsInline): model = BattleItemSlotItem
 
 @xadmin.sites.register(BattleResultJudge)
 class SeasonRecordAdmin(object):
-	list_display = ['id', 'score', 'win', 'lose']
+	list_display = ['id', 'name', 'score', 'win', 'lose']
 
-	list_editable = ['score', 'win', 'lose']
+	list_editable = ['name', 'score', 'win', 'lose']
 
 
 @xadmin.sites.register(BattleItemSlot)

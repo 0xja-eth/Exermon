@@ -10,7 +10,7 @@ using BattleModule.Data;
 using BattleModule.Services;
 
 using UI.BattleScene.Controls;
-using UI.BattleScene.Controls.Question;
+using UI.Common.Controls.QuestionDisplay;
 using UI.BattleScene.Controls.Storyboards;
 
 using BaseBattleWindow = UI.BattleScene.Windows.BaseBattleWindow;

@@ -1526,6 +1526,8 @@ class BattleResultRewardCalc(ExerciseResultRewardCalc):
 
 		self.judge, self.star_incr = self._calcJudgeAndStarIncr()
 
+		print("self.judge:"+str(self.judge))
+
 	# 艾瑟萌经验奖励加成
 	def _exerExpRewardRate(self, corr_rate):
 		return super()._exerExpRewardRate(corr_rate)*self.EXER_EXP_RATE

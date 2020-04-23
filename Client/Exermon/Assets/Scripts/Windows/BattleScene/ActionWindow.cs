@@ -10,17 +10,8 @@ using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
-using PlayerModule.Data;
-
-using GameModule.Services;
-
-using PlayerModule.Services;
-
 using BattleModule.Data;
-using BattleModule.Services;
 
-using UI.BattleScene.Controls;
-using UI.BattleScene.Controls.Question;
 using UI.BattleScene.Controls.Storyboards;
 
 /// <summary>
