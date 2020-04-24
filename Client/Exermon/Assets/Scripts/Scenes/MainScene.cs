@@ -91,7 +91,7 @@ namespace UI.MainScene {
         /// </summary>
         public void generateExercise() {
             var recordSer = RecordModule.Services.RecordService.get();
-            recordSer.generateExercise(2, 1, 10, () => onBulidingsClick(2));
+            recordSer.generateExercise(2, 1, 10, () => onBulidingsClick(3));
         }
 
         #endregion

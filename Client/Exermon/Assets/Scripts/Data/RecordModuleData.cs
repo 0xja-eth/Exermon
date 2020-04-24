@@ -484,24 +484,53 @@ namespace RecordModule.Data {
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
 
+            Debug.Log("loadCustomAttributes: " + json.ToJson());
+
             this.exerExpIncrs.Clear();
             this.slotExpIncrs.Clear();
 
             var exerExpIncrs = DataLoader.load(json, "exer_exp_incrs");
             var slotExpIncrs = DataLoader.load(json, "slot_exp_incrs");
-            
-            if (exerExpIncrs != null) 
+
+            if (exerExpIncrs != null) {
+                Debug.Log("Load exerExpIncrs: " + exerExpIncrs.ToJson());
                 foreach (KeyValuePair<string, JsonData> pair in exerExpIncrs) {
                     var key = int.Parse(pair.Key);
                     var data = DataLoader.load<int>(pair.Value);
+                    Debug.Log("Load exerExpIncrs: " + key + ", " + data);
                     this.exerExpIncrs.Add(key, data);
                 }
-            if (slotExpIncrs != null)
+            }
+            if (slotExpIncrs != null) {
+                Debug.Log("Load slotExpIncrs: " + slotExpIncrs.ToJson());
                 foreach (KeyValuePair<string, JsonData> pair in slotExpIncrs) {
                     var key = int.Parse(pair.Key);
                     var data = DataLoader.load<int>(pair.Value);
+                    Debug.Log("Load slotExpIncrs: " + key + ", " + data);
                     this.slotExpIncrs.Add(key, data);
                 }
+            }
+
+        }
+
+        /// <summary>
+        /// 转化自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void convertCustomAttributes(ref JsonData json) {
+            base.convertCustomAttributes(ref json);
+            var exer = new JsonData();
+            var slot = new JsonData();
+
+            foreach (var pair in exerExpIncrs) {
+                exer[pair.Key.ToString()] = pair.Value;
+            }
+            foreach (var pair in slotExpIncrs) {
+                exer[pair.Key.ToString()] = pair.Value;
+            }
+
+            json["exer_exp_incrs"] = exer;
+            json["slot_exp_incrs"] = slot;
         }
 
         #endregion
@@ -537,6 +566,10 @@ namespace RecordModule.Data {
         /// <returns></returns>
         protected override JsonData convertResultData() {
             var res = base.convertResultData();
+
+            Debug.Log("convertResultData: " + toJson().ToJson());
+            Debug.Log(exerExpIncrs);
+            Debug.Log(subjectId);
 
             res["subject"] = subject().name;
             res["mode"] = genTypeText();

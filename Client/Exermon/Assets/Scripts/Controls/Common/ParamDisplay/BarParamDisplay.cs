@@ -108,9 +108,11 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 读取数据
         /// </summary>
         void loadData() {
+            if (rawData == null) return;
             if (rawData.IsObject)
                 param = DataLoader.load(param, rawData);
-            else setValue(DataLoader.load<float>(rawData), force);
+            else if (rawData.IsInt || rawData.IsDouble || rawData.IsLong)
+                setValue(DataLoader.load<float>(rawData), force);
         }
 
         /// <summary>
@@ -120,9 +122,10 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="force">强制</param>
         public virtual void setValue(float value, bool force = false) {
             this.force = force;
+            Debug.Log("setValue: " + value);
             switch (setValueType) {
                 case SetValueType.Value:
-                    param.rate = calcRate(param.value); break;
+                    param.rate = calcRate(param.value = value); break;
                 case SetValueType.ValueIncr:
                     param.rate = calcRate(param.value += value); break;
                 case SetValueType.Rate: param.rate = value; break;

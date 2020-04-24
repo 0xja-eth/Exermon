@@ -596,9 +596,9 @@ class QuestionSetRecord(CacheableModel):
 		record = cls()
 		record.player = player
 		record._create(**kwargs)
-		record.start(**kwargs)
-
 		record.save()
+
+		record.start(**kwargs)
 
 		return record
 
@@ -809,7 +809,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		from utils.calc_utils import QuestionGenerator
 
-		configure = self.__makeGenerateConfigure(**kwargs)
+		configure = self._makeGenerateConfigure(**kwargs)
 
 		if configure is None: return
 
@@ -817,7 +817,7 @@ class QuestionSetRecord(CacheableModel):
 
 		for qid in gen.result: self.addQuestion(qid)
 
-	def __makeGenerateConfigure(self, **kwargs) -> QuestionGenerateConfigure:
+	def _makeGenerateConfigure(self, **kwargs) -> QuestionGenerateConfigure:
 		"""
 		获取题目生成配置信息，用于 _generateQuestions() 中进行题目生成
 		Args:
@@ -1282,7 +1282,7 @@ class ExerciseRecord(QuestionSetRecord):
 		self.gen_type = gen_type
 
 	# 生成题目生成配置信息
-	def __makeGenerateConfigure(self):
+	def _makeGenerateConfigure(self, **kwargs):
 		from utils.calc_utils import QuestionGenerateConfigure
 
 		return QuestionGenerateConfigure(self, self.player, self.subject,

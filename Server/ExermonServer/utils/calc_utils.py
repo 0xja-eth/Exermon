@@ -757,11 +757,11 @@ class QuestionGenerateConfigure:
 	# 调试用
 	def convertToDictForDebug(self):
 		return {
-			'question_set': self.question_set,
+			# 'question_set': self.question_set,
 			'player': str(self.player),
 			'subject': str(self.subject),
 			'gen_type': str(self.gen_type),
-			'questions': self.questions,
+			# 'questions': self.questions,
 			'count': self.count,
 			'star_dtb': self.star_dtb,
 			'ques_type': str(self.ques_type),

@@ -81,7 +81,7 @@ namespace UI.ExerciseScene.Windows {
         protected override void initializeOnce() {
             base.initializeOnce();
             record = recordSer.exerciseRecord;
-
+            configureQuestions();
         }
 
         /// <summary>
@@ -89,19 +89,9 @@ namespace UI.ExerciseScene.Windows {
         /// </summary>
         void configureQuestions() {
             questionNav.configure(record.getQuestions());
+            questionNav.select(0, true);
+            startQuestion();
         }
-
-        #endregion
-
-        #region 启动/结束窗口
-        
-        #endregion
-
-        #region 数据控制
-
-        #endregion
-
-        #region 界面控制
 
         #endregion
 
@@ -110,19 +100,21 @@ namespace UI.ExerciseScene.Windows {
         /// <summary>
         /// 下一题
         /// </summary>
-        public void next() {
-            questionNav.next();
+        public void next() { next(false); }
+        public void next(bool force) {
+            questionNav.next(force);
         }
 
         /// <summary>
         /// 上一题
         /// </summary>
-        public void prev() {
-            questionNav.prev();
+        public void prev() { prev(false); }
+        public void prev(bool force) {
+            questionNav.prev(force);
         }
 
         /// <summary>
-        /// 题目改变回调
+        /// 开始题目
         /// </summary>
         void startQuestion() {
             var qid = questionDisplay.getItem().getID();
@@ -174,7 +166,7 @@ namespace UI.ExerciseScene.Windows {
         /// 答题完毕回调
         /// </summary>
         void onAnswered() {
-            next(); startQuestion();
+            next(true); startQuestion();
         }
 
         /// <summary>
@@ -195,9 +187,9 @@ namespace UI.ExerciseScene.Windows {
             timer.stopTimer(true);
             questionDisplay.terminateQuestion();
 
-            questionNav.select(0);
             questionNav.results = record.questions;
             questionNav.showAnswer = true;
+            questionNav.select(0);
 
             scene.onExerciseTerminated();
         }

@@ -26,8 +26,8 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <param name="item">题目</param>
         protected override void drawExactlyItem(Question item) {
             base.drawExactlyItem(item);
-            number.text = index.ToString();
-            selectedNumber.text = index.ToString();
+            number.text = (index+1).ToString();
+            selectedNumber.text = (index+1).ToString();
         }
 
         /// <summary>

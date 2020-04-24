@@ -105,7 +105,7 @@ namespace UI.Common.Controls.ItemDisplays {
             }
         }
         [SerializeField]
-        bool _checkable = false; // 能否选中
+        bool _checkable = true; // 能否选中
         public virtual bool checkable {
             get { return _checkable; }
             set {

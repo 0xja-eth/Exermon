@@ -132,7 +132,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <returns>是否选择</returns>
         public virtual bool isSelected() {
             if (!container) return false;
-            if (!isSelectable()) return false;
+            // if (!isSelectable()) return false;
             return container.getSelectedIndex() == index;
         }
 
@@ -159,9 +159,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>是否选中</returns>
         public virtual bool isChecked() {
-            if (!container) return false;
-            if (!isCheckable()) return false;
             if (isForceChecked()) return true;
+            if (!container) return false;
+            // if (!isCheckable()) return false;
             return container.isChecked(index);
         }
 

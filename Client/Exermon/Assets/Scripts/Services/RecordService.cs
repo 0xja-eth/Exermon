@@ -418,7 +418,7 @@ namespace RecordModule.Services {
                 NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 if (terminate) {
                     changeState(State.Terminated);
-                    exerciseRecord = DataLoader.load(exerciseRecord, res, "record");
+                    exerciseRecord = DataLoader.load(exerciseRecord, res, "result");
                 } else
                     changeState(State.Answered);
                 onSuccess?.Invoke();
