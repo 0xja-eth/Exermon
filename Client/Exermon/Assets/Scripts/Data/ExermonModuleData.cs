@@ -601,7 +601,8 @@ namespace ExermonModule.Data {
     /// </summary>
     public class PlayerExermon : PackContItem<Exermon>,
         ParamDisplay.IDisplayDataConvertable,
-        ParamDisplay.IDisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable,
+        ExpParamDisplay.IExpConvertable {
 
         /// <summary>
         /// 属性
@@ -752,6 +753,22 @@ namespace ExermonModule.Data {
             return json;
         }
 
+        /// <summary>
+        /// 获取经验值
+        /// </summary>
+        /// <returns></returns>
+        int ExpParamDisplay.IExpConvertable.exp() {
+            return exp;
+        }
+
+        /// <summary>
+        /// 获取下一级经验
+        /// </summary>
+        /// <returns></returns>
+        public int maxExp() {
+            return next;
+        }
+
         #endregion
 
         #region 数据操作
@@ -865,7 +882,8 @@ namespace ExermonModule.Data {
     /// </summary>
     public class ExerSlotItem : SlotContItem<PlayerExermon, PlayerExerGift>,
         ParamDisplay.IDisplayDataConvertable,
-        ParamDisplay.IDisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable,
+        ExpParamDisplay.IExpConvertable {
 
         /// <summary>
         /// 属性
@@ -1154,12 +1172,28 @@ namespace ExermonModule.Data {
             json["delta"] = DataLoader.convertDouble(delta);
             json["delta_rate"] = deltaRate;
 
-            json[ParamDisplay.TrueColorKey] = DataLoader.convert(color);
+            json[MultParamsDisplay.TrueColorKey] = DataLoader.convert(color);
 
             return json;
         }
 
         #endregion
+
+        /// <summary>
+        /// 获取经验值
+        /// </summary>
+        /// <returns></returns>
+        int ExpParamDisplay.IExpConvertable.exp() {
+            return exp;
+        }
+
+        /// <summary>
+        /// 获取下一级经验
+        /// </summary>
+        /// <returns></returns>
+        public int maxExp() {
+            return next;
+        }
 
         #endregion
 

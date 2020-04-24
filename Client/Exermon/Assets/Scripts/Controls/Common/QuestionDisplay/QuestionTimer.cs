@@ -30,6 +30,8 @@ namespace UI.Common.Controls.QuestionDisplay {
         public Text time;
         public Image bar;
 
+        public bool countdown = true; // 倒计时模式
+
         /// <summary>
         /// 内部变量定义
         /// </summary>
@@ -42,6 +44,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 时间显示是否显示已过去的时间
         /// </summary>
+        [SerializeField]
         bool _reverse = false;
         public bool reverse {
             get { return _reverse; }
@@ -67,7 +70,7 @@ namespace UI.Common.Controls.QuestionDisplay {
             if (!timing) return;
             var now = DateTime.Now;
             if (now < endTime) refresh();
-            else stopTimer(true);
+            else if (countdown) stopTimer(true);
         }
 
         #endregion
@@ -117,6 +120,9 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 开始
         /// </summary>
+        public void startTimer() {
+            startTimer(0);
+        }
         /// <param name="timespan">时间</param>
         public void startTimer(TimeSpan timespan) {
             timing = true; timeUp = false;
@@ -183,8 +189,11 @@ namespace UI.Common.Controls.QuestionDisplay {
                 CriticalColor : NormalColor;
             time.text = SceneUtils.time2Str(delta);
 
-            bar.fillAmount = (duration.Ticks == 0 ? 0 :
+            var rate = (duration.Ticks == 0 ? 0 :
                 delta.Ticks * 1.0f / duration.Ticks);
+            rate = Mathf.Clamp01(rate);
+
+            bar.fillAmount = rate;
         }
 
         /// <summary>

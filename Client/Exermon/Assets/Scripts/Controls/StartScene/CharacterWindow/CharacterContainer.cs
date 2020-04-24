@@ -70,12 +70,9 @@ namespace UI.StartScene.Controls.Character {
         /// <summary>
         /// 选择
         /// </summary>
-        /// <param name="index">索引</param>
-        public override void select(int index) {
-            select(index, false);
-        }
         /// <param name="force">是否强制切换</param>
-        public void select(int index, bool force) {
+        public override void select(int index, bool force = false) {
+            // TODO: 可能会有Bug
             var posIndex = force ? index :
                 clacNearestPosIndex(index);
             select(index, posIndex, force);

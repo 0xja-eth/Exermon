@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using LitJson;
+
 using Core.Data;
 
 using GameModule.Data;
@@ -11,7 +13,8 @@ using GameModule.Services;
 
 using ItemModule.Data;
 using RecordModule.Data;
-using LitJson;
+
+using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
 /// 题目模块
@@ -26,7 +29,7 @@ namespace QuestionModule.Data {
     /// <summary>
     /// 题目数据
     /// </summary>
-    public class Question : BaseData {
+    public class Question : BaseData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 题目类型
@@ -129,6 +132,32 @@ namespace QuestionModule.Data {
         /// 打乱的选项
         /// </summary>
         Choice[] _shuffleChoices { get; set; } = null;
+
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>返回转化后的显示数据</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            switch (type) {
+                case "detail": return convertToDisplayData();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化为详情数据
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertDetailData() {
+            var res = new JsonData();
+
+            return res;
+        }
+
+        #endregion
 
         #region 数据操作
 

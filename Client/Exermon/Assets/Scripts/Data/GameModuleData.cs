@@ -397,6 +397,8 @@ namespace GameModule.Data {
         public Tuple<int, string>[] questionStatuses { get; protected set; }
         [AutoConvert]
         public Tuple<int, string>[] quesReportTypes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] quesReportTypeDescs { get; protected set; }
 
         [AutoConvert]
         public Tuple<int, string>[] recordSources { get; protected set; }

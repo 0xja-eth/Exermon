@@ -9,7 +9,8 @@ using RecordModule.Data;
 using RecordModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.QuestionDisplay;
+using UI.Common.Controls.ParamDisplays;
+
 using UI.Common.Controls.SystemExtend.QuestionText;
 
 namespace UI.Common.Controls.QuestionDisplay {
@@ -29,7 +30,10 @@ namespace UI.Common.Controls.QuestionDisplay {
 
         /// <summary>
         /// 外部组件设置
-        /// </summary>        
+        /// </summary>
+        public Text num, subject, type;
+        public StarsDisplay star;
+
         public QuestionText title, description;
         public QuesPictureContainer pictureContaienr; // 图片容器
         public QuesChoiceContainer choiceContainer; // 选项容器
@@ -188,11 +192,22 @@ namespace UI.Common.Controls.QuestionDisplay {
         protected override void drawExactlyItem(Question question) {
             base.drawExactlyItem(question);
 
+            drawBaseInfo(question);
             drawTitle(question);
             drawCollect(question);
             drawPictruesAndChoices(question);
             if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
+        }
+
+        /// <summary>
+        /// 绘制基本信息
+        /// </summary>
+        void drawBaseInfo(Question question) {
+            if (num) num.text = (index+1).ToString();
+            if (star) star.setValue(question.starId);
+            if (type) type.text = question.typeText();
+            if (subject) subject.text = question.subject().name;
         }
 
         /// <summary>
@@ -265,7 +280,13 @@ namespace UI.Common.Controls.QuestionDisplay {
             pictureContaienr.clearItems();
             choiceContainer.clearItems();
             buttonContainer.clearItems();
+
             title.text = "";
+
+            if (num) num.text = "";
+            if (type) type.text = "";
+            if (subject) subject.text = "";
+            if (star) star.clearValue();
 
             if (resultObj) resultObj.SetActive(false);
 

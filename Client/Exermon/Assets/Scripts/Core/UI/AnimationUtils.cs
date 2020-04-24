@@ -27,7 +27,7 @@ namespace Core.UI.Utils {
         /// 常量定义
         /// </summary>
         const string AniClipName = "Animation";
-        const float AniDuration = 0.5f;
+        public const float AniDuration = 0.75f;
 
         /// <summary>
         /// 临时动画对象

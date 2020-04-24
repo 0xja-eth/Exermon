@@ -32,7 +32,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         public Text animal, type, nickname, description;
         public TextInputField nicknameInput;
 
-        public ParamDisplay expBar;
+        public MultParamsDisplay expBar;
 
         public GameObject equipedFlag, editButton;
 

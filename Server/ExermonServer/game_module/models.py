@@ -981,6 +981,7 @@ class GameConfigure(models.Model):
 			'question_types': Question.TYPES,
 			'question_statuses': Question.STATUSES,
 			'ques_report_types': QuesReport.TYPES,
+			'ques_report_type_descs': QuesReport.TYPES_WITH_DESC,
 
 			# record_module
 			'record_sources': QuestionRecord.SOURCES,

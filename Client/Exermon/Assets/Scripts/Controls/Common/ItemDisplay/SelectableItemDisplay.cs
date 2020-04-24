@@ -53,6 +53,8 @@ namespace UI.Common.Controls.ItemDisplays {
 
         public bool forceChecked = false; // 强制选中
 
+        public bool deselectable = true; // 能否取消选中
+
         public Color normalColor = new Color(1, 1, 1, 0); // 默认背景颜色
         public Color emptyColor = new Color(1, 1, 1, 0); // 物品为空背景颜色
         public Color selectedColor = new Color(1, 1, 0.75f, 0); // 选择时背景颜色
@@ -103,6 +105,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>是否激活</returns>
         public virtual bool isActived() {
+            if (container != null && !container.actived) return false;
             return actived;
         }
 
@@ -111,6 +114,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否高光</returns>
         public virtual bool isHighlightable() {
+            if (container != null && !container.highlightable) return false;
             return isActived() && highlightable;
         }
 
@@ -137,7 +141,17 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选择</returns>
         public virtual bool isSelectable() {
+            if (container != null && !container.selectable) return false;
             return isActived() && selectable;
+        }
+
+        /// <summary>
+        /// 是否可以取消选择
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool isDeselectable() {
+            if (container != null && !container.deselectable) return false;
+            return isActived() && deselectable;
         }
 
         /// <summary>
@@ -164,6 +178,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选中</returns>
         public virtual bool isCheckable() {
+            if (container != null && !container.checkable) return false;
             return isActived() && checkable;
         }
 
@@ -172,7 +187,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否取消选中</returns>
         public virtual bool isUncheckable() {
-            return isActived() && !isForceChecked();
+            if (container != null && !container.checkable) return false;
+            return isActived() && checkable && !isForceChecked();
         }
 
         /// <summary>
@@ -326,7 +342,12 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerClick(PointerEventData eventData) {
-            if (isSelected() || !isSelectable()) toggle();
+            // 当已选择且不可选中时单击，如果可以取消选择就取消选择
+            if (isSelected() && !isCheckable() && 
+                !isUncheckable() && isDeselectable()) deselect();
+            // 如果已选择或者不可选择时单击，执行反转操作
+            else if (isSelected() || !isSelectable()) toggle();
+            // 否则，选择
             else select();
             refreshStatus();
         }

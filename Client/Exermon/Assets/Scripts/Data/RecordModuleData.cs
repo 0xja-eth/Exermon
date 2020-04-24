@@ -162,6 +162,8 @@ namespace RecordModule.Data {
         [AutoConvert]
         public bool correct { get; protected set; }
         [AutoConvert]
+        public int score { get; protected set; }
+        [AutoConvert]
         public bool isNew { get; protected set; }
 
         /// <summary>
@@ -222,6 +224,13 @@ namespace RecordModule.Data {
             var name = ((BaseItem.Type)this.type).ToString();
             var type = Type.GetType(name);
             return (BaseItem)DataService.get().get(type, itemId);
+        }
+        public T item<T>() where T : BaseItem {
+            if (this.type == 0 || !Enum.IsDefined(
+                typeof(BaseItem.Type), this.type)) return null;
+            var name = ((BaseItem.Type)this.type).ToString();
+            var type = Type.GetType(name);
+            return (T)DataService.get().get(type, itemId);
         }
     }
 
@@ -304,6 +313,9 @@ namespace RecordModule.Data {
 
             res["sum_time"] = sumTime()/1000.0;
 
+            res["sum_score"] = sumScore();
+            res["max_score"] = maxScore();
+
             res["corr_cnt"] = corrCnt();
             res["corr_rate"] = corrRate();
             res["new_cnt"] = newCnt();
@@ -367,6 +379,18 @@ namespace RecordModule.Data {
         }
 
         /// <summary>
+        /// 获取题目对象集
+        /// </summary>
+        /// <returns>返回题目集</returns>
+        public Question[] getQuestions() {
+            var cnt = this.questions.Length;
+            var questions = new Question[cnt];
+            for (int i = 0; i < cnt; ++i)
+                questions[i] = this.questions[i].question();
+            return questions;
+        }
+
+        /// <summary>
         /// 总用时
         /// </summary>
         /// <returns></returns>
@@ -374,6 +398,28 @@ namespace RecordModule.Data {
             var res = 0;
             foreach (var ques in questions)
                 res += ques.timespan;
+            return res;
+        }
+
+        /// <summary>
+        /// 总分数
+        /// </summary>
+        /// <returns></returns>
+        public int sumScore() {
+            var res = 0;
+            foreach (var ques in questions)
+                res += ques.score;
+            return res;
+        }
+
+        /// <summary>
+        /// 最大分数
+        /// </summary>
+        /// <returns></returns>
+        public int maxScore() {
+            var res = 0;
+            foreach (var ques in questions)
+                res += ques.question().score;
             return res;
         }
 
@@ -404,7 +450,7 @@ namespace RecordModule.Data {
         /// </summary>
         /// <returns></returns>
         public double corrRate() {
-            return corrCnt() / questions.Length;
+            return corrCnt()*1.0 / questions.Length;
         }
 
         /// <summary>
@@ -443,23 +489,17 @@ namespace RecordModule.Data {
 
             var exerExpIncrs = DataLoader.load(json, "exer_exp_incrs");
             var slotExpIncrs = DataLoader.load(json, "slot_exp_incrs");
-
-            Debug.Log("Load expIncrs:");
-
+            
             if (exerExpIncrs != null) 
                 foreach (KeyValuePair<string, JsonData> pair in exerExpIncrs) {
-                    Debug.Log("type: " + pair.GetType());
-                    Debug.Log("pair: " + pair);
                     var key = int.Parse(pair.Key);
                     var data = DataLoader.load<int>(pair.Value);
-                    Debug.Log("key: " + key + ", data: " + data);
                     this.exerExpIncrs.Add(key, data);
                 }
             if (slotExpIncrs != null)
                 foreach (KeyValuePair<string, JsonData> pair in slotExpIncrs) {
                     var key = int.Parse(pair.Key);
                     var data = DataLoader.load<int>(pair.Value);
-                    Debug.Log("key: " + key + ", data: " + data);
                     this.slotExpIncrs.Add(key, data);
                 }
         }
@@ -488,6 +528,27 @@ namespace RecordModule.Data {
         public int genType { get; protected set; }
         [AutoConvert]
         public int count { get; protected set; }
+
+        #region 数据转换
+
+        /// <summary>
+        /// 转换为统计数据
+        /// </summary>
+        /// <returns></returns>
+        protected override JsonData convertResultData() {
+            var res = base.convertResultData();
+
+            res["subject"] = subject().name;
+            res["mode"] = genTypeText();
+            res["count"] = count;
+
+            res["exer_exp_incr"] = exerExpIncrs[subjectId];
+            res["slot_exp_incr"] = slotExpIncrs[subjectId];
+
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 科目实例

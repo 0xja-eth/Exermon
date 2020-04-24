@@ -22,7 +22,7 @@ namespace UI.StatusScene.Controls.PlayerStatus {
         /// </summary>
         public Image bust;
         public Text name;
-        public ParamDisplay expBar;
+        public MultParamsDisplay expBar;
 
         /// <summary>
         /// 内部变量设置

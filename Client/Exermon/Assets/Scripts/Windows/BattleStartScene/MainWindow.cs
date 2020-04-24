@@ -42,7 +42,7 @@ namespace UI.BattleStartScene.Windows {
         /// </summary>
         public Image bust;
         public Text name, battlePoint;
-        public ParamDisplay expBar;
+        public MultParamsDisplay expBar;
 
         public BattleItemSlotDisplay battleItemSlotDisplay;
         public SmallExerSlotDisplay exerSlotDisplay;

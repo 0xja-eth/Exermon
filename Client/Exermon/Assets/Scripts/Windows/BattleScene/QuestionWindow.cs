@@ -22,7 +22,6 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const string NotStartedAlertText = "尚未开始作答！";
         const string EmptyAlertText = "未选择答案！";
 
         const string AnswerUploadWaitText = "作答中……";

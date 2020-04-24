@@ -407,10 +407,15 @@ namespace RecordModule.Services {
         /// <param name="terminate">是否提交</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
+        public void answerQuestion(int qid, int[] selection, TimeSpan timespan,
+            bool terminate, UnityAction onSuccess = null, UnityAction onError = null) {
+            answerQuestion(qid, selection, (int)timespan.TotalMilliseconds, 
+                terminate, onSuccess, onError);
+        }
         public void answerQuestion(int qid, int[] selection, int timespan,
-            bool terminate, UnityAction onSuccess, UnityAction onError = null) {
+            bool terminate, UnityAction onSuccess = null, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 if (terminate) {
                     changeState(State.Terminated);
                     exerciseRecord = DataLoader.load(exerciseRecord, res, "record");

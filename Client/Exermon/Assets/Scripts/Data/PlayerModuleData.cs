@@ -78,7 +78,9 @@ namespace PlayerModule.Data {
     /// <summary>
     /// 玩家数据
     /// </summary>
-    public class Player : BaseData, ParamDisplay.IDisplayDataConvertable {
+    public class Player : BaseData, 
+        ParamDisplay.IDisplayDataConvertable, 
+        ExpParamDisplay.IExpConvertable {
 
         /// <summary>
         /// 背包类容器数据		
@@ -388,6 +390,22 @@ namespace PlayerModule.Data {
             return json;
         }
 
+        /// <summary>
+        /// 获取经验值
+        /// </summary>
+        /// <returns></returns>
+        int ExpParamDisplay.IExpConvertable.exp() {
+            return exp;
+        }
+
+        /// <summary>
+        /// 获取下一级经验
+        /// </summary>
+        /// <returns></returns>
+        public int maxExp() {
+            return next;
+        }
+
         #endregion
 
         #region 数据操作
@@ -616,6 +634,7 @@ namespace PlayerModule.Data {
         public void loadCurrentSeasonRecord(JsonData json) {
             seasonRecord = DataLoader.load<SeasonRecord>(json);
         }
+
     }
 
     #region 物品

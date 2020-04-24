@@ -35,7 +35,7 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public ParamDisplay selfResult, oppoResult;
+        public MultParamsDisplay selfResult, oppoResult;
         public UsedItemDisplay selfItem, oppoItem;
         public Text timer;
 

@@ -31,7 +31,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// 外部组件设置
         /// </summary>
         public ParamDisplaysGroup paramInfo;
-        public ParamDisplay battlePoint;
+        public MultParamsDisplay battlePoint;
 
         /// <summary>
         /// 艾瑟萌槽项

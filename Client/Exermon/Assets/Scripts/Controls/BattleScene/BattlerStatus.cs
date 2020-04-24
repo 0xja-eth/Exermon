@@ -31,7 +31,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         public Image face, status;
 
-        public ParamDisplay baseStatus;
+        public MultParamsDisplay baseStatus;
 
         public Texture2D correctStatus, wrongStatus;
 

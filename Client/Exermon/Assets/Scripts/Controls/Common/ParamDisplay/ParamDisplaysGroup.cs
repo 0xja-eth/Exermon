@@ -10,7 +10,7 @@ namespace UI.Common.Controls.ParamDisplays {
     /// 属性条组
     /// </summary>
     /// 
-    public class ParamDisplaysGroup : GroupView<ParamDisplay> {
+    public class ParamDisplaysGroup : GroupView<MultParamsDisplay> {
 
         #region 初始化
 

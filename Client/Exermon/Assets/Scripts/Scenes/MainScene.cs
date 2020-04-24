@@ -84,6 +84,18 @@ namespace UI.MainScene {
 
         #endregion
 
+        #region 测试代码
+
+        /// <summary>
+        /// 生成刷题
+        /// </summary>
+        public void generateExercise() {
+            var recordSer = RecordModule.Services.RecordService.get();
+            recordSer.generateExercise(2, 1, 10, () => onBulidingsClick(2));
+        }
+
+        #endregion
+
         #region 流程控制
 
         /// <summary>
@@ -95,6 +107,7 @@ namespace UI.MainScene {
             switch (index) {
                 case 1: sceneName = SceneSystem.Scene.StatusScene; break;
                 case 2: sceneName = SceneSystem.Scene.BattleStartScene; break;
+                case 3: sceneName = SceneSystem.Scene.ExerciseScene; break;
             }
             sceneSys.pushScene(sceneName);
         }

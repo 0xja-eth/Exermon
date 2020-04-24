@@ -14,7 +14,7 @@ namespace UI.StatusScene.Controls.PlayerStatus {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public ParamDisplay paramsInfo, battleInfo, questionInfo, personalInfo;
+        public MultParamsDisplay paramsInfo, battleInfo, questionInfo, personalInfo;
 
         /// <summary>
         /// 内部变量设置

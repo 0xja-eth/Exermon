@@ -38,7 +38,7 @@ namespace UI.BattleResultScene {
         public BattlerDisplay selfBattler;
         public BattlerDisplay oppoBattler;
 
-        public ParamDisplay resultDetail, scoreDetail;
+        public MultParamsDisplay resultDetail, scoreDetail;
         public RadarDiagram radar;
 
         public Image radarTexture1, radarTexture2;

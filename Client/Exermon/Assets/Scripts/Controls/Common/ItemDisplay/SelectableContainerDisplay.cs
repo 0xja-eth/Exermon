@@ -74,11 +74,61 @@ namespace UI.Common.Controls.ItemDisplays {
         public int defaultCapacity = 0; // 默认容量
 
         /// <summary>
+        /// 外部变量设置
+        /// </summary>
+        [SerializeField]
+        bool _actived = true; // 是否可用
+        public virtual bool actived {
+            get { return _actived; }
+            set {
+                _actived = value;
+                requestRefresh();
+            }
+        }
+
+        [SerializeField]
+        bool _selectable = true; // 能否选择
+        public virtual bool selectable {
+            get { return _selectable; }
+            set {
+                _selectable = value;
+                requestRefresh();
+            }
+        }
+        [SerializeField]
+        bool _deselectable = true; // 能否取消选择
+        public virtual bool deselectable {
+            get { return _deselectable; }
+            set {
+                _deselectable = value;
+                requestRefresh();
+            }
+        }
+        [SerializeField]
+        bool _checkable = false; // 能否选中
+        public virtual bool checkable {
+            get { return _checkable; }
+            set {
+                _checkable = value;
+                requestRefresh();
+            }
+        }
+        [SerializeField]
+        bool _highlightable = true; // 能否高亮
+        public virtual bool highlightable {
+            get { return _highlightable; }
+            set {
+                _highlightable = value;
+                requestRefresh();
+            }
+        }
+
+        /// <summary>
         /// 回调函数集
         /// </summary>
-        public List<UnityAction> onItemsChangedCallbacks = new List<UnityAction>();
-        public List<UnityAction> onSelectChangedCallbacks = new List<UnityAction>();
-        public List<UnityAction> onCheckChangedCallbacks = new List<UnityAction>();
+        List<UnityAction> onItemsChangedCallbacks = new List<UnityAction>();
+        List<UnityAction> onSelectChangedCallbacks = new List<UnityAction>();
+        List<UnityAction> onCheckChangedCallbacks = new List<UnityAction>();
 
         /// <summary>
         /// 内部变量声明
@@ -418,16 +468,16 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选择
         /// </summary>
         /// <param name="index">索引</param>
-        public virtual void select(T item) {
-            select(items.IndexOf(item));
+        public virtual void select(T item, bool force = false) {
+            select(items.IndexOf(item), force);
         }
-        public virtual void select(int index) {
+        public virtual void select(int index, bool force = false) {
             //Debug.Log("select: " + index);
 
             index = getLoopedIndex(index);
             if (index >= 0) {
                 var item = subViews[index];
-                if (!item.isSelectable()) return;
+                if (!force && !item.isSelectable()) return;
             }
 
             lastIndex = selectedIndex = index;
@@ -447,9 +497,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 选择上次
         /// </summary>
-        public virtual void selectLast(int default_ = 0) {
-            if (lastIndex >= 0) select(lastIndex);
-            else if (default_ >= 0) select(default_);
+        public virtual void selectLast(int default_ = 0, bool force = false) {
+            if (lastIndex >= 0) select(lastIndex, force);
+            else if (default_ >= 0) select(default_, force);
             else deselect();
         }
 
@@ -538,16 +588,16 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选中
         /// </summary>
         /// <param name="index">索引</param>
-        public virtual void check(T item) {
+        public virtual void check(T item, bool force = false) {
             check(items.IndexOf(item));
         }
-        public virtual void check(int index) {
+        public virtual void check(int index, bool force = false) {
             //Debug.Log("check: " + index);
 
             index = getLoopedIndex(index);
 
             var item = subViews[index];
-            if (!item.isCheckable()) return;
+            if (!force && !item.isCheckable()) return;
             if (isChecked(index)) return;
 
             var cnt = checkedIndices.Count;
@@ -578,13 +628,16 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 取消选中
         /// </summary>
         /// <param name="index">索引</param>
-        public virtual void uncheck(int index) {
+        public virtual void uncheck(T item, bool force = false) {
+            uncheck(items.IndexOf(item), force);
+        }
+        public virtual void uncheck(int index, bool force = false) {
             //Debug.Log("uncheck: " + index);
 
             index = getLoopedIndex(index);
 
             var item = subViews[index];
-            if (!item.isUncheckable()) return;
+            if (!force && !item.isUncheckable()) return;
             if (!isChecked(index)) return;
 
             checkedIndices.Remove(index);
@@ -595,13 +648,16 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 反转选中
         /// </summary>
         /// <param name="index">索引</param>
-        public void toggle(int index) {
+        public virtual void toggle(T item, bool force = false) {
+            toggle(items.IndexOf(item), force);
+        }
+        public void toggle(int index, bool force = false) {
             //Debug.Log("toggle: " + index);
             //Debug.Log("Checked: " + string.Join(",", checkedIndices));
 
             index = getLoopedIndex(index);
-            if (isChecked(index)) uncheck(index);
-            else check(index);
+            if (isChecked(index)) uncheck(index, force);
+            else check(index, force);
         }
 
         /// <summary>

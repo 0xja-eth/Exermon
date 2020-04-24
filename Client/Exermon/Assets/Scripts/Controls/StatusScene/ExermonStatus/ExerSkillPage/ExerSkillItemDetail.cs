@@ -33,7 +33,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerSkillPage {
         public GameObject useCountFrame;
         public GameObject positive, negative;
 
-        public ParamDisplay detailInfo;
+        public MultParamsDisplay detailInfo;
 
         #region 界面绘制
 
