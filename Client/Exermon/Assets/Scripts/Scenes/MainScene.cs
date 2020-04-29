@@ -19,8 +19,19 @@ namespace UI.MainScene {
     public class MainScene : BaseScene {
 
         /// <summary>
-        /// 文本定义
+        /// 建筑物按钮
         /// </summary>
+        public enum BuildingType {
+            Dormitory, // 宿舍（状态）
+            Library, // 图书馆（刷题）
+            BattleCenter, // 对战大厅（对战）
+            Shop, // 小卖部（商城）
+            Adventure, // 外出冒险（冒险）
+            Playground, // 操场（社团）
+            TechBuilding, // 科技楼（科技）
+            ClassBuilding, // 教学楼（任务）
+            HelpCenter, // 新手中心（新手教程）
+        }
 
         /// <summary>
         /// 外部组件设置
@@ -84,32 +95,35 @@ namespace UI.MainScene {
 
         #endregion
 
-        #region 测试代码
-
-        /// <summary>
-        /// 生成刷题
-        /// </summary>
-        public void generateExercise() {
-            var recordSer = RecordModule.Services.RecordService.get();
-            recordSer.generateExercise(2, 1, 10, () => onBulidingsClick(3));
-        }
-
-        #endregion
-
         #region 流程控制
 
         /// <summary>
         /// 建筑物点击回调
         /// </summary>
-        /// <param name="index"></param>
-        public void onBulidingsClick(int index) {
-            string sceneName = this.sceneName();
-            switch (index) {
-                case 1: sceneName = SceneSystem.Scene.StatusScene; break;
-                case 2: sceneName = SceneSystem.Scene.BattleStartScene; break;
-                case 3: sceneName = SceneSystem.Scene.ExerciseScene; break;
+        /// <param name="type"></param>
+        public void onBulidingsClick(BuildingType type) {
+            string sceneName = "";
+            switch (type) {
+                case BuildingType.Dormitory:
+                    sceneName = SceneSystem.Scene.StatusScene; break;
+                case BuildingType.BattleCenter:
+                    sceneName = SceneSystem.Scene.BattleStartScene; break;
+                case BuildingType.Library:
+                    onLibraryClick(); break;
             }
-            sceneSys.pushScene(sceneName);
+            if (sceneName != "") sceneSys.pushScene(sceneName);
+        }
+        public void onBulidingsClick(int type) {
+            onBulidingsClick((BuildingType)type);
+        }
+
+        /// <summary>
+        /// 图书馆点击回调
+        /// </summary>
+        void onLibraryClick() {
+            var recordSer = RecordModule.Services.RecordService.get();
+            recordSer.generateExercise(2, 1, 10, () =>
+                sceneSys.pushScene(SceneSystem.Scene.ExerciseScene));
         }
 
         #endregion

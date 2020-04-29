@@ -9,7 +9,7 @@ using Core.UI;
 namespace UI.MainScene.Controls {
 
     /// <summary>
-    /// 地图显示组件（可拖拽）
+    /// 地图显示组件（可拖拽，已弃用）
     /// </summary>
     class MapDisplay : BaseView,
     IBeginDragHandler, IDragHandler, IEndDragHandler {
