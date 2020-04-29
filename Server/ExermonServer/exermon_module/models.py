@@ -937,6 +937,12 @@ class ExerSlotItem(SlotContItem):
 		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
 		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
+	def playerExer(self):
+		return self.equipItem(0)
+	
+	def playerGift(self):
+		return self.equipItem(1)
+
 	# 获取艾瑟萌技能槽
 	def exerEquipSlot(self):
 		return self._getOneToOneCache(
@@ -1087,12 +1093,18 @@ class ExerSlotItem(SlotContItem):
 
 	# 艾瑟萌等级
 	def exermonLevel(self):
-		return self.player_exer.level
+		player_exer = self.playerExer()
+		if player_exer is not None:
+			return player_exer.level
+		return 0
 
 	# 获得经验
 	def gainExp(self, slot_exp, exer_exp):
+		player_exer = self.playerExer()
+		if player_exer is not None:
+			player_exer.gainExp(exer_exp)
+
 		self.exp += slot_exp
-		self.player_exer.gainExp(exer_exp)
 		self.refresh()
 		self.save()
 

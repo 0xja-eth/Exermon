@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
@@ -186,6 +187,8 @@ namespace UI.ExerciseScene.Windows {
 
             timer.stopTimer(true);
             questionDisplay.terminateQuestion();
+
+            Debug.Log("onExerciseTerminated: "+record.toJson().ToJson());
 
             questionNav.results = record.questions;
             questionNav.showAnswer = true;

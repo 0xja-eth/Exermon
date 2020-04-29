@@ -69,8 +69,8 @@ namespace UI.Common.Controls.ParamDisplays {
             var res = new JsonData();
             if (obj == null) return res;
 
-            res["ori_value"] = obj.exp();
-            res["ori_rate"] = obj.exp() * 1.0 / obj.maxExp();
+            res["value"] = res["ori_value"] = obj.exp();
+            res["rate"] = res["ori_rate"] = obj.exp() * 1.0 / obj.maxExp();
             res["max"] = obj.maxExp();
 
             return res;
@@ -80,8 +80,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 设置值
         /// </summary>
         /// <param name="obj"></param>
-        public void setValue(IExpConvertable obj) {
-            setValue(generateJsonFromExpConvertable(obj));
+        public void setValue(IExpConvertable obj, bool force = true) {
+            setValue(generateJsonFromExpConvertable(obj), force);
         }
 
         #endregion
@@ -89,7 +89,7 @@ namespace UI.Common.Controls.ParamDisplays {
         #region 界面绘制
 
         /// <summary>
-        /// 实际刷新函数
+        /// 实际刷新函数s
         /// </summary>
         protected override void refreshMain() {
             base.refreshMain();

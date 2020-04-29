@@ -589,7 +589,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="index">索引</param>
         public virtual void check(T item, bool force = false) {
-            check(items.IndexOf(item));
+            check(items.IndexOf(item), force);
         }
         public virtual void check(int index, bool force = false) {
             //Debug.Log("check: " + index);
@@ -672,6 +672,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选中改变事件回调
         /// </summary>
         protected virtual void onCheckChanged() {
+            Debug.Log("onCheckChanged: " + name + ": " + 
+                string.Join(",", checkedIndices));
             requestRefresh();
             callbackCheckChange();
         }

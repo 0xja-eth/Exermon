@@ -31,7 +31,6 @@ namespace UI.Common.Controls.QuestionDisplay {
             get { return _result; }
             set {
                 _result = value;
-                setupSelection();
                 requestRefresh();
             }
         }
@@ -58,7 +57,15 @@ namespace UI.Common.Controls.QuestionDisplay {
             if (result == null) return;
             var selection = result.getSelection();
             foreach (var sel in selection)
-                check(items.Find(c => c.order == sel));
+                check(items.Find(c => c.order == sel), true);
+        }
+
+        /// <summary>
+        /// 物品变更回调
+        /// </summary>
+        protected override void onItemsChanged() {
+            base.onItemsChanged();
+            setupSelection();
         }
 
         #endregion

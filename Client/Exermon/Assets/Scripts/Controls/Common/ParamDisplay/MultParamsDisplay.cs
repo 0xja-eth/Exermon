@@ -552,7 +552,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         void processParamDisplayItem(DisplayItem item, JsonData value) {
             if (!item.obj.activeSelf) return;
-            var display = SceneUtils.get<MultParamsDisplay>(item.obj);
+            var display = SceneUtils.get<ParamDisplay>(item.obj);
             if (display == null) return;
             display.setValue(value);
         }

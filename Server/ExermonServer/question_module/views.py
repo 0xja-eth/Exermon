@@ -119,7 +119,7 @@ class Check:
 	# 校验题目反馈的长度-lgy
 	@classmethod
 	def ensureQuestionTypeExist(cls, val: int):
-		ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidFeedbackType)
+		ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidQuesReportType)
 
 
 # =======================

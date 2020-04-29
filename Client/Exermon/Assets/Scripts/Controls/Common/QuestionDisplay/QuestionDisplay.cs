@@ -178,7 +178,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            result = null; showAnswer = false;
+            // result = null; showAnswer = false;
         }
 
         #endregion

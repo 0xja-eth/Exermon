@@ -35,9 +35,9 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="value">值</param>
         /// <returns>返回值对应的比率</returns>
-        public override float calcRate(float value) {
+        public override double calcRate(double value) {
             var tmp = (value / param.max) - 0.5f * 10;
-            return (float)CalcService.Common.sigmoid(tmp);
+            return CalcService.Common.sigmoid(tmp);
         }
 
         #endregion

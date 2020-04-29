@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1718521159439039297}
   - component: {fileID: 732640450724448411}
   - component: {fileID: 7586799254182434530}
+  - component: {fileID: 1777489591733414345}
   m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
@@ -73,6 +74,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!111 &1777489591733414345
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82364519024210886}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &1131763825797029655
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,7 +393,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8445238179087237236}
   - component: {fileID: 4626819883342871935}
-  - component: {fileID: 7164016380489092088}
   m_Layer: 5
   m_Name: ParamBarDisplay
   m_TagString: Untagged
@@ -421,23 +436,12 @@ MonoBehaviour:
   titleText: {fileID: 0}
   valueText: {fileID: 2429311568303017076}
   bar: {fileID: 7586799254182434530}
-  ani: {fileID: 7164016380489092088}
+  ani: {fileID: 1777489591733414345}
   duration: 0.75
   barType: 2
   valueType: 2
+  deltaValueType: 0
   valueFormat: '{0}'
---- !u!111 &7164016380489092088
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8727770391586331319}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
+  setValueType: 0
+  defaultMax: 0
+  defaultValue: 0

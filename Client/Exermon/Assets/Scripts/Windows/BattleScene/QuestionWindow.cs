@@ -131,6 +131,8 @@ namespace UI.BattleScene.Windows {
         protected override void refreshQuestion() {
             base.refreshQuestion();
 
+            questionDisplay.result = null;
+            questionDisplay.showAnswer = false;
             questionDisplay.setItem(question);
             questionDisplay.startQuestion();
         }

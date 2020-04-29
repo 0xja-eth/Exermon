@@ -29,17 +29,17 @@ namespace UI.Common.Controls.ParamDisplays {
         public class ParamData : BaseData {
 
             [AutoConvert]
-            public string title { get; set; }
+            public string title { get; set; } = "";
             [AutoConvert]
-            public float max { get; set; }
+            public double max { get; set; } = 0;
             [AutoConvert]
-            public float value { get; set; }
+            public double value { get; set; } = 0;
             [AutoConvert]
-            public float rate { get; set; }
+            public double rate { get; set; } = 0;
             [AutoConvert]
-            public float oriValue { get; set; }
+            public double oriValue { get; set; } = 0;
             [AutoConvert]
-            public float oriRate { get; set; }
+            public double oriRate { get; set; } = 0;
         }
 
         /// <summary>
@@ -84,12 +84,24 @@ namespace UI.Common.Controls.ParamDisplays {
 
         public SetValueType setValueType = SetValueType.Value;
 
+        public float defaultMax = 0;
+        public float defaultValue = 0;
+
         /// <summary>
         /// 内部变量
         /// </summary>
         protected ParamData param = new ParamData();
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            param.max = defaultMax;
+            param.value = defaultValue;
+        }
 
         #endregion
 
@@ -98,8 +110,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 设置值
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="force"></param>
+        /// <param name="value">值</param>
+        /// <param name="force">强制</param>
         public override void setValue(JsonData value, bool force = false) {
             base.setValue(value, force); loadData();
         }
@@ -127,20 +139,32 @@ namespace UI.Common.Controls.ParamDisplays {
                 case SetValueType.Value:
                     param.rate = calcRate(param.value = value); break;
                 case SetValueType.ValueIncr:
-                    param.rate = calcRate(param.value += value); break;
-                case SetValueType.Rate: param.rate = value; break;
-                case SetValueType.RateIncr: param.rate += value; break;
+                    param.rate = calcRate(param.value = param.oriValue + value); break;
+                case SetValueType.Rate:
+                    param.value = calcValue(param.rate = value); break;
+                case SetValueType.RateIncr:
+                    param.value = calcValue(param.rate = param.oriRate + value); break;
             }
+            Debug.Log("param: " + param.toJson().ToJson());
             requestRefresh();
         }
 
         /// <summary>
         /// 计算比率
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">值</param>
         /// <returns></returns>
-        public virtual float calcRate(float value) {
+        public virtual double calcRate(double value) {
             return param.max > 0 ? value / param.max : 0;
+        }
+
+        /// <summary>
+        /// 计算值
+        /// </summary>
+        /// <param name="rate">比率</param>
+        /// <returns></returns>
+        public virtual double calcValue(double rate) {
+            return rate * param.max;
         }
 
         /// <summary>
@@ -164,12 +188,13 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="rate">比率</param>
         /// <param name="oriRate">原始比率</param>
         /// <param name="animated">是否动画</param>
-        void drawBar(float rate, float oriRate, bool animated = true) {
+        void drawBar(double rate, double oriRate, bool animated = true) {
             if (!bar) return;
-            rate = Mathf.Clamp01(rate);
-            oriRate = Mathf.Clamp01(oriRate);
-            if (animated) drawBarWithAnimation(rate, oriRate);
-            else drawBarNoAnimation(rate);
+            rate = Mathf.Clamp01((float)rate);
+            oriRate = Mathf.Clamp01((float)oriRate);
+            if (animated)
+                drawBarWithAnimation((float)rate, (float)oriRate);
+            else drawBarNoAnimation((float)rate);
         }
 
         /// <summary>
@@ -213,11 +238,13 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 绘制值
         /// </summary>
         /// <param name="value">值</param>
-        void drawValue(float value, float oriValue, float max) {
+        void drawValue(double value, double oriValue, double max) {
             if (!valueText) return;
             var delta = value - oriValue;
-            value = Mathf.Clamp(value, 0, max);
-            oriValue = Mathf.Clamp(oriValue, 0, max);
+
+            value = Mathf.Clamp((float)value, 0, (float)max);
+            oriValue = Mathf.Clamp((float)oriValue, 0, (float)max);
+
             valueText.text = string.Format(valueFormat, 
                 value2Str(value), value2Str(max), 
                 value2Str(delta, deltaValueType) 
@@ -229,10 +256,10 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        string value2Str(float value) {
+        string value2Str(double value) {
             return value2Str(value, valueType);
         }
-        string value2Str(float value, ValueType valueType) {
+        string value2Str(double value, ValueType valueType) {
             var res = "";
             switch (valueType) {
                 case ValueType.Number: return value.ToString();
@@ -265,7 +292,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         protected override void refreshMain() {
             drawTitle(param.title);
-            drawValue(param.value, param.oriRate, param.max);
+            drawValue(param.value, param.oriValue, param.max);
             drawBar(param.rate, param.oriRate, !force);
         }
 

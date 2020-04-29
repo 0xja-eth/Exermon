@@ -284,6 +284,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshSelectStatus() {
             var selected = isSelected();
+            Debug.Log("refreshSelectStatus: " + name + ": " + selected);
             if (selected) changeBackgroundColor(selectedColor);
             if (selectedFlag) selectedFlag.SetActive(selected);
         }
@@ -293,6 +294,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshCheckStatus() {
             var checked_ = isChecked();
+            Debug.Log("refreshCheckStatus: " + name + ": " + checked_);
             if (checked_) changeBackgroundColor(checkedColor);
             if (checkedFlag) checkedFlag.SetActive(checked_);
         }
