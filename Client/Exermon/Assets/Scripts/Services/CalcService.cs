@@ -7,6 +7,7 @@ using Core.Data.Loaders;
 using Core.Services;
 
 using GameModule.Data;
+using PlayerModule.Data;
 using ItemModule.Data;
 using ExermonModule.Data;
 using SeasonModule.Data;
@@ -346,6 +347,35 @@ namespace GameModule.Services {
                 double def, double eva, double cri) {
                 return (int)Math.Round((mhp + mmp * 2 + atk * 6 * C *
                     (1 + cri / 100) + def * 4) * (1 + eva / 50));
+            }
+        }
+
+        /// <summary>
+        /// 最大星级计算类
+        /// </summary>
+        public class MaxStarCalc {
+
+            /// <summary>
+            /// 计算
+            /// </summary>
+            /// <param name="player">玩家</param>
+            /// <param name="sid">科目ID</param>
+            /// <returns></returns>
+            static public QuesStar calc(Player player, int sid) {
+                var stars = DataService.get().staticData.configure.quesStars;
+                var exerSlot = player.slotContainers.exerSlot;
+                var exerSlotItem = exerSlot.getSlotItem(sid);
+
+                if (exerSlotItem == null) return null;
+
+                var lastStar = stars[0];
+                foreach(var star in stars) {
+                    if (exerSlotItem.level < star.level)
+                        return lastStar;
+                    lastStar = star;
+                }
+
+                return lastStar;
             }
         }
 

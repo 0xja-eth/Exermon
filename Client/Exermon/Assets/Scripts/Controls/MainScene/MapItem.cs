@@ -29,11 +29,6 @@ namespace UI.MainScene.Controls {
         /// </summary>
         int counter = 0;
         int nextDelta = 0;
-
-        /// <summary>
-        /// 场景组件引用
-        /// </summary>
-        MainScene scene;
         
         #region 初始化
 
@@ -42,7 +37,6 @@ namespace UI.MainScene.Controls {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            scene = (MainScene)SceneUtils.getSceneObject("Scene");
             setupOnClick();
         }
 
@@ -51,7 +45,19 @@ namespace UI.MainScene.Controls {
         /// </summary>
         void setupOnClick() {
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => scene.onBulidingsClick(type));
+            button.onClick.AddListener(() => scene().onBulidingsClick(type));
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 场景引用
+        /// </summary>
+        /// <returns></returns>
+        MainScene scene() {
+            return (MainScene)SceneUtils.getSceneObject("Scene");
         }
 
         #endregion

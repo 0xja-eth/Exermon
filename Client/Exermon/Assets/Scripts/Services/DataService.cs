@@ -303,6 +303,15 @@ namespace GameModule.Services {
                 GetProperty(attrName).GetValue(staticData.configure), id);
         }
         */
+        public Tuple<int, string>[] typeDataToTuples(TypeData[] data) {
+            var len = data.Length;
+            var res = new Tuple<int, string>[len];
+            for (int i = 0; i < len; ++i) 
+                res[i] = new Tuple<int, string>(
+                    data[i].getID(), data[i].name);
+            return res;
+        }
+
         /// <summary>
         /// 组合术语
         /// </summary>

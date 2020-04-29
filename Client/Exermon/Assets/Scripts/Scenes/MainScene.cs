@@ -13,6 +13,8 @@ using ExermonModule.Services;
 
 namespace UI.MainScene {
 
+    using Windows;
+
     /// <summary>
     /// 主场景
     /// </summary>
@@ -36,6 +38,7 @@ namespace UI.MainScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public ExerciseConfigWindow exerciseWindow;
 
         /// <summary>
         /// 能否跟随旋转
@@ -121,9 +124,7 @@ namespace UI.MainScene {
         /// 图书馆点击回调
         /// </summary>
         void onLibraryClick() {
-            var recordSer = RecordModule.Services.RecordService.get();
-            recordSer.generateExercise(2, 1, 10, () =>
-                sceneSys.pushScene(SceneSystem.Scene.ExerciseScene));
+            exerciseWindow.startWindow();
         }
 
         #endregion

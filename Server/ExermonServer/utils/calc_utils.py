@@ -852,7 +852,7 @@ class QuestionGenerator:
 			level = slot_item.slotLevel()
 
 			min_star = 1
-			max_star = self.getMaxStar(level)
+			max_star = self.getMaxStar(level).id
 
 			print("slot level: %d, max_star: %d" % (level, max_star))
 
@@ -1025,14 +1025,13 @@ class MaxStarCalc:
 
 		stars = QuestionStar.objs()
 
-		star_id = 0
+		last_star = stars[0]
 		for star in stars:
 			if level < star.level:
-				return star_id
-			star_id += 1
+				return last_star
+			last_star = star
 
-		return star_id
-
+		return last_star
 
 # # ================================
 # # 对战（单题）收益计算类
