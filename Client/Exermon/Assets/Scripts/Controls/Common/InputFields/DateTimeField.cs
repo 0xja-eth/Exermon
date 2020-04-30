@@ -47,6 +47,25 @@ namespace UI.Common.Controls.InputFields {
         }
 
         /// <summary>
+        /// 配置
+        /// </summary>
+        /// <param name="min">最小日期</param>
+        /// <param name="max">最大日期</param>
+        /// <param name="default_">默认日期</param>
+        public void configure(DateTime min) {
+            configure(min, DateTime.Now);
+        }
+        public void configure(DateTime min, DateTime max) {
+            configure(min, max, defaultDateTime);
+        }
+        public void configure(DateTime min, DateTime max, DateTime default_) {
+            defaultDateTime = default_;
+            minDateTime = min;
+            maxDateTime = max;
+            configure();
+        }
+
+        /// <summary>
         /// 配置日期选择项
         /// </summary>
         void setupPickers() {

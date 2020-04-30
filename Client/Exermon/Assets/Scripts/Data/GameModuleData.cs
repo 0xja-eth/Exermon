@@ -371,6 +371,8 @@ namespace GameModule.Data {
         public int maxSubject { get; protected set; }
         [AutoConvert]
         public int maxExerciseCount { get; protected set; }
+        [AutoConvert(format: "date")]
+        public DateTime minBirth { get; protected set; }
 
         /// <summary>
         /// 组合术语

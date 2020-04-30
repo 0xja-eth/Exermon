@@ -267,6 +267,8 @@ class Player(CacheableModel):
 
 	SUCCESSFUL_LOGOUT_MSG = '您已成功退出登录！'
 
+	MIN_BIRTH = datetime.datetime(1988, 1, 1)
+
 	MAX_CREDIT = 100
 
 	GRADES = [
@@ -349,7 +351,7 @@ class Player(CacheableModel):
 	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
 
 	# 生日
-	birth = models.DateField(blank=True, null=True, verbose_name="生日")
+	birth = models.DateField(default=MIN_BIRTH.date(), verbose_name="生日")
 
 	# 学校
 	school = models.CharField(blank=True, null=True, max_length=24, verbose_name="学校")
@@ -614,8 +616,8 @@ class Player(CacheableModel):
 
 			rank, sub_rank, _ = season_record.rank()
 
-			exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
-			battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+			# exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
+			# battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
 
 			base["rank_id"] = rank.id
 			base['sub_rank'] = sub_rank

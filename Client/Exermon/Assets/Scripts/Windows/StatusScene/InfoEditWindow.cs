@@ -97,9 +97,11 @@ namespace UI.StatusScene.Windows {
         /// 配置子组件
         /// </summary>
         void configureSubViews() {
+            var min = dataSer.staticData.configure.minBirth;
             var grades = dataSer.staticData.configure.playerGrades;
             name.check = ValidateService.checkName;
             grade.configure(grades);
+            birth.configure(min);
         }
 
         #endregion

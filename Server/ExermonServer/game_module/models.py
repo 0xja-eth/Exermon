@@ -954,6 +954,8 @@ class GameConfigure(models.Model):
 		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
 		result_judges = ModelUtils.objectsToDict(self.battleresultjudge_set.all())
 
+		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
+
 		return {
 			'name': self.name,
 			'eng_name': self.eng_name,
@@ -965,6 +967,7 @@ class GameConfigure(models.Model):
 			'max_subject': Subject.MAX_SELECTED,
 			'max_exercise_count': ExerciseRecord.MAX_COUNT,
 			'report_desc_len': QuesReport.MAX_DESC_LEN,
+			'min_birth': min_birth,
 
 			# player_module
 			'character_genders': Character.CHARACTER_GENDERS,

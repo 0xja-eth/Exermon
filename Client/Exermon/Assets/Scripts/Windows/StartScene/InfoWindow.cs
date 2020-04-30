@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
-
-using LitJson;
+﻿
+using System;
 
 using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
+using GameModule.Services;
 using PlayerModule.Services;
 
 using UI.Common.Controls.InputFields;
@@ -21,6 +16,12 @@ namespace UI.StartScene.Windows {
     /// 补全信息窗口
     /// </summary>
     public class InfoWindow : BaseWindow {
+
+        /// <summary>
+        /// 常量定义
+        /// </summary>
+        static readonly TimeSpan DeltaDate = 
+            new TimeSpan(18 * 365, 0, 0, 0, 0); // 18 年
 
         /// <summary>
         /// 文本常量定义
@@ -43,9 +44,27 @@ namespace UI.StartScene.Windows {
         /// 外部系统引用
         /// </summary>
         GameSystem gameSys = null;
+        DataService dataSer = null;
         PlayerService playerSer = null;
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            configureInputs();
+        }
+
+        /// <summary>
+        /// 配置输入域
+        /// </summary>
+        void configureInputs() {
+            var now = DateTime.Now;
+            var min = dataSer.staticData.configure.minBirth;
+            birthInput.configure(min, now, now - DeltaDate);
+        }
 
         /// <summary>
         /// 初始化场景
@@ -60,6 +79,7 @@ namespace UI.StartScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
+            dataSer = DataService.get();
             playerSer = PlayerService.get();
         }
 

@@ -420,8 +420,7 @@ class Check:
 	@classmethod
 	def ensureBirthFormat(cls, val: datetime.date):
 		now = datetime.datetime.now()
-		min_date = datetime.datetime(1900, 1, 1)
-		if val < min_date or val > now:
+		if val < Player.MIN_BIRTH or val > now:
 			raise GameException(ErrorType.InvalidBirth)
 
 	# 校验学校格式

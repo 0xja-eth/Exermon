@@ -24,8 +24,6 @@ namespace UI.MainScene.Windows {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const int MinExerciseCount = 1;
-        const int MaxExerciseCount = 10;
 
         /// <summary>
         /// 外部组件设置
@@ -83,13 +81,14 @@ namespace UI.MainScene.Windows {
         /// </summary>
         void configureSubViews() {
             var player = playerSer.player;
-            var mmodes = dataSer.staticData.configure.exerciseGenTypes;
             var subjects = player.subjects();
+            var mmodes = dataSer.staticData.configure.exerciseGenTypes;
+            var maxCount = dataSer.staticData.configure.maxExerciseCount;
 
             countSlider.onChanged = (_) => updateTimeEval();
             subjectSelect.onChanged = (_) => updateTimeEval();
 
-            countSlider.configure(MinExerciseCount, MaxExerciseCount);
+            countSlider.configure(1, maxCount);
             subjectSelect.configure(subjects);
             modeSelect.configure(mmodes);
 
