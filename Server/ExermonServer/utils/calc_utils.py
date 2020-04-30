@@ -1665,12 +1665,12 @@ class BattleScoreCalc:
 		self._calc()
 
 	def _calc(self):
-		self.time_score = self._calcTimeScore()
-		self.hurt_score = self._calcHurtScore()
-		self.damage_score = self._calcDamageScore()
-		self.recovery_score = self._calcRecoveryScore()
-		self.correct_score = self._calcCorrectScore()
-		self.plus_score = self._calcPlusScore()
+		self.time_score = min(self._calcTimeScore(), 100)
+		self.hurt_score = min(self._calcHurtScore(), 100)
+		self.damage_score = min(self._calcDamageScore(), 100)
+		self.recovery_score = min(self._calcRecoveryScore(), 100)
+		self.correct_score = min(self._calcCorrectScore(), 100)
+		self.plus_score = min(self._calcPlusScore(), 100)
 
 	# 计算时间分数
 	def _calcTimeScore(self):

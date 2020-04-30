@@ -80,7 +80,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         public virtual void setValue(JsonData value, bool force = false) {
             this.force = force; rawData = value;
-            Debug.Log("SetValue: " + name + ":" + value.ToJson());
+            if (value == null) rawData = new JsonData();
+            Debug.Log("SetValue: " + name + ":" + rawData.ToJson());
             requestRefresh();
         }
         /// <param name="obj">值对象</param>
@@ -112,7 +113,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 清除值
         /// </summary>
         public virtual void clearValue() {
-            force = true; rawData = null;
+            force = true; rawData = new JsonData();
             requestRefresh(true);
         }
 

@@ -19,7 +19,7 @@ namespace Core.Systems {
         /// <summary>
         /// 文本设定
         /// </summary>
-        const string ConnectingWaitText = "连接服务器中...";
+        const string ConnectingWaitText = "连接服务器中";
         const string ConnectionFailText = "连接服务器发生错误，错误信息：\n{0}\n选择“重试”重新连接，选择“取消”退出游戏。";
 
         const string DisconnectedAlertText = "您已断开连接：\n{0}\n选择“重试”重新连接，选择“取消”退出游戏。\n若仍然无法连接，请联系管理员。";
