@@ -67,9 +67,9 @@ class BattlePlayerAdmin(QuestionSetRecordAdmin):
 @xadmin.sites.register(BattleRoundResult)
 class BattleRoundResultAdmin(PlayerQuestionAdmin):
 	list_display = PlayerQuestionAdmin.list_display + \
-				   ['round', 'battle_player', 'attack', 'skill', 'target_type'
+				   ['round', 'battle_player', 'attack', 'skill', 'target_type',
 					   'result_type', 'hurt', 'damage', 'recovery']
 
 	list_editable = PlayerQuestionAdmin.list_editable + \
-					['attack', 'skill', 'target_type'
+					['attack', 'skill', 'target_type',
 					 'result_type', 'hurt', 'damage', 'recovery']

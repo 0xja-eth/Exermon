@@ -51,19 +51,19 @@ class ExerciseQuestionAdmin(PlayerQuestionAdmin):
 class QuestionSetRecordAdmin(object):
 
 	list_display = ['id', 'player', 'create_time', 'finished',
-					'exp_incr', 'slot_exp_incr', 'gold_incr']
+					'adminExerExpIncrs', 'adminSlotExpIncrs',
+					'adminExpIncrs', 'gold_incr']
 
-	list_editable = ['player', 'create_time', 'finished',
-					 'exp_incr', 'slot_exp_incr', 'gold_incr']
+	list_editable = ['player', 'create_time', 'finished', 'gold_incr']
 
 
 @xadmin.sites.register(ExerciseRecord)
 class ExerciseRecordAdmin(QuestionSetRecordAdmin):
 
 	list_display = QuestionSetRecordAdmin.list_display + \
-				   ['subject', 'count', 'dtb_type']
+				   ['subject', 'count', 'gen_type']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   ['subject', 'count', 'dtb_type']
+				   ['subject', 'count', 'gen_type']
 
 	inlines = [ExerciseQuestionsInline]

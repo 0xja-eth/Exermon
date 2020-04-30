@@ -476,7 +476,14 @@ class Player(CacheableModel):
 		season_record = self.currentSeasonRecord()
 		battle_records = self.battlePlayerRecords()
 
-		rank, sub_rank, _ = season_record.rank()
+		if season_record is not None:
+			star_num = season_record.star_num
+			point = season_record.point
+
+			rank, sub_rank, _ = season_record.rank()
+			rank_id = rank.id
+		else:
+			rank_id = sub_rank = star_num = point = 0
 
 		count = win_cnt = corr_cnt = 0
 		sum_hurt = sum_damage = sum_score = 0
@@ -511,10 +518,10 @@ class Player(CacheableModel):
 		avg_score = sum_score / count if count > 0 else 0
 
 		return {
-			'rank_id': rank.id,
+			'rank_id': rank_id,
 			'sub_rank': sub_rank,
-			'star_num': season_record.star_num,
-			'score': season_record.point,
+			'star_num': star_num,
+			'score': point,
 			'credit': self.credit,
 			'count': count,
 			'win_rate': win_rate,

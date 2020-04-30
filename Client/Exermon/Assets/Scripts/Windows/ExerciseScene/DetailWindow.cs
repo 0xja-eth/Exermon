@@ -110,6 +110,5 @@ namespace UI.ExerciseScene.Windows {
         }
         
         #endregion
-
     }
 }

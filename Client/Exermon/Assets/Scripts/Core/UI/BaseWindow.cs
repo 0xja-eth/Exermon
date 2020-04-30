@@ -36,6 +36,11 @@ namespace Core.UI {
 
         public string shownAttr = "shown"; // 显示状态属性
 
+        /// <summary>
+        /// 动画过渡
+        /// </summary>
+        bool isShowing = false, isHiding = false;
+
         /*
         /// <summary>
         /// 内部变量声明
@@ -75,6 +80,7 @@ namespace Core.UI {
         /// </summary>
         protected override void update() {
             base.update();
+            Debug.Log(name + ": isShowing: " + isShowing + ", isHiding: " + isHiding);
             updateBackground();
         }
 
@@ -93,7 +99,8 @@ namespace Core.UI {
         /// 启动窗口
         /// </summary>
         public virtual void startWindow() {
-            base.startView();
+            Debug.Log("startWindow: " + name);
+            isShowing = true; base.startView();
         }
 
         /// <summary>
@@ -109,7 +116,8 @@ namespace Core.UI {
         /// 结束窗口
         /// </summary>
         public virtual void terminateWindow() {
-            base.terminateView();
+            Debug.Log("terminateWindow: " + name);
+            isHiding = true; base.terminateView();
         }
 
         /// <summary>
@@ -124,15 +132,17 @@ namespace Core.UI {
         /// 窗口完全显示回调
         /// </summary>
         protected virtual void onWindowShown() {
-            requestRefresh(true);
+            Debug.Log("onWindowShown: " + name);
+            isShowing = false; requestRefresh(true);
         }
 
         /// <summary>
         /// 窗口完全隐藏回调
         /// </summary>
         protected virtual void onWindowHidden() {
-            base.hideView();
-            updateBackground();
+            Debug.Log("onWindowHidden: " + name);
+            isHiding = false; if (isShowing) return;
+            base.hideView(); updateBackground();
         }
 
         #endregion

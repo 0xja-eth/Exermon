@@ -204,7 +204,7 @@ namespace BattleModule.Services {
         }
         public void cancelMatch(NetworkSystem.RequestObject.SuccessAction onSuccess = null,
             UnityAction onError = null) {
-            sendRequest(Oper.MatchCancel, uid: true);
+            sendRequest(Oper.MatchCancel, null, onSuccess, onError, uid: true);
         }
 
         /// <summary>

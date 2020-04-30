@@ -582,6 +582,57 @@ class QuestionSetRecord(CacheableModel):
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
 
+	def adminExerExpIncrs(self):
+		"""
+		Admin 用显示艾瑟萌经验奖励
+		"""
+		from django.utils.html import format_html
+		from game_module.models import Subject
+
+		res = ""
+		sbjs = Subject.objs()
+
+		for sid in self.exer_exp_incrs:
+			res += "%s + %d<br>" % \
+				   (sbjs.get(id=sid).name,
+					self.exer_exp_incrs[sid])
+
+		return format_html(res)
+
+	adminExerExpIncrs.short_description = "艾瑟萌经验奖励"
+
+	def adminSlotExpIncrs(self):
+		"""
+		Admin 用显示艾瑟萌槽经验奖励
+		"""
+		from django.utils.html import format_html
+		from game_module.models import Subject
+
+		res = ""
+		sbjs = Subject.objs()
+
+		for sid in self.slot_exp_incrs:
+			res += "%s + %d<br>" % \
+				   (sbjs.get(id=sid).name,
+					self.exer_exp_incrs[sid])
+
+		return format_html(res)
+
+	adminSlotExpIncrs.short_description = "艾瑟萌槽经验奖励"
+
+	def adminExpIncrs(self):
+		"""
+		Admin 用显示人物经验奖励
+		"""
+		res = 0
+
+		for sid in self.slot_exp_incrs:
+			res += self.slot_exp_incrs[sid]
+
+		return res
+
+	adminExpIncrs.short_description = "人物经验奖励"
+
 	# 创建一个题目集
 	@classmethod
 	def create(cls, player: 'Player', **kwargs) -> 'QuestionSetRecord':
