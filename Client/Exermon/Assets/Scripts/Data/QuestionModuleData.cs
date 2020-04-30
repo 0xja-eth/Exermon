@@ -42,6 +42,59 @@ namespace QuestionModule.Data {
         }
 
         /// <summary>
+        /// 题目详情
+        /// </summary>
+        public class Detail : BaseData,
+            ParamDisplay.IDisplayDataConvertable {
+
+            /// <summary>
+            /// 过期秒数（30min)
+            /// </summary>
+            const int OutOfDateSeconds = 60 * 30;
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int sumPlayer { get; protected set; }
+            [AutoConvert]
+            public int count { get; protected set; }
+            [AutoConvert]
+            public int sumCollect { get; protected set; }
+            [AutoConvert]
+            public double corrRate { get; protected set; }
+            [AutoConvert]
+            public double allCorrRate { get; protected set; }
+            [AutoConvert]
+            public int firstTime { get; protected set; }
+            [AutoConvert]
+            public int lastTime { get; protected set; }
+            [AutoConvert]
+            public int allAvgTime { get; protected set; }
+            [AutoConvert]
+            public DateTime firstDate { get; protected set; }
+            [AutoConvert]
+            public DateTime updateDate { get; protected set; }
+
+            /// <summary>
+            /// 数据转换
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            public JsonData convertToDisplayData(string type = "") {
+                return toJson();
+            }
+
+            /// <summary>
+            /// 是否过期
+            /// </summary>
+            /// <returns></returns>
+            public bool isOutOfDate() {
+                return (DateTime.Now - updateDate).TotalSeconds >= OutOfDateSeconds;
+            }
+        }
+
+        /// <summary>
         /// 题目选项数据
         /// </summary>
         public class Choice : BaseData {
@@ -128,6 +181,9 @@ namespace QuestionModule.Data {
         [AutoConvert]
         public Picture[] pictures { get; protected set; }
 
+        [AutoConvert]
+        public Detail detail { get; protected set; } = null;
+
         /// <summary>
         /// 打乱的选项
         /// </summary>
@@ -152,7 +208,14 @@ namespace QuestionModule.Data {
         /// </summary>
         /// <returns></returns>
         JsonData convertDetailData() {
-            var res = new JsonData();
+            if (detail == null) return new JsonData();
+            var res = detail.convertToDisplayData();
+
+            res["number"] = number;
+            res["subject"] = subject().name;
+            res["type"] = typeText();
+            res["score"] = score;
+            res["source"] = source;
 
             return res;
         }
@@ -237,6 +300,14 @@ namespace QuestionModule.Data {
         /// </summary>
         public void clearShuffleChoices() {
             _shuffleChoices = null;
+        }
+
+        /// <summary>
+        /// 是否有详情数据
+        /// </summary>
+        /// <returns></returns>
+        public bool hasDetail() {
+            return detail != null && !detail.isOutOfDate();
         }
 
         #endregion

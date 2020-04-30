@@ -50,7 +50,6 @@ namespace UI.ExerciseScene.Windows {
         public bool starting { get; private set; } = true; // 回合索引
 
         ExerciseRecord record;
-        Question question;
 
         /// <summary>
         /// 外部系统
@@ -92,6 +91,18 @@ namespace UI.ExerciseScene.Windows {
             questionNav.configure(record.getQuestions());
             questionNav.select(0, true);
             startQuestion();
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 当前题目
+        /// </summary>
+        /// <returns></returns>
+        public Question currentQuestion() {
+            return questionDisplay.getItem(); 
         }
 
         #endregion
@@ -156,7 +167,8 @@ namespace UI.ExerciseScene.Windows {
         /// 结束刷题
         /// </summary>
         public void terminate() {
-            answer(true, true);
+            if (recordSer.state == (int)RecordService.State.Started)
+                answer(true, true);
         }
 
         #endregion
@@ -174,7 +186,7 @@ namespace UI.ExerciseScene.Windows {
         /// 题目开始回调
         /// </summary>
         void onQuestionStarted() {
-            var question = questionDisplay.getItem();
+            var question = currentQuestion();
             timer.startTimer(question.star().stdTime);
             questionDisplay.startQuestion();
         }

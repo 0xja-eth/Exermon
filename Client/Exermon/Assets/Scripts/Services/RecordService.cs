@@ -208,6 +208,7 @@ namespace RecordModule.Services {
         /// 外部系统
         /// </summary>
         QuestionService quesSer;
+        SceneSystem sceneSys;
 
         #region 初始化
 
@@ -217,6 +218,7 @@ namespace RecordModule.Services {
         protected override void initializeSystems() {
             base.initializeSystems();
             quesSer = QuestionService.get();
+            sceneSys = SceneSystem.get();
         }
 
         /// <summary>
@@ -433,6 +435,14 @@ namespace RecordModule.Services {
         }
 
         #endregion
+
+        /// <summary>
+        /// 结束
+        /// </summary>
+        public void terminate() {
+            changeState(State.Closed);
+            sceneSys.popScene();
+        }
 
         #endregion
     }

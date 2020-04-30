@@ -29,6 +29,8 @@ namespace QuestionModule.Services {
         const string GetReports = "查询反馈记录";
         const string PushReport = "提交反馈";
 
+        const string GetDetail = "获取题目详情";
+
         /// <summary>
         /// 题目缓存
         /// </summary>
@@ -64,6 +66,7 @@ namespace QuestionModule.Services {
         public enum Oper {
             Get,
             GetReports, PushReport,
+            GetDetail,
         }
 
         /// <summary>
@@ -75,6 +78,8 @@ namespace QuestionModule.Services {
         /// 反馈记录
         /// </summary>
         public QuesReport[] quesReports { get; protected set; }
+
+        public 
 
         /// <summary>
         /// 外部系统
@@ -94,6 +99,9 @@ namespace QuestionModule.Services {
                 NetworkSystem.Interfaces.QuestionReportGet);
             addOperDict(Oper.PushReport, PushReport,
                 NetworkSystem.Interfaces.QuestionReportPush);
+
+            addOperDict(Oper.GetDetail, GetDetail,
+                NetworkSystem.Interfaces.QuestionDetailGet);
         }
 
         #endregion
@@ -155,6 +163,26 @@ namespace QuestionModule.Services {
             sendRequest(Oper.PushReport, data, _onSuccess, onError, uid: true);
         }
 
+        /// <summary>
+        /// 获取题目详情
+        /// </summary>
+        /// <param name="question">题目对象</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getDetail(Question question, UnityAction onSuccess, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                DataLoader.load(question, res);
+                onSuccess?.Invoke();
+            };
+            getDetail(question.getID(), _onSuccess, onError);
+        }
+        /// <param name="qid">题目ID</param>
+        public void getDetail(int qid, 
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["qid"] = qid;
+            sendRequest(Oper.GetDetail, data, onSuccess, onError, uid: true);
+        }
+
         #endregion
 
         #region 题目操作
@@ -182,6 +210,24 @@ namespace QuestionModule.Services {
         }
 
         /// <summary>
+        /// 读取题目详情（先判断缓存）
+        /// </summary>
+        /// <param name="question">题目对象</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void loadQuestionDetail(Question question, UnityAction onSuccess = null, UnityAction onError = null) {
+            if (question.hasDetail()) onSuccess?.Invoke();
+            else getDetail(question, onSuccess, onError);
+        }
+        /// <param name="qid">题目ID</param>
+        public void loadQuestionDetail(int qid, UnityAction onSuccess = null, UnityAction onError = null) {
+            loadQuestion(qid, () => {
+                var question = getQuestion(qid);
+                loadQuestionDetail(question, onSuccess, onError);
+            }, onError);
+        }
+
+        /// <summary>
         /// 题目是否已缓存
         /// </summary>
         /// <param name="qid">题目ID</param>
@@ -191,12 +237,33 @@ namespace QuestionModule.Services {
         }
 
         /// <summary>
+        /// 是否存在详情
+        /// </summary>
+        /// <param name="qid">题目ID</param>
+        /// <returns>返回是否有题目详情缓存</returns>
+        public bool isQuestionDetailCached(int qid) {
+            var question = getQuestion(qid);
+            return question != null && question.hasDetail();
+        }
+
+        /// <summary>
         /// 获取单个题目（需确保已经缓存）
         /// </summary>
         /// <param name="qid">题目ID</param>
         /// <returns>题目实例</returns>
         public Question getQuestion(int qid) {
             return questionCache.questions.Find(q => q.getID() == qid);
+        }
+
+        /// <summary>
+        /// 获取单个题目（需确保已经缓存）
+        /// </summary>
+        /// <param name="qid">题目ID</param>
+        /// <returns>题目实例</returns>
+        public Question.Detail getQuestionDetail(int qid) {
+            var question = getQuestion(qid);
+            if (question == null) return null;
+            return question.detail;
         }
 
         #endregion

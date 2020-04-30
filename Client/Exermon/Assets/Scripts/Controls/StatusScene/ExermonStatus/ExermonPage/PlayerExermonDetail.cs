@@ -60,6 +60,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawFullImage(PlayerExermon playerExer) {
             var exermon = playerExer.exermon();
+            full.gameObject.SetActive(true);
             full.overrideSprite = AssetLoader.generateSprite(exermon.full);
 
             stars.setValue(exermon.starId);

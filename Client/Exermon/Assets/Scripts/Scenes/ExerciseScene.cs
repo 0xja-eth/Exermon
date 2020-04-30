@@ -1,18 +1,10 @@
 ﻿
-using System;
-using System.Collections.Generic;
-
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
-
 using Core.UI;
 using Core.UI.Utils;
 
 using Core.Systems;
 
-using PlayerModule.Services;
-using SeasonModule.Services;
+using QuestionModule.Services;
 using RecordModule.Services;
 
 using UI.ExerciseScene.Windows;
@@ -41,6 +33,12 @@ namespace UI.ExerciseScene {
         public DetailWindow detailWindow;
         public ReportWindow reportWindow;
 
+        /// <summary>
+        /// 外部系统
+        /// </summary>
+        RecordService recordSer;
+        QuestionService quesSer;
+
         #region 初始化
 
         /// <summary>
@@ -50,7 +48,16 @@ namespace UI.ExerciseScene {
         public override string sceneName() {
             return SceneSystem.Scene.ExerciseScene;
         }
-        
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            recordSer = RecordService.get();
+            quesSer = QuestionService.get();
+        }
+
         /// <summary>
         /// 开始
         /// </summary>
@@ -67,7 +74,9 @@ namespace UI.ExerciseScene {
         /// 打开详情窗口
         /// </summary>
         public void openDetail() {
-            // detailWindow.startWindow();
+            quesSer.loadQuestionDetail(
+                questionWindow.currentQuestion(),
+                detailWindow.startWindow);
         }
 
         /// <summary>
@@ -81,9 +90,11 @@ namespace UI.ExerciseScene {
         /// 返回
         /// </summary>
         public void back() {
-            gameSys.requestAlert(BackAlertText,
-                Common.Windows.AlertWindow.Type.YesOrNo,
-                onTerminateExercise);
+            if (recordSer.state != (int)RecordService.State.Terminated)
+                gameSys.requestAlert(BackAlertText,
+                    Common.Windows.AlertWindow.Type.YesOrNo,
+                    onTerminateExercise);
+            else recordSer.terminate();
         }
 
         #endregion

@@ -34,7 +34,7 @@ namespace UI.MainScene.Windows {
         public ValueSlideField countSlider;
 
         public Text time;
-        
+
         /// <summary>
         /// 场景组件引用
         /// </summary>
@@ -105,7 +105,7 @@ namespace UI.MainScene.Windows {
         /// </summary>
         void updateTimeEval() {
             var player = playerSer.player;
-            var sid = subjectSelect.getIndex();
+            var sid = subjectSelect.getValueId();
             var count = (int)countSlider.getValue();
 
             var star = CalcService.MaxStarCalc.calc(player, sid);
@@ -139,8 +139,8 @@ namespace UI.MainScene.Windows {
         /// 开始刷题
         /// </summary>
         public void onSubmit() {
-            var sid = subjectSelect.getIndex();
-            var mode = modeSelect.getIndex();
+            var sid = subjectSelect.getValueId();
+            var mode = modeSelect.getValueId();
             var count = (int)countSlider.getValue();
             recordSer.generateExercise(sid, mode, count, () =>
                 sceneSys.pushScene(SceneSystem.Scene.ExerciseScene));

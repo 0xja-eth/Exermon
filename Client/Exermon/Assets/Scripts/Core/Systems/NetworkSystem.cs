@@ -90,6 +90,7 @@ namespace Core.Systems {
             public const string QuestionGet = "question/question/get";
             public const string QuestionReportGet = "question/report/get";
             public const string QuestionReportPush = "question/report/push";
+            public const string QuestionDetailGet = "question/detail/get";
 
             public const string SeasonRecordGet = "season/record/get";
             public const string SeasonRankGet = "season/rank/get";
