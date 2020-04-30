@@ -536,6 +536,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: PromptLayer
       objectReference: {fileID: 0}
+    - target: {fileID: 2055601799952812844, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5912940858844840937, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5912940859007033243, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5912940859708065416, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a5038c31e4becd458984b0d39bd1b2b, type: 3}
 --- !u!224 &93120739 stripped
@@ -558,7 +578,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!114 &93120741 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7421170412872988889, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+  m_CorrespondingSourceObject: {fileID: 5912940858844840939, guid: 7a5038c31e4becd458984b0d39bd1b2b,
     type: 3}
   m_PrefabInstance: {fileID: 93120738}
   m_PrefabAsset: {fileID: 0}

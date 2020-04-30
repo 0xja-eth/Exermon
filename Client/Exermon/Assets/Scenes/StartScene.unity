@@ -862,7 +862,7 @@ PrefabInstance:
     - target: {fileID: 2325465904369734621, guid: c731fdc038c2fa14895046c63facbb72,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -7.9999847
+      value: -7.999977
       objectReference: {fileID: 0}
     - target: {fileID: 4223823816465424607, guid: c731fdc038c2fa14895046c63facbb72,
         type: 3}
@@ -7830,7 +7830,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!114 &2144663325 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7421170412872988889, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+  m_CorrespondingSourceObject: {fileID: 5912940858844840939, guid: 7a5038c31e4becd458984b0d39bd1b2b,
     type: 3}
   m_PrefabInstance: {fileID: 2144663322}
   m_PrefabAsset: {fileID: 0}

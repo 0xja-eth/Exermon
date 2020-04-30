@@ -3148,7 +3148,7 @@ PrefabInstance:
     - target: {fileID: 1957784490324985394, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1957784491179220096, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
@@ -3178,7 +3178,7 @@ PrefabInstance:
     - target: {fileID: 1957784491179220096, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1957784491456811644, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
@@ -3208,7 +3208,7 @@ PrefabInstance:
     - target: {fileID: 1957784491456811644, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1957784491719009833, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
@@ -3238,7 +3238,7 @@ PrefabInstance:
     - target: {fileID: 1957784491719009833, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1957784491789809036, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
@@ -3403,7 +3403,7 @@ PrefabInstance:
     - target: {fileID: 1957784492029536196, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1957784492301408521, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
@@ -3433,7 +3433,7 @@ PrefabInstance:
     - target: {fileID: 1957784492301408521, guid: 6f29fcbd7f6d88c4eb698e09257b66de,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6f29fcbd7f6d88c4eb698e09257b66de, type: 3}
@@ -5019,7 +5019,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 322954723}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12194,7 +12194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!114 &1985090421 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7421170412872988889, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+  m_CorrespondingSourceObject: {fileID: 5912940858844840939, guid: 7a5038c31e4becd458984b0d39bd1b2b,
     type: 3}
   m_PrefabInstance: {fileID: 1985090418}
   m_PrefabAsset: {fileID: 0}

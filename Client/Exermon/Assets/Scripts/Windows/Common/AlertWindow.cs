@@ -94,7 +94,7 @@ namespace UI.Common.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
             if (background) DontDestroyOnLoad(background);
         }
 

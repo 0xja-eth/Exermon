@@ -203,6 +203,14 @@ namespace Core.UI.Utils {
         }
 
         /// <summary>
+        /// 设置加载进度
+        /// </summary>
+        /// <param name="tips">加载界面文本</param>
+        static void setupLoadingProgress(double progress = -1) {
+            if (loadingWindow) loadingWindow.setProgress(progress);
+        }
+
+        /// <summary>
         /// 结束加载窗口
         /// </summary>
         static void endLoadingWindow() {
@@ -222,7 +230,10 @@ namespace Core.UI.Utils {
         /// </summary>
         /// <param name="tips">加载界面文本</param>
         public static void processLoadingRequest(GameSystem.LoadingRequest req) {
-            if (req.start) startLoadingWindow(req.text);
+            if (req.start)
+                if (req.setProgress)
+                    setupLoadingProgress(req.progress);
+                else startLoadingWindow(req.text);
             else endLoadingWindow();
         }
 

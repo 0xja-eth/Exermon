@@ -15,19 +15,20 @@ namespace UI.Common.Windows {
     public class LoadingWindow : BaseWindow {
 
         /// <summary>
+        /// 常量定义
+        /// </summary>
+        const string ProgressTextFormat = "当前：{0}";
+
+        /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Transform rotateBar; // 旋转圈
-        public Transform progressBar; // 下方进度条
         public Text progressText, loadingText; // 进度文本，提示文本
-        public GameObject textArea; // 提示框
-
-        public float rotateSpeed = 300; // 转圈速度
 
         /// <summary>
         /// 内部变量声明
         /// </summary>
         string text; // 提示文本
+        double progress = -1; // 进度
 
         #region 初始化
 
@@ -36,8 +37,8 @@ namespace UI.Common.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            DontDestroyOnLoad(gameObject);
-            DontDestroyOnLoad(background);
+            //DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(background);
         }
 
         #endregion
@@ -48,14 +49,15 @@ namespace UI.Common.Windows {
         /// 更新
         /// </summary>
         protected override void update() {
-            base.update(); updateRotateBar();
+            base.update();
+            updateProgress();
         }
 
         /// <summary>
-        /// 更新旋转圈
+        /// 更新进度
         /// </summary>
-        void updateRotateBar() {
-            rotateBar.Rotate(0, 0, rotateSpeed * Time.deltaTime); // rotation on the Z axis.
+        void updateProgress() {
+            drawProgress(progress);            
         }
 
         #endregion
@@ -67,8 +69,26 @@ namespace UI.Common.Windows {
         /// </summary>
         /// <param name="text">提示文本</param>
         public void startWindow(string text) {
-            Debug.LogError("startWindow: " + text);
             this.text = text; base.startWindow();
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 设置进度
+        /// </summary>
+        /// <param name="progress"></param>
+        public void setProgress(double progress) {
+            this.progress = progress;
+        }
+
+        /// <summary>
+        /// 清空进度
+        /// </summary>
+        public void clearProgress() {
+            setProgress(-1);  
         }
 
         #endregion
@@ -76,24 +96,22 @@ namespace UI.Common.Windows {
         #region 界面控制
 
         /// <summary>
+        /// 绘制进度
+        /// </summary>
+        void drawProgress(double progress) {
+            if (progress >= 0) {
+                progress = Mathf.Clamp01((float)progress);
+                var txt = SceneUtils.double2RoundedPerc(progress);
+                progressText.text = string.Format(ProgressTextFormat, txt);
+            } else progressText.text = "";
+        }
+
+        /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            gameObject.SetActive(true);
-            textArea.SetActive(text.Length > 0);
             loadingText.text = text;
-        }
-
-        /// <summary>
-        /// 设置加载进度
-        /// </summary>
-        /// <param name="rate"></param>
-        public void setProgress(float rate) {
-            var _rate = Mathf.Clamp01(rate);
-            progressBar.localScale = new Vector3(_rate, 0.9f, 1);
-            if (rate >= 0) progressText.text = SceneUtils.double2Perc(rate);
-            else progressText.text = "";
         }
 
         /// <summary>
@@ -101,8 +119,9 @@ namespace UI.Common.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            setProgress(-1);
+            clearProgress();
             loadingText.text = "";
+            progressText.text = "";
         }
 
         #endregion

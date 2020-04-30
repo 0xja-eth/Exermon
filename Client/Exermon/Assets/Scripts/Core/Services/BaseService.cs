@@ -44,7 +44,7 @@ namespace Core.Services {
         /// <summary>
         /// 操作文本设定
         /// </summary>
-        public const string WaitTextFormat = "{0}中...";
+        public const string WaitTextFormat = "{0}中";
         public const string FailTextFormat = "{0}失败：\n{{0}}";
 
         /// <summary>

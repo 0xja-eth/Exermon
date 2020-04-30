@@ -86,7 +86,10 @@ namespace Core.Systems {
             /// 属性
             /// </summary>
             public string text { get; } = "";
+            public double progress { get; } = -1;
             public bool start { get; } = true;
+
+            public bool setProgress { get; } = false;
 
             /// <summary>
             /// 构造函数
@@ -96,6 +99,10 @@ namespace Core.Systems {
             public LoadingRequest(string text, bool start = true) {
                 this.text = text;
                 this.start = start;
+            }
+            public LoadingRequest(double progress) {
+                this.progress = progress;
+                setProgress = true;
             }
             public LoadingRequest(bool start = true) {
                 this.start = start;
@@ -160,6 +167,14 @@ namespace Core.Systems {
         public void requestLoadStart(string text) {
             Debug.Log("requestLoadStart: " + text);
             loadingRequest = new LoadingRequest(text);
+        }
+        /// <summary>
+        /// 请求加载进度
+        /// </summary>
+        /// <param name="progress">加载进度</param>
+        public void requestLoadProgress(double progress = -1) {
+            Debug.Log("requestLoadProgress: " + progress);
+            loadingRequest = new LoadingRequest(progress);
         }
         /// <summary>
         /// 请求结束加载
