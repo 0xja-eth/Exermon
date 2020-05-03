@@ -14,7 +14,7 @@ class RankListData:
 	MAX_RANK = 9999
 
 	# 刷新最短间隔
-	MIN_DELTA = datetime.timedelta(0, 0, 300)
+	MIN_DELTA = datetime.timedelta(0, 300)
 
 	# 更新时间（分钟数）
 	UPDATE_MINUTES = [0, 30]

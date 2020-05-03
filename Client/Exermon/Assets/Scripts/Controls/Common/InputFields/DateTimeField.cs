@@ -115,7 +115,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>选择中</returns>
         bool isSelecting() {
-            return pickersPlane.shown;
+            return pickersPlane && pickersPlane.shown;
         }
 
         /// <summary>
@@ -218,9 +218,10 @@ namespace UI.Common.Controls.InputFields {
         /// 开始选择
         /// </summary>
         public void startSelect() {
+            if (!pickersPlane) return;
             pickersPlane.startWindow();
             oriParent = pickersPlane.transform.parent;
-            pickersPlane.transform.SetParent(pickersParent);
+            if (pickersParent) pickersPlane.transform.SetParent(pickersParent);
             refreshPickers();
         }
 
@@ -228,6 +229,7 @@ namespace UI.Common.Controls.InputFields {
         /// 结束选择
         /// </summary>
         public void endSelect() {
+            if (!pickersPlane) return;
             pickersPlane.terminateWindow();
             pickersPlane.transform.SetParent(oriParent);
             onValueChanged();
@@ -249,7 +251,7 @@ namespace UI.Common.Controls.InputFields {
         /// 是否实际有焦点
         /// </summary>
         public override bool isRealFocused() {
-            return pickersPlane.shown;
+            return isSelecting();
         }
 
         #endregion
