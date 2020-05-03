@@ -1,0 +1,135 @@
+﻿using UnityEngine;
+
+using QuestionModule.Data;
+using RecordModule.Data;
+
+using UI.Common.Controls.ItemDisplays;
+using UI.RecordScene.Windows;
+
+namespace UI.RecordScene.Controls.Question {
+
+    /// <summary>
+    /// 题目记录导航
+    /// </summary>
+    public class QuestionNavigation :
+        SelectableContainerDisplay<QuestionRecord>, 
+        IItemDetailDisplay<QuestionSetRecord> {
+
+        /// <summary>
+        /// 常量设置
+        /// </summary>
+
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public GameObject prevBtn;
+
+        public RecordWindow window;
+        public QuestionRecordPage page;
+
+        public QuestionRecordDetail detail;
+
+        /// <summary>
+        /// 显示结果
+        /// </summary>
+        IQuestionResult[] _results = null;
+        public IQuestionResult[] results {
+            get { return _results; }
+            set {
+                _results = value;
+                requestRefresh();
+            }
+        }
+
+        #region 数据控制
+
+        /// <summary>
+        /// 获取物品帮助组件
+        /// </summary>
+        /// <returns>帮助组件</returns>
+        protected override IItemDetailDisplay<QuestionRecord> getItemDetail() {
+            return detail;
+        }
+
+        /// <summary>
+        /// 是否包含某题目记录
+        /// </summary>
+        /// <param name="item">题目记录</param>
+        /// <returns></returns>
+        protected override bool isIncluded(QuestionRecord item) {
+            if (!base.isIncluded(item)) return false;
+            // 检查日期范围
+            if (window.getFromDate() > item.lastDate ||
+                item.lastDate > window.getToDate()) return false;
+            switch (page.mode) {
+                case QuestionRecordPage.Mode.All:
+                    return true;
+                case QuestionRecordPage.Mode.Collect:
+                    return item.collected;
+                case QuestionRecordPage.Mode.Wrong:
+                    return item.wrong;
+                default:
+                    return true;
+                    // 是否包含该题目
+                    // return page.record.hasQuestion(item.questionId);
+            }
+        }
+
+        #endregion
+
+        #region 界面绘制
+
+        #endregion
+
+        #region 接口实现
+
+        /// <summary>
+        /// 题目
+        /// </summary>
+        QuestionSetRecord record;
+
+        /// <summary>
+        /// 配置
+        /// </summary>
+        /// <param name="container"></param>
+        public void configure(IContainerDisplay<QuestionSetRecord> container) { }
+
+        /// <summary>
+        /// 获取物品
+        /// </summary>
+        /// <returns></returns>
+        public QuestionSetRecord getItem() { return record; }
+
+        /// <summary>
+        /// 设置物品
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <param name="index"></param>
+        /// <param name="refresh"></param>
+        public void setItem(QuestionSetRecord item, int index = -1, bool refresh = false) {
+            record = item;
+            setItems(item.getQuestionRecords());
+        }
+        public void setItem(QuestionSetRecord item, bool refresh = false) {
+            setItem(item, -1, refresh);
+        }
+
+        /// <summary>
+        /// 开启视窗
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <param name="index"></param>
+        /// <param name="refresh"></param>
+        public void startView(QuestionSetRecord item, int index = -1, bool refresh = false) {
+            startView();
+            setItem(item, index, refresh);
+        }
+        public void startView(QuestionSetRecord item, bool refresh = false) {
+            startView();
+            setItem(item, refresh);
+        }
+
+        #endregion
+
+    }
+}

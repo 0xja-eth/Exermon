@@ -31,7 +31,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Text num, subject, type;
+        public Text num, subject, type, quesNum;
         public StarsDisplay star;
 
         public QuestionText title, description;
@@ -52,6 +52,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 外部变量设置
         /// </summary>
         public Texture2D collectOn, collectOff;
+        public string quesNumFormat = "题目编号 #{0}";
 
         /// <summary>
         /// 外部系统定义
@@ -204,6 +205,8 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 绘制基本信息
         /// </summary>
         void drawBaseInfo(Question question) {
+            if (quesNum) quesNum.text = string.Format(
+                quesNumFormat, question.number);
             if (num) num.text = (index+1).ToString();
             if (star) star.setValue(question.starId);
             if (type) type.text = question.typeText();
@@ -283,6 +286,7 @@ namespace UI.Common.Controls.QuestionDisplay {
 
             title.text = "";
 
+            if (quesNum) quesNum.text = "";
             if (num) num.text = "";
             if (type) type.text = "";
             if (subject) subject.text = "";

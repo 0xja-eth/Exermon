@@ -29,6 +29,8 @@ namespace RecordModule { }
 /// </summary>
 namespace RecordModule.Data {
 
+    using Services;
+
     /// <summary>
     /// 题目记录数据
     /// </summary>
@@ -67,6 +69,14 @@ namespace RecordModule.Data {
         public string note { get; protected set; }
 
         #region 数据操作
+
+        /// <summary>
+        /// 获取题目对象
+        /// </summary>
+        /// <returns>返回题目对象</returns>
+        public Question question() {
+            return QuestionService.get().getQuestion(questionId);
+        }
 
         /// <summary>
         /// 星级实例
@@ -388,6 +398,34 @@ namespace RecordModule.Data {
             for (int i = 0; i < cnt; ++i)
                 questions[i] = this.questions[i].question();
             return questions;
+        }
+
+        /// <summary>
+        /// 是否包含某题目
+        /// </summary>
+        /// <param name="qid">题目ID</param>
+        /// <returns></returns>
+        public bool hasQuestion(int qid) {
+            var cnt = questions.Length;
+            for (int i = 0; i < cnt; ++i)
+                if (questions[i].questionId == qid)
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// 获取题目对象集
+        /// </summary>
+        /// <returns>返回题目集</returns>
+        public QuestionRecord[] getQuestionRecords() {
+            var cnt = questions.Length;
+            var records = new QuestionRecord[cnt];
+            for (int i = 0; i < cnt; ++i)
+                records[i] = RecordService.get().
+                    recordData.getQuestionRecordById(
+                    questions[i].questionId
+                );
+            return records;
         }
 
         /// <summary>

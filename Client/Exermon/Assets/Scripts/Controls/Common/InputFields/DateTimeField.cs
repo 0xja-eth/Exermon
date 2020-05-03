@@ -56,7 +56,10 @@ namespace UI.Common.Controls.InputFields {
             configure(min, DateTime.Now);
         }
         public void configure(DateTime min, DateTime max) {
-            configure(min, max, defaultDateTime);
+            var default_ = defaultDateTime;
+            if (default_ > max) default_ = max;
+            if (default_ < min) default_ = min;
+            configure(min, max, default_);
         }
         public void configure(DateTime min, DateTime max, DateTime default_) {
             defaultDateTime = default_;

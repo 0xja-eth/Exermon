@@ -12,6 +12,7 @@ using Core.Services;
 
 using RecordModule.Data;
 
+using QuestionModule.Data;
 using QuestionModule.Services;
 
 /// <summary>
@@ -53,6 +54,18 @@ namespace RecordModule.Services {
             #region 数据操作
 
             #region 题目记录操作
+
+            /// <summary>
+            /// 获取题目ID
+            /// </summary>
+            /// <param name="qid">题目ID</param>
+            /// <param name="note">备注</param>
+            public int[] questionIds() {
+                var res = new int[questionRecords.Count];
+                for (int i = 0; i < questionRecords.Count; ++i)
+                    res[i] = questionRecords[i].questionId;
+                return res;
+            }
 
             /// <summary>
             /// 获取题目记录
@@ -279,7 +292,7 @@ namespace RecordModule.Services {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 recordData = DataLoader.load<RecordData>(res);
-                onSuccess?.Invoke();
+                quesSer.loadQuestions(recordData.questionIds(), onSuccess, onError);
             };
             JsonData data = new JsonData();
             sendRequest(Oper.Get, data, _onSuccess, onError, uid: true);
