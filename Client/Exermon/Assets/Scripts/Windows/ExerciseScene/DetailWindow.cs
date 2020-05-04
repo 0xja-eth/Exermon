@@ -8,10 +8,10 @@ using Core.UI.Utils;
 
 using QuestionModule.Data;
 
-using PlayerModule.Services;
-
 using RecordModule.Data;
 using RecordModule.Services;
+
+using QuestionModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.QuestionDisplay;
@@ -49,8 +49,8 @@ namespace UI.ExerciseScene.Windows {
         /// <summary>
         /// 外部系统
         /// </summary>
-        PlayerService playerSer;
         RecordService recordSer;
+        QuestionService quesSer;
 
         #region 初始化
 
@@ -75,7 +75,7 @@ namespace UI.ExerciseScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             recordSer = RecordService.get();
-            playerSer = PlayerService.get();
+            quesSer = QuestionService.get();
         }
 
         /// <summary>
@@ -87,6 +87,19 @@ namespace UI.ExerciseScene.Windows {
             firstTime.configure(stdTime);
             lastTime.configure(stdTime);
             allAvgTime.configure(stdTime);
+        }
+
+        #endregion
+
+        #region 启动控制
+
+        /// <summary>
+        /// 开启窗口
+        /// </summary>
+        public override void startWindow() {
+            quesSer.loadQuestionDetail(
+                questionDisplay.getItem(), base.startWindow
+            );
         }
 
         #endregion

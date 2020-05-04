@@ -73,6 +73,8 @@ namespace UI.Common.Controls.ItemDisplays {
         public int maxCheck = 0; // 最大选中数
         public int defaultCapacity = 0; // 默认容量
 
+        public string defaultCountTextFormat = "当前选中/总数目：{0}/{1}";
+
         /// <summary>
         /// 外部变量设置
         /// </summary>
@@ -212,7 +214,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns></returns>
         protected virtual string countTextFormat() {
-            return "当前选中/总数目：{0}/{1}";
+            return defaultCountTextFormat;
         }
 
         #region 物品控制
@@ -281,7 +283,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="items">物品集</param>
         public void setItems(T[] items) {
-            clearItems();
+            deselect(); clearChecks();
             var tmpItems = new List<T>(items);
             this.items = tmpItems.FindAll(isIncluded);
             onItemsChanged();
@@ -366,11 +368,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 清空物品
         /// </summary>
         public void clearItems() {
-            if (gameObject.name == "Choices") 
-                Debug.Log("Choices: clearItems");
+            Debug.Log(name + ": clearItems");
             items.Clear();
             deselect(); clearChecks();
-            requestRefresh();
+            onItemsChanged();
         }
 
         /// <summary>
@@ -723,6 +724,14 @@ namespace UI.Common.Controls.ItemDisplays {
                 Debug.Log("Choices: subViews: " + string.Join(",", subViews));
             }
             */
+            Debug.Log(name + ": refreshItemDisplays");
+            Debug.Log(name + ": subViews: " + string.Join(",", subViews));
+            Debug.Log(name + ": items: " + string.Join(",", items));
+
+            Debug.Log(name + ": maxItemDisplaysCount: " + maxItemDisplaysCount());
+            Debug.Log(name + ": itemDisplaysCount: " + itemDisplaysCount());
+            Debug.Log(name + ": itemsCount: " + itemsCount());
+
             createSubViews();
             destroyRedundantSubViews();
         }
@@ -731,6 +740,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 创建子视图
         /// </summary>
         protected virtual void createSubViews() {
+
             for (int i = 0; i < maxItemDisplaysCount(); ++i) {
                 T item = (i < itemsCount() ? items[i] : null);
                 createSubView(item, i);

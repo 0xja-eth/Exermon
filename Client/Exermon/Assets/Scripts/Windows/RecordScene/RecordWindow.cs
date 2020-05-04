@@ -38,13 +38,11 @@ namespace UI.RecordScene.Windows {
 
         public DateTimeField fromDate, toDate;
 
-        public GameObject buttons;
-
         /// <summary>
         /// 内部变量声明
         /// </summary>
         View view;
-        int subjectId; // 科目ID
+        int subjectId = 1; // 科目ID
 
         /// <summary>
         /// 场景组件引用
@@ -118,7 +116,6 @@ namespace UI.RecordScene.Windows {
         /// </summary>
         public override void terminateView() {
             base.terminateView();
-            buttons.SetActive(false);
         }
 
         #endregion
@@ -138,7 +135,7 @@ namespace UI.RecordScene.Windows {
         /// 获取科目ID
         /// </summary>
         /// <returns></returns>
-        public int getSujbectId() {
+        public int getSubjectId() {
             return subjectId;
         }
 
@@ -182,11 +179,14 @@ namespace UI.RecordScene.Windows {
         /// 刷新视窗
         /// </summary>
         public void refreshView() {
+            clearView();
             switch (view) {
                 case View.Question:
+                    questionPage.startView(QuestionRecordPage.Mode.All); break;
                 case View.Collect:
+                    questionPage.startView(QuestionRecordPage.Mode.Collect); break;
                 case View.Wrong:
-                    questionPage.startView(); break;
+                    questionPage.startView(QuestionRecordPage.Mode.Wrong); break;
             }
         }
 
@@ -201,7 +201,6 @@ namespace UI.RecordScene.Windows {
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
-            buttons.SetActive(true);
             base.refresh();
             refreshView();
         }
@@ -262,10 +261,8 @@ namespace UI.RecordScene.Windows {
             switchView((View)view);
         }
         public void switchView(View view) {
-            clearView();
             this.view = view;
-            switch (view) {
-            }
+            requestRefresh(true);
         }
 
         #endregion

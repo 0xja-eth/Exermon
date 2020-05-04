@@ -5657,6 +5657,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a67276d26538ba46933055a60ec3278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &434363554 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1046781296872387748, guid: 6ba723c9a29c5bc42a569356c40a5a18,
+    type: 3}
+  m_PrefabInstance: {fileID: 434363551}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb3be3e781b77143b9a8f0e8644e505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &434363555 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5822143850147644019, guid: 6ba723c9a29c5bc42a569356c40a5a18,
+    type: 3}
+  m_PrefabInstance: {fileID: 434363551}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb3be3e781b77143b9a8f0e8644e505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &434363556 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2989128424450325790, guid: 6ba723c9a29c5bc42a569356c40a5a18,
+    type: 3}
+  m_PrefabInstance: {fileID: 434363551}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb3be3e781b77143b9a8f0e8644e505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &435117915
 GameObject:
   m_ObjectHideFlags: 0
@@ -15149,6 +15185,21 @@ PrefabInstance:
       propertyPath: pickersPlane
       value: 
       objectReference: {fileID: 434363553}
+    - target: {fileID: 2693701423312082197, guid: 690ccc120c5ab3043a615287b17ed99a,
+        type: 3}
+      propertyPath: pickers.Array.data[0]
+      value: 
+      objectReference: {fileID: 434363556}
+    - target: {fileID: 2693701423312082197, guid: 690ccc120c5ab3043a615287b17ed99a,
+        type: 3}
+      propertyPath: pickers.Array.data[1]
+      value: 
+      objectReference: {fileID: 434363555}
+    - target: {fileID: 2693701423312082197, guid: 690ccc120c5ab3043a615287b17ed99a,
+        type: 3}
+      propertyPath: pickers.Array.data[2]
+      value: 
+      objectReference: {fileID: 434363554}
     - target: {fileID: 2971479224868094745, guid: 690ccc120c5ab3043a615287b17ed99a,
         type: 3}
       propertyPath: m_AnchoredPosition.x

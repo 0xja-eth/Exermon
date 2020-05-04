@@ -68,6 +68,11 @@ namespace RecordModule.Data {
         [AutoConvert]
         public string note { get; protected set; }
 
+        /// <summary>
+        /// 题目缓存
+        /// </summary>
+        Question _question = null;
+
         #region 数据操作
 
         /// <summary>
@@ -75,7 +80,8 @@ namespace RecordModule.Data {
         /// </summary>
         /// <returns>返回题目对象</returns>
         public Question question() {
-            return QuestionService.get().getQuestion(questionId);
+            if (_question != null) return _question;
+            return _question = QuestionService.get().getQuestion(questionId);
         }
 
         /// <summary>
@@ -177,11 +183,19 @@ namespace RecordModule.Data {
         public bool isNew { get; protected set; }
 
         /// <summary>
+        /// 题目缓存
+        /// </summary>
+        Question _question = null;
+
+        #region 数据操作
+        
+        /// <summary>
         /// 获取题目对象
         /// </summary>
         /// <returns>返回题目对象</returns>
         public Question question() {
-            return QuestionService.get().getQuestion(questionId);
+            if (_question != null) return _question;
+            return _question = QuestionService.get().getQuestion(questionId);
         }
 
         /// <summary>
@@ -202,6 +216,7 @@ namespace RecordModule.Data {
         /// <returns>返回当前选择</returns>
         public bool isAnswered() { return selection != null; }
 
+        #endregion
     }
 
     /// <summary>

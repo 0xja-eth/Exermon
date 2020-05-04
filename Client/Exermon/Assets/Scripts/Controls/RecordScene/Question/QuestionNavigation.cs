@@ -22,8 +22,6 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public GameObject prevBtn;
-
         public RecordWindow window;
         public QuestionRecordPage page;
 
@@ -58,21 +56,25 @@ namespace UI.RecordScene.Controls.Question {
         /// <returns></returns>
         protected override bool isIncluded(QuestionRecord item) {
             if (!base.isIncluded(item)) return false;
-            // 检查日期范围
-            if (window.getFromDate() > item.lastDate ||
-                item.lastDate > window.getToDate()) return false;
+            // 模式
             switch (page.mode) {
-                case QuestionRecordPage.Mode.All:
-                    return true;
+                case QuestionRecordPage.Mode.All: break;
                 case QuestionRecordPage.Mode.Collect:
-                    return item.collected;
+                    if (!item.collected) return false; break;
                 case QuestionRecordPage.Mode.Wrong:
-                    return item.wrong;
-                default:
+                    if (!item.wrong) return false; break;
+                default: // 题目集
                     return true;
                     // 是否包含该题目
                     // return page.record.hasQuestion(item.questionId);
             }
+            // 检查日期范围
+            if (window.getFromDate() > item.lastDate ||
+                item.lastDate > window.getToDate()) return false;
+            // 检查科目
+            if (window.getSubjectId() != item.question().subjectId)
+                return false;
+            return true;
         }
 
         #endregion

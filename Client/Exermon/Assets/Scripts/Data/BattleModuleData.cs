@@ -170,6 +170,13 @@ namespace BattleModule.Data {
         public int questionId { get; protected set; }
 
         /// <summary>
+        /// 题目缓存
+        /// </summary>
+        Question _question = null;
+
+        #region 数据操作
+
+        /// <summary>
         /// 是否读取
         /// </summary>
         public bool loaded { get; protected set; } = false;
@@ -191,12 +198,15 @@ namespace BattleModule.Data {
         }
 
         /// <summary>
-        /// 题目对象
+        /// 获取题目对象
         /// </summary>
         /// <returns>返回题目对象</returns>
         public Question question() {
-            return QuestionService.get().getQuestion(questionId);
+            if (_question != null) return _question;
+            return _question = QuestionService.get().getQuestion(questionId);
         }
+
+        #endregion
 
         /// <summary>
         /// 读取自定义数据

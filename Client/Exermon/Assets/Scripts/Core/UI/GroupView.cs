@@ -68,7 +68,7 @@ namespace Core.UI {
         /// 通过查找来初始化子视图
         /// </summary>
         void initializeSubViewsByAutoFind() {
-            int index = 0; string name; T subView;
+            int index = subViews.Count; string name; T subView;
             container = container ?? transform;
             while (true) {
                 name = subViewName(index);
@@ -121,7 +121,9 @@ namespace Core.UI {
         /// </summary>
         /// <param name="item">物品</param>
         protected virtual T createSubView(int index) {
-            return getOrCreateSubView(index);
+            Debug.Log(name + ": createSubView: " + index);
+            var res = getOrCreateSubView(index);
+            return res;
         }
 
         /// <summary>
@@ -142,8 +144,7 @@ namespace Core.UI {
         /// </summary>
         /// <param name="index"></param>
         protected void destroySubView(int index) {
-            //if (gameObject.name == "Choices")
-            //    Debug.Log("Choices: destroySubView: " + index);
+            Debug.Log(name + ": destroySubView: " + index);
             if (index < subViews.Count) {
                 Destroy(subViews[index].gameObject);
                 onSubViewDestroyed(index);
@@ -156,8 +157,10 @@ namespace Core.UI {
         /// <param name="sub">子视图</param>
         /// <param name="index">索引</param>
         protected virtual void onSubViewCreated(T sub, int index) {
+            Debug.Log(name + " onSubViewCreated : subViews-before: " + string.Join(",", subViews));
             subViews.Add(sub);
             sub.transform.SetAsLastSibling();
+            Debug.Log(name + " onSubViewCreated : subViews-after: " + string.Join(",", subViews));
         }
 
         /// <summary>
@@ -165,7 +168,9 @@ namespace Core.UI {
         /// </summary>
         /// <param name="index">索引</param>
         protected virtual void onSubViewDestroyed(int index) {
+            Debug.Log(name + " onSubViewDestroyed : subViews-before: " + string.Join(",", subViews));
             subViews.RemoveAt(index);
+            Debug.Log(name + " onSubViewDestroyed : subViews-after: " + string.Join(",", subViews));
         }
 
         /// <summary>

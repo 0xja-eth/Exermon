@@ -222,7 +222,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         public void startSelect() {
             if (!pickersPlane) return;
-            pickersPlane.startWindow();
+            pickersPlane.startWindow(this);
             oriParent = pickersPlane.transform.parent;
             if (pickersParent) pickersPlane.transform.SetParent(pickersParent);
             refreshPickers();

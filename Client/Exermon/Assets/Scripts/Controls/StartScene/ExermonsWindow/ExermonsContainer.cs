@@ -123,7 +123,7 @@ namespace UI.StartScene.Controls.Exermon {
 
             for (int i = 0; i < cnt; ++i) {
                 eids[i] = items[eids[i]].getID();
-                enames[i] = this.enames[eids[i]];
+                enames[i] = this.enames[eids[i]-1];
             }
             return cnt;
         }

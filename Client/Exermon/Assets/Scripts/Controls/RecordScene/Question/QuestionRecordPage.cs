@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using QuestionModule.Data;
+using Core.UI;
+
 using RecordModule.Data;
 using RecordModule.Services;
 
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.QuestionDisplay;
+using UI.ExerciseScene.Windows;
 
 /// <summary>
 /// 记录场景题目页
 /// </summary>
 namespace UI.RecordScene.Controls.Question {
 
+    using Question = QuestionModule.Data.Question;
+
     /// <summary>
     /// 题目记录页
     /// </summary>
-    public class QuestionRecordPage : ItemDetailDisplay<QuestionRecord> {
+    public class QuestionRecordPage : BaseView {
 
         /// <summary>
         /// 模式
@@ -28,8 +30,11 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public QuestionRecordDetail questionDisplay;
+        public QuestionRecordDetail recordDisplay;
         public QuestionNavigation questionNav;
+
+        public DetailWindow detailWindow;
+        public ReportWindow reportWindow;
 
         /// <summary>
         /// 内部变量定义
@@ -67,6 +72,9 @@ namespace UI.RecordScene.Controls.Question {
 
         #region 初始化
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
             records = recordSer.recordData.questionRecords;
@@ -83,14 +91,57 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 配置
         /// </summary>
+        /// <param name="mode">模式</param>
         public void configure(int mode) {
+            configure((Mode)mode);
+        }
+        public void configure(Mode mode) {
             base.configure();
-            this.mode = (Mode)mode;
+            this.mode = mode;
+        }
+
+        #endregion
+
+        #region 启动控制
+
+        /// <summary>
+        /// 启动视窗
+        /// </summary>
+        public override void startView() {
+            base.startView();
+            questionNav.startView();
+        }
+
+        /// <summary>
+        /// 启动视窗
+        /// </summary>
+        /// <param name="mode">模式</param>
+        public void startView(int mode) {
+            startView((Mode)mode);
+        }
+        public void startView(Mode mode) {
+            startView(); this.mode = mode;
+        }
+
+        /// <summary>
+        /// 结束视窗
+        /// </summary>
+        public override void terminateView() {
+            base.terminateView();
+            questionNav.terminateView();
         }
 
         #endregion
 
         #region 数据控制
+
+        /// <summary>
+        /// 获取当前题目
+        /// </summary>
+        /// <returns></returns>
+        public Question currentQuestion() {
+            return recordDisplay.questionDisplay.getItem();
+        }
 
         #endregion
 
@@ -99,9 +150,8 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 绘制物品
         /// </summary>
-        /// <param name="item">物品</param>
-        protected override void drawExactlyItem(QuestionRecord item) {
-            base.drawExactlyItem(item);
+        protected override void refresh() {
+            base.refresh();
             if (record != null && (int)mode > (int)Mode.Wrong) {
                 questionNav.setItems(record.getQuestionRecords());
                 questionNav.results = record.questions;
@@ -109,6 +159,25 @@ namespace UI.RecordScene.Controls.Question {
                 questionNav.setItems(records);
                 questionNav.results = null;
             }
+            questionNav.select(0);
+        }
+
+        #endregion
+
+        #region 流程控制
+
+        /// <summary>
+        /// 打开详情窗口
+        /// </summary>
+        public void openDetail() {
+            detailWindow.startWindow();
+        }
+
+        /// <summary>
+        /// 打开反馈窗口
+        /// </summary>
+        public void openReport() {
+            reportWindow.startWindow();
         }
 
         #endregion

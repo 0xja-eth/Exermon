@@ -123,9 +123,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 收藏题目
         /// </summary>
         public void collect() {
-            Debug.Log("collect");
             if (item == null) return;
-            Debug.Log("doCollect");
             recordSer.collect(item.getID(), onCollected);
         }
 

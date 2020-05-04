@@ -80,7 +80,7 @@ namespace Core.UI {
         /// </summary>
         protected override void update() {
             base.update();
-            Debug.Log(name + ": isShowing: " + isShowing + ", isHiding: " + isHiding);
+            //Debug.Log(name + ": isShowing: " + isShowing + ", isHiding: " + isHiding);
             updateBackground();
         }
 
@@ -143,6 +143,14 @@ namespace Core.UI {
             Debug.Log("onWindowHidden: " + name);
             isHiding = false; if (isShowing) return;
             base.hideView(); updateBackground();
+        }
+
+        /// <summary>
+        /// 打开/关闭窗口
+        /// </summary>
+        public void toggleWindow() {
+            if (shown) terminateWindow();
+            else startWindow();
         }
 
         #endregion

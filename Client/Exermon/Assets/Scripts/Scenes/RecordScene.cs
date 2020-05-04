@@ -1,17 +1,14 @@
 ﻿
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine.Events;
-
 using Core.Systems;
 using Core.UI;
-using Core.UI.Utils;
 
-using PlayerModule.Services;
 using RecordModule.Services;
 
-using UI.StatusScene.Windows;
+using UI.RecordScene.Windows;
 
+/// <summary>
+/// 记录场景
+/// </summary>
 namespace UI.RecordScene {
 
     /// <summary>
@@ -26,20 +23,11 @@ namespace UI.RecordScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public StatusWindow statusWindow;
-        public InfoEditWindow infoEditWindow;
-        public Button confirm;
-
-        /// <summary>
-        /// 按钮回调
-        /// </summary>
-        List<UnityAction> confirmCallbacks = new List<UnityAction>(); // 确认按钮回调
-        List<UnityAction> backCallbacks = new List<UnityAction>(); // 返回按钮回调
+        public RecordWindow recordWindow;
 
         /// <summary>
         /// 内部系统声明
         /// </summary>
-        PlayerService playerSer;
         RecordService recordSer;
 
         #region 初始化
@@ -57,7 +45,6 @@ namespace UI.RecordScene {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            playerSer = PlayerService.get();
             recordSer = RecordService.get();
         }
 
@@ -70,68 +57,17 @@ namespace UI.RecordScene {
         }
 
         #endregion
-
-        #region 请求项控制
-
-        /// <summary>
-        /// 添加确认回调
-        /// </summary>
-        /// <param name="action">动作</param>
-        public void pushConfirmCallback(UnityAction action) {
-            confirmCallbacks.Add(action);
-            confirm.interactable = true;
-        }
-
-        /// <summary>
-        /// 添加返回回调
-        /// </summary>
-        /// <param name="action">动作</param>
-        public void pushBackCallback(UnityAction action) {
-            backCallbacks.Add(action);
-        }
-
-        /// <summary>
-        /// 清除回调项
-        /// </summary>
-        public void clearCallbacks() {
-            confirmCallbacks.Clear();
-            backCallbacks.Clear();
-            confirm.interactable = false;
-        }
-
-        #endregion
-
+        
         #region 场景控制
 
         /// <summary>
         /// 刷新场景
         /// </summary>
         public void refresh() {
-            playerSer.getPlayerStatus(statusWindow.startWindow);
+            recordSer.get(recordWindow.startWindow);
         }
 
         #endregion
 
-        #region 流程控制
-
-        /// <summary>
-        /// 确认
-        /// </summary>
-        public void onConfirm() {
-            foreach (var cb in confirmCallbacks) cb.Invoke();
-            clearCallbacks();
-        }
-
-        /// <summary>
-        /// 返回
-        /// </summary>
-        public void onBack() {
-            if (backCallbacks.Count > 0)
-                foreach (var cb in backCallbacks) cb.Invoke();
-            else popScene();
-            clearCallbacks();
-        }
-
-        #endregion
     }
 }

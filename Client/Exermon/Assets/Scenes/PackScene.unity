@@ -2424,7 +2424,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 28.099976, y: -32.600006}
+  m_AnchoredPosition: {x: 28.099854, y: -32.599976}
   m_SizeDelta: {x: -116.3, y: -65.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &669991522
@@ -4195,7 +4195,6 @@ GameObject:
   - component: {fileID: 944375642}
   - component: {fileID: 944375647}
   - component: {fileID: 944375646}
-  - component: {fileID: 944375645}
   - component: {fileID: 944375644}
   - component: {fileID: 944375643}
   m_Layer: 5
@@ -4225,7 +4224,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: -51, y: 71}
-  m_SizeDelta: {x: 367, y: 0}
+  m_SizeDelta: {x: 367, y: 171}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &944375643
 MonoBehaviour:
@@ -4246,7 +4245,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 0e3966f571ec3c8408cf04877d717ca3, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -4263,20 +4262,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 944375641}
   m_CullTransparentMesh: 0
---- !u!114 &944375645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 944375641}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &944375646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5264,7 +5249,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.0006866455}
   m_SizeDelta: {x: 344, y: 353.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1162186097
@@ -5579,10 +5564,9 @@ PrefabInstance:
       objectReference: {fileID: 1102355146}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c8e9c19041a40a4392ee463582f8617, type: 3}
---- !u!224 &1215385334 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 224754769532337012, guid: 7c8e9c19041a40a4392ee463582f8617,
-    type: 3}
+--- !u!4 &1215385334 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 1215385333}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1219561880
@@ -8276,6 +8260,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -32.370026, y: -74.100006}
+  m_AnchoredPosition: {x: -32.370117, y: -74.099976}
   m_SizeDelta: {x: 317.5, y: 374.9}
   m_Pivot: {x: 1, y: 1}

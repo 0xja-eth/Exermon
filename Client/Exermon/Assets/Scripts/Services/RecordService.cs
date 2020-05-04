@@ -301,37 +301,59 @@ namespace RecordModule.Services {
         /// <summary>
         /// 题目收藏/解除收藏
         /// </summary>
-        /// <param name="qid">题目ID</param>
+        /// <param name="record">题目记录</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void collect(int qid, UnityAction onSuccess, UnityAction onError = null) {
-
+        public void collect(QuestionRecord record, UnityAction onSuccess, UnityAction onError = null) {
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                recordData.collect(qid);
-                onSuccess?.Invoke();
+                record.collect(); onSuccess?.Invoke();
             };
+
+            collect(record.questionId, _onSuccess, onError);
+        }
+        /// <param name="qid">题目ID</param>
+        public void collect(int qid, UnityAction onSuccess, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                recordData.collect(qid); onSuccess?.Invoke();
+            };
+
+            collect(qid, _onSuccess, onError);
+        }
+        public void collect(int qid, 
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData(); data["qid"] = qid;
 
-            sendRequest(Oper.QuestionCollect, data, _onSuccess, onError, uid: true);
+            sendRequest(Oper.QuestionCollect, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>
         /// 错题解除
         /// </summary>
-        /// <param name="qid">题目ID</param>
+        /// <param name="record">题目记录</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void unwrong(int qid, UnityAction onSuccess, UnityAction onError = null) {
-
+        public void unwrong(QuestionRecord record, UnityAction onSuccess, UnityAction onError = null) {
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                recordData.setWrong(qid, false);
-                onSuccess?.Invoke();
+                record.setWrong(false); onSuccess?.Invoke();
             };
+
+            unwrong(record.questionId, _onSuccess, onError);
+        }
+        /// <param name="qid">题目ID</param>
+        public void unwrong(int qid, UnityAction onSuccess, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                recordData.setWrong(qid, false); onSuccess?.Invoke();
+            };
+
+            unwrong(qid, _onSuccess, onError);
+        }
+        public void unwrong(int qid, 
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData(); data["qid"] = qid;
 
-            sendRequest(Oper.QuestionUnwrong, data, _onSuccess, onError, uid: true);
+            sendRequest(Oper.QuestionUnwrong, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>

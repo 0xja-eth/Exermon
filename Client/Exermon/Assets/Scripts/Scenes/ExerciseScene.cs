@@ -4,11 +4,9 @@ using Core.UI.Utils;
 
 using Core.Systems;
 
-using QuestionModule.Services;
 using RecordModule.Services;
 
 using UI.ExerciseScene.Windows;
-//using UI.BattleAnswerScene.Controls;
 
 /// <summary>
 /// 刷题场景
@@ -37,7 +35,6 @@ namespace UI.ExerciseScene {
         /// 外部系统
         /// </summary>
         RecordService recordSer;
-        QuestionService quesSer;
 
         #region 初始化
 
@@ -55,7 +52,6 @@ namespace UI.ExerciseScene {
         protected override void initializeSystems() {
             base.initializeSystems();
             recordSer = RecordService.get();
-            quesSer = QuestionService.get();
         }
 
         /// <summary>
@@ -74,9 +70,7 @@ namespace UI.ExerciseScene {
         /// 打开详情窗口
         /// </summary>
         public void openDetail() {
-            quesSer.loadQuestionDetail(
-                questionWindow.currentQuestion(),
-                detailWindow.startWindow);
+            detailWindow.startWindow();
         }
 
         /// <summary>

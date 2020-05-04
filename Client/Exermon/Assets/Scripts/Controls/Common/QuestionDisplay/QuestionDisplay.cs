@@ -51,7 +51,6 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 外部变量设置
         /// </summary>
-        public Texture2D collectOn, collectOff;
         public string quesNumFormat = "题目编号 #{0}";
 
         /// <summary>
@@ -72,8 +71,10 @@ namespace UI.Common.Controls.QuestionDisplay {
         public IQuestionResult result {
             get { return _result; }
             set {
-                choiceContainer.result = value;
-                buttonContainer.result = value;
+                if (choiceContainer)
+                    choiceContainer.result = value;
+                if (buttonContainer)
+                    buttonContainer.result = value;
                 _result = value;
                 requestRefresh();
             }
@@ -86,8 +87,10 @@ namespace UI.Common.Controls.QuestionDisplay {
         public bool showAnswer {
             get { return _showAnswer; }
             set {
-                choiceContainer.showAnswer = value;
-                buttonContainer.showAnswer = value;
+                if (choiceContainer)
+                    choiceContainer.showAnswer = value;
+                if (buttonContainer)
+                    buttonContainer.showAnswer = value;
                 _showAnswer = value;
                 requestRefresh();
             }
@@ -159,6 +162,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         /// <returns>返回所选选项对象</returns>
         public Question.Choice[] getSelection() {
+            if (!buttonContainer) return new Question.Choice[0];
             return buttonContainer.getCheckedItems();
         }
 
@@ -227,9 +231,9 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         /// <param name="question">题目</param>
         void drawPictruesAndChoices(Question question) { 
-            pictureContaienr.setItem(question, false);
-            choiceContainer.setItem(question, false);
-            buttonContainer.setItem(question, false);
+            pictureContaienr?.setItem(question, false);
+            choiceContainer?.setItem(question, false);
+            buttonContainer?.setItem(question, false);
         }
 
         /// <summary>
@@ -279,10 +283,12 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 清除物品
         /// </summary>
         protected override void clearItem() {
+            base.clearItem();
             QuestionText.TexturePool.clearTextures();
-            pictureContaienr.clearItems();
-            choiceContainer.clearItems();
-            buttonContainer.clearItems();
+
+            pictureContaienr?.clearItems();
+            choiceContainer?.clearItems();
+            buttonContainer?.clearItems();
 
             title.text = "";
 

@@ -65,7 +65,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void onItemsChanged() {
             base.onItemsChanged();
-            setupSelection();
+            if (items != null) setupSelection();
         }
 
         #endregion

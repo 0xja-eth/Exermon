@@ -127,6 +127,20 @@ namespace UI.MainScene {
             exerciseWindow.startWindow();
         }
 
+        /// <summary>
+        /// 打开记录界面
+        /// </summary>
+        public void openRecordScene() {
+            sceneSys.pushScene(SceneSystem.Scene.RecordScene);
+        }
+        
+        /// <summary>
+        /// 打开记录界面
+        /// </summary>
+        public void openPackScene() {
+            sceneSys.pushScene(SceneSystem.Scene.PackScene);
+        }
+
         #endregion
     }
 
