@@ -309,23 +309,12 @@ class EquipParamCalc:
 		self.value = self._calc()
 
 	def _calc(self):
-		from item_module.models import EquipParamType
 
-		value = self.pack_equip.param(param_id=self.param.id)
-
-		# 计算可变属性（攻击/防御）
-		if (self.param.attr == 'atk' and
-			self.equip.param_type == EquipParamType.Attack.value) or \
-			(self.param.attr == 'def' and
-			self.equip.param_type == EquipParamType.Defense.value):
-			value += self._calcVariableParam()
-
-		return value
-
-	# 计算可变属性值
-	def _calcVariableParam(self):
+		value = self.pack_equip.baseParam(param_id=self.param.id)
+		rate = self.pack_equip.levelParam(param_id=self.param.id)
 		level = self.player_exer.level
-		return self.equip.param_rate/100 * level
+
+		return value + rate * level
 
 
 # ================================

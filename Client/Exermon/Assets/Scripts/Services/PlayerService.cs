@@ -34,6 +34,7 @@ namespace PlayerModule.Services {
         const string GetBasic = "拉取玩家基本信息";
         const string GetStatus = "拉取玩家状态信息";
         const string GetBattle = "拉取玩家对战信息";
+        const string GetPack = "拉取玩家背包信息";
 
         const string CreateCharacter = "创建角色";
         const string CreateExermons = "装备艾瑟萌";
@@ -51,7 +52,7 @@ namespace PlayerModule.Services {
         /// </summary>
         public enum Oper {
             Register, Login, Retrieve, Code, Logout,
-            GetBasic, GetStatus, GetBattle,
+            GetBasic, GetStatus, GetBattle, GetPack,
             CreateCharacter, CreateExermons, CreateGifts, CreateInfo,
             EditName, EditInfo,
             EquipSlotEquip, EquipSlotDequip,
@@ -114,6 +115,7 @@ namespace PlayerModule.Services {
             addOperDict(Oper.GetBasic, GetBasic, NetworkSystem.Interfaces.PlayerGetBasic);
             addOperDict(Oper.GetStatus, GetStatus, NetworkSystem.Interfaces.PlayerGetStatus);
             addOperDict(Oper.GetBattle, GetBattle, NetworkSystem.Interfaces.PlayerGetBattle);
+            addOperDict(Oper.GetPack, GetPack, NetworkSystem.Interfaces.PlayerGetPack);
 
             addOperDict(Oper.CreateCharacter, CreateCharacter,
                 NetworkSystem.Interfaces.PlayerCreateCharacter);
@@ -290,6 +292,19 @@ namespace PlayerModule.Services {
         }
 
         /// <summary>
+        /// 获取玩家背包信息
+        /// </summary>
+        /// <param name="uid">要获取信息的玩家ID</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getPack(int uid,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData();
+            data["get_uid"] = uid;
+            sendRequest(Oper.GetPack, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
         /// 获取玩家自身基础信息数据
         /// </summary>
         /// <param name="onSuccess">成功回调</param>
@@ -329,6 +344,20 @@ namespace PlayerModule.Services {
             };
 
             getBattle(player.getID(), _onSuccess, onError);
+        }
+
+        /// <summary>
+        /// 获取玩家自身背包信息数据
+        /// </summary>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getPlayerPack(UnityAction onSuccess = null, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                player = DataLoader.load(player, res, "player");
+                onSuccess?.Invoke();
+            };
+
+            getPack(player.getID(), _onSuccess, onError);
         }
 
         #endregion

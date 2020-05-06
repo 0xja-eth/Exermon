@@ -635,6 +635,14 @@ namespace PlayerModule.Data {
             seasonRecord = DataLoader.load<SeasonRecord>(json);
         }
 
+        /// <summary>
+        /// 读取金钱
+        /// </summary>
+        /// <param name="money"></param>
+        public void loadMoney(JsonData data) {
+            money = DataLoader.load(money, data, "money");
+        }
+
     }
 
     #region 物品
@@ -642,7 +650,8 @@ namespace PlayerModule.Data {
     /// <summary>
     /// 人类物品
     /// </summary>
-    public class HumanItem : UsableItem { }
+    public class HumanItem : UsableItem {
+    }
 
     /// <summary>
     /// 人类装备
@@ -654,6 +663,22 @@ namespace PlayerModule.Data {
         /// </summary>
         [AutoConvert]
         public int eType { get; protected set; }
+        
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            var res = base.convertToDisplayData(type);
+
+            res["type"] = equipType().name;
+
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 获取装备类型
@@ -662,6 +687,7 @@ namespace PlayerModule.Data {
         public TypeData equipType() {
             return DataService.get().humanEquipType(eType);
         }
+
         /*
         /// <summary>
         /// 数据加载
@@ -814,13 +840,68 @@ namespace PlayerModule.Data {
     /// <summary>
     /// 人类背包物品
     /// </summary>
-    public class HumanPackItem : PackContItem<HumanItem> {
+    public class HumanPackItem : PackContItem<HumanItem>,
+        ParamDisplay.IDisplayDataConvertable {
+
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            return item().convertToDisplayData(type);
+        }
+
+        #endregion
+
     }
 
     /// <summary>
     /// 人类背包装备
     /// </summary>
-    public class HumanPackEquip : PackContItem<HumanEquip> {
+    public class HumanPackEquip : PackContItem<HumanEquip>,
+        ParamDisplay.IDisplayDataConvertable,
+        ParamDisplay.IDisplayDataArrayConvertable {
+
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            var res = item().convertToDisplayData(type);
+            res["params"] = DataLoader.convert(
+                convertToDisplayDataArray(type));
+            return res;
+        }
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData[] convertToDisplayDataArray(string type = "") {
+            var params_ = DataService.get().staticData.configure.baseParams;
+            var count = params_.Length;
+            var data = new JsonData[count];
+            for (int i = 0; i < count; ++i) {
+                var json = new JsonData();
+                var paramId = params_[i].getID();
+
+                var levelParam = getLevelParam(paramId).value;
+                var baseParam = getBaseParam(paramId).value;
+
+                json["level_param"] = levelParam;
+                json["equip_param"] = baseParam;
+
+                data[i] = json;
+            }
+            return data;
+        }
+
+        #endregion
+
         /// <summary>
         /// 获取装备实例
         /// </summary>
@@ -828,25 +909,51 @@ namespace PlayerModule.Data {
         public HumanEquip equip() { return item(); }
 
         /// <summary>
-        /// 获取装备的所有属性
+        /// 获取装备的等级属性
         /// </summary>
         /// <returns>属性数据数组</returns>
-        public ParamData[] getParams() {
+        public ParamRateData[] getLevelParams() {
             var equip = this.equip();
-            if (equip == null) return new ParamData[0];
-            return equip.params_;
+            if (equip == null) return new ParamRateData[0];
+            return equip.levelParams;
         }
 
         /// <summary>
-        /// 获取装备的属性
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <returns>属性数据数组</returns>
+        public ParamData[] getBaseParams() {
+            var equip = this.equip();
+            if (equip == null) return new ParamData[0];
+            return equip.baseParams;
+        }
+
+        /// <summary>
+        /// 获取装备的等级属性
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamData getParam(int paramId) {
+        public ParamRateData getLevelParam(int paramId) {
+            var equip = this.equip();
+            if (equip == null) return new ParamRateData(paramId);
+            return equip.getLevelParam(paramId);
+        }
+
+        /// <summary>
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public ParamData getBaseParam(int paramId) {
             var equip = this.equip();
             if (equip == null) return new ParamData(paramId);
-            return equip.getParam(paramId);
+            return equip.getBaseParam(paramId);
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public HumanPackEquip() : base() { }
 
     }
 
@@ -916,23 +1023,43 @@ namespace PlayerModule.Data {
         }
 
         /// <summary>
-        /// 获取装备的所有属性
+        /// 获取装备的等级属性
         /// </summary>
         /// <returns>属性数据数组</returns>
-        public ParamData[] getParams() {
-            if (packEquip == null) return new ParamData[0];
-            return packEquip.getParams();
+        public ParamRateData[] getLevelParams() {
+            if (packEquip == null) return new ParamRateData[0];
+            return packEquip.getLevelParams();
         }
 
         /// <summary>
-        /// 获取装备的属性
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <returns>属性数据数组</returns>
+        public ParamData[] getBaseParams() {
+            if (packEquip == null) return new ParamData[0];
+            return packEquip.getBaseParams();
+        }
+
+        /// <summary>
+        /// 获取装备的等级属性
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamData getParam(int paramId) {
-            if (packEquip == null) return new ParamData(paramId);
-            return packEquip.getParam(paramId);
+        public ParamRateData getLevelParam(int paramId) {
+            if (packEquip == null) return new ParamRateData(paramId);
+            return packEquip.getLevelParam(paramId);
         }
+
+        /// <summary>
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public ParamData getBaseParam(int paramId) {
+            if (packEquip == null) return new ParamData(paramId);
+            return packEquip.getBaseParam(paramId);
+        }
+        
     }
 
     #endregion

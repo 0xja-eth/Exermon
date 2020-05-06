@@ -300,20 +300,9 @@ namespace GameModule.Services {
             /// 计算
             /// </summary>
             void _calc() {
-                value = packEquip.getParam(param.getID()).value;
-                
-                if ((param.attr == "atk" && equip.paramType ==
-                    (int)EquipableItem.ParamType.Attack) ||
-                    (param.attr == "def" && equip.paramType ==
-                    (int)EquipableItem.ParamType.Defense))
-                    _calcVariableParam();
-            }
-            /// <summary>
-            /// 计算变化属性
-            /// </summary>
-            void _calcVariableParam() {
-                var level = playerExer.level;
-                value += equip.paramRate/100.0 * level;
+                value = packEquip.getBaseParam(param.getID()).value;
+                var rate = packEquip.getLevelParam(param.getID()).value;
+                value += rate * playerExer.level;
             }
         }
 
@@ -400,14 +389,14 @@ namespace GameModule.Services {
             /// <returns>剩余星星数目</returns>
             /// <example>
             /// 0 = > 学渣I(1, 0, 0)
-			/// 1 = > 学渣I(1, 0, 1)
-			/// 2 = > 学渣I(1, 0, 2)
-			/// 3 = > 学渣I(1, 0, 3)
-			/// 4 = > 学渣II(1, 1, 1)
-			/// 5 = > 学渣II(1, 1, 2)
-			/// 6 = > 学渣II(1, 1, 3)
-			/// 7 = > 学渣III(1, 2, 1)
-			/// 10 = > 学酥I(2, 1, 1)
+            /// 1 = > 学渣I(1, 0, 1)
+            /// 2 = > 学渣I(1, 0, 2)
+            /// 3 = > 学渣I(1, 0, 3)
+            /// 4 = > 学渣II(1, 1, 1)
+            /// 5 = > 学渣II(1, 1, 2)
+            /// 6 = > 学渣II(1, 1, 3)
+            /// 7 = > 学渣III(1, 2, 1)
+            /// 10 = > 学酥I(2, 1, 1)
             /// </example>
             public static int calc(int starNum, out CompRank rank, out int subRank) {
                 var ranks = SeasonService.get().compRanks();

@@ -11,7 +11,10 @@ import xadmin
 class HumanItemEffectsInline(BaseEffectsInline): model = HumanItemEffect
 
 
-class HumanEquipParamsInline(EquipParamsInline): model = HumanEquipParam
+class HumanEquipLevelParamsInline(EquipParamsInline): model = HumanEquipLevelParam
+
+
+class HumanEquipBaseParamsInline(EquipParamsInline): model = HumanEquipBaseParam
 
 
 class HumanPackItemsInline(BaseContItemsInline): model = HumanPackItem
@@ -80,7 +83,9 @@ class HumanItemAdmin(UsableItemAdmin):
 
 @xadmin.sites.register(HumanEquip)
 class HumanEquipAdmin(EquipableItemAdmin):
-	inlines = [HumanEquipPriceInline, HumanEquipParamsInline]
+	inlines = [HumanEquipPriceInline,
+			   HumanEquipLevelParamsInline,
+			   HumanEquipBaseParamsInline]
 
 
 @xadmin.sites.register(HumanPack)

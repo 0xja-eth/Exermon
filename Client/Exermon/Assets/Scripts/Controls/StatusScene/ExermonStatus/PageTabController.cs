@@ -13,13 +13,6 @@ using ItemModule.Data;
 using PlayerModule.Data;
 using ExermonModule.Data;
 
-using GameModule.Services;
-using PlayerModule.Services;
-using ExermonModule.Services;
-
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.ParamDisplays;
-
 namespace UI.StatusScene.Controls.ExermonStatus {
 
     /// <summary>

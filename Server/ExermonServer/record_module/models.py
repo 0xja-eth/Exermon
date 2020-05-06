@@ -938,7 +938,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		player = self.exactlyPlayer()
 
-		player.gainMoney(calc.gold_incr)
+		player.gainMoney(gold=calc.gold_incr)
 		player.gainExp(calc.slot_exp_incr, calc.exer_exp_incrs,
 					   calc.slot_exp_incrs)
 

@@ -154,6 +154,96 @@ class Service:
 
 		return cls.convertContainers(container)
 
+	# 背包类容器使用
+	@classmethod
+	async def packContainerUse(cls, consumer, player: Player, type: int,
+							   ci_type: int, contitem_id: int,
+							   count: int, occasion: int, ):
+		# 返回数据：
+		# player: 玩家状态数据 => 玩家状态数据
+		ViewUtils.ensureEnumData(occasion, ItemUseOccasion, ErrorType.InvalidOccasion)
+
+		container: PackContainer = Common.getContainer(type, player=player)
+
+		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
+
+		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+
+		cont_item.ensureContItemUsable(ItemUseOccasion(occasion), count)
+
+		# TODO: 使用物品
+
+		return {'player': player.convertToDict(type="status")}
+
+	# 背包类容器丢弃
+	@classmethod
+	async def packContainerDiscard(cls, consumer, player: Player, type: int,
+								 ci_type: int, contitem_id: int, count: int):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+
+		container: PackContainer = Common.getContainer(type, player=player)
+
+		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
+
+		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+
+		Check.ensureItemDiscardable(cont_item.item)
+
+		container.lostContItem(cont_item, count, True)
+
+		return cls.convertContainers(container)
+
+	# 背包类容器出售
+	@classmethod
+	async def packContainerSell(cls, consumer, player: Player, type: int,
+								 ci_type: int, contitem_id: int, count: int):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+
+		container: PackContainer = Common.getContainer(type, player=player)
+
+		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
+
+		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+
+		item: LimitedItem = cont_item.item
+
+		Check.ensureItemSellable(item)
+
+		container.lostContItem(cont_item, count, True)
+		player.gainMoney(gold=item.sell_price * count)
+
+		res = cls.convertContainers(container)
+		res['money'] = player.playerMoney().convertToDict()
+
+		return res
+
+	# 购买物品
+	@classmethod
+	async def itemBuy(cls, consumer, player: Player, type: int, item_id: int, count: int, refresh: bool, ):
+		# 返回数据：
+		# container: 背包容器数据 => 背包容器数据
+
+		item: BaseItem = Common.getItem(type=type, id=item_id)
+
+		Check.ensureItemBoughtable(item)
+
+		container_class = item.contItemClass().containerClass()
+		container = player.getContainer(container_class)
+
+		buy_price = item.buyPrice()
+
+		# 附带检查容器是否已满
+		container.gainItems(item, count)
+
+		player.loseMoney(buy_price * count)
+
+		res = cls.convertContainers(container)
+		res['money'] = player.playerMoney().convertToDict()
+
+		return res
+
 	# 槽容器装备
 	@classmethod
 	def slotContainerEquip(cls, slot_container: SlotContainer,
@@ -225,6 +315,34 @@ class Check:
 		if val == 0:
 			raise GameException(ErrorType.IncorrectContItemType)
 		ViewUtils.ensureEnumData(val, ContItemType, ErrorType.IncorrectContItemType, True)
+
+	# 区确保物品可丢弃
+	@classmethod
+	def ensureItemDiscardable(cls, item: LimitedItem):
+		try:
+			if not item.discardable:
+				raise GameException(ErrorType.UndiscardableItem)
+		except AttributeError:
+			raise GameException(ErrorType.UndiscardableItem)
+
+	# 区确保物品可出售
+	@classmethod
+	def ensureItemSellable(cls, item: LimitedItem):
+		try:
+			if item.sell_price <= 0:
+				raise GameException(ErrorType.UnsellableItem)
+		except AttributeError:
+			raise GameException(ErrorType.UnboughtableItem)
+
+	# 区确保物品可购买
+	@classmethod
+	def ensureItemBoughtable(cls, item: LimitedItem):
+		try:
+			price: Currency = item.buyPrice()
+			if price.gold <= 0 and price.ticket <= 0 and price.bound_ticket <= 0:
+				raise GameException(ErrorType.UnboughtableItem)
+		except AttributeError:
+			raise GameException(ErrorType.UnboughtableItem)
 
 
 # =======================

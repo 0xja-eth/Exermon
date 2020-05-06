@@ -14,7 +14,9 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <remarks>
     /// 专门用于显示 PackContainer 的组件
     /// </remarks>
-    public class PackContainerDisplay<T> : SelectableContainerDisplay<T> where T : PackContItem, new() {
+    public class PackContainerDisplay<T> : 
+        SelectableContainerDisplay<T> 
+        where T : PackContItem, new() {
 
         /// <summary>
         /// 常量设置

@@ -1424,13 +1424,16 @@ class ExerSkillSlotItem(SlotContItem):
 
 		return res
 
-	def isContItemUsable(self) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
 		"""
 		配置当前物品是否可用
+		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 		Returns:
 			返回当前物品是否可用
 		"""
-		return self.skill and not self.skill.passive
+		return occasion == ItemUseOccasion.Battle and \
+			   self.skill and not self.skill.passive
 
 	# 移动容器项
 	# def transfer(self, container, **kwargs):
@@ -1456,11 +1459,14 @@ class ExerSkillSlotItem(SlotContItem):
 			if self.use_count >= skill.need_count:
 				self.setSkill(skill.next_skill)
 
-	def useItem(self, **kwargs):
+	def useItem(self, occasion: ItemUseOccasion, **kwargs):
 		"""
 		使用物品
+		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
+			**kwargs (**dict): 拓展参数
 		"""
-		self.ensureContItemUsable()
+		self.ensureContItemUsable(occasion)
 		self.useSkill()
 
 
@@ -1527,12 +1533,24 @@ class ExerItem(UsableItem):
 
 
 # ===================================================
-#  艾瑟萌装备属性值表
+#  艾瑟萌装备等级属性值表
 # ===================================================
-class ExerEquipParam(ParamValue):
+class ExerEquipLevelParam(ParamRate):
 
 	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌装备属性值"
+		verbose_name = verbose_name_plural = "艾瑟萌装备等级属性值"
+
+	# 装备
+	equip = models.ForeignKey("ExerEquip", on_delete=models.CASCADE, verbose_name="装备")
+
+
+# ===================================================
+#  艾瑟萌装备属性值表
+# ===================================================
+class ExerEquipBaseParam(ParamValue):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "艾瑟萌装备基础属性值"
 
 	# 装备
 	equip = models.ForeignKey("ExerEquip", on_delete=models.CASCADE, verbose_name="装备")
@@ -1586,8 +1604,12 @@ class ExerEquip(EquipableItem):
 		return res
 
 	# 获取所有的属性基本值
-	def params(self):
-		return self.exerequipparam_set.all()
+	def levelParams(self):
+		return self.exerequiplevelparam_set.all()
+
+	# 获取所有的属性基本值
+	def baseParams(self):
+		return self.exerequipbaseparam_set.all()
 
 	# 购买价格
 	def buyPrice(self):
@@ -1682,9 +1704,13 @@ class ExerPackEquip(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return ExerEquip
 
+	# 获取等级属性值
+	def levelParam(self, param_id=None, attr=None):
+		return self.item.levelParam(param_id, attr)
+
 	# 获取属性值
-	def param(self, param_id=None, attr=None):
-		return self.item.param(param_id, attr)
+	def baseParam(self, param_id=None, attr=None):
+		return self.item.baseParam(param_id, attr)
 
 
 # ===================================================

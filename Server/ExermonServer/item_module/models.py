@@ -149,6 +149,68 @@ class Currency(models.Model):
 			'bound_ticket': self.bound_ticket
 		}
 
+	def __add__(self, val) -> 'Currency':
+		res = self
+
+		if isinstance(val, int):
+			res = type(self)()
+			res.gold = self.gold + val
+			res.ticket = self.ticket
+			res.bound_ticket = self.bound_ticket
+
+		if isinstance(val, Currency):
+			res = type(self)()
+			res.gold = self.gold + val.gold
+			res.ticket = self.ticket + val.ticket
+			res.bound_ticket = \
+				self.bound_ticket + val.bound_ticket
+
+		return res
+
+	def __sub__(self, val) -> 'Currency':
+		res = self
+
+		if isinstance(val, int):
+			res = type(self)()
+			res.gold = self.gold - val
+			res.ticket = self.ticket
+			res.bound_ticket = self.bound_ticket
+
+		if isinstance(val, Currency):
+			res = type(self)()
+			res.gold = self.gold - val.gold
+			res.ticket = self.ticket - val.ticket
+			res.bound_ticket = \
+				self.bound_ticket - val.bound_ticket
+
+		return res
+
+	def __neg__(self) -> 'Currency':
+		res = type(self)()
+		res.gold = -self.gold
+		res.ticket = -self.ticket
+		res.bound_ticket = -self.bound_ticket 
+
+		return res
+
+	def __mul__(self, cnt) -> 'Currency':
+		res = self
+
+		if isinstance(cnt, int):
+			res = type(self)()
+			res.gold = self.gold * cnt
+			res.ticket = self.ticket * cnt
+			res.bound_ticket = self.bound_ticket * cnt
+
+		if isinstance(cnt, Currency):
+			res = type(self)()
+			res.gold = self.gold * cnt.gold
+			res.ticket = self.ticket * cnt.ticket
+			res.bound_ticket = \
+				self.bound_ticket * cnt.bound_ticket
+
+		return res
+
 
 # region 物品
 
@@ -321,6 +383,16 @@ class LimitedItem(BaseItem):
 
 
 # ===================================================
+#  物品使用场合
+# ===================================================
+class ItemUseOccasion(Enum):
+	Unknown = 0  # 未知
+	Battle = 1  # 对战中
+	Menu = 2  # 菜单（背包中）
+	Adventure = 3  # 冒险中
+
+
+# ===================================================
 #  可用物品表
 # ===================================================
 class UsableItem(LimitedItem):
@@ -382,6 +454,18 @@ class UsableItem(LimitedItem):
 
 		return res
 
+	def isUsable(self, occasion: ItemUseOccasion):
+		"""
+		物品在特定场合下是否可用
+		Args:
+			occasion (ItemUseOccasion): 场合枚举
+		Returns:
+			返回物品在指定场合下的可用性
+		"""
+		return occasion == ItemUseOccasion.Battle and self.battle_use or \
+			   occasion == ItemUseOccasion.Menu and self.menu_use or \
+			   occasion == ItemUseOccasion.Adventure and self.adventure_use
+
 	# 最大叠加数量（为0则不限）
 	def maxCount(self): return self.max_count
 
@@ -417,10 +501,10 @@ class UsableItem(LimitedItem):
 # ===================================================
 #  装备属性类型枚举
 # ===================================================
-class EquipParamType(Enum):
-	NoType = 0  # 无类型
-	Attack = 1  # 攻击型
-	Defense = 2  # 防御型
+# class EquipParamType(Enum):
+# 	NoType = 0  # 无类型
+# 	Attack = 1  # 攻击型
+# 	Defense = 2  # 防御型
 
 
 # ===================================================
@@ -432,28 +516,28 @@ class EquipableItem(LimitedItem):
 		abstract = True
 		verbose_name = verbose_name_plural = "可装备物品"
 
-	PARAM_TYPES = [
-		(EquipParamType.NoType.value, '无类型'),
-
-		(EquipParamType.Attack.value, '攻击型'),
-		(EquipParamType.Defense.value, '防御型'),
-	]
+	# PARAM_TYPES = [
+	# 	(EquipParamType.NoType.value, '无类型'),
+	#
+	# 	(EquipParamType.Attack.value, '攻击型'),
+	# 	(EquipParamType.Defense.value, '防御型'),
+	# ]
 
 	# 最低等级
 	min_level = models.PositiveSmallIntegerField(default=0, verbose_name="最低等级")
 
-	# 属性类型
-	param_type = models.PositiveSmallIntegerField(default=EquipParamType.NoType.value,
-												  choices=PARAM_TYPES, verbose_name="属性类型")
+	# # 属性类型
+	# param_type = models.PositiveSmallIntegerField(default=EquipParamType.NoType.value,
+	# 											  choices=PARAM_TYPES, verbose_name="属性类型")
+	#
+	# # 属性比率（*100）
+	# param_rate = models.PositiveSmallIntegerField(default=10, verbose_name="属性比率")
 
-	# 属性比率（*100）
-	param_rate = models.PositiveSmallIntegerField(default=10, verbose_name="属性比率")
-
-	# 管理界面用：显示属性基础值
-	def adminParams(self):
+	# 管理界面用：显示属性成长值
+	def adminLevelParams(self):
 		from django.utils.html import format_html
 
-		params = self.params()
+		params = self.baseParams()
 
 		res = ''
 		for p in params:
@@ -461,21 +545,40 @@ class EquipableItem(LimitedItem):
 
 		return format_html(res)
 
-	adminParams.short_description = "附加属性值"
+	adminLevelParams.short_description = "等级属性值"
+
+	# 管理界面用：显示属性基础值
+	def adminBaseParams(self):
+		from django.utils.html import format_html
+
+		params = self.baseParams()
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	adminBaseParams.short_description = "基础属性值"
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
 		res = super().convertToDict(**kwargs)
 
 		res['min_level'] = self.min_level
-		res['param_type'] = self.param_type
-		res['param_rate'] = self.param_rate
-		res['params'] = ModelUtils.objectsToDict(self.params())
+		# res['param_type'] = self.param_type
+		# res['param_rate'] = self.param_rate
+		res['level_params'] = ModelUtils.objectsToDict(self.levelParams())
+		res['base_params'] = ModelUtils.objectsToDict(self.baseParams())
 
 		return res
 
+	# 获取所有的等级属性值
+	def levelParams(self):
+		raise NotImplementedError
+
 	# 获取所有的属性基本值
-	def params(self):
+	def baseParams(self):
 		raise NotImplementedError
 
 	# 获取购买价格
@@ -488,13 +591,25 @@ class EquipableItem(LimitedItem):
 	# 	if param is None: return super().__getattr__(item)
 	# 	return param
 
-	# 获取属性值
-	def param(self, param_id=None, attr=None):
+	# 获取等级属性值
+	def levelParam(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.params().filter(param_id=param_id)
+			param = self.levelParams().filter(param_id=param_id)
 		if attr is not None:
-			param = self.params().filter(param__attr=attr)
+			param = self.levelParams().filter(param__attr=attr)
+
+		if param is None or not param.exists(): return 0
+
+		return param.first().getValue()
+
+	# 获取属性值
+	def baseParam(self, param_id=None, attr=None):
+		param = None
+		if param_id is not None:
+			param = self.baseParams().filter(param_id=param_id)
+		if attr is not None:
+			param = self.baseParams().filter(param__attr=attr)
 
 		if param is None or not param.exists(): return 0
 
@@ -2225,32 +2340,36 @@ class BaseContItem(CacheableModel):
 
 	# region 功能操作
 
-	def isContItemUsable(self) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
 		"""
 		配置当前物品是否可用
+		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 		Returns:
 			返回当前物品是否可用
 		"""
 		return False
 
-	def ensureContItemUsable(self, **kwargs):
+	def ensureContItemUsable(self, occasion: ItemUseOccasion, **kwargs):
 		"""
 		确保物品可用
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			**kwargs (**dict): 拓展参数
 		Raises:
 			ErrorType.UnusableItem: 该类型物品不可用
 		"""
-		if not self.isContItemUsable():
+		if not self.isContItemUsable(occasion):
 			raise GameException(ErrorType.UnusableItem)
 
-	def useItem(self, **kwargs):
+	def useItem(self, occasion: ItemUseOccasion, **kwargs):
 		"""
-		使用物品（）
+		使用物品
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			**kwargs (**dict): 拓展参数
 		"""
-		self.ensureContItemUsable(**kwargs)
+		self.ensureContItemUsable(occasion, **kwargs)
 
 	# endregion
 
@@ -2278,7 +2397,7 @@ class PackContItem(BaseContItem):
 		verbose_name = verbose_name_plural = "背包类容器项"
 
 	# 物品
-	item = None  # models.ForeignKey('BaseItem', on_delete=models.CASCADE, verbose_name="物品")
+	item: BaseItem = None  # models.ForeignKey('BaseItem', on_delete=models.CASCADE, verbose_name="物品")
 
 	# 叠加数量
 	count = models.PositiveSmallIntegerField(default=0, verbose_name="叠加数量")
@@ -2483,28 +2602,31 @@ class PackContItem(BaseContItem):
 
 	# region 功能操作
 
-	def ensureContItemUsable(self, count: int = 1, **kwargs):
+	def ensureContItemUsable(self, occasion: ItemUseOccasion,
+							 count: int = 1, **kwargs):
 		"""
 		确保物品可用
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			count (int): 使用数量
 			**kwargs (**dict): 拓展参数
 		Raises:
 			ErrorType.QuantityInsufficient: 物品数量不足
 		"""
-		super().ensureContItemUsable(**kwargs)
+		super().ensureContItemUsable(occasion, **kwargs)
 
 		if self.count < count:
 			raise GameException(ErrorType.QuantityInsufficient)
 
-	def useItem(self, count: int = 1, **kwargs):
+	def useItem(self, occasion: ItemUseOccasion, count: int = 1, **kwargs):
 		"""
 		使用物品
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			count (int): 使用数量
 			**kwargs (**dict): 拓展参数
 		"""
-		super().useItem(count=1, **kwargs)
+		super().useItem(occasion, count=1, **kwargs)
 
 		self.leave(count)
 
@@ -2838,10 +2960,13 @@ class SlotContItem(BaseContItem):
 
 		return equip_item
 
-	def ensureContItemUsable(self, index: int = 0, type_: type = None, count: int = 1, **kwargs):
+	def ensureContItemUsable(self, occasion: ItemUseOccasion,
+							 index: int = 0, type_: type = None,
+							 count: int = 1, **kwargs):
 		"""
 		确保物品可用
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			index (int): 装备类型索引
 			type_ (type): 装备类型（类）
 			count (int): 使用数量
@@ -2852,12 +2977,13 @@ class SlotContItem(BaseContItem):
 
 		equip_item = self.equipItem(index)
 		if equip_item is not None:
-			equip_item.ensureContItemUsable(count, **kwargs)
+			equip_item.ensureContItemUsable(occasion, count, **kwargs)
 
-	def useItem(self, index: int = 0, type_: type = None, count: int = 1, **kwargs):
+	def useItem(self, occasion: ItemUseOccasion, index: int = 0, type_: type = None, count: int = 1, **kwargs):
 		"""
 		使用物品
 		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 			index (int): 装备类型索引
 			type_ (type): 装备类型（类）
 			count (int): 使用数量
@@ -2868,7 +2994,7 @@ class SlotContItem(BaseContItem):
 
 		equip_item = self.equipItem(index)
 		if equip_item is not None:
-			equip_item.useItem(count, **kwargs)
+			equip_item.useItem(occasion, count, **kwargs)
 
 	# endregion
 

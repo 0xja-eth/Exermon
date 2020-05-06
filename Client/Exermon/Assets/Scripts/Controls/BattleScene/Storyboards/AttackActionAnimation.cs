@@ -86,14 +86,7 @@ namespace UI.BattleScene.Controls.Storyboards {
         #endregion
 
         #region 数据控制
-
-        /// <summary>
-        /// 物品改变回调
-        /// </summary>
-        protected override void onItemChanged() {
-            base.onItemChanged();
-        }
-
+        
         #endregion
 
         #region 界面绘制

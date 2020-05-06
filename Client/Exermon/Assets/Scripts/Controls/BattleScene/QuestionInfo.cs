@@ -63,7 +63,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            isLoaded = item.loaded;
+            isLoaded = item != null && item.loaded;
         }
 
         #endregion

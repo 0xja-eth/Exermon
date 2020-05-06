@@ -328,6 +328,16 @@ class Service:
 
 		return {'player': target_player.convertToDict(type="battle")}
 
+	# 获取玩家状态界面信息
+	@classmethod
+	async def getPack(cls, consumer, player: Player, get_uid: int, ):
+		# 返回数据：
+		# player: 玩家状态数据 => 玩家状态数据
+
+		target_player = Common.getPlayer(id=get_uid)
+
+		return {'player': target_player.convertToDict(type="pack")}
+
 	# 玩家修改昵称
 	@classmethod
 	async def editName(cls, consumer, player: Player, name: str, ):

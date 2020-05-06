@@ -159,9 +159,15 @@ class ParamValue(models.Model):
 			value.value = old_val
 
 		res = type(self)(param=self.param)
-		# res.param_id = self.param_id
 		res.value = self.value
 		res.addValue(-value)
+
+		return res
+
+	def __neg__(self) -> 'ParamValue':
+
+		res = type(self)(param=self.param)
+		res.value = -self.value
 
 		return res
 

@@ -46,11 +46,8 @@ namespace UI.Common.Controls.InputFields {
             //check = check ?? defaultCheckFunc;
             processPresetedOptions();
             dropdown?.onValueChanged.AddListener(
-                (index) => {
-                    Debug.Log("Listener: " + index);
-                    value = options[index];
-                    onValueChanged();
-                });
+                (index) => setValue(options[index])
+            );
         }
 
         /// <summary>

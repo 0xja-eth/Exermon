@@ -36,8 +36,17 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// <summary>
         /// 配置装备
         /// </summary>
-        protected override void setupEquip() {
-            equip = (item == null ? equip : item.getEquip<T>());
+        protected override void setupExactlyEquip() {
+            base.setupExactlyEquip();
+            equip = item.getEquip<T>();
+            // equip = (item == null ? equip : item.getEquip<T>());
+        }
+
+        /// <summary>
+        /// 配置空装备
+        /// </summary>
+        protected override void setupEmptyEquip() {
+            lastEquip = null;
         }
 
         /// <summary>

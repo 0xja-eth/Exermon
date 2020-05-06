@@ -23,7 +23,10 @@ class ExerItemEffectsInline(BaseEffectsInline): model = ExerItemEffect
 class ExerSkillEffectsInline(BaseEffectsInline): model = ExerSkillEffect
 
 
-class ExerEquipParamsInline(EquipParamsInline): model = ExerEquipParam
+class ExerEquipLevelParamsInline(EquipParamsInline): model = ExerEquipLevelParam
+
+
+class ExerEquipBaseParamsInline(EquipParamsInline): model = ExerEquipBaseParam
 
 
 class ExerEquipSlotItemsInline(BaseContItemsInline): model = ExerEquipSlotItem
@@ -144,7 +147,9 @@ class ExerItemAdmin(UsableItemAdmin):
 
 @xadmin.sites.register(ExerEquip)
 class ExerEquipAdmin(EquipableItemAdmin):
-	inlines = [ExerEquipPriceInline, ExerEquipParamsInline]
+	inlines = [ExerEquipPriceInline,
+			   ExerEquipLevelParamsInline,
+			   ExerEquipBaseParamsInline]
 
 
 @xadmin.sites.register(ExerHub)

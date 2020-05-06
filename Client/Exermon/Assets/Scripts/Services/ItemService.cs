@@ -31,13 +31,23 @@ namespace ItemModule.Services {
         const string SplitItem = "分解物品";
         const string MergeItems = "组合物品";
 
+        const string UseItem = "使用物品";
+
+        const string DiscardItem = "丢弃物品";
+        const string SellItem = "出售物品";
+
+        const string BuyItem = "购买物品";
+
         /// <summary>
         /// 业务操作
         /// </summary>
         public enum Oper {
             GetPack, GetSlot, GainItem, LostItem,
             GainContItems, LostContItems,
-            TransferItems, SplitItem, MergeItems
+            TransferItems, SplitItem, MergeItems,
+            UseItem,
+            DiscardItem, SellItem, 
+            BuyItem
         }
 
         #region 初始化
@@ -56,6 +66,10 @@ namespace ItemModule.Services {
             addOperDict(Oper.TransferItems, TransferItems, NetworkSystem.Interfaces.ItemTransferItems);
             addOperDict(Oper.SplitItem, SplitItem, NetworkSystem.Interfaces.ItemSplitItem);
             addOperDict(Oper.MergeItems, MergeItems, NetworkSystem.Interfaces.ItemMergeItems);
+            addOperDict(Oper.UseItem, UseItem, NetworkSystem.Interfaces.ItemUseItem);
+            addOperDict(Oper.DiscardItem, DiscardItem, NetworkSystem.Interfaces.ItemDiscardItem);
+            addOperDict(Oper.SellItem, SellItem, NetworkSystem.Interfaces.ItemSellItem);
+            addOperDict(Oper.BuyItem, BuyItem, NetworkSystem.Interfaces.ItemBuyItem);
         }
 
         #endregion
@@ -423,8 +437,137 @@ namespace ItemModule.Services {
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
             data["type"] = type;
+            data["ci_types"] = DataLoader.convert(ciTypes);
             data["contitem_ids"] = DataLoader.convert(contItemIds);
             sendRequest(Oper.MergeItems, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 丢弃物品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void discardItem<T>(PackContainer<T> container, T contItem, int count,
+            UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                onSuccess?.Invoke();
+            };
+
+            discardItem(container.type, contItem.type,
+                contItem.getID(), count, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        /// <param name="ciType">容器项类型</param>
+        /// <param name="contItemId">容器项ID</param>
+        public void discardItem(int type, int ciType, int contItemId, int count,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData();
+            data["type"] = type;
+            data["count"] = count;
+            data["ci_type"] = ciType;
+            data["contitem_id"] = contItemId;
+            sendRequest(Oper.DiscardItem, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 出售物品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void sellItem<T>(PackContainer<T> container, T contItem, int count,
+            UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                getPlayer().loadMoney(res);
+                onSuccess?.Invoke();
+            };
+
+            sellItem(container.type, contItem.type,
+                contItem.getID(), count, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        /// <param name="ciType">容器项类型</param>
+        /// <param name="contItemId">容器项ID</param>
+        public void sellItem(int type, int ciType, int contItemId, int count,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData();
+            data["type"] = type;
+            data["count"] = count;
+            data["ci_type"] = ciType;
+            data["contitem_id"] = contItemId;
+            sendRequest(Oper.SellItem, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 出售物品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="item">物品</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void buyItem<P, T>(PackContainer<P> container, T item, int count,
+            UnityAction onSuccess, UnityAction onError = null)
+            where T : BaseItem, new() where P : PackContItem<T>, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                getPlayer().loadMoney(res);
+                onSuccess?.Invoke();
+            };
+
+            buyItem(item.type, item.getID(), count, _onSuccess, onError);
+        }
+        /// <param name="type">物品类型</param>
+        /// <param name="itemId">物品ID</param>
+        public void buyItem(int type, int itemId, int count,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type;
+            data["item_id"] = itemId; data["count"] = count;
+            sendRequest(Oper.BuyItem, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 使用物品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="contItem">容器项</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="occasion">使用场合</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void useItem<T>(PackContainer<T> container, T contItem, 
+            int count, ItemUseOccasion occasion, UnityAction onSuccess, 
+            UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                getPlayer().loadMoney(res);
+                onSuccess?.Invoke();
+            };
+
+            useItem(container.type, contItem.type, contItem.getID(),
+                count, (int)occasion, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        /// <param name="ciType">容器项类型</param>
+        /// <param name="contItemId">容器项ID</param>
+        public void useItem(int type, int ciType, int contItemId, int count, int occasion,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData();
+            data["type"] = type; data["ci_type"] = ciType;
+            data["contitem_id"] = contItemId; data["count"] = count;
+            data["occasion"] = occasion;
+            sendRequest(Oper.UseItem, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>

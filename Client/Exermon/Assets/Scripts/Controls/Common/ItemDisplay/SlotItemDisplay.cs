@@ -72,13 +72,23 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            setupEquip();
+            if (item == null) setupEmptyEquip();
+            else setupExactlyEquip();
         }
 
         /// <summary>
-        /// 配置装备（原始装备）
+        /// 配置确切物品的装备（原始装备）
         /// </summary>
-        protected virtual void setupEquip() { }
+        protected virtual void setupExactlyEquip() {
+            lastEquip = null;
+        }
+
+        /// <summary>
+        /// 配置空物品装备（原始装备）
+        /// </summary>
+        protected virtual void setupEmptyEquip() {
+            lastEquip = equip = null;
+        }
 
         /// <summary>
         /// 装备

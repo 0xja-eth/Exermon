@@ -4,7 +4,7 @@ from item_module.models import *
 from utils.model_utils import CacheableModel, \
 	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
-from game_module.models import ParamValue, HumanEquipType
+from game_module.models import ParamValue, ParamRate, HumanEquipType
 from season_module.models import SeasonRecord
 from season_module.runtimes import SeasonManager
 from enum import Enum
@@ -226,11 +226,32 @@ class PlayerMoney(Currency):
 		return money
 
 	# 获得金钱
-	def gain(self, gold=0, ticket=0, bound_ticket=0):
-		self.gold += gold
-		self.ticket += ticket
-		self.bound_ticket += bound_ticket
+	def gain(self, currency: Currency = None, gold=0, ticket=0, bound_ticket=0):
+
+		if currency is not None:
+			gold = currency.gold
+			ticket = currency.ticket
+			bound_ticket = currency.bound_ticket
+
+		new_gold = self.gold + gold
+		new_ticket = self.ticket + ticket
+		new_bound_ticket = self.bound_ticket + bound_ticket
+
+		if new_gold < 0 or new_ticket < 0 or new_bound_ticket < 0:
+			raise GameException(ErrorType.NotEnoughMoney)
+
+		self.gold = new_gold
+		self.ticket = new_ticket
+		self.bound_ticket = new_bound_ticket
 		self.save()
+
+	# 失去金钱
+	def lose(self, currency: Currency = None,
+			 gold=0, ticket=0, bound_ticket=0):
+
+		self.gain(currency=-currency,
+				  gold=-gold, ticket=-ticket,
+				  bound_ticket=-bound_ticket)
 
 
 # ===================================================
@@ -598,6 +619,12 @@ class Player(CacheableModel):
 				'exercise_records': exercise_records
 			}
 
+		if type == "pack":
+			return {
+				'pack_containers': self._packContainerItems(),
+				'slot_containers': self._slotContainerItems(),
+			}
+
 		base = {
 			'id': self.id,
 			'name': self.name,
@@ -816,7 +843,7 @@ class Player(CacheableModel):
 
 	# 创建艾瑟萌槽
 	def createExermons(self, exers, enames):
-		from exermon_module.models import ExerSlot, PlayerExermon
+		from exermon_module.models import ExerSlot
 
 		player_exers = []
 
@@ -842,8 +869,6 @@ class Player(CacheableModel):
 
 	# 创建艾瑟萌天赋
 	def createGifts(self, gifts):
-		from exermon_module.models import PlayerExerGift
-
 		exerslot = self.exerSlot()
 
 		if exerslot is None:
@@ -1020,10 +1045,12 @@ class Player(CacheableModel):
 		"""
 		return self.exerSlot().battlePoint()
 
-	def gainMoney(self, gold=0, ticket=0, bound_ticket=0):
+	def gainMoney(self, currency: Currency = None,
+				  gold=0, ticket=0, bound_ticket=0):
 		"""
 		获得金钱
 		Args:
+			currency (Currency): 价格
 			gold (int): 金币
 			ticket (int): 点券
 			bound_ticket (int): 绑定点券
@@ -1031,7 +1058,22 @@ class Player(CacheableModel):
 		money = self.playerMoney()
 		if money is None: return
 
-		money.gain(gold, ticket, bound_ticket)
+		money.gain(currency, gold, ticket, bound_ticket)
+
+	def loseMoney(self, currency: Currency = None,
+				  gold=0, ticket=0, bound_ticket=0):
+		"""
+		失去金钱
+		Args:
+			currency (Currency): 价格
+			gold (int): 金币
+			ticket (int): 点券
+			bound_ticket (int): 绑定点券
+		"""
+		money = self.playerMoney()
+		if money is None: return
+
+		money.lose(currency, gold, ticket, bound_ticket)
 
 	def gainExp(self, sum_exp: int, slot_exps: dict, exer_exps: dict):
 		"""
@@ -1237,9 +1279,21 @@ class HumanItem(UsableItem):
 
 
 # ===================================================
+#  人类装备等级属性值表
+# ===================================================
+class HumanEquipLevelParam(ParamRate):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "人类装备等级属性值"
+
+	# 装备
+	equip = models.ForeignKey("HumanEquip", on_delete=models.CASCADE, verbose_name="装备")
+
+
+# ===================================================
 #  人类装备属性值表
 # ===================================================
-class HumanEquipParam(ParamValue):
+class HumanEquipBaseParam(ParamValue):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "人类装备属性值"
@@ -1294,10 +1348,14 @@ class HumanEquip(EquipableItem):
 		res['e_type'] = self.e_type_id
 
 		return res
+	
+	# 获取所有的属性基本值
+	def levelParams(self):
+		return self.humanequiplevelparam_set.all()
 
 	# 获取所有的属性基本值
-	def params(self):
-		return self.humanequipparam_set.all()
+	def baseParams(self):
+		return self.humanequipbaseparam_set.all()
 
 	# 购买价格
 	def buyPrice(self):
@@ -1365,13 +1423,15 @@ class HumanPackItem(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return HumanItem
 
-	def isContItemUsable(self) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
 		"""
 		配置当前物品是否可用
+		Args:
+			occasion (ItemUseOccasion): 使用场合枚举
 		Returns:
 			返回当前物品是否可用
 		"""
-		return self.item.battle_use
+		return self.item.isUsable(occasion)
 
 
 # ===================================================
@@ -1399,6 +1459,14 @@ class HumanPackEquip(PackContItem):
 	# 所接受的物品类
 	@classmethod
 	def acceptedItemClass(cls): return HumanEquip
+
+	# 获取等级属性值
+	def levelParam(self, param_id=None, attr=None):
+		return self.item.levelParam(param_id, attr)
+
+	# 获取属性值
+	def baseParam(self, param_id=None, attr=None):
+		return self.item.baseParam(param_id, attr)
 
 
 # ===================================================

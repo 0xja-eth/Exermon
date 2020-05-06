@@ -11,6 +11,8 @@ using Core.Data.Loaders;
 using GameModule.Data;
 using GameModule.Services;
 
+using UI.Common.Controls.ParamDisplays;
+
 /// <summary>
 /// 物品模块
 /// </summary>
@@ -24,7 +26,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 基本物品数据
     /// </summary>
-    public class BaseItem : BaseData {
+    public class BaseItem : BaseData,
+        ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 物品类型
@@ -60,6 +63,23 @@ namespace ItemModule.Data {
         public string description { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; } // 物品类型
+        
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public virtual JsonData convertToDisplayData(string type = "") {
+            var res = new JsonData();
+
+            res["name"] = name;
+            res["description"] = description;
+
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 最大叠加数量
@@ -95,6 +115,11 @@ namespace ItemModule.Data {
     public class LimitedItem : BaseItem {
 
         /// <summary>
+        /// 常量定义
+        /// </summary>
+        const string UnsellableText = "不可出售";
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -115,6 +140,25 @@ namespace ItemModule.Data {
         /// </summary>
         public Sprite icon { get; protected set; }
 
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            var res = base.convertToDisplayData(type);
+
+            res["sell_price"] = sellPrice;
+            res["sellable"] = sellable();
+            res["discardable"] = discardable;
+            res["tradable"] = tradable;
+
+            return res;
+        }
+
+        #endregion
+
         /// <summary>
         /// 获取星级实例
         /// </summary>
@@ -123,6 +167,14 @@ namespace ItemModule.Data {
             return DataService.get().itemStar(starId);
         }
 
+        /// <summary>
+        /// 可否出售
+        /// </summary>
+        /// <returns></returns>
+        public bool sellable() {
+            return sellPrice > 0;
+        }
+        
         /// <summary>
         /// 加载自定义属性
         /// </summary>
@@ -143,6 +195,16 @@ namespace ItemModule.Data {
         /// </summary>
         /// <returns>返回对应的效果数据数组</returns>
         EffectData[] convertToEffectData();
+    }
+
+    /// <summary>
+    /// 物品使用场合
+    /// </summary>
+    public enum ItemUseOccasion {
+        Unknown = 0, // 未知
+        Battle = 1, // 对战中
+	    Menu = 2, // 菜单（背包中）
+	    Adventure = 3, // 冒险中
     }
 
     /// <summary>
@@ -259,10 +321,23 @@ namespace ItemModule.Data {
         void changePercentParam(int paramId, double rate);
 
     }
+
     /// <summary>
     /// 可用物品数据
     /// </summary>
     public class UsableItem : LimitedItem, IEffectsConvertable {
+
+        /// <summary>
+        /// 常量定义
+        /// </summary>
+        const string UnusableText = "不可使用";
+        const string BattleUseText = "对战";
+        const string MenuUseText = "背包";
+        const string AdventureUseText = "冒险";
+
+        const string EmptyEffectText = "无";
+
+        const string Spliter = "|";
 
         /// <summary>
         /// 属性
@@ -288,6 +363,58 @@ namespace ItemModule.Data {
         [AutoConvert]
         public List<EffectData> effects { get; protected set; }
 
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            var res = base.convertToDisplayData(type);
+            var timing = generateTimingText();
+
+            res["type"] = itemType().name;
+
+            res["max_count"] = maxCount_;
+
+            res["timing"] = timing;
+            res["usable"] = timing == UnusableText;
+            res["freeze"] = freeze;
+
+            res["effects"] = generateEffectsText();
+
+            return res;
+        }
+
+        /// <summary>
+        /// 生成使用场合文本
+        /// </summary>
+        /// <returns></returns>
+        string generateTimingText() {
+            List<string> texts = new List<string>();
+
+            if (battleUse) texts.Add(BattleUseText);
+            if (menuUse) texts.Add(MenuUseText);
+            if (adventureUse) texts.Add(AdventureUseText);
+
+            string res = string.Join(Spliter, texts);
+
+            return res == "" ? UnusableText : res;
+        }
+
+        /// <summary>
+        /// 生成效果文本
+        /// </summary>
+        /// <returns></returns>
+        string generateEffectsText() {
+            var res = "";
+            foreach (var effect in effects)
+                res += effect.description + "\n";
+            return res == "" ? EmptyEffectText : res;
+        }
+
+        #endregion
+        
         /// <summary>
         /// 获取物品类型
         /// </summary>
@@ -314,36 +441,87 @@ namespace ItemModule.Data {
     /// <summary>
     /// 可装备物品数据
     /// </summary>
-    public class EquipableItem : LimitedItem {
+    public class EquipableItem : LimitedItem,
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性类型
         /// </summary>
-        public enum ParamType {
-            NoType = 0, // 无类型
-            Attack = 1, // 攻击型
-            Defense = 2 // 防御型
-        }
+        //public enum ParamType {
+        //    NoType = 0, // 无类型
+        //    Attack = 1, // 攻击型
+        //    Defense = 2 // 防御型
+        //}
 
         /// <summary>
         /// 属性
         /// </summary>
-        [AutoConvert("params")]
-        public ParamData[] params_ { get; protected set; }
+        [AutoConvert]
+        public ParamRateData[] levelParams { get; protected set; }
+        [AutoConvert]
+        public ParamData[] baseParams { get; protected set; }
         [AutoConvert]
         public int minLevel { get; protected set; }
-        [AutoConvert]
-        public int paramType { get; protected set; }
-        [AutoConvert]
-        public int paramRate { get; protected set; }
+        
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            var res = base.convertToDisplayData(type);
+
+            res["min_level"] = minLevel;
+            res["params"] = DataLoader.convert(
+                convertToDisplayDataArray(type));
+
+            return res;
+        }
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData[] convertToDisplayDataArray(string type = "") {
+            var params_ = DataService.get().staticData.configure.baseParams;
+            var count = params_.Length;
+            var data = new JsonData[count];
+            for (int i = 0; i < count; ++i) {
+                var json = new JsonData();
+                var paramId = params_[i].getID();
+
+                var levelParam = getLevelParam(paramId).value;
+                var baseParam = getBaseParam(paramId).value;
+
+                json["level_param"] = levelParam;
+                json["equip_param"] = baseParam;
+
+                data[i] = json;
+            }
+            return data;
+        }
+
+        #endregion
 
         /// <summary>
         /// 获取装备的属性
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamData getParam(int paramId) {
-            foreach (var param in params_)
+        public ParamRateData getLevelParam(int paramId) {
+            foreach (var param in levelParams)
+                if (param.paramId == paramId) return param;
+            return new ParamRateData(paramId);
+        }
+
+        /// <summary>
+        /// 获取装备的属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public ParamData getBaseParam(int paramId) {
+            foreach (var param in baseParams)
                 if (param.paramId == paramId) return param;
             return new ParamData(paramId);
         }

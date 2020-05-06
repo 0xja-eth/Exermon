@@ -50,6 +50,7 @@ namespace Core.Systems {
             public const string PlayerGetBasic = "player/get/basic";
             public const string PlayerGetStatus = "player/get/status";
             public const string PlayerGetBattle = "player/get/battle";
+            public const string PlayerGetPack = "player/get/pack";
 
             public const string PlayerCreateCharacter = "player/create/character";
             public const string PlayerCreateExermons = "player/create/exermons";
@@ -70,6 +71,13 @@ namespace Core.Systems {
             public const string ItemTransferItems = "item/packcontainer/transfer";
             public const string ItemSplitItem = "item/packcontainer/split";
             public const string ItemMergeItems = "item/packcontainer/merge";
+
+            public const string ItemUseItem = "item/packcontainer/use";
+
+            public const string ItemDiscardItem = "item/packcontainer/discard";
+            public const string ItemSellItem = "item/packcontainer/sell";
+
+            public const string ItemBuyItem = "item/item/buy";
 
             public const string ExermonEquipPlayerExer = "exermon/equip/playerexer";
             public const string ExermonEquipPlayerGift = "exermon/equip/playergift";

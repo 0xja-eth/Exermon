@@ -92,6 +92,13 @@ class ErrorType(Enum):
 	UnusableItem = 240  # 物品不可用
 	InvalidItemUsing = 241  # 无效的物品使用
 	ItemFrozen = 242  # 物品冻结中
+	InvalidOccasion = 243  # 非法的使用场合
+
+	# Buy/Sell/DiscardItem
+	UnsellableItem = 250  # 物品不可出售
+	UndiscardableItem = 251  # 物品不可丢弃
+	UnboughtableItem = 252  # 物品不可购买
+	NotEnoughMoney = 253  # 没有足够金钱
 
 	# ExermonCommon
 	ExermonNotExist = 300  # 艾瑟萌不存在
@@ -260,6 +267,13 @@ class GameException(Exception):
 		ErrorType.UnusableItem: "物品不可用！",
 		ErrorType.InvalidItemUsing: "无效的物品使用！",
 		ErrorType.ItemFrozen: "物品冻结中！",
+		ErrorType.InvalidOccasion: "非法的使用场合！",
+
+		# Buy/Sell/DiscardItem
+		ErrorType.UnsellableItem: "物品不可出售！",
+		ErrorType.UndiscardableItem: "物品不可丢弃！",
+		ErrorType.UnboughtableItem: "物品暂时无法购买！",
+		ErrorType.NotEnoughMoney: "没有足够的金钱！",
 
 		# ExermonCommon
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",

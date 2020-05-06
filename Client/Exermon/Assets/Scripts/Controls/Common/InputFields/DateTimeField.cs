@@ -126,11 +126,10 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="value">值</param>
         protected override bool assignValue(DateTime dateTime) {
-            if (value == dateTime) return false;
-            value = dateTime;
+            var oldValue = value; value = dateTime;
             if (value > maxDateTime) value = maxDateTime;
             if (value < minDateTime) value = minDateTime;
-            return true;
+            return oldValue != value;
         }
 
         /// <summary>

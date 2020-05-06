@@ -1,4 +1,5 @@
 ﻿using System;
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -166,7 +167,7 @@ namespace UI.Common.Controls.ParamDisplays {
             displayData.SetJsonType(JsonType.Object);
             foreach (var item in displayItems)
                 displayData[item.key] = null;
-            rawData = displayData;
+            data = displayData;
         }
 
         /// <summary>
@@ -265,7 +266,7 @@ namespace UI.Common.Controls.ParamDisplays {
                 case "TimeSpan": processTimeSpanDisplayItem(item, value); break;
                 case "TimeSpanWithHour": processTimeSpanDisplayItem(item, value, true); break;
                 case "Show": processShowDisplayItem(item, value); break;
-                case "Hide": processShowDisplayItem(item, value); break;
+                case "Hide": processShowDisplayItem(item, value, true); break;
                 case "Date": processDateDisplayItem(item, value); break;
                 case "DateTime": processDateTimeDisplayItem(item, value); break;
                 case "Color": processColorDisplayItem(item, value); break;
@@ -454,8 +455,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <returns></returns>
         Color trueColor() {
-            if (DataLoader.contains(rawData, TrueColorKey))
-                return DataLoader.load<Color>(rawData, TrueColorKey);
+            if (DataLoader.contains(data, TrueColorKey))
+                return DataLoader.load<Color>(data, TrueColorKey);
             return DefaultTrueColor;
         }
 
@@ -464,8 +465,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <returns></returns>
         Color falseColor() {
-            if (DataLoader.contains(rawData, FalseColorKey))
-                return DataLoader.load<Color>(rawData, FalseColorKey);
+            if (DataLoader.contains(data, FalseColorKey))
+                return DataLoader.load<Color>(data, FalseColorKey);
             return DefaultFalseColor;
         }
 
@@ -474,8 +475,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <returns></returns>
         Color normalColor() {
-            if (DataLoader.contains(rawData, NormalColorKey))
-                return DataLoader.load<Color>(rawData, NormalColorKey);
+            if (DataLoader.contains(data, NormalColorKey))
+                return DataLoader.load<Color>(data, NormalColorKey);
             return DefaultNormalColor;
         }
 

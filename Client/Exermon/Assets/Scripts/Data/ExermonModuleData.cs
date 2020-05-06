@@ -499,6 +499,22 @@ namespace ExermonModule.Data {
         [AutoConvert]
         public int eType { get; protected set; }
 
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public override JsonData convertToDisplayData(string type = "") {
+            var res = base.convertToDisplayData(type);
+
+            res["type"] = equipType().name;
+
+            return res;
+        }
+
+        #endregion
+
         /// <summary>
         /// 获取装备类型
         /// </summary>
@@ -515,7 +531,22 @@ namespace ExermonModule.Data {
     /// <summary>
     /// 艾瑟萌背包物品
     /// </summary>
-    public class ExerPackItem : PackContItem<ExerItem> {
+    public class ExerPackItem : PackContItem<ExerItem>,
+        ParamDisplay.IDisplayDataConvertable {
+
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            var res = new JsonData();
+
+            return res;
+        }
+
+        #endregion
 
         /// <summary>
         /// 容器项容量（0为无限）
@@ -533,9 +564,21 @@ namespace ExermonModule.Data {
     /// 艾瑟萌背包装备
     /// </summary>
     public class ExerPackEquip : PackContItem<ExerEquip>,
+        ParamDisplay.IDisplayDataConvertable,
         ParamDisplay.IDisplayDataArrayConvertable {
 
         #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            var res = item().convertToDisplayData(type);
+            res["params"] = DataLoader.convert(
+                convertToDisplayDataArray(type));
+            return res;
+        }
 
         /// <summary>
         /// 转化为属性信息集
@@ -548,8 +591,13 @@ namespace ExermonModule.Data {
             for (int i = 0; i < count; ++i) {
                 var json = new JsonData();
                 var paramId = params_[i].getID();
-                var value = getParam(paramId).value;
-                json["equip_param"] = value;
+
+                var levelParam = getLevelParam(paramId).value;
+                var baseParam = getBaseParam(paramId).value;
+
+                json["level_param"] = levelParam;
+                json["equip_param"] = baseParam;
+
                 data[i] = json;
             }
             return data;
@@ -564,24 +612,45 @@ namespace ExermonModule.Data {
         public ExerEquip equip() { return item(); }
 
         /// <summary>
-        /// 获取装备的所有属性
+        /// 获取装备的等级属性
         /// </summary>
         /// <returns>属性数据数组</returns>
-        public ParamData[] getParams() {
+        public ParamRateData[] getLevelParams() {
             var equip = this.equip();
-            if (equip == null) return new ParamData[0];
-            return equip.params_;
+            if (equip == null) return new ParamRateData[0];
+            return equip.levelParams;
         }
 
         /// <summary>
-        /// 获取装备的属性
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <returns>属性数据数组</returns>
+        public ParamData[] getBaseParams() {
+            var equip = this.equip();
+            if (equip == null) return new ParamData[0];
+            return equip.baseParams;
+        }
+
+        /// <summary>
+        /// 获取装备的等级属性
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamData getParam(int paramId) {
+        public ParamRateData getLevelParam(int paramId) {
+            var equip = this.equip();
+            if (equip == null) return new ParamRateData(paramId);
+            return equip.getLevelParam(paramId);
+        }
+
+        /// <summary>
+        /// 获取装备的基础属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public ParamData getBaseParam(int paramId) {
             var equip = this.equip();
             if (equip == null) return new ParamData(paramId);
-            return equip.getParam(paramId);
+            return equip.getBaseParam(paramId);
         }
 
         /// <summary>
@@ -1495,7 +1564,7 @@ namespace ExermonModule.Data {
         /// <returns>属性数据数组</returns>
         public ParamData[] getParams() {
             if (packEquip == null) return new ParamData[0];
-            return packEquip.getParams();
+            return packEquip.getBaseParams();
         }
 
         /// <summary>

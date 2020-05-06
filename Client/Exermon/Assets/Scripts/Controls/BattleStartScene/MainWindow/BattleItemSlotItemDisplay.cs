@@ -50,9 +50,10 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <summary>
         /// 设置装备
         /// </summary>
-        protected override void setupEquip() {
-            if (item == null) base.setEquip(null, true);
-            else base.setEquip(item.packItem, true);
+        protected override void setupExactlyEquip() {
+            base.setupExactlyEquip();
+            equip = item.packItem;
+            // base.setEquip(item.packItem, true);
         }
 
         /// <summary>

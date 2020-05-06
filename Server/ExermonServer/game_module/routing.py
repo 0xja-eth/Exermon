@@ -147,6 +147,14 @@ WEBSOCKET_METHOD_ROUTER = {
 		Player.getBattle,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 获取玩家对战界面信息
+	'player/get/pack': [[
+		['uid', 'int'],
+		['get_uid', 'int'],
+	],
+		Player.getPack,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 玩家修改昵称
 	'player/edit/name': [[
 		['uid', 'int'],
@@ -270,6 +278,51 @@ WEBSOCKET_METHOD_ROUTER = {
 		['contitem_ids', 'int[]'],
 	],
 		Item.packContainerMerge,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 背包类容器使用
+	'item/packcontainer/use': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['ci_type', 'int'],
+		['contitem_id', 'int'],
+		['count', 'int'],
+		['occasion', 'int'],
+	],
+		Item.packContainerUse,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 背包类容器丢弃
+	'item/packcontainer/discard': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['ci_type', 'int'],
+		['contitem_id', 'int'],
+		['count', 'int'],
+	],
+		Item.packContainerDiscard,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 背包类容器出售
+	'item/packcontainer/sell': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['ci_type', 'int'],
+		['contitem_id', 'int'],
+		['count', 'int'],
+	],
+		Item.packContainerSell,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 购买物品
+	'item/item/buy': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['item_id', 'int'],
+		['count', 'int'],
+		['refresh', 'bool'],
+	],
+		Item.itemBuy,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 	# 艾瑟萌槽装备艾瑟萌

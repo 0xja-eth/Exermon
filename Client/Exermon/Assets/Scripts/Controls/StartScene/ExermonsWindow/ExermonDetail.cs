@@ -67,7 +67,8 @@ namespace UI.StartScene.Controls.Exermon {
         /// 物品改变回调
         /// </summary>
         protected override void onItemChanged() {
-            nickname = item.name;
+            if (item != null) nickname = item.name;
+            else nickname = "";
             base.onItemChanged();
         }
 

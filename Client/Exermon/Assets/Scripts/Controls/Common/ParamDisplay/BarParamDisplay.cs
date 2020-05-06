@@ -85,7 +85,7 @@ namespace UI.Common.Controls.ParamDisplays {
         public SetValueType setValueType = SetValueType.Value;
 
         public float defaultMax = 0;
-        public float defaultValue = 0;
+        public new float defaultValue = 0;
 
         /// <summary>
         /// 内部变量
@@ -120,11 +120,11 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 读取数据
         /// </summary>
         void loadData() {
-            if (rawData == null) return;
-            if (rawData.IsObject)
-                param = DataLoader.load(param, rawData);
-            else if (rawData.IsInt || rawData.IsDouble || rawData.IsLong)
-                setValue(DataLoader.load<float>(rawData), force);
+            if (data == null) return;
+            if (data.IsObject)
+                param = DataLoader.load(param, data);
+            else if (data.IsInt || data.IsDouble || data.IsLong)
+                setValue(DataLoader.load<float>(data), force);
         }
 
         /// <summary>

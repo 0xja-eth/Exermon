@@ -260,6 +260,7 @@ class RuntimeBattleItem:
 
 		self.freeze_round = self.freezeRound()
 
+		# occasion 固定为 ItemUseOccasion.Battle
 		self.slot_item.useItem()
 
 	# endregion
@@ -918,7 +919,7 @@ class RuntimeBattlePlayer(RuntimeData):
 			from question_module.models import QuesSugarPackItem
 
 			if isinstance(self.pack_item, QuesSugarPackItem):
-				self.pack_item.useItem()
+				self.pack_item.useItem(ItemUseOccasion.Battle)
 
 	def processItem(self):
 		"""

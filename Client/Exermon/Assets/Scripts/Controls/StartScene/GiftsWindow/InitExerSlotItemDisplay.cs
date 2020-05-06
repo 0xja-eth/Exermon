@@ -51,7 +51,8 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 配置装备
         /// </summary>
-        protected override void setupEquip() {
+        protected override void setupExactlyEquip() {
+            base.setupExactlyEquip();
             equip = item.exerGift();
         }
 

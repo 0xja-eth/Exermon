@@ -195,7 +195,7 @@ class BattleItemSlotItem(SlotContItem):
 		Args:
 			**kwargs (**dict): 拓展参数
 		"""
-		super().useItem(**kwargs)
+		super().useItem(ItemUseOccasion.Battle, **kwargs)
 		self.dequip(index=0)
 
 

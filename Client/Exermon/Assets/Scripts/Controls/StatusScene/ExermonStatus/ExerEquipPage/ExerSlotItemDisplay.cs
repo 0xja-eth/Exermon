@@ -157,7 +157,8 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 配置装备
         /// </summary>
-        protected override void setupEquip() {
+        protected override void setupExactlyEquip() {
+            base.setupExactlyEquip();
             equip = equipSlotItem == null ? null : equipSlotItem.packEquip;
         }
         /*
