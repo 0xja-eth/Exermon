@@ -102,9 +102,9 @@ class ExermonParamCalc:
 
 	# 计算属性
 	@classmethod
-	def calc(cls, base, rate, level):
-		return base*pow((rate/cls.R+1)*cls.S, level-1)
-
+	def calc(cls, base, rate, level, plus=0, plus_rate=1):
+		value = base*pow((rate/cls.R+1)*cls.S, level-1)
+		return value * plus_rate + plus
 
 # ================================
 # 艾瑟萌槽和玩家等级计算类
@@ -219,7 +219,11 @@ class ExerSlotItemParamCalc:
 		epb = self.player_exer.paramBase(**self.kwargs)
 		rpr = self._calcRealParamRate()
 
-		return ExermonParamCalc.calc(epb, rpr, self.player_exer.level)
+		plus = self.player_exer.plusParamVal(**self.kwargs)
+		plus_rate = self.player_exer.plusParamRate(**self.kwargs)
+
+		return ExermonParamCalc.calc(epb, rpr,
+			 self.player_exer.level, plus, plus_rate)
 
 	# 计算 RPR = EPR*GPRR
 	def _calcRealParamRate(self):
@@ -1032,13 +1036,121 @@ class MaxStarCalc:
 
 
 # ===================================================
+# 通用物品效果处理类
+# ===================================================
+class GeneralItemEffectProcessor:
+
+	@classmethod
+	def process(cls, cont_item, player, target=None):
+		processor = GeneralItemEffectProcessor(cont_item, player, target)
+		processor._process()
+
+	def __init__(self, cont_item, player, target=None):
+		from player_module.models import Player
+		from item_module.models import PackContItem
+		from exermon_module.models import PlayerExermon
+
+		self.player: Player = player
+		self.cont_item: PackContItem = cont_item
+		self.target: PlayerExermon = target
+
+	def _process(self):
+		"""
+		开始处理
+		"""
+		from item_module.models import UsableItem
+
+		item = self.cont_item.item
+
+		if isinstance(item, UsableItem):
+			self._processUsableItem(item)
+
+	def _processUsableItem(self, item):
+		"""
+		处理 可使用物品 的使用效果
+		Args:
+			item (UsableItem): 可使用物品
+		"""
+		for effect in item.effects():
+			self.__processEffect(effect)
+
+	def __processEffect(self, effect):
+		"""
+		处理具体效果
+		Args:
+			effect (BaseEffect): 效果
+		"""
+		from item_module.models import BaseItem, ItemEffectCode
+		from item_module.views import Common as ItemCommon
+
+		player = self.player
+		target = self.target
+
+		code = ItemEffectCode(effect.code)
+		params = effect.params
+
+		p_len = len(params)
+
+		if code == ItemEffectCode.AddParam:
+			if target: target.addPlusParam(*params)
+
+		elif code == ItemEffectCode.TempAddParam:
+			if target: target.addTempPlusParam(*params)
+
+		elif code == ItemEffectCode.GainExermonExp and target:
+			min_cnt = max_cnt = params[0]
+			if p_len == 2: max_cnt = params[1]
+
+			value = random.randint(min_cnt, max_cnt)
+			target.gainExp(value)
+
+		elif code == ItemEffectCode.GainPlayerExp:
+			min_cnt = max_cnt = params[0]
+			if p_len == 2: max_cnt = params[1]
+
+			value = random.randint(min_cnt, max_cnt)
+			player.gainExp(value)
+
+		elif code == ItemEffectCode.GainItem:
+			type_, item_id = params[0], params[1]
+			min_cnt = max_cnt = params[2]
+
+			if p_len == 4: max_cnt = params[3]
+
+			item: BaseItem = ItemCommon.getItem(type_, id=item_id)
+
+			container_class = item.contItemClass().containerClass()
+			container = player.getContainer(container_class)
+
+			value = random.randint(min_cnt, max_cnt)
+			container.gainItems(item, value)
+
+		elif code == ItemEffectCode.GainGold:
+			min_cnt = max_cnt = params[0]
+			if p_len == 2: max_cnt = params[1]
+
+			value = random.randint(min_cnt, max_cnt)
+			player.gainMoney(gold=value)
+
+		elif code == ItemEffectCode.GainBoundTicket:
+			min_cnt = max_cnt = params[0]
+			if p_len == 2: max_cnt = params[1]
+
+			value = random.randint(min_cnt, max_cnt)
+			player.gainMoney(bound_ticket=value)
+
+		elif code == ItemEffectCode.Eval:
+			eval(params[0])
+
+
+# ===================================================
 # 物品效果处理类
 # ===================================================
-class ItemEffectProcessor:
+class BattleItemEffectProcessor:
 
 	@classmethod
 	def process(cls, item, player):
-		processor = ItemEffectProcessor(item, player)
+		processor = BattleItemEffectProcessor(item, player)
 		processor._process()
 
 	def __init__(self, item, player):

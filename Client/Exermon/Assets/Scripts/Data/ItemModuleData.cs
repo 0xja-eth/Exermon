@@ -328,6 +328,13 @@ namespace ItemModule.Data {
     public class UsableItem : LimitedItem, IEffectsConvertable {
 
         /// <summary>
+        /// 使用目标类型
+        /// </summary>
+        public enum UseTargetType {
+            Empty = 0, Human = 1, Exermon = 2
+        }
+
+        /// <summary>
         /// 常量定义
         /// </summary>
         const string UnusableText = "不可使用";
@@ -353,6 +360,8 @@ namespace ItemModule.Data {
         [AutoConvert]
         public bool consumable { get; protected set; }
         [AutoConvert]
+        public int target { get; protected set; }
+        [AutoConvert]
         public int freeze { get; protected set; }
         [AutoConvert]
         public int iType { get; protected set; }
@@ -371,14 +380,20 @@ namespace ItemModule.Data {
         /// <returns>属性信息集</returns>
         public override JsonData convertToDisplayData(string type = "") {
             var res = base.convertToDisplayData(type);
-            var timing = generateTimingText();
+            var occasion = generateTimingText();
 
             res["type"] = itemType().name;
 
             res["max_count"] = maxCount_;
 
-            res["timing"] = timing;
-            res["usable"] = timing == UnusableText;
+            res["battle_use"] = battleUse;
+            res["menu_use"] = menuUse;
+            res["adventure_use"] = adventureUse;
+
+            res["occasion"] = occasion;
+            res["usable"] = occasion == UnusableText;
+
+            res["target"] = targetText();
             res["freeze"] = freeze;
 
             res["effects"] = generateEffectsText();
@@ -414,13 +429,21 @@ namespace ItemModule.Data {
         }
 
         #endregion
-        
+
         /// <summary>
         /// 获取物品类型
         /// </summary>
         /// <returns>物品类型</returns>
         public UsableItemType itemType() {
             return DataService.get().usableItemType(iType);
+        }
+
+        /// <summary>
+        /// 目标类型文本
+        /// </summary>
+        /// <returns>目标类型文本</returns>
+        public string targetText() {
+            return DataService.get().itemUseTargetType(target).Item2;
         }
 
         /// <summary>

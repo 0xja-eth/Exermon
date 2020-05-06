@@ -393,6 +393,15 @@ class ItemUseOccasion(Enum):
 
 
 # ===================================================
+#  物品使用目标
+# ===================================================
+class ItemUseTargetType(Enum):
+	Empty = 0  # 空
+	Human = 1  # 人类
+	Exermon = 2  # 艾瑟萌
+
+
+# ===================================================
 #  可用物品表
 # ===================================================
 class UsableItem(LimitedItem):
@@ -400,6 +409,12 @@ class UsableItem(LimitedItem):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "可用物品"
+
+	TARGET_TYPES = [
+		(ItemUseTargetType.Empty.value, '无'),
+		(ItemUseTargetType.Human.value, '人物'),
+		(ItemUseTargetType.Exermon.value, '艾瑟萌'),
+	]
 
 	# 叠加数量
 	max_count = models.PositiveSmallIntegerField(default=99, verbose_name="叠加数量")
@@ -412,6 +427,10 @@ class UsableItem(LimitedItem):
 
 	# 冒险道具
 	adventure_use = models.BooleanField(default=True, verbose_name="冒险道具")
+
+	# 使用目标
+	target = models.PositiveSmallIntegerField(default=ItemUseTargetType.Empty.value,
+											  choices=TARGET_TYPES, verbose_name="使用目标")
 
 	# 消耗品
 	consumable = models.BooleanField(default=False, verbose_name="消耗品")
@@ -448,23 +467,29 @@ class UsableItem(LimitedItem):
 		res['battle_use'] = self.battle_use
 		res['menu_use'] = self.menu_use
 		res['adventure_use'] = self.adventure_use
+		res['target'] = self.target
 		res['freeze'] = self.freeze
 		res['i_type'] = self.i_type_id
 		res['effects'] = effects
 
 		return res
 
-	def isUsable(self, occasion: ItemUseOccasion):
+	def isUsable(self, occasion: ItemUseOccasion, target=None):
 		"""
 		物品在特定场合下是否可用
 		Args:
 			occasion (ItemUseOccasion): 场合枚举
+			target (PlayerExermon): 目标
 		Returns:
 			返回物品在指定场合下的可用性
 		"""
-		return occasion == ItemUseOccasion.Battle and self.battle_use or \
-			   occasion == ItemUseOccasion.Menu and self.menu_use or \
-			   occasion == ItemUseOccasion.Adventure and self.adventure_use
+		# 检查目标条件
+		if self.target == ItemUseTargetType.Exermon.value and \
+			target is None: return False
+
+		return (occasion == ItemUseOccasion.Battle and self.battle_use) or \
+			(occasion == ItemUseOccasion.Menu and self.menu_use) or \
+			(occasion == ItemUseOccasion.Adventure and self.adventure_use)
 
 	# 最大叠加数量（为0则不限）
 	def maxCount(self): return self.max_count
@@ -1038,7 +1063,7 @@ class BaseContainer(CacheableModel):
 		"""
 		cache = self._cachedContItems()
 		index = self._findCachedContItem(cont_item)
-		if index > 0:
+		if index >= 0:
 			del cache[index]
 			self._getCache(self.REMOVED_CACHE_KEY).append(cont_item)
 
@@ -2340,11 +2365,12 @@ class BaseContItem(CacheableModel):
 
 	# region 功能操作
 
-	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion, **kwargs) -> bool:
 		"""
 		配置当前物品是否可用
 		Args:
 			occasion (ItemUseOccasion): 使用场合枚举
+			**kwargs (**dict): 拓展参数
 		Returns:
 			返回当前物品是否可用
 		"""
@@ -2359,7 +2385,7 @@ class BaseContItem(CacheableModel):
 		Raises:
 			ErrorType.UnusableItem: 该类型物品不可用
 		"""
-		if not self.isContItemUsable(occasion):
+		if not self.isContItemUsable(occasion, **kwargs):
 			raise GameException(ErrorType.UnusableItem)
 
 	def useItem(self, occasion: ItemUseOccasion, **kwargs):
@@ -3287,13 +3313,13 @@ class BaseEffect(models.Model):
 		elif code == ItemEffectCode.GainItem:
 			from .views import Common
 
-			i, m = params[0], params[1]
-			name = Common.getItem(id=i).name
+			t, i, m = params[0], params[0], params[2]
+			name = Common.getItem(type_=t, id=i).name
 
-			if p_len < 3:  # 如果只有 m 参数
+			if p_len < 4:  # 如果只有 m 参数
 				return format.gain_item1 % (name, m)
 
-			n = params[2]
+			n = params[3]
 			return format.gain_item2 % (name, m, n)
 
 		elif code == ItemEffectCode.GainGold or \
@@ -3335,7 +3361,10 @@ class BaseEffect(models.Model):
 			return format.player_gain_exp2 % (m, n)
 
 		elif code == ItemEffectCode.Eval:
-			return format.eval % params[0]
+			if p_len == 2:  # 如果只有 m 参数
+				return params[1]
+			else:
+				return format.eval % params[0]
 
 		return format.empty
 

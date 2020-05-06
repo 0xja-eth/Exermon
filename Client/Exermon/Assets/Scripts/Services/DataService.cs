@@ -363,6 +363,9 @@ namespace GameModule.Services {
         public Tuple<int, string> battleStatus(int id) {
             return get(staticData.configure.battleStatuses, id);
         }
+        public Tuple<int, string> itemUseTargetType(int id) {
+            return get(staticData.configure.itemUseTargetTypes, id);
+        }
 
         /// <summary>
         /// 组合配置

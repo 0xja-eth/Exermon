@@ -1075,7 +1075,7 @@ class Player(CacheableModel):
 
 		money.lose(currency, gold, ticket, bound_ticket)
 
-	def gainExp(self, sum_exp: int, slot_exps: dict, exer_exps: dict):
+	def gainExp(self, sum_exp: int, slot_exps: dict = None, exer_exps: dict = None):
 		"""
 		获得经验
 		Args:
@@ -1087,7 +1087,9 @@ class Player(CacheableModel):
 		if exerslot is None: return
 
 		self.exp += sum_exp
-		exerslot.gainExp(slot_exps, exer_exps)
+
+		if slot_exps is not None and exer_exps is not None:
+			exerslot.gainExp(slot_exps, exer_exps)
 
 	def subjects(self) -> set:
 		"""
@@ -1423,15 +1425,16 @@ class HumanPackItem(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return HumanItem
 
-	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion, target=None) -> bool:
 		"""
 		配置当前物品是否可用
 		Args:
 			occasion (ItemUseOccasion): 使用场合枚举
+			target (PlayerExermon): 目标
 		Returns:
 			返回当前物品是否可用
 		"""
-		return self.item.isUsable(occasion)
+		return self.item.isUsable(occasion, target)
 
 
 # ===================================================

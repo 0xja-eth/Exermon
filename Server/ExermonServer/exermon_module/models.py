@@ -8,7 +8,7 @@ from utils.view_utils import Common as ViewUtils
 from utils.exception import ErrorType, GameException
 
 from enum import Enum
-import jsonfield, os, base64
+import os, base64, datetime
 
 
 # ===================================================
@@ -222,6 +222,98 @@ class ExerHub(PackContainer):
 
 
 # ===================================================
+#  玩家艾瑟萌附加属性值表
+# ===================================================
+class PlayerExerParamBase(ParamValue):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "玩家艾瑟萌附加属性值"
+
+	# 玩家艾瑟萌
+	player_exer = models.ForeignKey("PlayerExermon", on_delete=models.CASCADE, verbose_name="玩家艾瑟萌")
+
+	# 过期时间
+	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		expires_time = ModelUtils.timeToStr(self.expires_time)
+
+		res['expires_time'] = expires_time
+
+		return res
+
+	# 是否过期
+	def isOutOfDate(self):
+		if self.expires_time is None: return False
+		return datetime.datetime.now > self.expires_time
+
+	def remove(self):
+		"""
+		移除容器项（从当前容器中移除）
+		"""
+		self.player_exer = None
+
+	def save(self, judge=True, **kwargs):
+		if judge and self.player_exer is None:
+			self.delete_save = False
+			if self.id is not None: self.delete()
+		else: super().save(**kwargs)
+
+
+# ===================================================
+#  玩家艾瑟萌属性加成表
+# ===================================================
+class PlayerExerParamRate(ParamRate):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "玩家艾瑟萌属性加成"
+
+	# 玩家艾瑟萌
+	player_exer = models.ForeignKey("PlayerExermon", on_delete=models.CASCADE, verbose_name="玩家艾瑟萌")
+
+	# 过期时间
+	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		expires_time = ModelUtils.timeToStr(self.expires_time)
+
+		res['expires_time'] = expires_time
+
+		return res
+
+	# 是否过期
+	def isOutOfDate(self):
+		if self.expires_time is None: return False
+		return datetime.datetime.now > self.expires_time
+
+	def remove(self):
+		"""
+		移除容器项（从当前容器中移除）
+		"""
+		self.player_exer = None
+
+	def save(self, judge=True, **kwargs):
+		if judge and self.player_exer is None:
+			self.delete_save = False
+			if self.id is not None: self.delete()
+		else: super().save(**kwargs)
+
+
+# ===================================================
 #  玩家艾瑟萌表
 # ===================================================
 class PlayerExermon(PackContItem):
@@ -237,6 +329,15 @@ class PlayerExermon(PackContItem):
 
 	# 属性缓存键
 	PARAMS_CACHE_KEY = 'params'
+
+	# 附加属性缓存键
+	PLUS_PARAM_VALS_CACHE_KEY = 'plus_param_vals'
+
+	# 附加属性缓存键
+	PLUS_PARAM_RATES_CACHE_KEY = 'plus_param_rates'
+
+	# 移除的附加属性缓存键
+	REMOVED_PLUS_PARAMS_CACHE_KEY = 'removed_plus_params'
 
 	# 容器
 	container = models.ForeignKey('ExerHub', on_delete=models.CASCADE,
@@ -264,6 +365,7 @@ class PlayerExermon(PackContItem):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self._cache(self.PARAMS_CACHE_KEY, {})
+		self._cache(self.REMOVED_PLUS_PARAMS_CACHE_KEY, [])
 
 	# 所属容器的类
 	@classmethod
@@ -366,7 +468,12 @@ class PlayerExermon(PackContItem):
 
 			base = self.paramBase(param_id, attr)
 			rate = self.paramRate(param_id, attr)
-			cache[key] = ExermonParamCalc.calc(base, rate, self.level)
+
+			plus = self.plusParamVal(param_id, attr)
+			plus_rate = self.plusParamRate(param_id, attr)
+
+			cache[key] = ExermonParamCalc.calc(
+				base, rate, self.level, plus, plus_rate)
 
 		return cache[key]
 
@@ -397,6 +504,124 @@ class PlayerExermon(PackContItem):
 
 		if exermon is None: return []
 		return exermon.paramRates()
+
+	# region 附加能力值
+
+	def addPlusParam(self, param_id, val=0, rate=0):
+		"""
+		添加附加属性
+		Args:
+			param_id (int): 属性ID
+			val (int): 附加值
+			rate (float): 加成率
+		"""
+		self.addTempPlusParam(param_id, None, val, rate)
+
+	def addTempPlusParam(self, param_id, seconds, val=0, rate=0):
+		"""
+		临时添加附加属性
+		Args:
+			param_id (int): 属性ID
+			val (int): 附加值
+			rate (float): 加成率
+			seconds (int): 持续秒数（为 None 则永久）
+		"""
+		now = datetime.datetime.now()
+		duration = datetime.timedelta(0, seconds, 0)
+
+		if val != 0:
+			cache = self.plusParamVals(False)
+			param = PlayerExerParamBase(param_id=param_id)
+			if duration is not None:
+				param.expires_time = now + duration
+			param.setValue(val)
+			cache.append(param)
+
+		if rate != 0:
+			cache = self.plusParamRates(False)
+			param = PlayerExerParamRate(param_id=param_id)
+			if duration is not None:
+				param.expires_time = now + duration
+			param.setValue(rate)
+			cache.append(param)
+
+	# 附加艾瑟萌属性
+	def plusParamVal(self, param_id=None, attr=None):
+		sum_param: PlayerExerParamBase = None
+		values = self.plusParamVals()
+
+		if param_id is not None:
+			sum_param = ModelUtils.sum(values, param_id=param_id)
+
+		if attr is not None:
+			sum_param = ModelUtils.sum(values, attr=attr)
+
+		if sum_param is None: return 0
+
+		return sum_param.getValue()
+
+	# 附加艾瑟萌属性率
+	def plusParamRate(self, param_id=None, attr=None):
+		sum_param: PlayerExerParamRate = None
+		values = self.plusParamRates()
+
+		if param_id is not None:
+			sum_param = ModelUtils.mult(values, param_id=param_id)
+
+		if attr is not None:
+			sum_param = ModelUtils.mult(values, attr=attr)
+
+		if sum_param is None: return 1
+
+		return sum_param.getValue()
+
+	# 所有附加的能力值
+	def plusParamVals(self, need_filter=True) -> list:
+		cache = self._getOrSetCache(self.PLUS_PARAM_VALS_CACHE_KEY,
+									self._plusParamVals)
+
+		if not need_filter: return cache
+		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
+
+	# 所有附加的能力加成率
+	def plusParamRates(self, need_filter=True) -> list:
+		cache = self._getOrSetCache(self.PLUS_PARAM_RATES_CACHE_KEY,
+									self._plusParamRates)
+
+		if not need_filter: return cache
+		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
+
+	def _plusParamVals(self) -> QuerySet:
+		return self.playerexerparambase_set.all()
+
+	def _plusParamRates(self) -> QuerySet:
+		return self.playerexerparambase_set.all()
+
+	def updatePlusParams(self):
+		"""
+		更新附加能力值（判断过期自动删除）
+		"""
+		self._updatePlusParamVals()
+		self._updatePlusParamRates()
+
+	def _updatePlusParamVals(self):
+		cache = self.plusParamVals(False)
+		for param in cache:
+			if param.isOutOfDate():
+				self.removePlusParams(cache, param)
+
+	def _updatePlusParamRates(self):
+		cache = self.plusParamRates(False)
+		for param in cache:
+			if param.isOutOfDate():
+				self.removePlusParams(cache, param)
+
+	def removePlusParams(self, cache, param):
+		if param in cache:
+			cache.remove(param)
+			self._getCache(self.REMOVED_PLUS_PARAMS_CACHE_KEY).append(param)
+
+	# endregion
 
 	# 清除属性缓存
 	def _clearParamsCache(self):
@@ -1424,11 +1649,12 @@ class ExerSkillSlotItem(SlotContItem):
 
 		return res
 
-	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion, **kwargs) -> bool:
 		"""
 		配置当前物品是否可用
 		Args:
 			occasion (ItemUseOccasion): 使用场合枚举
+			**kwargs (**dict): 拓展参数
 		Returns:
 			返回当前物品是否可用
 		"""

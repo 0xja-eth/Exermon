@@ -131,7 +131,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_item = Common.getContItem(type_=ci_type, player=player, id=contitem_id)
+		cont_item = Common.getContItem(ci_type, player=player, id=contitem_id)
 
 		container.splitItem(cont_item, count)
 
@@ -158,9 +158,19 @@ class Service:
 	@classmethod
 	async def packContainerUse(cls, consumer, player: Player, type: int,
 							   ci_type: int, contitem_id: int,
-							   count: int, occasion: int, ):
+							   count: int, occasion: int, target: int = None):
 		# 返回数据：
 		# player: 玩家状态数据 => 玩家状态数据
+		from utils.calc_utils import GeneralItemEffectProcessor
+
+		target_item = None
+
+		if target is not None:
+			target = InterfaceCommon.convertDataType(target, 'int')
+			if target > 0:
+				target_item = Common.getContItem(PlayerExermon,
+					 player=player, id=target, error=ErrorType.InvalidUseTarget)
+
 		ViewUtils.ensureEnumData(occasion, ItemUseOccasion, ErrorType.InvalidOccasion)
 
 		container: PackContainer = Common.getContainer(type, player=player)
@@ -169,9 +179,10 @@ class Service:
 
 		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
 
-		cont_item.ensureContItemUsable(ItemUseOccasion(occasion), count)
+		cont_item.useItem(ItemUseOccasion(occasion), count, target=target_item)
 
-		# TODO: 使用物品
+		# 使用物品
+		GeneralItemEffectProcessor.process(cont_item, player, target_item)
 
 		return {'player': player.convertToDict(type="status")}
 
@@ -225,7 +236,7 @@ class Service:
 		# 返回数据：
 		# container: 背包容器数据 => 背包容器数据
 
-		item: BaseItem = Common.getItem(type=type, id=item_id)
+		item: BaseItem = Common.getItem(type, id=item_id)
 
 		Check.ensureItemBoughtable(item)
 

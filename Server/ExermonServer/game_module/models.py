@@ -943,6 +943,7 @@ class GameConfigure(models.Model):
 		if type == 'dynamic': return self._convertDynamicDataToDict()
 
 	def _convertStaticDataToDict(self):
+		from item_module.models import UsableItem
 		from player_module.models import Character, Player
 		from exermon_module.models import Exermon, ExerSkill
 		from question_module.models import Question, QuesReport
@@ -980,6 +981,9 @@ class GameConfigure(models.Model):
 			'player_grades': Player.GRADES,
 			'player_statuses': Player.STATUSES,
 			'player_types': Player.TYPES,
+
+			# item_module
+			'item_use_target_types': UsableItem.TARGET_TYPES,
 
 			# exermon_module
 			'exermon_types': Exermon.TYPES,

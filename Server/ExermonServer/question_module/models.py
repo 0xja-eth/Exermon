@@ -561,11 +561,12 @@ class QuesSugarPackItem(PackContItem):
 	@classmethod
 	def acceptedItemClass(cls): return QuesSugar
 
-	def isContItemUsable(self, occasion: ItemUseOccasion) -> bool:
+	def isContItemUsable(self, occasion: ItemUseOccasion, **kwargs) -> bool:
 		"""
 		配置当前物品是否可用
 		Args:
 			occasion (ItemUseOccasion): 使用场合枚举
+			**kwargs (**dict): 拓展参数
 		Returns:
 			返回当前物品是否可用
 		"""

@@ -344,7 +344,8 @@ class RuntimeBattleExerSkill:
 		Returns:
 			返回技能能否使用
 		"""
-		if not self.skill_item.isContItemUsable(): return False
+		occ = ItemUseOccasion.Battle
+		if not self.skill_item.isContItemUsable(occ): return False
 
 		if self.exermon.mp < self.mpCost(): return False
 
@@ -930,9 +931,9 @@ class RuntimeBattlePlayer(RuntimeData):
 
 		self.useItem()
 
-		from utils.calc_utils import ItemEffectProcessor
+		from utils.calc_utils import BattleItemEffectProcessor
 
-		ItemEffectProcessor.process(self.pack_item, self)
+		BattleItemEffectProcessor.process(self.pack_item, self)
 
 	# endregion
 

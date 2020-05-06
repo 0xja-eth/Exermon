@@ -288,6 +288,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		['contitem_id', 'int'],
 		['count', 'int'],
 		['occasion', 'int'],
+		['target', 'var'],
 	],
 		Item.packContainerUse,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应

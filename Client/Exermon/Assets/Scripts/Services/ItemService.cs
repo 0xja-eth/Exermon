@@ -8,6 +8,7 @@ using Core.Systems;
 using Core.Services;
 
 using ItemModule.Data;
+using ExermonModule.Data;
 
 /// <summary>
 /// 物品模块服务
@@ -545,9 +546,9 @@ namespace ItemModule.Services {
         /// <param name="occasion">使用场合</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void useItem<T>(PackContainer<T> container, T contItem, 
-            int count, ItemUseOccasion occasion, UnityAction onSuccess, 
-            UnityAction onError = null) where T : PackContItem, new() {
+        public void useItem<T>(PackContainer<T> container, T contItem,
+            int count, ItemUseOccasion occasion, PlayerExermon playerExer,
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");
@@ -556,17 +557,31 @@ namespace ItemModule.Services {
             };
 
             useItem(container.type, contItem.type, contItem.getID(),
-                count, (int)occasion, _onSuccess, onError);
+                count, (int)occasion, playerExer.getID(), _onSuccess, onError);
+        }
+        /// <param name="target">目标</param>
+        public void useItem<T>(PackContainer<T> container, T contItem,
+            int count, ItemUseOccasion occasion, int target = 0,
+            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                getPlayer().loadMoney(res);
+                onSuccess?.Invoke();
+            };
+
+            useItem(container.type, contItem.type, contItem.getID(),
+                count, (int)occasion, target, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="ciType">容器项类型</param>
         /// <param name="contItemId">容器项ID</param>
-        public void useItem(int type, int ciType, int contItemId, int count, int occasion,
+        public void useItem(int type, int ciType, int contItemId, int count, int occasion, int target,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
             data["type"] = type; data["ci_type"] = ciType;
             data["contitem_id"] = contItemId; data["count"] = count;
-            data["occasion"] = occasion;
+            data["occasion"] = occasion; data["target"] = target;
             sendRequest(Oper.UseItem, data, onSuccess, onError, uid: true);
         }
 
