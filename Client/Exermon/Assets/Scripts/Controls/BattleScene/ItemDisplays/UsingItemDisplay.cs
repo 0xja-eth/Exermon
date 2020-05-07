@@ -71,8 +71,8 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// <summary>
         /// 清空物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             effects.clearItems();
         }
 

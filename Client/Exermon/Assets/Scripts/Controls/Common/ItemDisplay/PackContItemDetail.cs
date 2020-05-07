@@ -72,6 +72,16 @@ namespace UI.Common.Controls.ItemDisplays {
             return null;
         }
 
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(PackContItem item) {
+            return base.isNullItem(item) || item.isNullItem() ||
+                !drawFuncs.ContainsKey(item.type);
+        }
+
         #endregion
 
         #region 界面控制
@@ -82,11 +92,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         protected override void drawExactlyItem(PackContItem item) {
             base.drawExactlyItem(item);
-
-            if (item.isNullItem()) drawEmptyItem();
-            else if (drawFuncs.ContainsKey(item.type))
-                drawFuncs[item.type]?.Invoke(item);
-            else drawEmptyItem();
+            drawFuncs[item.type]?.Invoke(item);
         }
 
         #endregion

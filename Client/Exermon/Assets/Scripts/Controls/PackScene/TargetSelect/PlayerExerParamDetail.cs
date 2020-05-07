@@ -63,6 +63,19 @@ namespace UI.PackScene.Controls.TargetSelect {
 
         #endregion
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(PlayerExermon item) {
+            return base.isNullItem(item) || item.isNullItem();
+        }
+
+        #endregion
+
         #region 界面绘制
 
         /// <summary>
@@ -71,14 +84,11 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// <param name="slotItem">艾瑟萌槽项</param>
         protected override void drawExactlyItem(PlayerExermon playerExer) {
             base.drawExactlyItem(playerExer);
-            if (playerExer.isNullItem()) drawEmptyItem();
-            else {
-                setupPreview();
+            setupPreview();
 
-                drawBaseInfo(playerExer);
-                drawParamsInfo(playerExer);
-                drawExpInfo(playerExer);
-            }
+            drawBaseInfo(playerExer);
+            drawParamsInfo(playerExer);
+            drawExpInfo(playerExer);
         }
 
         /// <summary>
@@ -111,8 +121,8 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             name.text = level.text = "";
             battlePoint.clearValue();
             paramsInfo.clearValues();

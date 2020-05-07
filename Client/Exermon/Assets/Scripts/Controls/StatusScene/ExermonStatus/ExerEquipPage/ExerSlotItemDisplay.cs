@@ -87,12 +87,12 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <param name="index">容器项索引</param>
         /// <param name="refresh">是否刷新</param>
         void IItemDetailDisplay<ExerEquipSlotItem>.startView(
-            ExerEquipSlotItem item, int index = -1, bool refresh = false) {
-            startView(); setItem(item, index, refresh);
+            ExerEquipSlotItem item, int index = -1) {
+            startView(); setItem(item, index, true);
         }
         void IItemDisplay<ExerEquipSlotItem>.startView(
-            ExerEquipSlotItem item, bool refresh = false) {
-            startView(); setItem(item, refresh);
+            ExerEquipSlotItem item) {
+            startView(); setItem(item, true);
         }
 
         #endregion

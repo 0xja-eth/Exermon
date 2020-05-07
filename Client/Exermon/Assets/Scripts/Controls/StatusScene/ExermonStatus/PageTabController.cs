@@ -51,7 +51,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(ExermonStatusPageDisplay content, int index) {
-            UnityAction action = () => content.startView(slotItem, true);
+            UnityAction action = () => content.startView(slotItem);
             if (content.initialized) action.Invoke();
             else {
                 // 读取数据后加载

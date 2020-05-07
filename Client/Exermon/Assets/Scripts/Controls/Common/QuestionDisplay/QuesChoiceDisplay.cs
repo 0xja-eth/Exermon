@@ -147,7 +147,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (canvasGroup) canvasGroup.alpha = 1;
             if (correctFlag) correctFlag.SetActive(false);
             if (wrongFlag) wrongFlag.SetActive(false);

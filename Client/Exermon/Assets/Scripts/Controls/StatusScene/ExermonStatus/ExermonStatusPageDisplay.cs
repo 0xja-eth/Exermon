@@ -25,7 +25,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
     /// <summary>
     /// Exermon 状态中每页总控制组件的基类
     /// </summary>
-    public class ExermonStatusPageDisplay : ItemDisplay<ExerSlotItem> {
+    public abstract class ExermonStatusPageDisplay : ItemDisplay<ExerSlotItem> {
 
         /// <summary>
         /// 外部组件设置
@@ -181,7 +181,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
     /// <summary>
     /// Exermon 状态中每页总控制组件的基类
     /// </summary>
-    public class ExermonStatusPageDisplay<T> : ExermonStatusPageDisplay where T : PackContItem, new() {
+    public abstract class ExermonStatusPageDisplay<T> : ExermonStatusPageDisplay where T : PackContItem, new() {
 
         #region 初始化
 

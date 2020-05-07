@@ -46,22 +46,22 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <param name="item">物品</param>
         /// <param name="index"></param>
         /// <param name="refresh"></param>
-        public void setItem(Question item, int index = -1, bool refresh = false) {
+        public void setItem(Question item, int _ = -1, bool __ = false) {
             setItems(item.textures());
         }
 
-        public void setItem(Question item, bool refresh = false) {
-            setItem(item, -1, refresh);
+        public void setItem(Question item, bool _ = false) {
+            setItem(item, -1, _);
         }
 
-        public void startView(Question item, int index = -1, bool refresh = false) {
+        public void startView(Question item, int index = -1) {
             startView();
-            setItem(item, index, refresh);
+            setItem(item, index, true);
         }
 
-        public void startView(Question item, bool refresh = false) {
+        public void startView(Question item) {
             startView();
-            setItem(item, refresh);
+            setItem(item, true);
         }
 
         #endregion

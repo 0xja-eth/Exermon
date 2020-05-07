@@ -67,7 +67,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             stars?.clearValue();
             if (name) name.text = "";
             if (level) level.text = "";

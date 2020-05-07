@@ -116,14 +116,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         #endregion
 
         #region 界面绘制
-
-        /// <summary>
-        /// 清空视图
-        /// </summary>
-        protected override void clear() {
-            base.clear();
-        }
-
+        
         #endregion
 
         #region 流程控制

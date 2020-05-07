@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
+
 using ExermonModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
@@ -39,12 +41,8 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawIconImage(PlayerExerGift playerGift) {
             var gift = playerGift.item();
-            var icon = gift.bigIcon;
-            var rect = new Rect(0, 0, icon.width, icon.height);
-            this.icon.gameObject.SetActive(true);
-            this.icon.overrideSprite = Sprite.Create(
-                icon, rect, new Vector2(0.5f, 0.5f));
-            this.icon.overrideSprite.name = icon.name;
+            icon.gameObject.SetActive(true);
+            icon.overrideSprite = AssetLoader.generateSprite(gift.bigIcon);
 
             stars.setValue(gift.starId);
         }

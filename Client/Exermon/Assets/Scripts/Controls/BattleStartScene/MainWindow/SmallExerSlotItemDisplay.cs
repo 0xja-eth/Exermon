@@ -46,7 +46,7 @@ namespace UI.BattleStartScene.Controls.Main {
         /// 绘制物品
         /// </summary>
         protected override void drawExactlyItem(ExerSlotItem slotItem) {
-            if (slotItem.isNullItem()) clearItem();
+            if (slotItem.isNullItem()) drawEmptyItem();
             else {
                 drawIcon(slotItem);
                 drawLevel(slotItem);
@@ -73,7 +73,7 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             icon.overrideSprite = null;
             icon.gameObject.SetActive(false);
         }

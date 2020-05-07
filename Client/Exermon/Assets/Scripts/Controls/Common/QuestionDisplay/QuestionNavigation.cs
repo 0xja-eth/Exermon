@@ -128,25 +128,20 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 设置物品
         /// </summary>
         /// <param name="item">物品</param>
-        /// <param name="index"></param>
-        /// <param name="refresh"></param>
-        public void setItem(QuestionSetRecord item, int index = -1, bool refresh = false) {
-            record = item;
-            setItems(item.getQuestions());
+        public void setItem(QuestionSetRecord item, int _ = -1, bool __ = false) {
+            record = item; setItems(item.getQuestions());
         }
 
-        public void setItem(QuestionSetRecord item, bool refresh = false) {
-            setItem(item, -1, refresh);
+        public void setItem(QuestionSetRecord item, bool _ = false) {
+            setItem(item, -1, _);
         }
 
-        public void startView(QuestionSetRecord item, int index = -1, bool refresh = false) {
-            startView();
-            setItem(item, index, refresh);
+        public void startView(QuestionSetRecord item, int _ = -1) {
+            startView(); setItem(item, _, true);
         }
 
-        public void startView(QuestionSetRecord item, bool refresh = false) {
-            startView();
-            setItem(item, refresh);
+        public void startView(QuestionSetRecord item) {
+            startView(); setItem(item, true);
         }
 
         #endregion

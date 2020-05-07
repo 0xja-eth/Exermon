@@ -124,8 +124,8 @@ namespace UI.BattleScene.Controls.Storyboards {
         /// <summary>
         /// 清空物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             if (waitingText) waitingText.SetActive(false);
         }
 

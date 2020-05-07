@@ -108,12 +108,11 @@ namespace UI.RecordScene.Controls.Question {
         /// <param name="item">物品</param>
         /// <param name="index"></param>
         /// <param name="refresh"></param>
-        public void setItem(QuestionSetRecord item, int index = -1, bool refresh = false) {
-            record = item;
-            setItems(item.getQuestionRecords());
+        public void setItem(QuestionSetRecord item, int _ = -1, bool __ = false) {
+            record = item; setItems(item.getQuestionRecords());
         }
-        public void setItem(QuestionSetRecord item, bool refresh = false) {
-            setItem(item, -1, refresh);
+        public void setItem(QuestionSetRecord item, bool _ = false) {
+            setItem(item, -1, _);
         }
 
         /// <summary>
@@ -122,13 +121,13 @@ namespace UI.RecordScene.Controls.Question {
         /// <param name="item">物品</param>
         /// <param name="index"></param>
         /// <param name="refresh"></param>
-        public void startView(QuestionSetRecord item, int index = -1, bool refresh = false) {
+        public void startView(QuestionSetRecord item, int _ = -1) {
             startView();
-            setItem(item, index, refresh);
+            setItem(item, _, true);
         }
-        public void startView(QuestionSetRecord item, bool refresh = false) {
+        public void startView(QuestionSetRecord item) {
             startView();
-            setItem(item, refresh);
+            setItem(item, true);
         }
 
         #endregion

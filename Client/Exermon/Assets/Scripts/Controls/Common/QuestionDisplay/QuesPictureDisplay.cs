@@ -43,7 +43,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             picture.gameObject.SetActive(false);
             alph.text = "";
         }

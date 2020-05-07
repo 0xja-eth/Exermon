@@ -87,7 +87,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (name) name.text = "";
             if (subject) subject.text = "";
             icon.gameObject.SetActive(false);
@@ -105,8 +105,8 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除装备
         /// </summary>
-        protected override void clearEquip() {
-            gift.requestClear();
+        protected override void drawEmptyEquip() {
+            gift.requestClear(true);
         }
 
         #endregion

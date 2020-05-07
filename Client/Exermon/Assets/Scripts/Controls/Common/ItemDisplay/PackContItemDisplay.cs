@@ -62,6 +62,20 @@ namespace UI.Common.Controls.ItemDisplays {
 
         #endregion
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(PackContItem item) {
+            return base.isNullItem(item) || item.isNullItem() ||
+                !drawFuncs.ContainsKey(item.type);
+        }
+
+        #endregion
+
         #region 界面控制
 
         /// <summary>
@@ -70,17 +84,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         protected override void drawExactlyItem(PackContItem item) {
             base.drawExactlyItem(item);
-
-            if (item.isNullItem()) drawEmptyItem();
-            else if (drawFuncs.ContainsKey(item.type))
-                drawFuncs[item.type]?.Invoke(item);
-            else drawEmptyItem();
+            drawFuncs[item.type]?.Invoke(item);
         }
 
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (icon) icon.gameObject.SetActive(false);
             if (name) name.text = "";
             if (count) count.text = "";

@@ -42,6 +42,20 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
 
         #endregion
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(PackContItem item) {
+            return base.isNullItem(item) || item.isNullItem() ||
+                item.type != (int)BaseContItem.Type.ExerPackEquip;
+        }
+
+        #endregion
+
         #region 界面控制
 
         /// <summary>
@@ -49,10 +63,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// </summary>
         protected override void drawExactlyItem(PackContItem contItem) {
             base.drawExactlyItem(contItem);
-
-            if (contItem.isNullItem()) drawEmptyItem();
-            else if (contItem.type == (int)BaseContItem.Type.ExerPackEquip)
-                drawExerPackEquip((ExerPackEquip)contItem);
+            drawExerPackEquip((ExerPackEquip)contItem);
         }
 
         /// <summary>
@@ -72,7 +83,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (count) count.text = "";
             icon.overrideSprite = null;
             icon.gameObject.SetActive(false);

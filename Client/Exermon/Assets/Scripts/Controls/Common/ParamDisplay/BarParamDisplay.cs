@@ -124,7 +124,7 @@ namespace UI.Common.Controls.ParamDisplays {
             if (data.IsObject)
                 param = DataLoader.load(param, data);
             else if (data.IsInt || data.IsDouble || data.IsLong)
-                setValue(DataLoader.load<float>(data), force);
+                setValue(DataLoader.load<float>(data), immediately);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         /// <param name="force">强制</param>
         public virtual void setValue(float value, bool force = false) {
-            this.force = force;
+            this.immediately = force;
             Debug.Log("setValue: " + value);
             switch (setValueType) {
                 case SetValueType.Value:
@@ -173,7 +173,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         /// <param name="force">强制</param>
         public virtual void setMax(float value, bool force = false) {
-            this.force = force; param.max = value;
+            this.immediately = force; param.max = value;
             param.rate = param.max > 0 ? param.value / param.max : 0;
             requestRefresh();
         }
@@ -293,7 +293,7 @@ namespace UI.Common.Controls.ParamDisplays {
         protected override void refreshMain() {
             drawTitle(param.title);
             drawValue(param.value, param.oriValue, param.max);
-            drawBar(param.rate, param.oriRate, !force);
+            drawBar(param.rate, param.oriRate, !immediately);
         }
 
         #endregion

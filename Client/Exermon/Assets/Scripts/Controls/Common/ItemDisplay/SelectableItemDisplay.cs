@@ -28,7 +28,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 可选择物品展示组件
     /// </summary>
-    public class SelectableItemDisplay<T> : ItemDisplay<T>, ISelectableItemDisplay<T> where T : class {
+    public abstract class SelectableItemDisplay<T> : ItemDisplay<T>, ISelectableItemDisplay<T> where T : class {
 
         /// <summary>
         /// 常量定义

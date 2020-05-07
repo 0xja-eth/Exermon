@@ -24,7 +24,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 内部变量声明
         /// </summary>
-        protected T data = default; // 数据
+        protected T data; // 数据
 
         #region 初始化
 
@@ -34,6 +34,19 @@ namespace UI.Common.Controls.ParamDisplays {
         protected override void initializeOnce() {
             base.initializeOnce();
             data = defaultValue();
+        }
+
+        #endregion
+
+        #region 启动控制
+
+        /// <summary>
+        /// 启动窗口
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <param name="refresh">强制刷新</param>
+        public virtual void startView(T item) {
+            startView(); setValue(item);
         }
 
         #endregion
@@ -57,6 +70,14 @@ namespace UI.Common.Controls.ParamDisplays {
         }
 
         /// <summary>
+        /// 是否为空值
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool isEmptyValue(T data) {
+            return Equals(data, emptyValue());
+        }
+
+        /// <summary>
         /// 获取数据
         /// </summary>
         /// <returns>物品</returns>
@@ -76,14 +97,15 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 清除值
         /// </summary>
         public virtual void clearValue() {
-            data = defaultValue(); onValueChanged(true);
+            setValue(defaultValue());
         }
 
         /// <summary>
         /// 值改变回调
         /// </summary>
-        protected virtual void onValueChanged(bool refresh = false) {
-            requestRefresh(refresh);
+        /// <param name="force">强制刷新</param>
+        protected virtual void onValueChanged(bool force = false) {
+            requestRefresh(force);
         }
 
         #endregion
@@ -95,8 +117,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="data">物品</param>
         void drawValue(T data) {
-            if (data.Equals(emptyValue()))
-                drawEmptyValue();
+            if (isEmptyValue(data)) drawEmptyValue();
             else drawExactlyValue(data);
         }
         
@@ -125,14 +146,14 @@ namespace UI.Common.Controls.ParamDisplays {
             base.refresh();
             refreshValue();
         }
-
+        /*
         /// <summary>
         /// 清除视窗
         /// </summary>
         protected override void clear() {
-            base.clear(); clearValue();
+            base.clear(); clearValue(false);
         }
-
+        */
         #endregion
     }
 
@@ -170,33 +191,48 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         //protected JsonData data = new JsonData(); // 原始数据
 
-        protected bool force = false; // 用于控制动画，在子类中实现其功能
+        protected bool immediately = false; // 用于控制动画，在子类中实现其功能
 
         #region 初始化
 
         /// <summary>
-        /// 配置组件
+        /// 配置
         /// </summary>
-        public override void configure() {
-            configure(new JsonData());
+        /// <param name="configData">配置数据</param>
+        public void configure(JsonData configData) {
+            configure(); setValue(configData, true);
         }
-        /// <param name="initData">初始数据</param>
-        public void configure(JsonData initData) {
-            base.configure(); setValue(initData, true);
-        }
-        /// <param name="obj">对象</param>
+        /// <param name="obj">配置对象</param>
         public void configure(IDisplayDataConvertable obj, string type = "") {
             configure(obj.convertToDisplayData(type));
         }
 
         #endregion
 
-        #region 数据控制
+        #region 启动控制
 
         /// <summary>
-        /// 默认值
+        /// 启动窗口
         /// </summary>
-        /// <returns>返回数据默认值</returns>
+        /// <param name="obj">值对象</param>
+        public void startView(IDisplayDataConvertable obj, 
+            string type = "", bool immediately = false) {
+            startView(); setValue(obj, type, immediately);
+        }
+        /// <param name="objs">值对象组</param>
+        public void startView(IDisplayDataConvertable[] objs,
+            string type = "", bool immediately = false) {
+            startView(); setValue(objs, type, immediately);
+        }
+
+        #endregion
+
+            #region 数据控制
+
+            /// <summary>
+            /// 默认值
+            /// </summary>
+            /// <returns>返回数据默认值</returns>
         protected override JsonData defaultValue() {
             return new JsonData();
         }
@@ -216,24 +252,33 @@ namespace UI.Common.Controls.ParamDisplays {
         public override void setValue(JsonData value) {
             setValue(value, false);
         }
-        public virtual void setValue(JsonData value, bool force) {
+        /// <param name="immediately">立即设置</param>
+        public virtual void setValue(JsonData value, bool immediately) {
             if (value == null) value = new JsonData();
-            this.force = force; base.setValue(value);
+            this.immediately = immediately; base.setValue(value);
             Debug.Log("SetValue: " + name + ":" + data.ToJson());
         }
         /// <param name="obj">值对象</param>
-        public void setValue(IDisplayDataConvertable obj, string type = "", bool force = false) {
-            setValue(obj.convertToDisplayData(type), force);
+        public void setValue(IDisplayDataConvertable obj, string type = "", bool immediately = false) {
+            setValue(obj.convertToDisplayData(type), immediately);
         }
         /// <param name="objs">值对象组</param>
-        public void setValue(IDisplayDataConvertable[] objs, string type = "", bool force = false) {
+        public void setValue(IDisplayDataConvertable[] objs, string type = "", bool immediately = false) {
+            setValue(mergeObjs(objs, type), immediately);
+        }
+
+        /// <summary>
+        /// 组合数据
+        /// </summary>
+        /// <param name="objs"></param>
+        JsonData mergeObjs(IDisplayDataConvertable[] objs, string type) {
             var json = new JsonData();
             foreach (var obj in objs) {
                 var res = obj.convertToDisplayData(type);
                 foreach (var key in res.Keys)
                     json[key] = res[key];
             }
-            setValue(json, force);
+            return json;
         }
 
         /// <summary>
@@ -241,7 +286,8 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public virtual void setKey(string key, JsonData value, bool refresh = false) {
+        public virtual void setKey(string key, 
+            JsonData value, bool refresh = false) {
             data[key] = value;
             requestRefresh(refresh);
         }
@@ -250,7 +296,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 清除值
         /// </summary>
         public override void clearValue() {
-            force = true; base.clearValue();
+            immediately = true; base.clearValue();
         }
 
         /// <summary>
@@ -266,23 +312,23 @@ namespace UI.Common.Controls.ParamDisplays {
         #region 界面绘制
 
         /// <summary>
-        /// 实际刷新
+        /// 实际刷新（用于绘制数据）
         /// </summary>
         protected abstract void refreshMain();
 
         /// <summary>
         /// 刷新视窗
         /// </summary>
-        protected override void drawExactlyValue(JsonData data) {
+        protected sealed override void drawExactlyValue(JsonData data) {
             base.drawExactlyValue(data); refreshMain(); 
         }
 
         /// <summary>
         /// 刷新值
         /// </summary>
-        protected override void refreshValue() {
+        protected sealed override void refreshValue() {
             base.refreshValue();
-            force = false;
+            immediately = false;
         }
 
         #endregion

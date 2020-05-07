@@ -216,14 +216,14 @@ namespace Core.UI {
         /// <summary>
         /// 请求刷新
         /// </summary>
-        public void requestRefresh(bool force = false) {
+        public virtual void requestRefresh(bool force = false) {
             if (force) refresh(); else refreshRequested = true;
         }
 
         /// <summary>
         /// 请求清除
         /// </summary>
-        public void requestClear(bool force = false) {
+        public virtual void requestClear(bool force = false) {
             if (force) clear(); else clearRequested = true;
         }
 

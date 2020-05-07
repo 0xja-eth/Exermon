@@ -701,7 +701,7 @@ namespace ExermonModule.Data {
             /// <summary>
             /// 构造函数
             /// </summary>
-            public PlusParamData(int paramId, double rate = 1) :
+            public PlusParamData(int paramId, double rate = 0) :
                 base(paramId, rate) { }
         }
     
@@ -733,7 +733,7 @@ namespace ExermonModule.Data {
             /// <summary>
             /// 构造函数
             /// </summary>
-            public PlusParamRateData(int paramId, double rate = 0) :
+            public PlusParamRateData(int paramId, double rate = 1) :
                 base(paramId, rate) { }
         }
 

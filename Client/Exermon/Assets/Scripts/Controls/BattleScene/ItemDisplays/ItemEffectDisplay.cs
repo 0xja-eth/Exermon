@@ -86,6 +86,20 @@ namespace UI.BattleScene.Controls.ItemDisplays {
 
         #endregion
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(EffectData effect) {
+            return base.isNullItem(effect) || 
+                (!effect.isRecovery() && !effect.isPromotion());
+        }
+
+        #endregion
+
         #region 界面控制
 
         /// <summary>
@@ -93,12 +107,11 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// </summary>
         /// <param name="effect">效果</param>
         protected override void drawExactlyItem(EffectData effect) {
-            base.drawExactlyItem(effect);
             Texture2D texture = null;
             if (effect.isRecovery()) texture = recoveryTag;
             if (effect.isPromotion()) texture = promotionTag;
-            if (texture == null) drawEmptyItem();
-            else {
+
+            if (texture != null) {
                 tagImage.gameObject.SetActive(true);
                 tagImage.overrideSprite =
                     AssetLoader.generateSprite(texture);
@@ -109,7 +122,7 @@ namespace UI.BattleScene.Controls.ItemDisplays {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             tagImage.gameObject.SetActive(false);
             shortDesc.text = "";
         }

@@ -106,26 +106,13 @@ namespace UI.BattleMatchingScene.Controls {
         }
 
         /// <summary>
-        /// 绘制空物品
+        /// 清除物品
         /// </summary>
         protected override void drawEmptyItem() {
             name.text = UnknownName;
             bust.gameObject.SetActive(false);
             if (level) level.text = "";
             if (unknown) unknown.SetActive(true);
-            if (rankDisplay) rankDisplay.requestClear(true);
-            if (progress) progress.text = "";
-            if (winFlag) winFlag.SetActive(false);
-        }
-
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        protected override void clearItem() {
-            name.text = "";
-            bust.gameObject.SetActive(false);
-            if (level) level.text = "";
-            if (unknown) unknown.SetActive(false);
             if (rankDisplay) rankDisplay.requestClear(true);
             if (progress) progress.text = "";
             if (winFlag) winFlag.SetActive(false);

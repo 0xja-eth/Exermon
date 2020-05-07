@@ -44,8 +44,8 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             image.gameObject.SetActive(false);
             override_.gameObject.SetActive(false);
         }

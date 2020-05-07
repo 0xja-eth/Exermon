@@ -25,15 +25,16 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         public Text info;
 
-        /// <summary>
-        /// 内部变量定义
-        /// </summary>
-
-        #region 初始化
-
-        #endregion
-
         #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(RuntimeBattleItem item) {
+            return base.isNullItem(item) || item.item() == null;
+        }
 
         #endregion
 
@@ -46,18 +47,15 @@ namespace UI.BattleScene.Controls.Prepare {
         protected override void drawExactlyItem(RuntimeBattleItem runtimeItem) {
             base.drawExactlyItem(runtimeItem);
             var item = runtimeItem.item();
-
-            if (item != null)
-                info.text = string.Format(InfoFormat,
-                    item.name, item.description);
-            else drawEmptyItem();
+            info.text = string.Format(InfoFormat,
+                item.name, item.description);
         }
         
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             info.text = "";
         }
 

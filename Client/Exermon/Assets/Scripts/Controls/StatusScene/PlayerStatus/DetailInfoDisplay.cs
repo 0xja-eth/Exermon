@@ -45,7 +45,7 @@ namespace UI.StatusScene.Controls.PlayerStatus {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             paramsInfo.clearValue();
             battleInfo.clearValue();
             questionInfo.clearValue();

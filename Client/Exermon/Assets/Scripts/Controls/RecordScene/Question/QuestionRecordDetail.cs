@@ -94,8 +94,8 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 清除物品绘制
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             questionDisplay.setItem(null);
             controlButtons.SetActive(false);
         }

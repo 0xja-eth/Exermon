@@ -91,6 +91,15 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         /// <summary>
+        /// 是否为空装备
+        /// </summary>
+        /// <param name="equip"></param>
+        /// <returns></returns>
+        public virtual bool isNullEquip(E equip) {
+            return equip == null;
+        }
+
+        /// <summary>
         /// 装备
         /// </summary>
         /// <param name="item">物品</param>
@@ -103,7 +112,14 @@ namespace UI.Common.Controls.ItemDisplays {
         public virtual void setEquip(SelectableContainerDisplay<E> container, E item) {
             setEquip(item);
         }
-        
+
+        /// <summary>
+        /// 清除装备
+        /// </summary>
+        public virtual void clearEquip() {
+            setEquip(null, true);
+        }
+
         /// <summary>
         /// 能否装备
         /// </summary>
@@ -176,7 +192,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="equip">装备</param>
         void drawEquip(E equip) {
-            if (equip == null) drawEmptyEquip();
+            if (isNullEquip(equip)) drawEmptyEquip();
             else drawExactlyEquip(equip);
         }
 
@@ -189,14 +205,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 绘制空装备
         /// </summary>
-        protected virtual void drawEmptyEquip() {
-            clearEquip();
-        }
-
-        /// <summary>
-        /// 清除装备
-        /// </summary>
-        protected virtual void clearEquip() { }
+        protected virtual void drawEmptyEquip() {}
 
         /// <summary>
         /// 刷新
@@ -211,7 +220,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected override void clear() {
             base.clear();
-            clearEquip();
+            drawEmptyEquip();
         }
 
         #endregion

@@ -40,6 +40,20 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
 
         #endregion
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(PackContItem item) {
+            return base.isNullItem(item) || item.isNullItem() ||
+                item.type != (int)BaseContItem.Type.HumanPackItem;
+        }
+
+        #endregion
+
         #region 界面控制
 
         /// <summary>
@@ -47,10 +61,7 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// </summary>
         protected override void drawExactlyItem(PackContItem packItem) {
             base.drawExactlyItem(packItem);
-            
-            if (packItem.isNullItem()) drawEmptyItem();
-            else if (packItem.type == (int)BaseContItem.Type.HumanPackItem)
-                drawHumanPackItem((HumanPackItem)packItem);
+            drawHumanPackItem((HumanPackItem)packItem);
         }
 
         /// <summary>
@@ -69,7 +80,7 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (count) count.text = "";
             icon.overrideSprite = null;
             icon.gameObject.SetActive(false);

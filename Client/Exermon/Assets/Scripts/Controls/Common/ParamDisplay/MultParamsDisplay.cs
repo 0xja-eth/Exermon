@@ -439,7 +439,7 @@ namespace UI.Common.Controls.ParamDisplays {
 
             var ani = SceneUtils.ani(item.obj);
 
-            if (!force && item.animated && ani != null) {
+            if (!immediately && item.animated && ani != null) {
                 var ori = graphic.color;
                 var tmpAni = AnimationUtils.createAnimation();
                 tmpAni.addCurve(typeof(Graphic), "m_Color.r", ori.r, color.r);
@@ -494,7 +494,7 @@ namespace UI.Common.Controls.ParamDisplays {
             var ani = SceneUtils.ani(item.obj);
             var ori = transform.localScale;
 
-            if (!force && item.animated && ani != null) {
+            if (!immediately && item.animated && ani != null) {
                 var tmpAni = AnimationUtils.createAnimation();
                 tmpAni.addCurve(typeof(Transform), "m_LocalScale.x", ori.x, rate);
                 tmpAni.setupAnimation(ani);
@@ -538,7 +538,7 @@ namespace UI.Common.Controls.ParamDisplays {
             var ani = SceneUtils.ani(item.obj);
             var ori = image.fillAmount;
 
-            if (!force && item.animated && ani != null) {
+            if (!immediately && item.animated && ani != null) {
                 var tmpAni = AnimationUtils.createAnimation();
                 tmpAni.addCurve(typeof(Image), "m_FillAmount", ori, rate);
                 tmpAni.setupAnimation(ani);

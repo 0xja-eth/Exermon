@@ -145,7 +145,7 @@ namespace UI.BattleScene.Controls {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             if (status) status.enabled = false;
             face.gameObject.SetActive(false);
             baseStatus.clearValue();

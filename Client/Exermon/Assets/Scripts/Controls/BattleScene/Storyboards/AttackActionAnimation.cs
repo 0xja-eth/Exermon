@@ -46,17 +46,18 @@ namespace UI.BattleScene.Controls.Storyboards {
         
         #region 启动/结束控制
 
+        /*
         /// <summary>
         /// 启动窗口
         /// </summary>
         /// <param name="item">物品</param>
         /// <param name="refresh">强制刷新</param>
-        public override void startView(
-            RuntimeBattle item, bool refresh = false) {
-            base.startView(item, refresh);
+        public override void startView(RuntimeBattle item) {
+            base.startView(item);
             //selfStoryboard.startView(item.self(), true);
             //oppoStoryboard.startView(item.oppo(), true);
         }
+        */
 
         /// <summary>
         /// 启动视窗
@@ -98,14 +99,14 @@ namespace UI.BattleScene.Controls.Storyboards {
         protected override void drawExactlyItem(RuntimeBattle battle) {
             base.drawExactlyItem(battle);
 
-            selfStoryboard.startView(item.self(), true);
-            oppoStoryboard.startView(item.oppo(), true);
+            selfStoryboard.startView(item.self());
+            oppoStoryboard.startView(item.oppo());
         }
 
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             selfStoryboard.requestClear(true);
             oppoStoryboard.requestClear(true);
         }

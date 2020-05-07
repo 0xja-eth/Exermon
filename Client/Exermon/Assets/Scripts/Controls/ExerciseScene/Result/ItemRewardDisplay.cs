@@ -94,7 +94,7 @@ namespace UI.ExerciseScene.Controls.Result {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             name.text = count.text = "";
             icon.gameObject.SetActive(false);
             itemDisplay.requestClear(true);

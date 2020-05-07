@@ -213,8 +213,8 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
             starsDisplay.clearValue();
             icon.gameObject.SetActive(false);
             name.text = description.text = "";

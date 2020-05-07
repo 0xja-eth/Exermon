@@ -66,6 +66,21 @@ namespace UI.StatusScene.Controls.ExermonStatus {
 
         #endregion
 
+        /*
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <returns></returns>
+        public override bool isNullItem(T item) {
+            return base.isNullItem(item) || ;
+        }
+
+        #endregion
+        */
+
         #region 界面绘制
 
         /// <summary>
@@ -73,12 +88,11 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         protected override void drawExactlyItem(T contItem) {
-            base.drawExactlyItem(contItem);
             if (!contItem.isNullItem())
                 drawMainInfo(contItem);
             else clearMainInfo();
-            drawSlotInfo();
             drawParamsInfo(contItem);
+            drawSlotInfo();
         }
 
         /// <summary>
@@ -150,20 +164,15 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         protected virtual void drawContItemParamsInfo(T contItem) { }
 
         /// <summary>
-        /// 绘制空白项
+        /// 清除物品
         /// </summary>
         protected override void drawEmptyItem() {
-            base.drawEmptyItem();
+            /*
             if (slotItem != null) {
                 drawSlotParamsInfo();
                 paramInfo?.setIgnoreTrigger();
             }
-        }
-
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        protected override void clearItem() {
+            */
             clearMainInfo();
             clearSlotInfo();
             clearParamsInfo();
@@ -175,7 +184,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         protected virtual void clearMainInfo() { }
 
         /// <summary>
-        /// 清除属性信息
+        /// 清除槽信息
         /// </summary>
         protected virtual void clearSlotInfo() { }
 
@@ -183,10 +192,11 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// 清除属性信息
         /// </summary>
         void clearParamsInfo() {
-            paramInfo?.clearValues();
-            battlePoint?.clearValue();
-
+            if (slotItem != null) drawSlotParamsInfo();
+            else paramInfo?.clearValues();
             paramInfo?.setIgnoreTrigger();
+
+            battlePoint?.clearValue();
         }
 
         #endregion

@@ -6,7 +6,7 @@ using Core.UI;
 /// <summary>
 /// 系统拓展控件
 /// </summary>
-namespace UI.Controls.Common.SystemExtend.ToggleExtend {
+namespace UI.Common.Controls.SystemExtend.ToggleExtend {
     public class ToggleFlag : BaseView {
 
         /// <summary>

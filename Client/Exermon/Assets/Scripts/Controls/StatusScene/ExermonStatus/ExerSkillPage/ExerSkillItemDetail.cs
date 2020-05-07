@@ -35,6 +35,19 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerSkillPage {
 
         public MultParamsDisplay detailInfo;
 
+        #region 数据控制
+
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullItem(ExerSkillSlotItem item) {
+            return base.isNullItem(item) || item.isNullItem();
+        }
+
+        #endregion
+
         #region 界面绘制
 
         /// <summary>
@@ -42,16 +55,11 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerSkillPage {
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         protected override void drawExactlyItem(ExerSkillSlotItem skillItem) {
-            base.drawExactlyItem(skillItem);
-            if (skillItem.isNullItem()) 
-                drawEmptyItem();  
-            else {
-                empty.SetActive(false);
-                content.SetActive(true);
-                drawIconImage(skillItem);
-                drawDetailInfo(skillItem);
-                drawTypeInfo(skillItem);
-            }
+            empty.SetActive(false);
+            content.SetActive(true);
+            drawIconImage(skillItem);
+            drawDetailInfo(skillItem);
+            drawTypeInfo(skillItem);
         }
 
         /// <summary>
@@ -97,14 +105,6 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerSkillPage {
         /// </summary>
         protected override void drawEmptyItem() {
             empty.SetActive(true);
-            content.SetActive(false);
-        }
-
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        protected override void clearItem() {
-            empty.SetActive(false);
             content.SetActive(false);
         }
 

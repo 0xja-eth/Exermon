@@ -159,7 +159,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             clearInfoView();
             clearParamsView();
             clearNicknameText();
