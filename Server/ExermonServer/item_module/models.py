@@ -396,7 +396,7 @@ class ItemUseOccasion(Enum):
 #  物品使用目标
 # ===================================================
 class ItemUseTargetType(Enum):
-	Empty = 0  # 空
+	Default = 0  # 默认（对战物品设置为默认即可）
 	Human = 1  # 人类
 	Exermon = 2  # 艾瑟萌
 
@@ -411,7 +411,7 @@ class UsableItem(LimitedItem):
 		verbose_name = verbose_name_plural = "可用物品"
 
 	TARGET_TYPES = [
-		(ItemUseTargetType.Empty.value, '无'),
+		(ItemUseTargetType.Default.value, '无'),
 		(ItemUseTargetType.Human.value, '人物'),
 		(ItemUseTargetType.Exermon.value, '艾瑟萌'),
 	]
@@ -429,8 +429,11 @@ class UsableItem(LimitedItem):
 	adventure_use = models.BooleanField(default=True, verbose_name="冒险道具")
 
 	# 使用目标
-	target = models.PositiveSmallIntegerField(default=ItemUseTargetType.Empty.value,
+	target = models.PositiveSmallIntegerField(default=ItemUseTargetType.Default.value,
 											  choices=TARGET_TYPES, verbose_name="使用目标")
+
+	# 批量使用个数（为0则不限）
+	batch_count = models.PositiveSmallIntegerField(default=0, verbose_name="使用个数")
 
 	# 消耗品
 	consumable = models.BooleanField(default=False, verbose_name="消耗品")
@@ -469,27 +472,62 @@ class UsableItem(LimitedItem):
 		res['adventure_use'] = self.adventure_use
 		res['target'] = self.target
 		res['freeze'] = self.freeze
+		res['batch_count'] = self.batch_count
 		res['i_type'] = self.i_type_id
 		res['effects'] = effects
 
 		return res
 
-	def isUsable(self, occasion: ItemUseOccasion, target=None):
+	def _isTargetUsable(self, target=None):
+		from exermon_module.models import PlayerExermon
+
+		if self.target == ItemUseTargetType.Exermon.value and \
+			not isinstance(target, PlayerExermon): return False
+
+		return True
+
+	def _isBatchCountUsable(self, count):
+		if self.batch_count <= 0: return True
+		return count <= self.batch_count
+
+	def _isOccasionUsable(self, occasion: ItemUseOccasion):
+		return (occasion == ItemUseOccasion.Battle and self.battle_use) or \
+			(occasion == ItemUseOccasion.Menu and self.menu_use) or \
+			(occasion == ItemUseOccasion.Adventure and self.adventure_use)
+
+	def isUsable(self, occasion: ItemUseOccasion, target=None, count=1):
 		"""
 		物品在特定场合下是否可用
 		Args:
 			occasion (ItemUseOccasion): 场合枚举
 			target (PlayerExermon): 目标
+			count (int): 使用次数
 		Returns:
 			返回物品在指定场合下的可用性
 		"""
-		# 检查目标条件
-		if self.target == ItemUseTargetType.Exermon.value and \
-			target is None: return False
+		return self._isTargetUsable(target) and \
+			   self._isBatchCountUsable(count) and \
+			   self._isOccasionUsable(occasion)
 
-		return (occasion == ItemUseOccasion.Battle and self.battle_use) or \
-			(occasion == ItemUseOccasion.Menu and self.menu_use) or \
-			(occasion == ItemUseOccasion.Adventure and self.adventure_use)
+	def ensureUsable(self, occasion: ItemUseOccasion, target=None, count=1):
+		"""
+		确保物品在特定场合下是否可用
+		Args:
+			occasion (ItemUseOccasion): 场合枚举
+			target (PlayerExermon): 目标
+			count (int): 使用次数
+		Raises:
+			ErrorType.InvalidUseTarget: 使用目标错误
+			ErrorType.UnusableItem: 物品不可用
+		"""
+		if not self._isTargetUsable(target):
+			raise GameException(ErrorType.InvalidUseTarget)
+
+		if not self._isBatchCountUsable(count):
+			raise GameException(ErrorType.InvalidBatchCount)
+
+		if not self._isOccasionUsable(occasion):
+			raise GameException(ErrorType.UnusableItem)
 
 	# 最大叠加数量（为0则不限）
 	def maxCount(self): return self.max_count
@@ -2639,6 +2677,9 @@ class PackContItem(BaseContItem):
 		Raises:
 			ErrorType.QuantityInsufficient: 物品数量不足
 		"""
+		if isinstance(self.item, UsableItem):
+			self.item.ensureUsable(occasion, count, **kwargs)
+
 		super().ensureContItemUsable(occasion, **kwargs)
 
 		if self.count < count:
@@ -2652,7 +2693,7 @@ class PackContItem(BaseContItem):
 			count (int): 使用数量
 			**kwargs (**dict): 拓展参数
 		"""
-		super().useItem(occasion, count=1, **kwargs)
+		super().useItem(occasion, count=count, **kwargs)
 
 		self.leave(count)
 

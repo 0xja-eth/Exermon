@@ -45,7 +45,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<Exermon> getItemDetail() {
+        public override IItemDetailDisplay<Exermon> getItemDetail() {
             return detail;
         }
 

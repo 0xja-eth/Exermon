@@ -73,7 +73,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品容器
         /// </summary>
         /// <returns>容器</returns>
-        public IContainerDisplay<T> getContainer() {
+        public virtual IContainerDisplay<T> getContainer() {
             return container;
         }
 

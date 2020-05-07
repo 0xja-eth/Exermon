@@ -56,7 +56,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<Question> getItemDetail() {
+        public override IItemDetailDisplay<Question> getItemDetail() {
             return detail;
         }
 

@@ -2,15 +2,31 @@
 
 using UnityEngine;
 
+using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
+using ItemModule.Data;
+using ItemModule.Services;
+
 using PlayerModule.Data;
 using PlayerModule.Services;
+
+using ExermonModule.Data;
+
 using RecordModule.Services;
 
 using UI.PackScene.Controls;
+
 using UI.PackScene.Controls.GeneralPack;
+
+using HumanPackDisplay = UI.PackScene.Controls.
+    GeneralPack.HumanPackDisplay;
+using ExerPackDisplay = UI.PackScene.Controls.
+    GeneralPack.ExerPackDisplay;
+
+using UI.Common.Controls.ParamDisplays;
+using UI.Common.Controls.ItemDisplays;
 
 namespace UI.PackScene.Windows {
 
@@ -18,6 +34,13 @@ namespace UI.PackScene.Windows {
     /// 状态窗口
     /// </summary>
     public class PackWindow : BaseWindow {
+
+        /// <summary>
+        /// 文本常量定义
+        /// </summary>
+        const string UseSuccessText = "使用成功！";
+        const string SellSuccessText = "出售成功！";
+        const string DiscardSuccessText = "丢弃成功！";
 
         /// <summary>
         /// 视图枚举
@@ -34,11 +57,20 @@ namespace UI.PackScene.Windows {
         public HumanPackDisplay humanPack;
         public ExerPackDisplay exerPack;
 
+        public PackItemDetail itemDetail;
+
+        public NumberInputWindow numberWindow;
+        public TargetSelectWindow selectWindow;
+
+        public CurrencyDisplay moneyDisplay;
+
         /// <summary>
         /// 内部变量声明
         /// </summary>
         View view;
         Player player;
+
+        NumberInputWindow currentNumberWindow;
 
         /// <summary>
         /// 场景组件引用
@@ -48,8 +80,10 @@ namespace UI.PackScene.Windows {
         /// <summary>
         /// 外部系统引用
         /// </summary>
+        GameSystem gameSys = null;
         PlayerService playerSer = null;
         RecordService recordSer = null;
+        ItemService itemSer = null;
 
         #region 初始化
 
@@ -73,8 +107,10 @@ namespace UI.PackScene.Windows {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
+            gameSys = GameSystem.get();
             playerSer = PlayerService.get();
             recordSer = RecordService.get();
+            itemSer = ItemService.get();
         }
         
         #endregion
@@ -104,7 +140,69 @@ namespace UI.PackScene.Windows {
         }
 
         #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 当前背包容器
+        /// </summary>
+        /// <returns></returns>
+        public PackContainerDisplay<PackContItem> 
+            currentPackContainer() {
+            switch (view) {
+                case View.Human: return humanPack;
+                case View.Exermon: return exerPack;
+                case View.QuesSugar: return null;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 当前物品详情显示控件
+        /// </summary>
+        /// <returns></returns>
+        public PackContItemDetail currentItemDetail() {
+            switch (view) {
+                case View.Human: return itemDetail;
+                case View.Exermon: return itemDetail;
+                case View.QuesSugar: return null;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 操作容器
+        /// </summary>
+        /// <returns></returns>
+        public PackContainer<PackContItem> operContainer() {
+            return currentPackContainer()?.getPackData();
+        }
+
+        /// <summary>
+        /// 当前操作物品
+        /// </summary>
+        /// <returns></returns>
+        public T operPackItem<T>() where T : PackContItem {
+            return currentItemDetail()?.getItem() as T;
+        }
+        /// <summary>
+        /// 操作物品
+        /// </summary>
+        /// <returns>返回操作物品</returns>
+        public PackContItem operPackItem() {
+            return currentItemDetail()?.getItem();
+        }
+
+        /// <summary>
+        /// 当前操作物品
+        /// </summary>
+        /// <returns></returns>
+        public T operItem<T>() where T : BaseItem {
+            return currentItemDetail()?.getContainedItem<T>();
+        }
         
+        #endregion
+
         #region 界面绘制
 
         /// <summary>
@@ -143,6 +241,13 @@ namespace UI.PackScene.Windows {
         }
 
         /// <summary>
+        /// 刷新金钱
+        /// </summary>
+        void refreshMoney() {
+            moneyDisplay.setValue(player.money);
+        }
+
+        /// <summary>
         /// 清除视图
         /// </summary>
         public void clearView() {
@@ -151,10 +256,19 @@ namespace UI.PackScene.Windows {
         }
 
         /// <summary>
+        /// 刷新背包
+        /// </summary>
+        void refreshPack() {
+            currentPackContainer()?.requestRefresh();
+            refreshMoney();
+        }
+
+        /// <summary>
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
             base.refresh();
+            refreshMoney();
             refreshView();
         }
 
@@ -180,6 +294,119 @@ namespace UI.PackScene.Windows {
             this.view = view;
             requestRefresh(true);
         }
+
+        /// <summary>
+        /// 开启数量选择窗口
+        /// </summary>
+        /// <param name="window">窗口</param>
+        /// <param name="mode">模式</param>
+        void startNumberWindow(NumberInputWindow window, 
+            NumberInputWindow.Mode mode) {
+            currentNumberWindow = window;
+            currentNumberWindow.startWindow(mode);
+        }
+
+        #region 道具操作
+
+        /// <summary>
+        /// 使用物品
+        /// </summary>
+        public void onUse() {
+            var item = operItem<UsableItem>();
+            if (item == null) return;
+
+            var packItem = operPackItem();
+
+            if (item.target == (int)UsableItem.TargetType.Exermon)
+                startNumberWindow(selectWindow, NumberInputWindow.Mode.Use);
+            else if (packItem.count > 1 && item.batchCount != 1)
+                startNumberWindow(numberWindow, NumberInputWindow.Mode.Use);
+            else useItem();
+        }
+
+        /// <summary>
+        /// 出售物品
+        /// </summary>
+        public void onSell() {
+            var item = operItem<LimitedItem>();
+            if (item == null) return;
+
+            var packItem = operPackItem();
+            if (packItem.count > 1)
+                startNumberWindow(numberWindow,
+                    NumberInputWindow.Mode.Sell);
+            else sellItem();
+        }
+
+        /// <summary>
+        /// 丢弃物品
+        /// </summary>
+        public void onDiscard() {
+            var item = operItem<LimitedItem>();
+            if (item == null) return;
+
+            var packItem = operPackItem();
+            if (packItem.count > 1)
+                startNumberWindow(numberWindow,
+                    NumberInputWindow.Mode.Discard);
+            else discardItem();
+        }
+
+        /// <summary>
+        /// 使用道具
+        /// </summary>
+        /// <param name="count"></param>
+        public void useItem(int count = 1, PlayerExermon target = null) {
+            var container = operContainer();
+            var contItem = operPackItem();
+            if (target == null) 
+                itemSer.useItem(container, contItem, count,
+                    ItemUseOccasion.Menu, onOperSuccess);
+            else
+                itemSer.useItem(container, contItem, count,
+                    ItemUseOccasion.Menu, target, onOperSuccess);
+        }
+
+        /// <summary>
+        /// 出售道具
+        /// </summary>
+        /// <param name="count"></param>
+        public void sellItem(int count = 1) {
+            var container = operContainer();
+            var contItem = operPackItem();
+            itemSer.sellItem(container, contItem, count, onOperSuccess);
+        }
+
+        /// <summary>
+        /// 丢弃道具
+        /// </summary>
+        /// <param name="count"></param>
+        public void discardItem(int count = 1) {
+            var container = operContainer();
+            var contItem = operPackItem();
+            itemSer.discardItem(container, contItem, count, onOperSuccess);
+        }
+
+        /// <summary>
+        /// 操作成功回调
+        /// </summary>
+        protected virtual void onOperSuccess() {
+            var successText = "";
+            switch (currentNumberWindow.mode) {
+                case NumberInputWindow.Mode.Use:
+                    successText = UseSuccessText; break;
+                case NumberInputWindow.Mode.Sell:
+                    successText = SellSuccessText; break;
+                case NumberInputWindow.Mode.Discard:
+                    successText = DiscardSuccessText; break;
+            }
+            if (successText != "") gameSys.requestAlert(successText);
+            numberWindow.terminateWindow();
+            selectWindow.terminateWindow();
+            refreshPack();
+        }
+
+        #endregion
 
         #endregion
     }

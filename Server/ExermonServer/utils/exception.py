@@ -94,6 +94,7 @@ class ErrorType(Enum):
 	ItemFrozen = 242  # 物品冻结中
 	InvalidOccasion = 243  # 非法的使用场合
 	InvalidUseTarget = 244  # 非法的使用目标
+	InvalidBatchCount = 245  # 无效的使用次数
 
 	# Buy/Sell/DiscardItem
 	UnsellableItem = 250  # 物品不可出售
@@ -270,6 +271,7 @@ class GameException(Exception):
 		ErrorType.ItemFrozen: "物品冻结中！",
 		ErrorType.InvalidOccasion: "非法的使用场合！",
 		ErrorType.InvalidUseTarget: "非法的使用目标！",
+		ErrorType.InvalidBatchCount: "无效的使用次数！",
 
 		# Buy/Sell/DiscardItem
 		ErrorType.UnsellableItem: "物品不可出售！",

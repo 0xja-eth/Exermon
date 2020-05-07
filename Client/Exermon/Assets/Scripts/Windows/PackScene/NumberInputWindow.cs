@@ -10,8 +10,10 @@ using GameModule.Services;
 using ItemModule.Data;
 
 using PlayerModule.Services;
+using ItemModule.Services;
 
 using UI.Common.Controls.InputFields;
+using UI.Common.Controls.ItemDisplays;
 
 using UI.PackScene.Controls.GeneralPack;
 
@@ -21,7 +23,7 @@ using UI.PackScene.Controls.GeneralPack;
 namespace UI.PackScene.Windows {
 
     /// <summary>
-    /// 数量输入窗口窗口
+    /// 数量输入窗口
     /// </summary>
     public class NumberInputWindow : BaseWindow {
 
@@ -31,10 +33,6 @@ namespace UI.PackScene.Windows {
         const string UseTipsText = "选择使用数量";
         const string SellTipsText = "选择出售数量";
         const string DiscardTipsText = "选择丢弃数量";
-
-        const string UseSuccessText = "使用成功！";
-        const string SellSuccessText = "出售成功！";
-        const string DiscardSuccessText = "丢弃成功！";
 
         /// <summary>
         /// 类型枚举
@@ -46,9 +44,10 @@ namespace UI.PackScene.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public ValueInputField numberInput;
+        public PackWindow packWindow;
 
-        public PackItemDetail itemDetail;
+        public ValueInputField numberInput;
+        //public PackItemDetail itemDetail;
 
         public GameObject sellDisplay;
         public Text tips, sellGold;
@@ -56,7 +55,7 @@ namespace UI.PackScene.Windows {
         /// <summary>
         /// 内部变量声明
         /// </summary>
-        Mode mode;
+        public Mode mode { get; protected set; }
 
         /// <summary>
         /// 场景组件引用
@@ -66,9 +65,9 @@ namespace UI.PackScene.Windows {
         /// <summary>
         /// 外部系统引用
         /// </summary>
-        GameSystem gameSys = null;
-        DataService dataSer = null;
-        PlayerService playerSer = null;
+        protected DataService dataSer = null;
+        protected PlayerService playerSer = null;
+        protected ItemService itemSer = null;
 
         #region 初始化
 
@@ -77,7 +76,7 @@ namespace UI.PackScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            numberInput.onChanged = (_) => drawSellDisplay();
+            numberInput.onChanged = onValueChanged;
         }
 
         /// <summary>
@@ -107,9 +106,9 @@ namespace UI.PackScene.Windows {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            gameSys = GameSystem.get();
             dataSer = DataService.get();
             playerSer = PlayerService.get();
+            itemSer = ItemService.get();
         }
 
         #endregion
@@ -124,7 +123,7 @@ namespace UI.PackScene.Windows {
         /// 开始窗口
         /// </summary>
         public override void startWindow() {
-            startWindow(Mode.Use);
+            startWindow(Mode.Sell);
         }
 
         /// <summary>
@@ -142,11 +141,29 @@ namespace UI.PackScene.Windows {
         #region 数据控制
 
         /// <summary>
+        /// 操作容器
+        /// </summary>
+        /// <returns></returns>
+        //public PackContainerDisplay<PackContItem> operContainerDisplay() {
+        //    return (PackContainerDisplay<PackContItem>)itemDetail.getContainer();
+        //}
+
+        /// <summary>
+        /// 操作容器
+        /// </summary>
+        /// <returns></returns>
+        public PackContainer<PackContItem> operContainer() {
+            return packWindow.operContainer();
+            //return operContainerDisplay()?.getPackData();
+        }
+
+        /// <summary>
         /// 操作物品
         /// </summary>
         /// <returns>返回操作物品</returns>
         public LimitedItem operItem() {
-            return itemDetail.getContainedItem();
+            return packWindow.operItem<LimitedItem>();
+            //return itemDetail.getContainedItem();
         }
         
         /// <summary>
@@ -154,7 +171,8 @@ namespace UI.PackScene.Windows {
         /// </summary>
         /// <returns>返回操作物品</returns>
         public PackContItem operPackItem() {
-            return itemDetail.getItem();
+            return packWindow.operPackItem();
+            //return itemDetail.getItem();
         }
 
         /// <summary>
@@ -169,23 +187,28 @@ namespace UI.PackScene.Windows {
         /// 最大值
         /// </summary>
         /// <returns></returns>
-        int maxCount() {
-            return operPackItem().count;
+        public virtual int maxCount() {
+            var maxCnt = operPackItem().count;
+            var item = operItem() as UsableItem;
+            if (mode == Mode.Use && item != null && 
+                item.batchCount > 0) 
+                maxCnt = Mathf.Min(maxCnt, item.batchCount);
+            return maxCnt;
         }
 
         /// <summary>
         /// 最小值
         /// </summary>
         /// <returns></returns>
-        int minCount() {
-            return 0;
+        public virtual int minCount() {
+            return 1;
         }
 
         /// <summary>
         /// 当前数量
         /// </summary>
         /// <returns></returns>
-        int currentCount() {
+        public virtual int currentCount() {
             return numberInput.getValue();
         }
 
@@ -193,13 +216,20 @@ namespace UI.PackScene.Windows {
         /// 单价
         /// </summary>
         /// <returns></returns>
-        int singlePrice() {
+        public virtual int singlePrice() {
             return operItem().sellPrice;
         }
 
         #endregion
 
         #region 界面控制
+
+        /// <summary>
+        /// 值变化回调
+        /// </summary>
+        protected virtual void onValueChanged(int value) {
+            drawSellDisplay();
+        }
 
         /// <summary>
         /// 绘制出售状态
@@ -246,26 +276,26 @@ namespace UI.PackScene.Windows {
         }
 
         /// <summary>
-        /// 使用
+        /// 出售
         /// </summary>
-        void onUse() {
-
+        protected virtual void onUse() {
+            packWindow.useItem(currentCount());
         }
 
         /// <summary>
         /// 出售
         /// </summary>
         void onSell() {
-
+            packWindow.sellItem(currentCount());
         }
 
         /// <summary>
         /// 丢弃
         /// </summary>
         void onDiscard() {
-
+            packWindow.discardItem(currentCount());
         }
-        
+
         #endregion
     }
 }

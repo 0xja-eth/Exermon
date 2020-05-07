@@ -11,6 +11,8 @@ using ExermonModule.Data;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
+using UI.PackScene.Windows;
+
 namespace UI.PackScene.Controls.GeneralPack {
 
     /// <summary>
@@ -25,6 +27,8 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <summary>
         /// 外部变量定义
         /// </summary>
+        public PackWindow packWindow;
+
         public StarsDisplay starsDisplay;
         public Text name, description;
         public Image icon;
@@ -53,8 +57,33 @@ namespace UI.PackScene.Controls.GeneralPack {
 
         #region 数据控制
 
+        #region 物品控制
+
         /// <summary>
-        /// 获取道具实例
+        /// 获取物品容器
+        /// </summary>
+        /// <returns>容器</returns>
+        public override IContainerDisplay<PackContItem> getContainer() {
+            return packWindow.currentPackContainer();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 获取包含的道具
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public override T getContainedItem<T>() {
+            if (typeof(T) == typeof(LimitedItem))
+                return getContainedItem() as T;
+            if (typeof(T) == typeof(UsableItem))
+                return getContainedUsableItem() as T;
+            return base.getContainedItem<T>();
+        }
+
+        /// <summary>
+        /// 获取包含的道具
         /// </summary>
         /// <returns></returns>
         public LimitedItem getContainedItem() {
@@ -62,6 +91,16 @@ namespace UI.PackScene.Controls.GeneralPack {
             item = item ?? getContainedItem<HumanEquip>();
             item = item ?? getContainedItem<ExerItem>();
             item = item ?? getContainedItem<ExerEquip>();
+            return item;
+        }
+
+        /// <summary>
+        /// 获取包含的道具
+        /// </summary>
+        /// <returns></returns>
+        public UsableItem getContainedUsableItem() {
+            UsableItem item = getContainedItem<HumanItem>();
+            item = item ?? getContainedItem<ExerItem>();
             return item;
         }
 

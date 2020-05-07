@@ -739,12 +739,15 @@ class ExerStar(GroupConfigure):
 
 	def convertToDict(self):
 
+		level_exp_factors: dict = self.level_exp_factors
+		level_exp_factors = list(level_exp_factors.values())
+
 		res = {
 			'id': self.id,
 			'name': self.name,
 			'color': self.color,
 			'max_level': self.max_level,
-			'level_exp_factors': self.level_exp_factors,
+			'level_exp_factors': level_exp_factors
 		}
 
 		self._convertParamsToDict(res)

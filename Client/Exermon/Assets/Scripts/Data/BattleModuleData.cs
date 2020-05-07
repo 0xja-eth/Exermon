@@ -930,7 +930,7 @@ namespace BattleModule.Data {
     public class RuntimeBattlePlayer : BaseData, 
         IQuestionResult, 
         ParamDisplay.IDisplayDataConvertable,
-        IItemUseTarget {
+        IBattleItemUseTarget {
 
         /// <summary>
         /// 常量设置

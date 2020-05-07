@@ -63,14 +63,12 @@ namespace UI.Common.Controls.ItemDisplays {
         #region 数据控制
 
         /// <summary>
-        /// 获取道具实例
+        /// 获取包含的道具
         /// </summary>
         /// <returns></returns>
-        public T getContainedItem<T>() where T: BaseItem {
-            var itemType = item.GetType();
-            var type = typeof(PackContItem<T>);
-            if (itemType == type || itemType.IsSubclassOf(type))
-                return ((PackContItem<T>)item).item();
+        public virtual T getContainedItem<T>() where T: BaseItem {
+            var _item = item as PackContItem<T>;
+            if (_item != null) return (_item).item();
             return null;
         }
 

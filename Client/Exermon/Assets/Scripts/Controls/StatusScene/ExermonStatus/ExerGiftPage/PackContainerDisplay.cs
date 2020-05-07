@@ -41,7 +41,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<PlayerExerGift> getItemDetail() {
+        public override IItemDetailDisplay<PlayerExerGift> getItemDetail() {
             return detail;
         }
 

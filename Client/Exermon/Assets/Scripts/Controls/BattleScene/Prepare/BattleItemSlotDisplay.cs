@@ -38,7 +38,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<RuntimeBattleItem> getItemDetail() {
+        public override IItemDetailDisplay<RuntimeBattleItem> getItemDetail() {
             return detail;
         }
 

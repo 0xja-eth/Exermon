@@ -6,6 +6,7 @@ using ItemModule.Data;
 using GameModule.Services;
 
 using UI.Common.Controls.InputFields;
+using UI.Common.Controls.ItemDisplays;
 
 using CommonExerPackDisplay = UI.Common.Controls.ItemDisplays.ExerPackDisplay;
 
@@ -31,6 +32,8 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// 外部组件设置
         /// </summary>
         public DropdownField typeSelector, starSelector;
+
+        public PackItemDetail itemDetail;
 
         /// <summary>
         /// 外部系统设置
@@ -96,7 +99,14 @@ namespace UI.PackScene.Controls.GeneralPack {
         #endregion
 
         #region 数据控制
-        
+
+        /// <summary>
+        /// 获取物品帮助组件
+        /// </summary>
+        /// <returns>帮助组件</returns>
+        public override IItemDetailDisplay<PackContItem>
+            getItemDetail() { return itemDetail; }
+
         /// <summary>
         /// 是否包含物品
         /// </summary>

@@ -223,7 +223,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected virtual IItemDetailDisplay<T> getItemDetail() {
+        public virtual IItemDetailDisplay<T> getItemDetail() {
             return null;
         }
 

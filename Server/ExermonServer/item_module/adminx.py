@@ -66,14 +66,15 @@ class UsableItemAdmin(LimitedItemAdmin):
 
 	list_display = LimitedItemAdmin.list_display + \
 				   ['max_count', 'battle_use', 'menu_use', 'adventure_use',
-					'consumable', 'freeze', 'i_type', 'adminEffects']
+					'consumable', 'target', 'batch_count', 'freeze', 'i_type', 'adminEffects']
 
 	list_editable = LimitedItemAdmin.list_editable + \
 					['max_count', 'battle_use', 'menu_use', 'adventure_use',
-					'consumable', 'freeze', 'i_type']
+					'consumable', 'target', 'batch_count', 'freeze', 'i_type']
 
 	field_set = [Fieldset('可用物品属性', 'max_count', 'battle_use', 'menu_use',
-						 'adventure_use', 'consumable', 'freeze', 'i_type')]
+						  'adventure_use', 'consumable', 'target',
+						  'batch_count', 'freeze', 'i_type')]
 
 	form_layout = LimitedItemAdmin.form_layout + field_set
 

@@ -401,6 +401,9 @@ class PlayerExermon(PackContItem):
 		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
 		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
+		res['plus_param_values'] = ModelUtils.objectsToDict(self.plusParamVals())
+		res['plus_param_rates'] = ModelUtils.objectsToDict(self.plusParamRates())
+
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
 		from utils.calc_utils import ExermonLevelCalc
@@ -507,17 +510,18 @@ class PlayerExermon(PackContItem):
 
 	# region 附加能力值
 
-	def addPlusParam(self, param_id, val=0, rate=0):
+	def addPlusParam(self, param_id, val=0, rate=0, count=1):
 		"""
 		添加附加属性
 		Args:
 			param_id (int): 属性ID
 			val (int): 附加值
 			rate (float): 加成率
+			count (int): 叠加次数
 		"""
-		self.addTempPlusParam(param_id, None, val, rate)
+		self.addTempPlusParam(param_id, None, val, rate, count)
 
-	def addTempPlusParam(self, param_id, seconds, val=0, rate=0):
+	def addTempPlusParam(self, param_id, seconds, val=0, rate=0, count=1):
 		"""
 		临时添加附加属性
 		Args:
@@ -525,9 +529,13 @@ class PlayerExermon(PackContItem):
 			val (int): 附加值
 			rate (float): 加成率
 			seconds (int): 持续秒数（为 None 则永久）
+			count (int): 叠加次数
 		"""
 		now = datetime.datetime.now()
 		duration = datetime.timedelta(0, seconds, 0)
+
+		val *= count
+		rate = pow(rate, count)
 
 		if val != 0:
 			cache = self.plusParamVals(False)

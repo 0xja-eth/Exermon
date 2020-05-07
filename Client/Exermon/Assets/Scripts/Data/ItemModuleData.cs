@@ -276,11 +276,11 @@ namespace ItemModule.Data {
             this.shortDescription = shortDescription;
         }
     }
-    
+
     /// <summary>
-    /// 物品使用目标接口
+    /// 对战物品使用目标接口
     /// </summary>
-    public interface IItemUseTarget {
+    public interface IBattleItemUseTarget {
 
         /// <summary>
         /// 修改HP
@@ -330,7 +330,7 @@ namespace ItemModule.Data {
         /// <summary>
         /// 使用目标类型
         /// </summary>
-        public enum UseTargetType {
+        public enum TargetType {
             Empty = 0, Human = 1, Exermon = 2
         }
 
@@ -361,6 +361,8 @@ namespace ItemModule.Data {
         public bool consumable { get; protected set; }
         [AutoConvert]
         public int target { get; protected set; }
+        [AutoConvert]
+        public int batchCount { get; protected set; }
         [AutoConvert]
         public int freeze { get; protected set; }
         [AutoConvert]

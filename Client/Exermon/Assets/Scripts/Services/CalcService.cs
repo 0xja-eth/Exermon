@@ -46,6 +46,88 @@ namespace GameModule.Services {
         /// </summary>
         public class ExermonLevelCalc {
 
+            /// <summary>
+            /// 星级等级表
+            /// </summary>
+            public static Dictionary<int, List<double>> StarLevelTable = null;
+
+            /// <summary>
+            /// 初始化计算所有星级的等级表
+            /// </summary>
+            public static void init() {
+                StarLevelTable = new Dictionary<int, List<double>>();
+                var stars = DataService.get().staticData.configure.exerStars;
+
+                foreach (var star in stars)
+                    StarLevelTable[star.getID()] = generateTalbe(star);
+            }
+
+            /// <summary>
+            /// 生成单个星级表格
+            /// </summary>
+            static List<double> generateTalbe(ExerStar star) {
+                var res = new List<double>(star.maxLevel);
+                var a = star.levelExpFactors[0];
+                var b = star.levelExpFactors[1];
+                var c = star.levelExpFactors[2];
+                for (int l = 0; l < star.maxLevel; ++l)
+                    res.Add(_calcTable(l, a, b, c));
+                return res;
+            }
+
+            /// <summary>
+            /// 计算表格项
+            /// </summary>
+            /// <param name="x">等级</param>
+            /// <param name="a">参数A</param>
+            /// <param name="b">参数B</param>
+            /// <param name="c">参数C</param>
+            /// <returns></returns>
+            static double _calcTable(int x, double a, double b, double c) {
+                return a / 3 * x * x * x + (a + b) / 2 * x * x + (a + b * 3 + c * 6) / 6 * x;
+            }
+
+            /// <summary>
+            /// 获取当前等级所需经验值
+            /// </summary>
+            /// <param name="star">星级</param>
+            /// <param name="level">等级</param>
+            /// <returns></returns>
+            public static double getDetlaExp(ExerStar star, int level) {
+                if (level >= star.maxLevel) return -1;
+                if (StarLevelTable == null) init();
+
+                var data = StarLevelTable[star.getID()];
+                return data[level] - data[level - 1];
+            }
+
+            /// <summary>
+            /// 获取下一等级所需总经验值
+            /// </summary>
+            /// <param name="star">星级</param>
+            /// <param name="level">等级</param>
+            /// <returns></returns>
+            public static double getDeltaSumExp(ExerStar star, int level) {
+                if (level >= star.maxLevel) return -1;
+                if (StarLevelTable == null) init();
+
+                var data = StarLevelTable[star.getID()];
+                return data[level];
+            }
+
+            /// <summary>
+            /// 获取累计经验值
+            /// </summary>
+            /// <param name="star">星级</param>
+            /// <param name="level">等级</param>
+            /// <returns></returns>
+            public static double getSumExp(ExerStar star, int level, int exp) {
+                if (level >= star.maxLevel) return -1;
+                if (StarLevelTable == null) init();
+
+                var data = StarLevelTable[star.getID()];
+                return data[level - 1] + exp;
+            }
         }
 
         /// <summary>
@@ -65,9 +147,13 @@ namespace GameModule.Services {
             /// <param name="base_">基础值</param>
             /// <param name="rate">成长率</param>
             /// <param name="level">等级</param>
+            /// <param name="plusVal">附加值</param>
+            /// <param name="plusRate">附加率</param>
             /// <returns>属性实际值</returns>
-            public static double calc(double base_, double rate, int level) {
-                return base_ * Math.Pow((rate / R + 1) * S, level - 1);
+            public static double calc(double base_, double rate, 
+                int level, double plusVal = 0, double plusRate = 1) {
+                var value = base_ * Math.Pow((rate / R + 1) * S, level - 1);
+                return value * plusRate + plusVal;
             }
         }
 
@@ -180,7 +266,11 @@ namespace GameModule.Services {
                 var epb = playerExer.paramBase(paramId).value;
                 var rpr = _calcRealParamRate();
 
-                return ExermonParamCalc.calc(epb, rpr, playerExer.level);
+                var plusVal = playerExer.plusParamValue(paramId).value;
+                var plusRate = playerExer.plusParamRate(paramId).value;
+
+                return ExermonParamCalc.calc(epb, rpr, 
+                    playerExer.level, plusVal, plusRate);
             }
             /// <summary>
             /// 计算 RPR
@@ -445,19 +535,87 @@ namespace GameModule.Services {
         }
 
         /// <summary>
+        /// 通用物品处理器
+        /// </summary>
+        public class GeneralItemEffectProcessor {
+
+            /// <summary>
+            /// 处理
+            /// </summary>
+            /// <param name="effects">效果</param>
+            /// <param name="count">次数</param>>
+            /// <param name="target">目标</param>
+            public static void process(IEffectsConvertable item, int count = 1, PlayerExermon target = null) {
+                process(item.convertToEffectData(), count, target);
+            }
+            public static void process(EffectData[] effects, int count = 1, PlayerExermon target = null) {
+                foreach (var effect in effects)
+                    processEffect(effect, count, target);
+            }
+
+            /// <summary>
+            /// 处理单个效果
+            /// </summary>
+            /// <param name="target">目标</param>
+            /// <param name="effect">效果</param>
+            static void processEffect(EffectData effect, int count = 1, PlayerExermon target = null) {
+                int p; double a, b;
+                int min, max, val;
+                var params_ = effect.params_;
+                if (params_ == null && params_.Count <= 0) return;
+
+                switch ((EffectData.Code)effect.code) {
+                    case EffectData.Code.AddParam:
+                        p = DataLoader.load<int>(params_[0]);
+                        a = DataLoader.load<double>(params_[1]);
+                        a *= count;
+
+                        target.addPlusParamValues(p, a);
+
+                        if (params_.Count > 2) { // 处理百分比
+                            b = DataLoader.load<double>(params_[2]);
+                            b = Math.Pow(b, count);
+                            target.addPlusParamRates(p, b);
+                        }
+                        break;
+                    case EffectData.Code.TempAddParam:
+                        p = DataLoader.load<int>(params_[0]);
+                        a = DataLoader.load<int>(params_[2]);
+                        a *= count;
+
+                        target.addPlusParamValues(p, a);
+
+                        if (params_.Count > 3) { // 处理百分比
+                            b = DataLoader.load<double>(params_[3]);
+                            b = Math.Pow(b, count);
+                            target.addPlusParamRates(p, b);
+                        }
+                        break;
+                    case EffectData.Code.GainExermonExp:
+                        min = max = DataLoader.load<int>(params_[0]);
+                        if (params_.Count > 1)
+                            max = DataLoader.load<int>(params_[1]);
+                        val = UnityEngine.Random.Range(min, max + 1);
+                        target.gainExp(val);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
         /// 物品效果处理类
         /// </summary>
-        public class ItemEffectProcessor {
+        public class BattleItemEffectProcessor {
 
             /// <summary>
             /// 处理
             /// </summary>
             /// <param name="target">目标</param>
             /// <param name="effects">效果</param>
-            public static void process(IItemUseTarget target, IEffectsConvertable item) {
+            public static void process(IBattleItemUseTarget target, IEffectsConvertable item) {
                 process(target, item.convertToEffectData());
             }
-            public static void process(IItemUseTarget target, EffectData[] effects) {
+            public static void process(IBattleItemUseTarget target, EffectData[] effects) {
                 foreach (var effect in effects)
                     processEffect(target, effect);
             }
@@ -467,15 +625,15 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="target">目标</param>
             /// <param name="effect">效果</param>
-            static void processEffect(IItemUseTarget target, EffectData effect) {
-                int p, a; double b;
+            static void processEffect(IBattleItemUseTarget target, EffectData effect) {
+                int p; double a, b;
                 var params_ = effect.params_;
                 if (params_ == null && params_.Count <= 0) return;
 
                 switch ((EffectData.Code)effect.code) {
                     case EffectData.Code.RecoverHP:
                         a = DataLoader.load<int>(params_[0]);
-                        target.changeHP(a);
+                        target.changeHP((int)a);
 
                         if (params_.Count > 1) { // 处理百分比
                             b = DataLoader.load<double>(params_[1]);
@@ -484,7 +642,7 @@ namespace GameModule.Services {
                         break;
                     case EffectData.Code.RecoverMP:
                         a = DataLoader.load<int>(params_[0]);
-                        target.changeMP(a);
+                        target.changeMP((int)a);
 
                         if (params_.Count > 1) { // 处理百分比
                             b = DataLoader.load<double>(params_[1]);
@@ -493,7 +651,7 @@ namespace GameModule.Services {
                         break;
                     case EffectData.Code.AddParam:
                         p = DataLoader.load<int>(params_[0]);
-                        a = DataLoader.load<int>(params_[1]);
+                        a = DataLoader.load<double>(params_[1]);
                         target.changeParam(p, a);
 
                         if (params_.Count > 2) { // 处理百分比
@@ -504,7 +662,7 @@ namespace GameModule.Services {
                     case EffectData.Code.TempAddParam:
                     case EffectData.Code.BattleAddParam:
                         p = DataLoader.load<int>(params_[0]);
-                        a = DataLoader.load<int>(params_[2]);
+                        a = DataLoader.load<double>(params_[2]);
                         target.changeParam(p, a);
 
                         if (params_.Count > 3) { // 处理百分比

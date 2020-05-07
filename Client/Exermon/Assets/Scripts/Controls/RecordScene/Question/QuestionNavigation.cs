@@ -45,7 +45,7 @@ namespace UI.RecordScene.Controls.Question {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<QuestionRecord> getItemDetail() {
+        public override IItemDetailDisplay<QuestionRecord> getItemDetail() {
             return detail;
         }
 

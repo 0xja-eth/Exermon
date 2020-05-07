@@ -36,15 +36,20 @@ class ExermonLevelCalc:
 
 	# 生成某个星级的等级表
 	@classmethod
-	def _generateTable(cls, q):
-		# from exermon_module.models import PetStar
-		# q: PetStar
+	def _generateTable(cls, star):
+		"""
+		生成某个星级的等级表
+		Args:
+			star (ExerStar): 艾瑟萌星级
+		Returns:
+			返回单个星级等级经验表格
+		"""
 		res = []
 
-		_max = q.max_level
-		a = q.level_exp_factors['a']
-		b = q.level_exp_factors['b']
-		c = q.level_exp_factors['c']
+		_max = star.max_level
+		a = star.level_exp_factors['a']
+		b = star.level_exp_factors['b']
+		c = star.level_exp_factors['c']
 
 		# 生成每一等级的最低累计经验值
 		for x in range(_max):
@@ -969,7 +974,7 @@ class QuestionGenerator:
 				question = questions[index]
 
 				# 随机出题，保证不重复
-				while ((self.return_id and question.id in result) or \
+				while ((self.return_id and question.id in result) or
 						(not self.return_id and question in result)) \
 						and ltd > 0:
 
@@ -1041,11 +1046,12 @@ class MaxStarCalc:
 class GeneralItemEffectProcessor:
 
 	@classmethod
-	def process(cls, cont_item, player, target=None):
-		processor = GeneralItemEffectProcessor(cont_item, player, target)
+	def process(cls, cont_item, player, count, target=None):
+		processor = GeneralItemEffectProcessor(
+			cont_item, player, count, target)
 		processor._process()
 
-	def __init__(self, cont_item, player, target=None):
+	def __init__(self, cont_item, player, count, target=None):
 		from player_module.models import Player
 		from item_module.models import PackContItem
 		from exermon_module.models import PlayerExermon
@@ -1053,6 +1059,7 @@ class GeneralItemEffectProcessor:
 		self.player: Player = player
 		self.cont_item: PackContItem = cont_item
 		self.target: PlayerExermon = target
+		self.count = count
 
 	def _process(self):
 		"""
@@ -1085,6 +1092,7 @@ class GeneralItemEffectProcessor:
 
 		player = self.player
 		target = self.target
+		count = self.count
 
 		code = ItemEffectCode(effect.code)
 		params = effect.params
@@ -1092,30 +1100,30 @@ class GeneralItemEffectProcessor:
 		p_len = len(params)
 
 		if code == ItemEffectCode.AddParam:
-			if target: target.addPlusParam(*params)
+			if target: target.addPlusParam(*params, count=count)
 
 		elif code == ItemEffectCode.TempAddParam:
-			if target: target.addTempPlusParam(*params)
+			if target: target.addTempPlusParam(*params, count=count)
 
 		elif code == ItemEffectCode.GainExermonExp and target:
-			min_cnt = max_cnt = params[0]
-			if p_len == 2: max_cnt = params[1]
+			min_cnt = max_cnt = params[0]*count
+			if p_len == 2: max_cnt = params[1]*count
 
 			value = random.randint(min_cnt, max_cnt)
 			target.gainExp(value)
 
 		elif code == ItemEffectCode.GainPlayerExp:
-			min_cnt = max_cnt = params[0]
-			if p_len == 2: max_cnt = params[1]
+			min_cnt = max_cnt = params[0]*count
+			if p_len == 2: max_cnt = params[1]*count
 
 			value = random.randint(min_cnt, max_cnt)
 			player.gainExp(value)
 
 		elif code == ItemEffectCode.GainItem:
 			type_, item_id = params[0], params[1]
-			min_cnt = max_cnt = params[2]
+			min_cnt = max_cnt = params[2]*count
 
-			if p_len == 4: max_cnt = params[3]
+			if p_len == 4: max_cnt = params[3]*count
 
 			item: BaseItem = ItemCommon.getItem(type_, id=item_id)
 
@@ -1126,21 +1134,22 @@ class GeneralItemEffectProcessor:
 			container.gainItems(item, value)
 
 		elif code == ItemEffectCode.GainGold:
-			min_cnt = max_cnt = params[0]
-			if p_len == 2: max_cnt = params[1]
+			min_cnt = max_cnt = params[0]*count
+			if p_len == 2: max_cnt = params[1]*count
 
 			value = random.randint(min_cnt, max_cnt)
 			player.gainMoney(gold=value)
 
 		elif code == ItemEffectCode.GainBoundTicket:
-			min_cnt = max_cnt = params[0]
-			if p_len == 2: max_cnt = params[1]
+			min_cnt = max_cnt = params[0]*count
+			if p_len == 2: max_cnt = params[1]*count
 
 			value = random.randint(min_cnt, max_cnt)
 			player.gainMoney(bound_ticket=value)
 
 		elif code == ItemEffectCode.Eval:
-			eval(params[0])
+			for i in range(count):
+				eval(params[0])
 
 
 # ===================================================

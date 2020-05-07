@@ -72,7 +72,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<Texture2D> getItemDetail() {
+        public override IItemDetailDisplay<Texture2D> getItemDetail() {
             return detail;
         }
         

@@ -674,6 +674,70 @@ namespace ExermonModule.Data {
         ExpParamDisplay.IExpConvertable {
 
         /// <summary>
+        /// 附加属性值
+        /// </summary>
+        public class PlusParamData : ParamData {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public DateTime expiresTime { get; protected set; }
+
+            /// <summary>
+            /// 是否过期
+            /// </summary>
+            /// <returns></returns>
+            public bool isOutOfDate() {
+                if (expiresTime == default) return false;
+                return DateTime.Now > expiresTime;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public PlusParamData() { }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public PlusParamData(int paramId, double rate = 1) :
+                base(paramId, rate) { }
+        }
+    
+        /// <summary>
+        /// 附加属性率
+        /// </summary>
+        public class PlusParamRateData : ParamRateData {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public DateTime expiresTime { get; protected set; }
+
+            /// <summary>
+            /// 是否过期
+            /// </summary>
+            /// <returns></returns>
+            public bool isOutOfDate() {
+                if (expiresTime == default) return false;
+                return DateTime.Now > expiresTime;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public PlusParamRateData() { }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public PlusParamRateData(int paramId, double rate = 0) :
+                base(paramId, rate) { }
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -693,8 +757,20 @@ namespace ExermonModule.Data {
         [AutoConvert]
         public ParamRateData[] rateParams { get; protected set; }
 
+        [AutoConvert]
+        public List<PlusParamData> plusParamValues { get; protected set; }
+        [AutoConvert]
+        public List<PlusParamRateData> plusParamRates { get; protected set; }
+
+        /// <summary>
+        /// 复制的对象，用于生成装备预览
+        /// </summary>
+        public PlayerExermon previewObj { get; set; } = null;
+
         #region 属性显示数据生成
 
+        #region 单数据生成
+        
         /// <summary>
         /// 转化为属性信息
         /// </summary>
@@ -703,7 +779,11 @@ namespace ExermonModule.Data {
         public JsonData convertToDisplayData(string type = "") {
             switch (type.ToLower()) {
                 case "exp": return convertExp();
-                case "battle_point": return covnertBattlePoint();
+                case "preview_exp": return convertExp(true);
+                case "battle_point":
+                    return covnertBattlePoint();
+                case "preview_battle_point":
+                    return covnertBattlePoint(true);
                 default: return toJson();
             }
         }
@@ -712,12 +792,21 @@ namespace ExermonModule.Data {
         /// 转化经验信息
         /// </summary>
         /// <returns></returns>
-        JsonData convertExp() {
+        JsonData convertExp(bool preview = false) {
             var json = new JsonData();
-            json["exp"] = exp;
-            json["next"] = next;
-            json["level"] = level;
-            json["rate"] = exp * 1.0 / next;
+            if (preview && previewObj != null) {
+                json = previewObj.convertExp();
+                var newLevel = previewObj.level;
+
+                json["old_exp"] = exp;
+                json["old_level"] = level;
+                json["level_up"] = newLevel > level;
+            } else {
+                json["exp"] = exp;
+                json["next"] = next;
+                json["level"] = level;
+                json["rate"] = exp * 1.0 / next;
+            }
             return json;
         }
 
@@ -725,11 +814,27 @@ namespace ExermonModule.Data {
         /// 转化战斗力信息
         /// </summary>
         /// <returns></returns>
-        JsonData covnertBattlePoint() {
+        //JsonData covnertBattlePoint(bool preview = false) {
+        //    var json = new JsonData();
+        //    json["battle_point"] = battlePoint();
+        //    return json;
+        //}
+        JsonData covnertBattlePoint(bool preview = false) {
             var json = new JsonData();
-            json["battle_point"] = battlePoint();
+            var bp = battlePoint();
+            if (preview && previewObj != null) {
+                json = previewObj.covnertBattlePoint();
+                var bp2 = DataLoader.load<int>(json, "battle_point");
+                json["delta_battle_point"] = bp2 - bp;
+            } else
+                json["battle_point"] = bp;
+
             return json;
         }
+
+        #endregion
+
+        #region 多数据生成
 
         /// <summary>
         /// 转化为属性信息集
@@ -753,6 +858,7 @@ namespace ExermonModule.Data {
         JsonData convertParamToDisplayData(int index, string type = "") {
             switch (type.ToLower()) {
                 case "params": return convertParams(index);
+                case "preview_params": return convertParams(index, true);
                 case "growth": return convertGrowth(index);
                 default: return convertBasic(index);
             }
@@ -797,7 +903,7 @@ namespace ExermonModule.Data {
         /// 转化属性信息
         /// </summary>
         /// <returns></returns>
-        JsonData convertParams(int index) {
+        JsonData convertParams(int index, bool preview = false) {
             var json = new JsonData();
             var exermon = this.exermon();
             var param = paramValues[index].param();
@@ -805,22 +911,48 @@ namespace ExermonModule.Data {
 
             var value = paramValues[index].value;
             var growth = rateParams[index].value;
+            
+            // 获取预览数据
+            if (preview && previewObj != null) {
 
-            var baseValue = exermon.baseParams[index].value;
-            var baseGrowth = exermon.rateParams[index].value;
+                json = previewObj.convertParams(index);
 
-            var levelValue = CalcService.ExermonParamCalc.
-                calc(baseValue, baseGrowth, level) - baseValue;
+                var value2 = DataLoader.load<double>(json, "value");
+                var growth2 = DataLoader.load<double>(json, "growth");
 
-            json["value"] = DataLoader.convertDouble(value, !percent, percent ? 4 : 2);
-            json["growth"] = DataLoader.convertDouble(growth);
+                var dtValue = value2 - value;
+                var dtGrowth = growth2 - growth;
 
-            json["base_value"] = DataLoader.convertDouble(baseValue, !percent, percent ? 4 : 2);
-            json["level_value"] = DataLoader.convertDouble(levelValue, !percent, percent ? 4 : 2);
-            json["equip_value"] = 0; json["gift_value"] = 0;
+                // 原始数据
+                json["old_value"] = DataLoader.convertDouble(value, !percent, percent ? 4 : 2);
+                json["old_growth"] = DataLoader.convertDouble(growth);
 
+                json["delta_value"] = DataLoader.convertDouble(dtValue, !percent, percent ? 4 : 2);
+                json["delta_growth"] = DataLoader.convertDouble(dtGrowth);
+
+                json["delta_value_rate"] = dtValue / value;
+                json["delta_growth_rate"] = dtGrowth / growth;
+
+            } else {
+
+                var baseValue = exermon.baseParams[index].value;
+                var baseGrowth = exermon.rateParams[index].value;
+
+                var levelValue = CalcService.ExermonParamCalc.
+                    calc(baseValue, baseGrowth, level) - baseValue;
+
+                json["value"] = DataLoader.convertDouble(value, !percent, percent ? 4 : 2);
+                json["growth"] = DataLoader.convertDouble(growth);
+
+                json["base_value"] = DataLoader.convertDouble(baseValue, !percent, percent ? 4 : 2);
+                json["level_value"] = DataLoader.convertDouble(levelValue, !percent, percent ? 4 : 2);
+                json["equip_value"] = 0; json["gift_value"] = 0;
+            }
+            
             return json;
         }
+
+        #endregion
 
         /// <summary>
         /// 获取经验值
@@ -892,7 +1024,10 @@ namespace ExermonModule.Data {
         public ParamData paramValue(int paramId) {
             var base_ = paramBase(paramId).value;
             var rate = paramRate(paramId).value;
-            var value = CalcService.ExermonParamCalc.calc(base_, rate, level);
+            var plusVal = plusParamValue(paramId).value;
+            var plusRate = plusParamRate(paramId).value;
+            var value = CalcService.ExermonParamCalc.calc(
+                base_, rate, level, plusVal, plusRate);
             value = Math.Round(value);
             return new ParamData(paramId, value);
         }
@@ -913,6 +1048,126 @@ namespace ExermonModule.Data {
             return CalcService.BattlePointCalc.calc(paramValue);
         }
 
+        #region 附加属性
+
+        /// <summary>
+        /// 获取实际属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public PlusParamData plusParamValue(int paramId) {
+            var prarm = new PlusParamData(paramId);
+            foreach (var _param in plusParamValues)
+                if (_param.paramId == paramId)
+                    prarm = (PlusParamData)(prarm + _param);
+            return prarm;
+        }
+
+        /// <summary>
+        /// 获取实际属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性数据</returns>
+        public PlusParamRateData plusParamRate(int paramId) {
+            var prarm = new PlusParamRateData(paramId);
+            foreach (var _param in plusParamRates)
+                if (_param.paramId == paramId)
+                    prarm = (PlusParamRateData)(prarm * _param);
+            return prarm;
+        }
+
+        /// <summary>
+        /// 添加临时能力值变量
+        /// </summary>
+        /// <param name="paramId">能力值ID</param>
+        /// <param name="value">值</param>
+        /// <param name="second">持续时间（为0则无限）</param>
+        public void addPlusParamValues(
+            int paramId, double value, int second = 0) {
+            var param = new PlusParamData(paramId, value);
+            plusParamValues.Add(param);
+        }
+
+        /// <summary>
+        /// 添加临时能力值变量
+        /// </summary>
+        /// <param name="paramId">能力值ID</param>
+        /// <param name="value">值</param>
+        /// <param name="second">持续时间（为0则无限）</param>
+        public void addPlusParamRates(
+            int paramId, double rate, int second = 0) {
+            var param = new PlusParamRateData(paramId, rate);
+            plusParamRates.Add(param);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 获得经验
+        /// </summary>
+        /// <param name="exp"></param>
+        public void gainExp(int exp) {
+            this.exp += exp; refresh();
+        }
+
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        public void refresh() {
+            refreshLevel();
+            recomputeParams();
+        }
+
+        /// <summary>
+        /// 刷新等级
+        /// </summary>
+        void refreshLevel() {
+            var exp = this.exp;
+            var level = this.level;
+            var star = item().star();
+
+            var delta = CalcService.ExermonLevelCalc.
+                getDetlaExp(star, level);
+            if (delta < 0) return; // 已经满级
+
+            while(exp > delta) {
+                level++; exp -= (int)delta;
+                if (level >= star.maxLevel) break;
+
+                delta = CalcService.ExermonLevelCalc.
+                    getDetlaExp(star, level);
+            }
+
+            if (level > this.level) onUpgrade();
+
+            this.exp = exp;
+            this.level = level;
+        }
+
+        /// <summary>
+        /// 升级回调
+        /// </summary>
+        void onUpgrade() { }
+
+        #endregion
+
+        #region 预览操作
+
+        /// <summary>
+        /// 创建预览对象
+        /// </summary>
+        /// <returns></returns>
+        public PlayerExermon createPreviewObject() {
+            return previewObj = (PlayerExermon)copy();
+        }
+
+        /// <summary>
+        /// 清除预览对象
+        /// </summary>
+        public void clearPreviewObject() {
+            previewObj = null;
+        }
+        
         #endregion
 
         #endregion

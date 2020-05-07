@@ -95,7 +95,7 @@ namespace UI.BattleScene.Controls.Storyboards {
 
             itemDisplay.showEffect = true;
 
-            CalcService.ItemEffectProcessor.process(item, effectItem);
+            CalcService.BattleItemEffectProcessor.process(item, effectItem);
 
             requestRefresh(true);
         }

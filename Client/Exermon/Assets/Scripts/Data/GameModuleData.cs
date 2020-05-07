@@ -266,6 +266,8 @@ namespace GameModule.Data {
         public ParamRangeData[] baseRanges { get; protected set; }
         [AutoConvert]
         public ParamRangeData[] rateRanges { get; protected set; }
+        [AutoConvert]
+        public double[] levelExpFactors { get; protected set; }
     }
 
     /// <summary>

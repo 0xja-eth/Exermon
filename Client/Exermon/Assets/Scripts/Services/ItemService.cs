@@ -561,8 +561,8 @@ namespace ItemModule.Services {
         }
         /// <param name="target">目标</param>
         public void useItem<T>(PackContainer<T> container, T contItem,
-            int count, ItemUseOccasion occasion, int target = 0,
-            UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
+            int count, ItemUseOccasion occasion, UnityAction onSuccess = null, 
+            UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");
@@ -571,7 +571,7 @@ namespace ItemModule.Services {
             };
 
             useItem(container.type, contItem.type, contItem.getID(),
-                count, (int)occasion, target, _onSuccess, onError);
+                count, (int)occasion, 0, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="ciType">容器项类型</param>
