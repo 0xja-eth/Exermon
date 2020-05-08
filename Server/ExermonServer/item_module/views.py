@@ -232,7 +232,7 @@ class Service:
 
 	# 购买物品
 	@classmethod
-	async def shopBuy(cls, consumer, player: Player, type: int, item_id: int, count: int, refresh: bool, ):
+	async def shopBuy(cls, consumer, player: Player, type: int, item_id: int, count: int, buy_type: int, ):
 		# 返回数据：
 		# container: 背包容器数据 => 背包容器数据
 
@@ -245,10 +245,12 @@ class Service:
 
 		buy_price = item.buyPrice()
 
+		Check.ensureBuyType(buy_type, buy_price)
+
 		# 附带检查容器是否已满
 		container.gainItems(item, count)
 
-		player.loseMoney(buy_price * count)
+		player.processBuy(buy_price * count, buy_type)
 
 		res = cls.convertContainers(container)
 		res['money'] = player.playerMoney().convertToDict()
@@ -378,6 +380,19 @@ class Check:
 	def ensureItemBoughtable(cls, item: BaseItem):
 		if not item.isBoughtable():
 			raise GameException(ErrorType.UnboughtableItem)
+
+	# 保证购买方式合法
+	@classmethod
+	def ensureBuyType(cls, buy_type, price: Currency):
+		if not 0 <= buy_type <= 2:
+			raise GameException(ErrorType.InvalidBuyType)
+
+		if buy_type == 0 and price.gold <= 0:
+			raise GameException(ErrorType.InvalidBuyType)
+		if buy_type == 1 and price.ticket <= 0:
+			raise GameException(ErrorType.InvalidBuyType)
+		if buy_type == 2 and price.bound_ticket <= 0:
+			raise GameException(ErrorType.InvalidBuyType)
 
 
 # =======================

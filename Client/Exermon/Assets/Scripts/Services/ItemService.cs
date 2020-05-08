@@ -598,7 +598,7 @@ namespace ItemModule.Services {
         /// <param name="count">丢弃数量</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void buyItem<T>(PackContainer<PackContItem> container, T item, int count,
+        public void buyItem<T>(PackContainer<PackContItem> container, T item, int count, int buyType,
             UnityAction onSuccess, UnityAction onError = null) where T : BaseItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -607,14 +607,14 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            buyItem(item.type, item.getID(), count, _onSuccess, onError);
+            buyItem(item.type, item.getID(), count, buyType, _onSuccess, onError);
         }
         /// <param name="type">物品类型</param>
         /// <param name="itemId">物品ID</param>
-        public void buyItem(int type, int itemId, int count,
+        public void buyItem(int type, int itemId, int count, int buyType,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData(); data["type"] = type;
-            data["item_id"] = itemId; data["count"] = count;
+            data["item_id"] = itemId; data["count"] = count; data["buy_typw"] = buyType;
             sendRequest(Oper.BuyItem, data, onSuccess, onError, uid: true);
         }
 

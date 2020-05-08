@@ -553,7 +553,7 @@ WEBSOCKET_METHOD_ROUTER = {
 		['type', 'int'],
 		['item_id', 'int'],
 		['count', 'int'],
-		['refresh', 'bool'],
+		['buy_type', 'int'],
 	],
 		Item.shopBuy,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应

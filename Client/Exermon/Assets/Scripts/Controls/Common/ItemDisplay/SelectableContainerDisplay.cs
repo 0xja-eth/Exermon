@@ -55,7 +55,8 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 物品容器显示
     /// </summary>
-    public class SelectableContainerDisplay<T> : GroupView<SelectableItemDisplay<T>>, IContainerDisplay<T> where T : class {
+    public class SelectableContainerDisplay<T> : 
+        GroupView<SelectableItemDisplay<T>>, IContainerDisplay<T> where T : class {
 
         /// <summary>
         /// 常量设置

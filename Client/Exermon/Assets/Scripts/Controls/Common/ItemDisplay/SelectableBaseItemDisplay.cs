@@ -11,7 +11,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <summary>
     /// 对战物资槽物品显示
     /// </summary
-    public class BaseItemDisplay : ItemDisplay<BaseItem> {
+    public class SelectableBaseItemDisplay : SelectableItemDisplay<BaseItem> {
 
         /// <summary>
         /// 外部组件设置

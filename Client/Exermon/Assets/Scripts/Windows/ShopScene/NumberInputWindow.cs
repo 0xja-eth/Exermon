@@ -15,7 +15,7 @@ using ItemModule.Services;
 using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 
-using UI.PackScene.Controls.GeneralPack;
+using UI.ShopScene.Controls;
 
 /// <summary>
 /// 状态场景窗口
@@ -37,10 +37,8 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         public ShopWindow shopWindow;
 
+        public BuySelector buySelector;
         public ValueInputField numberInput;
-
-        public GameObject gold, ticket, boundTicket;
-        public Text goldPrice, ticketPrice, boundTicketPrice;
         
         /// <summary>
         /// 场景组件引用
@@ -83,7 +81,7 @@ namespace UI.ShopScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (PackScene)SceneUtils.getSceneObject("Scene");
+            scene = (ShopScene)SceneUtils.getSceneObject("Scene");
         }
 
         /// <summary>
@@ -98,74 +96,30 @@ namespace UI.ShopScene.Windows {
 
         #endregion
 
-        #region 更新控制
-
-        #endregion
-
-        #region 开启控制
-
-        /// <summary>
-        /// 开始窗口
-        /// </summary>
-        public override void startWindow() {
-            startWindow(Mode.Sell);
-        }
-
-        /// <summary>
-        /// 开始窗口
-        /// </summary>
-        public void startWindow(int mode) {
-            startWindow((Mode)mode);
-        }
-        public void startWindow(Mode mode) {
-            base.startWindow(); setMode(mode);
-        }
-
-        #endregion
-
         #region 数据控制
 
         /// <summary>
         /// 操作容器
         /// </summary>
         /// <returns></returns>
-        //public PackContainerDisplay<PackContItem> operContainerDisplay() {
-        //    return (PackContainerDisplay<PackContItem>)itemDetail.getContainer();
-        //}
-
-        /// <summary>
-        /// 操作容器
-        /// </summary>
-        /// <returns></returns>
         public PackContainer<PackContItem> operContainer() {
-            return packWindow.operContainer();
-            //return operContainerDisplay()?.getPackData();
+            return shopWindow.operContainer();
         }
 
         /// <summary>
         /// 操作物品
         /// </summary>
         /// <returns>返回操作物品</returns>
-        public LimitedItem operItem() {
-            return packWindow.operItem<LimitedItem>();
-            //return itemDetail.getContainedItem();
+        public BaseItem operItem() {
+            return shopWindow.operItem();
         }
-        
+
         /// <summary>
         /// 操作物品
         /// </summary>
         /// <returns>返回操作物品</returns>
-        public PackContItem operPackItem() {
-            return packWindow.operPackItem();
-            //return itemDetail.getItem();
-        }
-
-        /// <summary>
-        /// 切换视图
-        /// </summary>
-        public void setMode(Mode mode) {
-            this.mode = mode;
-            requestRefresh();
+        public ItemService.ShopItem operShopItem() {
+            return shopWindow.operShopItem();
         }
 
         /// <summary>
@@ -173,12 +127,10 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public virtual int maxCount() {
-            var maxCnt = operPackItem().count;
-            var item = operItem() as UsableItem;
-            if (mode == Mode.Use && item != null && 
-                item.batchCount > 0) 
-                maxCnt = Mathf.Min(maxCnt, item.batchCount);
-            return maxCnt;
+            var money = currentMoney();
+            var price = singlePrice();
+            if (price == 0) return 0;
+            return money / price;
         }
 
         /// <summary>
@@ -186,7 +138,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public virtual int minCount() {
-            return 1;
+            return 0;
         }
 
         /// <summary>
@@ -202,7 +154,29 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public virtual int singlePrice() {
-            return operItem().sellPrice;
+            var buyType = buySelector.getBuyType();
+            var price = operShopItem().price;
+
+            if (buyType == 0) return price.gold;
+            if (buyType == 1) return price.ticket;
+            if (buyType == 2) return price.boundTicket;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// 当前指定金钱
+        /// </summary>
+        /// <returns></returns>
+        public int currentMoney() {
+            var buyType = buySelector.getBuyType();
+            var money = playerSer.player.money;
+
+            if (buyType == 0) return money.gold;
+            if (buyType == 1) return money.ticket;
+            if (buyType == 2) return money.boundTicket;
+
+            return 0;
         }
 
         #endregion
@@ -213,27 +187,21 @@ namespace UI.ShopScene.Windows {
         /// 值变化回调
         /// </summary>
         protected virtual void onValueChanged(int value) {
-            drawSellDisplay();
+            drawPrice();
         }
 
         /// <summary>
         /// 绘制出售状态
         /// </summary>
-        void drawSellDisplay() {
-            if (mode == Mode.Sell) {
-                var price = currentCount() * singlePrice();
-                sellGold.text = price.ToString();
-                sellDisplay.SetActive(true);
-            } else
-                sellDisplay.SetActive(false);
+        void drawPrice() {
+            buySelector.setCount(currentCount());
         }
 
         /// <summary>
         /// 刷新
         /// </summary>
         protected override void refresh() {
-            base.refresh();
-            drawSellDisplay();
+            base.refresh(); drawPrice();
         }
 
         /// <summary>
@@ -241,46 +209,23 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            sellDisplay.SetActive(false);
+            buySelector.clearItem();
             numberInput.requestClear(true);
         }
 
         #endregion
 
         #region 流程控制
-
+        
         /// <summary>
-        /// 确认
+        /// 购买
         /// </summary>
-        public void onConfirm() {
-            switch (mode) {
-                case Mode.Use: onUse(); break;
-                case Mode.Sell: onSell(); break;
-                case Mode.Discard: onDiscard(); break;
-            }
+        public virtual void onBuy() {
+            var count = currentCount();
+            if (count <= 0) terminateWindow();
+            else shopWindow.buyItem(count);
         }
-
-        /// <summary>
-        /// 出售
-        /// </summary>
-        protected virtual void onUse() {
-            packWindow.useItem(currentCount());
-        }
-
-        /// <summary>
-        /// 出售
-        /// </summary>
-        void onSell() {
-            packWindow.sellItem(currentCount());
-        }
-
-        /// <summary>
-        /// 丢弃
-        /// </summary>
-        void onDiscard() {
-            packWindow.discardItem(currentCount());
-        }
-
+        
         #endregion
     }
 }

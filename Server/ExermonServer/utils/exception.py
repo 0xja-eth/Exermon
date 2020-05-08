@@ -101,6 +101,7 @@ class ErrorType(Enum):
 	UndiscardableItem = 251  # 物品不可丢弃
 	UnboughtableItem = 252  # 物品不可购买
 	NotEnoughMoney = 253  # 没有足够金钱
+	InvalidBuyType = 254  # 非法的购买方式
 
 	# ExermonCommon
 	ExermonNotExist = 300  # 艾瑟萌不存在
@@ -278,6 +279,7 @@ class GameException(Exception):
 		ErrorType.UndiscardableItem: "物品不可丢弃！",
 		ErrorType.UnboughtableItem: "物品暂时无法购买！",
 		ErrorType.NotEnoughMoney: "没有足够的金钱！",
+		ErrorType.InvalidBuyType: "非法的购买方式！",
 
 		# ExermonCommon
 		ErrorType.ExermonNotExist: "艾瑟萌不存在！",

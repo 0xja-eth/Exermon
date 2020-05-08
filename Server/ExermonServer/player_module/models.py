@@ -1065,7 +1065,7 @@ class Player(CacheableModel):
 		"""
 		失去金钱
 		Args:
-			currency (Currency): 价格
+			currency (Currency): 货币
 			gold (int): 金币
 			ticket (int): 点券
 			bound_ticket (int): 绑定点券
@@ -1074,6 +1074,19 @@ class Player(CacheableModel):
 		if money is None: return
 
 		money.lose(currency, gold, ticket, bound_ticket)
+
+	def processBuy(self, price: Currency, buy_type):
+		"""
+		失去金钱
+		Args:
+			price (Currency): 价格
+			buy_type (int): 购买方式
+		"""
+		if buy_type == 0: self.loseMoney(gold=price.gold)
+
+		if buy_type == 1: self.loseMoney(ticket=price.ticket)
+
+		if buy_type == 2: self.loseMoney(bound_ticket=price.bound_ticket)
 
 	def gainExp(self, sum_exp: int, slot_exps: dict = None, exer_exps: dict = None):
 		"""

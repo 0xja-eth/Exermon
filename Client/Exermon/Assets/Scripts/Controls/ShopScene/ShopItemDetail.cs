@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,9 +8,6 @@ using Core.Data.Loaders;
 
 using ItemModule.Data;
 using ItemModule.Services;
-
-using PlayerModule.Data;
-using ExermonModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
@@ -26,13 +25,18 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 常量定义
         /// </summary>
+        const string GoldPriceFormat = "金币：{0}";
+        const string TicketPriceFormat = "点券：{0}";
+        const string BoundTicketPriceFormat = "绑定点券：{0}";
 
         /// <summary>
-        /// 外部变量定义
+        /// 外部组件定义
         /// </summary>
         public ShopWindow shopWindow;
 
-        public Text description;
+        public Text description, priceText;
+
+        public StarsDisplay starsDisplay;
 
         public MultParamsDisplay detail;
 
@@ -46,27 +50,8 @@ namespace UI.ShopScene.Controls {
         /// 初始化绘制函数
         /// </summary>
         protected override void initializeDrawFuncs() {
-            registerItemType<T>(drawHumanPackItem);
-            registerItemType<HumanPackEquip>(drawHumanPackEquip);
-            registerItemType<ExerPackItem>(drawExerPackItem);
-            registerItemType<ExerPackEquip>(drawExerPackEquip);
+            registerItemType<T>(drawItem);
         }
-
-        #endregion
-
-        #region 数据控制
-
-        #region 物品控制
-
-        /// <summary>
-        /// 获取物品容器
-        /// </summary>
-        /// <returns>容器</returns>
-        public IContainerDisplay<ItemService.ShopItem<T>> getContainer() {
-            return shopWindow.currentPackContainer();
-        }
-
-        #endregion
 
         #endregion
 
@@ -80,96 +65,67 @@ namespace UI.ShopScene.Controls {
             name.text = item.name;
             description.text = item.description;
 
-            /*
-            starsDisplay.setValue(item.starId);
+            // 处理物品星级和图标情况
+            var item_ = item as LimitedItem;
+            if (item_ != null){
+                starsDisplay?.setValue(item_.starId);
 
-            icon.gameObject.SetActive(true);
-            icon.overrideSprite = item.icon;
-            */
-        }
-
-        /// <summary>
-        /// 绘制人类背包物品
-        /// </summary>
-        /// <param name="packItem">人类背包物品</param>
-        void drawItem(T item) {
-            drawBaseInfo(item); drawItemDetail(item);
-        }
-
-        /// <summary>
-        /// 绘制人类背包装备
-        /// </summary>
-        /// <param name="packEquip">人类背包装备</param>
-        void drawHumanPackEquip(HumanPackEquip packEquip) {
-            drawBaseInfo(packEquip.item());
-            drawEquipDetail(packEquip);
-        }
-
-        /// <summary>
-        /// 绘制艾瑟萌背包物品
-        /// </summary>
-        /// <param name="packItem">艾瑟萌背包物品</param>
-        void drawExerPackItem(ExerPackItem packItem) {
-            drawBaseInfo(packItem.item());
-            drawItemDetail(packItem);
-        }
-
-        /// <summary>
-        /// 绘制艾瑟萌背包装备
-        /// </summary>
-        /// <param name="packEquip">艾瑟萌背包装备</param>
-        void drawExerPackEquip(ExerPackEquip packEquip) {
-            drawBaseInfo(packEquip.item());
-            drawEquipDetail(packEquip);
+                icon.gameObject.SetActive(true);
+                icon.overrideSprite = item_.icon;
+            }           
         }
 
         /// <summary>
         /// 绘制物品详情
         /// </summary>
         /// <param name="obj"></param>
-        void drawItemDetail(ParamDisplay.IDisplayDataConvertable obj) {
-            equipDetail.gameObject.SetActive(false);
-            itemDetail.gameObject.SetActive(true);
-            itemDetail.setValue(obj, "detail");
+        protected virtual void drawItemDetail(ParamDisplay.IDisplayDataConvertable obj) {
+            detail?.setValue(obj, "detail");
         }
 
         /// <summary>
-        /// 绘制物品详情
+        /// 绘制物品价格
         /// </summary>
         /// <param name="obj"></param>
-        void drawEquipDetail(ParamDisplay.IDisplayDataConvertable obj) {
-            itemDetail.gameObject.SetActive(false);
-            equipDetail.gameObject.SetActive(true);
-            equipDetail.setValue(obj, "detail");
+        void drawPrice() {
+            if (shopItem == null) return;
+            priceText.text = generatePriceText();
         }
 
         /// <summary>
-        /// 配置控制按钮
+        /// 生成价格文本
+        /// </summary>
+        /// <param name="obj"></param>
+        string generatePriceText() {
+            var price = shopItem.price;
+            var res = new List<string>();
+            if (price.gold > 0)
+                res.Add(string.Format(GoldPriceFormat, price.gold));
+            if (price.ticket > 0)
+                res.Add(string.Format(TicketPriceFormat, price.ticket));
+            if (price.boundTicket > 0)
+                res.Add(string.Format(BoundTicketPriceFormat, price.boundTicket));
+
+            return string.Join("\n", res);
+        }
+
+        /// <summary>
+        /// 绘制物品
         /// </summary>
         /// <param name="item">物品</param>
-        void setupButtons(LimitedItem item) {
-            equip.SetActive(isEquip());
-            use.SetActive(isUsable());
-            discard.SetActive(item.discardable);
-            sell.SetActive(item.sellable());
+        void drawItem(T item) {
+            drawPrice();
+            drawBaseInfo(item); 
+            drawItemDetail(item);
         }
-
+        
         /// <summary>
         /// 清除物品
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
-            starsDisplay.clearValue();
-            icon.gameObject.SetActive(false);
-            name.text = description.text = "";
-
-            itemDetail.gameObject.SetActive(false);
-            equipDetail.gameObject.SetActive(false);
-
-            equip.SetActive(false);
-            use.SetActive(false);
-            sell.SetActive(false);
-            discard.SetActive(false);
+            priceText.text = description.text = "";
+            detail.clearValue();
         }
 
         #endregion

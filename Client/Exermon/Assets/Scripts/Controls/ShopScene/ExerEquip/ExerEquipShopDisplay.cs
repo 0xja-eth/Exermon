@@ -4,32 +4,32 @@ using Core.Data;
 
 using ItemModule.Services;
 
-namespace UI.ShopScene.Controls.HumanItem {
+namespace UI.ShopScene.Controls.ExerEquip {
 
-    using HumanItem = PlayerModule.Data.HumanItem;
+    using ExerEquip = ExermonModule.Data.ExerEquip;
 
     /// <summary>
-    /// 人类商店显示
+    /// 艾瑟萌装备商店显示
     /// </summary>
-    public class HumanItemShopDisplay : ShopDisplay<HumanItem> {
+    public class ExerEquipShopDisplay : ShopDisplay<ExerEquip> {
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public HumanItemDetail humanItemDetail;
+        public ExerEquipDetail exerEquipDetail;
 
         /// <summary>
         /// 物品详情控件
         /// </summary>
-        public override ShopItemDetail<HumanItem> itemDetail {
+        public override ShopItemDetail<ExerEquip> itemDetail {
             get{
-                return humanItemDetail;
+                return exerEquipDetail;
             }
             set {
-                humanItemDetail = value as HumanItemDetail;   
+                exerEquipDetail = value as ExerEquipDetail;   
             }
         }
-        
+
         #region 初始化
         
         /// <summary>
@@ -37,7 +37,7 @@ namespace UI.ShopScene.Controls.HumanItem {
         /// </summary>
         /// <returns></returns>
         protected override TypeData[] typeData() {
-            return dataSer.staticData.configure.usableItemTypes;
+            return dataSer.staticData.configure.exerEquipTypes;
 
         }
 
@@ -50,12 +50,12 @@ namespace UI.ShopScene.Controls.HumanItem {
         /// </summary>
         /// <param name="shopItem">物品</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
-        protected override bool isIncluded(ItemService.ShopItem<HumanItem> shopItem) {
+        protected override bool isIncluded(ItemService.ShopItem<ExerEquip> shopItem) {
             if (!base.isIncluded(shopItem)) return false;
-
+            
             var typeIndex = typeSelector.getIndex();
             return typeIndex == UnlimitedIndex || 
-                typeIndex == shopItem.item().iType;
+                typeIndex == shopItem.item().eType;
         }
 
         #endregion

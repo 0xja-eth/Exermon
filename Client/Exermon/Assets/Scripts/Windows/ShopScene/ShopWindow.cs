@@ -21,6 +21,9 @@ using UI.ShopScene.Controls;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
+using UI.ShopScene.Controls.HumanItem;
+using UI.ShopScene.Controls.ExerEquip;
+
 namespace UI.ShopScene.Windows {
 
     /// <summary>
@@ -37,7 +40,7 @@ namespace UI.ShopScene.Windows {
         /// 视图枚举
         /// </summary>
         public enum View {
-            Human, Exermon,
+            HumanItem, ExerEquip,
         }
 
         /// <summary>
@@ -47,8 +50,6 @@ namespace UI.ShopScene.Windows {
 
         public HumanItemShopDisplay humanItemShop;
         public ExerEquipShopDisplay exerEquipShop;
-
-        public PackItemDetail itemDetail;
 
         public NumberInputWindow numberWindow;
 
@@ -109,7 +110,7 @@ namespace UI.ShopScene.Windows {
         /// 开始窗口
         /// </summary>
         public override void startWindow() {
-            startWindow(View.Human);
+            startWindow(View.HumanItem);
         }
 
         /// <summary>
@@ -128,14 +129,11 @@ namespace UI.ShopScene.Windows {
         /// 当前背包容器
         /// </summary>
         /// <returns></returns>
-        public SelectableContainerDisplay<ItemService.ShopItem<T>> 
-            currentPackContainer<T>() where T: BaseItem, new() {
+        public ShopDisplay<T> currentPackContainer<T>() where T: BaseItem, new() {
             if (typeof(T) == typeof(HumanItem))
-                return (SelectableContainerDisplay<ItemService.ShopItem<T>>)
-                    (object)humanItemShop;
+                return (ShopDisplay<T>)(object)humanItemShop;
             if (typeof(T) == typeof(ExerEquip))
-                return (SelectableContainerDisplay<ItemService.ShopItem<T>>)
-                    (object)exerEquipShop;
+                return (ShopDisplay<T>)(object)exerEquipShop;
             return null;
         }
 
@@ -144,13 +142,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public ShopItemDetail<T> currentItemDetail<T>() where T : BaseItem, new() {
-            if (typeof(T) == typeof(HumanItem))
-                return (SelectableContainerDisplay<ItemService.ShopItem<T>>)
-                    (object)humanItemShop;
-            if (typeof(T) == typeof(ExerEquip))
-                return (SelectableContainerDisplay<ItemService.ShopItem<T>>)
-                    (object)exerEquipShop;
-            return null;
+            return currentPackContainer<T>().itemDetail;
         }
 
         /// <summary>
@@ -158,32 +150,41 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public PackContainer<PackContItem> operContainer() {
-            return currentPackContainer()?.getPackData();
+            switch (view) {
+                case View.HumanItem: return player.packContainers.humanPack;
+                case View.ExerEquip: return player.packContainers.exerPack;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 当前操作商品
+        /// </summary>
+        /// <returns></returns>
+        public ItemService.ShopItem<T> operShopItem<T>() where T : BaseItem, new() {
+            return ((IItemDisplay<ItemService.ShopItem<T>>)
+                currentItemDetail<T>())?.getItem();
+        }
+        public ItemService.ShopItem operShopItem() {
+            switch (view) {
+                case View.HumanItem: return operShopItem<HumanItem>();
+                case View.ExerEquip: return operShopItem<ExerEquip>();
+            }
+            return null;
         }
 
         /// <summary>
         /// 当前操作物品
         /// </summary>
         /// <returns></returns>
-        public T operPackItem<T>() where T : PackContItem {
-            return currentItemDetail()?.getItem() as T;
-        }
-        /// <summary>
-        /// 操作物品
-        /// </summary>
-        /// <returns>返回操作物品</returns>
-        public PackContItem operPackItem() {
-            return currentItemDetail()?.getItem();
+        public BaseItem operItem() {
+            switch (view) {
+                case View.HumanItem: return operShopItem<HumanItem>().item();
+                case View.ExerEquip: return operShopItem<ExerEquip>().item();
+            }
+            return null;
         }
 
-        /// <summary>
-        /// 当前操作物品
-        /// </summary>
-        /// <returns></returns>
-        public T operItem<T>() where T : BaseItem {
-            return currentItemDetail()?.getContainedItem<T>();
-        }
-        
         #endregion
 
         #region 界面绘制
@@ -194,8 +195,8 @@ namespace UI.ShopScene.Windows {
         public void refreshView() {
             clearView();
             switch (view) {
-                case View.Human: onHumanPack(); break;
-                case View.Exermon: onExerPack(); break;
+                case View.HumanItem: onHumanPack(); break;
+                case View.ExerEquip: onExerPack(); break;
             }
         }
 
@@ -203,25 +204,16 @@ namespace UI.ShopScene.Windows {
         /// 人类背包
         /// </summary>
         void onHumanPack() {
-            var container = player.packContainers.humanPack;
-            humanPack.startView(); humanPack.setPackData(container);
+            itemSer.getShop<HumanItem>(humanItemShop.startView);
         }
 
         /// <summary>
         /// 艾瑟萌背包
         /// </summary>
         void onExerPack() {
-            var container = player.packContainers.exerPack;
-            exerPack.startView(); exerPack.setPackData(container);
+            itemSer.getShop<ExerEquip>(exerEquipShop.startView);
         }
-
-        /// <summary>
-        /// 题目糖背包
-        /// </summary>
-        void onQuesSugar() {
-
-        }
-
+        
         /// <summary>
         /// 刷新金钱
         /// </summary>
@@ -233,18 +225,10 @@ namespace UI.ShopScene.Windows {
         /// 清除视图
         /// </summary>
         public void clearView() {
-            humanPack.terminateView();
-            exerPack.terminateView();
+            humanItemShop.terminateView();
+            exerEquipShop.terminateView();
         }
-
-        /// <summary>
-        /// 刷新背包
-        /// </summary>
-        void refreshPack() {
-            currentPackContainer()?.requestRefresh();
-            refreshMoney();
-        }
-
+        
         /// <summary>
         /// 刷新窗口
         /// </summary>
@@ -292,7 +276,7 @@ namespace UI.ShopScene.Windows {
         /// 使用物品
         /// </summary>
         public void onBuy() {
-            var item = operItem<UsableItem>();
+            var item = operItem();
             if (item == null) return;
 
             startNumberWindow();
@@ -302,10 +286,11 @@ namespace UI.ShopScene.Windows {
         /// 购买道具
         /// </summary>
         /// <param name="count"></param>
-        public void buyItem(int count = 1) {
+        public void buyItem(int buyType, int count = 1) {
+            var item = operItem();
             var container = operContainer();
-            var item = operItem<BaseItem>();
-            itemSer.buyItem(container, item, count, onBuySuccess);
+            itemSer.buyItem(container, item, 
+                count, buyType, onBuySuccess);
         }
 
         /// <summary>
@@ -314,7 +299,7 @@ namespace UI.ShopScene.Windows {
         protected virtual void onBuySuccess() {
             gameSys.requestAlert(BuySuccessText);
             numberWindow.terminateWindow();
-            refreshPack();
+            refreshMoney();
         }
 
         #endregion
