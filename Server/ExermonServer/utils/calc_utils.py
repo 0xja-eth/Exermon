@@ -111,6 +111,7 @@ class ExermonParamCalc:
 		value = base*pow((rate/cls.R+1)*cls.S, level-1)
 		return value * plus_rate + plus
 
+
 # ================================
 # 艾瑟萌槽和玩家等级计算类
 # ================================
@@ -320,10 +321,10 @@ class EquipParamCalc:
 	def _calc(self):
 
 		value = self.pack_equip.baseParam(param_id=self.param.id)
-		rate = self.pack_equip.levelParam(param_id=self.param.id)
-		level = self.player_exer.level
+		# rate = self.pack_equip.levelParam(param_id=self.param.id)
+		# level = self.player_exer.level
 
-		return value + rate * level
+		return value # + rate * level
 
 
 # ================================

@@ -41,6 +41,7 @@ namespace Core.Systems {
             public const string ExerciseScene = "ExerciseScene";
             public const string RecordScene = "RecordScene";
             public const string PackScene = "PackScene";
+            public const string ShopScene = "ShopScene";
 
             public const string BattleStartScene = "BattleStartScene";
             public const string BattleMatchingScene = "BattleMatchingScene";

@@ -21,7 +21,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 设置物品
         /// </summary>
-        void setItem(T item, int index = -1, bool refresh = false);
+        void setItem(T item, int index = -1, bool force = false);
 
     }
 

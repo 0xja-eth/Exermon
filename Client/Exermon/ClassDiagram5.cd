@@ -60,11 +60,12 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="UI.Common.Controls.ItemDisplays.BaseItemDisplay" Collapsed="true">
+  <Class Name="UI.Common.Controls.ItemDisplays.BaseItemDetail" Collapsed="true">
     <Position X="31" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAAAAgAEAAACAAAAAAAAEAAAgAUAAAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\BaseItemDisplay.cs</FileName>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\BaseItemDetail.cs</FileName>
+      <NewMemberFileName>Assets\Scripts\Controls\Common\ItemDisplay\BaseItemDisplay.cs</NewMemberFileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UI.Common.Controls.ItemDisplays.ContainerDisplay&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
@@ -86,7 +87,7 @@
   <Class Name="UI.Common.Controls.ItemDisplays.DroppableContainerDisplay&lt;T&gt;" Collapsed="true">
     <Position X="9.75" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAIQAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DroppableContainerDisplay.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -454,7 +455,7 @@
   <Interface Name="UI.Common.Controls.ItemDisplays.IContainerDisplay" Collapsed="true">
     <Position X="8.25" Y="14.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAIgAgAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ContainerDisplay.cs</FileName>
     </TypeIdentifier>
   </Interface>

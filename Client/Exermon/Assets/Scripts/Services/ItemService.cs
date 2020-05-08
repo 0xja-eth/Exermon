@@ -598,9 +598,8 @@ namespace ItemModule.Services {
         /// <param name="count">丢弃数量</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void buyItem<P, T>(PackContainer<P> container, T item, int count,
-            UnityAction onSuccess, UnityAction onError = null)
-            where T : BaseItem, new() where P : PackContItem<T>, new() {
+        public void buyItem<T>(PackContainer<PackContItem> container, T item, int count,
+            UnityAction onSuccess, UnityAction onError = null) where T : BaseItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");

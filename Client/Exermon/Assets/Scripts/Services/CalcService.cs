@@ -391,8 +391,8 @@ namespace GameModule.Services {
             /// </summary>
             void _calc() {
                 value = packEquip.getBaseParam(param.getID()).value;
-                var rate = packEquip.getLevelParam(param.getID()).value;
-                value += rate * playerExer.level;
+                // var rate = packEquip.getLevelParam(param.getID()).value;
+                // value += rate * playerExer.level;
             }
         }
 
