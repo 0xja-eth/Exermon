@@ -1099,11 +1099,13 @@ class GeneralItemEffectProcessor:
 
 		p_len = len(params)
 
-		if code == ItemEffectCode.AddParam:
-			if target: target.addPlusParam(*params, count=count)
+		if code == ItemEffectCode.AddParam and target:
+			if p_len == 3: params[2] = params[2]/100+1
+			target.addPlusParam(*params, count=count)
 
-		elif code == ItemEffectCode.TempAddParam:
-			if target: target.addTempPlusParam(*params, count=count)
+		elif code == ItemEffectCode.TempAddParam and target:
+			if p_len == 4: params[3] = params[3]/100+1
+			target.addTempPlusParam(*params, count=count)
 
 		elif code == ItemEffectCode.GainExermonExp and target:
 			min_cnt = max_cnt = params[0]*count
@@ -1223,6 +1225,7 @@ class BattleItemEffectProcessor:
 			if p_len == 2: exermon.recoverMP(params[0], params[1]/100)
 
 		if code == ItemEffectCode.BattleAddParam:
+			if p_len == 4: params[3] = params[3]/100+1
 			exermon.addParam(*params)
 
 	def _processQuesSugar(self, item):

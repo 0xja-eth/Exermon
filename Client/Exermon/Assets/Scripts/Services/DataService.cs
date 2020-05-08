@@ -278,14 +278,26 @@ namespace GameModule.Services {
 
             return get((BaseData[])obj.GetType().GetProperty(attrName).GetValue(obj), id);
         }
+
+        /// <summary>
+        /// 获取静态/动态数据（不能获取组合术语数据）
+        /// </summary>
         /// <param name="type">数据类型</param>
+        /// <param name="id">索引</param>
+        /// <param name="dataType">数据类型（0：数据库数据，1：配置数据，2：动态数据）</param>
         public BaseData get(Type type, int id, int dataType = 0) {
             var attrType = type.Name;
             var attrName = char.ToLower(attrType[0]).ToString();
             attrName += attrType.Substring(1) + "s";
             return get(attrName, id, dataType);
         }
+        
+        /// <summary>
+        /// 获取静态/动态数据（不能获取组合术语数据）
+        /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="id">索引</param>
+        /// <param name="dataType">数据类型（0：数据库数据，1：配置数据，2：动态数据）</param>
         public T get<T>(int id, int dataType = 0) where T : BaseData {
             return (T)get(typeof(T), id, dataType);
         }

@@ -110,7 +110,8 @@ class ParamValue(models.Model):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.attr = self.param.attr
+		if self.param_id is not None:
+			self.attr = self.param.attr
 
 	def __str__(self):
 		val = self.getValue()

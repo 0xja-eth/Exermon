@@ -573,7 +573,7 @@ namespace GameModule.Services {
                         target.addPlusParamValues(p, a);
 
                         if (params_.Count > 2) { // 处理百分比
-                            b = DataLoader.load<double>(params_[2]);
+                            b = DataLoader.load<double>(params_[2]) / 100;
                             b = Math.Pow(b, count);
                             target.addPlusParamRates(p, b);
                         }
@@ -586,7 +586,7 @@ namespace GameModule.Services {
                         target.addPlusParamValues(p, a);
 
                         if (params_.Count > 3) { // 处理百分比
-                            b = DataLoader.load<double>(params_[3]);
+                            b = DataLoader.load<double>(params_[3]) / 100;
                             b = Math.Pow(b, count);
                             target.addPlusParamRates(p, b);
                         }
@@ -666,7 +666,7 @@ namespace GameModule.Services {
                         target.changeParam(p, a);
 
                         if (params_.Count > 3) { // 处理百分比
-                            b = DataLoader.load<double>(params_[3]);
+                            b = DataLoader.load<double>(params_[3]) / 100;
                             target.changePercentParam(p, b);
                         }
                         break;

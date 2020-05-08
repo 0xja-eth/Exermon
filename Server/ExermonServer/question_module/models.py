@@ -472,9 +472,16 @@ class QuesSugar(BaseItem):
 
 	# 转化为 dict
 	def convertToDict(self):
-		res = super().convertToDict()
-
 		buy_price = ModelUtils.objectToDict(self.buyPrice())
+
+		if type == "shop":
+			return {
+				'id': self.id,
+				'type': self.TYPE.value,
+				'price': buy_price
+			}
+
+		res = super().convertToDict()
 
 		res['question_id'] = self.question
 		res['buy_price'] = buy_price
@@ -488,6 +495,12 @@ class QuesSugar(BaseItem):
 	# 获取所有的属性成长率
 	def params(self):
 		return self.quessugarparam_set.all()
+
+	# 可否被购买
+	def isBoughtable(self):
+		buy_price: Currency = self.buyPrice()
+		if buy_price is None: return False
+		return not buy_price.isEmpty()
 
 	# 购买价格
 	def buyPrice(self):

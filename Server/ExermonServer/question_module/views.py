@@ -51,7 +51,7 @@ class Service:
 	@classmethod
 	def upload(cls, auth: str):
 		# 返回数据：无
-		ViewUtils.ensureAuth(auth[0])
+		ViewUtils.ensureAuth(auth)
 
 		from .raw_questions.upload import doPreprocess
 
@@ -104,6 +104,7 @@ class Service:
 		picture.file = p
 		picture.question = question
 		picture.save()
+
 
 # ====================
 # 题目校验类，封装管理题目模块的参数格式是否正确-lgy

@@ -1,11 +1,17 @@
 ﻿
+using System;
+using System.Collections.Generic;
+
 using UnityEngine.Events;
 
 using LitJson;
 
+using Core.Data;
 using Core.Data.Loaders;
 using Core.Systems;
 using Core.Services;
+
+using GameModule.Services;
 
 using ItemModule.Data;
 using ExermonModule.Data;
@@ -19,6 +25,32 @@ namespace ItemModule.Services {
     /// 物品服务
     /// </summary>
     public class ItemService : BaseService<ItemService> {
+
+        /// <summary>
+        /// 商品物品
+        /// </summary>
+        public class ShopItem : BaseData {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int type { get; protected set; }
+            [AutoConvert]
+            public ItemPrice price { get; protected set; }
+
+        }
+        public class ShopItem<T> : ShopItem where T : BaseItem, new() {
+            
+            /// <summary>
+            /// 获取对应的物品
+            /// </summary>
+            /// <returns></returns>
+            public T item() {
+                return DataService.get().get<T>(getID());
+            }
+
+        }
 
         /// <summary>
         /// 操作文本设定
@@ -38,6 +70,7 @@ namespace ItemModule.Services {
         const string SellItem = "出售物品";
 
         const string BuyItem = "购买物品";
+        const string GetShop = "获取商品";
 
         /// <summary>
         /// 业务操作
@@ -48,7 +81,7 @@ namespace ItemModule.Services {
             TransferItems, SplitItem, MergeItems,
             UseItem,
             DiscardItem, SellItem, 
-            BuyItem
+            BuyItem, GetShop
         }
 
         #region 初始化
@@ -71,10 +104,11 @@ namespace ItemModule.Services {
             addOperDict(Oper.DiscardItem, DiscardItem, NetworkSystem.Interfaces.ItemDiscardItem);
             addOperDict(Oper.SellItem, SellItem, NetworkSystem.Interfaces.ItemSellItem);
             addOperDict(Oper.BuyItem, BuyItem, NetworkSystem.Interfaces.ItemBuyItem);
+            addOperDict(Oper.GetShop, GetShop, NetworkSystem.Interfaces.ItemGetShop);
         }
 
         #endregion
-
+        
         #region 操作控制
 
         /// <summary>
@@ -509,35 +543,6 @@ namespace ItemModule.Services {
         }
 
         /// <summary>
-        /// 出售物品
-        /// </summary>
-        /// <param name="container">容器</param>
-        /// <param name="item">物品</param>
-        /// <param name="count">丢弃数量</param>
-        /// <param name="onSuccess">成功回调</param>
-        /// <param name="onError">失败回调</param>
-        public void buyItem<P, T>(PackContainer<P> container, T item, int count,
-            UnityAction onSuccess, UnityAction onError = null)
-            where T : BaseItem, new() where P : PackContItem<T>, new() {
-
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                container = DataLoader.load(container, res, "container");
-                getPlayer().loadMoney(res);
-                onSuccess?.Invoke();
-            };
-
-            buyItem(item.type, item.getID(), count, _onSuccess, onError);
-        }
-        /// <param name="type">物品类型</param>
-        /// <param name="itemId">物品ID</param>
-        public void buyItem(int type, int itemId, int count,
-            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
-            JsonData data = new JsonData(); data["type"] = type;
-            data["item_id"] = itemId; data["count"] = count;
-            sendRequest(Oper.BuyItem, data, onSuccess, onError, uid: true);
-        }
-
-        /// <summary>
         /// 使用物品
         /// </summary>
         /// <param name="container">容器</param>
@@ -583,6 +588,64 @@ namespace ItemModule.Services {
             data["contitem_id"] = contItemId; data["count"] = count;
             data["occasion"] = occasion; data["target"] = target;
             sendRequest(Oper.UseItem, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 购买物品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="item">物品</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void buyItem<P, T>(PackContainer<P> container, T item, int count,
+            UnityAction onSuccess, UnityAction onError = null)
+            where T : BaseItem, new() where P : PackContItem<T>, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                getPlayer().loadMoney(res);
+                onSuccess?.Invoke();
+            };
+
+            buyItem(item.type, item.getID(), count, _onSuccess, onError);
+        }
+        /// <param name="type">物品类型</param>
+        /// <param name="itemId">物品ID</param>
+        public void buyItem(int type, int itemId, int count,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type;
+            data["item_id"] = itemId; data["count"] = count;
+            sendRequest(Oper.BuyItem, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 获取商品
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="item">物品</param>
+        /// <param name="count">丢弃数量</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getShop<T>(UnityAction<ShopItem<T>[]> onSuccess, 
+            UnityAction onError = null) where T : BaseItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                var items = DataLoader.load<ShopItem<T>[]>(res, "items");
+                onSuccess?.Invoke(items);
+            };
+
+            var typeName = typeof(T).Name;
+            var type = (int)Enum.Parse(typeof(BaseItem.Type), typeName);
+
+            getShop(type, _onSuccess, onError);
+        }
+        /// <param name="type">物品类型</param>
+        /// <param name="itemId">物品ID</param>
+        public void getShop(int type,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type;
+            sendRequest(Oper.GetShop, data, onSuccess, onError, uid: true);
         }
 
         /// <summary>

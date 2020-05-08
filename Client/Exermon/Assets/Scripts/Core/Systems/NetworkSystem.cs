@@ -77,7 +77,8 @@ namespace Core.Systems {
             public const string ItemDiscardItem = "item/packcontainer/discard";
             public const string ItemSellItem = "item/packcontainer/sell";
 
-            public const string ItemBuyItem = "item/item/buy";
+            public const string ItemBuyItem = "item/shop/buy";
+            public const string ItemGetShop = "item/shop/get";
 
             public const string ExermonEquipPlayerExer = "exermon/equip/playerexer";
             public const string ExermonEquipPlayerGift = "exermon/equip/playergift";

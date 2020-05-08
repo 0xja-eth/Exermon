@@ -315,17 +315,6 @@ WEBSOCKET_METHOD_ROUTER = {
 		Item.packContainerSell,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
-	# 购买物品
-	'item/item/buy': [[
-		['uid', 'int'],
-		['type', 'int'],
-		['item_id', 'int'],
-		['count', 'int'],
-		['refresh', 'bool'],
-	],
-		Item.itemBuy,  # 处理函数
-		ChannelLayerTag.Self  # 是否需要响应
-	],
 	# 艾瑟萌槽装备艾瑟萌
 	'exermon/equip/playerexer': [[
 		['uid', 'int'],
@@ -556,6 +545,25 @@ WEBSOCKET_METHOD_ROUTER = {
 		['count', 'int'],
 	],
 		Season.getRanks,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 购买物品
+	'item/shop/buy': [[
+		['uid', 'int'],
+		['type', 'int'],
+		['item_id', 'int'],
+		['count', 'int'],
+		['refresh', 'bool'],
+	],
+		Item.shopBuy,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
+	# 获取商品
+	'item/shop/get': [[
+		['uid', 'int'],
+		['type', 'int'],
+	],
+		Item.shopGet,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
 

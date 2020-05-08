@@ -232,7 +232,7 @@ class Service:
 
 	# 购买物品
 	@classmethod
-	async def itemBuy(cls, consumer, player: Player, type: int, item_id: int, count: int, refresh: bool, ):
+	async def shopBuy(cls, consumer, player: Player, type: int, item_id: int, count: int, refresh: bool, ):
 		# 返回数据：
 		# container: 背包容器数据 => 背包容器数据
 
@@ -254,6 +254,23 @@ class Service:
 		res['money'] = player.playerMoney().convertToDict()
 
 		return res
+
+	# 获取商品
+	@classmethod
+	async def shopGet(cls, consumer, player: Player, type: int, ):
+		# 返回数据：
+		# items: 商品数据（数组） => 商品数据
+
+		Check.ensureItemType(type)
+		cla = eval(ItemType(type).name)
+
+		# TODO: 之后需要修改商品获取的算法
+		items = ViewUtils.getObjects(cla)
+		shop_list = ModelUtils.filter(
+			items, lambda i: i.isBoughtable(),
+			lambda i: i.convertToDict(type="shop"))
+
+		return {'items': shop_list}
 
 	# 槽容器装备
 	@classmethod
@@ -299,6 +316,17 @@ class Service:
 			res['slot'] = slot.convertToDict(type=type)
 
 		return res
+
+	# 上传题目
+	@classmethod
+	def upload(cls, auth: str, type: int):
+		# 返回数据：无
+		ViewUtils.ensureAuth(auth)
+
+		from .raw_data.upload import upload
+
+		if type == 1: upload(HumanItem)
+		if type == 2: upload(ExerEquip)
 
 
 # =======================
@@ -347,12 +375,8 @@ class Check:
 
 	# 区确保物品可购买
 	@classmethod
-	def ensureItemBoughtable(cls, item: LimitedItem):
-		try:
-			price: Currency = item.buyPrice()
-			if price.gold <= 0 and price.ticket <= 0 and price.bound_ticket <= 0:
-				raise GameException(ErrorType.UnboughtableItem)
-		except AttributeError:
+	def ensureItemBoughtable(cls, item: BaseItem):
+		if not item.isBoughtable():
 			raise GameException(ErrorType.UnboughtableItem)
 
 

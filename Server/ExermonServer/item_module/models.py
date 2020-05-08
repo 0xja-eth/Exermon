@@ -211,6 +211,9 @@ class Currency(models.Model):
 
 		return res
 
+	def isEmpty(self):
+		return self.gold == self.ticket == self.bound_ticket == 0
+
 
 # region 物品
 
@@ -272,6 +275,10 @@ class BaseItem(models.Model):
 
 	def __getattr__(self, item):
 		raise AttributeError(item)
+
+	# 可否被购买
+	def isBoughtable(self):
+		return False
 
 	# 转化为 dict
 	def convertToDict(self, **kwargs):
@@ -341,6 +348,12 @@ class LimitedItem(BaseItem):
 
 	adminBuyPrice.short_description = "购入价格"
 
+	# 可否被购买
+	def isBoughtable(self):
+		buy_price: Currency = self.buyPrice()
+		if buy_price is None: return False
+		return not buy_price.isEmpty()
+
 	# 获取购买价格
 	def buyPrice(self):
 		raise NotImplementedError
@@ -366,10 +379,17 @@ class LimitedItem(BaseItem):
 	# 	return data.decode()
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
-
+	def convertToDict(self, type=None, **kwargs):
 		buy_price = ModelUtils.objectToDict(self.buyPrice())
+
+		if type == "shop":
+			return {
+				'id': self.id,
+				'type': self.TYPE.value,
+				'price': buy_price
+			}
+
+		res = super().convertToDict(**kwargs)
 
 		res['star_id'] = self.star_id
 		res['icon_index'] = self.icon_index
@@ -600,7 +620,7 @@ class EquipableItem(LimitedItem):
 	def adminLevelParams(self):
 		from django.utils.html import format_html
 
-		params = self.baseParams()
+		params = self.levelParams()
 
 		res = ''
 		for p in params:
@@ -3331,7 +3351,7 @@ class BaseEffect(models.Model):
 			if p_len < 3:  # 如果只有 a 参数
 				return format.promote1 % (name, a)
 
-			b = params[2] - 1
+			b = params[2]
 			if a == 0: return format.promote2 % (name, b)
 			return format.promote3 % (name, a, b)
 
@@ -3347,7 +3367,7 @@ class BaseEffect(models.Model):
 			if p_len < 4:  # 如果只有 a 参数
 				return format.tmp_promote1 % (name, a, t, time)
 
-			b = params[3] - 1
+			b = params[3]
 			if a == 0: return format.tmp_promote2 % (name, b, t, time)
 			return format.tmp_promote3 % (name, a, b, t, time)
 

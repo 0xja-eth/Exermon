@@ -28,6 +28,7 @@ xversion.register_models()
 urlpatterns = [
     path('game/', include('game_module.urls')),
     path('question/', include('question_module.urls')),
+    path('item/', include('item_module.urls')),
     path('admin/', admin.site.urls),
     path('xadmin/', xadmin.site.urls),
 ]

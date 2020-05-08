@@ -271,7 +271,7 @@ class Common:
 
 			if key in request_data:
 				# 如果该接口所需参数在 request_data 中，进行数据类型转换
-				data[key] = Common.convertDataType(request_data[key], type)
+				data[key] = Common.convertDataType(request_data[key][0], type)
 			elif type != 'var':
 				# 否则且如果该参数不是可选的，抛出异常
 				raise GameException(ErrorType.ParameterError)

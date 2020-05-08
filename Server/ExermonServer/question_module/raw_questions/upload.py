@@ -5,7 +5,6 @@ import os, json, re, random, traceback
 
 PATH_ROOT = "question_module/raw_questions/"
 
-
 def doPreprocess():
 	questions = []
 
