@@ -163,11 +163,17 @@ def _saveExerEquip(d: dict):
 
 	if id == "": return
 
+	print("Processing ExerEquip "+id)
+
 	item = ExerEquip.objects.filter(id=id)
 	flag = item.exists()
 
-	if not flag: item = ExerEquip()
-	else: item = item.first()
+	if not flag:
+		item = ExerEquip()
+		print("[Created new]")
+	else:
+		item = item.first()
+		print("[Loaded from database]")
 
 	item.id = id
 	item.name = load(d, 'name', "")

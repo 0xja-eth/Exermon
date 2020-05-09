@@ -804,7 +804,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         protected virtual void drawExactlyItemHelp(T item) {
             var detail = getItemDetail();
-            if (detail != null) detail.setItem(item, selectedIndex);
+            if (detail != null) detail.startView(item, selectedIndex);
         }
 
         /// <summary>

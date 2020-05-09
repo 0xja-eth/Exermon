@@ -88,8 +88,6 @@ namespace UI.PackScene.Controls.TargetSelect {
             if (item != null)
                 CalcService.GeneralItemEffectProcessor.
                     process(item, count, preview);
-
-            preview.refresh();
         }
 
         #endregion

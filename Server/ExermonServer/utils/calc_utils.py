@@ -195,13 +195,13 @@ class ExerSlotItemParamCalc:
 		self.exerslot_item: ExerSlotItem = exerslot_item
 		if exerslot_item is None: return
 
-		self.player_exer: PlayerExermon = self.exerslot_item.player_exer
+		self.player_exer: PlayerExermon = self.exerslot_item.playerExer()
 		if self.player_exer is None: return
 
 		self.exermon: Exermon = self.player_exer.exermon()
 		if self.exermon is None: return
 
-		self.player_gift: PlayerExerGift = self.exerslot_item.player_gift
+		self.player_gift: PlayerExerGift = self.exerslot_item.playerGift()
 		self.exerequip_slot: ExerEquipSlot = self.exerslot_item.exerEquipSlot()
 
 		self.kwargs = kwargs
@@ -1047,18 +1047,19 @@ class MaxStarCalc:
 class GeneralItemEffectProcessor:
 
 	@classmethod
-	def process(cls, cont_item, player, count, target=None):
+	def process(cls, cont_item, player, count, target=None, target_slot_item=None):
 		processor = GeneralItemEffectProcessor(
-			cont_item, player, count, target)
+			cont_item, player, count, target, target_slot_item)
 		processor._process()
 
-	def __init__(self, cont_item, player, count, target=None):
+	def __init__(self, cont_item, player, count, target=None, target_slot_item=None):
 		from player_module.models import Player
 		from item_module.models import PackContItem
-		from exermon_module.models import PlayerExermon
+		from exermon_module.models import PlayerExermon, ExerSlotItem
 
 		self.player: Player = player
 		self.cont_item: PackContItem = cont_item
+		self.target_slot_item: ExerSlotItem = target_slot_item
 		self.target: PlayerExermon = target
 		self.count = count
 
@@ -1093,6 +1094,7 @@ class GeneralItemEffectProcessor:
 
 		player = self.player
 		target = self.target
+		target_slot_item = self.target_slot_item
 		count = self.count
 
 		code = ItemEffectCode(effect.code)
@@ -1154,7 +1156,9 @@ class GeneralItemEffectProcessor:
 			for i in range(count):
 				eval(params[0])
 
-		target.save()
+		target.refresh()
+		if target_slot_item is not None:
+			target_slot_item.refresh()
 
 
 # ===================================================

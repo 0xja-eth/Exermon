@@ -12,6 +12,7 @@ using Core.Systems;
 using Core.Services;
 
 using GameModule.Services;
+using PlayerModule.Services;
 
 using ItemModule.Data;
 using ExermonModule.Data;
@@ -85,7 +86,20 @@ namespace ItemModule.Services {
             BuyItem, GetShop
         }
 
+        /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        PlayerService playerSer;
+
         #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            playerSer = PlayerService.get();
+        }
 
         /// <summary>
         /// 初始化操作字典
@@ -557,8 +571,7 @@ namespace ItemModule.Services {
             UnityAction onSuccess = null, UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                container = DataLoader.load(container, res, "container");
-                getPlayer().loadMoney(res);
+                playerSer.loadPlayer(DataLoader.load(res, "player"));
                 onSuccess?.Invoke();
             };
 
@@ -571,8 +584,7 @@ namespace ItemModule.Services {
             UnityAction onError = null) where T : PackContItem, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                container = DataLoader.load(container, res, "container");
-                getPlayer().loadMoney(res);
+                playerSer.loadPlayer(DataLoader.load(res, "player"));
                 onSuccess?.Invoke();
             };
 

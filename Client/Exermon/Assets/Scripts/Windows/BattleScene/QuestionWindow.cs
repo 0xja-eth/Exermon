@@ -119,7 +119,7 @@ namespace UI.BattleScene.Windows {
         /// </summary>
         protected override void resetStatus() {
             base.resetStatus();
-            question = battle.round.question();
+            question = round().question();
             //question.clearShuffleChoices();
             completed = false;
         }
@@ -131,9 +131,11 @@ namespace UI.BattleScene.Windows {
         protected override void refreshQuestion() {
             base.refreshQuestion();
 
+            Debug.Log("refreshQuestion: " + question.title);
+
             questionDisplay.result = null;
             questionDisplay.showAnswer = false;
-            questionDisplay.setItem(question);
+            questionDisplay.setItem(question, true);
             questionDisplay.startQuestion();
         }
         

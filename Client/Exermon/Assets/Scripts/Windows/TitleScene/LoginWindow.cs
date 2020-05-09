@@ -43,10 +43,15 @@ namespace UI.TitleScene.Windows {
         }
 
         /// <summary>
+        /// 颜色设置
+        /// </summary>
+        static readonly Color DeactivedColor = new Color(0.5f, 0.5f, 0.5f, 1);
+        static readonly Color NormalColor = new Color(1, 1, 1, 1);
+
+        /// <summary>
         /// 提示框内容
         /// </summary>
         const string IncorrectUsernameOrPassword = "用户名或密码错误";//
-
 
         const string InvalidInputAlertText = "请检查输入格式正确后再提交！";
 
@@ -402,6 +407,10 @@ namespace UI.TitleScene.Windows {
             registerBtn.interactable = true;
             retrieveBtn.interactable = true;
 
+            loginBtn.targetGraphic.color = 
+                registerBtn.targetGraphic.color = 
+                retrieveBtn.targetGraphic.color = NormalColor;
+
             showLoginInputFields();
             autoComplete();
         }
@@ -417,6 +426,10 @@ namespace UI.TitleScene.Windows {
             registerBtn.interactable = false;
             retrieveBtn.interactable = true;
 
+            registerBtn.targetGraphic.color = NormalColor;
+            loginBtn.targetGraphic.color = 
+                retrieveBtn.targetGraphic.color = DeactivedColor;
+
             showRegisterRetrieveInputFields();
         }
 
@@ -430,6 +443,10 @@ namespace UI.TitleScene.Windows {
 
             registerBtn.interactable = true;
             retrieveBtn.interactable = false;
+
+            retrieveBtn.targetGraphic.color = NormalColor;
+            loginBtn.targetGraphic.color = 
+                registerBtn.targetGraphic.color = DeactivedColor;
 
             showRegisterRetrieveInputFields();
         }

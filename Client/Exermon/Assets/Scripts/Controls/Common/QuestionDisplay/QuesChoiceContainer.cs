@@ -56,6 +56,7 @@ namespace UI.Common.Controls.QuestionDisplay {
             clearChecks();
             if (result == null) return;
             var selection = result.getSelection();
+            if (selection == null) return;
             foreach (var sel in selection)
                 check(items.Find(c => c.order == sel), true);
         }

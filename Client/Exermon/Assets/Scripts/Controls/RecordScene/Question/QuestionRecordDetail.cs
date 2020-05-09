@@ -87,7 +87,7 @@ namespace UI.RecordScene.Controls.Question {
         void drawButtonsStatus(QuestionRecord record) {
             controlButtons.SetActive(true);
             showAnswerText.text = questionDisplay.showAnswer ? HideAnswerText : ShowAnswerText;
-            collectText.text = record.collected ? CollectText : UncollectText;
+            collectText.text = record.collected ? UncollectText : CollectText;
             wrongButton.SetActive(record.wrong);
         }
 

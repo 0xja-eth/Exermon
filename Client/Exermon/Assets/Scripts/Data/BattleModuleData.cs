@@ -202,8 +202,8 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回题目对象</returns>
         public Question question() {
-            if (_question != null) return _question;
-            return _question = QuestionService.get().getQuestion(questionId);
+            //if (_question != null) return _question;
+            return QuestionService.get().getQuestion(questionId);
         }
 
         #endregion
@@ -1245,7 +1245,8 @@ namespace BattleModule.Data {
         public void loadAnswer(bool correct, int timespan) {
             this.correct = correct;
             this.timespan = timespan;
-            if (selection == null) selection = new int[0];
+            if (selection == null)
+                selection = new int[0];
         }
 
         /// <summary>

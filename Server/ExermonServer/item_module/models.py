@@ -123,11 +123,8 @@ class Currency(models.Model):
 		abstract = True
 		verbose_name = verbose_name_plural = "货币"
 
-	# 默认金币
-	DEFAULT_GOLD = 0
-
 	# 金币
-	gold = models.PositiveIntegerField(default=DEFAULT_GOLD, verbose_name="金币")
+	gold = models.PositiveIntegerField(default=0, verbose_name="金币")
 
 	# 点券
 	ticket = models.PositiveIntegerField(default=0, verbose_name="点券")
@@ -1913,6 +1910,22 @@ class PackContainer(BaseContainer):
 				cont_item, count, fixed, combine_return))
 
 		return new_cont_items
+
+	def refreshContItems(self):
+		"""
+		刷新所有容器项
+		"""
+		for cont_item in self.contItems():
+			self.refreshContItem(cont_item)
+
+	def refreshContItem(self, cont_item: 'PackContItem'):
+		"""
+		刷新容器项
+		Args:
+			cont_item (PackContItem): 容器项
+		"""
+		if cont_item.container is None or cont_item.container.id != self.id:
+			self._removeCachedContItem(cont_item)
 
 	# endregion
 

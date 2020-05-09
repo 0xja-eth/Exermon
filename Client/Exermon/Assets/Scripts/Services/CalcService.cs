@@ -547,6 +547,7 @@ namespace GameModule.Services {
             /// <param name="target">目标</param>
             public static void process(IEffectsConvertable item, int count = 1, PlayerExermon target = null) {
                 process(item.convertToEffectData(), count, target);
+                target?.refresh();
             }
             public static void process(EffectData[] effects, int count = 1, PlayerExermon target = null) {
                 foreach (var effect in effects)
@@ -573,7 +574,7 @@ namespace GameModule.Services {
                         target.addPlusParamValues(p, a);
 
                         if (params_.Count > 2) { // 处理百分比
-                            b = DataLoader.load<double>(params_[2]) / 100;
+                            b = DataLoader.load<double>(params_[2]) / 100 + 1;
                             b = Math.Pow(b, count);
                             target.addPlusParamRates(p, b);
                         }
@@ -586,7 +587,7 @@ namespace GameModule.Services {
                         target.addPlusParamValues(p, a);
 
                         if (params_.Count > 3) { // 处理百分比
-                            b = DataLoader.load<double>(params_[3]) / 100;
+                            b = DataLoader.load<double>(params_[3]) / 100 + 1;
                             b = Math.Pow(b, count);
                             target.addPlusParamRates(p, b);
                         }
@@ -636,7 +637,7 @@ namespace GameModule.Services {
                         target.changeHP((int)a);
 
                         if (params_.Count > 1) { // 处理百分比
-                            b = DataLoader.load<double>(params_[1]);
+                            b = DataLoader.load<double>(params_[1]) / 100;
                             target.changePercentMP(b);
                         }
                         break;
@@ -645,7 +646,7 @@ namespace GameModule.Services {
                         target.changeMP((int)a);
 
                         if (params_.Count > 1) { // 处理百分比
-                            b = DataLoader.load<double>(params_[1]);
+                            b = DataLoader.load<double>(params_[1]) / 100;
                             target.changePercentMP(b);
                         }
                         break;
@@ -655,7 +656,7 @@ namespace GameModule.Services {
                         target.changeParam(p, a);
 
                         if (params_.Count > 2) { // 处理百分比
-                            b = DataLoader.load<double>(params_[2]);
+                            b = DataLoader.load<double>(params_[2]) / 100 + 1;
                             target.changePercentParam(p, b);
                         }
                         break;
@@ -666,7 +667,7 @@ namespace GameModule.Services {
                         target.changeParam(p, a);
 
                         if (params_.Count > 3) { // 处理百分比
-                            b = DataLoader.load<double>(params_[3]) / 100;
+                            b = DataLoader.load<double>(params_[3]) / 100 + 1;
                             target.changePercentParam(p, b);
                         }
                         break;

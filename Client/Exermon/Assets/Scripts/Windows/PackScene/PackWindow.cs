@@ -254,7 +254,7 @@ namespace UI.PackScene.Windows {
             humanPack.terminateView();
             exerPack.terminateView();
         }
-
+        /*
         /// <summary>
         /// 刷新背包
         /// </summary>
@@ -262,7 +262,7 @@ namespace UI.PackScene.Windows {
             currentPackContainer()?.requestRefresh();
             refreshMoney();
         }
-
+        */
         /// <summary>
         /// 刷新窗口
         /// </summary>
@@ -403,7 +403,7 @@ namespace UI.PackScene.Windows {
             if (successText != "") gameSys.requestAlert(successText);
             numberWindow.terminateWindow();
             selectWindow.terminateWindow();
-            refreshPack();
+            refreshView();
         }
 
         #endregion

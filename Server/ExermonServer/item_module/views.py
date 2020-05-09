@@ -163,7 +163,8 @@ class Service:
 		# player: 玩家状态数据 => 玩家状态数据
 		from utils.calc_utils import GeneralItemEffectProcessor
 
-		target_item = None
+		target_item: PlayerExermon = None
+		target_slot_item: ExerSlotItem = None
 
 		if target is not None:
 			target = InterfaceCommon.convertDataType(target, 'int')
@@ -171,6 +172,11 @@ class Service:
 				target_item = Common.getContItem(cla=PlayerExermon,
 					 player=player, id=target, include_equipped=True,
 					 error=ErrorType.InvalidUseTarget)
+
+				if target_item.equiped:
+					target_slot_item = Common.getContItem(cla=ExerSlotItem,
+						player=player, player_exer_id=target_item.id,
+						error=ErrorType.InvalidUseTarget)
 
 		ViewUtils.ensureEnumData(occasion, ItemUseOccasion, ErrorType.InvalidOccasion)
 
@@ -182,8 +188,11 @@ class Service:
 
 		cont_item.useItem(ItemUseOccasion(occasion), count, target=target_item)
 
+		container.refreshContItem(cont_item)
+
 		# 使用物品
-		GeneralItemEffectProcessor.process(cont_item, player, count, target_item)
+		GeneralItemEffectProcessor.process(cont_item, player, count,
+										   target_item, target_slot_item)
 
 		return {'player': player.convertToDict(type="status")}
 

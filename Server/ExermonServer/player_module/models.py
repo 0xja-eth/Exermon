@@ -222,6 +222,7 @@ class PlayerMoney(Currency):
 	def create(cls, player):
 		money = cls()
 		money.player = player
+		money.gold = cls.DEFAULT_GOLD
 		money.save()
 		return money
 

@@ -589,6 +589,14 @@ namespace PlayerModule.Services {
 
         #endregion
 
+        /// <summary>
+        /// 更新读取玩家信息
+        /// </summary>
+        /// <param name="json"></param>
+        public void loadPlayer(JsonData json) {
+            player = DataLoader.load(player, json);
+        }
+
         #endregion
     }
 }
