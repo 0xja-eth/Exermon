@@ -532,7 +532,9 @@ class PlayerExermon(PackContItem):
 			count (int): 叠加次数
 		"""
 		now = datetime.datetime.now()
-		duration = datetime.timedelta(0, seconds, 0)
+		if seconds is None: duration = None
+		else:
+			duration = datetime.timedelta(0, seconds, 0)
 
 		val *= count
 		rate = pow(rate, count)
@@ -540,6 +542,7 @@ class PlayerExermon(PackContItem):
 		if val != 0:
 			cache = self.plusParamVals(False)
 			param = PlayerExerParamBase(param_id=param_id)
+			param.player_exer = self
 			if duration is not None:
 				param.expires_time = now + duration
 			param.setValue(val)
@@ -548,6 +551,7 @@ class PlayerExermon(PackContItem):
 		if rate != 0:
 			cache = self.plusParamRates(False)
 			param = PlayerExerParamRate(param_id=param_id)
+			param.player_exer = self
 			if duration is not None:
 				param.expires_time = now + duration
 			param.setValue(rate)
@@ -586,7 +590,7 @@ class PlayerExermon(PackContItem):
 	# 所有附加的能力值
 	def plusParamVals(self, need_filter=True) -> list:
 		cache = self._getOrSetCache(self.PLUS_PARAM_VALS_CACHE_KEY,
-									self._plusParamVals)
+									lambda: list(self._plusParamVals()))
 
 		if not need_filter: return cache
 		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
@@ -594,7 +598,7 @@ class PlayerExermon(PackContItem):
 	# 所有附加的能力加成率
 	def plusParamRates(self, need_filter=True) -> list:
 		cache = self._getOrSetCache(self.PLUS_PARAM_RATES_CACHE_KEY,
-									self._plusParamRates)
+									lambda: list(self._plusParamRates()))
 
 		if not need_filter: return cache
 		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
@@ -603,7 +607,7 @@ class PlayerExermon(PackContItem):
 		return self.playerexerparambase_set.all()
 
 	def _plusParamRates(self) -> QuerySet:
-		return self.playerexerparambase_set.all()
+		return self.playerexerparamrate_set.all()
 
 	def updatePlusParams(self):
 		"""
@@ -627,6 +631,7 @@ class PlayerExermon(PackContItem):
 	def removePlusParams(self, cache, param):
 		if param in cache:
 			cache.remove(param)
+			param.player_exer = None
 			self._getCache(self.REMOVED_PLUS_PARAMS_CACHE_KEY).append(param)
 
 	# endregion

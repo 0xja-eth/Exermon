@@ -380,9 +380,15 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         void processShowDisplayItem(DisplayItem item, JsonData value, bool hide = false) {
             if (value == null) item.obj.SetActive(hide);
-            if (value.IsBoolean) {
+            else if (value.IsBoolean) {
                 var val = DataLoader.load<bool>(value);
                 item.obj.SetActive(hide ? !val : val);
+            } else if (value.IsInt) {
+                var val = DataLoader.load<int>(value);
+                item.obj.SetActive(hide ? val == 0 : val != 0);
+            } else if (value.IsDouble) {
+                var val = DataLoader.load<double>(value);
+                item.obj.SetActive(hide ? val == 0 : val != 0);
             }
         }
 
@@ -554,6 +560,7 @@ namespace UI.Common.Controls.ParamDisplays {
         void processParamDisplayItem(DisplayItem item, JsonData value) {
             if (!item.obj.activeSelf) return;
             var display = SceneUtils.get<ParamDisplay>(item.obj);
+            Debug.Log("processParamDisplayItem: " + display);
             if (display == null) return;
             display.setValue(value);
         }

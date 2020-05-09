@@ -54,6 +54,10 @@ namespace UI.Common.Controls.QuestionDisplay {
             setItem(item, -1, _);
         }
 
+        public void clearItem() {
+            setItem(null, -1);
+        }
+
         public void startView(Question item, int index = -1) {
             startView();
             setItem(item, index, true);
@@ -75,7 +79,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         public override IItemDetailDisplay<Texture2D> getItemDetail() {
             return detail;
         }
-        
+
         #endregion
     }
 }

@@ -103,7 +103,7 @@ namespace Core.Data {
         /// </summary>
         /// <param name="json"></param>
         protected virtual void loadCustomAttributes(JsonData json) {
-            id = idEnable() ? DataLoader.load<int>(json, "id") : -1;
+            id = idEnable() ? DataLoader.load(id, json, "id") : -1;
         }
 
         /// <summary>
@@ -239,6 +239,9 @@ namespace Core.Data {
         /// <param name="val">值</param>
         public void setValue(double val) {
             value = isDouble() ? val : Math.Round(val);
+        }
+        public void setValue(ParamData val) {
+            setValue(val.value);
         }
 
         /// <summary>

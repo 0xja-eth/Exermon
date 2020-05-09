@@ -133,7 +133,7 @@ class Currency(models.Model):
 	ticket = models.PositiveIntegerField(default=0, verbose_name="点券")
 
 	# 绑定点券
-	bound_ticket = models.PositiveIntegerField(default=0, verbose_name="金币")
+	bound_ticket = models.PositiveIntegerField(default=0, verbose_name="绑定点券")
 
 	def __str__(self):
 		term: GameConfigure = GameConfigure.get()
@@ -529,7 +529,7 @@ class UsableItem(LimitedItem):
 			   self._isBatchCountUsable(count) and \
 			   self._isOccasionUsable(occasion)
 
-	def ensureUsable(self, occasion: ItemUseOccasion, target=None, count=1):
+	def ensureUsable(self, occasion: ItemUseOccasion, count=1, target=None):
 		"""
 		确保物品在特定场合下是否可用
 		Args:

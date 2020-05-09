@@ -71,6 +71,10 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 设置值
         /// </summary>
         /// <param name="objs">对象数组</param>
+        public void setValues(JsonData[] values, bool force = false) {
+            for (int i = 0; i < values.Length; i++)
+                setValue(i, values[i], force);
+        }
         public void setValues(ParamDisplay.IDisplayDataConvertable[] objs,
             string type = "", bool force = false) {
             for (int i = 0; i < objs.Length; i++)

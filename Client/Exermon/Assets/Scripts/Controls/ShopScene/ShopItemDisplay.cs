@@ -16,8 +16,8 @@ namespace UI.ShopScene.Controls {
     /// <summary>
     /// 装备背包显示
     /// </summary>
-    public class ShopItemDisplay<T> : SelectableBaseItemDisplay,
-        ISelectableItemDisplay<ItemService.ShopItem<T>> where T: BaseItem, new() {
+    public class ShopItemDisplay<T> : 
+        SelectableItemDisplay<ItemService.ShopItem<T>> where T: BaseItem, new() {
 
         /// <summary>
         /// 常量定义
@@ -26,29 +26,36 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
+        public BaseItemDisplay itemDisplay;
+
         public StarsDisplay starsDisplay;
 
-        public Image priceTag;
-        public Text priceText;
+        public Image icon, priceTag;
+        public Text name, priceText;
 
         public Texture2D goldTag, ticketTag, boundTicketTag;
-        
-        /// <summary>
-        /// 内部变量声明
-        /// </summary>
 
         #region 初始化
 
         /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            initializeDrawFuncs();
+        }
+
+        /// <summary>
         /// 初始化绘制函数
         /// </summary>
-        protected override void initializeDrawFuncs() {
-            registerItemType<T>(drawItem);
+        protected void initializeDrawFuncs() {
+            itemDisplay.registerItemType<T>(drawItem);
         }
 
         #endregion
 
         #region 界面控制
+
         /// <summary>
         /// 绘制基本信息
         /// </summary>
@@ -69,19 +76,18 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 绘制物品价格
         /// </summary>
-        /// <param name="obj"></param>
-        void drawPrice() {
-            if (shopItem == null) return;
-            var price = shopItem.price;
+        /// <param name="item">商品</param>
+        void drawPrice(ItemService.ShopItem<T> item) {
+            var price = item.price;
             if (price.gold > 0) {
                 priceText.text = price.gold.ToString();
                 setPriceTag(goldTag);
-            } else if (price.ticket > 0) {
-                priceText.text = price.ticket.ToString();
-                setPriceTag(ticketTag);
             } else if (price.boundTicket > 0) {
                 priceText.text = price.boundTicket.ToString();
                 setPriceTag(boundTicketTag);
+            } else if (price.ticket > 0) {
+                priceText.text = price.ticket.ToString();
+                setPriceTag(ticketTag);
             } else {
                 priceText.text = "";
                 setPriceTag(null);
@@ -106,8 +112,17 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <param name="item">物品</param>
         void drawItem(T item) {
-            drawPrice();
             drawBaseInfo(item); 
+        }
+
+        /// <summary>
+        /// 绘制确切物品
+        /// </summary>
+        /// <param name="shopItem"></param>
+        protected override void drawExactlyItem(ItemService.ShopItem<T> shopItem) {
+            base.drawExactlyItem(shopItem);
+            itemDisplay.setItem(shopItem.item());
+            drawPrice(shopItem);
         }
 
         /// <summary>
@@ -115,12 +130,13 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
+            name.text = priceText.text = "";
+            icon.gameObject.SetActive(false);
             priceTag.gameObject.SetActive(false);
-            priceText.text = "";
         }
 
         #endregion
-
+        /*
         #region 接口实现
 
         /// <summary>
@@ -178,5 +194,6 @@ namespace UI.ShopScene.Controls {
         }
         
         #endregion
+    */
     }
 }

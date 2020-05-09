@@ -1,8 +1,8 @@
 ﻿using System;
 
-using Core.Data;
+using UnityEngine;
 
-using ExermonModule.Data;
+using Core.Data;
 
 using ItemModule.Data;
 using ItemModule.Services;
@@ -39,9 +39,15 @@ namespace UI.ShopScene.Controls {
         public abstract ShopItemDetail<T> itemDetail { get; set; }
 
         /// <summary>
+        /// 商品缓存
+        /// </summary>
+        public ItemService.ShopItem<T>[] shopItems { get; set; } = null;
+
+        /// <summary>
         /// 外部系统设置
         /// </summary>
         protected DataService dataSer;
+        protected ItemService itemSer;
 
         #region 初始化
 
@@ -59,6 +65,10 @@ namespace UI.ShopScene.Controls {
         void configureSelectors() {
             typeSelector.configure(generateTypesData());
             starSelector.configure(generateStarsData());
+            typeSelector.onChanged = onSelectorChanged;
+            starSelector.onChanged = onSelectorChanged;
+            //typeSelector.setValue(UnlimitedIndex);
+            //starSelector.setValue(UnlimitedIndex);
         }
 
         /// <summary>
@@ -72,7 +82,7 @@ namespace UI.ShopScene.Controls {
 
             res[0] = new Tuple<int, string>(UnlimitedIndex, UnlimitedText);
             for (int i = 1; i < res.Length; ++i) {
-                var _data = data[i];
+                var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
                     _data.getID(), _data.name);
             }
@@ -112,7 +122,7 @@ namespace UI.ShopScene.Controls {
 
             res[0] = new Tuple<int, string>(UnlimitedIndex, UnlimitedText);
             for (int i = 1; i < res.Length; ++i) {
-                var _data = data[i];
+                var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
                     _data.getID(), _data.name);
             }
@@ -126,23 +136,55 @@ namespace UI.ShopScene.Controls {
         protected override void initializeSystems() {
             base.initializeSystems();
             dataSer = DataService.get();
+            itemSer = ItemService.get();
         }
 
         #endregion
 
-        #region 启动
+        #region 启动/结束视窗
 
         /// <summary>
         /// 启动视窗
         /// </summary>
         /// <param name="items"></param>
-        public void startView(ItemService.ShopItem<T>[] items) {
-            startView(); setItems(items);
+        public override void startView() {
+            if (shopItems == null)
+                Debug.Log("startView: " + name + ": null");
+            else
+                Debug.Log("startView: " + name + ": " + string.Join(", ", (object[])shopItems));
+            if (shopItems == null || shopItems.Length == 0) {
+                base.startView(); itemSer.getShop<T>(setItems);
+            } else startView(shopItems);
+        }
+
+        /// <summary>
+        /// 启动视窗
+        /// </summary>
+        /// <param name="items"></param>
+        void startView(ItemService.ShopItem<T>[] items) {
+            base.startView(); itemDetail.startView();
+            setItems(shopItems = items);
+        }
+
+        /// <summary>
+        /// 结束视窗
+        /// </summary>
+        public override void terminateView() {
+            base.terminateView();
+            itemDetail.terminateView();
         }
 
         #endregion
 
         #region 数据控制
+
+        /// <summary>
+        /// 设置商品集
+        /// </summary>
+        /// <param name="items"></param>
+        public override void setItems(ItemService.ShopItem<T>[] items) {
+            shopItems = items; base.setItems(items);
+        }
 
         /// <summary>
         /// 获取物品帮助组件
@@ -163,10 +205,23 @@ namespace UI.ShopScene.Controls {
             var item = shopItem.item() as LimitedItem;
 
             if (item != null) {
-                var starIndex = starSelector.getIndex();
+                var starIndex = starSelector.getValueId();
+                Debug.Log("starIndex: " + starIndex);
                 return starIndex == UnlimitedIndex || 
                     starIndex == item.starId;
             } else return true;
+        }
+
+        /// <summary>
+        /// 筛选器变化回调
+        /// </summary>
+        /// <param name="index"></param>
+        void onSelectorChanged(Tuple<int, string> data) {
+            if (data!=null)
+                Debug.Log("onSelectorChanged: " + name + ": " + data.Item1);
+            else
+                Debug.Log("onSelectorChanged: " + name + ": null");
+            setItems(shopItems);
         }
 
         #endregion

@@ -15,6 +15,7 @@ using GameModule.Services;
 
 using ItemModule.Data;
 using ExermonModule.Data;
+using UnityEngine;
 
 /// <summary>
 /// 物品模块服务
@@ -614,7 +615,7 @@ namespace ItemModule.Services {
         public void buyItem(int type, int itemId, int count, int buyType,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData(); data["type"] = type;
-            data["item_id"] = itemId; data["count"] = count; data["buy_typw"] = buyType;
+            data["item_id"] = itemId; data["count"] = count; data["buy_type"] = buyType;
             sendRequest(Oper.BuyItem, data, onSuccess, onError, uid: true);
         }
 
@@ -631,6 +632,7 @@ namespace ItemModule.Services {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var items = DataLoader.load<ShopItem<T>[]>(res, "items");
+                Debug.Log("GetShop: " + string.Join(",", (object[])items));
                 onSuccess?.Invoke(items);
             };
 

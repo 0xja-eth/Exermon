@@ -32,6 +32,8 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
+        public RectTransform layoutContent;
+
         public ShopWindow shopWindow;
 
         public Text description, priceText;
@@ -40,11 +42,14 @@ namespace UI.ShopScene.Controls {
 
         public MultParamsDisplay detail;
 
-        /// <summary>
-        /// 内部变量定义
-        /// </summary>
-
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+        }
 
         /// <summary>
         /// 初始化绘制函数
@@ -155,19 +160,19 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <param name="container"></param>
         public void startView(ItemService.ShopItem<T> item, int index = -1) {
-            shopItem = item; startView(item.item(), index);
+            shopItem = item; startView(item?.item(), index);
         }
 
         public void setItem(ItemService.ShopItem<T> item, int index = -1, bool force = false) {
-            shopItem = item; setItem(item.item(), index, force);
+            shopItem = item; setItem(item?.item(), index, force);
         }
 
         public void startView(ItemService.ShopItem<T> item) {
-            shopItem = item; startView(item.item());
+            shopItem = item; startView(item?.item());
         }
 
         public void setItem(ItemService.ShopItem<T> item, bool force = false) {
-            shopItem = item; setItem(item.item(), force);
+            shopItem = item; setItem(item?.item(), force);
         }
 
         ItemService.ShopItem<T> IItemDisplay<ItemService.ShopItem<T>>.getItem() {

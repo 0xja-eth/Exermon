@@ -2,9 +2,7 @@
 using Core.Systems;
 using Core.UI;
 
-using PlayerModule.Services;
-
-using UI.PackScene.Windows;
+using UI.ShopScene.Windows;
 
 /// <summary>
 /// 背包场景
@@ -23,12 +21,7 @@ namespace UI.ShopScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public PackWindow packWindow;
-
-        /// <summary>
-        /// 内部系统声明
-        /// </summary>
-        PlayerService playerSer;
+        public ShopWindow shopWindow;
 
         #region 初始化
 
@@ -37,17 +30,9 @@ namespace UI.ShopScene {
         /// </summary>
         /// <returns>场景名</returns>
         public override string sceneName() {
-            return SceneSystem.Scene.PackScene;
+            return SceneSystem.Scene.ShopScene;
         }
-
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
-            base.initializeSystems();
-            playerSer = PlayerService.get();
-        }
-
+        
         /// <summary>
         /// 开始
         /// </summary>
@@ -64,7 +49,7 @@ namespace UI.ShopScene {
         /// 刷新场景
         /// </summary>
         public void refresh() {
-            playerSer.getPlayerPack(packWindow.startWindow);
+            shopWindow.startWindow();
         }
 
         #endregion

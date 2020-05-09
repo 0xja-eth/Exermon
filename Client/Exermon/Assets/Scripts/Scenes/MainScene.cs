@@ -111,6 +111,8 @@ namespace UI.MainScene {
                     sceneName = SceneSystem.Scene.StatusScene; break;
                 case BuildingType.BattleCenter:
                     sceneName = SceneSystem.Scene.BattleStartScene; break;
+                case BuildingType.Shop:
+                    sceneName = SceneSystem.Scene.ShopScene; break;
                 case BuildingType.Library:
                     onLibraryClick(); break;
             }

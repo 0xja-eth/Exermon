@@ -14,7 +14,7 @@ class Service:
 	@classmethod
 	def backend(cls, auth: str):
 		# 返回数据：无
-		ViewUtils.ensureAuth(auth[0])
+		ViewUtils.ensureAuth(auth)
 
 		return 'backend_admin.html'
 

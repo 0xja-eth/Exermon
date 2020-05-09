@@ -43,6 +43,35 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// 外部系统设置
         /// </summary>
         ExermonService exerSer;
+        DataService dataSer;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            configureParamsGroup();
+        }
+
+        /// <summary>
+        /// 配置属性组
+        /// </summary>
+        void configureParamsGroup() {
+            var params_ = dataSer.staticData.configure.baseParams;
+            paramsInfo.configure(params_);
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            dataSer = DataService.get();
+        }
+
+        #endregion
 
         #region 数据控制
 
@@ -59,6 +88,8 @@ namespace UI.PackScene.Controls.TargetSelect {
             if (item != null)
                 CalcService.GeneralItemEffectProcessor.
                     process(item, count, preview);
+
+            preview.refresh();
         }
 
         #endregion
@@ -115,7 +146,7 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawExpInfo(PlayerExermon playerExer) {
-            expBar.setValue(playerExer, "preview_exp");
+            expBar?.setValue(playerExer, "preview_exp");
         }
         
         /// <summary>
@@ -124,9 +155,9 @@ namespace UI.PackScene.Controls.TargetSelect {
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
             name.text = level.text = "";
-            battlePoint.clearValue();
-            paramsInfo.clearValues();
-            expBar.clearValue();
+            battlePoint?.clearValue();
+            paramsInfo?.clearValues();
+            expBar?.clearValue();
         }
 
         #endregion

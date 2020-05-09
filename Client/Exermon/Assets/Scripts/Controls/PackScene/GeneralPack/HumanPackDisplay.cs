@@ -56,6 +56,10 @@ namespace UI.PackScene.Controls.GeneralPack {
         void configureSelectors() {
             typeSelector.configure(generateTypesData());
             starSelector.configure(generateStarsData());
+            typeSelector.setValue(UnlimitedIndex);
+            starSelector.setValue(UnlimitedIndex);
+            //typeSelector.onChanged = onSelectorChanged;
+            //starSelector.onChanged = onSelectorChanged;
         }
 
         /// <summary>
@@ -80,7 +84,7 @@ namespace UI.PackScene.Controls.GeneralPack {
 
             res[0] = new Tuple<int, string>(UnlimitedIndex, UnlimitedText);
             for (int i = 1; i < res.Length; ++i) {
-                var _data = data[i];
+                var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
                     _data.getID(), _data.name);
             }
@@ -113,14 +117,14 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <param name="packItem">物品</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected override bool isItemIncluded(HumanPackItem packItem) {
-            if (!base.isIncluded(packItem)) return false;
+            if (!base.isItemIncluded(packItem)) return false;
             bool flag = true;
             // 判断类型
-            var typeIndex = typeSelector.getIndex();
+            var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)
                 flag = typeIndex == ItemIndex;
             // 判断星级
-            var starIndex = starSelector.getIndex();
+            var starIndex = starSelector.getValueId();
             if (starIndex != UnlimitedIndex)
                 flag = starIndex == packItem.item().starId;
 
@@ -133,18 +137,26 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <param name="packEquip">装备</param>
         /// <returns>返回指定装备能否包含在容器中</returns>
         protected override bool isEquipIncluded(HumanPackEquip packEquip) {
-            if (!base.isIncluded(packEquip)) return false;
+            if (!base.isEquipIncluded(packEquip)) return false;
             bool flag = true;
             // 判断类型
-            var typeIndex = typeSelector.getIndex();
+            var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)
                 flag = typeIndex == EquipIndex;
             // 判断星级
-            var starIndex = starSelector.getIndex();
+            var starIndex = starSelector.getValueId();
             if (starIndex != UnlimitedIndex)
                 flag = starIndex == packEquip.item().starId;
 
             return flag;
+        }
+
+        /// <summary>
+        /// 筛选器变化回调
+        /// </summary>
+        /// <param name="index"></param>
+        void onSelectorChanged(Tuple<int, string> data) {
+            requestRefresh();
         }
 
         #endregion

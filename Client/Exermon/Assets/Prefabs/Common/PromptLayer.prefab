@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1370592253303250944}
   - component: {fileID: 1370592253303250950}
   - component: {fileID: 1370592253303250945}
+  - component: {fileID: 4400701592633758072}
   m_Layer: 5
   m_Name: PromptLayer
   m_TagString: Untagged
@@ -78,6 +79,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4400701592633758072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370592253303250947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c89f80f76a8504fad506da60cb31ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  contents: []
 --- !u!1001 &1370592254209943221
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -23,6 +23,11 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void setItem(T item, int index = -1, bool force = false);
 
+        /// <summary>
+        /// 清除物品
+        /// </summary>
+        void clearItem();
+
     }
 
     /// <summary>

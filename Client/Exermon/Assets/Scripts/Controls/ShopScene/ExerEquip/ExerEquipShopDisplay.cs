@@ -53,7 +53,7 @@ namespace UI.ShopScene.Controls.ExerEquip {
         protected override bool isIncluded(ItemService.ShopItem<ExerEquip> shopItem) {
             if (!base.isIncluded(shopItem)) return false;
             
-            var typeIndex = typeSelector.getIndex();
+            var typeIndex = typeSelector.getValueId();
             return typeIndex == UnlimitedIndex || 
                 typeIndex == shopItem.item().eType;
         }

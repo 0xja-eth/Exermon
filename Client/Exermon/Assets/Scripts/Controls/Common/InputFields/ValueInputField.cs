@@ -56,6 +56,9 @@ namespace UI.Common.Controls.InputFields {
         /// 配置触发器
         /// </summary>
         void setupEventTrigger() {
+            decrease.triggers.Clear();
+            increase.triggers.Clear();
+
             addEventTrigger(decrease,
                 EventTriggerType.PointerDown, onDecreaseDown);
             addEventTrigger(decrease,
@@ -79,7 +82,6 @@ namespace UI.Common.Controls.InputFields {
             entry.callback = new EventTrigger.TriggerEvent();
             entry.callback.AddListener(func);
             entry.eventID = eventID;
-            trigger.triggers.Clear();
             trigger.triggers.Add(entry);
         }
 
@@ -91,6 +93,7 @@ namespace UI.Common.Controls.InputFields {
         public void configure(int minValue, int maxValue) {
             this.minValue = minValue;
             this.maxValue = maxValue;
+            requestRefresh();
             configure();
         }
 
@@ -149,6 +152,8 @@ namespace UI.Common.Controls.InputFields {
         /// <param name="value"></param>
         protected override bool assignValue(int value) {
             var oldValue = this.value;
+            Debug.Log("min, max: " + minValue + ", " + maxValue);
+
             this.value = Mathf.Clamp(value, minValue, maxValue);
             return oldValue != this.value;
         }
@@ -194,6 +199,7 @@ namespace UI.Common.Controls.InputFields {
         /// 减少按钮点击按下回调
         /// </summary>
         void onDecreaseDown(BaseEventData e) {
+            Debug.Log("onDecreaseDown: " + decreasing);
             decreasing = true; decreaseCnt = 0;
         }
 
@@ -201,6 +207,7 @@ namespace UI.Common.Controls.InputFields {
         /// 减少按钮点击释放回调
         /// </summary>
         void onDecreaseUp(BaseEventData e) {
+            Debug.Log("onDecreaseUp: " + decreasing);
             if (!decreasing) return; decreasing = false;
             decreaseValue(decreaseCnt > longStepTime);
             decreaseCnt = 0;
@@ -210,6 +217,7 @@ namespace UI.Common.Controls.InputFields {
         /// 增加按钮点击按下回调
         /// </summary>
         void onIncreaseDown(BaseEventData e) {
+            Debug.Log("onIncreaseDown: " + increasing);
             increasing = true; increaseCnt = 0;
         }
 
@@ -217,6 +225,7 @@ namespace UI.Common.Controls.InputFields {
         /// 增加按钮点击释放回调
         /// </summary>
         void onIncreaseUp(BaseEventData e) {
+            Debug.Log("onIncreaseUp: " + increasing);
             if (!increasing) return; increasing = false;
             increaseValue(increaseCnt > longStepTime);
             increaseCnt = 0;

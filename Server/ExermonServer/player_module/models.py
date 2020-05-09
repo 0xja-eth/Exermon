@@ -249,9 +249,13 @@ class PlayerMoney(Currency):
 	def lose(self, currency: Currency = None,
 			 gold=0, ticket=0, bound_ticket=0):
 
-		self.gain(currency=-currency,
-				  gold=-gold, ticket=-ticket,
-				  bound_ticket=-bound_ticket)
+		if currency is None:
+			self.gain(gold=-gold, ticket=-ticket,
+					  bound_ticket=-bound_ticket)
+		else:
+			self.gain(currency=-currency,
+					  gold=-gold, ticket=-ticket,
+					  bound_ticket=-bound_ticket)
 
 
 # ===================================================
@@ -684,6 +688,8 @@ class Player(CacheableModel):
 			base['city'] = self.city
 			base['contact'] = self.contact
 			base['description'] = self.description
+
+			base['money'] = money
 
 			base['battle_info'] = self._battleInfo()
 			base['question_info'] = self._questionInfo()

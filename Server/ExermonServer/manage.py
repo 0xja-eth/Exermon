@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
-import sys
+import sys, io
+
+# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ExermonServer.settings')

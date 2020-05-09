@@ -43,6 +43,7 @@ namespace UI.PackScene.Windows {
         /// </summary>
         void configureExerHub() {
             exerHub.configure(playerSer.player.packContainers.exerHub);
+            exerHub.select(0);
         }
 
         #endregion

@@ -124,7 +124,7 @@ class CacheableModel(models.Model):
 
 		if not self.saved:
 			super().save(**kwargs)
-			print(str(self)+" saved!")
+			# print(str(self)+" saved!")
 
 		self.saved = True
 		self._saveCache()

@@ -25,13 +25,14 @@ namespace Core.UI.Utils {
         /// </summary>
         public const string AlertWindowKey = "AlertWindow";
         public const string LoadingWindowKey = "LoadingWindow";
+        public const string RebuildControllerKey = "RebuildController";
 
         /// <summary>
         /// 提示窗口（脚本）
         /// </summary>
         public static AlertWindow alertWindow {
             get {
-                return (AlertWindow)getSceneObject(AlertWindowKey);
+                return getSceneObject(AlertWindowKey) as AlertWindow;
             }
             set {
                 depositSceneObject(AlertWindowKey, value);
@@ -43,10 +44,22 @@ namespace Core.UI.Utils {
         /// </summary>
         public static LoadingWindow loadingWindow {
             get {
-                return (LoadingWindow)getSceneObject(LoadingWindowKey);
+                return getSceneObject(LoadingWindowKey) as LoadingWindow;
             }
             set {
                 depositSceneObject(LoadingWindowKey, value);
+            }
+        }
+
+        /// <summary>
+        /// 加载窗口（脚本）
+        /// </summary>
+        public static RebuildController rebuildController {
+            get {
+                return getSceneObject(RebuildControllerKey) as RebuildController;
+            }
+            set {
+                depositSceneObject(RebuildControllerKey, value);
             }
         }
 
@@ -75,10 +88,12 @@ namespace Core.UI.Utils {
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
         public static void initialize(string scene,
-            AlertWindow alertWindow = null, LoadingWindow loadingWindow = null) {
+            AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
+            RebuildController rebuildController = null) {
             Debug.Log("initialize Scene: " + scene);
             initializeSystems();
-            initializeScene(scene, alertWindow, loadingWindow);
+            initializeScene(scene, alertWindow, 
+                loadingWindow, rebuildController);
         }
 
         /// <summary>
@@ -97,12 +112,13 @@ namespace Core.UI.Utils {
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
         static void initializeScene(string scene,
-            AlertWindow alertWindow = null, 
-            LoadingWindow loadingWindow = null) {
+            AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
+            RebuildController rebuildController = null) {
             if (sceneSys.currentScene() != scene)
                 sceneSys.gotoScene(scene);
             SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
+            SceneUtils.rebuildController = rebuildController;
         }
 
         #region 场景管理
@@ -235,6 +251,14 @@ namespace Core.UI.Utils {
                     setupLoadingProgress(req.progress);
                 else startLoadingWindow(req.text);
             else endLoadingWindow();
+        }
+
+        /// <summary>
+        /// 申请重建布局
+        /// </summary>
+        /// <param name="rect"></param>
+        public static void registerUpdateLayout(RectTransform rect) {
+            rebuildController?.registerUpdateLayout(rect);
         }
 
         #endregion

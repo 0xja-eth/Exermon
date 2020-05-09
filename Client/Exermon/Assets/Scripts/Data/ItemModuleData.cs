@@ -391,6 +391,7 @@ namespace ItemModule.Data {
             res["battle_use"] = battleUse;
             res["menu_use"] = menuUse;
             res["adventure_use"] = adventureUse;
+            res["consumable"] = consumable;
 
             res["occasion"] = occasion;
             res["usable"] = occasion == UnusableText;

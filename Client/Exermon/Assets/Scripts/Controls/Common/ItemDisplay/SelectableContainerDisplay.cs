@@ -183,7 +183,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 启动视窗
         /// </summary>
-        public virtual void startView(int index = 0) {
+        public override void startView() {
+            startView(0);
+        }
+        public virtual void startView(int index) {
             base.startView();
             select(index);
         }
@@ -283,13 +286,14 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 设置物品集
         /// </summary>
         /// <param name="items">物品集</param>
-        public void setItems(T[] items) {
+        public virtual void setItems(T[] items) {
             deselect(); clearChecks();
-            var tmpItems = new List<T>(items);
+            var tmpItems = items == null ? 
+                new List<T>() : new List<T>(items);
             this.items = tmpItems.FindAll(isIncluded);
             onItemsChanged();
         }
-        public void setItems(List<T> items) {
+        public virtual void setItems(List<T> items) {
             setItems(items.ToArray());
         }
 
@@ -791,7 +795,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected virtual void drawEmptyHelp() {
             var detail = getItemDetail();
-            if (detail != null) detail.startView(null);
+            if (detail != null) detail.clearItem();
         }
 
         /// <summary>
@@ -800,7 +804,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         protected virtual void drawExactlyItemHelp(T item) {
             var detail = getItemDetail();
-            if (detail != null) detail.startView(item, selectedIndex);
+            if (detail != null) detail.setItem(item, selectedIndex);
         }
 
         /// <summary>

@@ -559,6 +559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alertWindow: {fileID: 1641558033}
   loadingWindow: {fileID: 1641558034}
+  rebuildController: {fileID: 1641558035}
   topInfoDisplay: {fileID: 431829468}
   selfBattler: {fileID: 190695943}
   oppoBattler: {fileID: 338044499}
@@ -2702,6 +2703,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed8d6e240d3aeb1418596be42da8c1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1641558035 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4400701592633758072, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1641558031}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c89f80f76a8504fad506da60cb31ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1647653193

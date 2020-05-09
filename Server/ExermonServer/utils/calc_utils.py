@@ -1154,6 +1154,8 @@ class GeneralItemEffectProcessor:
 			for i in range(count):
 				eval(params[0])
 
+		target.save()
+
 
 # ===================================================
 # 物品效果处理类

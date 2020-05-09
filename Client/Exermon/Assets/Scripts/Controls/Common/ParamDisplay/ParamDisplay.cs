@@ -288,7 +288,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         public virtual void setKey(string key, 
             JsonData value, bool refresh = false) {
-            data[key] = value;
+            if (data != null) data[key] = value;
             requestRefresh(refresh);
         }
 

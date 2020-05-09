@@ -53,7 +53,7 @@ namespace UI.ShopScene.Controls.HumanItem {
         protected override bool isIncluded(ItemService.ShopItem<HumanItem> shopItem) {
             if (!base.isIncluded(shopItem)) return false;
 
-            var typeIndex = typeSelector.getIndex();
+            var typeIndex = typeSelector.getValueId();
             return typeIndex == UnlimitedIndex || 
                 typeIndex == shopItem.item().iType;
         }

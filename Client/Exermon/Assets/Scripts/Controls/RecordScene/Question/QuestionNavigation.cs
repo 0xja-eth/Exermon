@@ -115,6 +115,10 @@ namespace UI.RecordScene.Controls.Question {
             setItem(item, -1, _);
         }
 
+        public void clearItem() {
+            setItem(null, -1);
+        }
+
         /// <summary>
         /// 开启视窗
         /// </summary>

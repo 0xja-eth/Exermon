@@ -32,7 +32,8 @@ namespace ExermonModule.Data {
     /// <summary>
     /// 艾瑟萌数据
     /// </summary>
-    public class Exermon : BaseItem, ParamDisplay.IDisplayDataArrayConvertable {
+    public class Exermon : BaseItem, 
+        ParamDisplay.IDisplayDataArrayConvertable {
 
         /// <summary>
         /// 属性
@@ -1028,7 +1029,7 @@ namespace ExermonModule.Data {
             var plusRate = plusParamRate(paramId).value;
             var value = CalcService.ExermonParamCalc.calc(
                 base_, rate, level, plusVal, plusRate);
-            value = Math.Round(value);
+            // value = Math.Round(value);
             return new ParamData(paramId, value);
         }
 
@@ -1059,7 +1060,7 @@ namespace ExermonModule.Data {
             var prarm = new PlusParamData(paramId);
             foreach (var _param in plusParamValues)
                 if (_param.paramId == paramId)
-                    prarm = (PlusParamData)(prarm + _param);
+                    prarm.setValue((prarm + _param));
             return prarm;
         }
 
@@ -1072,7 +1073,7 @@ namespace ExermonModule.Data {
             var prarm = new PlusParamRateData(paramId);
             foreach (var _param in plusParamRates)
                 if (_param.paramId == paramId)
-                    prarm = (PlusParamRateData)(prarm * _param);
+                    prarm.setValue(prarm * _param);
             return prarm;
         }
 

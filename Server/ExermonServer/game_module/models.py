@@ -962,6 +962,7 @@ class GameConfigure(models.Model):
 		exer_stars = ModelUtils.objectsToDict(self.exerstar_set.all())
 		exer_gift_stars = ModelUtils.objectsToDict(self.exergiftstar_set.all())
 		ques_stars = ModelUtils.objectsToDict(self.questionstar_set.all())
+		item_stars = ModelUtils.objectsToDict(self.itemstar_set.all())
 		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
 		result_judges = ModelUtils.objectsToDict(self.battleresultjudge_set.all())
 
@@ -1019,6 +1020,7 @@ class GameConfigure(models.Model):
 			'exer_stars': exer_stars,
 			'exer_gift_stars': exer_gift_stars,
 			'ques_stars': ques_stars,
+			'item_stars': item_stars,
 			'comp_ranks': comp_ranks,
 			'result_judges': result_judges,
 		}

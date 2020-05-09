@@ -195,25 +195,25 @@ namespace UI.ShopScene.Windows {
         public void refreshView() {
             clearView();
             switch (view) {
-                case View.HumanItem: onHumanPack(); break;
-                case View.ExerEquip: onExerPack(); break;
+                case View.HumanItem: onHumanItemShop(); break;
+                case View.ExerEquip: onExerEquipShop(); break;
             }
         }
 
         /// <summary>
-        /// 人类背包
+        /// 人类物品商店
         /// </summary>
-        void onHumanPack() {
-            itemSer.getShop<HumanItem>(humanItemShop.startView);
+        void onHumanItemShop() {
+            humanItemShop.startView();
         }
 
         /// <summary>
-        /// 艾瑟萌背包
+        /// 艾瑟萌装备商店
         /// </summary>
-        void onExerPack() {
-            itemSer.getShop<ExerEquip>(exerEquipShop.startView);
+        void onExerEquipShop() {
+            exerEquipShop.startView();
         }
-        
+
         /// <summary>
         /// 刷新金钱
         /// </summary>

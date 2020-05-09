@@ -24,6 +24,7 @@ namespace Core.UI {
         /// </summary>
         public AlertWindow alertWindow; // 提示窗口
         public LoadingWindow loadingWindow; // 加载窗口
+        public RebuildController rebuildController; // 布局重建器
 
         /// <summary>
         /// 初始化标志
@@ -60,7 +61,8 @@ namespace Core.UI {
         /// 初始化
         /// </summary>
         void initializeSceneUtils() {
-            SceneUtils.initialize(sceneName(), alertWindow, loadingWindow);
+            SceneUtils.initialize(sceneName(), alertWindow, 
+                loadingWindow, rebuildController);
             SceneUtils.depositSceneObject("Scene", this);
         }
 

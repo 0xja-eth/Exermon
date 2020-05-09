@@ -106,6 +106,10 @@ namespace UI.Common.Controls.QuestionDisplay {
             setItem(item, -1, _);
         }
 
+        public void clearItem() {
+            setItem(null, -1);
+        }
+
         public void startView(Question item, int _ = -1) {
             startView(); setItem(item, _, true);
         }

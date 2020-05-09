@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using GameModule.Services;
+
 using ItemModule.Data;
 using PlayerModule.Data;
 using ExermonModule.Data;
@@ -34,14 +36,40 @@ namespace UI.PackScene.Controls.GeneralPack {
         public Image icon;
 
         public MultParamsDisplay itemDetail, equipDetail;
+        public ParamDisplaysGroup paramsGroup;
 
         public GameObject equip, use, discard, sell;
-
+        
         /// <summary>
-        /// 内部变量定义
+        /// 外部系统设置
         /// </summary>
+        DataService dataSer;
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            configureParamsGroup();
+        }
+
+        /// <summary>
+        /// 配置属性组
+        /// </summary>
+        void configureParamsGroup() {
+            var params_ = dataSer.staticData.configure.baseParams;
+            paramsGroup.configure(params_);
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            dataSer = DataService.get();
+        }
 
         /// <summary>
         /// 初始化绘制函数

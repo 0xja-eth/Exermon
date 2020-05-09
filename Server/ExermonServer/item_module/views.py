@@ -168,8 +168,9 @@ class Service:
 		if target is not None:
 			target = InterfaceCommon.convertDataType(target, 'int')
 			if target > 0:
-				target_item = Common.getContItem(PlayerExermon,
-					 player=player, id=target, error=ErrorType.InvalidUseTarget)
+				target_item = Common.getContItem(cla=PlayerExermon,
+					 player=player, id=target, include_equipped=True,
+					 error=ErrorType.InvalidUseTarget)
 
 		ViewUtils.ensureEnumData(occasion, ItemUseOccasion, ErrorType.InvalidOccasion)
 
@@ -177,12 +178,12 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+		cont_item: PackContItem = Common.getContItem(type_=ci_type, id=contitem_id, player=player)
 
 		cont_item.useItem(ItemUseOccasion(occasion), count, target=target_item)
 
 		# 使用物品
-		GeneralItemEffectProcessor.process(cont_item, player, target_item)
+		GeneralItemEffectProcessor.process(cont_item, player, count, target_item)
 
 		return {'player': player.convertToDict(type="status")}
 
@@ -197,7 +198,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+		cont_item: PackContItem = Common.getContItem(type_=ci_type, id=contitem_id, player=player)
 
 		Check.ensureItemDiscardable(cont_item.item)
 
@@ -216,7 +217,7 @@ class Service:
 
 		ViewUtils.ensureObjectType(container, PackContainer, ErrorType.IncorrectContainerType)
 
-		cont_item: PackContItem = Common.getContItem(contitem_id, type=ci_type, player=player)
+		cont_item: PackContItem = Common.getContItem(type_=ci_type, id=contitem_id, player=player)
 
 		item: LimitedItem = cont_item.item
 

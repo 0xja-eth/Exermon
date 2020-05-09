@@ -86,6 +86,7 @@ namespace UI.Common.Controls.InputFields {
         /// 创建所有选项
         /// </summary>
         void createOptions() {
+            clearOptions();
             foreach (var opt in options)
                 createOption(opt.Item2);
             value = options[0];
@@ -166,7 +167,8 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>项</returns>
         public string getValueText() {
-            return getValue().Item2;
+            var value = getValue();
+            return value != null ? value.Item2 : "";
         }
 
         /// <summary>
@@ -174,7 +176,8 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>项</returns>
         public int getValueId() {
-            return getValue().Item1;
+            var value = getValue();
+            return value != null ? value.Item1 : 0;
         }
 
         /// <summary>
@@ -184,9 +187,9 @@ namespace UI.Common.Controls.InputFields {
         public void setValue(int id, bool check = true, bool emit = true) {
             for (int i = 0; i < options.Length; i++)
                 if (options[i].Item1 == id) {
-                    setValue(options[i], check, emit); break;
+                    setValue(options[i], check, emit); return;
                 }
-            base.setValue(null, check, emit);
+            setValue(null, check, emit);
         }
 
         /// <summary>
@@ -196,9 +199,9 @@ namespace UI.Common.Controls.InputFields {
         public void setValue(string text, bool check = true, bool emit = true) {
             for (int i = 0; i < options.Length; i++)
                 if (options[i].Item2 == text) {
-                    setValue(options[i], check, emit); break;
+                    setValue(options[i], check, emit); return;
                 }
-            base.setValue(null, check, emit);
+            setValue(null, check, emit);
         }
         /*
         /// <summary>

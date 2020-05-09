@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.UI.Utils;
+
 namespace Core.UI {
 
     /// <summary>
@@ -54,7 +56,7 @@ namespace Core.UI {
         /// <summary>
         /// 布局稳定帧
         /// </summary>
-        const int LayoutStableFrame = 4;
+        const int LayoutStableFrame = 10;
 
         /// <summary>
         /// 外部组件设置
@@ -147,34 +149,9 @@ namespace Core.UI {
             registerUpdateLayout((RectTransform)rect);
         }
         public void registerUpdateLayout(RectTransform rect) {
-            doRoutine(updateLayout(rect));
+            SceneUtils.registerUpdateLayout(rect);
         }
-
-        /// <summary>
-        /// 更新布局（仅用于挂载 Layout 的物体）
-        /// </summary>
-        /// <param name="rect">物体 RectTransform</param>
-        /// <returns></returns>
-        IEnumerator updateLayout(RectTransform rect) {
-            int cnt = 0;
-            bool active = rect.gameObject.activeInHierarchy;
-            float width = rect.rect.width, height = rect.rect.height;
-            while (true) {
-                if (++cnt <= LayoutStableFrame) 
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-
-                bool newActive = rect.gameObject.activeInHierarchy;
-                float newWidth = rect.rect.width, newHeight = rect.rect.height;
-                if (newActive != active || 
-                    newWidth != width || newHeight != height) {
-                    cnt = 0; newActive = active;
-                    newWidth = width; newHeight = height;
-                }
-
-                yield return new WaitForEndOfFrame();
-            }
-        }
-
+        
         #endregion
 
         #region 启动/结束控制
@@ -183,6 +160,7 @@ namespace Core.UI {
         /// 启动视窗
         /// </summary>
         public virtual void startView() {
+            Debug.Log("startView: " + name);
             initialize(); showView();
         }
 
@@ -198,6 +176,7 @@ namespace Core.UI {
         /// 结束视窗
         /// </summary>
         public virtual void terminateView() {
+            Debug.Log("terminateView: " + name);
             hideView();
         }
 

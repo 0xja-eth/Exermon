@@ -67,14 +67,16 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         protected override void initializeEvery() {
             base.initializeEvery();
-            setupNumberInput();
+            setupBuySelector();
         }
 
         /// <summary>
-        /// 配置输入
+        /// 配置购买选择器
         /// </summary>
-        void setupNumberInput() {
-            numberInput.configure(minCount(), maxCount());
+        void setupBuySelector() {
+            var shopItem = operShopItem();
+            buySelector.configure(shopItem.price);
+            buySelector.onChanged = updateNumberInput;
         }
 
         /// <summary>
@@ -97,6 +99,13 @@ namespace UI.ShopScene.Windows {
         #endregion
 
         #region 数据控制
+
+        /// <summary>
+        /// 更新输入配置
+        /// </summary>
+        void updateNumberInput() {
+            numberInput.configure(minCount(), maxCount());
+        }
 
         /// <summary>
         /// 操作容器
@@ -194,6 +203,7 @@ namespace UI.ShopScene.Windows {
         /// 绘制出售状态
         /// </summary>
         void drawPrice() {
+            Debug.Log("currentCount = " + currentCount());
             buySelector.setCount(currentCount());
         }
 
@@ -209,7 +219,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            buySelector.clearItem();
+            buySelector.clearValue();
             numberInput.requestClear(true);
         }
 
@@ -222,8 +232,9 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         public virtual void onBuy() {
             var count = currentCount();
+            var buyType = buySelector.getBuyType();
             if (count <= 0) terminateWindow();
-            else shopWindow.buyItem(count);
+            else shopWindow.buyItem(buyType, count);
         }
         
         #endregion

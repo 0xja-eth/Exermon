@@ -238,11 +238,11 @@
       <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplay.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplaysGroup" Collapsed="true">
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplaysGroupWrapper" Collapsed="true">
     <Position X="39.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAA4AAAAAwAAAAAAAAAACAAAAAAA=</HashCode>
-      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplaysGroup.cs</FileName>
+      <HashCode>QAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplaysGroupWrapper.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UI.Common.Controls.ParamDisplays.RankStarsDisplay" Collapsed="true">
@@ -304,7 +304,7 @@
   <Class Name="UI.Common.Controls.QuestionDisplay.QuesChoiceContainer" Collapsed="true">
     <Position X="3" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAIAEQAAAIAACBAEAAAAAQAQEEAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAAIAEQAAAIAACBAEAAAAAQAQEEAAAAAAAAAABgAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\QuestionDisplay\QuesChoiceContainer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -319,7 +319,7 @@
   <Class Name="UI.Common.Controls.QuestionDisplay.QuesPictureContainer" Collapsed="true">
     <Position X="12" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEQAAAIAAAAAAAAAAAQAQAAAAAAAAIAAAgAAA=</HashCode>
+      <HashCode>AAAAAAAEQAAAIAAAAAAAAAAAQAQAAAAAAAAIAAAggAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\QuestionDisplay\QuesPictureContainer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -341,7 +341,7 @@
   <Class Name="UI.Common.Controls.QuestionDisplay.QuestionNavigation" Collapsed="true">
     <Position X="0.75" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABEAMAEQAAAJAAAAAAAAAAAQAAEAAwAAABIAAIgBAA=</HashCode>
+      <HashCode>AABEAMAEQAAAJAAAAAAAAAAAQAAEAAwAAABIAAIghAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\QuestionDisplay\QuestionNavigation.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -483,7 +483,7 @@
   <Interface Name="UI.Common.Controls.ItemDisplays.IItemDetailDisplay&lt;T&gt;" Collapsed="true">
     <Position X="5" Y="16" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAEAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDetailDisplay.cs</FileName>
     </TypeIdentifier>
   </Interface>

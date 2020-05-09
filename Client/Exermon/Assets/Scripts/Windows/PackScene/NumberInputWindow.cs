@@ -235,12 +235,13 @@ namespace UI.PackScene.Windows {
         /// 绘制出售状态
         /// </summary>
         void drawSellDisplay() {
+            if (!sellDisplay) return;
             if (mode == Mode.Sell) {
                 var price = currentCount() * singlePrice();
                 sellGold.text = price.ToString();
                 sellDisplay.SetActive(true);
             } else
-                sellDisplay.SetActive(false);
+                sellDisplay?.SetActive(false);
         }
 
         /// <summary>
@@ -256,7 +257,7 @@ namespace UI.PackScene.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            sellDisplay.SetActive(false);
+            if (sellDisplay) sellDisplay.SetActive(false);
             numberInput.requestClear(true);
         }
 

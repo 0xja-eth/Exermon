@@ -97,8 +97,8 @@ def _saveHumanItem(d: dict):
 	else: price = HumanItemPrice()
 
 	price.gold = load(d, 'gold_price', 0)
-	price.ticket = load(d, 'ticket', 0)
-	price.bound_ticket = load(d, 'bound_ticket', 0)
+	price.ticket = load(d, 'ticket_price', 0)
+	price.bound_ticket = load(d, 'bound_ticket_price', 0)
 	price.item_id = id
 	price.save()
 
@@ -173,6 +173,7 @@ def _saveExerEquip(d: dict):
 	item.name = load(d, 'name', "")
 	item.description = load(d, 'description', "")
 	item.icon_index = load(d, 'icon_index', 0)
+	item.min_level = load(d, 'min_level', 0)
 	item.e_type_id = load(d, 'e_type_id', 1)
 	item.star_id = load(d, 'star_id', 1)
 	item.discardable = eval(load(d, 'discardable', "True"))
@@ -185,8 +186,8 @@ def _saveExerEquip(d: dict):
 	else: price = ExerEquipPrice()
 
 	price.gold = load(d, 'gold_price', 0)
-	price.ticket = load(d, 'ticket', 0)
-	price.bound_ticket = load(d, 'bound_ticket', 0)
+	price.ticket = load(d, 'ticket_price', 0)
+	price.bound_ticket = load(d, 'bound_ticket_price', 0)
 	price.item_id = id
 	price.save()
 

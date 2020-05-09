@@ -151,7 +151,7 @@ class Common:
 		"""
 		container = cls.getBattleItemSlot(player)
 
-		return ItemCommon.getContItem(container=container, type_=type, id=id,
+		return ItemCommon.getContItem(type_=type, container=container, id=id,
 									  error=ErrorType.ItemNotEquiped)
 
 	@classmethod

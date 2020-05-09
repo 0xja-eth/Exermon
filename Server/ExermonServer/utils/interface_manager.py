@@ -68,6 +68,9 @@ class HTTP:
 		if method == "GET": request_data = dict(request.GET)
 		if method == "POST": request_data = dict(request.POST)
 
+		for key in request_data:
+			request_data[key] = request_data[key][0]
+
 		# 具体处理函数
 		data = Common.getRequestDict(request_data, params, data)
 		data = cls._getRequestFileDict(request, files, data)
@@ -168,7 +171,11 @@ class WebSocket:
 			print('No layer response:' + str(res))
 			return None, tag
 
-		print('response: ' + str(res))
+		print('response: ')
+		try:
+			print(res)
+		except:
+			traceback.print_stack()
 
 		return res, tag
 
@@ -271,7 +278,7 @@ class Common:
 
 			if key in request_data:
 				# 如果该接口所需参数在 request_data 中，进行数据类型转换
-				data[key] = Common.convertDataType(request_data[key][0], type)
+				data[key] = Common.convertDataType(request_data[key], type)
 			elif type != 'var':
 				# 否则且如果该参数不是可选的，抛出异常
 				raise GameException(ErrorType.ParameterError)
