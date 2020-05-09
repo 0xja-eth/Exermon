@@ -465,11 +465,6 @@ MonoBehaviour:
   countText: {fileID: 0}
   maxCheck: 0
   defaultCapacity: 0
-  _actived: 1
-  _selectable: 1
-  _deselectable: 1
-  _checkable: 1
-  _highlightable: 1
   draggingParent: {fileID: 0}
   slotDetail: {fileID: 0}
   exerSlot: {fileID: 0}

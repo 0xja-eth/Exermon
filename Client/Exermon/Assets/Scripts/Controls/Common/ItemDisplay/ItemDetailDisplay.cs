@@ -16,24 +16,19 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 启动窗口
         /// </summary>
-        void startView(T item, int index = -1);
+        void startView(T item, int index = -1, bool refresh = false);
 
         /// <summary>
         /// 设置物品
         /// </summary>
-        void setItem(T item, int index = -1, bool force = false);
-
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        void clearItem();
+        void setItem(T item, int index = -1, bool refresh = false);
 
     }
 
     /// <summary>
     /// 物品详细信息，带有容器和索引功能
     /// </summary>
-    public abstract class ItemDetailDisplay<T> : ItemDisplay<T>, IItemDetailDisplay<T> where T : class {
+    public class ItemDetailDisplay<T> : ItemDisplay<T>, IItemDetailDisplay<T> where T : class {
 
         /// <summary>
         /// 内部变量声明
@@ -63,9 +58,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         /// <param name="index">所在索引</param>
         /// <param name="refresh">强制刷新</param>
-        public void startView(T item, int index = -1) {
+        public void startView(T item, int index = -1, bool refresh = false) {
             startView();
-            setItem(item, index, true);
+            setItem(item, index, refresh);
         }
 
         #endregion
@@ -78,7 +73,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品容器
         /// </summary>
         /// <returns>容器</returns>
-        public virtual IContainerDisplay<T> getContainer() {
+        public IContainerDisplay<T> getContainer() {
             return container;
         }
 
@@ -89,10 +84,11 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="item">物品</param>
         /// <param name="index">所在索引</param>
-        /// <param name="force">强制刷新</param>
-        public void setItem(T item, int index = -1, bool force = false) {
-            if (!force && this.item == item && this.index == index) return;
-            this.index = index; setValue(item);
+        /// <param name="refresh">强制刷新</param>
+        public void setItem(T item, int index = -1, bool refresh = false) {
+            if (!refresh && this.item == item && this.index == index) return;
+            this.item = item; this.index = index;
+            onItemChanged();
         }
 
         #endregion

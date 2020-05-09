@@ -51,7 +51,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<ExerEquipSlotItem> getItemDetail() {
+        protected override IItemDetailDisplay<ExerEquipSlotItem> getItemDetail() {
             return exerSlotItemDisplay;
         }
 

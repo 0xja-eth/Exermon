@@ -55,19 +55,6 @@ namespace UI.BattleScene.Controls.Prepare {
 
         #endregion
 
-        #region 数据控制
-
-        /// <summary>
-        /// 是否为空物品
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public override bool isNullItem(RuntimeBattleItem item) {
-            return base.isNullItem(item) || item.item() == null;
-        }
-
-        #endregion
-
         #region 界面控制
 
         /// <summary>
@@ -78,19 +65,20 @@ namespace UI.BattleScene.Controls.Prepare {
             base.drawExactlyItem(runtimeItem);
             var item = runtimeItem.item();
 
-            icon.gameObject.SetActive(true);
-            icon.overrideSprite = item.icon;
+            if (item != null) {
+                icon.gameObject.SetActive(true);
+                icon.overrideSprite = item.icon;
 
-            name.text = item.name;
-            freeze.text = string.Format(
-                FreezeFormat, runtimeItem.freezeRound);
-
+                name.text = item.name;
+                freeze.text = string.Format(
+                    FreezeFormat, runtimeItem.freezeRound);
+            } else drawEmptyItem();
         }
 
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             icon.gameObject.SetActive(false);
             name.text = freeze.text = "";
         }

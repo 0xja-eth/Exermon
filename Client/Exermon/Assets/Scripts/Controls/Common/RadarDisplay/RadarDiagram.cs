@@ -19,30 +19,6 @@ namespace UI.Common.Controls.RadarDisplay {
         protected const float StopMoveDist = 0.015f;
 
         /// <summary>
-        /// 能转化为雷达数据的接口
-        /// </summary>
-        public interface IRadarDataConvertable {
-
-            /// <summary>
-            /// 转化为属性信息集
-            /// </summary>
-            /// <returns>属性信息集</returns>
-            List<float> convertToRadarData(string type = "");
-        }
-
-        /// <summary>
-        /// 能转化为雷达文本数据的接口
-        /// </summary>
-        public interface IRadarConfigurable {
-
-            /// <summary>
-            /// 转化为属性信息集
-            /// </summary>
-            /// <returns>属性信息集</returns>
-            List<string> convertToRadarConfigure(string type = "");
-        }
-
-        /// <summary>
         /// 外部组件设置
         /// </summary>
         public PolygonImage polygonBackground;
@@ -65,19 +41,6 @@ namespace UI.Common.Controls.RadarDisplay {
             setWeightCount(edgeTexts.Length);
         }
 
-        /// <summary>
-        /// 配置
-        /// </summary>
-        /// <param name="names">文本</param>
-        public void configure(List<string> names) {
-            base.configure(); setNames(names);
-        }
-        /// <param name="obj">可转化对象</param>
-        /// <param name="type">类型</param>
-        public void configure(IRadarConfigurable obj, string type = "") {
-            base.configure(); setNames(obj, type);
-        }
-
         #endregion
 
         #region 数据设置
@@ -85,14 +48,8 @@ namespace UI.Common.Controls.RadarDisplay {
         /// <summary>
         /// 启动视窗
         /// </summary>
-        /// <param name="values">值</param>
         public void startView(List<float> values) {
             base.startView(); setValues(values);
-        }
-        /// <param name="obj">可转化对象</param>
-        /// <param name="type">类型</param>
-        public void startView(IRadarDataConvertable obj, string type = "") {
-            base.startView(); setValues(obj, type);
         }
 
         /// <summary>
@@ -104,7 +61,7 @@ namespace UI.Common.Controls.RadarDisplay {
             polygonImage.setWeightCount(weightCount = cnt);
             targetValues = polygonImage.weights;
         }
-        
+
         /// <summary>
         /// 设置权重值（有动画）
         /// </summary>
@@ -113,12 +70,6 @@ namespace UI.Common.Controls.RadarDisplay {
         public void setValues(List<float> values, bool force = false) {
             targetValues = values;
             if (force) polygonImage.setWeights(values);
-        }
-        /// <param name="obj">可转化对象</param>
-        /// <param name="type">类型</param>
-        /// <param name="force">强制（无动画）</param>
-        public void setValues(IRadarDataConvertable obj, string type = "", bool force = false) {
-            setValues(obj.convertToRadarData(type));
         }
 
         /// <summary>
@@ -139,11 +90,6 @@ namespace UI.Common.Controls.RadarDisplay {
         public void setNames(List<string> names) {
             for (int i = 0; i < edgeTexts.Length; i++)
                 edgeTexts[i].text = names[i];
-        }
-        /// <param name="obj">可转化对象</param>
-        /// <param name="type">类型</param>
-        public void setNames(IRadarConfigurable obj, string type) {
-            setNames(obj.convertToRadarConfigure(type));
         }
 
         #endregion

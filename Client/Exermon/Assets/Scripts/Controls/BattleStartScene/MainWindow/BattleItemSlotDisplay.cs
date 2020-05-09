@@ -46,7 +46,7 @@ namespace UI.BattleStartScene.Controls.Main {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<BattleItemSlotItem> getItemDetail() {
+        protected override IItemDetailDisplay<BattleItemSlotItem> getItemDetail() {
             return detail;
         }
 

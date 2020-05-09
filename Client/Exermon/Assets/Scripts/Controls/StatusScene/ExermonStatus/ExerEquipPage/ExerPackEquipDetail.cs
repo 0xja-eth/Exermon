@@ -97,7 +97,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         protected override void drawCurrentParamsInfo(PackContItem contItem) {
             if (contItem.type == (int)BaseContItem.Type.ExerPackEquip) {
                 // var packEquip = (ExerPackEquip)contItem;
-                var objs = new ParamDisplay.IDisplayDataArrayConvertable[]
+                var objs = new ParamDisplay.DisplayDataArrayConvertable[]
                     { slotItem, equipSlotItem };
                 paramInfo.setValues(objs, "params");
                 battlePoint.setValue(slotItem, "battle_point");
@@ -115,7 +115,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
                 slotItem.setPackEquipPreview(equipSlotItem.index, packEquip);
                 equipSlotItem = slotItem.getPreviewEquipSlotItem(equipSlotItem.index);
 
-                var objs = new ParamDisplay.IDisplayDataArrayConvertable[]
+                var objs = new ParamDisplay.DisplayDataArrayConvertable[]
                     { slotItem, equipSlotItem };
 
                 paramInfo?.setValues(objs, "preview_params");

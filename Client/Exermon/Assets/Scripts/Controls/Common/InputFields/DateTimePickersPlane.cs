@@ -15,26 +15,12 @@ namespace UI.Common.Controls.InputFields {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public DateTimeField field;
 
         /// <summary>
         /// 内部变量设置
         /// </summary>
         bool enter = false;
-
-        DateTimeField field;
-
-        #region 启动窗口
-
-        /// <summary>
-        /// 启动窗口
-        /// </summary>
-        /// <param name="field">绑定输入域</param>
-        public void startWindow(DateTimeField field) {
-            startWindow();
-            this.field = field;
-        }
-
-        #endregion
 
         #region 更新控制
 
@@ -54,7 +40,7 @@ namespace UI.Common.Controls.InputFields {
                 Input.GetMouseButtonDown(0) ||
                 Input.GetMouseButtonDown(1) ||
                 Input.touchCount > 0))
-                field?.endSelect();
+                field.endSelect();
         }
 
         #endregion

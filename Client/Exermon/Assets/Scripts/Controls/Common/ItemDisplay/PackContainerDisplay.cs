@@ -14,9 +14,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <remarks>
     /// 专门用于显示 PackContainer 的组件
     /// </remarks>
-    public class PackContainerDisplay<T> : 
-        SelectableContainerDisplay<T> 
-        where T : PackContItem, new() {
+    public class PackContainerDisplay<T> : ContainerDisplay<T> where T : PackContItem, new() {
 
         /// <summary>
         /// 常量设置
@@ -188,7 +186,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
-        protected override void acceptTransfer(SelectableContainerDisplay<T> container, T item) {
+        protected override void acceptTransfer(ContainerDisplay<T> container, T item) {
             var packContainer = getPackDisplay(container);
             if (packContainer != null)
                 acceptTransfer(packContainer, item);
@@ -205,7 +203,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>返回背包容器</returns>
         PackContainerDisplay<T> getPackDisplay(
-            SelectableContainerDisplay<T> container = null) {
+            ContainerDisplay<T> container = null) {
             return DataLoader.cast<PackContainerDisplay<T>>(container);
         }
 

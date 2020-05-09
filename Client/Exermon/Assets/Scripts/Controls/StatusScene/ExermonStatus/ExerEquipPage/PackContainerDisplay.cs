@@ -49,7 +49,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<PackContItem> getItemDetail() {
+        protected override IItemDetailDisplay<PackContItem> getItemDetail() {
             return detail;
         }
 

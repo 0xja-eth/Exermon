@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2892292536363378034}
   - component: {fileID: 1204434281886885978}
   - component: {fileID: 2656825397428738307}
+  - component: {fileID: 8318917273206236259}
   - component: {fileID: 7699169500913736775}
   m_Layer: 5
   m_Name: WrongFlag
@@ -30,12 +31,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6862336069697328098}
-  m_RootOrder: 1
+  m_Father: {fileID: 6862336070834217216}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 37.565216, y: 36}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &1204434281886885978
@@ -74,6 +75,27 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!223 &8318917273206236259
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055807756702061430}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 2
+  m_TargetDisplay: 0
 --- !u!114 &7699169500913736775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,7 +128,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6862336069697328098
 RectTransform:
   m_ObjectHideFlags: 0
@@ -117,9 +139,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 6862336069857945277}
-  - {fileID: 2892292536363378034}
+  m_Children: []
   m_Father: {fileID: 6862336070812339297}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -196,6 +216,7 @@ GameObject:
   - component: {fileID: 6862336069857945277}
   - component: {fileID: 6862336069857945278}
   - component: {fileID: 6862336069857945279}
+  - component: {fileID: 6862336069857945276}
   - component: {fileID: 6862336069857945273}
   m_Layer: 5
   m_Name: CorrectFlag
@@ -215,12 +236,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 6862336069697328098}
-  m_RootOrder: 0
+  m_Father: {fileID: 6862336070834217216}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 41.47826, y: 36}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &6862336069857945278
@@ -259,6 +280,27 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!223 &6862336069857945276
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6862336069857945266}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 2
+  m_TargetDisplay: 0
 --- !u!114 &6862336069857945273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +447,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6862336070812339297}
+  - {fileID: 6862336069857945277}
+  - {fileID: 2892292536363378034}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -481,7 +525,6 @@ MonoBehaviour:
   checkable: 1
   highlightable: 1
   forceChecked: 0
-  deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 1, g: 1, b: 0.75, a: 0}

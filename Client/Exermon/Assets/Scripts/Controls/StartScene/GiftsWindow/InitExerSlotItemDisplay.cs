@@ -51,8 +51,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 配置装备
         /// </summary>
-        protected override void setupExactlyEquip() {
-            base.setupExactlyEquip();
+        protected override void setupEquip() {
             equip = item.exerGift();
         }
 
@@ -87,7 +86,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             if (name) name.text = "";
             if (subject) subject.text = "";
             icon.gameObject.SetActive(false);
@@ -105,8 +104,8 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除装备
         /// </summary>
-        protected override void drawEmptyEquip() {
-            gift.requestClear(true);
+        protected override void clearEquip() {
+            gift.requestClear();
         }
 
         #endregion

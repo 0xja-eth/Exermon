@@ -34,7 +34,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         public Type type; // 日期类型
         public int itemCount = 2; // 备选数量（上下对称）
-        public int threshold = 25; // 灵敏度
+        public int threshold = 15; // 灵敏度
         public int itemHeight = 42; // 每个项的大小
 
         public Color currentTextColor = new Color(1, 1, 1); // 当前项的文本颜色

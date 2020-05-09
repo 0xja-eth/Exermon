@@ -16,15 +16,13 @@ namespace UI.Common.Controls.RadarDisplay {
         /// <summary>
         /// 纹理
         /// </summary>
-        [SerializeField]
-        Texture _texture;
+        [SerializeField] private Texture _texture;
 
         /// <summary>
         /// 边权重
         /// </summary>
         //public PolygonImageEdge edgeWeights;
-        [SerializeField]
-        List<float> _weights;// = new List<float>();
+        [SerializeField] private List<float> _weights;// = new List<float>();
         public List<float> weights {
             get { return _weights; }
         }

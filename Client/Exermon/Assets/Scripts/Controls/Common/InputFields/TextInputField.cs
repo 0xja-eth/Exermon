@@ -25,7 +25,8 @@ namespace UI.Common.Controls.InputFields {
             base.initializeOnce();
             value = inputField.text;
             inputField?.onEndEdit.AddListener((text) => {
-                setValue(text);
+                value = text;
+                onValueChanged();
             });
         }
 

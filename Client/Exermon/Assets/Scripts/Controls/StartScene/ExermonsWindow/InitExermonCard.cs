@@ -66,7 +66,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             if (name) name.text = "";
             if (subject) subject.text = "";
             icon.overrideSprite = null;

@@ -138,8 +138,8 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// 图片容器控件
         /// </summary>
         [SerializeField]
-        private SelectableContainerDisplay<Texture2D> _imageContainer = null;
-        public SelectableContainerDisplay<Texture2D> imageContainer {
+        private ContainerDisplay<Texture2D> _imageContainer = null;
+        public ContainerDisplay<Texture2D> imageContainer {
             get { return _imageContainer; }
             set { _imageContainer = value; }
         }

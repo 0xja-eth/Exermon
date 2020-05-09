@@ -32,7 +32,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         public Text animal, type, nickname, description;
         public TextInputField nicknameInput;
 
-        public MultParamsDisplay expBar;
+        public ParamDisplay expBar;
 
         public GameObject equipedFlag, editButton;
 
@@ -60,7 +60,6 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawFullImage(PlayerExermon playerExer) {
             var exermon = playerExer.exermon();
-            full.gameObject.SetActive(true);
             full.overrideSprite = AssetLoader.generateSprite(exermon.full);
 
             stars.setValue(exermon.starId);

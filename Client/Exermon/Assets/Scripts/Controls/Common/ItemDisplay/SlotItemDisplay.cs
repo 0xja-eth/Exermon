@@ -1,5 +1,4 @@
 ﻿
-using UnityEngine;
 using UnityEngine.EventSystems;
 
 using Core.UI.Utils;
@@ -19,7 +18,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         void setEquip(E item, bool force = false);
         /// <param name="container">容器</param>
-        void setEquip(SelectableContainerDisplay<E> container, E item);
+        void setEquip(ContainerDisplay<E> container, E item);
 
         /// <summary>
         /// 获取装备
@@ -72,32 +71,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            if (item == null) setupEmptyEquip();
-            else setupExactlyEquip();
+            setupEquip();
         }
 
         /// <summary>
-        /// 配置确切物品的装备（原始装备）
+        /// 配置装备（原始装备）
         /// </summary>
-        protected virtual void setupExactlyEquip() {
-            lastEquip = null;
-        }
-
-        /// <summary>
-        /// 配置空物品装备（原始装备）
-        /// </summary>
-        protected virtual void setupEmptyEquip() {
-            lastEquip = equip = null;
-        }
-
-        /// <summary>
-        /// 是否为空装备
-        /// </summary>
-        /// <param name="equip"></param>
-        /// <returns></returns>
-        public virtual bool isNullEquip(E equip) {
-            return equip == null;
-        }
+        protected virtual void setupEquip() { }
 
         /// <summary>
         /// 装备
@@ -109,17 +89,10 @@ namespace UI.Common.Controls.ItemDisplays {
             onEquipChanged();
         }
         /// <param name="container">容器</param>
-        public virtual void setEquip(SelectableContainerDisplay<E> container, E item) {
+        public virtual void setEquip(ContainerDisplay<E> container, E item) {
             setEquip(item);
         }
-
-        /// <summary>
-        /// 清除装备
-        /// </summary>
-        public virtual void clearEquip() {
-            setEquip(null, true);
-        }
-
+        
         /// <summary>
         /// 能否装备
         /// </summary>
@@ -192,7 +165,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="equip">装备</param>
         void drawEquip(E equip) {
-            if (isNullEquip(equip)) drawEmptyEquip();
+            if (equip == null) drawEmptyEquip();
             else drawExactlyEquip(equip);
         }
 
@@ -205,7 +178,14 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 绘制空装备
         /// </summary>
-        protected virtual void drawEmptyEquip() {}
+        protected virtual void drawEmptyEquip() {
+            clearEquip();
+        }
+
+        /// <summary>
+        /// 清除装备
+        /// </summary>
+        protected virtual void clearEquip() { }
 
         /// <summary>
         /// 刷新
@@ -220,7 +200,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected override void clear() {
             base.clear();
-            drawEmptyEquip();
+            clearEquip();
         }
 
         #endregion
@@ -262,9 +242,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="data">事件数据</param>
         public void OnDrop(PointerEventData data) {
-            Debug.Log("OnDrop: " + data.pointerDrag);
-
-            processItemDrop(getDraggingItemDisplay(data), data);
+            processItemDrop(getDraggingItemDisplay(data));
         }
 
         /// <summary>
@@ -292,12 +270,12 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 处理物品放下
         /// </summary>
         protected virtual void processItemDrop(
-            DraggableItemDisplay<E> display, PointerEventData data) {
-            if (display == null && !display.isDraggable()) return;
-            var container = display.getContainer();
-            var item = display.getItem();
-            container.transferItem(this, item);
-            display.OnEndDrag(data);
+            DraggableItemDisplay<E> display) {
+            if (display != null && display.isDraggable()) {
+                var container = display.getContainer();
+                var item = display.getItem();
+                container.transferItem(this, item);
+            }
         }
 
         #endregion

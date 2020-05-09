@@ -154,7 +154,7 @@ namespace UI.StartScene.Controls.Character {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             image.overrideSprite = null;
             image.gameObject.SetActive(false);
         }

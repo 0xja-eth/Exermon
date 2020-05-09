@@ -87,12 +87,12 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <param name="index">容器项索引</param>
         /// <param name="refresh">是否刷新</param>
         void IItemDetailDisplay<ExerEquipSlotItem>.startView(
-            ExerEquipSlotItem item, int index = -1) {
-            startView(); setItem(item, index, true);
+            ExerEquipSlotItem item, int index = -1, bool refresh = false) {
+            startView(); setItem(item, index, refresh);
         }
         void IItemDisplay<ExerEquipSlotItem>.startView(
-            ExerEquipSlotItem item) {
-            startView(); setItem(item, true);
+            ExerEquipSlotItem item, bool refresh = false) {
+            startView(); setItem(item, refresh);
         }
 
         #endregion
@@ -157,8 +157,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 配置装备
         /// </summary>
-        protected override void setupExactlyEquip() {
-            base.setupExactlyEquip();
+        protected override void setupEquip() {
             equip = equipSlotItem == null ? null : equipSlotItem.packEquip;
         }
         /*

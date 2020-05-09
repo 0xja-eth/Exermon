@@ -9,7 +9,7 @@ namespace UI.BattleScene.Controls.Prepare {
     /// 对战物资槽显示
     /// </summary>
     public class BattleItemSlotDisplay : 
-        SelectableContainerDisplay<RuntimeBattleItem>, IPrepareContainerDisplay {
+        ContainerDisplay<RuntimeBattleItem>, IPrepareContainerDisplay {
 
         /// <summary>
         /// 常量设置
@@ -38,7 +38,7 @@ namespace UI.BattleScene.Controls.Prepare {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<RuntimeBattleItem> getItemDetail() {
+        protected override IItemDetailDisplay<RuntimeBattleItem> getItemDetail() {
             return detail;
         }
 
@@ -47,7 +47,6 @@ namespace UI.BattleScene.Controls.Prepare {
         /// </summary>
         /// <returns></returns>
         public BaseContItem itemToUse() {
-            if (selectedItem() == null) return null;
             return selectedItem().battleItemSlotItem();
         }
 

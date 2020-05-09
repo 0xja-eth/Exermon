@@ -6,9 +6,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using Core.UI;
-using Core.Data;
-
-using GameModule.Services;
 
 namespace UI.Common.Controls.InputFields {
 
@@ -46,8 +43,11 @@ namespace UI.Common.Controls.InputFields {
             //check = check ?? defaultCheckFunc;
             processPresetedOptions();
             dropdown?.onValueChanged.AddListener(
-                (index) => setValue(options[index])
-            );
+                (index) => {
+                    Debug.Log("Listener: " + index);
+                    value = options[index];
+                    onValueChanged();
+                });
         }
 
         /// <summary>
@@ -73,20 +73,9 @@ namespace UI.Common.Controls.InputFields {
         }
 
         /// <summary>
-        /// 配置组件
-        /// </summary>
-        public void configure(TypeData[] options) {
-            configure(DataService.get().typeDataToTuples(options));
-        }
-        public void configure(List<TypeData> options) {
-            configure(options.ToArray());
-        }
-
-        /// <summary>
         /// 创建所有选项
         /// </summary>
         void createOptions() {
-            clearOptions();
             foreach (var opt in options)
                 createOption(opt.Item2);
             value = options[0];
@@ -109,8 +98,6 @@ namespace UI.Common.Controls.InputFields {
 
         #endregion
 
-        #region 更新控制
-
         /// <summary>
         /// 更新
         /// </summary>
@@ -129,8 +116,6 @@ namespace UI.Common.Controls.InputFields {
                 focused_ = enter;
             }
         }
-
-        #endregion
 
         #region 启动/结束控制
 
@@ -167,8 +152,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>项</returns>
         public string getValueText() {
-            var value = getValue();
-            return value != null ? value.Item2 : "";
+            return getValue().Item2;
         }
 
         /// <summary>
@@ -176,8 +160,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>项</returns>
         public int getValueId() {
-            var value = getValue();
-            return value != null ? value.Item1 : 0;
+            return getValue().Item1;
         }
 
         /// <summary>
@@ -187,9 +170,9 @@ namespace UI.Common.Controls.InputFields {
         public void setValue(int id, bool check = true, bool emit = true) {
             for (int i = 0; i < options.Length; i++)
                 if (options[i].Item1 == id) {
-                    setValue(options[i], check, emit); return;
+                    setValue(options[i], check, emit); break;
                 }
-            setValue(null, check, emit);
+            base.setValue(null, check, emit);
         }
 
         /// <summary>
@@ -199,9 +182,9 @@ namespace UI.Common.Controls.InputFields {
         public void setValue(string text, bool check = true, bool emit = true) {
             for (int i = 0; i < options.Length; i++)
                 if (options[i].Item2 == text) {
-                    setValue(options[i], check, emit); return;
+                    setValue(options[i], check, emit); break;
                 }
-            setValue(null, check, emit);
+            base.setValue(null, check, emit);
         }
         /*
         /// <summary>
@@ -222,7 +205,10 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="text">值</param>
         protected override void drawValue(Tuple<int, string> value) {
+            Debug.Log("drawValue: " + value);
             dropdown.itemText.text = (value == null ? "" : value.Item2);
+            Debug.Log("drowdown.value = " + dropdown.value +
+                "\ndrowdown.itemText.text = " + dropdown.itemText.text);
         }
 
         #endregion

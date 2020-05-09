@@ -63,7 +63,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             name.text = EmptyGiftText;
             description.text = "";
             paramsView.clearValues();

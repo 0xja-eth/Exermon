@@ -47,28 +47,6 @@ namespace UI.Common.Controls.InputFields {
         }
 
         /// <summary>
-        /// 配置
-        /// </summary>
-        /// <param name="min">最小日期</param>
-        /// <param name="max">最大日期</param>
-        /// <param name="default_">默认日期</param>
-        public void configure(DateTime min) {
-            configure(min, DateTime.Now);
-        }
-        public void configure(DateTime min, DateTime max) {
-            var default_ = defaultDateTime;
-            if (default_ > max) default_ = max;
-            if (default_ < min) default_ = min;
-            configure(min, max, default_);
-        }
-        public void configure(DateTime min, DateTime max, DateTime default_) {
-            defaultDateTime = default_;
-            minDateTime = min;
-            maxDateTime = max;
-            configure();
-        }
-
-        /// <summary>
         /// 配置日期选择项
         /// </summary>
         void setupPickers() {
@@ -118,7 +96,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <returns>选择中</returns>
         bool isSelecting() {
-            return pickersPlane && pickersPlane.shown;
+            return pickersPlane.shown;
         }
 
         /// <summary>
@@ -126,10 +104,11 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="value">值</param>
         protected override bool assignValue(DateTime dateTime) {
-            var oldValue = value; value = dateTime;
+            if (value == dateTime) return false;
+            value = dateTime;
             if (value > maxDateTime) value = maxDateTime;
             if (value < minDateTime) value = minDateTime;
-            return oldValue != value;
+            return true;
         }
 
         /// <summary>
@@ -220,10 +199,9 @@ namespace UI.Common.Controls.InputFields {
         /// 开始选择
         /// </summary>
         public void startSelect() {
-            if (!pickersPlane) return;
-            pickersPlane.startWindow(this);
+            pickersPlane.startWindow();
             oriParent = pickersPlane.transform.parent;
-            if (pickersParent) pickersPlane.transform.SetParent(pickersParent);
+            pickersPlane.transform.SetParent(pickersParent);
             refreshPickers();
         }
 
@@ -231,7 +209,6 @@ namespace UI.Common.Controls.InputFields {
         /// 结束选择
         /// </summary>
         public void endSelect() {
-            if (!pickersPlane) return;
             pickersPlane.terminateWindow();
             pickersPlane.transform.SetParent(oriParent);
             onValueChanged();
@@ -253,7 +230,7 @@ namespace UI.Common.Controls.InputFields {
         /// 是否实际有焦点
         /// </summary>
         public override bool isRealFocused() {
-            return isSelecting();
+            return pickersPlane.shown;
         }
 
         #endregion

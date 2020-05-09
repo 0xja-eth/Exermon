@@ -117,8 +117,8 @@ namespace UI.BattleStartScene.Controls.Right.MainContent {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
-            base.drawEmptyItem();
+        protected override void clearItem() {
+            base.clearItem();
             starsDisplay.clearValue();
             rankIcon.gameObject.SetActive(false);
             rankName.text = score.text = scoreDesc.text = "";

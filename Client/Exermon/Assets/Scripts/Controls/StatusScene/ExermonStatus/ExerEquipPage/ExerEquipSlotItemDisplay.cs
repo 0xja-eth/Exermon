@@ -68,7 +68,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem() {
+        protected override void clearItem() {
             if (type) type.text = "";
             clearPackEquip();
         }

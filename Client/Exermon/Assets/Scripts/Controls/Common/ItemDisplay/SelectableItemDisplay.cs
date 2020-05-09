@@ -15,20 +15,20 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置窗口
         /// </summary>
-        void configure(SelectableContainerDisplay<T> container, int index);
+        void configure(ContainerDisplay<T> container, int index);
 
         /// <summary>
         /// 获取容器
         /// </summary>
         /// <returns></returns>
-        SelectableContainerDisplay<T> getContainer();
+        ContainerDisplay<T> getContainer();
 
     }
 
     /// <summary>
     /// 可选择物品展示组件
     /// </summary>
-    public abstract class SelectableItemDisplay<T> : ItemDisplay<T>, ISelectableItemDisplay<T> where T : class {
+    public class SelectableItemDisplay<T> : ItemDisplay<T>, ISelectableItemDisplay<T> where T : class {
 
         /// <summary>
         /// 常量定义
@@ -53,8 +53,6 @@ namespace UI.Common.Controls.ItemDisplays {
 
         public bool forceChecked = false; // 强制选中
 
-        public bool deselectable = true; // 能否取消选中
-
         public Color normalColor = new Color(1, 1, 1, 0); // 默认背景颜色
         public Color emptyColor = new Color(1, 1, 1, 0); // 物品为空背景颜色
         public Color selectedColor = new Color(1, 1, 0.75f, 0); // 选择时背景颜色
@@ -67,7 +65,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         bool highlighting = false; // 是否高亮中
 
-        protected SelectableContainerDisplay<T> container = null;
+        protected ContainerDisplay<T> container = null;
 
         protected int index = -1;
 
@@ -76,7 +74,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 配置组件
         /// </summary>
-        public virtual void configure(SelectableContainerDisplay<T> container, int index) {
+        public virtual void configure(ContainerDisplay<T> container, int index) {
             this.container = container;
             this.index = index;
             configure();
@@ -92,7 +90,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 获取物品容器
         /// </summary>
         /// <returns>容器</returns>
-        public SelectableContainerDisplay<T> getContainer() {
+        public ContainerDisplay<T> getContainer() {
             return container;
         }
 
@@ -105,7 +103,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>是否激活</returns>
         public virtual bool isActived() {
-            if (container != null && !container.actived) return false;
             return actived;
         }
 
@@ -114,7 +111,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否高光</returns>
         public virtual bool isHighlightable() {
-            if (container != null && !container.highlightable) return false;
             return isActived() && highlightable;
         }
 
@@ -130,9 +126,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 是否选择
         /// </summary>
         /// <returns>是否选择</returns>
-        public virtual bool isSelected() {
+        public bool isSelected() {
             if (!container) return false;
-            // if (!isSelectable()) return false;
+            if (!isSelectable()) return false;
             return container.getSelectedIndex() == index;
         }
 
@@ -141,27 +137,17 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选择</returns>
         public virtual bool isSelectable() {
-            if (container != null && !container.selectable) return false;
             return isActived() && selectable;
-        }
-
-        /// <summary>
-        /// 是否可以取消选择
-        /// </summary>
-        /// <returns></returns>
-        public virtual bool isDeselectable() {
-            if (container != null && !container.deselectable) return false;
-            return isActived() && deselectable;
         }
 
         /// <summary>
         /// 是否选中
         /// </summary>
         /// <returns>是否选中</returns>
-        public virtual bool isChecked() {
-            if (isForceChecked()) return true;
+        public bool isChecked() {
             if (!container) return false;
-            // if (!isCheckable()) return false;
+            if (!isCheckable()) return false;
+            if (isForceChecked()) return true;
             return container.isChecked(index);
         }
 
@@ -178,7 +164,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选中</returns>
         public virtual bool isCheckable() {
-            if (container != null && !container.checkable) return false;
             return isActived() && checkable;
         }
 
@@ -187,14 +172,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否取消选中</returns>
         public virtual bool isUncheckable() {
-            if (container != null && !container.checkable) return false;
-            return isActived() && checkable && !isForceChecked();
+            return isActived() && !isForceChecked();
         }
 
         /// <summary>
         /// 选择
         /// </summary>
-        public virtual void select() {
+        public void select() {
             if (container == null) return;
             if (!isSelectable()) return;
             container.select(index);
@@ -203,7 +187,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 取消选择
         /// </summary>
-        public virtual void deselect() {
+        public void deselect() {
             if (container == null) return;
             container.deselect();
         }
@@ -211,7 +195,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 选中
         /// </summary>
-        public virtual void check() {
+        public void check() {
             if (container == null) return;
             if (!isCheckable()) return;
             container.check(index);
@@ -220,7 +204,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 取消选中
         /// </summary>
-        public virtual void uncheck() {
+        public void uncheck() {
             if (container == null) return;
             if (!isUncheckable()) return;
             container.uncheck(index);
@@ -229,7 +213,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 反转
         /// </summary>
-        public virtual void toggle() {
+        public void toggle() {
             if (container == null) return;
             if (!isActived()) return;
             container.toggle(index);
@@ -246,7 +230,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 改变背景颜色
         /// </summary>
-        protected virtual void changeBackgroundColor(Color color) {
+        protected void changeBackgroundColor(Color color) {
             if (!background) return;
             if (color.a <= 0) return;
             background.color = color;
@@ -284,7 +268,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshSelectStatus() {
             var selected = isSelected();
-            Debug.Log("refreshSelectStatus: " + name + ": " + selected);
             if (selected) changeBackgroundColor(selectedColor);
             if (selectedFlag) selectedFlag.SetActive(selected);
         }
@@ -294,7 +277,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshCheckStatus() {
             var checked_ = isChecked();
-            Debug.Log("refreshCheckStatus: " + name + ": " + checked_);
             if (checked_) changeBackgroundColor(checkedColor);
             if (checkedFlag) checkedFlag.SetActive(checked_);
         }
@@ -344,12 +326,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerClick(PointerEventData eventData) {
-            // 当已选择且不可选中时单击，如果可以取消选择就取消选择
-            if (isSelected() && !isCheckable() && 
-                !isUncheckable() && isDeselectable()) deselect();
-            // 如果已选择或者不可选择时单击，执行反转操作
-            else if (isSelected() || !isSelectable()) toggle();
-            // 否则，选择
+            if (isSelected() || !isSelectable()) toggle();
             else select();
             refreshStatus();
         }

@@ -63,8 +63,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            if (item != null) packDisplay.setSubjectId(item.subjectId);
-            else packDisplay.setSubjectId(0);
+            packDisplay.setSubjectId(item.subjectId);
         }
 
         #endregion
