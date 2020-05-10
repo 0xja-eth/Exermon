@@ -118,7 +118,7 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected override bool isItemIncluded(HumanPackItem packItem) {
             if (!base.isItemIncluded(packItem)) return false;
-            bool flag = true;
+            bool flag = !packItem.equiped;
             // 判断类型
             var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)
@@ -138,7 +138,7 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// <returns>返回指定装备能否包含在容器中</returns>
         protected override bool isEquipIncluded(HumanPackEquip packEquip) {
             if (!base.isEquipIncluded(packEquip)) return false;
-            bool flag = true;
+            bool flag = !packEquip.equiped;
             // 判断类型
             var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)

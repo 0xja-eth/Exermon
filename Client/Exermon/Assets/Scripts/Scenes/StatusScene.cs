@@ -1,7 +1,13 @@
 ﻿
 using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+
+using LitJson;
+
+using Core.Data.Loaders;
 
 using Core.Systems;
 using Core.UI;
@@ -59,11 +65,37 @@ namespace UI.StatusScene {
         }
 
         /// <summary>
+        /// 处理通道数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <remarks>
+        /// 数据格式：[MainTabId, SubTabId]
+        /// </remarks>
+        protected override void processTunnelData(JsonData data) {
+            base.processTunnelData(data);
+            var d = DataLoader.load<int[]>(data);
+            if (d == null || d.Length <= 0) acceptData = false;
+            else playerSer.getPlayerStatus(() => swtichTabs(d));
+        }
+
+        /// <summary>
+        /// 切换页面
+        /// </summary>
+        /// <param name="tabs"></param>
+        void swtichTabs(int[] tabs) {
+            var view = (StatusWindow.View)tabs[0];
+            statusWindow.startWindow(view);
+            if (view == StatusWindow.View.ExermonView)
+                statusWindow.exermonStatusDisplay.
+                    tabController.startView(tabs[1]);
+        }
+
+        /// <summary>
         /// 开始
         /// </summary>
         protected override void start() {
             base.start();
-            refresh();
+            if (!acceptData) refresh();
         }
 
         #endregion

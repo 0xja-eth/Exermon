@@ -28,6 +28,18 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         public Player player { get; private set; }
         public Subject subject { get; private set; }
 
+        #region 启动
+
+        /// <summary>
+        /// 显示视窗
+        /// </summary>
+        protected override void showView() {
+            gameObject.SetActive(shown = true);
+            requestRefresh();
+        }
+
+        #endregion
+
         #region 数据控制
 
         /// <summary>

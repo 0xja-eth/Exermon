@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
+using UnityEngine.UI;
 
 using Core.Systems;
 using Core.UI;
 using Core.UI.Utils;
 
+using GameModule.Data;
 using GameModule.Services;
 using RecordModule.Services;
 
@@ -26,10 +26,13 @@ namespace UI.TitleScene {
         const float MaxCameraRotateY = 5; // 摄像机最大纵向旋转程度
         const float MoveSpeed = 0.4f; // 旋转速度
 
+        const string VersionFormat = "版本：{0}.{1}";
+
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public LoginWindow loginWindow;
+        public Text version;
 
         /// <summary>
         /// 内部变量声明
@@ -73,6 +76,10 @@ namespace UI.TitleScene {
         /// </summary>
         protected override void start() {
             base.start();
+            if (!version) return;
+            var mainVersion = GameStaticData.LocalMainVersion;
+            var subVersion = GameStaticData.LocalSubVersion;
+            version.text = string.Format(VersionFormat, mainVersion, subVersion);
         }
 
         #endregion

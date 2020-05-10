@@ -235,7 +235,7 @@ class RuntimeBattleItem:
 		Returns:
 			返回物品能否使用
 		"""
-		if not self.slot_item.isContItemUsable(): return False
+		if not self.slot_item.isContItemUsable(occasion=ItemUseOccasion.Battle): return False
 
 		if self.freeze_round > 0: return False
 
@@ -247,7 +247,7 @@ class RuntimeBattleItem:
 		Raises:
 			ErrorType.ItemFrozen: 物品已冻结
 		"""
-		self.slot_item.ensureContItemUsable()
+		self.slot_item.ensureContItemUsable(occasion=ItemUseOccasion.Battle)
 
 		if self.freeze_round > 0:
 			raise GameException(ErrorType.ItemFrozen)
@@ -364,7 +364,7 @@ class RuntimeBattleExerSkill:
 			ErrorType.NoUseCount: 使用次数已满
 			ErrorType.ItemFrozen: 物品已冻结
 		"""
-		self.skill_item.ensureContItemUsable()
+		self.skill_item.ensureContItemUsable(occasion=ItemUseOccasion.Battle)
 
 		if self.exermon.mp < self.mpCost():
 			raise GameException(ErrorType.MPInsufficient)
@@ -550,18 +550,18 @@ class RuntimeBattleExermon:
 			val (int): 属性提升值
 			rate (int): 属性提升率
 		"""
+		from exermon_module.models import PlayerExerParamBase, PlayerExerParamRate
+
 		plus_params = []
 		rate_params = []
 
 		if val != 0:
-			plus_param = ParamValue()
-			plus_param.param_id = param_id
+			plus_param = PlayerExerParamBase(param_id=param_id)
 			plus_param.setValue(val, False)
 			plus_params.append(plus_param)
 
 		if rate != 0:
-			rate_param = ParamRate()
-			rate_param.param_id = param_id
+			rate_param = PlayerExerParamRate(param_id=param_id)
 			rate_param.setValue(val, False)
 			rate_params.append(rate_param)
 

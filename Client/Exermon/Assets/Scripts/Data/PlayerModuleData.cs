@@ -381,9 +381,12 @@ namespace PlayerModule.Data {
         /// <returns></returns>
         JsonData covnertPersonalInfo() {
             var json = new JsonData();
+            var birth = DataLoader.convert(this.birth);
+            if (this.birth == default) birth = "";
+
             json["grade"] = gradeText();
             json["school"] = school;
-            json["birth"] = DataLoader.convert(birth);
+            json["birth"] = birth;
             json["city"] = city;
             json["contact"] = contact;
             json["description"] = description;

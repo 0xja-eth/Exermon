@@ -500,12 +500,12 @@ MonoBehaviour:
       m_Calls: []
   _texture: {fileID: 0}
   _weights:
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   defaultValue: 0
 --- !u!114 &7460257731982727315
 MonoBehaviour:

@@ -6277,10 +6277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b169f3a5030cb74eb0970463f1a595f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  time: {fileID: 1972488395}
-  bar: {fileID: 1732625775}
-  countdown: 1
-  _reverse: 0
 --- !u!1 &1069954732
 GameObject:
   m_ObjectHideFlags: 0
@@ -13399,7 +13395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.41176474, g: 0.80392164, b: 0.3019608, a: 1}
+  m_Color: {r: 0.41176474, g: 0.80392164, b: 0.3019608, a: 0.5019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -13554,7 +13550,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 5533166958429378049}
   m_OnClick:
     m_PersistentCalls:

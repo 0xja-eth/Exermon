@@ -377,7 +377,7 @@ class Player(CacheableModel):
 	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
 
 	# 生日
-	birth = models.DateField(default=MIN_BIRTH.date(), verbose_name="生日")
+	birth = models.DateField(default=MIN_BIRTH.date(), blank=True, null=True, verbose_name="生日")
 
 	# 学校
 	school = models.CharField(blank=True, null=True, max_length=24, verbose_name="学校")
@@ -892,6 +892,9 @@ class Player(CacheableModel):
 
 	# 补全人物信息
 	def createInfo(self, birth, school, city, contact, description):
+
+		# if birth is None:
+		# 	birth = self.MIN_BIRTH.date()
 
 		self.birth = birth
 		self.school = school

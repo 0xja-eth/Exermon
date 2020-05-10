@@ -1,6 +1,8 @@
 ﻿
 using System.Collections;
 
+using LitJson;
+
 using Core.Systems;
 using Core.UI.Utils;
 
@@ -36,6 +38,11 @@ namespace Core.UI {
         /// </summary>
         protected GameSystem gameSys;
         protected SceneSystem sceneSys;
+
+        /// <summary>
+        /// 内部变量设置
+        /// </summary>
+        protected bool acceptData = false;
 
         #region 初始化
 
@@ -89,6 +96,24 @@ namespace Core.UI {
             var first = SceneSystem.Scene.FirstScene;
             if (gameSys.isConnectable() && sceneName() != first)
                 sceneSys.gotoScene(first);
+        }
+
+        /// <summary>
+        /// 开始
+        /// </summary>
+        protected override void start() {
+            base.start();
+
+            if (acceptData = sceneSys.tunnelData != null)
+                processTunnelData(sceneSys.tunnelData);
+        }
+
+        /// <summary>
+        /// 处理通道数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        protected virtual void processTunnelData(JsonData data) {
+
         }
 
         #endregion

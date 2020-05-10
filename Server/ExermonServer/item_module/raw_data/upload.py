@@ -80,12 +80,12 @@ def _saveHumanItem(d: dict):
 	item.i_type_id = load(d, 'i_type_id', 1)
 	item.star_id = load(d, 'star_id', 1)
 	item.max_count = load(d, 'max_count', 0)
-	item.battle_use = eval(load(d, 'battle_use', 'False'))
-	item.menu_use = eval(load(d, 'menu_use', 'False'))
-	item.adventure_use = eval(load(d, 'adventure_use', 'False'))
-	item.consumable = eval(load(d, 'consumable', 'False'))
-	item.discardable = eval(load(d, 'discardable', 'True'))
-	item.tradable = eval(load(d, 'tradable', 'True'))
+	item.battle_use = load(d, 'battle_use', 'False').upper() == 'TRUE'
+	item.menu_use = load(d, 'menu_use', 'False').upper() == 'TRUE'
+	item.adventure_use = load(d, 'adventure_use', 'False').upper() == 'TRUE'
+	item.consumable = load(d, 'consumable', 'False').upper() == 'TRUE'
+	item.discardable = load(d, 'discardable', 'True').upper() == 'TRUE'
+	item.tradable = load(d, 'tradable', 'True').upper() == 'TRUE'
 	item.sell_price = load(d, 'sell_price', 0)
 	item.batch_count = load(d, 'batch_count', 0)
 	item.target = load(d, 'target', 0)
@@ -182,8 +182,8 @@ def _saveExerEquip(d: dict):
 	item.min_level = load(d, 'min_level', 0)
 	item.e_type_id = load(d, 'e_type_id', 1)
 	item.star_id = load(d, 'star_id', 1)
-	item.discardable = eval(load(d, 'discardable', "True"))
-	item.tradable = eval(load(d, 'tradable', "True"))
+	item.discardable = load(d, 'discardable', "True").upper() == 'TRUE'
+	item.tradable = load(d, 'tradable', "True").upper() == 'TRUE'
 	item.sell_price = load(d, 'sell_price', 0)
 
 	item.save()
@@ -224,7 +224,7 @@ def __saveExerEquipParams(item: ExerEquip, flag, d: dict):
 
 		if base_param_key in d:
 			p = ExerEquipBaseParam(param_id=id)
-			val = int(d[base_param_key])
+			val = float(d[base_param_key])
 			if id == 5 or id == 6: val /= 100
 			p.setValue(val)
 

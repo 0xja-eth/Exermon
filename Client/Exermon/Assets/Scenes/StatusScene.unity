@@ -14720,7 +14720,7 @@ MonoBehaviour:
     type: Date
     animated: 0
     configData: 0
-    format: "\u751F\u65E5\uFF1Ayyyy \u5E74 MM \u6708 dd \u65E5"
+    format: "\u751F\u65E5\uFF1A{0}"
     trigger: 
   - key: city
     obj: {fileID: 0}

@@ -304,7 +304,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -314,7 +314,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -534,7 +534,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -544,7 +544,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -764,7 +764,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -774,7 +774,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -989,7 +989,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -999,7 +999,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -1219,7 +1219,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -1229,7 +1229,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -1449,7 +1449,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
@@ -1459,7 +1459,7 @@ PrefabInstance:
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7398880743489137281, guid: c306fa9774b587449b02ceea9b9f1edd,
         type: 3}

@@ -929,6 +929,8 @@ MonoBehaviour:
   loadingWindow: {fileID: 1985090421}
   rebuildController: {fileID: 1985090422}
   recordWindow: {fileID: 1007870147}
+  detailWindow: {fileID: 1772653119}
+  reportWindow: {fileID: 1137064415}
 --- !u!1001 &209909711
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9893,6 +9895,34 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1129996523}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1129996526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129996525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 200864845}
+          m_MethodName: onUpperWindowBack
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1137064413
 GameObject:
   m_ObjectHideFlags: 0
@@ -15056,7 +15086,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1839102420}
   m_OnClick:
     m_PersistentCalls:

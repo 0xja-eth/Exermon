@@ -1853,7 +1853,7 @@ class PackContainer(BaseContainer):
 
 			self._removeContItem(cont_item)
 
-			self._addCachedContItem(cont_item)
+			# self._addCachedContItem(cont_item)
 
 			return cont_item
 		else:

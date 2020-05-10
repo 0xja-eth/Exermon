@@ -85,8 +85,11 @@ namespace Core.UI {
         /// </summary>
         /// <param name="index"></param>
         public void setIndex(int index) {
+            Debug.Log("setIndex: " + index);
+            Debug.Log("setIndex: " + string.Join(",", subViews));
             for (int i = 0; i < subViews.Count; i++)
                 subViews[i].isOn = (index == i);
+            requestRefresh();
         }
 
         /// <summary>
@@ -114,11 +117,13 @@ namespace Core.UI {
         /// 刷新内容切换
         /// </summary>
         void refreshSwitchContent() {
-            for (int i = 0; i < contents.Length; i++)
+            for (int i = 0; i < contents.Length; i++) {
+                Debug.Log("refreshSwitchContent."+name+".subViews[" + i+"].isOn = " + subViews[i].isOn);
                 if (subViews[i].isOn)
                     showContent(contents[i], i);
                 else
                     hideContent(contents[i], i);
+            }
         }
 
         /// <summary>
@@ -187,7 +192,6 @@ namespace Core.UI {
         /// 页变更回调
         /// </summary>
         protected virtual void onTabChanged(bool val) {
-            Debug.Log("onTabChanged: " + val);
             requestRefresh();
         }
 

@@ -206,7 +206,7 @@ MonoBehaviour:
   highlightColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
   disableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   normalFontColor: {r: 0, g: 0, b: 0, a: 1}
-  correctFontColor: {r: 0.2705882, g: 0.6078432, b: 0.372549, a: 1}
+  correctFontColor: {r: 0, g: 0.57254905, b: 1, a: 1}
   wrongFontColor: {r: 0.9372549, g: 0.2666667, b: 0.1137255, a: 1}
   canvasGroup: {fileID: 5452047119152669203}
   noAnswerAlpha: 0.4

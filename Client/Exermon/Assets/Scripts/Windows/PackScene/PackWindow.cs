@@ -3,6 +3,7 @@
 using UnityEngine;
 
 using Core.Systems;
+
 using Core.UI;
 using Core.UI.Utils;
 
@@ -81,6 +82,7 @@ namespace UI.PackScene.Windows {
         /// 外部系统引用
         /// </summary>
         GameSystem gameSys = null;
+        SceneSystem sceneSys = null;
         PlayerService playerSer = null;
         RecordService recordSer = null;
         ItemService itemSer = null;
@@ -108,6 +110,7 @@ namespace UI.PackScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
+            sceneSys = SceneSystem.get();
             playerSer = PlayerService.get();
             recordSer = RecordService.get();
             itemSer = ItemService.get();
@@ -307,6 +310,16 @@ namespace UI.PackScene.Windows {
         }
 
         #region 道具操作
+
+        /// <summary>
+        /// 装备
+        /// </summary>
+        public void onEquip() {
+            sceneSys.pushScene(
+                SceneSystem.Scene.StatusScene,
+                new int[] { 1, 2 }
+            );
+        }
 
         /// <summary>
         /// 使用物品

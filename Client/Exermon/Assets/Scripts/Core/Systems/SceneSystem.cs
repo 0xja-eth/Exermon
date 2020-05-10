@@ -6,6 +6,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
+using LitJson;
+
+using Core.Data.Loaders;
+
 using Core.UI.Utils;
 
 using GameModule.Services;
@@ -56,6 +60,11 @@ namespace Core.Systems {
         /// 场景栈
         /// </summary>
         Stack<string> sceneStack = new Stack<string>();
+
+        /// <summary>
+        /// 通道数据
+        /// </summary>
+        public JsonData tunnelData { get; private set; } = null;
 
         /// <summary>
         /// 异步场景切换操作对象
@@ -112,35 +121,59 @@ namespace Core.Systems {
         /// 返回上一场景（如果上一场景为空则退出游戏）
         /// </summary>
         /// <returns>当前场景名称</returns>
+        public void popScene(JsonData data, bool async = false) {
+            sceneStack.Pop(); loadScene(data: data, async: async);
+        }
+        public void popScene(object data, bool async = false) {
+            popScene(DataLoader.convert(data.GetType(), data), async);
+        }
         public void popScene(bool async = false) {
-            sceneStack.Pop(); loadScene(async: async);
+            popScene((JsonData)null, async: async);
         }
 
         /// <summary>
         /// 添加场景（往当前追加场景）
         /// </summary>
         /// <param name="scene">场景名称</param>
+        public void pushScene(string scene, JsonData data, bool async = false) {
+            sceneStack.Push(scene); loadScene(data: data, async: async);
+        }
+        public void pushScene(string scene, object data, bool async = false) {
+            pushScene(scene, DataLoader.convert(data.GetType(), data), async);
+        }
         public void pushScene(string scene, bool async = false) {
-            sceneStack.Push(scene); loadScene(async: async);
+            pushScene(scene, (JsonData)null, async: async);
         }
 
         /// <summary>
         /// 切换场景（替换掉当前场景）
         /// </summary>
         /// <param name="scene">场景名称</param>
-        public void changeScene(string scene, bool async = false) {
+        public void changeScene(string scene, JsonData data, bool async = false) {
             if (sceneStack.Count > 0) sceneStack.Pop();
-            pushScene(scene, async);
+            pushScene(scene, data, async);
+        }
+        public void changeScene(string scene, object data, bool async = false) {
+            changeScene(scene, DataLoader.convert(data.GetType(), data), async);
+        }
+        public void changeScene(string scene, bool async = false) {
+            changeScene(scene, (JsonData)null, async: async);
         }
 
         /// <summary>
         /// 转到场景（前面的场景将被清空）
         /// </summary>
         /// <param name="scene">场景名称</param>
-        public void gotoScene(string scene, bool async = false) {
-            clearScene(); pushScene(scene, async);
+        public void gotoScene(string scene, JsonData data, bool async = false) {
+            clearScene(); pushScene(scene, data, async);
         }
-        
+        public void gotoScene(string scene, object data, bool async = false) {
+            gotoScene(scene, DataLoader.convert(data.GetType(), data), async);
+        }
+        public void gotoScene(string scene, bool async = false) {
+            gotoScene(scene, (JsonData)null, async: async);
+        }
+
         /// <summary>
         /// 清除场景
         /// </summary>
@@ -153,9 +186,11 @@ namespace Core.Systems {
         /// </summary>
         /// <param name="reload">是否重载</param>
         /// <param name="async">是否异步操作</param>
-        public void loadScene(bool reload = false, bool async = false) {
+        public void loadScene(bool reload = false, JsonData data = null, bool async = false) {
+            tunnelData = data;
             string scene = currentScene();
-            Debug.Log("loadScene: " + scene + " (real: " + realCurrentScene() + ")");
+            Debug.Log("loadScene: " + scene + " (real: " + realCurrentScene() + 
+                "), tunnel: "+ tunnelData?.ToJson());
             if (scene == "") gameSer.exitGame();
             // 如果需要重载（强制LoadScene）或者场景分歧
             else if (reload || differentScene()) {

@@ -43,8 +43,8 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeSystems() {
+            base.initializeSystems();
             dataSer = DataService.get();
         }
 

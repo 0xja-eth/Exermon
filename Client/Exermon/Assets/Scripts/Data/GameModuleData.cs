@@ -35,7 +35,7 @@ namespace GameModule.Data {
         /// </summary>
         //public string localVersion = PlayerSettings.bundleVersion;
         public const string LocalMainVersion = "0.3.1";
-        public const string LocalSubVersion = "20200126";
+        public const string LocalSubVersion = "20200510";
 
         /// <summary>
         /// 后台版本

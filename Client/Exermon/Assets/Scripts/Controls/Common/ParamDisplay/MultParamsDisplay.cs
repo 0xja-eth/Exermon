@@ -401,9 +401,11 @@ namespace UI.Common.Controls.ParamDisplays {
             if (!item.obj.activeSelf) return;
             var text = SceneUtils.text(item.obj);
             if (text == null) return;
-            var format = item.format.Length > 0 ? item.format : DefaultDateFormat;
+            var dateFormat = DefaultDateFormat;
+            var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
             var date = DataLoader.load<DateTime>(value);
-            text.text = date.ToString(format);
+            var txt = date == default ? "" : date.ToString(dateFormat);
+            text.text = string.Format(format, txt);
         }
 
         /// <summary>
@@ -415,9 +417,11 @@ namespace UI.Common.Controls.ParamDisplays {
             if (!item.obj.activeSelf) return;
             var text = SceneUtils.text(item.obj);
             if (text == null) return;
-            var format = item.format.Length > 0 ? item.format : DefaultDateTimeFormat;
+            var dateFormat = DefaultDateTimeFormat;
+            var format = item.format.Length > 0 ? item.format : DefaultTextFormat;
             var date = DataLoader.load<DateTime>(value);
-            text.text = date.ToString(format);
+            var txt = date == default ? "" : date.ToString(dateFormat);
+            text.text = string.Format(format, txt);
         }
 
         /// <summary>

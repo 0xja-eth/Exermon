@@ -4691,7 +4691,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 666843406}
-        m_MethodName: onUse
+        m_MethodName: onSell
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6278,7 +6278,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 666843406}
-        m_MethodName: onUse
+        m_MethodName: onDiscard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8932,7 +8932,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 666843406}
-        m_MethodName: onUse
+        m_MethodName: onEquip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

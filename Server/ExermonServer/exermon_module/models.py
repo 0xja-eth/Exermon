@@ -252,7 +252,7 @@ class PlayerExerParamBase(ParamValue):
 	# 是否过期
 	def isOutOfDate(self):
 		if self.expires_time is None: return False
-		return datetime.datetime.now > self.expires_time
+		return datetime.datetime.now() > self.expires_time
 
 	def remove(self):
 		"""
@@ -298,7 +298,7 @@ class PlayerExerParamRate(ParamRate):
 	# 是否过期
 	def isOutOfDate(self):
 		if self.expires_time is None: return False
-		return datetime.datetime.now > self.expires_time
+		return datetime.datetime.now() > self.expires_time
 
 	def remove(self):
 		"""
