@@ -1,4 +1,4 @@
-﻿
+﻿/*
 using UnityEngine.UI;
 
 using ItemModule.Data;
@@ -62,7 +62,7 @@ namespace UI.BattleScene.Controls.Result {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        public override void clearItem() {
             icon.gameObject.SetActive(false);
             name.text = "";
         }
@@ -70,3 +70,4 @@ namespace UI.BattleScene.Controls.Result {
         #endregion
     }
 }
+*/

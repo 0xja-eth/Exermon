@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Core.Data.Loaders;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,6 +30,8 @@ namespace UI.BattleMatchingScene.Controls {
         public const string LevelFormat = "Lv. {0}";
         public const string ProgressFormat = "{0}%";
 
+        const int BustHeight = 384;
+
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -35,6 +39,7 @@ namespace UI.BattleMatchingScene.Controls {
         public GameObject unknown;
         public Text name, level, progress;
         public SmallRankDisplay rankDisplay;
+        public GameObject winFlag;
 
         #region 数据控制
 
@@ -67,8 +72,15 @@ namespace UI.BattleMatchingScene.Controls {
         /// <param name="battler">对战者</param>
         void drawBust(RuntimeBattlePlayer battler) {
             if (unknown) unknown.SetActive(false);
-            bust.gameObject.SetActive(true);
-            bust.overrideSprite = battler.character().bust;
+            var bust = AssetLoader.getCharacterBustSprite(
+                battler.characterId, BustHeight);
+            this.bust.gameObject.SetActive(true);
+            this.bust.overrideSprite = bust;
+
+            if (winFlag) 
+                winFlag.SetActive(battler.result().isWon());
+
+            //bust.overrideSprite = battler.character().bust;
         }
 
         /// <summary>
@@ -76,9 +88,9 @@ namespace UI.BattleMatchingScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawBaseInfo(RuntimeBattlePlayer battler) {
-            rankDisplay.setStarNum(battler.starNum);
             name.text = battler.name;
-            level.text = string.Format(LevelFormat, battler.level);
+            if (rankDisplay) rankDisplay.setStarNum(battler.starNum);
+            if (level) level.text = string.Format(LevelFormat, battler.level);
         }
 
         /// <summary>
@@ -86,6 +98,7 @@ namespace UI.BattleMatchingScene.Controls {
         /// </summary>
         /// <param name="battler">对战者</param>
         void drawProgress(RuntimeBattlePlayer battler) {
+            if (!progress) return;
             if (battler.progress >= 0)
                 progress.text = string.Format(ProgressFormat, battler.progress);
             else
@@ -93,24 +106,16 @@ namespace UI.BattleMatchingScene.Controls {
         }
 
         /// <summary>
-        /// 绘制空物品
-        /// </summary>
-        protected override void drawEmptyItem() {
-            if(unknown) unknown.SetActive(true);
-            bust.gameObject.SetActive(false);
-            rankDisplay.requestClear(true);
-            name.text = UnknownName;
-            progress.text = level.text = "";
-        }
-
-        /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            if (unknown) unknown.SetActive(false);
+        protected override void drawEmptyItem() {
+            name.text = UnknownName;
             bust.gameObject.SetActive(false);
-            rankDisplay.requestClear(true);
-            name.text = progress.text = level.text = "";
+            if (level) level.text = "";
+            if (unknown) unknown.SetActive(true);
+            if (rankDisplay) rankDisplay.requestClear(true);
+            if (progress) progress.text = "";
+            if (winFlag) winFlag.SetActive(false);
         }
 
         #endregion

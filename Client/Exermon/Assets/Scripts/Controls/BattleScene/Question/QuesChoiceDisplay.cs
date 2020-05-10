@@ -1,4 +1,4 @@
-﻿
+﻿/*
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -158,3 +158,4 @@ namespace UI.BattleScene.Controls.Question {
 
     }
 }
+*/

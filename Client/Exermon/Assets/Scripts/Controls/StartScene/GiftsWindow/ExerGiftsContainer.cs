@@ -10,7 +10,7 @@ namespace UI.StartScene.Controls.ExerGift {
     /// <summary>
     /// 艾瑟萌天赋卡片容器
     /// </summary>
-    public class ExerGiftsContainer : ContainerDisplay<ExerGift> {
+    public class ExerGiftsContainer : SelectableContainerDisplay<ExerGift> {
 
         /// <summary>
         /// 常量设置

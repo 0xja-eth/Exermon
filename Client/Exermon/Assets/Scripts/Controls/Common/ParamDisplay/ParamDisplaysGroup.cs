@@ -10,7 +10,7 @@ namespace UI.Common.Controls.ParamDisplays {
     /// 属性条组
     /// </summary>
     /// 
-    public class ParamDisplaysGroup : GroupView<ParamDisplay> {
+    public class ParamDisplaysGroup : GroupView<MultParamsDisplay> {
 
         #region 初始化
 
@@ -18,12 +18,12 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 配置组件
         /// </summary>
         /// <param name="objs">对象数组</param>
-        public void configure(ParamDisplay.DisplayDataConvertable[] objs) {
+        public void configure(ParamDisplay.IDisplayDataConvertable[] objs) {
             base.configure();
             configureParams(objs);
         }
         /// <param name="obj">对象</param>
-        public void configure(ParamDisplay.DisplayDataArrayConvertable obj) {
+        public void configure(ParamDisplay.IDisplayDataArrayConvertable obj) {
             base.configure();
             configureParams(obj);
         }
@@ -32,12 +32,12 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 配置属性集
         /// </summary>
         /// <param name="objs">对象数组</param>
-        void configureParams(ParamDisplay.DisplayDataConvertable[] objs) {
+        void configureParams(ParamDisplay.IDisplayDataConvertable[] objs) {
             for (int i = 0; i < subViewsCount(); i++)
                 configureParam(i, objs[i]);
         }
         /// <param name="obj">对象</param>
-        void configureParams(ParamDisplay.DisplayDataArrayConvertable obj, string type = "") {
+        void configureParams(ParamDisplay.IDisplayDataArrayConvertable obj, string type = "") {
             var data = obj.convertToDisplayDataArray(type);
             for (int i = 0; i < subViewsCount(); i++)
                 configureParam(i, data[i]);
@@ -48,7 +48,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="index">索引</param>
         /// <param name="obj">对象/数据</param>
-        void configureParam(int index, ParamDisplay.DisplayDataConvertable obj) {
+        void configureParam(int index, ParamDisplay.IDisplayDataConvertable obj) {
             subViews[index].configure(obj);
         }
         void configureParam(int index, JsonData obj) {
@@ -71,13 +71,17 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 设置值
         /// </summary>
         /// <param name="objs">对象数组</param>
-        public void setValues(ParamDisplay.DisplayDataConvertable[] objs,
+        public void setValues(JsonData[] values, bool force = false) {
+            for (int i = 0; i < values.Length; i++)
+                setValue(i, values[i], force);
+        }
+        public void setValues(ParamDisplay.IDisplayDataConvertable[] objs,
             string type = "", bool force = false) {
             for (int i = 0; i < objs.Length; i++)
                 setValue(i, objs[i], type, force);
         }
         /// <param name="obj">对象</param>
-        public void setValues(ParamDisplay.DisplayDataArrayConvertable obj,
+        public void setValues(ParamDisplay.IDisplayDataArrayConvertable obj,
             string type = "", bool force = false) {
             if (obj == null) clearValues();
             else {
@@ -87,7 +91,7 @@ namespace UI.Common.Controls.ParamDisplays {
             }
         }
         /// <param name="objs">多个对象</param>
-        public void setValues(ParamDisplay.DisplayDataArrayConvertable[] objs,
+        public void setValues(ParamDisplay.IDisplayDataArrayConvertable[] objs,
             string type = "", bool force = false) {
             if (objs == null || objs.Length <= 0) clearValues();
             else {
@@ -119,11 +123,11 @@ namespace UI.Common.Controls.ParamDisplays {
         public void setValue(int index, JsonData obj, bool force = false) {
             createSubView(index).setValue(obj, force);
         }
-        public void setValue(int index, ParamDisplay.DisplayDataConvertable obj,
+        public void setValue(int index, ParamDisplay.IDisplayDataConvertable obj,
             string type = "", bool force = false) {
             createSubView(index).setValue(obj, type, force);
         }
-        public void setValue(int index, ParamDisplay.DisplayDataConvertable[] objs,
+        public void setValue(int index, ParamDisplay.IDisplayDataConvertable[] objs,
             string type = "", bool force = false) {
             createSubView(index).setValue(objs, type, force);
         }

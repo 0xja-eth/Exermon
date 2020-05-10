@@ -191,7 +191,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5291817098460535220}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 304a3b7b46930a04fa8c76b8e1baa91b, type: 3}
+  m_Script: {fileID: 11500000, guid: a74676ea3740c79499dd314f979c024c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   container: {fileID: 5291817098326634379}
@@ -201,6 +201,12 @@ MonoBehaviour:
   countText: {fileID: 0}
   maxCheck: 0
   defaultCapacity: 0
+  defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
+  _actived: 1
+  _selectable: 1
+  _deselectable: 1
+  _checkable: 1
+  _highlightable: 1
   detail: {fileID: 0}
 --- !u!1 &5291817099483803047
 GameObject:

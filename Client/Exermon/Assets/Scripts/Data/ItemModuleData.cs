@@ -941,7 +941,7 @@ namespace ItemModule.Data {
         /// <param name="json"></param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-
+            Debug.Log("loadCustomAttributes: " + json.ToJson());
             var data = DataLoader.load(json, "items");
             if (data != null && data.IsArray) {
                 items.Clear();

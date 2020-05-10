@@ -67,7 +67,8 @@ namespace UI.StartScene.Controls.Exermon {
         /// 物品改变回调
         /// </summary>
         protected override void onItemChanged() {
-            nickname = item.name;
+            if (item != null) nickname = item.name;
+            else nickname = "";
             base.onItemChanged();
         }
 
@@ -158,7 +159,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             clearInfoView();
             clearParamsView();
             clearNicknameText();

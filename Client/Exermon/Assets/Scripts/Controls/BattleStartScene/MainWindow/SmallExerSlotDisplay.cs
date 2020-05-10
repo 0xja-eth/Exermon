@@ -8,7 +8,7 @@ namespace UI.BattleStartScene.Controls.Main {
     /// <summary>
     /// 艾瑟萌槽显示
     /// </summary>
-    public class SmallExerSlotDisplay : ContainerDisplay<ExerSlotItem> {
+    public class SmallExerSlotDisplay : SelectableContainerDisplay<ExerSlotItem> {
 
         /// <summary>
         /// 常量设置

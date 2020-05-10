@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 using RecordModule.Data;
-
+/*
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.BattleScene.Controls.Question {
@@ -12,7 +12,7 @@ namespace UI.BattleScene.Controls.Question {
     /// 题目选项容器
     /// </summary>
     public class QuesChoiceContainer :
-        ContainerDisplay<Question.Choice>, IItemDetailDisplay<Question> {
+        SelectableContainerDisplay<Question.Choice>, IItemDetailDisplay<Question> {
 
         /// <summary>
         /// 常量设置
@@ -26,8 +26,8 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 显示结果
         /// </summary>
-        QuestionSetRecord.IQuestionResult _result = null; // 是否显示答案
-        public QuestionSetRecord.IQuestionResult result {
+        IQuestionResult _result = null; // 是否显示答案
+        public IQuestionResult result {
             get { return _result; }
             set {
                 _result = value;
@@ -99,17 +99,22 @@ namespace UI.BattleScene.Controls.Question {
             setItem(item, -1, refresh);
         }
 
-        public void startView(Question item, int index = -1, bool refresh = false) {
+        public void startView(Question item, int index = -1) {
             startView();
-            setItem(item, index, refresh);
+            setItem(item, index, true);
         }
 
-        public void startView(Question item, bool refresh = false) {
+        public void startView(Question item) {
             startView();
-            setItem(item, refresh);
+            setItem(item, true);
+        }
+
+        public void clearItem() {
+            setItem(null, -1);
         }
 
         #endregion
 
     }
 }
+*/

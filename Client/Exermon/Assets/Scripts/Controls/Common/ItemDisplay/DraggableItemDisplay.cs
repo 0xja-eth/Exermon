@@ -93,34 +93,37 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 开始拖拽
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnBeginDrag(PointerEventData eventData) {
+        /// <param name="data">事件数据</param>
+        public void OnBeginDrag(PointerEventData data) {
             if (!isDraggable()) return;
             dragging = true;
             onBeforeDrag();
             if (createDragObj) dragObj = createDraggingObject();
             else dragObj = convertToDraggingObject();
-            updateDraggingObjectPosition(eventData);
+            updateDraggingObjectPosition(data);
             refreshStatus();
         }
 
         /// <summary>
         /// 拖拽中
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnDrag(PointerEventData eventData) {
+        /// <param name="data">事件数据</param>
+        public void OnDrag(PointerEventData data) {
+            Debug.Log("OnDrag: " + data.pointerDrag);
             if (!isDraggable()) return;
             dragging = true;
-            updateDraggingObjectPosition(eventData);
+            updateDraggingObjectPosition(data);
         }
 
         /// <summary>
         /// 结束拖拽
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnEndDrag(PointerEventData eventData) {
+        /// <param name="data">事件数据</param>
+        public void OnEndDrag(PointerEventData data) {
+            Debug.Log("OnEndDrag: "+ data.pointerDrag);
+            if (!isDragging()) return;
             dragging = false;
-            if (!isDraggable()) return;
+            //if (!isDraggable()) return;
 
             if (createDragObj) Destroy(dragObj);
             else resetFromDraggingObject();

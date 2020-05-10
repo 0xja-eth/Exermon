@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿/*
+using UnityEngine;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.QuestionDisplay;
 
 namespace UI.BattleScene.Controls.Question {
 
@@ -54,14 +56,18 @@ namespace UI.BattleScene.Controls.Question {
             setItem(item, -1, refresh);
         }
 
-        public void startView(Question item, int index = -1, bool refresh = false) {
+        public void startView(Question item, int index = -1) {
             startView();
-            setItem(item, index, refresh);
+            setItem(item, index, true);
         }
 
-        public void startView(Question item, bool refresh = false) {
+        public void startView(Question item) {
             startView();
-            setItem(item, refresh);
+            setItem(item, true);
+        }
+
+        public void clearItem() {
+            setItem(null, -1);
         }
 
         #endregion
@@ -78,4 +84,4 @@ namespace UI.BattleScene.Controls.Question {
         
         #endregion
     }
-}
+}*/

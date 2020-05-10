@@ -16,15 +16,15 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// 过滤的标签
         /// </summary>
         public static string[] filterLabels = new string[] {
-        "br", "a", "div", "em", "label", "span", "!--"
-    };
+            "br", "a", "div", "em", "label", "span", "!--"
+        };
 
         /// <summary>
         /// Unity 内置标签
         /// </summary>
         public static string[] buildInLabels = new string[] {
-        "size", "quad", "color"
-    };
+            "size", "quad", "color"
+        };
 
         /// <summary>
         /// 单个字符数据结构
@@ -306,18 +306,18 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
 
                     lastInfo = info;
                     ls = ms; le = me; // 记录当前匹配项数据
-                                      /* } else if (ms < le && me > le) { // 当两个匹配项重叠的时候（ls[..ms[..]le..]me..）
-                                          // 这时候只有当两个标签相同才处理（因为正则表达式无法处理内嵌的情况，在这里进行处理）
-                                          if (info.handler.tag() == lastInfo.handler.tag()) {
-                                              // 只生成一段：ls - me
-                                              subText = text.Substring(ls, me - ls);
-                                              QuestionText.TestLog("SubText = " + subText);
-                                              var child = new FragmentData(subText, ls, me, lastInfo);
-                                              parent.children.Add(child); // 添加子树
-                                              build(child); // 递归建树
+                /* } else if (ms < le && me > le) { // 当两个匹配项重叠的时候（ls[..ms[..]le..]me..）
+                    // 这时候只有当两个标签相同才处理（因为正则表达式无法处理内嵌的情况，在这里进行处理）
+                    if (info.handler.tag() == lastInfo.handler.tag()) {
+                        // 只生成一段：ls - me
+                        subText = text.Substring(ls, me - ls);
+                        QuestionText.TestLog("SubText = " + subText);
+                        var child = new FragmentData(subText, ls, me, lastInfo);
+                        parent.children.Add(child); // 添加子树
+                        build(child); // 递归建树
 
-                                              le = me;
-                                          } */
+                        le = me;
+                    } */
                 }
                 if (ms >= le) { // 当当前匹配项起始位置大于已有匹配项的末位置（ls[...]le..ms[...）
 

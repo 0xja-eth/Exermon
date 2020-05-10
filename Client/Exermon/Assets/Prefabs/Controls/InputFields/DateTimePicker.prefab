@@ -133,7 +133,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 72, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &6493679601216751454
 MonoBehaviour:
@@ -229,7 +229,7 @@ MonoBehaviour:
   container: {fileID: 6493679601216751456}
   type: 0
   itemCount: 2
-  threshold: 15
+  threshold: 25
   itemHeight: 42
   currentTextColor: {r: 0, g: 0, b: 0, a: 1}
   minTextColor: {r: 0, g: 0, b: 0, a: 0.2509804}

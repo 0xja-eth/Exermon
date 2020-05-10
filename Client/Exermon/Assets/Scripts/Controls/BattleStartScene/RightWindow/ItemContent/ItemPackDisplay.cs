@@ -34,7 +34,7 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<PackContItem> getItemDetail() {
+        public override IItemDetailDisplay<PackContItem> getItemDetail() {
             return detail;
         }
         

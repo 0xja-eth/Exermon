@@ -15,7 +15,7 @@ namespace UI.StartScene.Controls.Exermon {
     /// <summary>
     /// 艾瑟萌卡片容器
     /// </summary>
-    public class ExermonsContainer : ContainerDisplay<Exermon> {
+    public class ExermonsContainer : SelectableContainerDisplay<Exermon> {
 
         /// <summary>
         /// 常量设置
@@ -45,7 +45,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<Exermon> getItemDetail() {
+        public override IItemDetailDisplay<Exermon> getItemDetail() {
             return detail;
         }
 
@@ -123,7 +123,7 @@ namespace UI.StartScene.Controls.Exermon {
 
             for (int i = 0; i < cnt; ++i) {
                 eids[i] = items[eids[i]].getID();
-                enames[i] = this.enames[eids[i]];
+                enames[i] = this.enames[eids[i]-1];
             }
             return cnt;
         }

@@ -116,7 +116,7 @@ namespace UI.Common.Controls.InputFields {
             var value = getValue();
             var res = (check != null ? check.Invoke(value) : "");
             // 如果当前为空值且允许，不进行信息提示
-            if (value.Equals(emptyValue()) && res == "") {
+            if (Equals(value, emptyValue()) && res == "") {
                 clear(); return "";
             }
             if (display) displayCheckResult(res);
@@ -158,6 +158,7 @@ namespace UI.Common.Controls.InputFields {
         /// <param name="check">是否更新状态</param>
         /// <param name="emit">是否回调</param>
         public void setValue(T value, bool check = true, bool emit = true) {
+            Debug.Log("setValue: " + name + ": " + value);
             if (assignValue(value)) onValueChanged(check, emit);
         }
 

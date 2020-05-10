@@ -39,7 +39,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        protected override IItemDetailDisplay<PlayerExermon> getItemDetail() {
+        public override IItemDetailDisplay<PlayerExermon> getItemDetail() {
             return detail;
         }
 

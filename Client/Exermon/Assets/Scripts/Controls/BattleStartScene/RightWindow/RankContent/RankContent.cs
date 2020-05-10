@@ -19,8 +19,8 @@ namespace UI.BattleStartScene.Controls.Right.RankContent {
         /// 外部变量定义
         /// </summary>
         public ParamDisplaysGroup rankList;
-        public ParamDisplay selfRank;
-        public ParamDisplay rankInfo;
+        public MultParamsDisplay selfRank;
+        public MultParamsDisplay rankInfo;
 
         /// <summary>
         /// 外部系统定义

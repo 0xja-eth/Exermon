@@ -1,4 +1,4 @@
-﻿
+﻿/*
 namespace UI.BattleScene.Controls.Question {
     
     /// <summary>
@@ -6,3 +6,4 @@ namespace UI.BattleScene.Controls.Question {
     /// </summary>
     public class ChoiceButtonContainer : QuesChoiceContainer {}
 }
+*/

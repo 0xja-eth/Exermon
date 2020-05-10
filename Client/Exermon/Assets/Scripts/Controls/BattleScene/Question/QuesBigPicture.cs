@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Core.Data.Loaders;
 
 using UI.Common.Controls.ItemDisplays;
-
+/*
 namespace UI.BattleScene.Controls.Question {
 
     /// <summary>
@@ -46,7 +46,7 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        public override void clearItem() {
             picture.gameObject.SetActive(false);
             alph.text = "";
         }
@@ -55,3 +55,4 @@ namespace UI.BattleScene.Controls.Question {
 
     }
 }
+*/

@@ -59,7 +59,7 @@ namespace UI.StartScene.Controls.ExerGift {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             icon.gameObject.SetActive(false);
             if (name) name.text = "";
         }

@@ -63,7 +63,7 @@ namespace UI.BattleScene.Controls {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
-            isLoaded = item.loaded;
+            isLoaded = item != null && item.loaded;
         }
 
         #endregion
@@ -103,7 +103,7 @@ namespace UI.BattleScene.Controls {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
+        protected override void drawEmptyItem() {
             num.text = subject.text = "";
             if (type) type.text = "";
             star.clearValue();

@@ -53,12 +53,12 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// <param name="item">物品</param>
         /// <param name="index">索引</param>
         /// <param name="refresh">是否刷新</param>
-        public void startView(BattleItemSlotItem item, int index = -1, bool refresh = false) {
+        public void startView(BattleItemSlotItem item, int index = -1) {
             slotItem = item;
-            PackContItem packItem;
-            if (item == null || item.isNullItem()) packItem = null;
-            else packItem = item.packItem;
-            startView(packItem, index, refresh);
+            PackContItem packItem = null;
+            if (item != null && !item.isNullItem())
+                packItem = item.packItem;
+            startView(packItem, index);
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// </summary>
         /// <param name="item">物品</param>
         /// <param name="refresh">是否刷新</param>
-        public void startView(BattleItemSlotItem item, bool refresh = false) {
+        public void startView(BattleItemSlotItem item) {
             slotItem = item;
-            startView(item.packItem, refresh);
+            startView(item.packItem);
         }
 
         /// <summary>
@@ -103,11 +103,20 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         #endregion
 
         #region 初始化
-        
+
         #endregion
 
         #region 数据控制
         
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <returns></returns>
+        public override bool isNullItem(PackContItem item) {
+            return base.isNullItem(item) || item.isNullItem() ||
+                item.type != (int)BaseContItem.Type.HumanPackItem;
+        }
+
         #endregion
 
         #region 画面绘制
@@ -117,11 +126,7 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// </summary>
         /// <param name="packItem">物品</param>
         protected override void drawExactlyItem(PackContItem packItem) {
-            base.drawExactlyItem(packItem);
-
-            if (packItem.isNullItem()) drawEmptyItem();
-            else if (packItem.type == (int)BaseContItem.Type.HumanPackItem)
-                drawHumanPackItem((HumanPackItem)packItem);
+            drawHumanPackItem((HumanPackItem)packItem);
         }
 
         /// <summary>
@@ -168,8 +173,7 @@ namespace UI.BattleStartScene.Controls.Right.ItemContent {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            base.clearItem();
+        protected override void drawEmptyItem() {
             icon.gameObject.SetActive(false);
             name.text = description.text = type.text =
                 freeze.text = effects.text = "";

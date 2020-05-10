@@ -50,9 +50,10 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <summary>
         /// 设置装备
         /// </summary>
-        protected override void setupEquip() {
-            if (item == null) base.setEquip(null, true);
-            else base.setEquip(item.packItem, true);
+        protected override void setupExactlyEquip() {
+            base.setupExactlyEquip();
+            equip = item.packItem;
+            // base.setEquip(item.packItem, true);
         }
 
         /// <summary>
@@ -81,6 +82,16 @@ namespace UI.BattleStartScene.Controls.Main {
         protected override UnityAction<UnityAction> dequipRequestFunc() {
             return action => battleSer.dequipBattleItem(item, action);
         }
+        
+        /// <summary>
+        /// 是否为空物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool isNullEquip(PackContItem equip) {
+            return base.isNullEquip(equip) || equip.isNullItem() ||
+                equip.type != (int)BaseContItem.Type.HumanPackItem;
+        }
 
         #endregion
 
@@ -92,10 +103,7 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <param name="equip">装备</param>
         protected override void drawExactlyEquip(PackContItem packItem) {
             base.drawExactlyEquip(packItem);
-
-            if (packItem.isNullItem()) drawEmptyItem();
-            else if (packItem.type == (int)BaseContItem.Type.HumanPackItem)
-                drawHumanPackItem((HumanPackItem)packItem);
+            drawHumanPackItem((HumanPackItem)packItem);
         }
 
         /// <summary>
@@ -111,7 +119,7 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <summary>
         /// 清除装备
         /// </summary>
-        protected override void clearEquip() {
+        protected override void drawEmptyEquip() {
             icon.overrideSprite = null;
             icon.gameObject.SetActive(false);
         }
@@ -119,8 +127,8 @@ namespace UI.BattleStartScene.Controls.Main {
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void clearItem() {
-            clearEquip();
+        protected override void drawEmptyItem() {
+            drawEmptyEquip();
         }
 
         #endregion

@@ -160,7 +160,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6138918091594468110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f35f88abe5c0e945ad772aa3c23f80c, type: 3}
+  m_Script: {fileID: 11500000, guid: d44a181f3c421254ba2eb5df4a37b412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   background: {fileID: 0}
@@ -172,6 +172,7 @@ MonoBehaviour:
   checkable: 0
   highlightable: 1
   forceChecked: 0
+  deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 1, g: 1, b: 0.75, a: 0}

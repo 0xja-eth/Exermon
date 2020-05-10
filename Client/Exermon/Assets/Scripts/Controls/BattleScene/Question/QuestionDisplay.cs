@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+/*
+using System;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +10,7 @@ using Core.Data.Loaders;
 using RecordModule.Data;
 using RecordModule.Services;
 
+using UI.Common.Controls.QuestionDisplay;
 using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.SystemExtend.QuestionText;
 
@@ -61,8 +64,8 @@ namespace UI.BattleScene.Controls.Question {
         /// <summary>
         /// 显示结果
         /// </summary>
-        QuestionSetRecord.IQuestionResult _result = null;
-        public QuestionSetRecord.IQuestionResult result {
+        IQuestionResult _result = null;
+        public IQuestionResult result {
             get { return _result; }
             set {
                 choiceContainer.result = value;
@@ -271,4 +274,4 @@ namespace UI.BattleScene.Controls.Question {
 
         #endregion
     }
-}
+}*/

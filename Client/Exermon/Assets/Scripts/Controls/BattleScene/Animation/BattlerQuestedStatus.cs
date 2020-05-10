@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,11 +43,7 @@ namespace UI.BattleScene.Controls.Animation {
 
             //var texture = correct ? correctBackground : wrongBackground;
             //statusBackground.overrideSprite = AssetLoader.generateSprite(texture);
-            /*
-            if (humanBlackLine) humanBlackLine.SetActive(!correct);
-            if (exermonBlackLine) exermonBlackLine.SetActive(!correct);
-            if (lightEffect) lightEffect.SetActive(correct);
-            */
+
         }
 
         /// <summary>
@@ -64,3 +61,4 @@ namespace UI.BattleScene.Controls.Animation {
         #endregion
     }
 }
+*/

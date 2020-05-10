@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+/*
+using System;
 using UnityEngine;
 
 using Core.Data.Loaders;
@@ -116,7 +118,7 @@ namespace UI.BattleScene.Controls.Animation {
         /// <summary>
         /// 清空物品
         /// </summary>
-        protected override void clearItem() {
+        public override void clearItem() {
             base.clearItem();
             if (waitingText) waitingText.SetActive(false);
         }
@@ -124,3 +126,4 @@ namespace UI.BattleScene.Controls.Animation {
         #endregion
     }
 }
+*/
