@@ -36,7 +36,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <param name="value">值</param>
         /// <returns>返回值对应的比率</returns>
         public override double calcRate(double value) {
-            var tmp = (value / param.max) - 0.5f * 10;
+            var tmp = ((value / param.max) - 0.5f) * 10;
             return CalcService.Common.sigmoid(tmp);
         }
 

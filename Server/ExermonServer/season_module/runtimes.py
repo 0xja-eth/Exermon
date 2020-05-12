@@ -14,7 +14,7 @@ class RankListData:
 	MAX_RANK = 9999
 
 	# 刷新最短间隔
-	MIN_DELTA = datetime.timedelta(0, 300)
+	MIN_DELTA = datetime.timedelta(0, 60*30)
 
 	# 更新时间（分钟数）
 	UPDATE_MINUTES = [0, 30]
@@ -69,8 +69,12 @@ class RankListData:
 			返回排行榜是否需要更新
 		"""
 		now = datetime.datetime.now()
-		return now.minute in self.UPDATE_MINUTES and \
-			now - self.update_time >= self.MIN_DELTA
+		delta = now - self.update_time
+
+		return delta >= self.MIN_DELTA
+
+		# return now.minute in self.UPDATE_MINUTES and \
+		# 	now - self.update_time >= self.MIN_DELTA
 
 	def convertToDict(self, player: 'Player', count=MAX_RANK):
 		"""
@@ -188,16 +192,16 @@ class SeasonManager:
 
 	# region 排行榜操作
 
-	@classmethod
-	async def updateRank(cls):
-		"""
-		管理赛季高分排行榜
-		"""
-		rank_list = cls.getCurrentRankList()
-		if rank_list is None: return
-
-		if rank_list.isUpdateRequired():
-			rank_list.update()
+	# @classmethod
+	# def updateRank(cls):
+	# 	"""
+	# 	管理赛季高分排行榜
+	# 	"""
+	# 	rank_list = cls.getCurrentRankList()
+	# 	if rank_list is None: return
+	#
+	# 	if rank_list.isUpdateRequired():
+	# 		rank_list.update()
 
 	@classmethod
 	def getCurrentRankList(cls) -> RankListData:
@@ -222,20 +226,21 @@ class SeasonManager:
 			返回制定赛季ID的排行榜
 		"""
 		if season is not None: season_id = season.id
+		else: season = CompSeason.get(id=season_id)
 
 		# 如果该ID未有缓存结果，生成一个排行榜
-		if season_id not in cls.SeasonRankMap:
-			# 获取赛季实例
-			if season is None:
-				season = CompSeason.get(id=season_id)
+		if season_id in cls.SeasonRankMap:
+			rank_list = cls.SeasonRankMap[season_id]
+			if rank_list.isUpdateRequired(): rank_list.update()
 
+		else:
 			# 生成排行榜并缓存
-			cls.SeasonRankMap[season_id] = RankListData(season)
+			rank_list = cls.SeasonRankMap[season_id] = RankListData(season)
 
-		return cls.SeasonRankMap[season_id]
+		return rank_list
 
 	# endregion
 
 
 RuntimeManager.registerEvent(SeasonManager.maintainSeason)
-RuntimeManager.registerEvent(SeasonManager.updateRank)
+# RuntimeManager.registerEvent(SeasonManager.updateRank)

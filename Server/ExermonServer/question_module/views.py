@@ -24,6 +24,15 @@ class Service:
 
 		return {'questions': questions}
 
+	# 查询题目详情
+	@classmethod
+	async def getDetail(cls, consumer, player: Player, qid: int, ):
+		# 返回数据：
+		# detail: 题目详情数据 => 题目详情数据
+		from .runtimes import QuestionDetail
+
+		return {'detail': QuestionDetail.getData(qid, player=player)}
+
 	# 查询玩家题目反馈-lgy
 	@classmethod
 	async def getReports(cls, consumer, player: Player):

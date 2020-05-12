@@ -274,7 +274,8 @@ namespace UI.Common.Controls.ParamDisplays {
                 case ValueType.SignPercent:
                     res = SceneUtils.double2Perc(value);
                     if (value > 0) res = "+" + res; break;
-                case ValueType.TimeSpan: return SceneUtils.time2Str(value);
+                case ValueType.TimeSpan:
+                    return SceneUtils.time2Str(value/1000.0);
             }
             return res;
         }

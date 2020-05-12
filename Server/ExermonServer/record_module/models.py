@@ -142,6 +142,8 @@ class QuestionRecord(models.Model):
 			if self.corr_time is None:
 				self.corr_time = timespan
 			self.correct += 1
+		else:
+			self.wrong = True
 
 		if self.count <= 0:
 			self.source = player_ques.source().value
@@ -162,6 +164,8 @@ class QuestionRecord(models.Model):
 
 	# 正确率
 	def corrRate(self):
+		if self.count is None or self.count == 0:
+			return 0
 		return self.correct / self.count
 
 

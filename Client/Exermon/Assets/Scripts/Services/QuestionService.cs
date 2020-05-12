@@ -79,8 +79,6 @@ namespace QuestionModule.Services {
         /// </summary>
         public QuesReport[] quesReports { get; protected set; }
 
-        public 
-
         /// <summary>
         /// 外部系统
         /// </summary>

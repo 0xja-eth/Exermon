@@ -7,6 +7,7 @@ using UnityEngine;
 using LitJson;
 
 using Core.Data;
+using Core.Data.Loaders;
 
 using GameModule.Data;
 using GameModule.Services;
@@ -62,6 +63,8 @@ namespace QuestionModule.Data {
             [AutoConvert]
             public int sumCollect { get; protected set; }
             [AutoConvert]
+            public int sumCount { get; protected set; }
+            [AutoConvert]
             public double corrRate { get; protected set; }
             [AutoConvert]
             public double allCorrRate { get; protected set; }
@@ -74,7 +77,7 @@ namespace QuestionModule.Data {
             [AutoConvert]
             public DateTime firstDate { get; protected set; }
             [AutoConvert]
-            public DateTime updateDate { get; protected set; }
+            public DateTime updateTime { get; protected set; }
 
             /// <summary>
             /// 数据转换
@@ -90,7 +93,7 @@ namespace QuestionModule.Data {
             /// </summary>
             /// <returns></returns>
             public bool isOutOfDate() {
-                return (DateTime.Now - updateDate).TotalSeconds >= OutOfDateSeconds;
+                return (DateTime.Now - updateTime).TotalSeconds >= OutOfDateSeconds;
             }
         }
 
@@ -198,7 +201,7 @@ namespace QuestionModule.Data {
         /// <returns>返回转化后的显示数据</returns>
         public JsonData convertToDisplayData(string type = "") {
             switch (type) {
-                case "detail": return convertToDisplayData();
+                case "detail": return convertDetailData();
                 default: return toJson();
             }
         }
@@ -216,6 +219,7 @@ namespace QuestionModule.Data {
             res["type"] = typeText();
             res["score"] = score;
             res["source"] = source;
+            res["create_time"] = DataLoader.convert(createTime);
 
             return res;
         }

@@ -429,6 +429,14 @@ WEBSOCKET_METHOD_ROUTER = {
 		Question.get,  # 处理函数
 		ChannelLayerTag.Self  # 是否需要响应
 	],
+	# 查询题目详情
+	'question/detail/get': [[
+		['uid', 'int'],
+		['qid', 'int'],
+	],
+		Question.getDetail,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 装备对战物资槽
 	'battle/equip/item': [[
 		['uid', 'int'],

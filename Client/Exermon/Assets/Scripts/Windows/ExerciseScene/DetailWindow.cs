@@ -33,8 +33,7 @@ namespace UI.ExerciseScene.Windows {
 
         public StarsDisplay quesStar;
         public MultParamsDisplay detail;
-        public TimeParamDisplay firstTime, 
-            lastTime, allAvgTime;
+        public TimeParamDisplay firstTime, lastTime, allAvgTime;
 
         /// <summary>
         /// 场景组件引用
@@ -94,12 +93,11 @@ namespace UI.ExerciseScene.Windows {
         #region 启动控制
 
         /// <summary>
-        /// 开启窗口
+        /// 显示窗口
         /// </summary>
-        public override void startWindow() {
+        protected override void showView() {
             quesSer.loadQuestionDetail(
-                questionDisplay.getItem(), base.startWindow
-            );
+                questionDisplay.getItem(), base.showView);
         }
 
         #endregion
