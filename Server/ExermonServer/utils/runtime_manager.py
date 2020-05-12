@@ -819,6 +819,7 @@ class RuntimeManager:
 # from player_module.models import *
 
 # 初始化
+"""
 try:
 	from game_module.models import GameConfigure
 	GameConfigure.load()
@@ -826,6 +827,7 @@ except:
 	# 打印错误路径
 	traceback.print_exc()
 	print("仍未建立数据库")
+"""
 
 # 创建一个事件循环thread_loop
 thread_loop = asyncio.new_event_loop()

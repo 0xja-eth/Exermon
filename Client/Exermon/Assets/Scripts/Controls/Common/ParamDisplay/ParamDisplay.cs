@@ -90,6 +90,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="value">值</param>
         public virtual void setValue(T value) {
+            Debug.Log("setValue: " + name + ": " + value);
             data = value; onValueChanged();
         }
 

@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 using Core.UI;
 
 using UI.Common.Controls.ParamDisplays;
@@ -39,7 +41,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         protected T item {
             get { return data; }
-            set { data = value; }
+            set {
+                Debug.Log("setItem: " + name + ": " + value);
+                data = value;
+            }
         }
         /*
         #region 启动控制
