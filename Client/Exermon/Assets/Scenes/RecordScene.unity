@@ -4859,6 +4859,7 @@ MonoBehaviour:
   subViewNameFormat: 
   subViewPrefab: {fileID: 2183529268616405575, guid: 5024ee64b3a31b04ba3435fbf05f3a78,
     type: 3}
+  mask: {fileID: 0}
   countText: {fileID: 1408412028}
   maxCheck: 0
   defaultCapacity: 0
@@ -9034,7 +9035,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
 --- !u!1001 &1410321782

@@ -60,7 +60,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
 --- !u!114 &8280967252155034256
@@ -93,6 +93,7 @@ MonoBehaviour:
   subViewNameFormat: 
   subViewPrefab: {fileID: 4573236140866131684, guid: 28b417948516bd540bd36f4df8f271b9,
     type: 3}
+  mask: {fileID: 0}
   countText: {fileID: 0}
   maxCheck: 0
   defaultCapacity: 0

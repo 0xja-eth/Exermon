@@ -37,7 +37,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 383.89996, y: 0}
-  m_SizeDelta: {x: 719.7999, y: 0}
+  m_SizeDelta: {x: 719.7999, y: 70}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7226310312150356660
 CanvasRenderer:
@@ -67,7 +67,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: bc7071bc9eee3c04b9c2304e14dd20e6, type: 3}
-    m_FontSize: 20
+    m_FontSize: 28
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -81,6 +81,7 @@ MonoBehaviour:
   m_Text: "\uFF082019\u6625\u2022\u6587\u5CF0\u533A\u6821\u7EA7\u6708\u8003\uFF09\u5DF2\u77E5\u96C6\u5408
     A = {x | x<sup>2</sup>-3x \u2264 0}, B = {x | -1 < x < 1}\uFF0C\u5219A\u2229B
     =\uFF08\u3000\u3000\uFF09"
+  _embedImage: 0
   _textures: []
   _imagePrefab: {fileID: 0}
 --- !u!114 &7226310312150356682
@@ -102,7 +103,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7226310312150356687}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 

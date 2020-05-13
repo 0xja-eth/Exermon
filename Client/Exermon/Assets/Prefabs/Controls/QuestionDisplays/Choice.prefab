@@ -160,7 +160,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
 --- !u!114 &4573236140866131682
@@ -336,7 +336,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4573236140959222756
 RectTransform:
   m_ObjectHideFlags: 0
@@ -542,7 +542,7 @@ PrefabInstance:
     - target: {fileID: 7226310312150356680, guid: 7a47c627550f6a64f8153e5b6d472013,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 363.89996
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7226310312150356680, guid: 7a47c627550f6a64f8153e5b6d472013,
         type: 3}
@@ -552,7 +552,7 @@ PrefabInstance:
     - target: {fileID: 7226310312150356680, guid: 7a47c627550f6a64f8153e5b6d472013,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 695.7999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7226310312150356680, guid: 7a47c627550f6a64f8153e5b6d472013,
         type: 3}
