@@ -88,9 +88,15 @@ namespace UI.ExerciseScene.Windows {
         /// 配置题目
         /// </summary>
         void configureQuestions() {
+            updateQuestions(); startQuestion();
+        }
+
+        /// <summary>
+        /// 更新题目
+        /// </summary>
+        void updateQuestions() {
             questionNav.configure(record.getQuestions());
             questionNav.select(0, true);
-            startQuestion();
         }
 
         #endregion
@@ -200,7 +206,8 @@ namespace UI.ExerciseScene.Windows {
             timer.stopTimer(true);
             questionDisplay.terminateQuestion();
 
-            Debug.Log("onExerciseTerminated: "+record.toJson().ToJson());
+            //Debug.Log("onExerciseTerminated: "+record.toJson().ToJson());
+            updateQuestions();
 
             questionNav.results = record.questions;
             questionNav.showAnswer = true;

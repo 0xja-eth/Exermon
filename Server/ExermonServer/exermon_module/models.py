@@ -665,12 +665,12 @@ class PlayerExermon(PackContItem):
 			self._onUpgrade()
 
 		self.exp = 0
-		self.level = level
+		self.level = int(level)
 		self.refresh()
 
 	# 更改经验
 	def gainExp(self, val):
-		self.exp += val
+		self.exp += int(val)
 		self.refresh()
 
 	# 刷新艾瑟萌
@@ -701,8 +701,8 @@ class PlayerExermon(PackContItem):
 		if level > self.level:
 			self._onUpgrade()
 
-		self.exp = exp
-		self.level = level
+		self.exp = int(exp)
+		self.level = int(level)
 
 	# 升级触发事件
 	def _onUpgrade(self):
@@ -1338,11 +1338,11 @@ class ExerSlotItem(SlotContItem):
 
 	# 获得经验
 	def gainExp(self, slot_exp, exer_exp):
-		player_exer = self.playerExer()
+		player_exer: PlayerExermon = self.playerExer()
 		if player_exer is not None:
 			player_exer.gainExp(exer_exp)
 
-		self.exp += slot_exp
+		self.exp += int(slot_exp)
 		self.refresh()
 		self.save()
 

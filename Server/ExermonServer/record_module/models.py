@@ -320,14 +320,30 @@ class PlayerQuestion(CacheableModel):
 		self.is_new = rec is None
 
 	# 设置题目集
-	def setQuestionSet(self, question_set):
+	def setQuestionSet(self, question_set: 'QuestionSetRecord'):
+		"""
+		设置题目集
+		Args:
+			question_set (QuestionSetRecord): 题目集记录
+		"""
 		raise NotImplementedError
 		# self.question_set = question_set
 
 	# 获取题目集
 	def questionSet(self):
+		"""
+		返回题目集
+		Returns:
+			返回该题目关系对应的题目集
+		"""
 		raise NotImplementedError
 		# return self.question_set
+
+	def clearQuestionSet(self):
+		"""
+		清除题目集（删除用）
+		"""
+		self.setQuestionSet(None)
 
 	def correct(self) -> bool:
 		"""
@@ -335,7 +351,7 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			返回作答是否正确
 		"""
-		if not self.answered: return None
+		if not self.answered: return False
 		return self._getOrSetCache(self.CORRECT_CACHE_KEY,
 								   lambda: self.question.calcCorrect(self.selection))
 
@@ -412,6 +428,12 @@ class PlayerQuestion(CacheableModel):
 		self.slot_exp_incr = calc.slot_exp_incr
 		self.gold_incr = calc.gold_incr
 
+	def save(self, judge=True, **kwargs):
+		if judge and self.questionSet() is None:
+			self.delete_save = False
+			if self.id is not None: self.delete()
+		else: super().save(**kwargs)
+
 
 # ===================================================
 #  刷题题目关系表
@@ -421,7 +443,7 @@ class ExerciseQuestion(PlayerQuestion):
 		verbose_name = verbose_name_plural = "刷题题目关系"
 
 	# 刷题记录
-	exercise = models.ForeignKey('ExerciseRecord',
+	exercise = models.ForeignKey('ExerciseRecord', null=True,
 								 on_delete=models.CASCADE, verbose_name="刷题记录")
 
 	@classmethod
@@ -562,6 +584,9 @@ class QuestionSetRecord(CacheableModel):
 	# 奖励缓存键
 	REWARD_CACHE_KEY = 'rewards'
 
+	# 已删除容器项缓存键
+	REMOVED_CACHE_KEY = 'removed'
+
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
 							   verbose_name="玩家")
@@ -584,6 +609,7 @@ class QuestionSetRecord(CacheableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self._cache(self.REWARD_CACHE_KEY, [])
+		self._cache(self.REMOVED_CACHE_KEY, [])
 
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
@@ -712,7 +738,8 @@ class QuestionSetRecord(CacheableModel):
 			转化后的字典数据
 		"""
 		create_time = ModelUtils.timeToStr(self.create_time)
-		player_questions = ModelUtils.objectsToDict(self.playerQuestions(), type=type)
+		player_questions = ModelUtils.objectsToDict(
+			self.playerQuestions(), type=type)
 
 		base = {
 			'id': self.id,
@@ -744,6 +771,8 @@ class QuestionSetRecord(CacheableModel):
 		# 如果已有的缓存为 list 保存并删除之再重新读取
 		if isinstance(cache, list):
 			self._deleteCache(self.QUES_CACHE_KEY)
+			self._saveCache(self.REMOVED_CACHE_KEY)
+			self._cache(self.REMOVED_CACHE_KEY, [])
 		
 		return self._getOrSetCache(self.QUES_CACHE_KEY,
 								   lambda: self._playerQuestions())
@@ -825,7 +854,10 @@ class QuestionSetRecord(CacheableModel):
 			player_ques (PlayerQuestion): 题目关系
 		"""
 		cache = self._getQuestionsCache()
-		if player_ques in cache: cache.remove(player_ques)
+		if player_ques in cache:
+			cache.remove(player_ques)
+			player_ques.clearQuestionSet()
+			self._getCache(self.REMOVED_CACHE_KEY).append(player_ques)
 
 	def exactlyPlayer(self): # -> Player:
 		"""
@@ -1350,7 +1382,7 @@ class ExerciseRecord(QuestionSetRecord):
 		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
 		"""
 
-		player_queses = self._getQuestionsCache()
+		player_queses = self._getQuestionsCache().copy()
 
 		for player_ques in player_queses:
 			if not player_ques.answered:

@@ -1109,7 +1109,7 @@ class Player(CacheableModel):
 		exerslot = self.exerSlot()
 		if exerslot is None: return
 
-		self.exp += sum_exp
+		self.exp += int(sum_exp)
 
 		if slot_exps is not None and exer_exps is not None:
 			exerslot.gainExp(slot_exps, exer_exps)

@@ -81,27 +81,60 @@ namespace Core.Data.Loaders {
                 // 如果值为空且忽略空值，则返回原样
                 return ignoreNull ? val : default;
             // 判断特殊类型
-            if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData)) {
-                // 只有当值为空（默认）时才会创建对象
-                if (val == default) val = Activator.CreateInstance(type);
-                ((BaseData)val).load(data);
-                return val;
-            } else return load(type, data);
+            try {
+                if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData)) {
+                    // 只有当值为空（默认）时才会创建对象
+                    if (val == default) val = Activator.CreateInstance(type);
+                    ((BaseData)val).load(data);
+                    return val;
+                } else return _load(type, data);
+            } catch (Exception e) {
+                Debug.LogError("Error in " + data.ToJson() +
+                    " (load type: " + type + ", ori val: " + val + ")");
+                throw e;
+            }
         }
 
         public static T load<T>(JsonData json, string key) {
             if (!contains(json, key, true)) return default;
-            return (T)load(typeof(T), json[key]);
+            try {
+                return (T)_load(typeof(T), json[key]);
+            } catch (Exception e) {
+                Debug.LogError("Error in " + key + " of " + json.ToJson() +
+                    " (load type: " + typeof(T) + ")");
+                throw e;
+            }
         }
         public static T load<T>(JsonData data) {
             if (data == null) return default;
-            return (T)load(typeof(T), data);
+            try {
+                return (T)_load(typeof(T), data);
+            } catch (Exception e) {
+                Debug.LogError("Error in " + data.ToJson() + 
+                    " (load type: " + typeof(T) + ")");
+                throw e;
+            }
         }
         public static object load(Type type, JsonData json, string key) {
             if (!contains(json, key, true)) return default;
-            return load(type, json[key]);
+            try {
+                return _load(type, json[key]);
+            } catch (Exception e) {
+                Debug.LogError("Error in " + key + " of " + json.ToJson() + 
+                    " (load type: " + type + ")");
+                throw e;
+            }
         }
         public static object load(Type type, JsonData data) {
+            try {
+                return _load(type, data);
+            } catch (Exception e) {
+                Debug.LogError("Error in " + data.ToJson() + 
+                    " (load type: " + type + ")");
+                throw e;
+            }
+        }
+        private static object _load(Type type, JsonData data) {
             if (data == null) return default;
 
             // 处理数组情况

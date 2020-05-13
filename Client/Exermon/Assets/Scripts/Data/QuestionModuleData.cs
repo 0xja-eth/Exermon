@@ -71,7 +71,7 @@ namespace QuestionModule.Data {
             [AutoConvert]
             public int firstTime { get; protected set; }
             [AutoConvert]
-            public int lastTime { get; protected set; }
+            public int avgTime { get; protected set; }
             [AutoConvert]
             public int allAvgTime { get; protected set; }
             [AutoConvert]

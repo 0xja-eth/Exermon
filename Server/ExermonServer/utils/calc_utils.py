@@ -912,7 +912,8 @@ class QuestionGenerator:
 				print("WrongFirst")
 
 				wrong_questions = occur_questions.filter(wrong=True)
-				wrong_qids = ModelUtils.getObjectRelatedForFilter(wrong_questions, 'question_id')
+				wrong_qids = ModelUtils.getObjectRelatedForFilter(wrong_questions, 'question')
+				wrong_qids = list(q.id for q in wrong_qids)
 
 				id_limit = wrong_qids
 
@@ -920,7 +921,8 @@ class QuestionGenerator:
 				print("CollectedFirst")
 
 				collected_questions = occur_questions.filter(collected=True)
-				collected_qids = ModelUtils.getObjectRelatedForFilter(collected_questions, 'question_id')
+				collected_qids = ModelUtils.getObjectRelatedForFilter(collected_questions, 'question')
+				collected_qids = list(q.id for q in collected_qids)
 
 				id_limit = collected_qids
 
