@@ -66,6 +66,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 外部组件设置
         /// </summary>
+        public RectTransform mask; // 内容的上层蒙版
         public Text countText; // 个数文本
 
         /// <summary>
@@ -143,6 +144,21 @@ namespace UI.Common.Controls.ItemDisplays {
         protected int selectedIndex = -1, lastIndex = -1; // 选择的索引, 上次索引
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            initializeMask();
+        }
+
+        /// <summary>
+        /// 初始化上层蒙版
+        /// </summary>
+        void initializeMask() {
+            if (mask == null) mask = container.parent as RectTransform;
+        }
 
         /// <summary>
         /// 配置
@@ -696,6 +712,52 @@ namespace UI.Common.Controls.ItemDisplays {
         #endregion
 
         #region 界面控制
+
+        /// <summary>
+        /// 滚动到指定位置
+        /// </summary>
+        /// <param name="x">x位置</param>
+        /// <param name="y">y位置</param>
+        public void scrollTo(float x, float y) {
+            container.anchoredPosition = new Vector2(x, y);
+        }
+        /// <param name="rt">RectTransform</param>
+        public void scrollTo(RectTransform rt) {
+            Debug.Log("scrollTo: " + name + ": " + rt.anchoredPosition);
+            container.anchoredPosition = -rt.anchoredPosition;
+        }
+        /// <param name="index">项索引</param>
+        public void scrollTo(int index) {
+            if (index < 0 || index > subViewsCount()) return;
+            var subView = subViews[index];
+            var rt = subView.transform as RectTransform;
+            if (rt) scrollTo(rt);
+        }
+
+        /// <summary>
+        /// 指定项是否可视
+        /// </summary>
+        /// <param name="rt">RectTransform</param>
+        /// <returns>返回指定项是否可视</returns>
+        public bool isItemVisible(RectTransform rt) {
+            if (mask == null) return true;
+            Debug.Log("isItemVisible: " + name + ": " + rt);
+            var cPos = container.anchoredPosition;
+            var rPos = rt.anchoredPosition;
+            var mSize = mask.rect.size;
+            var rSize = rt.rect.size;
+            Debug.Log(name + ": cPos: " + cPos + ", rPos: " + rPos + 
+                " , mSize: " + mSize + " , rSize: " + rSize);
+            return (cPos.x + rPos.x >= 0 && cPos.x + rPos.x + rSize.x <= mSize.x &&
+                cPos.y + rPos.y - rSize.y >= -mSize.y && cPos.y + rPos.y <= 0);
+        }
+        /// <param name="index">项索引</param>
+        public bool isItemVisible(int index) {
+            if (index < 0 || index > subViewsCount()) return false;
+            var subView = subViews[index];
+            var rt = subView.transform as RectTransform;
+            return isItemVisible(rt);
+        }
 
         /// <summary>
         /// 绘制数目

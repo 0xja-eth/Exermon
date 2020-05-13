@@ -19,7 +19,7 @@ namespace Core.UI {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Transform container;
+        public RectTransform container;
         public T[] presetSubViews = new T[0];
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Core.UI {
         /// </summary>
         void initializeSubViewsByAutoFind() {
             int index = subViews.Count; string name; T subView;
-            container = container ?? transform;
+            container = container ?? (transform as RectTransform);
             while (true) {
                 name = subViewName(index);
                 subView = SceneUtils.find<T>(container, name);

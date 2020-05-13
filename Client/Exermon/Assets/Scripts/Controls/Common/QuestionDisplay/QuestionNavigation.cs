@@ -87,8 +87,11 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void onSelectChanged() {
             base.onSelectChanged();
+            Debug.Log("selectedIndex: " + name + ": " + selectedIndex);
             if (results != null && selectedIndex < results.Length)
                 detail.result = results[selectedIndex];
+            if (!isItemVisible(selectedIndex))
+                scrollTo(selectedIndex);
         }
 
         #endregion
