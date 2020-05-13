@@ -335,6 +335,7 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			返回作答是否正确
 		"""
+		if not self.answered: return None
 		return self._getOrSetCache(self.CORRECT_CACHE_KEY,
 								   lambda: self.question.calcCorrect(self.selection))
 
@@ -344,6 +345,7 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			返回作答得分
 		"""
+		if not self.answered: return 0
 		return self._getOrSetCache(self.SCORE_CACHE_KEY,
 								   lambda: self.question.calcScore(self.selection))
 
