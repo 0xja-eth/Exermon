@@ -48,8 +48,8 @@ namespace UI.BattleScene.Controls.Prepare {
         /// 是否可以选中
         /// </summary>
         /// <returns>可否选中</returns>
-        public override bool isSelectable() {
-            return base.isSelectable() && item != null && 
+        public override bool isEnabled() {
+            return base.isEnabled() && item != null && 
                 item.item() != null && item.freezeRound == 0;
         }
 
@@ -84,7 +84,6 @@ namespace UI.BattleScene.Controls.Prepare {
             name.text = item.name;
             freeze.text = string.Format(
                 FreezeFormat, runtimeItem.freezeRound);
-
         }
 
         /// <summary>

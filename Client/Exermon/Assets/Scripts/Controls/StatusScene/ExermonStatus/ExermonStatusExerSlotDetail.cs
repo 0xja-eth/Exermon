@@ -113,6 +113,8 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// <param name="contItem">容器项</param>
         protected virtual void drawParamsInfo(T contItem) {
             // 如果要显示的艾瑟萌与装备中的一致，直接显示
+            paramInfo.gameObject.SetActive(true);
+
             if (slotItem != null)
                 if (contItem == currentEquip())
                     drawCurrentParamsInfo(contItem);
@@ -192,6 +194,8 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// 清除属性信息
         /// </summary>
         void clearParamsInfo() {
+            paramInfo.gameObject.SetActive(false);
+
             if (slotItem != null) drawSlotParamsInfo();
             else paramInfo?.clearValues();
             paramInfo?.setIgnoreTrigger();

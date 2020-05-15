@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 using System.Collections;
 using System.Collections.Generic;
 
@@ -59,23 +60,27 @@ namespace Core.UI {
             bool active = rect.gameObject.activeInHierarchy;
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
-                
-                if (maxLayoutStableFrame == 0)
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-                else if (++cnt > minLayoutStableFrame && cnt <= maxLayoutStableFrame)
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-                else {
-                    bool newActive = rect.gameObject.activeInHierarchy;
-                    float newWidth = rect.rect.width, newHeight = rect.rect.height;
-                    if (newActive != active ||
-                        newWidth != width || newHeight != height) {
-                        cnt = 0; active = newActive;
-                        width = newWidth; height = newHeight;
+                try {
+                    if (maxLayoutStableFrame == 0)
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                    else if (++cnt > minLayoutStableFrame && cnt <= maxLayoutStableFrame)
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                    else {
+                        bool newActive = rect.gameObject.activeInHierarchy;
+                        float newWidth = rect.rect.width, newHeight = rect.rect.height;
+                        if (newActive != active ||
+                            newWidth != width || newHeight != height) {
+                            cnt = 0; active = newActive;
+                            width = newWidth; height = newHeight;
+                        }
                     }
+                } catch (Exception e) {
+                    Debug.LogWarning(e + ": " + e.StackTrace);
+                    break;
                 }
-
                 yield return null; // new WaitForEndOfFrame();
             }
+
         }
 
         #endregion

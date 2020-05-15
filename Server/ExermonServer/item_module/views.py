@@ -300,7 +300,9 @@ class Service:
 
 		ViewUtils.ensureObjectType(slot_container, SlotContainer, ErrorType.IncorrectContainerType)
 
-		pack_container = slot_container.setEquip(equip_item=equip_item, **kwargs)
+		pack_container, equiped_item = slot_container.setEquip(equip_item=equip_item, **kwargs)
+
+		pack_container.arrangeItems(equiped_item)
 
 		return cls.convertContainers(pack_container, slot=slot_container)
 

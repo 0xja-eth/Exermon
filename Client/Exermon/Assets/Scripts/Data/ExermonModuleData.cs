@@ -1334,6 +1334,7 @@ namespace ExermonModule.Data {
         /// <returns></returns>
         JsonData convertSlotExp() {
             var json = new JsonData();
+            json["subject"] = subject().name;
             json["exp"] = exp;
             json["next"] = next;
             json["level"] = level;

@@ -13788,6 +13788,7 @@ MonoBehaviour:
   selfPStatus: {fileID: 525189542}
   battleItemSlotDisplay: {fileID: 1422442524}
   prepareControl: {fileID: 1732850379}
+  confirmBtn: {fileID: 75473214}
 --- !u!95 &1453049234
 Animator:
   serializedVersion: 3
@@ -18997,6 +18998,11 @@ PrefabInstance:
       propertyPath: contents.Array.data[0]
       value: 
       objectReference: {fileID: 1409980130}
+    - target: {fileID: 4400701592633758072, guid: 7a5038c31e4becd458984b0d39bd1b2b,
+        type: 3}
+      propertyPath: maxLayoutStableFrame
+      value: 512
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a5038c31e4becd458984b0d39bd1b2b, type: 3}
 --- !u!114 &1370592254042265331 stripped

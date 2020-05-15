@@ -3,6 +3,7 @@ using ItemModule.Data;
 using ExermonModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.ParamDisplays;
 
 namespace UI.StatusScene.Controls.ExermonStatus {
     
@@ -12,6 +13,11 @@ namespace UI.StatusScene.Controls.ExermonStatus {
     public class ExermonStatusSlotItemDisplay<T> : 
         SlotContItemDisplay<ExerSlotItem, T>
         where T : PackContItem, new() {
+
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public MultParamsDisplay expBar;
 
         /// <summary>
         /// 详情显示组件
@@ -80,10 +86,27 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// <summary>
         /// 绘制物品
         /// </summary>
+        /// <param name="item"></param>
+        protected override void drawExactlyItem(ExerSlotItem item) {
+            base.drawExactlyItem(item);
+            expBar?.setValue(item, "slot_exp");
+        }
+
+        /// <summary>
+        /// 绘制物品
+        /// </summary>
         /// <param name="slotItem">艾瑟萌槽项</param>
         protected override void drawExactlyEquip(T equipItem) {
             base.drawExactlyEquip(equipItem);
             detail.setItem(equipItem);
+        }
+
+        /// <summary>
+        /// 绘制空物品
+        /// </summary>
+        protected override void drawEmptyItem() {
+            base.drawEmptyItem();
+            expBar?.clearValue();
         }
 
         #endregion

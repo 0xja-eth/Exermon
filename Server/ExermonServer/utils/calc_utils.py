@@ -1695,18 +1695,17 @@ class BattleResultRewardCalc(ExerciseResultRewardCalc):
 	def _calcScores(self):
 
 		battle_scores = BattleScoreCalc.calc(self.self_battle_player,
-							 self.self_runtime_battler,
-							 self.oppo_runtime_battler)
+											 self.self_runtime_battler,
+											 self.oppo_runtime_battler)
 
-		score_incr = BattleRankScoreCalc.calc(self.self_battle_player,
+		score_incr = BattleRankScoreCalc.calc(battle_scores.sumScore(),
+											  self.self_battle_player,
 											  self.oppo_battle_player)
 
 		return battle_scores, score_incr
 
 	def __battleScore(self):
-		return (self.battle_scores.time_score + self.battle_scores.hurt_score +
-				self.battle_scores.damage_score + self.battle_scores.recovery_score +
-				self.battle_scores.correct_score) / 5 + self.battle_scores.plus_score
+		return self.battle_scores.sumScore()
 
 	# 计算评价结果及星星奖励
 	def _calcJudgeAndStarIncr(self):
@@ -1842,7 +1841,7 @@ class BattleScoreCalc:
 	def _calcRecoveryScore(self):
 		ar = self.__calcRecoveryRate()
 		if ar <= 0: return 100
-		return 1-Common.sigmoid((ar-self.MX)/self.K4)*100
+		return (1-Common.sigmoid((ar-self.MX)/self.K4))*100
 
 	def __calcRecoveryRate(self):
 		ar = self.battler.sumRecovery()
@@ -1858,6 +1857,12 @@ class BattleScoreCalc:
 	def _calcPlusScore(self):
 		return 0
 
+	# 总分
+	def sumScore(self):
+		return (self.time_score + self.hurt_score +
+				self.damage_score + self.recovery_score +
+				self.correct_score) / 5 + self.plus_score
+
 
 # ===================================================
 # 对战赛季积分计算类
@@ -1868,11 +1873,11 @@ class BattleRankScoreCalc:
 	# round(对战评分 / (max(50, ARF + ARF - BRF) / 100)) - 50
 
 	@classmethod
-	def calc(cls, battler1, battler2):
-		calc_obj = cls(battler1, battler2)
+	def calc(cls, sum_score, battler1, battler2):
+		calc_obj = cls(sum_score, battler1, battler2)
 		return calc_obj.value
 
-	def __init__(self, battler1, battler2):
+	def __init__(self, sum_score, battler1, battler2):
 		from battle_module.models import BattlePlayer
 		from season_module.models import SeasonRecord
 		from player_module.models import Player
@@ -1880,6 +1885,8 @@ class BattleRankScoreCalc:
 
 		self.battler1: BattlePlayer = battler1
 		self.battler2: BattlePlayer = battler2
+
+		self.sum_score: BattleScoreCalc = sum_score
 
 		online_player = PlayerCommon.getOnlinePlayer(self.battler1.player_id)
 
@@ -1912,7 +1919,7 @@ class BattleRankScoreCalc:
 		arf = rank1.score_factor
 		brf = rank2.score_factor
 
-		return round(self.battler1.sumScore()/(max(50, arf+arf-brf)/100))-50
+		return round(self.sum_score/(max(50, arf+arf-brf)/100))-50
 
 
 # ===================================================

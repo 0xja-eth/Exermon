@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 using UI.BattleScene.Controls;
 using UI.BattleScene.Controls.Prepare;
@@ -31,6 +32,8 @@ namespace UI.BattleScene.Windows {
 
         public GameObject prepareControl;
 
+        public Button confirmBtn;
+
         #region 初始化
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace UI.BattleScene.Windows {
             var containerDisplays = new IPrepareContainerDisplay[] {
                 battleItemSlotDisplay, /* quesSugarPackDisplay */};
             tabController.configure(containerDisplays);
+            battleItemSlotDisplay.addCallback(onSelectedChanged, 1);
         }
 
         #endregion
@@ -103,6 +107,13 @@ namespace UI.BattleScene.Windows {
             return PrepareTime;
         }
 
+        /// <summary>
+        /// 选择改变回调
+        /// </summary>
+        void onSelectedChanged() {
+            confirmBtn.interactable = battleItemSlotDisplay.isCurrentEnabled();
+        }
+
         #endregion
 
         #region 界面控制
@@ -121,6 +132,7 @@ namespace UI.BattleScene.Windows {
         protected override void refresh() {
             base.refresh();
             refreshContainers();
+            onSelectedChanged();
         }
 
         /// <summary>

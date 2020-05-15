@@ -33,8 +33,8 @@ namespace UI.PackScene.Windows {
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+        protected override void initializeEvery() {
+            base.initializeEvery();
             configureExerHub();
         }
 

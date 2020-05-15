@@ -258,7 +258,7 @@ class RuntimeBattleItem:
 		"""
 		self.ensureUsable()
 
-		self.freeze_round = self.freezeRound()
+		self.freeze_round = self.freezeRound() + 1
 
 		# occasion 固定为 ItemUseOccasion.Battle
 		self.slot_item.useItem()

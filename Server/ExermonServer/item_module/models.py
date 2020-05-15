@@ -1748,6 +1748,42 @@ class PackContainer(BaseContainer):
 
 		return self._mergeItem(cont_items)
 
+	def arrangeItems(self, cont_item: 'PackContItem' = None,
+					 cont_items: list = None) -> list:
+		"""
+		整理背包
+		Args:
+			cont_item (PackContItem): 需要整理的容器项（类型）
+			cont_items (list): 需要整理的容器项列表
+		Returns:
+			返回整理后的容器项列表
+		"""
+		if cont_items is None:
+			cont_items = self.contItems()
+
+		if cont_item is not None:
+			item_data = cont_item.itemData()
+			cont_items = ModelUtils.filter(cont_items,
+				lambda ct: ct.itemData() == item_data)
+
+			self._mergeItem(cont_items)
+
+		else:
+			cont_item_dict = {}
+
+			for cont_item_ in cont_items:
+				key = cont_item_.itemData()
+				if key not in cont_item_dict:
+					cont_item_dict[key] = [cont_item_]
+				else:
+					cont_item_dict[key].append(cont_item_)
+
+			for key in cont_item_dict:
+				if len(cont_item_dict[key]) > 1:
+					self._mergeItem(cont_item_dict[key])
+
+		# return self.contItems()
+
 	# 获得物品
 	def gainItems(self, item: BaseItem, count: int = 1,
 				  combine_return: bool = True) -> list or (list, list):
@@ -1827,7 +1863,11 @@ class PackContainer(BaseContainer):
 
 			return cont_item
 		else:
-			return self.gainItems(cont_item.item, cont_item.count, combine_return)
+			res = self.gainItems(cont_item.item, cont_item.count, combine_return)
+
+			self._removeContItem(cont_item)
+
+			return res
 
 	def lostContItem(self, cont_item: 'PackContItem', count=None,
 					 fixed: bool = True, combine_return: bool = True):
@@ -1964,14 +2004,16 @@ class PackContainer(BaseContainer):
 		return res
 
 	# 接受转移
-	def acceptTransfer(self, container, cont_items=None, cont_item=None, **kwargs):
+	def acceptTransfer(self, container, cont_items=None,
+					   cont_item=None, fixed: bool = False, **kwargs):
 
+		# 如果物品是槽容器项，不进行后续操作（直接设置equiped即可）
 		if isinstance(container, SlotContainer): return
 
 		if cont_item is not None:
-			self.gainContItem(cont_item)
+			self.gainContItem(cont_item, fixed=fixed)
 		if cont_items is not None:
-			self.gainContItems(cont_items)
+			self.gainContItems(cont_items, fixed=fixed)
 
 	# endregion
 
@@ -2126,7 +2168,7 @@ class SlotContainer(BaseContainer):
 			force (bool): 是否强制装备（不改变背包物品）
 			**kwargs (**dict): 其他用于查询槽项的参数
 		Returns:
-			返回对应容器实例
+			返回对应容器实例以及原始装备实例
 		"""
 
 		# 强制装备（替换原有装备）
@@ -2179,7 +2221,7 @@ class SlotContainer(BaseContainer):
 		if equip_item is not None:
 			container.transfer(self, slot_item=slot_item, cont_item=equip_item)
 
-		return container
+		return container, equiped_item
 
 	# 槽装备（强制装备）
 	# 可以传入 index 参数指定槽的索引
@@ -2554,6 +2596,14 @@ class PackContItem(BaseContItem):
 		self.item = item
 
 		self.refresh()
+
+	def itemData(self):
+		"""
+		类型数据（用于唯一标识一类容器项）
+		Returns:
+			返回类型数据
+		"""
+		return type(self), self.item_id
 
 	def isItemAcceptable(self, item: BaseItem):
 		"""

@@ -1401,7 +1401,7 @@ class HumanPack(PackContainer):
 	TYPE = ContainerType.HumanPack
 
 	# 默认容量
-	DEFAULT_CAPACITY = 64
+	DEFAULT_CAPACITY = 0
 
 	# 玩家
 	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
