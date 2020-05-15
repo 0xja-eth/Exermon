@@ -47,6 +47,8 @@ namespace Core.Systems {
 
             public const string PlayerLogout = "player/player/logout";
 
+            public const string PlayerReconnect = "player/player/reconnect";
+
             public const string PlayerGetBasic = "player/get/basic";
             public const string PlayerGetStatus = "player/get/status";
             public const string PlayerGetBattle = "player/get/battle";
@@ -335,7 +337,7 @@ namespace Core.Systems {
             Connected, // 已连接
             Disconnecting, // 断开连接中
             Disconnected, // 已断开连接
-            Error, // 连接错误
+            //Error, // 连接错误
         }
         public bool isConnected() {
             return state == (int)State.Connected;
@@ -344,7 +346,7 @@ namespace Core.Systems {
             return state == (int)State.Disconnected;
         }
         public bool isError() {
-            return state == (int)State.Error;
+            return isDisconnected(); // state == (int)State.Error;
         }
 
         /// <summary>
@@ -386,7 +388,7 @@ namespace Core.Systems {
             addStateDict(State.Connected);
             addStateDict(State.Disconnecting);
             addStateDict(State.Disconnected);
-            addStateDict(State.Error);
+            //addStateDict(State.Error);
         }
 
         /// <summary>
@@ -737,8 +739,11 @@ namespace Core.Systems {
         /// <param name="errmsg">错误信息</param>
         void handleConnectError(int code, string errmsg) {
             errmsg = generateErrorMessage(code, errmsg);
+            //if (code == 101) handleDisconnect(code, errmsg);
+            //else {
             Debug.Log("Error: code: " + code + " msg: " + errmsg);
-            changeState(State.Error, new Tuple<int, string>(code, errmsg));
+            changeState(State.Disconnected, new Tuple<int, string>(code, errmsg));
+            //}
         }
 
         /// <summary>

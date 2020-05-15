@@ -1,8 +1,9 @@
+# encoding=utf8
 #!/usr/bin/env python
 import os
 import sys, io
 
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ExermonServer.settings')

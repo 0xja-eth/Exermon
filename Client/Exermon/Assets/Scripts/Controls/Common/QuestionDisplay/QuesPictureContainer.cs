@@ -10,7 +10,7 @@ namespace UI.Common.Controls.QuestionDisplay {
     /// 题目图片容器
     /// </summary>
     public class QuesPictureContainer :
-        SelectableContainerDisplay<Texture2D>, IItemDetailDisplay<Question> {
+        SelectableContainerDisplay<Question.Picture>, IItemDetailDisplay<Question> {
 
         /// <summary>
         /// 常量设置
@@ -20,7 +20,19 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 外部组件设置
         /// </summary>
         public QuesBigPicture detail; // 帮助界面
-        
+
+        /// <summary>
+        /// 显示答案解析
+        /// </summary>
+        bool _showAnswer = false;
+        public bool showAnswer {
+            get { return _showAnswer; }
+            set {
+                _showAnswer = value;
+                requestRefresh();
+            }
+        }
+
         #region 接口实现
 
         /// <summary>
@@ -47,7 +59,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <param name="index"></param>
         /// <param name="refresh"></param>
         public void setItem(Question item, int _ = -1, bool __ = false) {
-            setItems(item.textures());
+            setItems(item.pictures);
         }
 
         public void setItem(Question item, bool _ = false) {
@@ -76,8 +88,19 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<Texture2D> getItemDetail() {
+        public override IItemDetailDisplay<Question.Picture> getItemDetail() {
             return detail;
+        }
+
+        /// <summary>
+        /// 是否包含
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected override bool isIncluded(Question.Picture item) {
+            if (!base.isIncluded(item)) return false;
+            if (!showAnswer) return !item.descPic;
+            return true;
         }
 
         #endregion

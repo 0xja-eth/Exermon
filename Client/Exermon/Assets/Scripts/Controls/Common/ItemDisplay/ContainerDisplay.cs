@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using Core.UI;
 
 namespace UI.Common.Controls.ItemDisplays {
-
+    /*
     /// <summary>
     /// 物品容器接口
     /// </summary>
@@ -16,13 +16,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 启动视窗
         /// </summary>
-        void startView(int index = 0);
+        //void startView(int index = 0);
     }
-
+    */
     /// <summary>
     /// 物品容器接口
     /// </summary>
-    public interface IContainerDisplay<T> : IContainerDisplay where T : class {
+    public interface IContainerDisplay<T> : IBaseView where T : class {
 
         /// <summary>
         /// 配置

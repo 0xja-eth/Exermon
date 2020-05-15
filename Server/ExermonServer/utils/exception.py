@@ -300,7 +300,7 @@ class GameException(Exception):
 		ErrorType.IncorrectSubject: "艾瑟萌科目与槽科目不一致！",
 
 		# ExerEquipSlot
-		ErrorType.InsufficientLevel: "艾瑟萌等级不足！",
+		ErrorType.InsufficientLevel: "艾瑟萌槽等级不足！",
 
 		# UseExerSkill
 		ErrorType.PassiveSkill: "被动技能无法使用！",

@@ -177,7 +177,7 @@ namespace UI.StartScene {
         /// 处理创建完成
         /// </summary>
         void processFinished() {
-            gameSer.startGame();
+            sceneSys.pushScene(SceneSystem.Scene.MainScene, data: true);
         }
 
         /// <summary>

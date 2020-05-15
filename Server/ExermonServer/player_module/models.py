@@ -626,6 +626,7 @@ class Player(CacheableModel):
 
 		if type == "pack":
 			return {
+				'money': money,
 				'pack_containers': self._packContainerItems(),
 				'slot_containers': self._slotContainerItems(),
 			}

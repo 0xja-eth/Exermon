@@ -1,4 +1,7 @@
-﻿using ItemModule.Data;
+﻿
+using UnityEngine;
+
+using ItemModule.Data;
 using ExermonModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
@@ -22,11 +25,34 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <summary>
         /// 内部变量声明
         /// </summary>
-        int eType = 0;
+        ExerSlotItem slotItem = null;
+
         ExerPackEquip equipItem = null;
+
+        int eType = 0;
 
         #region 数据控制
 
+        /// <summary>
+        /// 设置装备类型
+        /// </summary>
+        /// <param name="eType">装备类型</param>
+        public void setExerSlotItem(ExerSlotItem slotItem) {
+            this.slotItem = slotItem;
+            refreshItems();
+        }
+
+        /// <summary>
+        /// 设置装备类型
+        /// </summary>
+        /// <param name="eType">装备类型</param>
+        public void setEquipSlotItem(ExerEquipSlotItem slotItem) {
+            eType = slotItem.eType;
+            equipItem = slotItem.packEquip;
+            refreshItems();
+        }
+
+        /*
         /// <summary>
         /// 设置装备类型
         /// </summary>
@@ -44,13 +70,25 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
             this.equipItem = equipItem;
             refreshItems();
         }
-
-        /// <summary>
+        */
+        
+            /// <summary>
         /// 获取物品帮助组件
         /// </summary>
         /// <returns>帮助组件</returns>
         public override IItemDetailDisplay<PackContItem> getItemDetail() {
             return detail;
+        }
+
+        /// <summary>
+        /// 物品是否有效
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <returns>返回物品是否有效</returns>
+        protected override bool isEquipEnabled(ExerPackEquip item) {
+            if (!base.isEquipEnabled(item)) return false;
+            if (slotItem == null) return false;
+            return slotItem.level >= item.equip().minLevel;
         }
 
         /// <summary>

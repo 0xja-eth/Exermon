@@ -7,56 +7,50 @@ using UnityEngine.Events;
 using Core.UI;
 
 namespace UI.Common.Controls.ItemDisplays {
-    /*
-    /// <summary>
-    /// 物品容器接口
-    /// </summary>
-    public interface IContainerDisplay : IBaseView {
 
+    /// <summary>
+    /// 可选择物品容器接口
+    /// </summary>
+    public interface ISelectableContainerDisplay : IBaseView {
+        
         /// <summary>
         /// 启动视窗
         /// </summary>
         void startView(int index = 0);
+
+        /// <summary>
+        /// 选择项
+        /// </summary>
+        void select(int index, bool force = false);
+
+        /// <summary>
+        /// 选中项
+        /// </summary>
+        void check(int index, bool force = false);
     }
 
     /// <summary>
-    /// 物品容器接口
+    /// 可选择物品容器接口
     /// </summary>
-    public interface IContainerDisplay<T> : IContainerDisplay where T : class {
+    public interface ISelectableContainerDisplay<T> : 
+        ISelectableContainerDisplay, IContainerDisplay<T> where T : class {
 
         /// <summary>
-        /// 配置
+        /// 选择项
         /// </summary>
-        /// <param name="items">物品集</param>
-        void configure(T[] items);
-        void configure(List<T> items);
-
+        void select(T item, bool force = false);
+        
         /// <summary>
-        /// 设置物品集
+        /// 选中项
         /// </summary>
-        /// <param name="items">物品集</param>
-        void setItems(T[] items);
-        void setItems(List<T> items);
-
-        /// <summary>
-        /// 是否包含物品
-        /// </summary>
-        /// <param name="item">物品</param>
-        /// <returns>是否包含</returns>
-        bool containsItem(T item);
-
-        /// <summary>
-        /// 获取物品集
-        /// </summary>
-        /// <returns>物品集</returns>
-        T[] getItems();
+        void check(T item, bool force = false);
     }
-    */
+
     /// <summary>
     /// 物品容器显示
     /// </summary>
     public class SelectableContainerDisplay<T> : 
-        GroupView<SelectableItemDisplay<T>>, IContainerDisplay<T> where T : class {
+        GroupView<SelectableItemDisplay<T>>, ISelectableContainerDisplay<T> where T : class {
 
         /// <summary>
         /// 常量设置
@@ -281,10 +275,35 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         /// <summary>
+        /// 空物品是否有效
+        /// </summary>
+        /// <returns>空物品是否有效</returns>
+        protected virtual bool isEmptyEnabled() {
+            return isEmptyIncluded();
+        }
+
+        /// <summary>
+        /// 物品是否有效
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <returns>返回物品是否有效</returns>
+        public virtual bool isEnabled(T item) {
+            if (item == null) return isEmptyEnabled();
+            return true;
+        }
+
+        /// <summary>
+        /// 当前物品是否有效
+        /// </summary>
+        public bool isCurrentEnabled() {
+            return isEnabled(selectedItem());
+        }
+
+        /// <summary>
         /// 是否包含空物品
         /// </summary>
         /// <returns>返回容器是否包含空物品</returns>
-        protected virtual bool includeEmpty() {
+        protected virtual bool isEmptyIncluded() {
             return false;
         }
 
@@ -294,7 +313,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="item">物品</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected virtual bool isIncluded(T item) {
-            if (item == null) return includeEmpty();
+            if (item == null) return isEmptyIncluded();
             return true;
         }
 
@@ -494,7 +513,7 @@ namespace UI.Common.Controls.ItemDisplays {
             select(items.IndexOf(item), force);
         }
         public virtual void select(int index, bool force = false) {
-            //Debug.Log("select: " + index);
+            Debug.Log("select: " + name + ": " + index);
 
             index = getLoopedIndex(index);
             if (index >= 0) {
@@ -511,6 +530,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         public virtual void deselect() {
             //if (selectedIndex < 0) return;
+            Debug.Log("deselect: " + name);
 
             selectedIndex = -1;
             onSelectChanged();
@@ -520,6 +540,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 选择上次
         /// </summary>
         public virtual void selectLast(int default_ = 0, bool force = false) {
+            Debug.Log("selectLast: " + name + ": " + selectedIndex + ", " + lastIndex);
+
             if (lastIndex >= 0) select(lastIndex, force);
             else if (default_ >= 0) select(default_, force);
             else deselect();

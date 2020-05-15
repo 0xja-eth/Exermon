@@ -87,7 +87,8 @@ namespace Core.Systems {
         /// <summary>
         /// 加密盐
         /// </summary>
-        const string DefaultSalt = "R0cDovMzgwLTE2Lm1pZAl";
+        const string DefaultSalt = "aZrY5R0cDc97oCEv3vdDcMz34gwPf9hL8wL3TaAE2Lm1DaxpZAlcgMMALa1EMA";
+        const string LastSalt = "R0cDovMzgwLTE2Lm1pZAl";
 
         /// <summary>
         /// 储存项
@@ -255,7 +256,12 @@ namespace Core.Systems {
         /// <param name="code">编码后字符串</param>
         /// <param name="salt">盐</param>
         /// <returns>源字符串</returns>
-        public string base64Decode(string code, string salt = DefaultSalt) {
+        public string base64Decode(string code, string salt = DefaultSalt,
+            string lastSalt = LastSalt) {
+            // 如果存在上一个盐，用上一个盐来解码
+            if (lastSalt != "" && code.Contains(LastSalt))
+                return base64Decode(code, lastSalt, "");
+
             code = code.Substring(salt.Length);
             code = code.Replace(salt, "");
             byte[] bytes = Convert.FromBase64String(code);

@@ -30,6 +30,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="field">绑定输入域</param>
         public void startWindow(DateTimeField field) {
+            Debug.Log("cur field:" + field.name);
             startWindow();
             this.field = field;
         }
@@ -50,6 +51,7 @@ namespace UI.Common.Controls.InputFields {
         /// 更新取消事件
         /// </summary>
         void updateCancel() {
+            if (field) Debug.Log("cur field:" + field.name);
             if (!enter && (
                 Input.GetMouseButtonDown(0) ||
                 Input.GetMouseButtonDown(1) ||

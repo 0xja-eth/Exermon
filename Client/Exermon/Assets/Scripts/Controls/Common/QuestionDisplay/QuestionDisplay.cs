@@ -290,7 +290,7 @@ namespace UI.Common.Controls.QuestionDisplay {
             choiceContainer?.clearItems();
             buttonContainer?.clearItems();
 
-            title.text = "";
+            title.text = description.text = "";
 
             if (quesNum) quesNum.text = "";
             if (num) num.text = "";

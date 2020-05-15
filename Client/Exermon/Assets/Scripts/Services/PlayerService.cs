@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Text;
+using System.Security.Cryptography;
+
 using UnityEngine.Events;
 
 using LitJson;
@@ -30,6 +33,7 @@ namespace PlayerModule.Services {
         const string Retrieve = "找回密码";
         const string Code = "发送验证码";
         const string Logout = "登出";
+        const string Reconnect = "重连";
 
         const string GetBasic = "拉取玩家基本信息";
         const string GetStatus = "拉取玩家状态信息";
@@ -51,7 +55,7 @@ namespace PlayerModule.Services {
         /// 业务操作
         /// </summary>
         public enum Oper {
-            Register, Login, Retrieve, Code, Logout,
+            Register, Login, Retrieve, Code, Logout, Reconnect,
             GetBasic, GetStatus, GetBattle, GetPack,
             CreateCharacter, CreateExermons, CreateGifts, CreateInfo,
             EditName, EditInfo,
@@ -111,6 +115,7 @@ namespace PlayerModule.Services {
             addOperDict(Oper.Retrieve, Retrieve, NetworkSystem.Interfaces.PlayerRetrieve);
             addOperDict(Oper.Code, Code, NetworkSystem.Interfaces.PlayerCode);
             addOperDict(Oper.Logout, Logout, NetworkSystem.Interfaces.PlayerLogout);
+            addOperDict(Oper.Reconnect, Reconnect, NetworkSystem.Interfaces.PlayerReconnect);
 
             addOperDict(Oper.GetBasic, GetBasic, NetworkSystem.Interfaces.PlayerGetBasic);
             addOperDict(Oper.GetStatus, GetStatus, NetworkSystem.Interfaces.PlayerGetStatus);
@@ -162,7 +167,7 @@ namespace PlayerModule.Services {
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData();
-            data["un"] = un; data["pw"] = pw;
+            data["un"] = un; data["pw"] = cryptoPassword(pw);
             data["email"] = email; data["code"] = code;
             sendRequest(Oper.Register, data, onSuccess, onError);
         }
@@ -180,11 +185,12 @@ namespace PlayerModule.Services {
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 changeState(State.Logined);
                 player = DataLoader.load(player, res, "player");
+                player.setUserInfo(un, pw);
                 onSuccess?.Invoke();
             };
 
             JsonData data = new JsonData();
-            data["un"] = un; data["pw"] = pw;
+            data["un"] = un; data["pw"] = cryptoPassword(pw);
             sendRequest(Oper.Login, data, _onSuccess, onError);
         }
 
@@ -201,7 +207,7 @@ namespace PlayerModule.Services {
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData();
-            data["un"] = un; data["pw"] = pw;
+            data["un"] = un; data["pw"] = cryptoPassword(pw);
             data["email"] = email; data["code"] = code;
 
             sendRequest(Oper.Retrieve, data, onSuccess, onError);
@@ -244,8 +250,26 @@ namespace PlayerModule.Services {
         /// <summary>
         /// 重连
         /// </summary>
-        public void reconnect() {
+        public void reconnect(UnityAction onSuccess = null, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                onSuccess?.Invoke();
+            };
 
+            JsonData data = new JsonData();
+            data["un"] = player.username;
+            data["pw"] = cryptoPassword(player.password);
+            sendRequest(Oper.Reconnect, data, _onSuccess, onError);
+        }
+
+        /// <summary>
+        /// 加密密码
+        /// </summary>
+        /// <param name="pw">原文本</param>
+        /// <returns>加密文本</returns>
+        string cryptoPassword(string pw) {
+            var md5 = new MD5CryptoServiceProvider();
+            var bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(pw));
+            return Encoding.UTF8.GetString(bytes);
         }
 
         #endregion
@@ -574,7 +598,7 @@ namespace PlayerModule.Services {
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void loadHumanPack(UnityAction onSuccess = null, UnityAction onError = null) {
-            itemSer.getPack(player.packContainers.humanPack, onSuccess, onError);
+            itemSer.getSelfPack(player.packContainers.humanPack, onSuccess, onError);
         }
 
         /// <summary>
@@ -584,7 +608,7 @@ namespace PlayerModule.Services {
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void loadHumanEquipSlot(UnityAction onSuccess = null, UnityAction onError = null) {
-            itemSer.getSlot(player.slotContainers.humanEquipSlot, onSuccess, onError);
+            itemSer.getSelfSlot(player.slotContainers.humanEquipSlot, onSuccess, onError);
         }
 
         #endregion

@@ -310,6 +310,8 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// <returns></returns>
         public override bool equipable() {
             var packDisplay = getPackDisplay();
+            if (!packDisplay.isCurrentEnabled()) return false;
+
             var slotItemDisplay = getSlotItemDisplay();
             var selectedItem = packDisplay.selectedItem();
             var equipedItem = slotItemDisplay.getEquip();
@@ -319,6 +321,8 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         }
         public override bool dequipable() {
             var packDisplay = getPackDisplay();
+            if (!packDisplay.isCurrentEnabled()) return false;
+
             var slotItemDisplay = getSlotItemDisplay();
             var selectedItem = packDisplay.selectedItem();
             var equipedItem = slotItemDisplay.getEquip();

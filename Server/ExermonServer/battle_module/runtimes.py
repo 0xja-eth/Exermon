@@ -492,7 +492,7 @@ class RuntimeBattleExermon:
 			返回添加的 Buff
 		"""
 		if buff is None:
-			buff = BattleBuff(rate_params, plus_params, round)
+			buff = BattleBuff(plus_params, rate_params, round)
 
 		self.buffs.append(buff)
 
@@ -541,7 +541,7 @@ class RuntimeBattleExermon:
 		new_mp = self.mp + val + value * rate
 		self.mp = max(min(new_mp, value), param.param.min_value)
 
-	def addParam(self, param_id: int, round: int = 1, val: int = 0, rate: float = 0):
+	def addParam(self, param_id: int, round: int = 1, val: int = 0, rate: float = 1):
 		"""
 		添加能力值
 		Args:
@@ -560,9 +560,9 @@ class RuntimeBattleExermon:
 			plus_param.setValue(val, False)
 			plus_params.append(plus_param)
 
-		if rate != 0:
+		if rate != 1:
 			rate_param = PlayerExerParamRate(param_id=param_id)
-			rate_param.setValue(val, False)
+			rate_param.setValue(rate, False)
 			rate_params.append(rate_param)
 
 		self.addBuff(plus_params, rate_params, round)

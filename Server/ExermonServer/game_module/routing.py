@@ -84,6 +84,14 @@ WEBSOCKET_METHOD_ROUTER = {
 		Player.disconnect,  # 处理函数
 		ChannelLayerTag.NoLayer  # 是否需要响应
 	],
+	# 玩家重连
+	'player/player/reconnect': [[
+		['un', 'str'],
+		['pw', 'str'],
+	],
+		Player.reconnect,  # 处理函数
+		ChannelLayerTag.Self  # 是否需要响应
+	],
 	# 选择玩家形象
 	'player/create/character': [[
 		['uid', 'int'],

@@ -41,6 +41,26 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExermonPage {
         /// </summary>
         ExermonService exerSer;
 
+        #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            nicknameInput.onChanged = onNicknameChanged;
+        }
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            exerSer = ExermonService.get();
+        }
+
+        #endregion
+
         #region 界面绘制
 
         /// <summary>

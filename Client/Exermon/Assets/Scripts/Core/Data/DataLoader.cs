@@ -89,9 +89,9 @@ namespace Core.Data.Loaders {
                     return val;
                 } else return _load(type, data);
             } catch (Exception e) {
-                Debug.LogError("Error in " + data.ToJson() +
+                Debug.LogError(e.StackTrace + "\n\nError in " + data.ToJson() +
                     " (load type: " + type + ", ori val: " + val + ")");
-                throw e;
+                throw new Exception();
             }
         }
 
@@ -100,9 +100,9 @@ namespace Core.Data.Loaders {
             try {
                 return (T)_load(typeof(T), json[key]);
             } catch (Exception e) {
-                Debug.LogError("Error in " + key + " of " + json.ToJson() +
+                Debug.LogError(e.StackTrace + "\n\nError in " + key + " of " + json.ToJson() +
                     " (load type: " + typeof(T) + ")");
-                throw e;
+                throw new Exception();
             }
         }
         public static T load<T>(JsonData data) {
@@ -110,9 +110,9 @@ namespace Core.Data.Loaders {
             try {
                 return (T)_load(typeof(T), data);
             } catch (Exception e) {
-                Debug.LogError("Error in " + data.ToJson() + 
+                Debug.LogError(e.StackTrace + "\n\nError in " + data.ToJson() + 
                     " (load type: " + typeof(T) + ")");
-                throw e;
+                throw new Exception();
             }
         }
         public static object load(Type type, JsonData json, string key) {
@@ -120,18 +120,18 @@ namespace Core.Data.Loaders {
             try {
                 return _load(type, json[key]);
             } catch (Exception e) {
-                Debug.LogError("Error in " + key + " of " + json.ToJson() + 
+                Debug.LogError(e.StackTrace + "\n\nError in " + key + " of " + json.ToJson() + 
                     " (load type: " + type + ")");
-                throw e;
+                throw new Exception();
             }
         }
         public static object load(Type type, JsonData data) {
             try {
                 return _load(type, data);
             } catch (Exception e) {
-                Debug.LogError("Error in " + data.ToJson() + 
+                Debug.LogError(e.StackTrace + "\n\nError in " + data.ToJson() + 
                     " (load type: " + type + ")");
-                throw e;
+                throw new Exception();
             }
         }
         private static object _load(Type type, JsonData data) {

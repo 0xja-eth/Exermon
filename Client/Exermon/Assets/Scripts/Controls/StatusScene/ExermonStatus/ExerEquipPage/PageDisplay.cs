@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.Events;
 
 using ItemModule.Data;
@@ -91,9 +93,8 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// </summary>
         void refreshPackContainer() {
             var slotItem = slotItemDisplay.getEquipSlotItem();
-            if (slotItem == null) return;
-            packDisplay.setEquipType(slotItem.eType);
-            packDisplay.setEquipItem(slotItem.packEquip);
+            if (item != null) packDisplay.setExerSlotItem(item);
+            if (slotItem != null) packDisplay.setEquipSlotItem(slotItem);
         }
 
         /// <summary>
@@ -113,6 +114,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 状态变更回调
         /// </summary>
         public override void onEquipChanged() {
+            Debug.Log("onEquipChanged");
             base.onEquipChanged();
             equipSlotDisplay.selectLast();
         }

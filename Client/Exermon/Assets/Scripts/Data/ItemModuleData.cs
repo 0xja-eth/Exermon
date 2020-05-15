@@ -394,7 +394,7 @@ namespace ItemModule.Data {
             res["consumable"] = consumable;
 
             res["occasion"] = occasion;
-            res["usable"] = occasion == UnusableText;
+            res["usable"] = occasion != UnusableText;
 
             res["target"] = targetText();
             res["freeze"] = freeze;

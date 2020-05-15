@@ -160,7 +160,7 @@ namespace Core.UI {
         /// 启动视窗
         /// </summary>
         public virtual void startView() {
-            Debug.Log("startView: " + name);
+            //Debug.Log("startView: " + name);
             initialize(); showView();
         }
 
@@ -176,7 +176,7 @@ namespace Core.UI {
         /// 结束视窗
         /// </summary>
         public virtual void terminateView() {
-            Debug.Log("terminateView: " + name);
+            //Debug.Log("terminateView: " + name);
             hideView();
         }
 

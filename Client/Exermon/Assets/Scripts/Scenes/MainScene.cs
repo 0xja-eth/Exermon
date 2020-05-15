@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Core.Systems;
+using Core.Data.Loaders;
+
 using Core.UI;
 using Core.UI.Utils;
 
@@ -12,7 +14,7 @@ using PlayerModule.Services;
 using ExermonModule.Services;
 
 namespace UI.MainScene {
-
+    using LitJson;
     using Windows;
 
     /// <summary>
@@ -71,13 +73,22 @@ namespace UI.MainScene {
             playerSer = PlayerService.get();
             exermonSer = ExermonService.get();
         }
-        
+
+        /// <summary>
+        /// 处理通道数据
+        /// </summary>
+        /// <param name="data"></param>
+        protected override void processTunnelData(JsonData data) {
+            base.processTunnelData(data);
+            var r = DataLoader.load<bool>(data);
+            if (r) playerSer.getPlayerStatus();
+        }
+
         /// <summary>
         /// 开始
         /// </summary>
         protected override void start() {
             base.start();
-            refresh();
         }
 
         #endregion
@@ -88,14 +99,7 @@ namespace UI.MainScene {
         #endregion
 
         #region 场景控制
-
-        /// <summary>
-        /// 刷新场景
-        /// </summary>
-        public void refresh() {
-
-        }
-
+        
         #endregion
 
         #region 流程控制

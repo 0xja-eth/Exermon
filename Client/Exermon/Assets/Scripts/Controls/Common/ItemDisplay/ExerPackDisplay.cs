@@ -48,7 +48,43 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="packItem">物品</param>
         /// <param name="type">指定的类型</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
+        protected override bool isEnabled(PackContItem packItem, BaseContItem.Type type) {
+            if (!base.isEnabled(packItem, type)) return false;
+            switch (type) {
+                case BaseContItem.Type.ExerPackItem:
+                    return isItemEnabled((ExerPackItem)packItem);
+                case BaseContItem.Type.ExerPackEquip:
+                    return isEquipEnabled((ExerPackEquip)packItem);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 物品是否有效
+        /// </summary>
+        /// <param name="packItem">物品</param>
+        /// <returns>返回物品是否有效</returns>
+        protected virtual bool isItemEnabled(ExerPackItem packItem) {
+            return isItemIncluded(packItem);
+        }
+
+        /// <summary>
+        /// 装备是否有效
+        /// </summary>
+        /// <param name="packEquip">装备</param>
+        /// <returns>返回装备是否有效</returns>
+        protected virtual bool isEquipEnabled(ExerPackEquip packEquip) {
+            return isEquipIncluded(packEquip);
+        }
+
+        /// <summary>
+        /// 是否包含物品
+        /// </summary>
+        /// <param name="packItem">物品</param>
+        /// <param name="type">指定的类型</param>
+        /// <returns>返回指定物品能否包含在容器中</returns>
         protected override bool isIncluded(PackContItem packItem, BaseContItem.Type type) {
+            if (!base.isIncluded(packItem, type)) return false;
             switch(type) {
                 case BaseContItem.Type.ExerPackItem:
                     return isItemIncluded((ExerPackItem)packItem);

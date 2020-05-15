@@ -138,8 +138,8 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// 图片容器控件
         /// </summary>
         [SerializeField]
-        private SelectableContainerDisplay<Texture2D> _imageContainer = null;
-        public SelectableContainerDisplay<Texture2D> imageContainer {
+        private ISelectableContainerDisplay _imageContainer = null;
+        public ISelectableContainerDisplay imageContainer {
             get { return _imageContainer; }
             set { _imageContainer = value; }
         }
@@ -864,6 +864,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             // 隐藏
             image.color = new Color(0.75f, 0.75f, 1, 0.5f);
             btn.onClick.AddListener(() => {
+                Debug.Log("setImageLink: " + index);
                 if (textObj.onImageLinkClick != null)
                     textObj.onImageLinkClick.Invoke(index);
                 else if (textObj.imageContainer != null)

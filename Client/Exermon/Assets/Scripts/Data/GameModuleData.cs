@@ -35,7 +35,7 @@ namespace GameModule.Data {
         /// </summary>
         //public string localVersion = PlayerSettings.bundleVersion;
         public const string LocalMainVersion = "0.3.1";
-        public const string LocalSubVersion = "20200510";
+        public const string LocalSubVersion = "20200515";
 
         /// <summary>
         /// 后台版本
@@ -52,20 +52,12 @@ namespace GameModule.Data {
         /// <summary>
         /// 游戏配置
         /// </summary>
-        GameConfigure _configure;
-        public GameConfigure configure {
-            get { return _configure; }
-            private set { _configure = value; }
-        }
+        public GameConfigure configure { get; protected set; }
 
         /// <summary>
         /// 游戏资料（数据库）
         /// </summary>
-        GameDatabase _data;
-        public GameDatabase data {
-            get { return _data; }
-            private set { _data = value; }
-        }
+        public GameDatabase data { get; protected set; }
 
         /// <summary>
         /// 读取标志
@@ -83,22 +75,11 @@ namespace GameModule.Data {
         /// </summary>
         /// <returns>更新日志文本</returns>
         public string generateUpdateNote() {
-            string updateNote = "当前版本：\n" + generateUpdateNote(curVersion);
+            string updateNote = "当前版本：\n" + curVersion.generateUpdateNote();
             updateNote += "\n历史版本：\n";
             foreach (var ver in lastVersions)
-                updateNote += generateUpdateNote(ver);
+                updateNote += ver.generateUpdateNote();
             return updateNote;
-        }
-
-        /// <summary>
-        /// 生成单个版本的更新日志
-        /// </summary>
-        /// <param name="ver">版本对象</param>
-        /// <returns>更新日志文本</returns>
-        string generateUpdateNote(GameVersionData ver) {
-            string time = ver.updateTime.ToString(DataLoader.SystemDateFormat);
-            return string.Format(GameVersionData.UpdateNoteFormat, ver.mainVersion,
-                ver.subVersion, time, ver.updateNote, ver.description);
         }
 
         /// <summary>
@@ -108,8 +89,8 @@ namespace GameModule.Data {
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
 
-            Debug.Log("curVersion: " + curVersion + " (" + (curVersion == default) + ")");
-            if (curVersion == default) return;
+            if (curVersion == null) return;
+            Debug.Log("curVersion: " + curVersion.generateUpdateNote());
 
             // 如果没有版本变更且数据已读取（本地缓存），则直接返回
             if (curVersion.mainVersion == LocalMainVersion &&
@@ -119,6 +100,16 @@ namespace GameModule.Data {
             data = DataLoader.load(data, json, "data");
 
             loaded = true;
+        }
+
+        /// <summary>
+        /// 转化自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void convertCustomAttributes(ref JsonData json) {
+            base.convertCustomAttributes(ref json);
+            json["configure"] = DataLoader.convert(configure);
+            json["data"] = DataLoader.convert(data);
         }
     }
 
@@ -345,6 +336,17 @@ namespace GameModule.Data {
         public DateTime updateTime { get; protected set; }
         [AutoConvert]
         public string description { get; protected set; }
+
+        /// <summary>
+        /// 生成单个版本的更新日志
+        /// </summary>
+        /// <returns>更新日志文本</returns>
+        public string generateUpdateNote() {
+            string time = updateTime.ToString(DataLoader.SystemDateFormat);
+            return string.Format(GameVersionData.UpdateNoteFormat, mainVersion,
+                subVersion, time, updateNote, description);
+        }
+
     }
 
     /// <summary>

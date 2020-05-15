@@ -434,8 +434,8 @@ namespace BattleModule.Services {
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void loadBattleItemSlot(UnityAction onSuccess = null, UnityAction onError = null) {
-            Player player = getPlayer();
-            itemSer.getSlot(player.slotContainers.battleItemSlot, onSuccess, onError);
+            var slot = getPlayer().slotContainers.battleItemSlot;
+            itemSer.getSelfSlot(slot, onSuccess, onError);
         }
 
         #endregion

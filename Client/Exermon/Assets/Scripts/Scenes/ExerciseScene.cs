@@ -120,5 +120,16 @@ namespace UI.ExerciseScene {
 
         #endregion
 
+        #region 场景控制
+
+        /// <summary>
+        /// 返回场景
+        /// </summary>
+        public override void popScene() {
+            sceneSys.popScene(data: true);
+        }
+
+        #endregion
+
     }
 }

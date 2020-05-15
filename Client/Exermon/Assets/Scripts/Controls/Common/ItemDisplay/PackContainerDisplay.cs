@@ -14,8 +14,7 @@ namespace UI.Common.Controls.ItemDisplays {
     /// <remarks>
     /// 专门用于显示 PackContainer 的组件
     /// </remarks>
-    public class PackContainerDisplay<T> : 
-        SelectableContainerDisplay<T> 
+    public class PackContainerDisplay<T> : SelectableContainerDisplay<T> 
         where T : PackContItem, new() {
 
         /// <summary>
@@ -88,13 +87,39 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         /// <summary>
+        /// 物品是否有效
+        /// </summary>
+        /// <param name="packItem">物品</param>
+        /// <param name="type">指定的类型</param>
+        /// <returns>返回指定物品能否包含在容器中</returns>
+        protected virtual bool isEnabled(T packItem, BaseContItem.Type type) {
+            return isIncluded(packItem, type);
+        }
+
+        /// <summary>
+        /// 物品是否有效
+        /// </summary>
+        /// <param name="packItem">物品</param>
+        /// <returns>返回指定物品能否包含在容器中</returns>
+        public override bool isEnabled(T packItem) {
+            if (!base.isEnabled(packItem)) return false;
+            if (packItem.isNullItem()) return isEmptyEnabled();
+
+            if (isNeedJudgeType())
+                foreach (var type in acceptableTypes())
+                    if (packItem.type == (int)type)
+                        return isEnabled(packItem, type);
+            return true;
+        }
+
+        /// <summary>
         /// 是否包含物品
         /// </summary>
         /// <param name="packItem">物品</param>
         /// <param name="type">指定的类型</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected virtual bool isIncluded(T packItem, BaseContItem.Type type) {
-            return true;
+            return packItem.count > 0;
         }
 
         /// <summary>
@@ -104,10 +129,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected override bool isIncluded(T packItem) {
             if (!base.isIncluded(packItem)) return false;
-            if (packItem.isNullItem()) return includeEmpty();
+            if (packItem.isNullItem()) return isEmptyIncluded();
 
-            if (isNeedJudgeType()) 
-                foreach(var type in acceptableTypes()) 
+            if (isNeedJudgeType())
+                foreach (var type in acceptableTypes())
                     if (packItem.type == (int)type)
                         return isIncluded(packItem, type);
             return true;

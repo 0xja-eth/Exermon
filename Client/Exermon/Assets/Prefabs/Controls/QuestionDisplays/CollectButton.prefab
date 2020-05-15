@@ -370,14 +370,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   background: {fileID: 0}
+  disabledFlag: {fileID: 0}
   selectedFlag: {fileID: 0}
   checkedFlag: {fileID: 527721615988117683}
   highlightFlag: {fileID: 0}
   actived: 1
+  _enabled: 1
   selectable: 0
   checkable: 1
   highlightable: 0
   forceChecked: 0
+  deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 1, g: 1, b: 0.75, a: 0}

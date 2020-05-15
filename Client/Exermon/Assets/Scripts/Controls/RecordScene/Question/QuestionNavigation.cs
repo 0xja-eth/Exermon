@@ -69,6 +69,9 @@ namespace UI.RecordScene.Controls.Question {
                     // return page.record.hasQuestion(item.questionId);
             }
             // 检查日期范围
+            Debug.Log(item.questionId + ": item.lastDate: " + item.lastDate +
+                " getFromDate: " + window.getFromDate() +
+                " getToDate: " + window.getToDate());
             if (window.getFromDate() > item.lastDate ||
                 item.lastDate > window.getToDate()) return false;
             // 检查科目

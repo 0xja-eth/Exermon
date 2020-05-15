@@ -30,10 +30,11 @@ namespace Core.Systems {
         public enum State {
             Connecting, Loading, Loaded,
             Disconnected, Reconnecting,
-            Error, Ending
+            // Error,
+            Ending
         }
         public bool isConnectable() { // 可以执行 connect
-            return state == -1 || state == (int)State.Error;
+            return state == -1 || state == (int)State.Disconnected;
         }
         public bool isReconnectable() { // 可以执行 reconnect
             return state == (int)State.Disconnected;
@@ -218,7 +219,7 @@ namespace Core.Systems {
             addStateDict(State.Loaded);
             addStateDict(State.Disconnected);
             addStateDict(State.Reconnecting, updateReconnecting);
-            addStateDict(State.Error);
+            //addStateDict(State.Error);
             addStateDict(State.Ending);
         }
 
@@ -271,6 +272,7 @@ namespace Core.Systems {
         /// 更新连接状态
         /// </summary>
         void updateReconnecting() {
+            Debug.Log("updateReconnecting");
             if (!networkSys.isStateChanged()) return;
             if (networkSys.isConnected()) onReconnected();
         }
@@ -370,6 +372,7 @@ namespace Core.Systems {
         /// 重连回调
         /// </summary>
         protected virtual void onReconnected() {
+            requestLoadEnd();
             changeState(State.Loaded);
             if (reconnectedCallback != null)
                 reconnectedCallback.Invoke();
@@ -382,7 +385,8 @@ namespace Core.Systems {
         /// <param name="errmsg">错误信息</param>
         protected virtual void onDisconnected(int status, string errmsg) {
             Debug.LogError("onDisconnected, " + status + ": " + errmsg);
-            processException(status, errmsg, DisconnectedAlertText, State.Disconnected, reconnect);
+            processException(status, errmsg, DisconnectedAlertText, 
+                State.Disconnected, reconnect);
             if (disconnectedCallback != null) disconnectedCallback.Invoke();
         }
 
@@ -392,9 +396,13 @@ namespace Core.Systems {
         /// <param name="status">状态码</param>
         /// <param name="errmsg">错误信息</param>
         protected virtual void onConnectingError(int status, string errmsg) {
-            Debug.LogError("onConnectingError, " + status + ": " + errmsg);
-            processException(status, errmsg, ConnectionFailText, State.Error, connect);
-            if (connectErrorCallback != null) connectErrorCallback.Invoke();
+            if (state != -1) onDisconnected(status, errmsg);
+            else {
+                Debug.LogError("onConnectingError, " + status + ": " + errmsg);
+                processException(status, errmsg, ConnectionFailText,
+                    State.Disconnected, connect);
+                if (connectErrorCallback != null) connectErrorCallback.Invoke();
+            }
         }
 
         /// <summary>

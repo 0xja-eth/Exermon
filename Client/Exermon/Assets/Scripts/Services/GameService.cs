@@ -115,6 +115,7 @@ namespace GameModule.Services {
         /// 重连回调
         /// </summary>
         void onReconnected() {
+            Debug.Log("onReconnected: " + playerSer.isLogined());
             if (playerSer.isLogined()) playerSer.reconnect();
         }
 

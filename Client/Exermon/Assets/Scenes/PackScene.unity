@@ -1315,7 +1315,12 @@ PrefabInstance:
     - target: {fileID: 7667525660022936167, guid: c1fc0256d0f3ec54a8392b15c9927da6,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: -4
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7667525660022936167, guid: c1fc0256d0f3ec54a8392b15c9927da6,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7667525660497383013, guid: c1fc0256d0f3ec54a8392b15c9927da6,
         type: 3}
@@ -2064,7 +2069,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 1162186096}
+  m_Content: {fileID: 1024974246}
   m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
@@ -3781,7 +3786,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.99984837}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 6, y: 6}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5022,6 +5027,7 @@ MonoBehaviour:
   subViewNameFormat: 
   subViewPrefab: {fileID: 390596781024641670, guid: 604eee1a7082cb444acb101871874003,
     type: 3}
+  mask: {fileID: 0}
   countText: {fileID: 254953516}
   maxCheck: 0
   defaultCapacity: 0
@@ -5459,7 +5465,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 477715965}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99984837
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7248,7 +7254,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 272.4, y: 0.00063189113}
+  m_AnchoredPosition: {x: 272.4, y: 0.0001820475}
   m_SizeDelta: {x: 544.8, y: 8}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1162186097
@@ -7305,6 +7311,7 @@ MonoBehaviour:
   subViewNameFormat: 
   subViewPrefab: {fileID: 6990545333838936145, guid: 3d1c76afbb0a6384ca784d1dfd27b732,
     type: 3}
+  mask: {fileID: 0}
   countText: {fileID: 652254771}
   maxCheck: 0
   defaultCapacity: 0
@@ -10483,6 +10490,7 @@ MonoBehaviour:
   subViewNameFormat: 
   subViewPrefab: {fileID: 6990545333838936145, guid: 3d1c76afbb0a6384ca784d1dfd27b732,
     type: 3}
+  mask: {fileID: 0}
   countText: {fileID: 652254771}
   maxCheck: 0
   defaultCapacity: 0
@@ -13135,7 +13143,12 @@ PrefabInstance:
     - target: {fileID: 7667525660022936167, guid: c1fc0256d0f3ec54a8392b15c9927da6,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: -4
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7667525660022936167, guid: c1fc0256d0f3ec54a8392b15c9927da6,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7667525660497383013, guid: c1fc0256d0f3ec54a8392b15c9927da6,
         type: 3}

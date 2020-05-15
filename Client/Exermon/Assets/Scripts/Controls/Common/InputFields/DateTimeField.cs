@@ -24,7 +24,7 @@ namespace UI.Common.Controls.InputFields {
         /// 外部变量设置
         /// </summary>
         public DateTime defaultDateTime = new DateTime(2000, 1, 1);
-        public DateTime minDateTime = new DateTime(1900, 1, 1);
+        public DateTime minDateTime = new DateTime(1988, 1, 1);
         public DateTime maxDateTime = DateTime.Now;
 
         public string dateFormat = DataLoader.DisplayDateFormat;
@@ -81,7 +81,12 @@ namespace UI.Common.Controls.InputFields {
 
             value = defaultDateTime;
             updatePickersRange();
+        }
 
+        /// <summary>
+        /// 启动日期选择项
+        /// </summary>
+        void startPickers() {
             foreach (var picker in pickers)
                 picker.configure(this);
         }
@@ -95,7 +100,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         public override void onValueChanged(bool check = true, bool emit = true) {
             base.onValueChanged(check, emit);
-            if (emit) updatePickersRange();
+            updatePickersRange();
         }
 
         #endregion
@@ -157,13 +162,17 @@ namespace UI.Common.Controls.InputFields {
         /// 更新日期选择器的范围
         /// </summary>
         void updatePickersRange() {
+            Debug.Log("updatePickersRange: " + value);
+
             var min = minDateTime;
             var max = maxDateTime;
             var year = value.Year;
             var month = value.Month;
             var minMonth = (year == min.Year) ? min.Month : 1;
             var maxMonth = (year == max.Year) ? max.Month : 12;
-            var minDay = (year == min.Year && month == min.Month) ? min.Day : 1;
+
+            var minDay = (year == min.Year && month == min.Month) ? 
+                min.Day : 1;
             var maxDay = (year == max.Year && month == max.Month) ?
                 max.Day : DateTime.DaysInMonth(year, month);
 
@@ -183,6 +192,7 @@ namespace UI.Common.Controls.InputFields {
         /// 刷新日期选择器
         /// </summary>
         void refreshPickers() {
+            updatePickersRange();
             foreach (var picker in pickers)
                 picker.setValue(value, true);
         }
@@ -221,6 +231,8 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         public void startSelect() {
             if (!pickersPlane) return;
+
+            startPickers();
             pickersPlane.startWindow(this);
             oriParent = pickersPlane.transform.parent;
             if (pickersParent) pickersPlane.transform.SetParent(pickersParent);
@@ -231,6 +243,7 @@ namespace UI.Common.Controls.InputFields {
         /// 结束选择
         /// </summary>
         public void endSelect() {
+            Debug.Log("endSelect");
             if (!pickersPlane) return;
             pickersPlane.terminateWindow();
             pickersPlane.transform.SetParent(oriParent);

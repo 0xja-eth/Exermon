@@ -64,7 +64,7 @@ class Service:
 
 		Check.ensureNameFormat(name)
 
-		player_exer = Common.getPlayerExer(player, id=peid)
+		player_exer = Common.getPlayerExer(player, include_equipped=True, id=peid)
 
 		ItemCommon.ensureContItemOwnerPlayer(player_exer, player)
 

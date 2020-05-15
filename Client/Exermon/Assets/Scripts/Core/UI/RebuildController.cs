@@ -11,16 +11,17 @@ namespace Core.UI {
     /// 布局重建控制器
     /// </summary>
     public class RebuildController : BaseComponent {
-
-        /// <summary>
-        /// 布局稳定帧
-        /// </summary>
-        const int LayoutStableFrame = 10;
-
+        
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public RectTransform[] contents; // 需要重建布局的变换
+
+        /// <summary>
+        /// 外部变量设置
+        /// </summary>
+        public int minLayoutStableFrame = 0; // 最小布局稳定帧
+        public int maxLayoutStableFrame = 128; // 最大布局稳定帧
 
         #region 初始化
 
@@ -58,21 +59,22 @@ namespace Core.UI {
             bool active = rect.gameObject.activeInHierarchy;
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-                //Debug.Log("ForceRebuildLayoutImmediate: "+rect.name);
-                /*
-                if (++cnt <= LayoutStableFrame) 
-
-                bool newActive = rect.gameObject.activeInHierarchy;
-                float newWidth = rect.rect.width, newHeight = rect.rect.height;
-                if (newActive != active || 
-                    newWidth != width || newHeight != height) {
-                    cnt = 0; newActive = active;
-                    newWidth = width; newHeight = height;
+                
+                if (maxLayoutStableFrame == 0)
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                else if (++cnt > minLayoutStableFrame && cnt <= maxLayoutStableFrame)
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                else {
+                    bool newActive = rect.gameObject.activeInHierarchy;
+                    float newWidth = rect.rect.width, newHeight = rect.rect.height;
+                    if (newActive != active ||
+                        newWidth != width || newHeight != height) {
+                        cnt = 0; active = newActive;
+                        width = newWidth; height = newHeight;
+                    }
                 }
-                */
 
-                yield return null;// new WaitForEndOfFrame();
+                yield return null; // new WaitForEndOfFrame();
             }
         }
 

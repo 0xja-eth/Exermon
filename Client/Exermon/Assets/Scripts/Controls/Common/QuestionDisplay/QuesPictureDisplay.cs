@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using QuestionModule.Data;
+
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.Common.Controls.QuestionDisplay {
@@ -12,7 +14,7 @@ namespace UI.Common.Controls.QuestionDisplay {
     /// 题目小图片显示
     /// </summary
     public class QuesPictureDisplay :
-        SelectableItemDisplay<Texture2D> {
+        SelectableItemDisplay<Question.Picture> {
 
         /// <summary>
         /// 常量定义
@@ -30,12 +32,12 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 绘制确切物品
         /// </summary>
-        /// <param name="texture">图片</param>
-        protected override void drawExactlyItem(Texture2D texture) {
-            base.drawExactlyItem(texture);
-            picture.gameObject.SetActive(true);
-            picture.preserveAspect = true;
-            picture.overrideSprite = AssetLoader.generateSprite(texture);
+        /// <param name="picture">图片</param>
+        protected override void drawExactlyItem(Question.Picture picture) {
+            base.drawExactlyItem(picture);
+            this.picture.gameObject.SetActive(true);
+            this.picture.preserveAspect = true;
+            this.picture.overrideSprite = AssetLoader.generateSprite(picture.data);
 
             alph.text = (index + 1).ToString();
         }

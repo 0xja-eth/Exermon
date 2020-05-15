@@ -14,7 +14,7 @@ namespace UI.BattleScene.Controls.Prepare {
     /// <summary>
     /// 对战准备容器显示接口
     /// </summary>
-    public interface IPrepareContainerDisplay : IContainerDisplay {
+    public interface IPrepareContainerDisplay : ISelectableContainerDisplay {
 
         /// <summary>
         /// 将要使用的物品

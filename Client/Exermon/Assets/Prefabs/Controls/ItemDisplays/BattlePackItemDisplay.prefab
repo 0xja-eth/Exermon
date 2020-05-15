@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 2546970278524325713}
   - component: {fileID: 4666261996436844730}
   m_Layer: 5
-  m_Name: PackItemDisplay
+  m_Name: BattlePackItemDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -238,14 +238,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   background: {fileID: 2515668171332469321}
+  disabledFlag: {fileID: 0}
   selectedFlag: {fileID: 185504071409984141}
   checkedFlag: {fileID: 0}
   highlightFlag: {fileID: 1894075197327225812}
   actived: 1
+  _enabled: 1
   selectable: 1
   checkable: 0
   highlightable: 1
   forceChecked: 0
+  deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 1, g: 1, b: 1, a: 0}
@@ -291,7 +294,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2515668172800818551
 RectTransform:
   m_ObjectHideFlags: 0
@@ -423,4 +426,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 20
+  m_Text: 

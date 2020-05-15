@@ -98,7 +98,7 @@ MonoBehaviour:
   highlightable: 1
   forceChecked: 0
   deselectable: 0
-  normalColor: {r: 1, g: 1, b: 1, a: 0}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
   selectedColor: {r: 1, g: 1, b: 0.75, a: 0}
   checkedColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}

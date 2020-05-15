@@ -2024,8 +2024,8 @@ class ExerEquipSlot(SlotContainer):
 		Raises:
 			ErrorType.InsufficientLevel: 等级不足
 		"""
-		player_exer = self.exer_slot.player_exer
-		if player_exer.level < equip_item.item.min_level:
+		# player_exer = self.exer_slot.player_exer
+		if self.exer_slot.slotLevel() < equip_item.item.min_level:
 			raise GameException(ErrorType.InsufficientLevel)
 
 	# 设置艾瑟萌装备

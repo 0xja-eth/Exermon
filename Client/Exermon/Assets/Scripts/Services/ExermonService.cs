@@ -363,7 +363,7 @@ namespace ExermonModule.Services {
         /// <param name="onError">失败回调</param>
         public void loadExerPack(UnityAction onSuccess = null, UnityAction onError = null) {
             Player player = getPlayer();
-            itemSer.getPack(player.packContainers.exerPack, onSuccess, onError);
+            itemSer.getSelfPack(player.packContainers.exerPack, onSuccess, onError);
         }
 
         /// <summary>
@@ -374,7 +374,7 @@ namespace ExermonModule.Services {
         /// <param name="onError">失败回调</param>
         public void loadExerFragPack(UnityAction onSuccess = null, UnityAction onError = null) {
             Player player = getPlayer();
-            itemSer.getPack(player.packContainers.exerFragPack, onSuccess, onError);
+            itemSer.getSelfPack(player.packContainers.exerFragPack, onSuccess, onError);
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace ExermonModule.Services {
         /// <param name="onError">失败回调</param>
         public void loadExerGiftPool(UnityAction onSuccess = null, UnityAction onError = null) {
             Player player = getPlayer();
-            itemSer.getPack(player.packContainers.exerGiftPool, onSuccess, onError);
+            itemSer.getSelfPack(player.packContainers.exerGiftPool, onSuccess, onError);
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace ExermonModule.Services {
         /// <param name="onError">失败回调</param>
         public void loadExerHub(UnityAction onSuccess = null, UnityAction onError = null) {
             Player player = getPlayer();
-            itemSer.getPack(player.packContainers.exerHub, onSuccess, onError);
+            itemSer.getSelfPack(player.packContainers.exerHub, onSuccess, onError);
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace ExermonModule.Services {
         /// <param name="onError">失败回调</param>
         public void loadExerSlot(UnityAction onSuccess = null, UnityAction onError = null) {
             Player player = getPlayer();
-            itemSer.getSlot(player.slotContainers.exerSlot, onSuccess, onError);
+            itemSer.getSelfSlot(player.slotContainers.exerSlot, onSuccess, onError);
         }
 
         #endregion

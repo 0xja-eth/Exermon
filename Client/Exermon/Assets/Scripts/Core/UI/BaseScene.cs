@@ -139,7 +139,7 @@ namespace Core.UI {
         /// <summary>
         /// 返回场景
         /// </summary>
-        public void popScene() {
+        public virtual void popScene() {
             sceneSys.popScene();
         }
 

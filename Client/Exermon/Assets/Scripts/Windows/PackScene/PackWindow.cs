@@ -213,6 +213,7 @@ namespace UI.PackScene.Windows {
         /// </summary>
         public void refreshView() {
             clearView();
+            refreshMoney();
             switch (view) {
                 case View.Human: onHumanPack(); break;
                 case View.Exermon: onExerPack(); break;
@@ -271,7 +272,6 @@ namespace UI.PackScene.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            refreshMoney();
             refreshView();
         }
 
@@ -373,11 +373,11 @@ namespace UI.PackScene.Windows {
             var container = operContainer();
             var contItem = operPackItem();
             if (target == null) 
-                itemSer.useItem(container, contItem, count,
-                    ItemUseOccasion.Menu, onOperSuccess);
+                itemSer.useItem(container, contItem, count, ItemUseOccasion.Menu,
+                    () => onOperSuccess(NumberInputWindow.Mode.Use));
             else
-                itemSer.useItem(container, contItem, count,
-                    ItemUseOccasion.Menu, target, onOperSuccess);
+                itemSer.useItem(container, contItem, count, ItemUseOccasion.Menu, 
+                    target, () => onOperSuccess(NumberInputWindow.Mode.Use));
         }
 
         /// <summary>
@@ -387,7 +387,8 @@ namespace UI.PackScene.Windows {
         public void sellItem(int count = 1) {
             var container = operContainer();
             var contItem = operPackItem();
-            itemSer.sellItem(container, contItem, count, onOperSuccess);
+            itemSer.sellItem(container, contItem, count,
+                () => onOperSuccess(NumberInputWindow.Mode.Sell));
         }
 
         /// <summary>
@@ -397,15 +398,16 @@ namespace UI.PackScene.Windows {
         public void discardItem(int count = 1) {
             var container = operContainer();
             var contItem = operPackItem();
-            itemSer.discardItem(container, contItem, count, onOperSuccess);
+            itemSer.discardItem(container, contItem, count,
+                () => onOperSuccess(NumberInputWindow.Mode.Discard));
         }
 
         /// <summary>
         /// 操作成功回调
         /// </summary>
-        protected virtual void onOperSuccess() {
+        protected virtual void onOperSuccess(NumberInputWindow.Mode mode) {
             var successText = "";
-            switch (currentNumberWindow.mode) {
+            switch (mode) {
                 case NumberInputWindow.Mode.Use:
                     successText = UseSuccessText; break;
                 case NumberInputWindow.Mode.Sell:

@@ -116,6 +116,22 @@ class Service:
 		if online_player.consumer == consumer:
 			cls._doLogout(consumer, online_player.player)
 
+	# 玩家重连
+	@classmethod
+	async def reconnect(cls, consumer, un: str, pw: str, ):
+		# 返回数据：无
+		Check.ensureUsernameFormat(un)
+		Check.ensurePasswordFormat(pw)
+
+		pw = cls.cryptoPassword(pw)
+
+		# 获取对应的 Player（程序会自动校验并报错）
+		player = Common.getPlayer(error=ErrorType.IncorrectLogin, username=un, password=pw)
+
+		Common.ensurePlayerNormalState(player)
+
+		await cls._doLogin(consumer, player)
+
 	# 辅助函数
 	# 实际执行登陆操作
 	@classmethod
@@ -178,11 +194,15 @@ class Service:
 
 		# 登陆时同时在线
 		if type == 'login':
-			message = Player.DUPLICATED_LOGIN_KICKOUT_MSG
+			message = Player.DUPLICATED_LOGIN_KICKOUT_MSG % (
+				online_player.consumer.ip_address[0], consumer.ip_address[0]
+			)
 
 		# 重置密码（忘记密码）时玩家在线
 		if type == 'retrieve':
-			message = Player.CHANGE_PASSWORD_KICKOUT_MSG
+			message = Player.CHANGE_PASSWORD_KICKOUT_MSG % (
+				online_player.consumer.ip_address[0], consumer.ip_address[0]
+			)
 
 		await cls._doKickout(online_player, message)
 

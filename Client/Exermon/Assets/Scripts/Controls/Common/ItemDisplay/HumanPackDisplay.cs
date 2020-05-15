@@ -49,7 +49,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="type">指定的类型</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
         protected override bool isIncluded(PackContItem packItem, BaseContItem.Type type) {
-            switch(type) {
+            if (!base.isIncluded(packItem, type)) return false;
+            switch (type) {
                 case BaseContItem.Type.HumanPackItem:
                     return isItemIncluded((HumanPackItem)packItem);
                 case BaseContItem.Type.HumanPackEquip:

@@ -16,6 +16,7 @@ using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 
 using UI.ShopScene.Controls;
+using System;
 
 /// <summary>
 /// 状态场景窗口
@@ -39,6 +40,8 @@ namespace UI.ShopScene.Windows {
 
         public BuySelector buySelector;
         public ValueInputField numberInput;
+
+        public Button buyBtn;
         
         /// <summary>
         /// 场景组件引用
@@ -68,6 +71,7 @@ namespace UI.ShopScene.Windows {
         protected override void initializeEvery() {
             base.initializeEvery();
             setupBuySelector();
+            setupNumberInput();
         }
 
         /// <summary>
@@ -77,6 +81,13 @@ namespace UI.ShopScene.Windows {
             var shopItem = operShopItem();
             buySelector.configure(shopItem.price);
             buySelector.onChanged = updateNumberInput;
+        }
+
+        /// <summary>
+        /// 配置数值输入控件
+        /// </summary>
+        private void setupNumberInput() {
+            numberInput.setValue(1);
         }
 
         /// <summary>
@@ -147,7 +158,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public virtual int minCount() {
-            return 0;
+            return 1;
         }
 
         /// <summary>
@@ -188,6 +199,22 @@ namespace UI.ShopScene.Windows {
             return 0;
         }
 
+        /// <summary>
+        /// 总价
+        /// </summary>
+        /// <returns></returns>
+        public int sumPrice() {
+            return currentCount() * singlePrice();
+        }
+
+        /// <summary>
+        /// 能否购买
+        /// </summary>
+        /// <returns></returns>
+        public bool isBoughtable() {
+            return sumPrice() <= currentMoney();
+        }
+
         #endregion
 
         #region 界面控制
@@ -197,6 +224,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         protected virtual void onValueChanged(int value) {
             drawPrice();
+            buyBtn.interactable = isBoughtable();
         }
 
         /// <summary>

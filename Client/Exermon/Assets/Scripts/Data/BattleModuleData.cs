@@ -1041,7 +1041,7 @@ namespace BattleModule.Data {
             var exermon = currentExermon();
             if (exermon != null) {
                 var mp = exermon.mp;
-                var mmp = exermon.param(1).value;
+                var mmp = exermon.param(2).value;
                 res["mp"] = string.Format("{0}/{1}", mp, mmp);
                 res["mp_rate"] = mp * 1.0 / mmp;
             }
@@ -1275,7 +1275,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <param name="value">HP</param>
         public void changeHP(int value) {
-            hp = Mathf.Clamp(hp + value, 0, mhp);
+            //hp = Mathf.Clamp(hp + value, 0, mhp);
         }
 
         /// <summary>
@@ -1283,7 +1283,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <param name="hp">HP百分比</param>
         public void changePercentHP(double rate) {
-            changeHP((int)Math.Round(mhp * rate));
+            //changeHP((int)Math.Round(mhp * rate));
         }
 
         /// <summary>
@@ -1291,9 +1291,9 @@ namespace BattleModule.Data {
         /// </summary>
         /// <param name="value">MP</param>
         public void changeMP(int value) {
-            var exermon = currentExermon();
-            if (exermon == null) return;
-            exermon.changeMP(value);
+            //var exermon = currentExermon();
+            //if (exermon == null) return;
+            //exermon.changeMP(value);
         }
 
         /// <summary>
@@ -1301,9 +1301,9 @@ namespace BattleModule.Data {
         /// </summary>
         /// <param name="rate">MP百分比</param>
         public void changePercentMP(double rate) {
-            var exermon = currentExermon();
-            if (exermon == null) return;
-            exermon.changePercentMP(rate);
+            //var exermon = currentExermon();
+            //if (exermon == null) return;
+            //exermon.changePercentMP(rate);
         }
 
         /// <summary>
@@ -1312,9 +1312,9 @@ namespace BattleModule.Data {
         /// <param name="paramId">属性ID</param>
         /// <param name="value">属性值</param>
         public void changeParam(int paramId, double value) {
-            var exermon = currentExermon();
-            if (exermon == null) return;
-            exermon.changeParam(paramId, value);
+            //var exermon = currentExermon();
+            //if (exermon == null) return;
+            //exermon.changeParam(paramId, value);
         }
 
         /// <summary>
@@ -1323,9 +1323,9 @@ namespace BattleModule.Data {
         /// <param name="paramId">属性ID</param>
         /// <param name="rate">属性值（百分比）</param>
         public void changePercentParam(int paramId, double rate) {
-            var exermon = currentExermon();
-            if (exermon == null) return;
-            exermon.changePercentParam(paramId, rate);
+            //var exermon = currentExermon();
+            //if (exermon == null) return;
+            //exermon.changePercentParam(paramId, rate);
         }
 
         #endregion

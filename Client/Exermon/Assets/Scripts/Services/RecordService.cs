@@ -12,6 +12,8 @@ using Core.Services;
 
 using RecordModule.Data;
 
+using PlayerModule.Services;
+
 using QuestionModule.Data;
 using QuestionModule.Services;
 
@@ -221,6 +223,7 @@ namespace RecordModule.Services {
         /// 外部系统
         /// </summary>
         QuestionService quesSer;
+        PlayerService playerSer;
         SceneSystem sceneSys;
 
         #region 初始化
@@ -231,6 +234,7 @@ namespace RecordModule.Services {
         protected override void initializeSystems() {
             base.initializeSystems();
             quesSer = QuestionService.get();
+            playerSer = PlayerService.get();
             sceneSys = SceneSystem.get();
         }
 
@@ -456,6 +460,7 @@ namespace RecordModule.Services {
                 if (terminate) {
                     changeState(State.Terminated);
                     exerciseRecord = DataLoader.load(exerciseRecord, res, "result");
+                    // playerSer.loadPlayer(DataLoader.load(res, "player"));
                 } else
                     changeState(State.Answered);
                 onSuccess?.Invoke();
@@ -476,7 +481,7 @@ namespace RecordModule.Services {
         /// </summary>
         public void terminate() {
             changeState(State.Closed);
-            sceneSys.popScene();
+            sceneSys.popScene(data: true);
         }
 
         #endregion

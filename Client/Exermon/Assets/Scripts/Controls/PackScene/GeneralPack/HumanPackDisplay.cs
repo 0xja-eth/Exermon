@@ -56,10 +56,10 @@ namespace UI.PackScene.Controls.GeneralPack {
         void configureSelectors() {
             typeSelector.configure(generateTypesData());
             starSelector.configure(generateStarsData());
-            typeSelector.setValue(UnlimitedIndex);
-            starSelector.setValue(UnlimitedIndex);
-            //typeSelector.onChanged = onSelectorChanged;
-            //starSelector.onChanged = onSelectorChanged;
+            //typeSelector.setValue(UnlimitedIndex);
+            //starSelector.setValue(UnlimitedIndex);
+            typeSelector.onChanged = onSelectorChanged;
+            starSelector.onChanged = onSelectorChanged;
         }
 
         /// <summary>
@@ -122,11 +122,11 @@ namespace UI.PackScene.Controls.GeneralPack {
             // 判断类型
             var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)
-                flag = typeIndex == ItemIndex;
+                flag = flag && typeIndex == ItemIndex;
             // 判断星级
             var starIndex = starSelector.getValueId();
             if (starIndex != UnlimitedIndex)
-                flag = starIndex == packItem.item().starId;
+                flag = flag && starIndex == packItem.item().starId;
 
             return flag;
         }
@@ -142,11 +142,11 @@ namespace UI.PackScene.Controls.GeneralPack {
             // 判断类型
             var typeIndex = typeSelector.getValueId();
             if (typeIndex != UnlimitedIndex)
-                flag = typeIndex == EquipIndex;
+                flag = flag && typeIndex == EquipIndex;
             // 判断星级
             var starIndex = starSelector.getValueId();
             if (starIndex != UnlimitedIndex)
-                flag = starIndex == packEquip.item().starId;
+                flag = flag && starIndex == packEquip.item().starId;
 
             return flag;
         }
@@ -156,7 +156,7 @@ namespace UI.PackScene.Controls.GeneralPack {
         /// </summary>
         /// <param name="index"></param>
         void onSelectorChanged(Tuple<int, string> data) {
-            requestRefresh();
+            refreshItems();
         }
 
         #endregion

@@ -229,8 +229,8 @@ namespace PlayerModule.Data {
             public int sumTimespan { get; protected set; }
             [AutoConvert]
             public double avgTimespan { get; protected set; }
-            [AutoConvert]
-            public double corrTimespan { get; protected set; }
+            //[AutoConvert]
+            //public double corrTimespan { get; protected set; }
             [AutoConvert]
             public int sumExp { get; protected set; }
             [AutoConvert]
@@ -245,7 +245,7 @@ namespace PlayerModule.Data {
                 var res = toJson();
                 res["sum_timespan"] = sumTimespan / 1000;
                 res["avg_timespan"] = (int)avgTimespan / 1000;
-                res["corr_timespan"] = (int)corrTimespan / 1000;
+                //res["corr_timespan"] = (int)corrTimespan / 1000;
                 return res;
             }
         }
@@ -272,7 +272,7 @@ namespace PlayerModule.Data {
         /// </summary>
         [AutoConvert]
         public string username { get; protected set; }
-        [AutoConvert]
+        //[AutoConvert]
         public string password { get; protected set; }
         [AutoConvert]
         public string phone { get; protected set; }
@@ -419,8 +419,8 @@ namespace PlayerModule.Data {
         /// 设置密码
         /// </summary>
         /// <param name="pw">密码</param>
-        public void setPassword(string pw) {
-            password = pw;
+        public void setUserInfo(string un, string pw) {
+            username = un; password = pw;
         }
 
         /// <summary>
@@ -643,7 +643,7 @@ namespace PlayerModule.Data {
         /// </summary>
         /// <param name="money"></param>
         public void loadMoney(JsonData data) {
-            money = DataLoader.load(money, data, "money");
+            money = DataLoader.load(money, data);
         }
 
     }

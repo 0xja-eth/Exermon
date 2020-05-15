@@ -69,7 +69,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         void updateTimer() {
             if (!timing) return;
             var now = DateTime.Now;
-            if (now < endTime) refresh();
+            if (now < endTime || !countdown) refresh();
             else if (countdown) stopTimer(true);
         }
 
@@ -181,16 +181,16 @@ namespace UI.Common.Controls.QuestionDisplay {
         void drawTimer() {
             var now = DateTime.Now;
             var delta = endTime - now;
-            if (reverse) delta = duration - delta;
-
+            var rate = (duration.Ticks == 0 ? 0 :
+                delta.Ticks * 1.0f / duration.Ticks);
             var seconds = delta.TotalSeconds;
+
+            if (reverse) delta = duration - delta;
 
             time.color = (seconds < CriticalSecond) ?
                 CriticalColor : NormalColor;
             time.text = SceneUtils.time2Str(delta);
 
-            var rate = (duration.Ticks == 0 ? 0 :
-                delta.Ticks * 1.0f / duration.Ticks);
             rate = Mathf.Clamp01(rate);
 
             bar.fillAmount = rate;

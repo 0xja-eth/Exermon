@@ -20,7 +20,8 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         public Image icon;
         public StarsDisplay stars;
 
-        public Text name, description;
+        public Text name, description, minLevel;
+        public GameObject minLevelObj;
 
         /// <summary>
         /// 艾瑟萌装备槽项
@@ -66,6 +67,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// <param name="slotItem">艾瑟萌槽项</param>
         void drawIconImage(ExerPackEquip packEquip) {
             var equip = packEquip.equip();
+            icon.gameObject.SetActive(true);
             icon.color = new Color(1, 1, 1, 1);
             icon.overrideSprite = equip.icon;
             
@@ -80,6 +82,9 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
             var equip = packEquip.equip();
             name.text = equip.name;
             description.text = equip.description;
+
+            minLevelObj.SetActive(true);
+            minLevel.text = equip.minLevel.ToString();
         }
 
         /// <summary>
@@ -137,9 +142,10 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         /// 清除物品
         /// </summary>
         protected override void clearMainInfo() {
-            name.text = description.text = "";
+            name.text = description.text = minLevel.text = "";
+            minLevelObj.SetActive(false);
+            icon.gameObject.SetActive(false);
             icon.overrideSprite = null;
-            icon.color = new Color(0, 0, 0, 0);
             stars.clearValue();
         }
 

@@ -152,6 +152,29 @@ namespace ItemModule.Services {
         }
 
         /// <summary>
+        /// 获取自身背包容器
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getSelfPack<T>(PackContainer<T> container,
+            UnityAction onSuccess, UnityAction onError = null) where T : PackContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                onSuccess?.Invoke();
+            };
+
+            getSelfPack(container.type, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        public void getSelfPack(int type,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type;
+            sendRequest(Oper.GetPack, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
         /// 获取槽容器
         /// </summary>
         /// <param name="container">容器</param>
@@ -173,6 +196,29 @@ namespace ItemModule.Services {
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
             JsonData data = new JsonData();
             data["type"] = type; data["cid"] = cid;
+            sendRequest(Oper.GetSlot, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 获取自身槽容器
+        /// </summary>
+        /// <param name="container">容器</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void getSelfSlot<T>(SlotContainer<T> container,
+            UnityAction onSuccess, UnityAction onError = null) where T : SlotContItem, new() {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                container = DataLoader.load(container, res, "container");
+                onSuccess?.Invoke();
+            };
+
+            getSelfSlot(container.type, _onSuccess, onError);
+        }
+        /// <param name="type">容器类型</param>
+        public void getSelfSlot(int type, 
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            JsonData data = new JsonData(); data["type"] = type; 
             sendRequest(Oper.GetSlot, data, onSuccess, onError, uid: true);
         }
 
@@ -537,7 +583,7 @@ namespace ItemModule.Services {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");
-                getPlayer().loadMoney(res);
+                getPlayer().loadMoney(DataLoader.load(res, "money"));
                 onSuccess?.Invoke();
             };
 
@@ -616,7 +662,7 @@ namespace ItemModule.Services {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 container = DataLoader.load(container, res, "container");
-                getPlayer().loadMoney(res);
+                getPlayer().loadMoney(DataLoader.load(res, "money"));
                 onSuccess?.Invoke();
             };
 

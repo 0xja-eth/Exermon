@@ -249,7 +249,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 刷新物品
         /// </summary>
         public override void refreshItems() {
-            Debug.Log("slotDisplay.refreshItems: " + slotData);
             if (slotData == null) clearItems();
             else setItems(slotData.items);
         }

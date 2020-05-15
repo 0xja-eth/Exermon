@@ -94,6 +94,14 @@ namespace UI.Common.Controls.QuestionDisplay {
             return base.isCheckable() && !isTerminated();
         }
 
+        /// <summary>
+        /// 能否取消选中
+        /// </summary>
+        /// <returns></returns>
+        public override bool isUncheckable() {
+            return base.isUncheckable() && !isTerminated();
+        }
+
         #endregion
 
         #region 界面控制

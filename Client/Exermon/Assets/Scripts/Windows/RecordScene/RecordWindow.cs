@@ -144,7 +144,7 @@ namespace UI.RecordScene.Windows {
         /// </summary>
         /// <returns></returns>
         public DateTime getFromDate() {
-            return fromDate.getValue();
+            return fromDate.getValue().Date;
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace UI.RecordScene.Windows {
         /// </summary>
         /// <returns></returns>
         public DateTime getToDate() {
-            return toDate.getValue();
+            return toDate.getValue().AddDays(1).Date;
         }
 
         /// <summary>

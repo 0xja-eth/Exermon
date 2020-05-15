@@ -38,6 +38,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 外部组件设置
         /// </summary>
         public Image background;
+        public GameObject disabledFlag; // 选择时显示的 GameObject
         public GameObject selectedFlag; // 选择时显示的 GameObject
         public GameObject checkedFlag; // 选中时显示的 GameObject
         public GameObject highlightFlag; // 高亮时显示的 GameObject
@@ -46,6 +47,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 外部变量设置
         /// </summary>
         public bool actived = true; // 是否可用
+        public bool _enabled = true; // 是否有效
 
         public bool selectable = true; // 能否选择
         public bool checkable = false; // 能否选中
@@ -105,8 +107,17 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>是否激活</returns>
         public virtual bool isActived() {
-            if (container != null && !container.actived) return false;
+            if (container && !container.actived) return false;
             return actived;
+        }
+
+        /// <summary>
+        /// 是否有效
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool isEnabled() {
+            if (container && !container.isEnabled(item)) return false;
+            else return isActived() && _enabled;
         }
 
         /// <summary>
@@ -114,7 +125,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否高光</returns>
         public virtual bool isHighlightable() {
-            if (container != null && !container.highlightable) return false;
+            if (container && !container.highlightable) return false;
             return isActived() && highlightable;
         }
 
@@ -141,7 +152,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选择</returns>
         public virtual bool isSelectable() {
-            if (container != null && !container.selectable) return false;
+            if (container && !container.selectable) return false;
             return isActived() && selectable;
         }
 
@@ -150,7 +161,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns></returns>
         public virtual bool isDeselectable() {
-            if (container != null && !container.deselectable) return false;
+            if (container && !container.deselectable) return false;
             return isActived() && deselectable;
         }
 
@@ -178,7 +189,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否选中</returns>
         public virtual bool isCheckable() {
-            if (container != null && !container.checkable) return false;
+            if (container && !container.checkable) return false;
             return isActived() && checkable;
         }
 
@@ -187,7 +198,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>可否取消选中</returns>
         public virtual bool isUncheckable() {
-            if (container != null && !container.checkable) return false;
+            if (container && !container.checkable) return false;
             return isActived() && checkable && !isForceChecked();
         }
 
@@ -268,7 +279,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 刷新激活状态
         /// </summary>
         void refreshActivedStatus() {
-            if (!isActived()) changeBackgroundColor(disableColor);
+            var activing = isActived() && isEnabled();
+            if (!activing) changeBackgroundColor(disableColor);
+            if (disabledFlag) disabledFlag.SetActive(!activing);
         }
 
         /// <summary>
@@ -284,7 +297,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshSelectStatus() {
             var selected = isSelected();
-            Debug.Log("refreshSelectStatus: " + name + ": " + selected);
             if (selected) changeBackgroundColor(selectedColor);
             if (selectedFlag) selectedFlag.SetActive(selected);
         }
@@ -294,7 +306,6 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void refreshCheckStatus() {
             var checked_ = isChecked();
-            Debug.Log("refreshCheckStatus: " + name + ": " + checked_);
             if (checked_) changeBackgroundColor(checkedColor);
             if (checkedFlag) checkedFlag.SetActive(checked_);
         }
@@ -344,13 +355,14 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerClick(PointerEventData eventData) {
-            // 当已选择且不可选中时单击，如果可以取消选择就取消选择
-            if (isSelected() && !isCheckable() && 
-                !isUncheckable() && isDeselectable()) deselect();
-            // 如果已选择或者不可选择时单击，执行反转操作
-            else if (isSelected() || !isSelectable()) toggle();
-            // 否则，选择
-            else select();
+            // 取消选择：当已经选择，同时没有选中的时候，可取消选择
+            if (isDeselectable() && isSelected() && !isChecked()) deselect();
+            else {
+                // 如果已选择或者不可选择时单击，执行反转操作
+                // else if (isSelected() || !isSelectable()) toggle();
+                if (isSelectable() && !isSelected()) select();
+                toggle(); 
+            }
             refreshStatus();
         }
 

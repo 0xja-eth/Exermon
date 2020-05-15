@@ -56,6 +56,9 @@ class QuesPicture(models.Model):
 	# 序号
 	number = models.PositiveSmallIntegerField(verbose_name="序号")
 
+	# 解析图片
+	desc_pic = models.BooleanField(default=False, verbose_name="解析图片")
+
 	# 图片文件名
 	file = models.ImageField(upload_to=QuestionImageUpload(), verbose_name="图片文件")
 
@@ -86,6 +89,7 @@ class QuesPicture(models.Model):
 	def convertToDict(self):
 		return {
 			'number': self.number,
+			'desc_pic': self.desc_pic,
 			'data': self.convertToBase64()
 		}
 

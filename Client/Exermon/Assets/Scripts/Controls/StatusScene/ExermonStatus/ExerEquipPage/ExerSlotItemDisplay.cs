@@ -178,7 +178,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerEquipPage {
         protected override void onEquipChanged(PackContainerDisplay<PackContItem> container, PackContItem equipItem) {
             base.onEquipChanged(container, equipItem);
             slotDisplay.refreshItems();
-            slotDisplay.select(0);
+            slotDisplay.selectLast(); // (0);
         }
 
         #endregion

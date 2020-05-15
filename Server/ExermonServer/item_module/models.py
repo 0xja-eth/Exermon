@@ -3191,6 +3191,10 @@ class EffectDescriptionFormat:
 		self.empty = self.get("empty", "无效果")
 
 		self.second = self.get("second", "秒")
+		self.minute = self.get("minute", "分")
+		self.hour = self.get("hour", "时")
+		self.day = self.get("day", "天")
+
 		self.round = self.get("round", "回合")
 
 		self.gold = self.get("gold", conf.gold)
@@ -3206,16 +3210,16 @@ class EffectDescriptionFormat:
 		self.recover2 = self.get("recover2", "%s 回复 %s %%")
 		self.recover3 = self.get("recover3", "%s 回复 %s 点，%s%%")
 
-		self.promote1 = self.get("promote1", "属性 %s 增加 %s 点")
-		self.promote2 = self.get("promote2", "属性 %s 增加 %s %%")
-		self.promote3 = self.get("promote3", "属性 %s 增加 %s 点，%s%%")
+		self.promote1 = self.get("promote1", "%s 增加 %s 点")
+		self.promote2 = self.get("promote2", "%s 增加 %s %%")
+		self.promote3 = self.get("promote3", "%s 增加 %s 点，%s%%")
 
-		self.tmp_promote1 = self.get("tmp_promote1", "属性 %s 增加 %s 点，持续 %s %s")
-		self.tmp_promote2 = self.get("tmp_promote2", "属性 %s 增加%s%%，持续 %s %s")
-		self.tmp_promote3 = self.get("tmp_promote3", "属性 %s 增加 %s 点，%s%%，持续 %s %s")
+		self.tmp_promote1 = self.get("tmp_promote1", "%s 增加 %s 点，持续 %s %s")
+		self.tmp_promote2 = self.get("tmp_promote2", "%s 增加%s%%，持续 %s %s")
+		self.tmp_promote3 = self.get("tmp_promote3", "%s 增加 %s 点，%s%%，持续 %s %s")
 
-		self.gain_item1 = self.get("gain_item1", "物品 %s 增加 %s 个")
-		self.gain_item2 = self.get("gain_item2", "物品 %s 增加 %s~%s 个")
+		self.gain_item1 = self.get("gain_item1", "%s 增加 %s 个")
+		self.gain_item2 = self.get("gain_item2", "%s 增加 %s~%s 个")
 
 		self.gain_gold1 = self.get("gain_gold1", "%s 增加 %s")
 		self.gain_gold2 = self.get("gain_gold2", "%s 增加 %s~%s")
@@ -3262,7 +3266,9 @@ class EffectDescriptionFormat:
 		return EffectDescriptionFormat(True,
 			empty="无",
 
-			second="s", round="回",
+			second="s", minute="m", hour="h", day="d",
+
+		    round="回",
 
 			hp_attr="HP", mp_attr="MP",
 
@@ -3373,16 +3379,15 @@ class BaseEffect(models.Model):
 			p, t, a = params[0], params[1], params[2]
 			name = BaseParam.get(id=p).name
 			if format.short: name = name[0]
-			
-			time = format.second if code == ItemEffectCode.TempAddParam \
-				else format.round
+
+			t, unit = self._getUnit(format, code, t)
 
 			if p_len < 4:  # 如果只有 a 参数
-				return format.tmp_promote1 % (name, a, t, time)
+				return format.tmp_promote1 % (name, a, t, unit)
 
 			b = params[3]
-			if a == 0: return format.tmp_promote2 % (name, b, t, time)
-			return format.tmp_promote3 % (name, a, b, t, time)
+			if a == 0: return format.tmp_promote2 % (name, b, t, unit)
+			return format.tmp_promote3 % (name, a, b, t, unit)
 
 		elif code == ItemEffectCode.GainItem:
 			from .views import Common
@@ -3441,6 +3446,27 @@ class BaseEffect(models.Model):
 				return format.eval % params[0]
 
 		return format.empty
+
+	@classmethod
+	def _getUnit(cls, format: EffectDescriptionFormat,
+				 code: ItemEffectCode, t) -> (int, str):
+		"""
+		获取时间单位
+		Args:
+			format (EffectDescriptionFormat): 描述格式
+			code (ItemEffectCode): 效果类型
+			t (int): 数值
+		Returns:
+			返回转化后的数值以及单位
+		"""
+
+		if code == ItemEffectCode.BattleAddParam:
+			return t, format.round
+		
+		if 60 <= t <= 3600: return t/60, format.minute
+		if 3600 <= t <= 86400: return t/3600, format.hour
+		
+		return t/86400, format.day
 
 	# 转化为字典
 	def convertToDict(self):

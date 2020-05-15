@@ -149,6 +149,8 @@ namespace QuestionModule.Data {
             [AutoConvert]
             public int number { get; protected set; }
             [AutoConvert]
+            public bool descPic { get; protected set; }
+            [AutoConvert]
             public Texture2D data { get; protected set; }
         }
 

@@ -99,8 +99,8 @@ class QuestionRecord(models.Model):
 	# 转化为字典
 	def convertToDict(self, type=None):
 
-		last_date = ModelUtils.dateToStr(self.last_date)
-		first_date = ModelUtils.dateToStr(self.first_date)
+		last_date = ModelUtils.timeToStr(self.last_date)
+		first_date = ModelUtils.timeToStr(self.first_date)
 
 		return {
 			'id': self.id,
