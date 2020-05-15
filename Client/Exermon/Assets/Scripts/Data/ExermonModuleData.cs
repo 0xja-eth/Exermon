@@ -802,6 +802,7 @@ namespace ExermonModule.Data {
                 json["old_exp"] = exp;
                 json["old_level"] = level;
                 json["level_up"] = newLevel > level;
+
             } else {
                 json["exp"] = exp;
                 json["next"] = next;
@@ -1324,7 +1325,7 @@ namespace ExermonModule.Data {
             json["exp"] = playerExer.exp;
             json["next"] = playerExer.next;
             json["level"] = playerExer.level;
-            json["rate"] = playerExer.exp / playerExer.next;
+            json["rate"] = playerExer.exp * 1.0 / playerExer.next;
             return json;
         }
 
@@ -1338,7 +1339,7 @@ namespace ExermonModule.Data {
             json["exp"] = exp;
             json["next"] = next;
             json["level"] = level;
-            json["rate"] = exp / next;
+            json["rate"] = exp * 1.0 / next;
             return json;
         }
 

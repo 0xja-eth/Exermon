@@ -162,7 +162,8 @@ namespace UI.ExerciseScene.Windows {
         /// </summary>
         void onPushSuccess() {
             gameSys.requestAlert(PushReportSuccessText);
-            scene.onUpperWindowBack();
+            if (scene) scene.onUpperWindowBack();
+            else terminateWindow();
         }
 
         #endregion

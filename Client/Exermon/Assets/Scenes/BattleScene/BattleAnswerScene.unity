@@ -2094,7 +2094,7 @@ PrefabInstance:
     - target: {fileID: 4400701592633758072, guid: 7a5038c31e4becd458984b0d39bd1b2b,
         type: 3}
       propertyPath: maxLayoutStableFrame
-      value: 512
+      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a5038c31e4becd458984b0d39bd1b2b, type: 3}
@@ -3007,7 +3007,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
 --- !u!1001 &1410321782
