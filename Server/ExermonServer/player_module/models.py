@@ -513,11 +513,13 @@ class Player(CacheableModel):
 		else:
 			rank_id = sub_rank = star_num = point = 0
 
-		count = win_cnt = corr_cnt = 0
+		count = win_cnt = corr_cnt = sum_cnt = 0
 		sum_hurt = sum_damage = sum_score = 0
 		max_hurt = max_damage = max_score = 0
 
 		for rec in battle_records:
+
+			if not rec.finished: continue
 
 			if rec.result == BattlePlayerResult.Win.value:
 				win_cnt += 1
@@ -526,6 +528,7 @@ class Player(CacheableModel):
 			damage = rec.sumDamage()
 			score = rec.sumScore()
 
+			sum_cnt += len(rec.results())
 			corr_cnt += rec.corrCount()
 
 			sum_hurt += hurt
@@ -539,7 +542,8 @@ class Player(CacheableModel):
 			count += 1
 
 		win_rate = win_cnt / count if count > 0 else 0
-		corr_rate = corr_cnt / count if count > 0 else 0
+
+		corr_rate = corr_cnt / sum_cnt if sum_cnt > 0 else 0
 
 		avg_hurt = sum_hurt / count if count > 0 else 0
 		avg_damage = sum_damage / count if count > 0 else 0
@@ -552,7 +556,10 @@ class Player(CacheableModel):
 			'score': point,
 			'credit': self.credit,
 			'count': count,
+			'win_cnt': win_cnt,
 			'win_rate': win_rate,
+			'sum_cnt': sum_cnt,
+			'corr_cnt': corr_cnt,
 			'corr_rate': corr_rate,
 			'avg_hurt': avg_hurt,
 			'avg_damage': avg_damage,

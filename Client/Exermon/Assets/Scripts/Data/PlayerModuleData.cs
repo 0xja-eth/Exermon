@@ -167,7 +167,13 @@ namespace PlayerModule.Data {
             [AutoConvert]
             public int count { get; protected set; }
             [AutoConvert]
+            public int winCnt { get; protected set; }
+            [AutoConvert]
             public double winRate { get; protected set; }
+            [AutoConvert]
+            public int sumCnt { get; protected set; }
+            [AutoConvert]
+            public int corrCnt { get; protected set; }
             [AutoConvert]
             public double corrRate { get; protected set; }
             [AutoConvert]

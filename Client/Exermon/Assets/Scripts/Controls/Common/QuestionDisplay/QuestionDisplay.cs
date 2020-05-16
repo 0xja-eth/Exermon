@@ -183,6 +183,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void onItemChanged() {
             base.onItemChanged();
+            content.anchoredPosition = new Vector2(0, 0);
             // result = null; showAnswer = false;
         }
 
