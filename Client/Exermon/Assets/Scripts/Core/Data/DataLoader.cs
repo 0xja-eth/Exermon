@@ -397,7 +397,7 @@ namespace Core.Data.Loaders {
         #endregion
 
         #region 其他工具
-
+        /*
         /// <summary>
         /// 类型转化并判断
         /// </summary>
@@ -410,7 +410,7 @@ namespace Core.Data.Loaders {
             if (ot == nt || ot.IsSubclassOf(nt)) return p((T)obj);
             return false;
         }
-
+        
         /// <summary>
         /// 类型转化
         /// </summary>
@@ -423,7 +423,7 @@ namespace Core.Data.Loaders {
             if (ot == nt || ot.IsSubclassOf(nt)) return (T)obj;
             return default;
         }
-
+        */
         /// <summary>
         /// 下划线命名法转化为小驼峰命名法
         /// </summary>

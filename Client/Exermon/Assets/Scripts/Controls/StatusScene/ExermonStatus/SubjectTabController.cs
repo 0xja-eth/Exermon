@@ -1,4 +1,5 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 using Core.UI;
 using Core.UI.Utils;
@@ -75,8 +76,16 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// </summary>
         /// <param name="sub">子视图</param>
         protected override void refreshSubView(Toggle sub, int index) {
-            var trans = sub.transform;
-            var txt = SceneUtils.find<Text>(trans, "Label");
+            drawSubject(sub.transform, index);
+        }
+
+        /// <summary>
+        /// 绘制科目
+        /// </summary>
+        /// <param name="tf">变换</param>
+        /// <param name="index">索引</param>
+        void drawSubject(Transform tf, int index) {
+            var txt = SceneUtils.find<Text>(tf, "Label");
             txt.text = (subjects == null ? "" : subjects[index].name);
         }
 

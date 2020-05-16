@@ -63,12 +63,14 @@ namespace UI.ShopScene.Windows {
         protected override void initializeOnce() {
             base.initializeOnce();
             numberInput.onChanged = onValueChanged;
+            buySelector.onChanged = updateNumberInput;
         }
 
         /// <summary>
         /// 每次初始化
         /// </summary>
         protected override void initializeEvery() {
+            buyBtn.interactable = false;
             base.initializeEvery();
             setupBuySelector();
             setupNumberInput();
@@ -78,9 +80,7 @@ namespace UI.ShopScene.Windows {
         /// 配置购买选择器
         /// </summary>
         void setupBuySelector() {
-            var shopItem = operShopItem();
-            buySelector.configure(shopItem.price);
-            buySelector.onChanged = updateNumberInput;
+            buySelector.configure(operShopItem().price);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         /// <returns></returns>
         public bool isBoughtable() {
-            return sumPrice() <= currentMoney();
+            return sumPrice() > 0 && sumPrice() <= currentMoney();
         }
 
         #endregion
@@ -224,7 +224,6 @@ namespace UI.ShopScene.Windows {
         /// </summary>
         protected virtual void onValueChanged(int value) {
             drawPrice();
-            buyBtn.interactable = isBoughtable();
         }
 
         /// <summary>
@@ -233,6 +232,7 @@ namespace UI.ShopScene.Windows {
         void drawPrice() {
             Debug.Log("currentCount = " + currentCount());
             buySelector.setCount(currentCount());
+            buyBtn.interactable = isBoughtable();
         }
 
         /// <summary>

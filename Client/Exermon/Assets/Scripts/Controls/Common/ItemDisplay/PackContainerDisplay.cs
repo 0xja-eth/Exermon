@@ -231,7 +231,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <returns>返回背包容器</returns>
         PackContainerDisplay<T> getPackDisplay(
             SelectableContainerDisplay<T> container = null) {
-            return DataLoader.cast<PackContainerDisplay<T>>(container);
+            return container as PackContainerDisplay<T>;
         }
 
         /// <summary>

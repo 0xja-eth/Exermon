@@ -99,6 +99,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// </summary>
         /// <param name="exermon">物品</param>
         void drawFull(Exermon exermon) {
+            full.gameObject.SetActive(true);
             full.overrideSprite = AssetLoader.generateSprite(exermon.full);
         }
 
@@ -139,6 +140,7 @@ namespace UI.StartScene.Controls.Exermon {
         /// </summary>
         void clearInfoView() {
             full.overrideSprite = null;
+            full.gameObject.SetActive(false);
             name.text = subject.text = animal.text = "";
         }
 

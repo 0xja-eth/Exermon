@@ -56,7 +56,7 @@ namespace UI.Common.Controls.ItemDisplays {
         public PackContainerDisplay<E> getPackDisplay(
             SelectableContainerDisplay<E> container) {
             if (container == null) return getPackDisplay();
-            return DataLoader.cast<PackContainerDisplay<E>>(container);
+            return container as PackContainerDisplay<E>;
         }
 
 
@@ -126,8 +126,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <returns>返回对应索引的<装备槽项/returns>
         public SlotContItemDisplay<T, E> getSlotItemDisplay(int slotIndex) {
             return (SlotContItemDisplay<T, E>)subViews.Find(
-                sub => DataLoader.castPredicate<SlotContItemDisplay<T, E>>(
-                    sub, obj => obj.getSlotIndex() == slotIndex)
+                sub => {
+                    var obj = sub as SlotContItemDisplay<T, E>;
+                    return obj != null && obj.getSlotIndex() == slotIndex;
+                }
             );
         }
 
@@ -137,7 +139,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="slotIndex">下标</param>
         /// <returns>返回对应索引的装备槽项</returns>
         public SlotContItemDisplay<T, E> getSlotItemDisplayByIndex(int index) {
-            return DataLoader.cast<SlotContItemDisplay<T, E>>(subViews[index]);
+            return subViews[index] as SlotContItemDisplay<T, E>;
         }
 
         #endregion
@@ -264,7 +266,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="index">索引</param>
         protected override void onSubViewCreated(SelectableItemDisplay<T> sub, int index) {
             base.onSubViewCreated(sub, index);
-            var slotItemDisplay = DataLoader.cast<SlotContItemDisplay<T, E>>(sub);
+            var slotItemDisplay = sub as SlotContItemDisplay<T, E>;
             if (slotItemDisplay != null) {
                 var slotItem = getSlotItemDataByIndex(index);
                 slotItemDisplay.setSlotIndex(slotItem.slotIndex);

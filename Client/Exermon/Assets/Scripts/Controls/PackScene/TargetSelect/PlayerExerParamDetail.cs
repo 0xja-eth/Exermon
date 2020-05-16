@@ -31,7 +31,7 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Text name, level;
+        public Text name; //, level;
 
         public ParamDisplaysGroup paramsInfo;
         public MultParamsDisplay battlePoint;
@@ -127,7 +127,7 @@ namespace UI.PackScene.Controls.TargetSelect {
         void drawBaseInfo(PlayerExermon playerExer) {
             var exermon = playerExer.exermon();
             name.text = playerExer.name();
-            level.text = string.Format(LevelTextFormat, playerExer.level);
+            //level.text = string.Format(LevelTextFormat, playerExer.level);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace UI.PackScene.Controls.TargetSelect {
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
-            name.text = level.text = "";
+            name.text = ""; // level.text = "";
             battlePoint?.clearValue();
             paramsInfo?.clearValues();
             expBar?.clearValue();

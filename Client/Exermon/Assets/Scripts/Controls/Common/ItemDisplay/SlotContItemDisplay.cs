@@ -121,7 +121,7 @@ namespace UI.Common.Controls.ItemDisplays {
         public PackContainerDisplay<E> getPackDisplay(
             SelectableContainerDisplay<E> container) {
             if (container == null) return getPackDisplay();
-            return DataLoader.cast<PackContainerDisplay<E>>(container);
+            return container as PackContainerDisplay<E>;
         }
 
         /// <summary>
@@ -130,12 +130,12 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <returns>返回槽容器显示组件</returns>
         public virtual SlotContainerDisplay<T, E> getSlotDisplay() {
             var container = this.container;
-            return DataLoader.cast<SlotContainerDisplay<T, E>>(container);
+            return container as SlotContainerDisplay<T, E>;
         }
         public SlotContainerDisplay<T, E> getSlotDisplay(
             SelectableContainerDisplay<T> container) {
             if (container == null) return getSlotDisplay();
-            return DataLoader.cast<SlotContainerDisplay<T, E>>(container);
+            return container as SlotContainerDisplay<T, E>;
         }
 
         /// <summary>

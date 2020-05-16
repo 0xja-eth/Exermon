@@ -172,6 +172,13 @@ namespace UI.Common.Controls.InputFields {
         }
 
         /// <summary>
+        /// 更新数值
+        /// </summary>
+        void updateValue() {
+            assignValue(value);
+        }
+
+        /// <summary>
         /// 判断是否正确
         /// </summary>
         /// <param name="display">判断后是否显示校验信息</param>

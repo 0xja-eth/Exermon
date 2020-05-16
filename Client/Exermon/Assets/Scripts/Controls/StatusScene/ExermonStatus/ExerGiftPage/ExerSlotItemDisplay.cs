@@ -23,8 +23,6 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
         /// </summary>
         public PlayerExerGiftDetail playerGiftDetail;
 
-        public PackContainerDisplay packDisplay;
-
         /// <summary>
         /// 详情显示组件
         /// </summary>
@@ -59,7 +57,7 @@ namespace UI.StatusScene.Controls.ExermonStatus.ExerGiftPage {
         /// <param name="equipItem">装备项</param>
         protected override void onEquipChanged(PackContainerDisplay<PlayerExerGift> container, PlayerExerGift equipItem) {
             base.onEquipChanged(container, equipItem);
-            var packDisplay = DataLoader.cast<PackContainerDisplay>(getPackDisplay());
+            var packDisplay = getPackDisplay() as PackContainerDisplay;
             packDisplay?.setEquipItem(item.playerGift);
         }
 
