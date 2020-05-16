@@ -66,7 +66,18 @@ namespace Core.UI {
         /// 内部变量声明
         /// </summary>
         public bool initialized { get; protected set; } = false; // 初始化标志
-        public bool shown { get; protected set; } = false;
+
+        /// <summary>
+        /// 显示状态
+        /// </summary>
+        public virtual bool shown {
+            get {
+                return gameObject.activeSelf;
+            }
+            protected set {
+                gameObject.SetActive(value);
+            }
+        }
 
         bool refreshRequested = true;
         bool clearRequested = false;
@@ -104,8 +115,7 @@ namespace Core.UI {
         /// 配置组件
         /// </summary>
         public virtual void configure() {
-            shown = gameObject.activeSelf;
-            Debug.Log("configure: shown: " + name + ": " + shown);
+            Debug.Log("configure: " + name + ": " + shown);
             initialize();
         }
 
@@ -161,7 +171,6 @@ namespace Core.UI {
         /// 启动视窗
         /// </summary>
         public virtual void startView() {
-            //Debug.Log("startView: " + name);
             initialize(); showView();
         }
 
@@ -169,15 +178,14 @@ namespace Core.UI {
         /// 显示视窗
         /// </summary>
         protected virtual void showView() {
-            gameObject.SetActive(shown = true);
-            requestRefresh(true);
+            shown = true; requestRefresh(true);
+            Debug.Log("showView: " + name);
         }
 
         /// <summary>
         /// 结束视窗
         /// </summary>
         public virtual void terminateView() {
-            //Debug.Log("terminateView: " + name);
             hideView();
         }
 
@@ -185,9 +193,8 @@ namespace Core.UI {
         /// 隐藏视窗
         /// </summary>
         protected virtual void hideView() {
-            requestClear(true);
-            gameObject.SetActive(shown = false);
-            Debug.Log("hideView shown: " + name + ": " + shown);
+            requestClear(true); shown = false;
+            Debug.Log("hideView: " + name);
         }
 
         #endregion

@@ -2142,7 +2142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &731487603
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2281,7 +2281,7 @@ MonoBehaviour:
     type: DateTime
     animated: 0
     configData: 0
-    format: "\uFF08\u66F4\u65B0\u65F6\u95F4\uFF1Ahh:mm:ss\uFF09"
+    format: "\uFF08\u66F4\u65B0\u65F6\u95F4\uFF1A{0}\uFF09"
     trigger: 
 --- !u!1 &772048259
 GameObject:

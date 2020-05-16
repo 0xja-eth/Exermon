@@ -863,6 +863,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             var btn = SceneUtils.button(obj);
             // 隐藏
             image.color = new Color(0.75f, 0.75f, 1, 0.5f);
+            btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() => {
                 Debug.Log("setImageLink: " + index);
                 if (textObj.onImageLinkClick != null)

@@ -34,7 +34,7 @@ namespace Core.UI {
         */
         int layerIndex;
 
-        string eventState; // 当前事件状态
+        protected string eventState; // 当前事件状态
 
         /// <summary>
         /// 状态切换回调函数（key 为 "" 时表示任意状态）
@@ -169,6 +169,45 @@ namespace Core.UI {
                 var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
                 if (state.IsName(key)) updateEvents[key]?.Invoke();
             }
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        /// <summary>
+        /// 是否处于某状态
+        /// </summary>
+        /// <param name="name">状态名</param>
+        /// <returns>返回是否处于某状态</returns>
+        public bool isState(string name) {
+            if (animator == null) return false;
+            var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
+            return state.IsName(name);
+        }
+
+        /// <summary>
+        /// 设置动画变量
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="name">变量名</param>
+        /// <param name="val">值</param>
+        public void setVar<T>(string name, T val) {
+            Debug.Log("setVar: " + typeof(T) + ": " + val);
+            if (typeof(T) == typeof(bool))
+                animator.SetBool(name, (bool)(object)val);
+            else if (typeof(T) == typeof(int))
+                animator.SetInteger(name, (int)(object)val);
+            else if (typeof(T) == typeof(double) || typeof(T) == typeof(float))
+                animator.SetFloat(name, (float)(object)val);
+            else if (typeof(T) == typeof(Vector3))
+                animator.SetVector(name, (Vector3)(object)val);
+            else if (typeof(T) == typeof(Quaternion))
+                animator.SetQuaternion(name, (Quaternion)(object)val);
+            else animator.SetTrigger(name);
+        }
+        public void setVar(string name) {
+            animator.SetTrigger(name);
         }
 
         #endregion

@@ -396,7 +396,7 @@ namespace Core.Systems {
         /// <param name="status">状态码</param>
         /// <param name="errmsg">错误信息</param>
         protected virtual void onConnectingError(int status, string errmsg) {
-            if (state != -1) onDisconnected(status, errmsg);
+            if (dataSer.isLoaded()) onDisconnected(status, errmsg);
             else {
                 Debug.LogError("onConnectingError, " + status + ": " + errmsg);
                 processException(status, errmsg, ConnectionFailText,

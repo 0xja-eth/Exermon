@@ -38,9 +38,10 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <param name="picture">图片</param>
         protected override void drawExactlyItem(Question.Picture picture) {
             base.drawExactlyItem(picture);
+
             this.picture.gameObject.SetActive(true);
-            this.picture.preserveAspect = true;
             this.picture.overrideSprite = AssetLoader.generateSprite(picture.data);
+            this.picture.SetNativeSize();
 
             alph.text = string.Format(ImageTextFormat, index + 1);
         }

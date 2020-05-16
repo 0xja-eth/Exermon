@@ -74,6 +74,7 @@ namespace UI.BattleScene.Controls.Storyboards {
         /// </summary>
         public override void startView() {
             base.startView();
+            Debug.Log("startView: " + name + ": " + selfWindow);
             if (selfWindow) selfWindow.startWindow();
         }
         /// <param name="force">强制（无过渡动画）</param>
@@ -85,14 +86,15 @@ namespace UI.BattleScene.Controls.Storyboards {
         /// 结束视窗
         /// </summary>
         public override void terminateView() {
-            shown = false;
+            Debug.Log("terminateView: " + name + ": " + selfWindow);
             if (waitingText) waitingText.SetActive(false);
             if (selfWindow) selfWindow.terminateWindow();
             else base.terminateView();
         }
         /// <param name="force">强制（无过渡动画）</param>
         public void terminateView(bool force) {
-            if (force) base.terminateView(); else terminateView();
+            if (force) base.terminateView();
+            else terminateView();
         }
 
         #endregion

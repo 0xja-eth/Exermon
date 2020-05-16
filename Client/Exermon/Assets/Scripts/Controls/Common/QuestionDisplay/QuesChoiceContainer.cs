@@ -5,7 +5,7 @@ using RecordModule.Data;
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.Common.Controls.QuestionDisplay {
-
+    using QuestionModule.Data;
     using Question = QuestionModule.Data.Question;
 
     /// <summary>
@@ -67,6 +67,22 @@ namespace UI.Common.Controls.QuestionDisplay {
         protected override void onItemsChanged() {
             base.onItemsChanged();
             if (items != null) setupSelection();
+        }
+
+        #endregion
+
+        #region 画面绘制
+
+        /// <summary>
+        /// 子窗口创建回调
+        /// </summary>
+        /// <param name="sub">子视图</param>
+        /// <param name="index">索引</param>
+        protected override void onSubViewCreated(SelectableItemDisplay<Question.Choice> sub, int index) {
+            base.onSubViewCreated(sub, index);
+            var choice = sub as QuesChoiceDisplay;
+            if (choice == null || choice.text == null) return;
+            choice.text.imageContainer = pictureContaienr;
         }
 
         #endregion

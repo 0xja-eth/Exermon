@@ -91,7 +91,7 @@ namespace SeasonModule.Services {
                 public JsonData convertToDisplayData(string type = "") {
                     var res = toJson();
                     var cIndex = Mathf.Clamp(
-                        order - 1, 0, RankColors.Length);
+                        order - 1, 0, RankColors.Length - 1);
                     var color = RankColors[cIndex];
                     var fontColor = FontColors[cIndex];
 

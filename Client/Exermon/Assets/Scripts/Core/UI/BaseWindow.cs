@@ -37,6 +37,15 @@ namespace Core.UI {
         public string shownAttr = "shown"; // 显示状态属性
 
         /// <summary>
+        /// 显示状态
+        /// </summary>
+        public override bool shown {
+            get {
+                return base.shown && !isState(hiddenState);
+            }
+        }
+
+        /// <summary>
         /// 动画过渡
         /// </summary>
         bool isShowing = false, isHiding = false;
@@ -99,7 +108,7 @@ namespace Core.UI {
         /// 启动窗口
         /// </summary>
         public virtual void startWindow() {
-            Debug.Log("startWindow: " + name);
+            Debug.Log("startWindow: " + name + ": " + shown + ", " + isHiding);
             if (!shown || isHiding) {
                 isShowing = true;
                 isHiding = false;
@@ -111,11 +120,12 @@ namespace Core.UI {
         /// 显示窗口（视窗）
         /// </summary>
         protected override void showView() {
+            Debug.Log("showView: " + name + ": " + shown);
             if (shown) onWindowShown();
             else {
-                gameObject.SetActive(shown = true);
+                shown = true;
                 if (!animator) onWindowShown();
-                else animator.SetBool(shownAttr, true);
+                else setVar(shownAttr, true);
             }
         }
 
@@ -123,7 +133,7 @@ namespace Core.UI {
         /// 结束窗口
         /// </summary>
         public virtual void terminateWindow() {
-            Debug.Log("terminateWindow: " + name);
+            Debug.Log("terminateWindow: " + name + ": "+ shown + ", " + isShowing);
             if (shown || isShowing) {
                 isShowing = false;
                 isHiding = true;
@@ -135,15 +145,16 @@ namespace Core.UI {
         /// 隐藏窗口（视窗）
         /// </summary>
         protected override void hideView() {
+            Debug.Log("hideView: " + name + ": " + shown);
             if (!shown || !animator) onWindowHidden();
-            else animator.SetBool(shownAttr, false);
+            else setVar(shownAttr, false);
         }
 
         /// <summary>
         /// 窗口完全显示回调
         /// </summary>
         protected virtual void onWindowShown() {
-            Debug.Log("onWindowShown: " + name);
+            Debug.Log("onWindowShown: " + name + ": " + isShowing);
             if (isShowing) {
                 isShowing = false;
                 requestRefresh(true);
@@ -154,7 +165,7 @@ namespace Core.UI {
         /// 窗口完全隐藏回调
         /// </summary>
         protected virtual void onWindowHidden() {
-            Debug.Log("onWindowHidden: " + name);
+            Debug.Log("onWindowHidden: " + name + ": " + isHiding);
             if (isHiding) {
                 isHiding = false;
                 base.hideView();
