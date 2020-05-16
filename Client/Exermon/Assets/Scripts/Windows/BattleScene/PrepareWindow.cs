@@ -15,7 +15,7 @@ namespace UI.BattleScene.Windows {
         /// <summary>
         /// 半常量定义
         /// </summary>
-        public const int PrepareTime = 30; // 准备时间（秒）
+        public const int PrepareTime = 5; // 准备时间（秒）
 
         /// <summary>
         /// 文本常量定义

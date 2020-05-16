@@ -255,7 +255,7 @@ class Service:
 
 		buy_price = item.buyPrice()
 
-		Check.ensureBuyType(buy_type, buy_price)
+		Check.ensureBuyType(buy_type, buy_price, player.playerMoney())
 
 		# 附带检查容器是否已满
 		container.gainItems(item, count)
@@ -395,16 +395,27 @@ class Check:
 
 	# 保证购买方式合法
 	@classmethod
-	def ensureBuyType(cls, buy_type, price: Currency):
+	def ensureBuyType(cls, buy_type, price: Currency, money: PlayerMoney):
 		if not 0 <= buy_type <= 2:
 			raise GameException(ErrorType.InvalidBuyType)
 
-		if buy_type == 0 and price.gold <= 0:
-			raise GameException(ErrorType.InvalidBuyType)
-		if buy_type == 1 and price.ticket <= 0:
-			raise GameException(ErrorType.InvalidBuyType)
-		if buy_type == 2 and price.bound_ticket <= 0:
-			raise GameException(ErrorType.InvalidBuyType)
+		if buy_type == 0:
+			if price.gold <= 0:
+				raise GameException(ErrorType.InvalidBuyType)
+			elif money.gold < price.gold:
+				raise GameException(ErrorType.NotEnoughMoney)
+
+		elif buy_type == 1:
+			if price.ticket <= 0:
+				raise GameException(ErrorType.InvalidBuyType)
+			elif money.ticket < price.ticket:
+				raise GameException(ErrorType.NotEnoughMoney)
+
+		elif buy_type == 2:
+			if price.bound_ticket <= 0:
+				raise GameException(ErrorType.InvalidBuyType)
+			elif money.bound_ticket < price.bound_ticket:
+				raise GameException(ErrorType.NotEnoughMoney)
 
 
 # =======================

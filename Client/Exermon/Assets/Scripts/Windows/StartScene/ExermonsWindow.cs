@@ -82,6 +82,7 @@ namespace UI.StartScene.Windows {
             foreach (var exer in exermons)
                 if (exer.eType == 1) initExers.Add(exer);
             this.exermons.configure(initExers);
+            this.exermons.select(0);
         }
 
         #endregion

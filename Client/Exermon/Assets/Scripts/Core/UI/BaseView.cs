@@ -105,6 +105,7 @@ namespace Core.UI {
         /// </summary>
         public virtual void configure() {
             shown = gameObject.activeSelf;
+            Debug.Log("configure: shown: " + name + ": " + shown);
             initialize();
         }
 
@@ -186,6 +187,7 @@ namespace Core.UI {
         protected virtual void hideView() {
             requestClear(true);
             gameObject.SetActive(shown = false);
+            Debug.Log("hideView shown: " + name + ": " + shown);
         }
 
         #endregion

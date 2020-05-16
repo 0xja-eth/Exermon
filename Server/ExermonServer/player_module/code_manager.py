@@ -8,8 +8,8 @@ import datetime, random
 # =======================
 class CodeDatum:
 
-    CODE_LENGTH = 6 # 验证码位数
-    CODE_SECOND = 60 # 验证码有效时间（秒）
+    CODE_LENGTH = 6  # 验证码位数
+    CODE_MINUTE = 5  # 验证码有效时间（分钟）
 
     def __init__(self, un, email, type):
         self.un = un
@@ -19,7 +19,7 @@ class CodeDatum:
 
         # token 过期时间
         now = datetime.datetime.now()
-        delta = datetime.timedelta(0, self.CODE_SECOND)
+        delta = datetime.timedelta(0, self.CODE_MINUTE * 60)
         self.out_time = now+delta
 
     # 生成一个 code（100000~999999）

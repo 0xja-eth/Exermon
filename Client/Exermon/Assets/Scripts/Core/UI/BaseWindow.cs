@@ -100,16 +100,23 @@ namespace Core.UI {
         /// </summary>
         public virtual void startWindow() {
             Debug.Log("startWindow: " + name);
-            isShowing = true; base.startView();
+            if (!shown || isHiding) {
+                isShowing = true;
+                isHiding = false;
+            }
+            base.startView();
         }
 
         /// <summary>
         /// 显示窗口（视窗）
         /// </summary>
         protected override void showView() {
-            gameObject.SetActive(shown = true);
-            if (!animator) onWindowShown();
-            else animator.SetBool(shownAttr, true);
+            if (shown) onWindowShown();
+            else {
+                gameObject.SetActive(shown = true);
+                if (!animator) onWindowShown();
+                else animator.SetBool(shownAttr, true);
+            }
         }
 
         /// <summary>
@@ -117,14 +124,18 @@ namespace Core.UI {
         /// </summary>
         public virtual void terminateWindow() {
             Debug.Log("terminateWindow: " + name);
-            isHiding = true; base.terminateView();
+            if (shown || isShowing) {
+                isShowing = false;
+                isHiding = true;
+            }
+            base.terminateView();
         }
 
         /// <summary>
         /// 隐藏窗口（视窗）
         /// </summary>
         protected override void hideView() {
-            if (!animator) onWindowHidden();
+            if (!shown || !animator) onWindowHidden();
             else animator.SetBool(shownAttr, false);
         }
 
@@ -133,7 +144,10 @@ namespace Core.UI {
         /// </summary>
         protected virtual void onWindowShown() {
             Debug.Log("onWindowShown: " + name);
-            isShowing = false; requestRefresh(true);
+            if (isShowing) {
+                isShowing = false;
+                requestRefresh(true);
+            }
         }
 
         /// <summary>
@@ -141,8 +155,11 @@ namespace Core.UI {
         /// </summary>
         protected virtual void onWindowHidden() {
             Debug.Log("onWindowHidden: " + name);
-            isHiding = false; if (isShowing) return;
-            base.hideView(); updateBackground();
+            if (isHiding) {
+                isHiding = false;
+                base.hideView();
+                updateBackground();
+            }
         }
 
         /// <summary>

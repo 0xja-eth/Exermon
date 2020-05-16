@@ -148,6 +148,8 @@ namespace UI.Common.Windows {
         /// </summary>
         /// <returns>是否可视状态</returns>
         protected override bool isBackgroundVisible() {
+            Debug.Log("enableBackground: " + enableBackground);
+            Debug.Log("base.isBackgroundVisible(): " + base.isBackgroundVisible());
             return enableBackground && base.isBackgroundVisible();
         }
 
@@ -163,6 +165,7 @@ namespace UI.Common.Windows {
             this.text = text; this.type = type;
             this.onOK = onOK; this.onCancel = onCancel;
             this.duration = duration;
+            requestRefresh();
             setupType(type);
         }
 
@@ -206,7 +209,7 @@ namespace UI.Common.Windows {
         /// 设置显示文本
         /// </summary>
         /// <param name="text">文本</param>
-        void setText(string text) {
+        void drawText(string text) {
             alertText.text = text;
         }
 
@@ -215,6 +218,7 @@ namespace UI.Common.Windows {
         /// </summary>
         void adjustToBigWindow() {
             enableBackground = true;
+            Debug.Log("enableBackground = true");
             SceneUtils.setRectWidth(transform as RectTransform, bigWidth);
         }
 
@@ -223,6 +227,7 @@ namespace UI.Common.Windows {
         /// </summary>
         void adjustToSmallWindow() {
             enableBackground = false;
+            Debug.Log("enableBackground = false");
             SceneUtils.setRectWidth(transform as RectTransform, smallWidth);
         }
 
@@ -231,7 +236,7 @@ namespace UI.Common.Windows {
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            setText(text);
+            drawText(text);
         }
 
         /// <summary>
@@ -239,7 +244,7 @@ namespace UI.Common.Windows {
         /// </summary>
         protected override void clear() {
             base.clear();
-            setText("");
+            drawText("");
             clearButtons();
         }
 

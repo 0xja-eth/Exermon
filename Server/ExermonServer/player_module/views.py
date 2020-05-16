@@ -153,7 +153,7 @@ class Service:
 		try:
 			from django.core.mail import send_mail
 
-			send_mail(conf[0], conf[1] % (un, code, CodeDatum.CODE_SECOND), conf[2], [email])
+			send_mail(conf[0], conf[1] % (un, code, CodeDatum.CODE_MINUTE), conf[2], [email])
 
 		except smtplib.SMTPException as exception:
 			print("ERROR in sendEmailCode: " + str(exception))

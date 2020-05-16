@@ -77,6 +77,14 @@ namespace UI.StatusScene.Windows {
         }
 
         /// <summary>
+        /// 每次初始化
+        /// </summary>
+        protected override void initializeEvery() {
+            base.initializeEvery();
+            setupInitValues();
+        }
+
+        /// <summary>
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
@@ -102,6 +110,20 @@ namespace UI.StatusScene.Windows {
             name.check = ValidateService.checkName;
             grade.configure(grades);
             birth.configure(min);
+        }
+
+        /// <summary>
+        /// 配置初始值
+        /// </summary>
+        void setupInitValues() {
+            var player = playerSer.player;
+            name.setValue(player.name);
+            grade.setValue(player.grade);
+            birth.setValue(player.birth);
+            school.setValue(player.school);
+            city.setValue(player.city);
+            contact.setValue(player.contact);
+            description.setValue(player.description);
         }
 
         #endregion

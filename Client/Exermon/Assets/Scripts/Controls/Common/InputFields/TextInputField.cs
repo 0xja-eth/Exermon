@@ -1,4 +1,6 @@
 ﻿
+using System.Text.RegularExpressions;
+
 using UnityEngine.UI;
 
 namespace UI.Common.Controls.InputFields {
@@ -13,6 +15,13 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         public InputField inputField;
 
+        /// <summary>
+        /// 外部变量设置
+        /// </summary>
+        public string[] filters = new string[] {
+            @"\p{Cs}", @"[\u2702-\u27B0]"
+        };
+
         //public Text content, placeholder;
         //调用InputField的属性就可以，不需要额外声明
 
@@ -24,7 +33,8 @@ namespace UI.Common.Controls.InputFields {
         protected override void initializeOnce() {
             base.initializeOnce();
             value = inputField.text;
-            inputField?.onEndEdit.AddListener((text) => {
+            inputField.onValidateInput = onValidateInput;
+            inputField.onEndEdit.AddListener((text) => {
                 setValue(text);
             });
         }
@@ -59,7 +69,30 @@ namespace UI.Common.Controls.InputFields {
         /// 是否实际有焦点
         /// </summary>
         public override bool isRealFocused() {
-            return inputField && inputField.isFocused;
+            return inputField.isFocused;
+        }
+
+        /// <summary>
+        /// 数据验证
+        /// </summary>
+        /// <returns></returns>
+        char onValidateInput(string text, int charIndex, char addedChar) {
+            if (filters.Length > 0) 
+                if (filter(addedChar)) return '\0';
+            return addedChar;
+        }
+
+        /// <summary>
+        /// 过滤非法字符
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        bool filter(char s) {
+            var str = s.ToString();
+            foreach(var f in filters)
+                if (Regex.IsMatch(str, f))
+                    return true;
+            return false;
         }
 
         #endregion

@@ -1052,7 +1052,7 @@ class RuntimeBattle(RuntimeData):
 	BACKEND_DELTA_TIME = 30
 
 	# 准备阶段时长（秒）
-	PREPARE_TIME = 30
+	PREPARE_TIME = 5
 
 	# 准备阶段结束数据发射时差（秒）
 	PREPARE_END_WAIT_TIME = 2

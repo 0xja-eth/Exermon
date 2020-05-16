@@ -57,7 +57,7 @@ namespace UI.TitleScene.Windows {
 
         const string RegisterSuccessText = "注册用户成功！你的幸运号码是 {0} ！";
         const string RetrieveSuccessText = "密码已重置！请返回登录！";
-        const string SendCodeSuccessText = "验证码发送成功！请留意你的邮箱！";
+        const string SendCodeSuccessText = "验证码发送成功！请留意你的邮箱并在5分钟内填写验证码！";
 
         /// <summary>
         /// 外部组件设置
