@@ -29,13 +29,7 @@ namespace UI.Common.Controls.InputFields {
     /// <summary>
     /// 所有输入域基类
     /// </summary>
-    public class BaseInputField<T> : BaseView {
-
-        /// <summary>
-        /// 检查函数类型
-        /// </summary>
-        public delegate string checkFunc(T value);
-        public delegate void onChangeFunc(T value);
+    public class BaseInputField : BaseView {
 
         /// <summary>
         /// 外部组件设置
@@ -55,15 +49,7 @@ namespace UI.Common.Controls.InputFields {
         public Color focusColor = new Color(1, 1, 1, 0.85f);
         public Color blurColor = new Color(1, 1, 1, 0.5f);
 
-        /// <summary>
-        /// 内部变量声明
-        /// </summary>
-        public checkFunc check { get; set; }
-        public onChangeFunc onChanged { get; set; }
-
-        protected T value = default; // 值
-
-        bool focused = false;
+        protected bool focused = false;
 
         #region 初始化
 
@@ -71,7 +57,7 @@ namespace UI.Common.Controls.InputFields {
         /// 初次打开时初始化（子类中重载）
         /// </summary>
         protected override void initializeOnce() {
-            value = emptyValue();
+            base.initializeOnce();
             onBlur();
         }
 
@@ -97,6 +83,212 @@ namespace UI.Common.Controls.InputFields {
 
         #endregion
 
+        #region 监控输入
+
+        #endregion
+
+        #region 数据控制
+        #endregion
+
+        #region 画面绘制
+
+        #region 状态绘制
+
+        /// <summary>
+        /// 设置状态
+        /// </summary>
+        /// <param name="corr">正误</param>
+        public void setStatus(bool corr) {
+            if (corr) showCorrect();
+            else showWrong();
+        }
+
+        /// <summary>
+        /// 清空状态
+        /// </summary>
+        public void clearStatus() {
+            if (correct) correct.SetActive(false);
+            if (wrong) wrong.SetActive(false);
+        }
+
+        /// <summary>
+        /// 显示正确
+        /// </summary>
+        public void showCorrect() {
+            if (correct) correct.SetActive(true);
+            if (wrong) wrong.SetActive(false);
+        }
+
+        /// <summary>
+        /// 显示正错误
+        /// </summary>
+        public void showWrong() {
+            if (correct) correct.SetActive(false);
+            if (wrong) wrong.SetActive(true);
+        }
+
+        /// <summary>
+        /// 显示校验结果
+        /// </summary>
+        /// <param name="res">校验结果</param>
+        public void displayCheckResult(string res) {
+            setStatus(res == "");
+            setExplainerText(res);
+        }
+
+        /// <summary>
+        /// 设置提示文本
+        /// </summary>
+        /// <param name="text">提示文本</param>
+        public void setExplainerText(string text) {
+            if (explainer) explainer.SetActive(text != "");
+            if (explainerText) explainerText.text = text;
+        }
+
+        /// <summary>
+        /// 清空提示文本
+        /// </summary>
+        public void clearExplainerText() {
+            setExplainerText("");
+        }
+
+        #endregion
+        
+        /// <summary>
+        /// 清空内容
+        /// </summary>
+        protected override void clear() {
+            base.clear();
+            clearStatus();
+            clearExplainerText();
+        }
+
+        #endregion
+
+        #region 事件控制
+
+        /// <summary>
+        /// 是否有焦点
+        /// </summary>
+        /// <returns></returns>
+        public bool isFocused() {
+            return focused;
+        }
+
+        /// <summary>
+        /// 是否实际有焦点
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool isRealFocused() {
+            return isFocused();
+        }
+
+        /// <summary>
+        /// 获取焦点
+        /// </summary>
+        protected virtual void onFocus() {
+            if (!isFocusEnable) return;
+            focused = true;
+            if (current) current.SetActive(true);
+            if (inputBackground)
+                inputBackground.color = focusColor;
+        }
+
+        /// <summary>
+        /// 失去焦点
+        /// </summary>
+        protected virtual void onBlur() {
+            if (!isFocusEnable) return;
+            focused = false;
+            if (current) current.SetActive(false);
+            if (inputBackground)
+                inputBackground.color = blurColor;
+        }
+
+        #endregion
+
+        #region 流程控制
+
+        /// <summary>
+        /// 激活
+        /// </summary>
+        public virtual void activate() { }
+
+        #endregion
+
+    }
+
+    /// <summary>
+    /// 所有输入域基类
+    /// </summary>
+    public class BaseInputField<T> : BaseInputField {
+
+        /// <summary>
+        /// 检查函数类型
+        /// </summary>
+        public delegate string checkFunc(T value);
+        public delegate void onChangeFunc(T value);
+        /*
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public GameObject explainer; // 文本提示（物体）
+        public Text explainerText; // 文本提示（文本组件）
+
+        public GameObject correct, wrong, attention; // 图标提示
+        public GameObject current; // 当前箭头
+        public Image inputBackground; // 输入背景
+
+        /// <summary>
+        /// 外部变量设置
+        /// </summary>
+        public bool isFocusEnable = false;
+
+        public Color focusColor = new Color(1, 1, 1, 0.85f);
+        public Color blurColor = new Color(1, 1, 1, 0.5f);
+        */
+        /// <summary>
+        /// 内部变量声明
+        /// </summary>
+        public checkFunc check { get; set; }
+        public onChangeFunc onChanged { get; set; }
+
+        protected T value = default; // 值
+
+        //bool focused = false;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初次打开时初始化（子类中重载）
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            value = emptyValue();
+        }
+
+        #endregion
+        /*
+        #region 更新控制
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        protected override void update() {
+            base.update();
+            updateFocus();
+        }
+
+        /// <summary>
+        /// 更新 Focus 事件
+        /// </summary>
+        void updateFocus() {
+            if (isRealFocused() && !isFocused()) onFocus();
+            if (!isRealFocused() && isFocused()) onBlur();
+        }
+
+        #endregion
+        */
         #region 监控输入
 
         /// <summary>
@@ -211,7 +403,7 @@ namespace UI.Common.Controls.InputFields {
             setValue(emptyValue(), false, false);
             requestRefresh(true);
         }
-
+        /*
         #region 状态绘制
 
         /// <summary>
@@ -273,7 +465,7 @@ namespace UI.Common.Controls.InputFields {
         }
 
         #endregion
-
+        */
         /// <summary>
         /// 刷新视窗
         /// </summary>
@@ -288,12 +480,10 @@ namespace UI.Common.Controls.InputFields {
         protected override void clear() {
             base.clear();
             clearValue();
-            clearStatus();
-            clearExplainerText();
         }
 
         #endregion
-
+        /*
         #region 事件控制
 
         /// <summary>
@@ -344,7 +534,7 @@ namespace UI.Common.Controls.InputFields {
         public virtual void activate() { }
 
         #endregion
-
+        */
     }
 
 }

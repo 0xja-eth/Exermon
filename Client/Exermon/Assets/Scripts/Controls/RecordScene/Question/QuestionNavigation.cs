@@ -69,15 +69,26 @@ namespace UI.RecordScene.Controls.Question {
                     // return page.record.hasQuestion(item.questionId);
             }
             // 检查日期范围
-            Debug.Log(item.questionId + ": item.lastDate: " + item.lastDate +
-                " getFromDate: " + window.getFromDate() +
-                " getToDate: " + window.getToDate());
             if (window.getFromDate() > item.lastDate ||
                 item.lastDate > window.getToDate()) return false;
             // 检查科目
             if (window.getSubjectId() != item.question().subjectId)
                 return false;
             return true;
+        }
+
+        /// <summary>
+        /// 前一题目
+        /// </summary>
+        public void prev() {
+            select(selectedIndex - 1);
+        }
+
+        /// <summary>
+        /// 后一题目
+        /// </summary>
+        public void next() {
+            select(selectedIndex + 1);
         }
 
         #endregion

@@ -22,7 +22,7 @@ namespace Core.UI {
         /// 外部变量设置
         /// </summary>
         public int minLayoutStableFrame = 0; // 最小布局稳定帧
-        public int maxLayoutStableFrame = 128; // 最大布局稳定帧
+        public int maxLayoutStableFrame = 0; // 最大布局稳定帧
 
         #region 初始化
 
@@ -61,6 +61,8 @@ namespace Core.UI {
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
                 try {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                    /*
                     if (maxLayoutStableFrame == 0)
                         LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
                     else if (++cnt > minLayoutStableFrame && cnt <= maxLayoutStableFrame)
@@ -74,6 +76,7 @@ namespace Core.UI {
                             width = newWidth; height = newHeight;
                         }
                     }
+                    */
                 } catch (Exception e) {
                     Debug.LogWarning(e + ": " + e.StackTrace);
                     break;

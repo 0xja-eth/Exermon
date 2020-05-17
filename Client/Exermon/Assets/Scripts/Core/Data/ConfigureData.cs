@@ -16,6 +16,13 @@ namespace Core.Data {
         [AutoConvert]
         public bool autoLogin { get; set; } = false; // 自动登录
 
+        [AutoConvert]
+        public int exerSubjectId { get; set; } = 1; // 刷题科目ID记忆
+        [AutoConvert]
+        public int exerGenType { get; set; } = 0; // 刷题类型记忆
+        [AutoConvert]
+        public int exerCount { get; set; } = 1; // 刷题数目记忆
+
         /// <summary>
         /// 是否需要ID
         /// </summary>

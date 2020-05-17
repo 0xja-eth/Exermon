@@ -112,6 +112,15 @@ namespace Core.UI {
             return subViews.ToArray();
         }
 
+        /// <summary>
+        /// 获取子视图索引
+        /// </summary>
+        /// <param name="subView">子视图</param>
+        /// <returns>返回指定子视图索引</returns>
+        public int getIndex(T subView) {
+            return subViews.IndexOf(subView);
+        }
+
         #endregion
 
         #region 界面控制

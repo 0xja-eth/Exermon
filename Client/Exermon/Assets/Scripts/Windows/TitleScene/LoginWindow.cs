@@ -63,10 +63,13 @@ namespace UI.TitleScene.Windows {
         /// 外部组件设置
         /// </summary>
         public GameObject loginUsername, loginPassword;
-        public GameObject registerRetrieveUsername, registerRetrievePassword, registerRetrieveEmail, registerRetrieveCode;
+        public GameObject registerRetrieveUsername, registerRetrievePassword, 
+            registerRetrieveEmail, registerRetrieveCode;
         public GameObject registerPattern, retrievePattern; // 界面花纹
         public GameObject loginPage, registerRetrievePage, welcomeButtons, buttons; // 界面
         public Button loginBtn, registerBtn, retrieveBtn, finishBtn; // 功能按钮
+
+        public Toggle showPassword;
 
         /// <summary>
         /// 内部组件声明
@@ -157,22 +160,25 @@ namespace UI.TitleScene.Windows {
         #endregion
 
         #region 更新控制
-        /*
+        
         /// <summary>
         /// 更新
         /// </summary>
         protected override void update() {
             base.update();
-            updateType();
+            updateShowPassword();
         }
 
         /// <summary>
         /// 更新类型变换
         /// </summary>
-        void updateType() {
-
+        void updateShowPassword() {
+            if (showPassword && showPassword.isOn)
+                passwordInput.inputField.contentType = InputField.ContentType.Standard;
+            else
+                passwordInput.inputField.contentType = InputField.ContentType.Password;
         }
-        */
+
         #endregion
 
         #region 启动/结束控制

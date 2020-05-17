@@ -153,6 +153,12 @@ namespace UI.Common.Controls.InputFields {
         public int getIndex() {
             return dropdown.value;
         }
+        /// <param name="value">指定值</param>
+        public int getIndex(Tuple<int, string> value) {
+            for (int i = 0; i < options.Length; ++i)
+                if (options[i] == value) return i;
+            return -1;
+        }
 
         /// <summary>
         /// 设置当前索引
@@ -189,7 +195,7 @@ namespace UI.Common.Controls.InputFields {
                 if (options[i].Item1 == id) {
                     setValue(options[i], check, emit); return;
                 }
-            setValue(null, check, emit);
+            setValue(options[0], check, emit);
         }
 
         /// <summary>
@@ -201,7 +207,7 @@ namespace UI.Common.Controls.InputFields {
                 if (options[i].Item2 == text) {
                     setValue(options[i], check, emit); return;
                 }
-            setValue(null, check, emit);
+            setValue(options[0], check, emit);
         }
         /*
         /// <summary>
@@ -222,7 +228,7 @@ namespace UI.Common.Controls.InputFields {
         /// </summary>
         /// <param name="text">值</param>
         protected override void drawValue(Tuple<int, string> value) {
-            dropdown.itemText.text = (value == null ? "" : value.Item2);
+            dropdown.value = getIndex(value);
         }
 
         #endregion

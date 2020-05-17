@@ -467,8 +467,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explainer: {fileID: 0}
+  explainerText: {fileID: 0}
   correct: {fileID: 8980869655759915975}
   wrong: {fileID: 1515612976627591785}
+  attention: {fileID: 0}
   current: {fileID: 4504499849482112929}
   inputBackground: {fileID: 7667525660497383015}
   isFocusEnable: 0
@@ -1250,7 +1252,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 12
   m_Viewport: {fileID: 7667525659914487521}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 7667525660497106363}

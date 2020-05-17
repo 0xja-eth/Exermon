@@ -72,6 +72,7 @@ namespace UI.RecordScene.Windows {
             var now = DateTime.Now;
             var player = playerSer.player;
             subjectController.configure(player);
+
             fromDate.configure(player.createTime, now);
             toDate.configure(player.createTime, now, now);
         }

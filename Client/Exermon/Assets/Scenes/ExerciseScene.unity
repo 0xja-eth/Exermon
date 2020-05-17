@@ -4890,7 +4890,7 @@ PrefabInstance:
     - target: {fileID: 4400701592633758072, guid: 7a5038c31e4becd458984b0d39bd1b2b,
         type: 3}
       propertyPath: maxLayoutStableFrame
-      value: 256
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a5038c31e4becd458984b0d39bd1b2b, type: 3}
@@ -6672,7 +6672,7 @@ PrefabInstance:
     - target: {fileID: 4823756591384457255, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756591384457255, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
@@ -6702,7 +6702,7 @@ PrefabInstance:
     - target: {fileID: 4823756591910618226, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756591910618226, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
@@ -6732,7 +6732,7 @@ PrefabInstance:
     - target: {fileID: 4823756591953495455, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756591953495455, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
@@ -6762,7 +6762,7 @@ PrefabInstance:
     - target: {fileID: 4823756592216472402, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756592216472402, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
@@ -6792,7 +6792,7 @@ PrefabInstance:
     - target: {fileID: 4823756592668288105, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756592668288105, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
@@ -6822,7 +6822,7 @@ PrefabInstance:
     - target: {fileID: 4823756593523310299, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 27.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4823756593523310299, guid: 64bec879e15fb0847a81009aea8fbf52,
         type: 3}

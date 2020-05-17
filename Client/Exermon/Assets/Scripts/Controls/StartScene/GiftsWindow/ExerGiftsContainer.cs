@@ -23,9 +23,7 @@ namespace UI.StartScene.Controls.ExerGift {
 
         public ExerSlotDetail slotDetail; // 艾瑟萌槽帮助界面
         public ExerSlotsContainer exerSlot; // 艾瑟萌槽
-
-        public GameObject tips;
-
+        
         /// <summary>
         /// 外部变量设置
         /// </summary>
@@ -63,7 +61,6 @@ namespace UI.StartScene.Controls.ExerGift {
         protected override void drawExactlyItemHelp(ExerGift item) {
             if (exerSlot) exerSlot.deselect();
             if (slotDetail) slotDetail.terminateView();
-            if (tips) tips.SetActive(false);
             base.drawExactlyItemHelp(item);
         }
 

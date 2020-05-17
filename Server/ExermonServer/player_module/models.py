@@ -1251,6 +1251,10 @@ class Player(CacheableModel):
 
 	# endregion
 
+	def save(self, **kwargs):
+		self.last_refresh_time = datetime.datetime.now()
+		super().save(**kwargs)
+
 	""" 占位符 """
 
 

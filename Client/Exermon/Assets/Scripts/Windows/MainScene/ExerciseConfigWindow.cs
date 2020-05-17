@@ -43,6 +43,7 @@ namespace UI.MainScene.Windows {
         /// </summary>
         GameSystem gameSys = null;
         SceneSystem sceneSys = null;
+        GameService gameSer = null;
         DataService dataSer = null;
         PlayerService playerSer = null;
         RecordService recordSer = null;
@@ -55,6 +56,7 @@ namespace UI.MainScene.Windows {
         protected override void initializeOnce() {
             base.initializeOnce();
             configureSubViews();
+            setupSelectInitValue();
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace UI.MainScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
+            gameSer = GameService.get();
             sceneSys = SceneSystem.get();
             playerSer = PlayerService.get();
             dataSer = DataService.get();
@@ -92,7 +95,20 @@ namespace UI.MainScene.Windows {
             subjectSelect.configure(subjects);
             modeSelect.configure(mmodes);
 
-            clear();
+            //clear();
+        }
+
+        /// <summary>
+        /// 配置初始值
+        /// </summary>
+        void setupSelectInitValue() {
+            var conf = gameSer.configure;
+
+            Debug.Log("setupSelectInitValue: " + conf.toJson().ToJson());
+
+            subjectSelect.setValue(conf.exerSubjectId);
+            modeSelect.setValue(conf.exerGenType);
+            countSlider.setValue(conf.exerCount);
         }
 
         #endregion
@@ -138,11 +154,27 @@ namespace UI.MainScene.Windows {
         /// 开始刷题
         /// </summary>
         public void onSubmit() {
+            saveConfigure();
+
             var sid = subjectSelect.getValueId();
             var mode = modeSelect.getValueId();
             var count = (int)countSlider.getValue();
+
             recordSer.generateExercise(sid, mode, count, () =>
                 sceneSys.pushScene(SceneSystem.Scene.ExerciseScene));
+        }
+
+        /// <summary>
+        /// 保存配置
+        /// </summary>
+        void saveConfigure() {
+            var conf = gameSer.configure;
+
+            conf.exerSubjectId = subjectSelect.getValueId();
+            conf.exerGenType = modeSelect.getValueId();
+            conf.exerCount = (int)countSlider.getValue();
+
+            Debug.Log("saveConfigure: " + conf.toJson().ToJson());
         }
 
         #endregion

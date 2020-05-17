@@ -9,6 +9,7 @@ import datetime, random
 class CodeDatum:
 
     CODE_LENGTH = 6  # 验证码位数
+    CODE_RESEND_MINUTE = 1  # 验证码发送间隔时间（分钟）
     CODE_MINUTE = 5  # 验证码有效时间（分钟）
 
     def __init__(self, un, email, type):
@@ -21,6 +22,9 @@ class CodeDatum:
         now = datetime.datetime.now()
         delta = datetime.timedelta(0, self.CODE_MINUTE * 60)
         self.out_time = now+delta
+
+        delta = datetime.timedelta(0, self.CODE_RESEND_MINUTE * 60)
+        self.resend_time = now+delta
 
     # 生成一个 code（100000~999999）
     def generateCode(self):
@@ -38,7 +42,11 @@ class CodeManager:
     # 生成一个 CodeDatum 并存入 code_data 中
     @classmethod
     def generateCode(cls, un, email, type):
-        if cls.getCode(un, email, type) is not None:
+
+        now = datetime.datetime.now()
+
+        code = cls.getCode(un, email, type)
+        if code is not None and now < code.resend_time:
             raise GameException(ErrorType.CodeTooFrequent)
 
         code = CodeDatum(un, email, type)

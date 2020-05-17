@@ -205,8 +205,8 @@ namespace Core.Services {
             UnityAction retry, UnityAction onError = null) {
             return (status, errmsg) => {
                 var text = string.Format(format, errmsg);
-                var type = AlertWindow.Type.RetryOrNo;
-                gameSys.requestAlert(text, type, retry, onError);
+                var type = AlertWindow.Type.Notice;
+                gameSys.requestAlert(text, type);//, retry, onError);
             };
         }
 
