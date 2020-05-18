@@ -61,8 +61,8 @@ namespace Core.UI {
             float width = rect.rect.width, height = rect.rect.height;
             while (true) {
                 try {
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-                    /*
+                    // LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                    
                     if (maxLayoutStableFrame == 0)
                         LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
                     else if (++cnt > minLayoutStableFrame && cnt <= maxLayoutStableFrame)
@@ -76,7 +76,7 @@ namespace Core.UI {
                             width = newWidth; height = newHeight;
                         }
                     }
-                    */
+                    
                 } catch (Exception e) {
                     Debug.LogWarning(e + ": " + e.StackTrace);
                     break;

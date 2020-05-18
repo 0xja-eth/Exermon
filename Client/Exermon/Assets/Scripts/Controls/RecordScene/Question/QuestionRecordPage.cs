@@ -6,8 +6,6 @@ using Core.UI;
 using RecordModule.Data;
 using RecordModule.Services;
 
-using UI.ExerciseScene.Windows;
-
 /// <summary>
 /// 记录场景题目页
 /// </summary>
@@ -32,10 +30,7 @@ namespace UI.RecordScene.Controls.Question {
         /// </summary>
         public QuestionRecordDetail recordDisplay;
         public QuestionNavigation questionNav;
-
-        public DetailWindow detailWindow;
-        public ReportWindow reportWindow;
-
+        
         /// <summary>
         /// 内部变量定义
         /// </summary>
@@ -164,22 +159,5 @@ namespace UI.RecordScene.Controls.Question {
 
         #endregion
 
-        #region 流程控制
-
-        /// <summary>
-        /// 打开详情窗口
-        /// </summary>
-        public void openDetail() {
-            detailWindow.startWindow();
-        }
-
-        /// <summary>
-        /// 打开反馈窗口
-        /// </summary>
-        public void openReport() {
-            reportWindow.startWindow();
-        }
-
-        #endregion
     }
 }

@@ -2470,7 +2470,7 @@ MonoBehaviour:
   - {fileID: 2055408724}
   subViewNameFormat: 
   subViewPrefab: {fileID: 0}
-  default_: {fileID: 1173027294}
+  default_: {fileID: 0}
 --- !u!1 &1042383361 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7759236541307048772, guid: c731fdc038c2fa14895046c63facbb72,
@@ -5503,7 +5503,7 @@ MonoBehaviour:
   - {fileID: 1604362059}
   subViewNameFormat: 
   subViewPrefab: {fileID: 0}
-  default_: {fileID: 849435438}
+  default_: {fileID: 0}
 --- !u!222 &1986818594
 CanvasRenderer:
   m_ObjectHideFlags: 0

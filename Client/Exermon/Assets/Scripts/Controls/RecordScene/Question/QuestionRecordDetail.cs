@@ -8,6 +8,7 @@ using QuestionModule.Data;
 using RecordModule.Data;
 using RecordModule.Services;
 
+using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.QuestionDisplay;
 
@@ -24,19 +25,22 @@ namespace UI.RecordScene.Controls.Question {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const string ShowAnswerText = "显示答案";
-        const string HideAnswerText = "隐藏答案";
-        const string CollectText = "收藏题目";
-        const string UncollectText = "解除收藏";
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
         public QuestionDisplay questionDisplay;
 
-        public Text showAnswerText, collectText;
+        public GameObject wrongButton;
 
-        public GameObject controlButtons, wrongButton;
+        public GameObject rightView; // 右侧视图
+
+        public GameObject pictureView;
+        public QuestionDetailView detailView;
+        public QuestionReportView reportView;
+
+        public Toggle showAnswer;
+        public DropdownField showTypeSelect;
 
         /// <summary>
         /// 内部变量定义
@@ -49,6 +53,14 @@ namespace UI.RecordScene.Controls.Question {
         RecordService recordSer;
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            showTypeSelect.onChanged = onShowTypeChanged;
+        }
 
         /// <summary>
         /// 初始化外部系统
@@ -79,16 +91,15 @@ namespace UI.RecordScene.Controls.Question {
         void drawQuestion(QuestionRecord record) {
             questionDisplay.setItem(record.question());
             questionDisplay.result = playerQues;
+
+            rightView.SetActive(true);
         }
 
         /// <summary>
         /// 绘制按钮状态
         /// </summary>
         void drawButtonsStatus(QuestionRecord record) {
-            controlButtons.SetActive(true);
-            showAnswerText.text = questionDisplay.showAnswer ? HideAnswerText : ShowAnswerText;
-            collectText.text = record.collected ? UncollectText : CollectText;
-            wrongButton.SetActive(record.wrong);
+            if (wrongButton) wrongButton.SetActive(record.wrong);
         }
 
         /// <summary>
@@ -96,8 +107,19 @@ namespace UI.RecordScene.Controls.Question {
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
-            questionDisplay.setItem(null);
-            controlButtons.SetActive(false);
+            questionDisplay.clearItem();
+
+            rightView.SetActive(false);
+            if (wrongButton) wrongButton.SetActive(false);
+        }
+        
+        /// <summary>
+        /// 清除右方视图
+        /// </summary>
+        void clearRightView() {
+            pictureView.SetActive(false);
+            detailView.terminateView();
+            reportView.terminateView();
         }
 
         #endregion
@@ -108,10 +130,9 @@ namespace UI.RecordScene.Controls.Question {
         /// 开启/关闭答案
         /// </summary>
         public void toggleAnswer() {
-            questionDisplay.showAnswer = !questionDisplay.showAnswer;
-            drawButtonsStatus(item);
+            questionDisplay.showAnswer = showAnswer.isOn;
         }
-
+        /*
         /// <summary>
         /// 收藏/解除收藏
         /// </summary>
@@ -119,13 +140,30 @@ namespace UI.RecordScene.Controls.Question {
             if (item == null) return;
             recordSer.collect(item, () => drawButtonsStatus(item));
         }
-
+        */
         /// <summary>
         /// 解除错题
         /// </summary>
         public void unwrong() {
             if (item == null) return;
             recordSer.unwrong(item, () => drawButtonsStatus(item));
+        }
+
+        #endregion
+
+        #region 流程控制
+
+        /// <summary>
+        /// 显示类型改变回调
+        /// </summary>
+        public void onShowTypeChanged(Tuple<int, string> obj) {
+            clearRightView();
+            var index = showTypeSelect.getIndex();
+            switch (index) {
+                case 0: pictureView.SetActive(true); break;
+                case 1: detailView.startView(); break;
+                case 2: reportView.startView(); break;
+            }
         }
 
         #endregion

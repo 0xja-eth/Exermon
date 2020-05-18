@@ -28,8 +28,7 @@ namespace UI.ExerciseScene {
         /// </summary>
         public QuestionWindow questionWindow;
         public ResultWindow resultWindow;
-        public DetailWindow detailWindow;
-        public ReportWindow reportWindow;
+        public BaseWindow detailWindow, reportWindow;
 
         /// <summary>
         /// 外部系统

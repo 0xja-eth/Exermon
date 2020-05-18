@@ -29,8 +29,8 @@ class Service:
 		Check.ensurePasswordFormat(pw)
 		Check.ensureEmailFormat(email)
 
-		Common.ensurePlayerNotExist(error=ErrorType.PlayerExist,
-									username=un, email=email)
+		Common.ensurePlayerNotExist(error=ErrorType.PlayerExist, username=un)
+		Common.ensurePlayerNotExist(error=ErrorType.PlayerExist, email=email)
 
 		CodeManager.ensureCode(un, email, code, 'register')
 		CodeManager.deleteCode(un, email, 'register')
@@ -91,7 +91,8 @@ class Service:
 			Common.ensurePlayerExist(error=ErrorType.IncorrectRetrieve, username=un, email=email)
 
 		if type == 'register':
-			Common.ensurePlayerNotExist(error=ErrorType.PlayerExist, username=un, email=email)
+			Common.ensurePlayerNotExist(error=ErrorType.PlayerExist, username=un)
+			Common.ensurePlayerNotExist(error=ErrorType.PlayerExist, email=email)
 
 		print("sendCode to %s [%s]: %s" % (email, type, code))
 		cls._doSendCode(un, email, code, conf)

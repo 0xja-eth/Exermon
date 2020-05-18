@@ -6,8 +6,6 @@ using RecordModule.Services;
 
 using UI.RecordScene.Windows;
 
-using UI.ExerciseScene.Windows;
-
 /// <summary>
 /// 记录场景
 /// </summary>
@@ -26,10 +24,7 @@ namespace UI.RecordScene {
         /// 外部组件设置
         /// </summary>
         public RecordWindow recordWindow;
-
-        public DetailWindow detailWindow;
-        public ReportWindow reportWindow;
-
+        
         /// <summary>
         /// 内部系统声明
         /// </summary>
@@ -71,15 +66,7 @@ namespace UI.RecordScene {
         public void refresh() {
             recordSer.get(recordWindow.startWindow);
         }
-
-        /// <summary>
-        /// 关闭上层窗口
-        /// </summary>
-        public void onUpperWindowBack() {
-            detailWindow.terminateWindow();
-            reportWindow.terminateWindow();
-        }
-
+        
         #endregion
 
     }

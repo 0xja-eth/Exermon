@@ -7,9 +7,7 @@ using UnityEngine.Events;
 
 using Core.Systems;
 using Core.UI;
-using Core.UI.Utils;
 
-using QuestionModule.Data;
 using QuestionModule.Services;
 
 using GameModule.Services;
@@ -19,14 +17,13 @@ using RecordModule.Data;
 using RecordModule.Services;
 
 using UI.Common.Controls.InputFields;
-using UI.Common.Controls.QuestionDisplay;
 
-namespace UI.ExerciseScene.Windows {
+namespace UI.Common.Controls.QuestionDisplay {
 
     /// <summary>
     /// 反馈窗口
     /// </summary>
-    public class ReportWindow : BaseWindow {
+    public class QuestionReportView : BaseView {
 
         /// <summary>
         /// 常量定义
@@ -44,9 +41,9 @@ namespace UI.ExerciseScene.Windows {
         public Text placeHolder;
 
         /// <summary>
-        /// 场景组件引用
+        /// 成功回调
         /// </summary>
-        protected ExerciseScene scene;
+        UnityAction onSuccess = null;
 
         /// <summary>
         /// 内部变量声明
@@ -65,14 +62,7 @@ namespace UI.ExerciseScene.Windows {
         QuestionService quesSer;
 
         #region 初始化
-
-        /// <summary>
-        /// 初始化场景
-        /// </summary>
-        protected override void initializeScene() {
-            scene = SceneUtils.getSceneObject("Scene") as ExerciseScene;
-        }
-
+        
         /// <summary>
         /// 初始化外部系统
         /// </summary>
@@ -101,7 +91,7 @@ namespace UI.ExerciseScene.Windows {
             setupReportTypes();
             var types = dataSer.staticData.configure.quesReportTypes;
             typeInput.configure(types);
-            typeInput.setIndex(1);
+            typeInput.setIndex(0);
             typeInput.onChanged = onTypeChanged;
         }
 
@@ -162,8 +152,7 @@ namespace UI.ExerciseScene.Windows {
         /// </summary>
         void onPushSuccess() {
             gameSys.requestAlert(PushReportSuccessText);
-            if (scene) scene.onUpperWindowBack();
-            else terminateWindow();
+            onSuccess?.Invoke();
         }
 
         #endregion
