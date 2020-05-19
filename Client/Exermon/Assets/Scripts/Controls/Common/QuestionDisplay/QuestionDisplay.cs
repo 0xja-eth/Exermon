@@ -5,9 +5,13 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using Core.UI;
+using Core.UI.Utils;
+
 using RecordModule.Data;
 using RecordModule.Services;
 
+using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.ParamDisplays;
 
@@ -15,6 +19,8 @@ using UI.Common.Controls.SystemExtend.QuestionText;
 
 namespace UI.Common.Controls.QuestionDisplay {
     using Question = QuestionModule.Data.Question;
+
+    using QuestionDrawView = DrawView.DrawView;
 
     /// <summary>
     /// 题目显示组件
@@ -47,6 +53,18 @@ namespace UI.Common.Controls.QuestionDisplay {
         public GameObject confirmBtn;
 
         public RectTransform content;
+
+        public DropdownField showTypeSelect;
+        
+        public GameObject rightView; // 右侧视图
+
+        public GameObject[] rightViews;
+
+        /// <summary>
+        /// 外部变量设定
+        /// </summary>
+        public int pictureViewIndex = 0;
+        public int noPictureViewIndex = 1; // 没有图片时显示的右视图索引
 
         /// <summary>
         /// 外部变量设置
@@ -103,7 +121,8 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            if (content) registerUpdateLayout(content);
+            if (showTypeSelect) showTypeSelect.onChanged = onShowTypeChanged;
+            //if (content) registerUpdateLayout(content);
         }
         
         /// <summary>
@@ -202,8 +221,11 @@ namespace UI.Common.Controls.QuestionDisplay {
             drawTitle(question);
             drawCollect(question);
             drawPictruesAndChoices(question);
+
             if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
+
+            rightView.SetActive(true);
         }
 
         /// <summary>
@@ -231,10 +253,24 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 绘制图片和选项
         /// </summary>
         /// <param name="question">题目</param>
-        void drawPictruesAndChoices(Question question) { 
-            pictureContaienr?.setItem(question, false);
-            choiceContainer?.setItem(question, false);
-            buttonContainer?.setItem(question, false);
+        void drawPictruesAndChoices(Question question) {
+            pictureContaienr?.startView(question);
+            choiceContainer?.startView(question);
+            buttonContainer?.startView(question);
+
+            if (question.pictures.Length <= 0) processNoPicture();
+            else {
+                showTypeSelect.setIndex(pictureViewIndex);
+                pictureContaienr?.select(0);
+            }
+        }
+
+        /// <summary>
+        /// 处理无图片情况
+        /// </summary>
+        void processNoPicture() {
+            if (showTypeSelect && showTypeSelect.getIndex() == pictureViewIndex)
+                showTypeSelect.setIndex(noPictureViewIndex);
         }
 
         /// <summary>
@@ -305,6 +341,36 @@ namespace UI.Common.Controls.QuestionDisplay {
             if (answerText) answerText.text = "";
 
             if (collectButton) collectButton.requestClear(true);
+
+            rightView.SetActive(false);
+        }
+
+        /// <summary>
+        /// 清除右方视图
+        /// </summary>
+        void clearRightView() {
+            for (int i = 0; i < rightViews.Length; ++i)
+                rightViews[i].SetActive(false);
+        }
+
+        #endregion
+
+        #region 流程控制
+
+        /// <summary>
+        /// 显示类型改变回调
+        /// </summary>
+        public void onShowTypeChanged(Tuple<int, string> obj) {
+            if (!showTypeSelect) return;
+            var index = showTypeSelect.getIndex();
+            for (int i = 0; i < rightViews.Length; ++i) {
+                var go = rightViews[i];
+                var view = SceneUtils.get<BaseView>(go);
+                if (view != null) 
+                    if (i == index) view.startView();
+                    else view.terminateView();
+                else go.SetActive(i == index);
+            }
         }
 
         #endregion

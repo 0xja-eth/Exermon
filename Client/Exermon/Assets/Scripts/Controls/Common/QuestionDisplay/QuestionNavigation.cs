@@ -103,7 +103,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         protected override void refresh() {
             base.refresh();
-            prevBtn.SetActive(showAnswer);
+            if (prevBtn) prevBtn.SetActive(showAnswer);
         }
 
         #endregion

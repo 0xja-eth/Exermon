@@ -145,6 +145,8 @@ namespace UI.Common.Controls.ItemDisplays {
         protected override void initializeOnce() {
             base.initializeOnce();
             initializeMask();
+            configureItemDisplays();
+            configureDetail();
         }
 
         /// <summary>
@@ -153,15 +155,13 @@ namespace UI.Common.Controls.ItemDisplays {
         void initializeMask() {
             if (mask == null) mask = container.parent as RectTransform;
         }
-
+        /*
         /// <summary>
         /// 配置
         /// </summary>
         public override void configure() {
             base.configure();
-            configureItemDisplays();
-            configureDetail();
-        }
+        }*/
         /// <param name="items">物品集</param>
         public void configure(T[] items) {
             configure(); setItems(items);
@@ -407,7 +407,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 清空物品
         /// </summary>
-        public void clearItems() {
+        public virtual void clearItems() {
             Debug.Log(name + ": clearItems");
             items.Clear();
             deselect(); clearChecks();

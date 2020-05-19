@@ -33,14 +33,7 @@ namespace UI.RecordScene.Controls.Question {
 
         public GameObject wrongButton;
 
-        public GameObject rightView; // 右侧视图
-
-        public GameObject pictureView;
-        public QuestionDetailView detailView;
-        public QuestionReportView reportView;
-
         public Toggle showAnswer;
-        public DropdownField showTypeSelect;
 
         /// <summary>
         /// 内部变量定义
@@ -59,7 +52,6 @@ namespace UI.RecordScene.Controls.Question {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            showTypeSelect.onChanged = onShowTypeChanged;
         }
 
         /// <summary>
@@ -91,8 +83,6 @@ namespace UI.RecordScene.Controls.Question {
         void drawQuestion(QuestionRecord record) {
             questionDisplay.setItem(record.question());
             questionDisplay.result = playerQues;
-
-            rightView.SetActive(true);
         }
 
         /// <summary>
@@ -109,17 +99,7 @@ namespace UI.RecordScene.Controls.Question {
             base.drawEmptyItem();
             questionDisplay.clearItem();
 
-            rightView.SetActive(false);
             if (wrongButton) wrongButton.SetActive(false);
-        }
-        
-        /// <summary>
-        /// 清除右方视图
-        /// </summary>
-        void clearRightView() {
-            pictureView.SetActive(false);
-            detailView.terminateView();
-            reportView.terminateView();
         }
 
         #endregion
@@ -147,23 +127,6 @@ namespace UI.RecordScene.Controls.Question {
         public void unwrong() {
             if (item == null) return;
             recordSer.unwrong(item, () => drawButtonsStatus(item));
-        }
-
-        #endregion
-
-        #region 流程控制
-
-        /// <summary>
-        /// 显示类型改变回调
-        /// </summary>
-        public void onShowTypeChanged(Tuple<int, string> obj) {
-            clearRightView();
-            var index = showTypeSelect.getIndex();
-            switch (index) {
-                case 0: pictureView.SetActive(true); break;
-                case 1: detailView.startView(); break;
-                case 2: reportView.startView(); break;
-            }
         }
 
         #endregion
