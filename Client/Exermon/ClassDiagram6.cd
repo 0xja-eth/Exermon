@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Core.UI.AnimatorView" Collapsed="true">
+    <Position X="21" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAACgAAAAAABAAAACQAAAQIEACAAAIBAABAAAmoAA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\AnimatorView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseComponent" Collapsed="true">
+    <Position X="21" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAgAAAAAhAAAAAAAAAAAAAAQAAEAEA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseComponent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseScene" Collapsed="true">
+    <Position X="19" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAABAKAAAwAJACAAAAgBAABEACAAAgQAAEAEA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseView" Collapsed="true">
+    <Position X="21" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQIEGAQBAAIAAAAQGAABEQSAAEAEAAgAAEQABEAQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseView.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Core.UI.BaseWindow" Collapsed="true">
+    <Position X="19" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAEgwEAAAAAACEASEAAAQCKAAAAQAEAAAEIQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.GroupView&lt;T&gt;" Collapsed="true">
+    <Position X="36" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JEgACEAAACABAQAAgACAUAAAAAAgEAACACoAAAAREQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\GroupView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.TabView&lt;T&gt;" Collapsed="true">
+    <Position X="37" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEAAAEAIQAAAIQAAIUCAEACBQAAAAAgAgAAAAAAAAAg=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\TabView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.BaseItemDetail" Collapsed="true">
+    <Position X="27" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAgAEAAACAAAAAAAAEAAAgAUAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\BaseItemDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.BaseItemDisplay" Collapsed="true">
+    <Position X="29" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAgAEAAACAAAAAAAAEAAAgAUAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\BaseItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ContainerDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="33" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAwAAACCABoCAlAAqoYBAAQgACkEAAAAIgAgAgAQA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.DraggableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="29" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAgUIEABAkAAEAAAYUCAAgAGSCBAAABg=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DraggableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.DroppableContainerDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="37" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DroppableContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.DroppableContainerDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="39" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAIQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\DroppableContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ItemDetailDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="27" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAABBAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDetailDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.ItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="27" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAgBCESAAAAAEQAAYIAAAAAAAAAAAgQAABAAAggAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\ItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.PackContainerDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="35" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACgEAEQBFAECIgAAAQAAAAECAAgIAAAiAABI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\PackContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.PackContItemDetail" Collapsed="true">
+    <Position X="25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAgAEAAACAAAAAAABAAAAgAEAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\PackContItemDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.PackContItemDisplay" Collapsed="true">
+    <Position X="31" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAgAEABACAAAAAAAAEAAAgAUAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\PackContItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SelectableBaseItemDisplay" Collapsed="true">
+    <Position X="33" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAgAEAAACAAAAAAAAEAAAgAUAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SelectableBaseItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SelectableContainerDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="35" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>REhE4UQ4qSAKsaR/BA6oYFIkQgqCkGBEAAs8ihowgQI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SelectableContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SelectableItemDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="29" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BEAAoEBagiAIgYgSAQEAIRIAwIZgAARQ1AHQAQCBJCI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SelectableItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotContainerDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="39" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAgABAJQQAAAAAAABAAIQCAAQAAEIAQAAAIAAIAAEAI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotContainerDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotContItemDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="33" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggAAAJQYBCAAAAABAAAACAAQAAGIEQAAAAAAAgAAAI=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotContItemDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ItemDisplays.SlotItemDisplay&lt;T, E&gt;" Collapsed="true">
+    <Position X="31" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BEAoAEIgSgAACAQUBAADIAAAAAAgEIEIQAAQIQAAUAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ItemDisplay\SlotItemDisplay.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.BarParamDisplay" Collapsed="true">
+    <Position X="29" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAkICDMACAACAAkAAAKBEAAAAAABABACRAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\BarParamDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.MultParamsDisplay" Collapsed="true">
+    <Position X="27" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAgUBIMggAAJAUAUbFgSQAQQgCAagQAAICCaAAQAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\MultParamsDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplay" Collapsed="true">
+    <Position X="27" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAQgAAAAAAAIgAAAAYAAAABQAAAAAAAQAAAgAAgQAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplay&lt;T&gt;" Collapsed="true">
+    <Position X="27" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAQgECACAAAIAAAAAaAAAAAAAAAAAAAQAARgAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplaysGroup" Collapsed="true">
+    <Position X="39" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAA4AAAAAwAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplaysGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.ParamDisplays.ParamDisplaysGroupWrapper" Collapsed="true">
+    <Position X="29" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>RAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\ParamDisplay\ParamDisplaysGroupWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.BaseInputField" Collapsed="true">
+    <Position X="23" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AECAAACABABABAAAAUCAUAIRlAAAYEABAAggQAAkAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\BaseInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.BaseInputField&lt;T&gt;" Collapsed="true">
+    <Position X="23" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BEABgEAAAAAIICAAAAaAAAAgAAAACiAAAACBgAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\BaseInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DateTimeField" Collapsed="true">
+    <Position X="23" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAkAEEAAAAAIAAAAgSQgQmAwgQACJEAACCjAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DateTimeField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.DropdownField" Collapsed="true">
+    <Position X="25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BEABAAAAAEAAIAgAAAKBEAADQACoIAAABAAgAQAEACA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\DropdownField.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.TextInputField" Collapsed="true">
+    <Position X="17" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAEAAAAAAAAAACAUACAAAAAAAAAAAAgkAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\TextInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.ValueInputField" Collapsed="true">
+    <Position X="19" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAIAAEEARAIBAgAAQiIQgAQQEAggCIBAICgyCBEAAg=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\ValueInputField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.InputFields.ValueSlideField" Collapsed="true">
+    <Position X="21" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAgAAAEAAAAAAAAAAACBAAAAQAAgIAAABAAkgQAEAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\InputFields\ValueSlideField.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

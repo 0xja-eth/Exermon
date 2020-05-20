@@ -221,11 +221,10 @@ namespace UI.Common.Controls.QuestionDisplay {
             drawTitle(question);
             drawCollect(question);
             drawPictruesAndChoices(question);
+            drawRightView(question);
 
             if (showAnswer) drawResult(question);
             else resultObj?.SetActive(false);
-
-            rightView.SetActive(true);
         }
 
         /// <summary>
@@ -257,12 +256,18 @@ namespace UI.Common.Controls.QuestionDisplay {
             pictureContaienr?.startView(question);
             choiceContainer?.startView(question);
             buttonContainer?.startView(question);
+            pictureContaienr?.select(0);
+        }
 
+        /// <summary>
+        /// 绘制右窗口
+        /// </summary>
+        void drawRightView(Question question) {
             if (question.pictures.Length <= 0) processNoPicture();
-            else {
-                showTypeSelect.setIndex(pictureViewIndex);
-                pictureContaienr?.select(0);
-            }
+            else showTypeSelect?.setIndex(pictureViewIndex);
+            showTypeSelect?.onValueChanged();
+
+            rightView.SetActive(true);
         }
 
         /// <summary>

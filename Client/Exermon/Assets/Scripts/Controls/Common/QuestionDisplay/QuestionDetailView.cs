@@ -69,14 +69,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         #endregion
 
         #region 启动控制
-
-        /// <summary>
-        /// 显示窗口
-        /// </summary>
-        protected override void showView() {
-            quesSer.loadQuestionDetail(
-                questionDisplay.getItem(), base.showView);
-        }
+        
 
         #endregion
 
@@ -86,6 +79,10 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 刷新窗口
         /// </summary>
         protected override void refresh() {
+            quesSer.loadQuestionDetail(
+                questionDisplay.getItem(), mainRefresh);
+        }
+        void mainRefresh() {
             base.refresh();
             refreshQuestion();
         }
