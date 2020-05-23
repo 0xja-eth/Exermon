@@ -11,6 +11,7 @@ using Core.Data;
 using Core.Data.Loaders;
 using GameModule.Services;
 using QuestionModule.Services;
+using ExerPro.EnglishModule.Services;
 
 namespace Core.Systems {
 
@@ -84,6 +85,8 @@ namespace Core.Systems {
         const string CacheDataFilename = ".cache";
         const string ConfigDataFilename = ".config";
 
+        const string EngCacheDataFilename = ".eng.cache";
+
         /// <summary>
         /// 加密盐
         /// </summary>
@@ -102,6 +105,7 @@ namespace Core.Systems {
         GameSystem gameSys;
         GameService gameSer;
         QuestionService quesSer;
+        EnglishService engSer;
 
         #region 初始化
 
@@ -114,6 +118,7 @@ namespace Core.Systems {
             dataSer = DataService.get();
             gameSer = GameService.get();
             quesSer = QuestionService.get();
+            engSer = EnglishService.get();
         }
 
         /// <summary>
@@ -125,6 +130,8 @@ namespace Core.Systems {
             storageItems.Add(new StorageItem(dataSer.staticData, StaticDataFilename));
             storageItems.Add(new StorageItem(gameSer.configure, ConfigDataFilename));
             storageItems.Add(new StorageItem(quesSer.questionCache, CacheDataFilename));
+
+            storageItems.Add(new StorageItem(engSer.questionCache, EngCacheDataFilename));
         }
 
         #endregion

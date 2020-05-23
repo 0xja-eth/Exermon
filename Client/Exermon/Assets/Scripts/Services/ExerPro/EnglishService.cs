@@ -10,10 +10,6 @@ using Core.Data.Loaders;
 using Core.Systems;
 using Core.Services;
 
-using RecordModule.Data;
-
-using PlayerModule.Services;
-
 using ExerPro.EnglishModule.Data;
 
 /// <summary>
@@ -119,12 +115,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 缓存题目数据
         /// </summary>
         public QuestionCache questionCache { get; protected set; } = new QuestionCache();
-
-        /// <summary>
-        /// 外部系统
-        /// </summary>
-        PlayerService playerSer;
-
+        
         #region 初始化
 
         /// <summary>
@@ -132,7 +123,6 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
-            playerSer = PlayerService.get();
         }
 
         /// <summary>
