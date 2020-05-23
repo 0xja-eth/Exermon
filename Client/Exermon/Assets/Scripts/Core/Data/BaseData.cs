@@ -33,6 +33,16 @@ namespace Core.Data {
         public bool ignoreNull;
 
         /// <summary>
+        /// 自动读取
+        /// </summary>
+        public bool autoLoad;
+
+        /// <summary>
+        /// 自动转化
+        /// </summary>
+        public bool autoConvert;
+
+        /// <summary>
         /// 转换格式
         /// </summary>
         public string format;
@@ -41,11 +51,14 @@ namespace Core.Data {
         /// 构造函数
         /// </summary>
         public AutoConvertAttribute(string keyName = null,
+            bool autoLoad = true, bool autoConvert = true,
             bool preventCover = true, bool ignoreNull = false, string format = "") {
             this.keyName = keyName;
             this.preventCover = preventCover;
             this.ignoreNull = ignoreNull;
             this.format = format;
+            this.autoLoad = autoLoad;
+            this.autoConvert = autoConvert;
         }
     }
 
@@ -116,6 +129,8 @@ namespace Core.Data {
                 foreach (Attribute a in p.GetCustomAttributes(false))
                     if (a.GetType() == typeof(AutoConvertAttribute)) {
                         var attr = (AutoConvertAttribute)a;
+                        if (!attr.autoLoad) continue;
+
                         var pType = p.PropertyType; var pName = p.Name;
                         var key = attr.keyName ?? DataLoader.hump2Underline(pName);
                         var val = p.GetValue(this);
@@ -161,6 +176,8 @@ namespace Core.Data {
                 foreach (Attribute a in p.GetCustomAttributes(false))
                     if (a.GetType() == typeof(AutoConvertAttribute)) {
                         var attr = (AutoConvertAttribute)a;
+                        if (!attr.autoConvert) continue;
+
                         var pType = p.PropertyType; var pName = p.Name;
                         var key = attr.keyName ?? DataLoader.hump2Underline(pName);
                         var val = p.GetValue(this);

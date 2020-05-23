@@ -30,7 +30,7 @@ namespace QuestionModule.Data {
     /// <summary>
     /// 题目数据
     /// </summary>
-    public class Question : BaseData, ParamDisplay.IDisplayDataConvertable {
+    public class BaseQuestion : BaseData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 题目类型
@@ -41,7 +41,139 @@ namespace QuestionModule.Data {
             Judge = 2,  // 判断题
             Other = -1,  // 其他
         }
+        
+        /// <summary>
+        /// 题目选项数据
+        /// </summary>
+        public class Choice : BaseData {
 
+            /// <summary>
+            /// 是否需要ID
+            /// </summary>
+            protected override bool idEnable() { return false; }
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int order { get; protected set; }
+            [AutoConvert]
+            public string text { get; protected set; }
+            [AutoConvert]
+            public bool answer { get; protected set; }
+
+            /// <summary>
+            /// 是否选择
+            /// </summary>
+            /// <param name="result">结果</param>
+            /// <returns>返回该选项是否在所给的选择中</returns>
+            public bool isInSelection(IQuestionResult result) {
+                return isInSelection(result.getSelection());
+            }
+            /// <param name="selection">选择</param>
+            public bool isInSelection(int[] selection) {
+                for (int i = 0; i < selection.Length; ++i)
+                    if (selection[i] == order) return true;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int number { get; protected set; }
+        [AutoConvert]
+        public string title { get; protected set; }
+        [AutoConvert]
+        public string description { get; protected set; }
+        [AutoConvert]
+        public int type { get; protected set; }
+
+        [AutoConvert]
+        public Choice[] choices { get; protected set; }
+
+        /// <summary>
+        /// 打乱的选项
+        /// </summary>
+        Choice[] _shuffleChoices { get; set; } = null;
+
+        #region 数据转换
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>返回转化后的显示数据</returns>
+        public virtual JsonData convertToDisplayData(string type = "") {
+            return toJson();
+        }
+
+        #endregion
+
+        #region 数据操作
+        
+        /// <summary>
+        /// 类型文本
+        /// </summary>
+        /// <returns></returns>
+        public string typeText() {
+            return DataService.get().questionType(type).Item2;
+        }
+        
+        /// <summary>
+        /// 打乱的选项
+        /// </summary>
+        /// <returns>返回打乱的选项</returns>
+        public Choice[] shuffleChoices() {
+            if (_shuffleChoices == null) {
+                int map = 0, cnt = choices.Length;
+                var res = new Choice[cnt];
+                for (int i = 0; i < cnt; ++i) {
+                    int index = UnityEngine.Random.Range(0, cnt);
+                    while ((map & (1 << index)) != 0)
+                        index = UnityEngine.Random.Range(0, cnt);
+                    res[index] = choices[i];
+                    map = map | (1 << index);
+                }
+                _shuffleChoices = res;
+            }
+            return _shuffleChoices;
+        }
+
+        /// <summary>
+        /// 清空打乱题目
+        /// </summary>
+        public void clearShuffleChoices() {
+            _shuffleChoices = null;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// 题目组数据
+    /// </summary>
+    public class GroupQuestion<T> : BaseData where T: BaseQuestion, new() {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string article { get; protected set; }
+        [AutoConvert]
+        public string source { get; protected set; }
+
+        [AutoConvert]
+        public T[] subQuestions { get; protected set; }
+        
+    }
+
+    /// <summary>
+    /// 题目数据
+    /// </summary>
+    public class Question : BaseQuestion {
+        
         /// <summary>
         /// 题目详情
         /// </summary>
@@ -96,43 +228,7 @@ namespace QuestionModule.Data {
                 return (DateTime.Now - updateTime).TotalSeconds >= OutOfDateSeconds;
             }
         }
-
-        /// <summary>
-        /// 题目选项数据
-        /// </summary>
-        public class Choice : BaseData {
-
-            /// <summary>
-            /// 是否需要ID
-            /// </summary>
-            protected override bool idEnable() { return false; }
-
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int order { get; protected set; }
-            [AutoConvert]
-            public string text { get; protected set; }
-            [AutoConvert]
-            public bool answer { get; protected set; }
-
-            /// <summary>
-            /// 是否选择
-            /// </summary>
-            /// <param name="result">结果</param>
-            /// <returns>返回该选项是否在所给的选择中</returns>
-            public bool isInSelection(IQuestionResult result) {
-                return isInSelection(result.getSelection());
-            }
-            /// <param name="selection">选择</param>
-            public bool isInSelection(int[] selection) {
-                for (int i = 0; i < selection.Length; ++i)
-                    if (selection[i] == order) return true;
-                return false;
-            }
-        }
-
+        
         /// <summary>
         /// 图片
         /// </summary>
@@ -158,12 +254,6 @@ namespace QuestionModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public int number { get; protected set; }
-        [AutoConvert]
-        public string title { get; protected set; }
-        [AutoConvert]
-        public string description { get; protected set; }
-        [AutoConvert]
         public string source { get; protected set; }
         [AutoConvert]
         public int starId { get; protected set; }
@@ -174,15 +264,11 @@ namespace QuestionModule.Data {
         [AutoConvert]
         public int subjectId { get; protected set; }
         [AutoConvert]
-        public int type { get; protected set; }
-        [AutoConvert]
         public int status { get; protected set; }
 
         [AutoConvert]
         public DateTime createTime { get; protected set; }
-
-        [AutoConvert]
-        public Choice[] choices { get; protected set; }
+        
         [AutoConvert]
         public Picture[] pictures { get; protected set; }
 
@@ -201,7 +287,7 @@ namespace QuestionModule.Data {
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>返回转化后的显示数据</returns>
-        public JsonData convertToDisplayData(string type = "") {
+        public override JsonData convertToDisplayData(string type = "") {
             switch (type) {
                 case "detail": return convertDetailData();
                 default: return toJson();
@@ -245,15 +331,7 @@ namespace QuestionModule.Data {
         public Subject subject() {
             return DataService.get().subject(subjectId);
         }
-
-        /// <summary>
-        /// 类型文本
-        /// </summary>
-        /// <returns></returns>
-        public string typeText() {
-            return DataService.get().questionType(type).Item2;
-        }
-
+        
         /// <summary>
         /// 状态文本
         /// </summary>
@@ -279,33 +357,6 @@ namespace QuestionModule.Data {
             for (int i = 0; i < pictures.Length; ++i)
                 res[i] = pictures[i].data;
             return res;
-        }
-
-        /// <summary>
-        /// 打乱的选项
-        /// </summary>
-        /// <returns>返回打乱的选项</returns>
-        public Choice[] shuffleChoices() {
-            if (_shuffleChoices == null) {
-                int map = 0, cnt = choices.Length;
-                var res = new Choice[cnt];
-                for (int i = 0; i < cnt; ++i) {
-                    int index = UnityEngine.Random.Range(0, cnt);
-                    while ((map & (1 << index)) != 0)
-                        index = UnityEngine.Random.Range(0, cnt);
-                    res[index] = choices[i];
-                    map = map | (1 << index);
-                }
-                _shuffleChoices = res;
-            }
-            return _shuffleChoices;
-        }
-
-        /// <summary>
-        /// 清空打乱题目
-        /// </summary>
-        public void clearShuffleChoices() {
-            _shuffleChoices = null;
         }
 
         /// <summary>

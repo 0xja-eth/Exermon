@@ -1,4 +1,6 @@
 ﻿using System;
+
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +8,9 @@ using UnityEngine;
 using LitJson;
 
 using Core.UI.Utils;
+
+using NAudio;
+using NAudio.Wave;
 
 using ItemModule.Data;
 using PlayerModule.Data;
@@ -166,6 +171,7 @@ namespace Core.Data.Loaders {
             if (type == typeof(TimeSpan)) return loadTimeSpan(data);
             if (type == typeof(Tuple<int, string>)) return loadTuple(data);
             if (type == typeof(Texture2D)) return loadTexture2D(data);
+            if (type == typeof(AudioClip)) return loadAudioClip(data);
 
             if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData))
                 return loadData(type, data);
@@ -234,6 +240,53 @@ namespace Core.Data.Loaders {
         }
 
         /// <summary>
+        /// 加载音频数据（MP3）
+        /// </summary>
+        /// <param name="json">数据</param>
+        /// <returns>加载的音频</returns>
+        public static AudioClip loadAudioClip(JsonData data) {
+            byte[] buffer = Convert.FromBase64String((string)data);
+
+            // 转换mp3格式的代码
+            MemoryStream mp3stream = new MemoryStream(buffer);
+            // Convert the data in the stream to WAV format
+            Mp3FileReader mp3audio = new Mp3FileReader(mp3stream);
+
+            //转换wave格式的代码
+            //MemoryStream wavstream = new MemoryStream(buffer);
+            //WaveFileReader waveAudio = new WaveFileReader(wavstream);
+            
+            WaveStream waveStream = WaveFormatConversionStream.CreatePcmStream(mp3audio);
+
+            // Convert to WAV data
+            WAVUtils wav = new WAVUtils(audioMemStream(waveStream).ToArray());
+
+            Debug.Log(wav);
+
+            AudioClip audioClip = AudioClip.Create("", wav.SampleCount, 1, wav.Frequency, false);
+            audioClip.SetData(wav.LeftChannel, 0);
+            // Return the clip
+            return audioClip;
+        }
+
+        /// <summary>
+        /// 转化为 WAV 数据
+        /// </summary>
+        /// <param name="waveStream"></param>
+        /// <returns></returns>
+        private static MemoryStream audioMemStream(WaveStream waveStream) {
+            MemoryStream outputStream = new MemoryStream();
+            using (WaveFileWriter waveFileWriter = new WaveFileWriter(outputStream, waveStream.WaveFormat)) {
+                byte[] bytes = new byte[waveStream.Length];
+                waveStream.Position = 0;
+                waveStream.Read(bytes, 0, Convert.ToInt32(waveStream.Length));
+                waveFileWriter.Write(bytes, 0, bytes.Length);
+                waveFileWriter.Flush();
+            }
+            return outputStream;
+        }
+        
+        /// <summary>
         /// 加载数据
         /// </summary>
         /// <param name="type">类型</param>
@@ -287,6 +340,7 @@ namespace Core.Data.Loaders {
             if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
             if (type == typeof(Tuple<int, string>)) return convertTuple((Tuple<int, string>)data);
             if (type == typeof(Texture2D)) return convertTexture2D(data as Texture2D);
+            if (type == typeof(AudioClip)) return convertAudioClip(data as AudioClip);
 
             if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData))
                 return convertData(data as BaseData);
@@ -354,6 +408,30 @@ namespace Core.Data.Loaders {
         static JsonData convertTexture2D(Texture2D data) {
             if (data == null) return "";
             byte[] bytes = data.EncodeToPNG();
+            return Convert.ToBase64String(bytes, 0, bytes.Length);
+        }
+
+        /// <summary>
+        /// 转化音频（MP3）
+        /// </summary>
+        /// <param name="data">纹理</param>
+        /// <returns>转化后的JsonData</returns>
+        static JsonData convertAudioClip(AudioClip data) {
+            var samples = new float[data.samples * data.channels];
+
+            data.GetData(samples, 0);
+
+            Int16[] intData = new Int16[samples.Length];
+            byte[] bytes = new byte[samples.Length * 2];
+            float rescaleFactor = 32767; 
+
+            for (int i = 0; i < samples.Length; i++) {
+                intData[i] = (short)(samples[i] * rescaleFactor);
+                byte[] byteArr = new byte[2];
+                byteArr = BitConverter.GetBytes(intData[i]);
+                byteArr.CopyTo(bytes, i * 2);
+            }
+
             return Convert.ToBase64String(bytes, 0, bytes.Length);
         }
 

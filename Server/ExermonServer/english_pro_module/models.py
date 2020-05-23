@@ -263,7 +263,7 @@ class WordRecord(models.Model):
 
 		verbose_name = verbose_name_plural = "单词记录"
 
-	# 题目
+	# 单词
 	word = models.ForeignKey('Word', null=False,
 							 on_delete=models.CASCADE, verbose_name="单词")
 

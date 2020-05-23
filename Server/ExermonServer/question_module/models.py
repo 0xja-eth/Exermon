@@ -43,82 +43,12 @@ class BaseQuesChoice(models.Model):
 
 
 # ===================================================
-#  题目选项表
-# ===================================================
-class QuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "题目选项"
-
-	# 所属问题
-	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
-
-
-# ===================================================
-#  题目图片表
-# ===================================================
-class QuesPicture(models.Model):
-	class Meta:
-
-		verbose_name = verbose_name_plural = "题目图片"
-
-	# 序号
-	number = models.PositiveSmallIntegerField(verbose_name="序号")
-
-	# 解析图片
-	desc_pic = models.BooleanField(default=False, verbose_name="解析图片")
-
-	# 图片文件名
-	file = models.ImageField(upload_to=QuestionImageUpload(), verbose_name="图片文件")
-
-	# 图片所属题目
-	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属题目")
-
-	def __str__(self):
-		return self.file.url
-
-	# 获取完整路径
-	def getExactlyPath(self):
-		base = settings.STATIC_URL
-		path = os.path.join(base, str(self.file))
-		if os.path.exists(path):
-			return path
-		else:
-			raise GameException(ErrorType.PictureFileNotFound)
-
-	# 获取视频base64编码
-	def convertToBase64(self):
-
-		with open(self.getExactlyPath(), 'rb') as f:
-			data = base64.b64encode(f.read())
-
-		return data.decode()
-
-	def convertToDict(self):
-		return {
-			'number': self.number,
-			'desc_pic': self.desc_pic,
-			'data': self.convertToBase64()
-		}
-
-
-# ===================================================
 #  题目类型枚举
 # ===================================================
 class QuestionType(Enum):
 	Single = 0  # 单选题
 	Multiple = 1  # 多选题
 	Judge = 2  # 判断题
-	Other = -1  # 其他
-
-
-# ===================================================
-#  题目状态枚举
-# ===================================================
-class QuestionStatus(Enum):
-	Normal = 0  # 正常
-	Abnormal = 1  # 异常
 	Other = -1  # 其他
 
 
@@ -217,6 +147,76 @@ class BaseQuestion(models.Model):
 			else: count += 1
 
 		return count == len(answers)
+
+
+# ===================================================
+#  题目选项表
+# ===================================================
+class QuesChoice(BaseQuesChoice):
+	class Meta:
+		verbose_name = verbose_name_plural = "题目选项"
+
+	# 所属问题
+	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
+								 verbose_name="所属问题")
+
+
+# ===================================================
+#  题目图片表
+# ===================================================
+class QuesPicture(models.Model):
+	class Meta:
+
+		verbose_name = verbose_name_plural = "题目图片"
+
+	# 序号
+	number = models.PositiveSmallIntegerField(verbose_name="序号")
+
+	# 解析图片
+	desc_pic = models.BooleanField(default=False, verbose_name="解析图片")
+
+	# 图片文件名
+	file = models.ImageField(upload_to=QuestionImageUpload(), verbose_name="图片文件")
+
+	# 图片所属题目
+	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
+								 verbose_name="所属题目")
+
+	def __str__(self):
+		return self.file.url
+
+	# 获取完整路径
+	def getExactlyPath(self):
+		base = settings.STATIC_URL
+		path = os.path.join(base, str(self.file))
+		if os.path.exists(path):
+			return path
+		else:
+			raise GameException(ErrorType.PictureFileNotFound)
+
+	# 获取视频base64编码
+	def convertToBase64(self):
+
+		with open(self.getExactlyPath(), 'rb') as f:
+			data = base64.b64encode(f.read())
+
+		return data.decode()
+
+	def convertToDict(self):
+		return {
+			'number': self.number,
+			'desc_pic': self.desc_pic,
+			'data': self.convertToBase64()
+		}
+
+
+# ===================================================
+#  题目状态枚举
+# ===================================================
+class QuestionStatus(Enum):
+	Normal = 0  # 正常
+	Abnormal = 1  # 异常
+	Other = -1  # 其他
 
 
 # ===================================================
