@@ -32,7 +32,7 @@ namespace ExerPro.EnglishModule { }
 /// <summary>
 /// 英语特训模块数据
 /// </summary>
-namespace EnglishModule.Data {
+namespace ExerPro.EnglishModule.Data {
 
     /// <summary>
     /// 听力小题

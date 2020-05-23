@@ -117,6 +117,17 @@ namespace Core.Systems {
             public const string BattleQuestionComplete = "battle/question/complete";
             public const string BattleActionComplete = "battle/action/complete";
             public const string BattleResultComplete = "battle/result/complete";
+
+            public const string EngProQuestionGenerate = "engpro/question/generate";
+            public const string EngProQuestionGet = "engpro/question/get";
+
+            public const string EngProWordGenerate = "engpro/word/generate";
+            public const string EngProWordAnswer = "engpro/word/answer";
+            public const string EngProWordGet = "engpro/word/get";
+
+            public const string EngProWordRecordGet = "engpro/record/get";
+
+
         }
 
         /// <summary>
