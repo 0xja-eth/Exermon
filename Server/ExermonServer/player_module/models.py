@@ -1187,6 +1187,30 @@ class Player(CacheableModel):
 		"""
 		self._clearCache(self.CUR_QUES_SET_CACHE_KEY)
 
+	# region EnglishPro
+
+	def wordRecords(self) -> QuerySet:
+		"""
+		获取所有单词记录
+		Returns:
+			所有与该玩家相关的单词记录 QuerySet 对象
+		"""
+		return self.questionrecord_set.all()
+
+	def wordRecord(self, word_id: int) -> 'WordRecord':
+		"""
+		通过题目ID查找单词记录
+		Args:
+			word_id (int): 题目ID
+		Returns:
+			若存在题目记录，返回之，否则返回 None
+		"""
+		res = self.wordRecords().filter(word_id=word_id)
+		if res.exists(): return res.first()
+		return None
+
+	# endregion
+
 	# endregion
 
 	# region 赛季操作

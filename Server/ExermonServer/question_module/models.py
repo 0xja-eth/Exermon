@@ -11,8 +11,9 @@ from enum import Enum
 # ===================================================
 #  题目选项表
 # ===================================================
-class QuesChoice(models.Model):
+class BaseQuesChoice(models.Model):
 	class Meta:
+		abstract = True
 		verbose_name = verbose_name_plural = "题目选项"
 
 	# 编号
@@ -23,10 +24,6 @@ class QuesChoice(models.Model):
 
 	# 正误
 	answer = models.BooleanField(default=False, verbose_name="正误")
-
-	# 所属问题
-	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
 
 	def __str__(self):
 		return self.text
@@ -43,6 +40,18 @@ class QuesChoice(models.Model):
 			'text': self.text,
 			'answer': self.answer
 		}
+
+
+# ===================================================
+#  题目选项表
+# ===================================================
+class QuesChoice(BaseQuesChoice):
+	class Meta:
+		verbose_name = verbose_name_plural = "题目选项"
+
+	# 所属问题
+	question = models.ForeignKey('Question', null=False, on_delete=models.CASCADE,
+								 verbose_name="所属问题")
 
 
 # ===================================================
@@ -92,6 +101,304 @@ class QuesPicture(models.Model):
 			'desc_pic': self.desc_pic,
 			'data': self.convertToBase64()
 		}
+
+
+# ===================================================
+#  题目类型枚举
+# ===================================================
+class QuestionType(Enum):
+	Single = 0  # 单选题
+	Multiple = 1  # 多选题
+	Judge = 2  # 判断题
+	Other = -1  # 其他
+
+
+# ===================================================
+#  题目状态枚举
+# ===================================================
+class QuestionStatus(Enum):
+	Normal = 0  # 正常
+	Abnormal = 1  # 异常
+	Other = -1  # 其他
+
+
+# ===================================================
+#  基本题目表
+# ===================================================
+class BaseQuestion(models.Model):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "题目"
+
+	TYPES = [
+		(QuestionType.Single.value, '单选题'),
+		(QuestionType.Multiple.value, '多选题'),
+		(QuestionType.Judge.value, '判断题'),
+		(QuestionType.Other.value, '其他题'),
+	]
+
+	# 题干
+	title = models.TextField(verbose_name="题干")
+
+	# 题解
+	description = models.TextField(null=True, blank=True, verbose_name="题解")
+
+	# 类型ID
+	type = models.PositiveSmallIntegerField(default=QuestionType.Single.value,
+											choices=TYPES, verbose_name="类型")
+
+	# 测试题目
+	for_test = models.BooleanField(default=False, verbose_name="测试")
+
+	def __str__(self):
+
+		return self.title[:32]
+
+	# 生成随机编号
+	def number(self): return self.id
+
+	# 正确答案（编号）文本
+	def adminCorrectAnswer(self):
+
+		text = ""
+		answers = self.correctAnswer()
+
+		for answer in answers:
+			text += chr(65 + answer) + ' '
+
+		return text
+
+	adminCorrectAnswer.short_description = "正确选项"
+
+	def convertToDict(self, type=None):
+
+		if type == 'info':
+			return {
+				'id': self.id,
+			}
+
+		choices = ModelUtils.objectsToDict(self.choices())
+
+		return {
+			'id': self.id,
+			'number': self.number(),
+			'title': self.title,
+			'description': self.description,
+			'type': self.type,
+
+			'choices': choices,
+		}
+
+	# 正确答案（编号）
+	def correctAnswer(self):
+
+		answers = []
+		for choice in self.correctChoices():
+			answers.append(choice.order)
+
+		return answers
+
+	# 选项
+	def choices(self):
+		raise NotImplementedError
+
+	# 正确选项
+	def correctChoices(self):
+		return self.choices().filter(answer=True)
+
+	# 计算选择是否正确
+	def calcCorrect(self, selection):
+
+		count = 0
+		answers = self.correctAnswer()
+
+		for select in selection:
+			if select not in answers: return False
+			else: count += 1
+
+		return count == len(answers)
+
+
+# ===================================================
+#  题目表
+# ===================================================
+class Question(BaseQuestion):
+	class Meta:
+
+		verbose_name = verbose_name_plural = "题目"
+
+	# 常量声明
+	DEFAULT_SCORE = 6
+	UNDER_SELECT_SCORE_RATE = 0.5
+
+	# 起始编号
+	NUMBER_BASE = 10000
+
+	STATUSES = [
+		(QuestionStatus.Normal.value, '正常'),
+		(QuestionStatus.Abnormal.value, '异常'),
+		(QuestionStatus.Other.value, '其他')
+	]
+
+	# 来源
+	source = models.TextField(null=True, blank=True, verbose_name="来源")
+
+	# 星数
+	star = models.ForeignKey('game_module.QuestionStar', default=1, on_delete=models.CASCADE,
+							 verbose_name="星级")
+
+	# 题目附加等级（计算用）
+	level = models.SmallIntegerField(default=0, verbose_name="附加等级")
+
+	# 分值
+	score = models.PositiveSmallIntegerField(default=DEFAULT_SCORE, verbose_name="分值")
+
+	# 科目
+	subject = models.ForeignKey('game_module.Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
+
+	# 创建时间
+	create_time = models.DateTimeField(auto_now_add=True, verbose_name="收录时间")
+
+	# 状态
+	status = models.PositiveSmallIntegerField(default=QuestionStatus.Normal.value,
+											  choices=STATUSES, verbose_name="状态")
+
+	# 删除标记
+	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
+
+	def convertToDict(self, type=None):
+
+		res = super().convertToDict(type)
+
+		if type == 'info':
+			res['star_id'] = self.star_id
+			res['subject_id'] = self.subject_id
+
+			return res
+
+		create_time = ModelUtils.timeToStr(self.create_time)
+		pictures = ModelUtils.objectsToDict(self.pictures())
+
+		res['source'] = self.source
+		res['level'] = self.level
+		res['score'] = self.score
+		res['status'] = self.status
+
+		res['star_id'] = self.star_id
+		res['subject_id'] = self.subject_id
+
+		res['create_time'] = create_time
+		res['pictures'] = pictures
+
+		return res
+
+		# return {
+		# 	'id': self.id,
+		# 	'number': self.number(),
+		# 	'title': self.title,
+		# 	'description': self.description,
+		# 	'source': self.source,
+		# 	'star_id': self.star.id,
+		# 	'level': self.level,
+		# 	'score': self.score,
+		# 	'subject_id': self.subject_id,
+		# 	'type': self.type,
+		# 	'status': self.status,
+		#
+		# 	'create_time': create_time,
+		#
+		# 	'choices': choices,
+		# 	'pictures': pictures
+		# }
+	#
+	# # 正确答案（编号）
+	# def correctAnswer(self):
+	#
+	# 	answers = []
+	# 	for choice in self.correctChoices():
+	# 		answers.append(choice.order)
+	#
+	# 	return answers
+
+	# 选项
+	def choices(self):
+		return self.queschoice_set.all()
+
+	# # 正确选项
+	# def correctChoices(self):
+	# 	return self.choices().filter(answer=True)
+	#
+	# # 计算选择是否正确
+	# def calcCorrect(self, selection):
+	#
+	# 	count = 0
+	# 	answers = self.correctAnswer()
+	#
+	# 	for select in selection:
+	# 		if select not in answers: return False
+	# 		else: count += 1
+	#
+	# 	return count == len(answers)
+
+	# 计算分数
+	def calcScore(self, selection):
+
+		count = 0
+		answers = self.correctAnswer()
+
+		for select in selection:
+			if select not in answers: return 0
+			else: count += 1
+
+		if count == len(answers): return self.score
+		elif count > 0: return round(self.score * self.UNDER_SELECT_SCORE_RATE)
+		else: return 0
+
+	# 图片
+	def pictures(self):
+		return self.quespicture_set.all()
+
+	# 基础经验值增量
+	def expIncr(self):
+		return self.star.exp_incr
+
+	# 基础金币增量
+	def goldIncr(self):
+		return self.star.gold_incr
+
+	# 总等级
+	def sumLevel(self):
+		return self.star.level + self.level
+
+
+# ===================================================
+#  组合题
+# ===================================================
+class GroupQuestion(models.Model):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "组合题"
+
+	# 文章
+	article = models.TextField(null=True, blank=True, verbose_name="文章")
+
+	# 来源
+	source = models.TextField(null=True, blank=True, verbose_name="来源")
+
+	def convertToDict(self):
+		sub_questions = ModelUtils.objectsToDict(self.subQuestions())
+
+		return {
+			'id': self.id,
+			'article': self.article,
+			'source': self.source,
+
+			'sub_questions': sub_questions,
+		}
+
+	def subQuestions(self) -> QuerySet:
+		raise NotImplementedError
 
 
 # ===================================================
@@ -195,206 +502,7 @@ class QuesReport(models.Model):
 		}
 
 
-# ===================================================
-#  题目类型枚举
-# ===================================================
-class QuestionType(Enum):
-	Single = 0  # 单选题
-	Multiple = 1  # 多选题
-	Judge = 2  # 判断题
-	Other = -1  # 其他
-
-
-# ===================================================
-#  题目状态枚举
-# ===================================================
-class QuestionStatus(Enum):
-	Normal = 0  # 正常
-	Abnormal = 1  # 异常
-	Other = -1  # 其他
-
-
-# ===================================================
-#  题目表
-# ===================================================
-class Question(models.Model):
-	class Meta:
-
-		verbose_name = verbose_name_plural = "题目"
-
-	# 常量声明
-	DEFAULT_SCORE = 6
-	CORRECT_PRESSURE_RATE = 0.25
-	UNDER_SELECT_SCORE_RATE = 0.5
-
-	# 起始编号
-	NUMBER_BASE = 10000
-
-	TYPES = [
-		(QuestionType.Single.value, '单选题'),
-		(QuestionType.Multiple.value, '多选题'),
-		(QuestionType.Judge.value, '判断题'),
-		(QuestionType.Other.value, '其他题'),
-	]
-
-	STATUSES = [
-		(QuestionStatus.Normal.value, '正常'),
-		(QuestionStatus.Abnormal.value, '异常'),
-		(QuestionStatus.Other.value, '其他')
-	]
-
-	# 题干
-	title = models.TextField(verbose_name="题干")
-
-	# 题解
-	description = models.TextField(null=True, blank=True, verbose_name="题解")
-
-	# 来源
-	source = models.TextField(null=True, blank=True, verbose_name="来源")
-
-	# 星数
-	star = models.ForeignKey('game_module.QuestionStar', default=1, on_delete=models.CASCADE,
-							 verbose_name="星级")
-
-	# 题目附加等级（计算用）
-	level = models.SmallIntegerField(default=0, verbose_name="附加等级")
-
-	# 分值
-	score = models.PositiveSmallIntegerField(default=DEFAULT_SCORE, verbose_name="分值")
-
-	# 科目
-	subject = models.ForeignKey('game_module.Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
-
-	# 创建时间
-	create_time = models.DateTimeField(auto_now_add=True, verbose_name="收录时间")
-
-	# 类型ID
-	type = models.PositiveSmallIntegerField(default=QuestionType.Single.value,
-											choices=TYPES, verbose_name="类型")
-
-	# 测试题目
-	for_test = models.BooleanField(default=False, verbose_name="测试")
-
-	# 状态
-	status = models.PositiveSmallIntegerField(default=QuestionStatus.Normal.value,
-											  choices=STATUSES, verbose_name="状态")
-
-	# 删除标记
-	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
-
-	def __str__(self):
-
-		return self.title
-
-	# 生成随机编号
-	def number(self):
-		return self.NUMBER_BASE + self.id
-
-	# 正确答案（编号）文本
-	def adminCorrectAnswer(self):
-
-		text = ""
-		answers = self.correctAnswer()
-
-		for answer in answers:
-			text += chr(65 + answer) + ' '
-
-		return text
-
-	adminCorrectAnswer.short_description = "正确选项"
-
-	def convertToDict(self, type=None):
-
-		if type == 'info':
-			return {
-				'id': self.id,
-				'star_id': self.star.id,
-				'subject_id': self.subject.id,
-			}
-
-		create_time = ModelUtils.timeToStr(self.create_time)
-
-		choices = ModelUtils.objectsToDict(self.choices())
-		pictures = ModelUtils.objectsToDict(self.pictures())
-
-		return {
-			'id': self.id,
-			'number': self.number(),
-			'title': self.title,
-			'description': self.description,
-			'source': self.source,
-			'star_id': self.star.id,
-			'level': self.level,
-			'score': self.score,
-			'subject_id': self.subject_id,
-			'type': self.type,
-			'status': self.status,
-
-			'create_time': create_time,
-
-			'choices': choices,
-			'pictures': pictures
-		}
-
-	# 正确答案（编号）
-	def correctAnswer(self):
-
-		answers = []
-		for choice in self.correctChoices():
-			answers.append(choice.order)
-
-		return answers
-
-	# 选项
-	def choices(self):
-		return self.queschoice_set.all()
-
-	# 正确选项
-	def correctChoices(self):
-		return self.choices().filter(answer=True)
-
-	# 计算选择是否正确
-	def calcCorrect(self, selection):
-
-		count = 0
-		answers = self.correctAnswer()
-
-		for select in selection:
-			if select not in answers: return False
-			else: count += 1
-
-		return count == len(answers)
-
-	# 计算分数
-	def calcScore(self, selection):
-
-		count = 0
-		answers = self.correctAnswer()
-
-		for select in selection:
-			if select not in answers: return 0
-			else: count += 1
-
-		if count == len(answers): return self.score
-		elif count > 0: return round(self.score * self.UNDER_SELECT_SCORE_RATE)
-		else: return 0
-
-	# 图片
-	def pictures(self):
-		return self.quespicture_set.all()
-
-	# 基础经验值增量
-	def expIncr(self):
-		return self.star.exp_incr
-
-	# 基础金币增量
-	def goldIncr(self):
-		return self.star.gold_incr
-
-	# 总等级
-	def sumLevel(self):
-		return self.star.level + self.level
-
+# region 物品
 
 # ===================================================
 #  题目糖属性值表
@@ -588,3 +696,5 @@ class QuesSugarPackItem(PackContItem):
 			返回当前物品是否可用
 		"""
 		return occasion == ItemUseOccasion.Battle
+
+# endregion

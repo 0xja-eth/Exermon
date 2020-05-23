@@ -291,6 +291,25 @@ class QuestionImageUpload(SystemImageUpload):
 		return filename+ext
 
 
+# ===================================================
+#  题目音频
+# ===================================================
+@deconstructible
+class QuestionAudioUpload(SystemImageUpload):
+
+	IMAGE_DIR = 'question/audio'
+
+	def generateFileName(self, instance, filename):
+
+		# 文件拓展名
+		ext = os.path.splitext(filename)[1]
+
+		# 定义文件名
+		filename = "question_%d" % instance.question.id
+
+		return filename+ext
+
+
 # ============================================
 # 公用类：处理模型函数的共有业务逻辑
 # ============================================

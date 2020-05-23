@@ -18,16 +18,23 @@ import xadmin
 # 	style = "one"
 
 
-class QuesChoicesInline(object):
+class BaseQuesChoicesInline(object):
 
-	model = QuesChoice
 	style = "table"
+
+
+class BaseQuestionsInline(object):
+
+	style = "accordion"
 
 
 class QuesPicturesInline(object):
 
 	model = QuesPicture
 	style = "table"
+
+
+class QuesChoicesInline(BaseQuesChoicesInline): model = QuesChoice
 
 
 class QuesSugarParamsInline(ParamsInline): model = QuesSugarParam
@@ -47,14 +54,32 @@ class QuesSugarPriceInline(CurrencyInline): model = QuesSugarPrice
 # 	list_editable = ['sugar', 'gold', 'ticket', 'bound_ticket']
 
 
+class BaseQuestionAdmin(object):
+
+	list_display = ['id', 'title', 'type', 'for_test']
+
+	list_editable = ['type', 'for_test']
+
+	# form_layout = [Fieldset('题目主体', 'name', 'description')]
+
+
+class GroupQuestionAdmin(object):
+
+	list_display = ['id', 'material', 'source']
+
+	list_editable = ['source']
+
+	# form_layout = [Fieldset('题目主体', 'name', 'description')]
+
+
 @xadmin.sites.register(Question)
-class QuestionAdmin(object):
+class QuestionAdmin(BaseQuestionAdmin):
 
-	list_display = ['id', 'title', 'star', 'score', 'subject',
-					'create_time', 'type', 'for_test', 'status', 'is_deleted']
+	list_display = BaseQuestionAdmin.list_display + \
+				   ['star', 'score', 'subject', 'create_time', 'status', 'is_deleted']
 
-	list_editable = ['star', 'score', 'subject',
-					 'type', 'for_test', 'status', 'is_deleted']
+	list_editable = BaseQuestionAdmin.list_editable + \
+					['star', 'score', 'subject', 'status', 'is_deleted']
 
 	# form_layout = [Fieldset('题目主体', 'name', 'description')]
 
