@@ -73,6 +73,9 @@ class Service:
 		from player_module.models import Character, HumanItem, HumanEquip
 		from question_module.models import QuesSugar
 
+		# eng_pro
+		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy
+
 		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
 		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
 		exer_skills = ModelUtils.objectsToDict(ExerSkill.objects.all())
@@ -84,6 +87,12 @@ class Service:
 		ques_sugars = ModelUtils.objectsToDict(QuesSugar.objects.all())
 		characters = ModelUtils.objectsToDict(Character.objects.all())
 
+		# eng_pro
+		exer_pro_items = ModelUtils.objectsToDict(ExerProItem.objects.all())
+		exer_pro_potions = ModelUtils.objectsToDict(ExerProPotion.objects.all())
+		exer_pro_cards = ModelUtils.objectsToDict(ExerProCard.objects.all())
+		exer_pro_enemies = ModelUtils.objectsToDict(ExerProEnemy.objects.all())
+
 		return {
 			'exermons': exermons,
 			'exer_frags': exer_frags,
@@ -94,7 +103,13 @@ class Service:
 			'human_items': human_items,
 			'human_equips': human_equips,
 			'ques_sugars': ques_sugars,
-			'characters': characters
+			'characters': characters,
+
+			# eng_pro
+			'exer_pro_items': exer_pro_items,
+			'exer_pro_potions': exer_pro_potions,
+			'exer_pro_cards': exer_pro_cards,
+			'exer_pro_enemies': exer_pro_enemies,
 		}
 
 	# 生成主体数据

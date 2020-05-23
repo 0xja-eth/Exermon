@@ -9,6 +9,8 @@ from enum import Enum
 
 # Create your models here.
 
+# region 题目
+
 
 # ===================================================
 #  题目选项表
@@ -390,3 +392,164 @@ class WordRecord(models.Model):
 # 	def convertToDict(self):
 # 		return self.source
 #
+
+# endregion
+
+# region 物品
+
+# ===================================================
+#  特训物品表
+# ===================================================
+class ExerProItem(BaseItem):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训物品"
+
+	# 道具类型
+	TYPE = ItemType.ExerProItem
+
+
+# ===================================================
+#  特训药水表
+# ===================================================
+class ExerProPotion(BaseItem):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训物品"
+
+	# 道具类型
+	TYPE = ItemType.ExerProPotion
+
+	# HP回复点数
+	hp_recover = models.SmallIntegerField(default=0, verbose_name="HP回复点数")
+
+	# HP回复率（*100）
+	hp_rate = models.IntegerField(default=0, verbose_name="HP回复率")
+
+	# 力量提升点数
+	power_add = models.SmallIntegerField(default=0, verbose_name="力量提升点数")
+
+	# 力量提升率（*100）（提升的概率，即计算中要+1）
+	power_rate = models.IntegerField(default=0, verbose_name="力量提升率")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['hp_recover'] = self.hp_recover
+		res['hp_rate'] = self.hp_rate
+		res['power_add'] = self.power_add
+		res['power_rate'] = self.power_rate
+
+		return res
+
+
+# ===================================================
+#  卡片类型枚举
+# ===================================================
+class ExerProCardType(Enum):
+
+	Normal = 1  # 普通
+	Evil = 2  # 诅咒
+
+
+# ===================================================
+#  特训卡片表
+# ===================================================
+class ExerProCard(BaseItem):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训卡片"
+
+	# 道具类型
+	TYPE = ItemType.ExerProCard
+
+	CARD_TYPES = [
+		(ExerProCardType.Normal.value, '普通'),
+		(ExerProCardType.Evil.value, '诅咒'),
+	]
+
+	# 消耗能量
+	cost = models.PositiveSmallIntegerField(default=1, verbose_name="消耗能量")
+
+	# 卡片类型
+	card_type = models.PositiveSmallIntegerField(
+		default=ExerProCardType.Normal.value, choices=CARD_TYPES, verbose_name="卡片类型")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['cost'] = self.cost
+		res['card_type'] = self.card_type
+
+		return res
+
+
+# ===================================================
+#  敌人等级枚举
+# ===================================================
+class ExerProEnemyLevel(Enum):
+
+	Normal = 1  # 普通
+	Elite = 2  # 精英
+	Boss = 3  # BOSS
+
+
+# ===================================================
+#  特训敌人表
+# ===================================================
+class ExerProEnemy(BaseItem):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训敌人"
+
+	# 道具类型
+	TYPE = ItemType.ExerProEnemy
+
+	LEVELS = [
+		(ExerProEnemyLevel.Normal.value, '普通'),
+		(ExerProEnemyLevel.Elite.value, '精英'),
+		(ExerProEnemyLevel.Boss.value, 'BOSS'),
+	]
+
+	# 最大体力值
+	mhp = models.PositiveSmallIntegerField(default=100, verbose_name="最大体力值")
+
+	# 力量
+	power = models.PositiveSmallIntegerField(default=10, verbose_name="力量")
+
+	# 等级
+	level = models.PositiveSmallIntegerField(
+		default=ExerProEnemyLevel.Normal.value, choices=LEVELS, verbose_name="等级")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['mhp'] = self.mhp
+		res['power'] = self.power
+		res['level'] = self.level
+
+		return res
+
+
+# endregion
+
+

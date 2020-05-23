@@ -548,7 +548,7 @@ class QuesSugar(BaseItem):
 		verbose_name = verbose_name_plural = "题目糖"
 
 	# 道具类型
-	TYPE = ItemType.Exermon
+	TYPE = ItemType.QuesSugar
 
 	# 题目
 	question = models.ForeignKey("Question", on_delete=models.CASCADE, verbose_name="对应题目")

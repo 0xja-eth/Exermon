@@ -953,6 +953,7 @@ class GameConfigure(models.Model):
 		from question_module.models import Question, QuesReport
 		from record_module.models import QuestionRecord, ExerciseRecord
 		from battle_module.models import BattleRecord, BattlePlayer, BattleRoundResult
+		from english_pro_module.models import WrongItem, ExerProCard, ExerProEnemy
 
 		subjects = ModelUtils.objectsToDict(self.subject_set.all())
 		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
@@ -1010,6 +1011,11 @@ class GameConfigure(models.Model):
 			'round_result_types': BattleRoundResult.RESULT_TYPES,
 			'battle_result_types': BattlePlayer.RESULT_TYPES,
 			'battle_statuses': BattlePlayer.STATUSES,
+
+			# english_pro_module
+			'correct_types': WrongItem.TYPES,
+			'card_types': ExerProCard.CARD_TYPES,
+			'enemy_levels': ExerProEnemy.LEVELS,
 
 			# 组合配置
 			'subjects': subjects,
