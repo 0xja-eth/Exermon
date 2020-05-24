@@ -34,6 +34,8 @@ namespace ExerPro.EnglishModule { }
 /// </summary>
 namespace ExerPro.EnglishModule.Data {
 
+    #region 题目
+
     /// <summary>
     /// 听力小题
     /// </summary>
@@ -83,6 +85,14 @@ namespace ExerPro.EnglishModule.Data {
             public int type { get; protected set; }
             [AutoConvert]
             public string word { get; protected set; }
+
+            /// <summary>
+            /// 类型文本
+            /// </summary>
+            /// <returns></returns>
+            public string typeText() {
+                return DataService.get().correctType(type).Item2;
+            }
 
         }
 
@@ -145,4 +155,87 @@ namespace ExerPro.EnglishModule.Data {
         public bool wrong { get; protected set; }
 
     }
+
+    #endregion
+
+    #region 物品
+
+    /// <summary>
+    /// 特训物品数据
+    /// </summary>
+    public class ExerProItem : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+
+    }
+
+    /// <summary>
+    /// 特训药水数据
+    /// </summary>
+    public class ExerProPotion : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int hpRecover { get; protected set; }
+        [AutoConvert]
+        public double hpRate { get; protected set; }
+        [AutoConvert]
+        public int powerAdd { get; protected set; }
+        [AutoConvert]
+        public int powerRate { get; protected set; }
+
+    }
+
+    /// <summary>
+    /// 特训药水数据
+    /// </summary>
+    public class ExerProCard : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int cost { get; protected set; }
+        [AutoConvert]
+        public int cardType { get; protected set; }
+
+        /// <summary>
+        /// 类型文本
+        /// </summary>
+        /// <returns></returns>
+        public string typeText() {
+            return DataService.get().cardType(cardType).Item2;
+        }
+    }
+
+    /// <summary>
+    /// 特训敌人数据
+    /// </summary>
+    public class ExerProEnemy : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int mhp { get; protected set; }
+        [AutoConvert]
+        public int power { get; protected set; }
+        [AutoConvert]
+        public int level { get; protected set; }
+
+        /// <summary>
+        /// 类型文本
+        /// </summary>
+        /// <returns></returns>
+        public string levelText() {
+            return DataService.get().enemyLevel(level).Item2;
+        }
+    }
+
+    #endregion
+
 }

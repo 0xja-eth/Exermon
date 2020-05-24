@@ -13,6 +13,8 @@ using QuestionModule.Data;
 using SeasonModule.Data;
 using BattleModule.Data;
 
+using ExerPro.EnglishModule.Data;
+
 using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
@@ -419,9 +421,20 @@ namespace GameModule.Data {
         public Tuple<int, string>[] battleResultTypes { get; protected set; }
         [AutoConvert]
         public Tuple<int, string>[] battleStatuses { get; protected set; }
+
         [AutoConvert]
         public Tuple<int, string>[] itemUseTargetTypes { get; protected set; }
-        
+
+        /// <summary>
+        /// 英语特训
+        /// </summary>
+        [AutoConvert]
+        public Tuple<int, string>[] correctTypes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] cardTypes { get; protected set; }
+        [AutoConvert]
+        public Tuple<int, string>[] enemyLevels { get; protected set; }
+
         /// <summary>
         /// 组合配置
         /// </summary>
@@ -477,5 +490,18 @@ namespace GameModule.Data {
         public ExerEquip[] exerEquips { get; protected set; }
         [AutoConvert]
         public QuesSugar[] quesSugars { get; protected set; }
+
+        /// <summary>
+        /// 英语特训
+        /// </summary>
+        [AutoConvert]
+        public ExerProItem[] exerProItems { get; protected set; }
+        [AutoConvert]
+        public ExerProPotion[] exerProPotions { get; protected set; }
+        [AutoConvert]
+        public ExerProCard[] exerProCards { get; protected set; }
+        [AutoConvert]
+        public ExerProEnemy[] exerProEnemies { get; protected set; }
+
     }
 }

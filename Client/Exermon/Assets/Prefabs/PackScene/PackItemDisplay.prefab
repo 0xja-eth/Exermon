@@ -252,10 +252,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   background: {fileID: 0}
+  disabledFlag: {fileID: 0}
   selectedFlag: {fileID: 4717837089779701899}
   checkedFlag: {fileID: 0}
   highlightFlag: {fileID: 6459022187564992978}
   actived: 1
+  _enabled: 1
   selectable: 1
   checkable: 0
   highlightable: 1

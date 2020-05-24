@@ -443,9 +443,9 @@ class ExerProPotion(BaseItem):
 		res = super().convertToDict()
 
 		res['hp_recover'] = self.hp_recover
-		res['hp_rate'] = self.hp_rate
+		res['hp_rate'] = self.hp_rate / 100
 		res['power_add'] = self.power_add
-		res['power_rate'] = self.power_rate
+		res['power_rate'] = self.power_rate / 100
 
 		return res
 

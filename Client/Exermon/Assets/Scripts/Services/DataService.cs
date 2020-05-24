@@ -16,6 +16,8 @@ using QuestionModule.Data;
 using SeasonModule.Data;
 using BattleModule.Data;
 
+using ExerPro.EnglishModule.Data;
+
 namespace GameModule.Services {
 
     /// <summary>
@@ -378,6 +380,15 @@ namespace GameModule.Services {
         public Tuple<int, string> itemUseTargetType(int id) {
             return get(staticData.configure.itemUseTargetTypes, id);
         }
+        public Tuple<int, string> correctType(int id) {
+            return get(staticData.configure.correctTypes, id);
+        }
+        public Tuple<int, string> cardType(int id) {
+            return get(staticData.configure.cardTypes, id);
+        }
+        public Tuple<int, string> enemyLevel(int id) {
+            return get(staticData.configure.enemyLevels, id);
+        }
 
         /// <summary>
         /// 组合配置
@@ -448,6 +459,18 @@ namespace GameModule.Services {
         }
         public QuesSugar quesSugar(int id) {
             return get(staticData.data.quesSugars, id);
+        }
+        public ExerProItem exerProItem(int id) {
+            return get(staticData.data.exerProItems, id);
+        }
+        public ExerProPotion exerProPotion(int id) {
+            return get(staticData.data.exerProPotions, id);
+        }
+        public ExerProCard exerProCard(int id) {
+            return get(staticData.data.exerProCards, id);
+        }
+        public ExerProEnemy exerProEnemy(int id) {
+            return get(staticData.data.exerProEnemies, id);
         }
 
         /// <summary>
