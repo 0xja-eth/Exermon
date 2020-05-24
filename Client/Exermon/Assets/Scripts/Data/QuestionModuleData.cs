@@ -96,7 +96,7 @@ namespace QuestionModule.Data {
         /// <summary>
         /// 打乱的选项
         /// </summary>
-        Choice[] _shuffleChoices { get; set; } = null;
+        Choice[] shuffledChoices { get; set; } = null;
 
         #region 数据转换
 
@@ -126,7 +126,7 @@ namespace QuestionModule.Data {
         /// </summary>
         /// <returns>返回打乱的选项</returns>
         public Choice[] shuffleChoices() {
-            if (_shuffleChoices == null) {
+            if (shuffledChoices == null) {
                 int map = 0, cnt = choices.Length;
                 var res = new Choice[cnt];
                 for (int i = 0; i < cnt; ++i) {
@@ -136,16 +136,16 @@ namespace QuestionModule.Data {
                     res[index] = choices[i];
                     map = map | (1 << index);
                 }
-                _shuffleChoices = res;
+                shuffledChoices = res;
             }
-            return _shuffleChoices;
+            return shuffledChoices;
         }
 
         /// <summary>
         /// 清空打乱题目
         /// </summary>
         public void clearShuffleChoices() {
-            _shuffleChoices = null;
+            shuffledChoices = null;
         }
 
         #endregion

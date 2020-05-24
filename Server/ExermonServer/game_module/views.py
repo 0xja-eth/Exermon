@@ -74,7 +74,7 @@ class Service:
 		from question_module.models import QuesSugar
 
 		# eng_pro
-		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy
+		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy, Map
 
 		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
 		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
@@ -93,6 +93,8 @@ class Service:
 		exer_pro_cards = ModelUtils.objectsToDict(ExerProCard.objects.all())
 		exer_pro_enemies = ModelUtils.objectsToDict(ExerProEnemy.objects.all())
 
+		exer_pro_maps = ModelUtils.objectsToDict(Map)
+
 		return {
 			'exermons': exermons,
 			'exer_frags': exer_frags,
@@ -110,6 +112,8 @@ class Service:
 			'exer_pro_potions': exer_pro_potions,
 			'exer_pro_cards': exer_pro_cards,
 			'exer_pro_enemies': exer_pro_enemies,
+
+			'exer_pro_maps': exer_pro_maps,
 		}
 
 	# 生成主体数据

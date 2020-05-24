@@ -53,6 +53,8 @@ namespace Core.Systems {
             public const string BattleResultScene = "BattleResultScene";
             public const string BattleAnswerScene = "BattleAnswerScene";
 
+            public const string EnglishProMapScene = "Scenes/ExerPro/EnglishPro/MapScene";
+
             public const string HelpScene = "HelpScene";
         }
 

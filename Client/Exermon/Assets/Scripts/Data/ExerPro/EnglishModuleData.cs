@@ -60,7 +60,7 @@ namespace ExerPro.EnglishModule.Data {
     public class ReadingSubQuestion : BaseQuestion { }
 
     /// <summary>
-    /// 听力题
+    /// 阅读题
     /// </summary>
     public class ReadingQuestion : GroupQuestion<ReadingSubQuestion> { }
 
@@ -234,6 +234,93 @@ namespace ExerPro.EnglishModule.Data {
         public string levelText() {
             return DataService.get().enemyLevel(level).Item2;
         }
+    }
+
+    #endregion
+
+    #region 地图
+
+    /// <summary>
+    /// 地图阶段数据
+    /// </summary>
+    class Map : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string name { get; protected set; }
+        [AutoConvert]
+        public string description { get; protected set; }
+        [AutoConvert]
+        public int level { get; protected set; }
+        [AutoConvert]
+        public int minLevel { get; protected set; }
+
+        [AutoConvert]
+        public MapStage[] stages { get; protected set; }
+    }
+
+    /// <summary>
+    /// 地图关卡
+    /// </summary>
+    class MapStage : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int order { get; protected set; }
+        [AutoConvert]
+        public int[] enemies { get; protected set; }
+        [AutoConvert]
+        public int maxBattleEnemies { get; protected set; }
+        [AutoConvert]
+        public int[] steps { get; protected set; }
+        [AutoConvert]
+        public int maxForkNode { get; protected set; }
+        [AutoConvert]
+        public int maxFork { get; protected set; }
+        [AutoConvert]
+        public int[] nodeRate { get; protected set; }
+
+        [AutoConvert]
+        public List<Node> nodes { get; protected set; }
+    }
+
+    /// <summary>
+    /// 据点
+    /// </summary>
+    class Node : BaseData {
+
+        /// <summary>
+        /// 据点类型
+        /// </summary>
+        public enum Type {
+            Rest = 0, //休息据点
+	        Treasure = 1, //藏宝据点
+	        Shop = 2, //商人据点
+	        Enemy = 3, //敌人据点
+	        Elite = 4, //精英据点
+	        Unknown = 5, //未知据点
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int xOrder { get; protected set; }
+        [AutoConvert]
+        public int yOrder { get; protected set; }
+        [AutoConvert]
+        public Type type { get; protected set; }
+
+        /// <summary>
+        /// 分叉标记
+        /// </summary>
+        public bool fork = false;
+
+
     }
 
     #endregion

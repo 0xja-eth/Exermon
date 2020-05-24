@@ -4,7 +4,7 @@ from item_module.models import *
 from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
 from utils.model_utils import QuestionAudioUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
-import os, base64, datetime
+import os, base64, datetime, jsonfield
 from enum import Enum
 
 # Create your models here.
@@ -552,4 +552,116 @@ class ExerProEnemy(BaseItem):
 
 # endregion
 
+# region 地图
+
+
+# ===================================================
+#  地图表
+# ===================================================
+class Map(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = "地图"
+
+	# 地图名称
+	name = models.CharField(max_length=24, verbose_name="地图名称")
+
+	# 故事描述
+	description = models.CharField(max_length=512, verbose_name="故事描述")
+
+	# 地图难度
+	level = models.PositiveSmallIntegerField(default=1, verbose_name="地图难度")
+
+	# 等级要求
+	min_level = models.PositiveSmallIntegerField(default=1, verbose_name="等级要求")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		stages = ModelUtils.objectsToDict(self.stages())
+
+		return {
+			'id': self.id,
+			'name': self.name,
+			'description': self.description,
+			'level': self.level,
+			'min_level': self.min_level,
+
+			'stages': stages
+		}
+
+	def stages(self):
+		"""
+		获取所有关卡
+		Returns:
+			返回关卡 QuerySet
+		"""
+		return self.mapstage_set.all()
+
+
+# ===================================================
+#  据点类型表
+# ===================================================
+class NodeType(Enum):
+	Rest = 0  # 休息据点
+	Treasure = 1  # 藏宝据点
+	Shop = 2  # 商人据点
+	Enemy = 3  # 敌人据点
+	Elite = 4  # 精英据点
+	Unknown = 5  # 未知据点
+
+
+# ===================================================
+#  地图关卡表
+# ===================================================
+class MapStage(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = "地图关卡"
+
+	# 序号
+	order = models.PositiveSmallIntegerField(default=1, verbose_name="序号")
+
+	# 地图
+	map = models.ForeignKey("Map", on_delete=models.CASCADE, verbose_name="地图")
+
+	# 敌人集合（本阶段会刷的敌人）
+	enemies = models.ManyToManyField("ExerProEnemy", verbose_name="敌人集合")
+
+	# 战斗最大敌人数量
+	max_battle_enemies = models.PositiveSmallIntegerField(default=1, verbose_name="战斗最大敌人数量")
+
+	# 每步据点个数（最后一个需为1）
+	steps = jsonfield.JSONField(default=[3, 4, 5, 2, 1], verbose_name="每步据点个数")
+
+	# 最大分叉据点数量
+	max_fork_node = models.PositiveSmallIntegerField(default=5, verbose_name="最大分叉据点数量")
+
+	# 最大分叉选择数
+	max_fork = models.PositiveSmallIntegerField(default=3, verbose_name="最大分叉选择数")
+
+	# 据点比例（一共6种据点，按照该比例的几率进行生成，实际不一定为该比例）
+	node_rate = jsonfield.JSONField(default=[1, 1, 1, 1, 1, 1], verbose_name="据点比例")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		enemies = list(e.id for e in self.enemies.all())
+
+		return {
+			'order': self.order,
+			'max_battle_enemies': self.max_battle_enemies,
+			'steps': self.steps,
+			'max_fork_node': self.max_fork_node,
+			'max_fork': self.max_fork,
+			'node_rate': self.node_rate,
+
+			'enemies': enemies,
+		}
+
+# endregion
 

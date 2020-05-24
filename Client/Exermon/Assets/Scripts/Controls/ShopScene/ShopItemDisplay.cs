@@ -136,6 +136,7 @@ namespace UI.ShopScene.Controls {
         }
 
         #endregion
+
         /*
         #region 接口实现
 

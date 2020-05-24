@@ -44,4 +44,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ShopScene.unity
     guid: 2d14b73f27d242f49b8edd4a2a385346
+  - enabled: 1
+    path: Assets/Scenes/Demos/TestScene.unity
+    guid: b9dd2f3ae9291554588bdb02d5e6a531
+  - enabled: 0
+    path: Assets/Scenes/Demos/Test/TestScene.unity
+    guid: 8a6ab9ee565b0a141803d516c368fbc2
   m_configObjects: {}
