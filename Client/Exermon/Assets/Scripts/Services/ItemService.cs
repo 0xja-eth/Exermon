@@ -49,7 +49,7 @@ namespace ItemModule.Services {
             /// </summary>
             /// <returns></returns>
             public T item() {
-                return DataService.get().get<T>(getID());
+                return DataService.get().get<T>(id);
             }
 
         }
@@ -140,7 +140,7 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getPack(container.type, container.getID(), _onSuccess, onError);
+            getPack(container.type, container.id, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="cid">容器ID</param>
@@ -188,7 +188,7 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getSlot(container.type, container.getID(), _onSuccess, onError);
+            getSlot(container.type, container.id, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="cid">容器ID</param>
@@ -241,7 +241,7 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            gainItem(container.type, container.getID(), item.type, item.getID(), 
+            gainItem(container.type, container.id, item.type, item.id, 
                 count, realTime, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
@@ -311,7 +311,7 @@ namespace ItemModule.Services {
             var contItemIds = new int[count];
             for (int i = 0; i < count; i++) {
                 ciTypes[i] = contItems[i].type;
-                contItemIds[i] = contItems[i].getID();
+                contItemIds[i] = contItems[i].id;
             }
 
             gainContItems(container.type, ciTypes, contItemIds,
@@ -365,7 +365,7 @@ namespace ItemModule.Services {
             var contItemIds = new int[count];
             for (int i = 0; i < count; i++) {
                 ciTypes[i] = contItems[i].type;
-                contItemIds[i] = contItems[i].getID();
+                contItemIds[i] = contItems[i].id;
             }
 
             lostContItems(container.type, ciTypes, contItemIds, counts,
@@ -428,10 +428,10 @@ namespace ItemModule.Services {
             var contItemIds = new int[count];
             for (int i = 0; i < count; i++) {
                 ciTypes[i] = contItems[i].type;
-                contItemIds[i] = contItems[i].getID();
+                contItemIds[i] = contItems[i].id;
             }
 
-            transferItems(container.type, target.getID(), ciTypes,
+            transferItems(container.type, target.id, ciTypes,
                 contItemIds, counts, _onSuccess, onError);
         }
         public void transferItems<T>(PackContainer<T> container, 
@@ -448,7 +448,7 @@ namespace ItemModule.Services {
             var contItemIds = new int[count];
             for (int i = 0; i < count; i++) {
                 ciTypes[i] = contItems[i].type;
-                contItemIds[i] = contItems[i].getID();
+                contItemIds[i] = contItems[i].id;
             }
 
             transferItems(container.type, targetCid, ciTypes,
@@ -488,7 +488,7 @@ namespace ItemModule.Services {
             };
 
             splitItem(container.type, contItem.type,
-                contItem.getID(), count, _onSuccess, onError);
+                contItem.id, count, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="ciType">容器项类</param>
@@ -521,7 +521,7 @@ namespace ItemModule.Services {
             var contItemIds = new int[count];
             for (int i = 0; i < count; i++) {
                 ciTypes[i] = contItems[i].type;
-                contItemIds[i] = contItems[i].getID();
+                contItemIds[i] = contItems[i].id;
             }
 
             mergeItems(container.type, ciTypes, contItemIds, _onSuccess, onError);
@@ -555,7 +555,7 @@ namespace ItemModule.Services {
             };
 
             discardItem(container.type, contItem.type,
-                contItem.getID(), count, _onSuccess, onError);
+                contItem.id, count, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="ciType">容器项类型</param>
@@ -588,7 +588,7 @@ namespace ItemModule.Services {
             };
 
             sellItem(container.type, contItem.type,
-                contItem.getID(), count, _onSuccess, onError);
+                contItem.id, count, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
         /// <param name="ciType">容器项类型</param>
@@ -621,8 +621,8 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            useItem(container.type, contItem.type, contItem.getID(),
-                count, (int)occasion, playerExer.getID(), _onSuccess, onError);
+            useItem(container.type, contItem.type, contItem.id,
+                count, (int)occasion, playerExer.id, _onSuccess, onError);
         }
         /// <param name="target">目标</param>
         public void useItem<T>(PackContainer<T> container, T contItem,
@@ -634,7 +634,7 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            useItem(container.type, contItem.type, contItem.getID(),
+            useItem(container.type, contItem.type, contItem.id,
                 count, (int)occasion, 0, _onSuccess, onError);
         }
         /// <param name="type">容器类型</param>
@@ -666,7 +666,7 @@ namespace ItemModule.Services {
                 onSuccess?.Invoke();
             };
 
-            buyItem(item.type, item.getID(), count, buyType, _onSuccess, onError);
+            buyItem(item.type, item.id, count, buyType, _onSuccess, onError);
         }
         /// <param name="type">物品类型</param>
         /// <param name="itemId">物品ID</param>

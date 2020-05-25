@@ -73,7 +73,7 @@ namespace UI.StartScene.Controls.ExerGift {
             for (int i = 0; i < cnt; ++i) {
                 var gift = items[i].exerGift();
                 if (gift == null) continue;
-                gids.Add(gift.getID());
+                gids.Add(gift.id);
             }
             return gids.ToArray();
         }

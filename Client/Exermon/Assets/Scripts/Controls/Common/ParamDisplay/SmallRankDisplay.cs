@@ -93,7 +93,7 @@ namespace UI.Common.Controls.ParamDisplays {
         protected void drawRank() {
             icon.gameObject.SetActive(true);
             icon.overrideSprite = AssetLoader.
-                getRankIconSprite(rank.getID(), subRank, true);
+                getRankIconSprite(rank.id, subRank, true);
             name.text = generateRankName();
         }
 

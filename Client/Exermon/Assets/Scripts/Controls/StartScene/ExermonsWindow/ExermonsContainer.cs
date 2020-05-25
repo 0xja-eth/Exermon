@@ -122,7 +122,7 @@ namespace UI.StartScene.Controls.Exermon {
             Array.Sort(eids);
 
             for (int i = 0; i < cnt; ++i) {
-                eids[i] = items[eids[i]].getID();
+                eids[i] = items[eids[i]].id;
                 enames[i] = this.enames[eids[i]-1];
             }
             return cnt;

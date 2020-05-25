@@ -197,7 +197,7 @@ namespace GameModule.Services {
         /// <returns>目标数据</returns>
         public static T get<T>(T[] collection, int id) where T : BaseData {
             foreach (var element in collection)
-                if (element.getID() == id) return element;
+                if (element.id == id) return element;
             return default;
         }
 
@@ -209,7 +209,7 @@ namespace GameModule.Services {
         /// <param name="id">ID</param>
         /// <returns>目标数据</returns>
         public static T get<T>(List<T> collection, int id) where T : BaseData {
-            return collection.Find((d) => d.getID() == id);
+            return collection.Find((d) => d.id == id);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace GameModule.Services {
         /// <returns>目标数据</returns>
         public static BaseData get(BaseData[] collection, int id) {
             foreach (var element in collection)
-                if (element.getID() == id) return element;
+                if (element.id == id) return element;
             return default;
         }
 
@@ -246,7 +246,7 @@ namespace GameModule.Services {
         /// <returns>目标数据索引</returns>
         public static int getIndex<T>(T[] collection, int id) where T : BaseData {
             for (int i = 0; i < collection.Length; ++i)
-                if (collection[i].getID() == id) return i;
+                if (collection[i].id == id) return i;
             return -1;
         }
 
@@ -322,7 +322,7 @@ namespace GameModule.Services {
             var res = new Tuple<int, string>[len];
             for (int i = 0; i < len; ++i) 
                 res[i] = new Tuple<int, string>(
-                    data[i].getID(), data[i].name);
+                    data[i].id, data[i].name);
             return res;
         }
 
@@ -471,6 +471,9 @@ namespace GameModule.Services {
         }
         public ExerProEnemy exerProEnemy(int id) {
             return get(staticData.data.exerProEnemies, id);
+        }
+        public ExerProMap exerProMap(int id) {
+            return get(staticData.data.exerProMaps, id);
         }
 
         /// <summary>

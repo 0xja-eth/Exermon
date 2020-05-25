@@ -211,9 +211,9 @@ namespace ExermonModule.Data {
         /// <param name="json">数据</param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            full = AssetLoader.loadExermonFull(getID());
-            icon = AssetLoader.loadExermonIcon(getID());
-            battle = AssetLoader.loadExermonBattle(getID());
+            full = AssetLoader.loadExermonFull(id);
+            icon = AssetLoader.loadExermonIcon(id);
+            battle = AssetLoader.loadExermonBattle(id);
         }
     }
 
@@ -292,8 +292,8 @@ namespace ExermonModule.Data {
         /// <param name="json">数据</param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            icon = AssetLoader.loadExerGift(getID());
-            bigIcon = AssetLoader.loadBigExerGift(getID());
+            icon = AssetLoader.loadExerGift(id);
+            bigIcon = AssetLoader.loadBigExerGift(id);
         }
     }
 
@@ -468,9 +468,9 @@ namespace ExermonModule.Data {
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
 
-            icon = AssetLoader.loadExerSkillIcon(getID());
-            ani = AssetLoader.loadExerSkillAni(getID());
-            targetAni = AssetLoader.loadExerSkillTarget(getID());
+            icon = AssetLoader.loadExerSkillIcon(id);
+            ani = AssetLoader.loadExerSkillAni(id);
+            targetAni = AssetLoader.loadExerSkillTarget(id);
 
             var exer = exermon();
             if (exer != null) exer.addExerSkill(this);
@@ -591,7 +591,7 @@ namespace ExermonModule.Data {
             var data = new JsonData[count];
             for (int i = 0; i < count; ++i) {
                 var json = new JsonData();
-                var paramId = params_[i].getID();
+                var paramId = params_[i].id;
 
                 var levelParam = getLevelParam(paramId).value;
                 var baseParam = getBaseParam(paramId).value;
@@ -1241,10 +1241,10 @@ namespace ExermonModule.Data {
         public PlayerExermon playerExer {
             get {
                 var exerHub = exerSlot.player.packContainers.exerHub;
-                return exerHub.getItem(item => item.getID() == playerExerId);
+                return exerHub.getItem(item => item.id == playerExerId);
             }
             set {
-                playerExerId = value.getID();
+                playerExerId = value.id;
             }
         }
 
@@ -1254,18 +1254,18 @@ namespace ExermonModule.Data {
         public PlayerExerGift playerGift {
             get {
                 var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
-                var playerGift = exerGiftPool.getItem(item => item.getID() == playerGiftId);
+                var playerGift = exerGiftPool.getItem(item => item.id == playerGiftId);
                 return playerGift ?? tmpPlayerGift;
             }
             set {
                 var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
-                var playerGift = exerGiftPool.getItem(item => item.getID() == playerGiftId);
+                var playerGift = exerGiftPool.getItem(item => item.id == playerGiftId);
                 if (playerGift == null) {
                     tmpPlayerGift = value;
-                    playerGiftId = tmpPlayerGift.getID();
+                    playerGiftId = tmpPlayerGift.id;
                 } else {
                     tmpPlayerGift = null;
-                    playerGiftId = value.getID();
+                    playerGiftId = value.id;
                 }
             }
         }
@@ -1452,7 +1452,7 @@ namespace ExermonModule.Data {
 
                 var levelValue = CalcService.ExermonParamCalc.
                     calc(baseValue, baseGrowth, level) - baseValue;
-                var equipValue = exerEquipSlot.getParam(param.getID()).value;
+                var equipValue = exerEquipSlot.getParam(param.id).value;
                 var giftValue = CalcService.ExermonParamCalc.
                     calc(baseValue, growth, level) - levelValue - baseValue;
 
@@ -1557,7 +1557,7 @@ namespace ExermonModule.Data {
         /// </summary>
         /// <param name="exermon">艾瑟萌</param>
         public void setExermon(Exermon exermon) {
-            setEquip(new PlayerExermon(exermon.getID()));
+            setEquip(new PlayerExermon(exermon.id));
         }
         */
         /// <summary>
@@ -1565,10 +1565,10 @@ namespace ExermonModule.Data {
         /// </summary>
         /// <param name="exerGift">艾瑟萌天赋</param>
         public void setExerGift(ExerGift exerGift) {
-            //var playerExer = new PlayerExerGift(exerGift.getID());
+            //var playerExer = new PlayerExerGift(exerGift.id);
             //var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
             //exerGiftPool.pushItem(playerExer);
-            setEquip(new PlayerExerGift(exerGift.getID()));
+            setEquip(new PlayerExerGift(exerGift.id));
         }
 
         /// <summary>
@@ -1756,10 +1756,10 @@ namespace ExermonModule.Data {
                 var exerPack = equipSlot.exerSlotItem.exerSlot.
                     player.packContainers.exerPack;
                 return exerPack.getItem<ExerPackEquip>(
-                    item => item.getID() == packEquipId);
+                    item => item.id == packEquipId);
             }
             set {
-                packEquipId = value.getID();
+                packEquipId = value.id;
             }
         }
 
@@ -1788,7 +1788,7 @@ namespace ExermonModule.Data {
             var data = new JsonData[count];
             for (int i = 0; i < count; ++i) {
                 var json = new JsonData();
-                var paramId = params_[i].getID();
+                var paramId = params_[i].id;
                 var param = getParam(paramId);
                 var percent = param.param().isPercent();
                 json["equip_param"] = DataLoader.convertDouble(

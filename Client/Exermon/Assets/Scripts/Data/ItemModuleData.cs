@@ -515,7 +515,7 @@ namespace ItemModule.Data {
             var data = new JsonData[count];
             for (int i = 0; i < count; ++i) {
                 var json = new JsonData();
-                var paramId = params_[i].getID();
+                var paramId = params_[i].id;
 
                 var levelParam = getLevelParam(paramId).value;
                 var baseParam = getBaseParam(paramId).value;
@@ -747,7 +747,7 @@ namespace ItemModule.Data {
         /// <param name="count">数量</param>
         public PackContItem(int itemId, int count = 1) : base(itemId, count) { }
         /// <param name="item">物品</param>
-        public PackContItem(T item, int count = 1) : base(item.getID(), count) { }
+        public PackContItem(T item, int count = 1) : base(item.id, count) { }
 
     }
 

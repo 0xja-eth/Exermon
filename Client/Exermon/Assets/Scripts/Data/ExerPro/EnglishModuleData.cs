@@ -218,6 +218,13 @@ namespace ExerPro.EnglishModule.Data {
     public class ExerProEnemy : BaseItem {
 
         /// <summary>
+        /// 等级
+        /// </summary>
+        public enum Level {
+            Normal = 1, Elite = 2, Boss = 3
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -243,7 +250,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 地图阶段数据
     /// </summary>
-    class Map : BaseData {
+    public class ExerProMap : BaseData {
 
         /// <summary>
         /// 属性
@@ -258,20 +265,40 @@ namespace ExerPro.EnglishModule.Data {
         public int minLevel { get; protected set; }
 
         [AutoConvert]
-        public MapStage[] stages { get; protected set; }
+        public ExerProMapStage[] stages { get; protected set; }
+
+        /// <summary>
+        /// 获取关卡
+        /// </summary>
+        /// <param name="order">序号</param>
+        /// <returns>返回对应序号的关卡</returns>
+        public ExerProMapStage stage(int order) {
+            foreach (var stage in stages)
+                if (stage.order == order) return stage;
+            return null;
+        }
+
+        /// <summary>
+        /// 读取自定义数据
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            foreach (var stage in stages) stage.map = this;
+        }
     }
 
     /// <summary>
     /// 地图关卡
     /// </summary>
-    class MapStage : BaseData {
+    public class ExerProMapStage : BaseData {
 
         /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
         public int order { get; protected set; }
-        [AutoConvert]
+        [AutoConvert("enemies")]
         public int[] enemies { get; protected set; }
         [AutoConvert]
         public int maxBattleEnemies { get; protected set; }
@@ -284,14 +311,126 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int[] nodeRate { get; protected set; }
 
-        [AutoConvert]
-        public List<Node> nodes { get; protected set; }
+        /// <summary>
+        /// 地图
+        /// </summary>
+        public ExerProMap map { get; set; }
     }
 
     /// <summary>
-    /// 据点
+    /// 地图关卡记录
     /// </summary>
-    class Node : BaseData {
+    public class MapStageRecord : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int mapId { get; protected set; }
+        [AutoConvert]
+        public int stageOrder { get; protected set; }
+
+        [AutoConvert]
+        public bool initialized { get; protected set; } = false;
+
+        [AutoConvert]
+        public List<ExerProMapNode> nodes { get; protected set; }
+
+        /// <summary>
+        /// 获取关卡
+        /// </summary>
+        /// <param name="order">序号</param>
+        /// <returns>返回对应序号的关卡</returns>
+        public ExerProMap map() {
+            return DataService.get().exerProMap(mapId);
+        }
+
+        /// <summary>
+        /// 获取关卡
+        /// </summary>
+        /// <param name="order">序号</param>
+        /// <returns>返回对应序号的关卡</returns>
+        public ExerProMapStage stage() {
+            return map()?.stage(stageOrder);
+        }
+
+        /// <summary>
+        /// 敌人数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> enemies() {
+            var enemies = stage()?.enemies;
+            if (enemies == null) return null;
+            var res = new List<ExerProEnemy>(enemies.Length);
+            foreach (var enemy in enemies)
+                res.Add(DataService.get().exerProEnemy(enemy));
+            return res;
+        }
+
+        /// <summary>
+        /// BOSS数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> bosses() {
+            return enemies().FindAll(e => e.type == (int)ExerProEnemy.Level.Boss);
+        }
+
+        /// <summary>
+        /// 创建据点
+        /// </summary>
+        /// <param name="xOrder">X序号</param>
+        /// <param name="yOrder">Y序号</param>
+        /// <param name="type">据点类型</param>
+        public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type) {
+            var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
+            nodes.Add(node); return node;
+        }
+
+        /// <summary>
+        /// 生成地图
+        /// </summary>
+        void generate() {
+            if (initialized) return; 
+            initialized = CalcService.NodeGenerator.generate(this);
+        }
+
+        /// <summary>
+        /// 读取自定义数据
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            for (int i = 0; i < nodes.Count; ++i) {
+                nodes[i].setId(i);
+                nodes[i].stage = this;
+            }
+
+            generate();
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public MapStageRecord() { }
+        public MapStageRecord(ExerProMapStage stage) : this(stage.map.id, stage.order) { }
+        public MapStageRecord(ExerProMap map, int order) : this(map.id, order) { }
+
+        public MapStageRecord(int mapId, int stageOrder) {
+            this.mapId = mapId; this.stageOrder = stageOrder;
+            generate();
+        }
+    }
+
+    /// <summary>
+    /// 地图据点
+    /// </summary>
+    public class ExerProMapNode : BaseData {
+
+        /// <summary>
+        /// 最大偏移量
+        /// </summary>
+        const int MaxXOffset = 24;
+        const int MaxYOffset = 16;
 
         /// <summary>
         /// 据点类型
@@ -313,14 +452,80 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int yOrder { get; protected set; }
         [AutoConvert]
+        public double xOffset { get; protected set; }
+        [AutoConvert]
+        public double yOffset { get; protected set; }
+        [AutoConvert]
         public Type type { get; protected set; }
+
+        /// <summary>
+        /// 下一个Y序号（数组）
+        /// </summary>
+        [AutoConvert]
+        public List<int> nexts { get; protected set; } = new List<int>();
+
+        /// <summary>
+        /// 地图关卡
+        /// </summary>
+        public MapStageRecord stage { get; set; }
 
         /// <summary>
         /// 分叉标记
         /// </summary>
         public bool fork = false;
 
+        /// <summary>
+        /// 生成位置
+        /// </summary>
+        public void generatePosition() {
+            xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
+            yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
+        }
 
+        /// <summary>
+        /// 设置ID
+        /// </summary>
+        /// <param name="id"></param>
+        public void setId(int id) {
+            this.id = id; 
+        }
+
+        /// <summary>
+        /// 添加下一步
+        /// </summary>
+        /// <param name="next"></param>
+        public void addNext(int next) {
+            if (nexts.Contains(next)) return;
+            nexts.Add(next);
+        }
+        public void addNext(ExerProMapNode next) {
+            addNext(next.id);
+        }
+
+        /// <summary>
+        /// 获取下一节点
+        /// </summary>
+        /// <returns></returns>
+        public List<ExerProMapNode> getNexts() {
+            if (stage == null) return null;
+            var nodes = new List<ExerProMapNode>();
+            foreach (var next in nexts)
+                nodes.Add(stage.nodes[next]);
+            return nodes;
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProMapNode() { }
+        public ExerProMapNode(int id, MapStageRecord stage, 
+            int xOrder, int yOrder, Type type) {
+            this.id = id; this.stage = stage;
+            this.xOrder = xOrder; this.yOrder = yOrder;
+            this.type = type; 
+
+            generatePosition();
+        }
     }
 
     #endregion

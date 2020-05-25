@@ -135,7 +135,7 @@ namespace UI.ExerciseScene.Windows {
         /// 开始题目
         /// </summary>
         void startQuestion() {
-            var qid = questionDisplay.getItem().getID();
+            var qid = questionDisplay.getItem().id;
             recordSer.startQuestion(qid, onQuestionStarted);
         }
 
@@ -159,7 +159,7 @@ namespace UI.ExerciseScene.Windows {
         /// </summary>
         /// <param name="selection"></param>
         void doAnswer(int[] selection, bool terminate) {
-            var qid = questionDisplay.getItem().getID();
+            var qid = questionDisplay.getItem().id;
             var timespan = questionDisplay.getTimeSpan();
             terminate = terminate || questionNav.isLastQuestion();
 

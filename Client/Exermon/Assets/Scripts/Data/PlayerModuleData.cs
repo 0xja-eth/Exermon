@@ -69,9 +69,9 @@ namespace PlayerModule.Data {
         /// <param name="json">数据</param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            bust = AssetLoader.getCharacterBustSprite(getID());
-            face = AssetLoader.getCharacterFaceSprite(getID());
-            //battle = AssetLoader.getCharacterFaceSprite(getID());
+            bust = AssetLoader.getCharacterBustSprite(id);
+            face = AssetLoader.getCharacterFaceSprite(id);
+            //battle = AssetLoader.getCharacterFaceSprite(id);
         }
     }
 
@@ -370,12 +370,12 @@ namespace PlayerModule.Data {
             var json = new JsonData();
             var params_ = DataService.get().staticData.configure.baseParams;
 
-            json["sum_mhp"] = (int)exerSlot.sumParam(params_[0].getID()).value;
-            json["sum_mmp"] = (int)exerSlot.sumParam(params_[1].getID()).value;
-            json["avg_atk"] = exerSlot.avgParam(params_[2].getID()).value;
-            json["avg_def"] = exerSlot.avgParam(params_[3].getID()).value;
-            json["avg_eva"] = exerSlot.avgParam(params_[4].getID()).value;
-            json["avg_cri"] = exerSlot.avgParam(params_[5].getID()).value;
+            json["sum_mhp"] = (int)exerSlot.sumParam(params_[0].id).value;
+            json["sum_mmp"] = (int)exerSlot.sumParam(params_[1].id).value;
+            json["avg_atk"] = exerSlot.avgParam(params_[2].id).value;
+            json["avg_def"] = exerSlot.avgParam(params_[3].id).value;
+            json["avg_eva"] = exerSlot.avgParam(params_[4].id).value;
+            json["avg_cri"] = exerSlot.avgParam(params_[5].id).value;
             json["sum_bp"] = sumBattlePoint();
 
             return json;
@@ -610,7 +610,7 @@ namespace PlayerModule.Data {
         /// <returns></returns>
         public ExerSlotItem getExerSlotItem(Subject subject) {
             var exerSlot = slotContainers.exerSlot;
-            return exerSlot.getSlotItem(subject.getID());
+            return exerSlot.getSlotItem(subject.id);
         }
 
         /// <summary>
@@ -896,7 +896,7 @@ namespace PlayerModule.Data {
             var data = new JsonData[count];
             for (int i = 0; i < count; ++i) {
                 var json = new JsonData();
-                var paramId = params_[i].getID();
+                var paramId = params_[i].id;
 
                 var levelParam = getLevelParam(paramId).value;
                 var baseParam = getBaseParam(paramId).value;
@@ -995,10 +995,10 @@ namespace PlayerModule.Data {
                 var humanPack = equipSlot.player.
                     packContainers.humanPack;
                 return humanPack.getItem<HumanPackEquip>(
-                    item => item.getID() == packEquipId);
+                    item => item.id == packEquipId);
             }
             set {
-                packEquipId = value.getID();
+                packEquipId = value.id;
             }
         }
 

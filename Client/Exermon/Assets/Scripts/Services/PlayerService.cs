@@ -339,7 +339,7 @@ namespace PlayerModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getBasic(player.getID(), _onSuccess, onError);
+            getBasic(player.id, _onSuccess, onError);
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace PlayerModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getStatus(player.getID(), _onSuccess, onError);
+            getStatus(player.id, _onSuccess, onError);
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace PlayerModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getBattle(player.getID(), _onSuccess, onError);
+            getBattle(player.id, _onSuccess, onError);
         }
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace PlayerModule.Services {
                 onSuccess?.Invoke();
             };
 
-            getPack(player.getID(), _onSuccess, onError);
+            getPack(player.id, _onSuccess, onError);
         }
 
         #endregion
@@ -554,7 +554,7 @@ namespace PlayerModule.Services {
             var equipSlot = player.slotContainers.humanEquipSlot;
             var _onSuccess = itemSer.slotOperationSuccess(humanPack, equipSlot, onSuccess);
 
-            equipSlotEquip(packEquip.getID(), _onSuccess, onError);
+            equipSlotEquip(packEquip.id, _onSuccess, onError);
         }
         /// <param name="heid">人类背包装备项ID</param>
         public void equipSlotEquip(int heid,

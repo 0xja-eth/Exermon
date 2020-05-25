@@ -149,7 +149,7 @@ namespace UI.StartScene.Windows {
         void doCreate() {
             var name = nameInput.getValue();
             var grade = gradeInput.getValueId();
-            var cid = bustGroup.selectedItem().getID();
+            var cid = bustGroup.selectedItem().id;
 
             playerSer.createCharacter(name, grade, cid, onCreateSuccess);
         }

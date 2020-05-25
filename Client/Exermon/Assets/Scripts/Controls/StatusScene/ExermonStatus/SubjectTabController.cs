@@ -60,7 +60,7 @@ namespace UI.StatusScene.Controls.ExermonStatus {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(StatusDisplay content, int index) {
-            content.startView(subjects[index].getID());
+            content.startView(subjects[index].id);
         }
 
         /// <summary>

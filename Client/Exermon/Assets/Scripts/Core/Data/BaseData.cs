@@ -70,9 +70,11 @@ namespace Core.Data {
         /// <summary>
         /// 属性
         /// </summary>
-        int id; // ID（只读）
-                //public int id { get; protected set; }
-        public int getID() { return id; }
+        //int id; // ID（只读）
+
+        public int id { get; protected set; }
+
+        //public int id { return id; }
 
         /// <summary>
         /// 是否为复制对象（复制对象无法进行复制）

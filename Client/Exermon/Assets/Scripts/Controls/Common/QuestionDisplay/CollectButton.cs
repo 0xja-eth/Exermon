@@ -73,7 +73,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         }
         public bool isChecked(Question item) {
             if (item == null) return false;
-            return recordSer.recordData.isQuestionCollected(item.getID());
+            return recordSer.recordData.isQuestionCollected(item.id);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// </summary>
         public void collect() {
             if (item == null) return;
-            recordSer.collect(item.getID(), onCollected);
+            recordSer.collect(item.id, onCollected);
         }
 
         /// <summary>

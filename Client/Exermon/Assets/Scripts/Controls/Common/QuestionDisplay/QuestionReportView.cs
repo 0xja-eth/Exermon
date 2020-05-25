@@ -132,7 +132,7 @@ namespace UI.Common.Controls.QuestionDisplay {
             var question = questionDisplay.getItem();
             var type = typeInput.getValueId();
             var desc = descriptionInput.text;
-            quesSer.pushReport(question.getID(),
+            quesSer.pushReport(question.id,
                 type, desc, onPushSuccess);
         }
 

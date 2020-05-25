@@ -61,7 +61,7 @@ namespace UI.RecordScene.Controls {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(RecordWindow content, int index) {
-            content.setSubjectId(subjects[index].getID());
+            content.setSubjectId(subjects[index].id);
         }
 
         /// <summary>

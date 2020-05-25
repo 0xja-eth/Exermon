@@ -101,7 +101,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回自身运行时数据</returns>
         public BattlePlayer self() {
-            return getPlayer(PlayerService.get().player.getID());
+            return getPlayer(PlayerService.get().player.id);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回对方运行时数据</returns>
         public BattlePlayer oppo() {
-            return getPlayer(PlayerService.get().player.getID(), true);
+            return getPlayer(PlayerService.get().player.id, true);
         }
 
         /// <summary>
@@ -581,10 +581,10 @@ namespace BattleModule.Data {
                 var humanPack = equipSlot.player.
                     packContainers.humanPack;
                 return humanPack.getItem<HumanPackItem>(
-                    item => item.getID() == packItemId);
+                    item => item.id == packItemId);
             }
             set {
-                packItemId = value.getID();
+                packItemId = value.id;
             }
         }
 
@@ -777,7 +777,7 @@ namespace BattleModule.Data {
         public ExerSlotItem exerSlotItem() {
             var player = PlayerService.get().player;
             if (player == null ||
-                this.player.getID() != player.getID()) return null;
+                this.player.id != player.id) return null;
             return player.slotContainers.exerSlot.getSlotItem(subjectId);
         }
 
@@ -833,8 +833,8 @@ namespace BattleModule.Data {
         public BattleItemSlotItem battleItemSlotItem() {
             var player = PlayerService.get().player;
             if (player == null || 
-                this.player.getID() != player.getID()) return null;
-            return player.slotContainers.battleItemSlot.getSlotItem(getID());
+                this.player.id != player.id) return null;
+            return player.slotContainers.battleItemSlot.getSlotItem(id);
         }
     }
 
@@ -1132,7 +1132,7 @@ namespace BattleModule.Data {
         /// <returns></returns>
         public BattlePlayer result() {
             if (battle.record == null) return null;
-            return battle.record.getPlayer(getID());
+            return battle.record.getPlayer(id);
         }
 
         /// <summary>
@@ -1386,7 +1386,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回自身运行时数据</returns>
         public RuntimeBattlePlayer self() {
-            return getPlayer(PlayerService.get().player.getID());
+            return getPlayer(PlayerService.get().player.id);
         }
 
         /// <summary>
@@ -1394,7 +1394,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <returns>返回对方运行时数据</returns>
         public RuntimeBattlePlayer oppo() {
-            return getPlayer(PlayerService.get().player.getID(), true);
+            return getPlayer(PlayerService.get().player.id, true);
         }
 
         /// <summary>
@@ -1404,8 +1404,8 @@ namespace BattleModule.Data {
         /// <param name="oppo">获取对方玩家</param>
         /// <returns>返回对应的运行时玩家</returns>
         public RuntimeBattlePlayer getPlayer(int pid, bool oppo = false) {
-            if (player1.getID() == pid) return oppo ? player2 : player1;
-            if (player2.getID() == pid) return oppo ? player1 : player2;
+            if (player1.id == pid) return oppo ? player2 : player1;
+            if (player2.id == pid) return oppo ? player1 : player2;
             return null;
         }
 

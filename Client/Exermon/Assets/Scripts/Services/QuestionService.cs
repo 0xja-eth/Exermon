@@ -172,7 +172,7 @@ namespace QuestionModule.Services {
                 DataLoader.load(question, res);
                 onSuccess?.Invoke();
             };
-            getDetail(question.getID(), _onSuccess, onError);
+            getDetail(question.id, _onSuccess, onError);
         }
         /// <param name="qid">题目ID</param>
         public void getDetail(int qid, 
@@ -231,7 +231,7 @@ namespace QuestionModule.Services {
         /// <param name="qid">题目ID</param>
         /// <returns>是否缓存</returns>
         public bool isQuestionCached(int qid) {
-            return questionCache.questions.Exists(q => q.getID() == qid);
+            return questionCache.questions.Exists(q => q.id == qid);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace QuestionModule.Services {
         /// <param name="qid">题目ID</param>
         /// <returns>题目实例</returns>
         public Question getQuestion(int qid) {
-            return questionCache.questions.Find(q => q.getID() == qid);
+            return questionCache.questions.Find(q => q.id == qid);
         }
 
         /// <summary>

@@ -88,7 +88,7 @@ namespace ExermonModule.Services {
                 onSuccess?.Invoke();
             };
 
-            editNickname(playerExer.getID(), name, _onSuccess, onError);
+            editNickname(playerExer.id, name, _onSuccess, onError);
         }
         /// <param name="peid">艾瑟萌仓库项ID</param>
         public void editNickname(int peid, string name,
@@ -130,7 +130,7 @@ namespace ExermonModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 exerHub, exerSlot, onSuccess);
 
-            var peid = playerExer == null ? 0 : playerExer.getID();
+            var peid = playerExer == null ? 0 : playerExer.id;
 
             equipPlayerExer(slotItem.subjectId, peid, _onSuccess, onError);
         }
@@ -143,7 +143,7 @@ namespace ExermonModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 exerHub, exerSlot, onSuccess);
 
-            var peid = playerExer == null ? 0 : playerExer.getID();
+            var peid = playerExer == null ? 0 : playerExer.id;
 
             equipPlayerExer(sid, peid, _onSuccess, onError);
         }
@@ -188,7 +188,7 @@ namespace ExermonModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 exerGiftPool, exerSlot, onSuccess);
 
-            var pgid = playerGift == null ? 0 : playerGift.getID();
+            var pgid = playerGift == null ? 0 : playerGift.id;
 
             equipPlayerGift(slotItem.subjectId, pgid, _onSuccess, onError);
         }
@@ -201,7 +201,7 @@ namespace ExermonModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 exerGiftPool, exerSlot, onSuccess);
 
-            var pgid = playerGift == null ? 0 : playerGift.getID();
+            var pgid = playerGift == null ? 0 : playerGift.id;
 
             equipPlayerGift(sid, pgid, _onSuccess, onError);
         }
@@ -249,7 +249,7 @@ namespace ExermonModule.Services {
                     onSuccess?.Invoke();
                 });
 
-            equipExerEquip(equipSlot.exerSlotItem.subjectId, packEquip.getID(), _onSuccess, onError);
+            equipExerEquip(equipSlot.exerSlotItem.subjectId, packEquip.id, _onSuccess, onError);
         }
         /// <param name="slotItem">艾瑟萌槽项</param>
         public void equipExerEquip(ExerSlotItem slotItem, ExerPackEquip packEquip,
@@ -271,7 +271,7 @@ namespace ExermonModule.Services {
                     onSuccess?.Invoke();
                 });
 
-            equipExerEquip(sid, packEquip.getID(), _onSuccess, onError);
+            equipExerEquip(sid, packEquip.id, _onSuccess, onError);
         }
         /// <param name="eid">装备位置ID</param>
         /// <param name="eeid">艾瑟萌背包装备项ID</param>

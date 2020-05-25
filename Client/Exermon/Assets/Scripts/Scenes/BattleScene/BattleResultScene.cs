@@ -130,7 +130,7 @@ namespace UI.BattleResultScene {
         /// </summary>
         void setupRadarTexture() {
             var judge = result.judge();
-            var jid = judge.getID() - 1;
+            var jid = judge.id - 1;
             if (judgeTextures.Length > jid) {
                 var texture = judgeTextures[jid];
                 var sprite = AssetLoader.generateSprite(texture);

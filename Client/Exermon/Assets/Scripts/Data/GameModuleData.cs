@@ -503,5 +503,8 @@ namespace GameModule.Data {
         [AutoConvert]
         public ExerProEnemy[] exerProEnemies { get; protected set; }
 
+        [AutoConvert]
+        public ExerProMap[] exerProMaps { get; protected set; }
+
     }
 }

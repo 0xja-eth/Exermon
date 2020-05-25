@@ -88,7 +88,7 @@ namespace RecordModule.Services {
             /// <param name="id">题目记录ID</param>
             /// <returns>题目记录数据</returns>
             public QuestionRecord getQuestionRecordById(int id) {
-                return questionRecords.Find((q) => q.getID() == id);
+                return questionRecords.Find((q) => q.id == id);
             }
 
             /// <summary>

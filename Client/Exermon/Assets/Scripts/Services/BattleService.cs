@@ -240,7 +240,7 @@ namespace BattleModule.Services {
                 NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                     onSuccess?.Invoke();
                 };
-                prepareComplete(contItem.type, contItem.getID(), _onSuccess, onError);
+                prepareComplete(contItem.type, contItem.id, _onSuccess, onError);
             }
         }
         /// <param name="type">使用物品类型</param>
@@ -347,7 +347,7 @@ namespace BattleModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 humanPack, itemSlot, onSuccess);
 
-            var id = packItem == null ? 0 : packItem.getID();
+            var id = packItem == null ? 0 : packItem.id;
 
             equipBattleItem(slotItem.index, id, _onSuccess, onError);
         }
@@ -360,7 +360,7 @@ namespace BattleModule.Services {
             var _onSuccess = itemSer.slotOperationSuccess(
                 humanPack, itemSlot, onSuccess);
 
-            var id = packItem == null ? 0 : packItem.getID();
+            var id = packItem == null ? 0 : packItem.id;
 
             equipBattleItem(index, id, _onSuccess, onError);
         }

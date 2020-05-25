@@ -84,7 +84,7 @@ namespace UI.ShopScene.Controls {
             for (int i = 1; i < res.Length; ++i) {
                 var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
-                    _data.getID(), _data.name);
+                    _data.id, _data.name);
             }
 
             return res;
@@ -100,7 +100,7 @@ namespace UI.ShopScene.Controls {
             //    if (i < baseLen) res[i] = base_[i];
             //    else {
             //        var type = types[i - baseLen];
-            //        res[i] = new Tuple<int, string>(type.getID(), type.name);
+            //        res[i] = new Tuple<int, string>(type.id, type.name);
             //    }
 
             //return res;
@@ -124,7 +124,7 @@ namespace UI.ShopScene.Controls {
             for (int i = 1; i < res.Length; ++i) {
                 var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
-                    _data.getID(), _data.name);
+                    _data.id, _data.name);
             }
 
             return res;

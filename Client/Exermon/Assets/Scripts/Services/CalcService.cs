@@ -1,6 +1,7 @@
 ﻿using System;
 
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 using Core.Data;
 using Core.Data.Loaders;
@@ -12,6 +13,8 @@ using ItemModule.Data;
 using ExermonModule.Data;
 using SeasonModule.Data;
 using BattleModule.Data;
+
+using ExerPro.EnglishModule.Data;
 
 using SeasonModule.Services;
 using System.Collections.Generic;
@@ -59,7 +62,7 @@ namespace GameModule.Services {
                 var stars = DataService.get().staticData.configure.exerStars;
 
                 foreach (var star in stars)
-                    StarLevelTable[star.getID()] = generateTalbe(star);
+                    StarLevelTable[star.id] = generateTalbe(star);
             }
 
             /// <summary>
@@ -97,7 +100,7 @@ namespace GameModule.Services {
                 if (level >= star.maxLevel) return -1;
                 if (StarLevelTable == null) init();
 
-                var data = StarLevelTable[star.getID()];
+                var data = StarLevelTable[star.id];
                 return data[level] - data[level - 1];
             }
 
@@ -111,7 +114,7 @@ namespace GameModule.Services {
                 if (level >= star.maxLevel) return -1;
                 if (StarLevelTable == null) init();
 
-                var data = StarLevelTable[star.getID()];
+                var data = StarLevelTable[star.id];
                 return data[level];
             }
 
@@ -125,7 +128,7 @@ namespace GameModule.Services {
                 if (level >= star.maxLevel) return -1;
                 if (StarLevelTable == null) init();
 
-                var data = StarLevelTable[star.getID()];
+                var data = StarLevelTable[star.id];
                 return data[level - 1] + exp;
             }
         }
@@ -390,7 +393,7 @@ namespace GameModule.Services {
             /// 计算
             /// </summary>
             void _calc() {
-                value = packEquip.getBaseParam(param.getID()).value;
+                value = packEquip.getBaseParam(param.id).value;
                 // var rate = packEquip.getLevelParam(param.getID()).value;
                 // value += rate * playerExer.level;
             }
@@ -730,6 +733,168 @@ namespace GameModule.Services {
                 return null;
             }
 
+        }
+
+        /// <summary>
+        /// 节点生成器
+        /// </summary>
+        public class NodeGenerator {
+
+            /// <summary>
+            /// 关卡
+            /// </summary>
+            MapStageRecord stageRecord;
+            ExerProMapStage stage;
+
+            List<ExerProMapNode>[] nodes;
+
+            /// <summary>
+            /// 生成关卡地图
+            /// </summary>
+            /// <param name="stage">关卡</param>
+            public static bool generate(MapStageRecord stage) {
+                var generator = new NodeGenerator(stage);
+                return generator.generateNodes() && 
+                    generator.generateForkNodes() && 
+                    generator.generateLinks();
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            NodeGenerator(MapStageRecord stageRecord) {
+                this.stageRecord = stageRecord;
+                stage = stageRecord.stage();
+            }
+
+            /// <summary>
+            /// 生成结点数组
+            /// </summary>
+            /// <param name="stage"></param>
+            bool generateNodes() {
+                if (stage == null) return false;
+
+                var steps = stage.steps;
+                var xCnt = steps.Length;
+                nodes = new List<ExerProMapNode>[xCnt];
+                for (int x = 0; x < xCnt; ++x) 
+                    for (int y = 0; y < steps[x]; ++y)
+                        nodes[x].Add(stageRecord.createNode(
+                            x, y, generateNodeType()));
+
+                return true;
+            }
+
+            /// <summary>
+            /// 生成据点类型
+            /// </summary>
+            /// <returns></returns>
+            ExerProMapNode.Type generateNodeType() {
+                if (stage == null) return ExerProMapNode.Type.Unknown;
+
+                var rates = stage.nodeRate;
+                var rateList = new List<int>();
+
+                // 将比率填充为列表，然后从中抽取一个
+                for (int i = 0; i < rates.Length; ++i)
+                    for (int j = 0; j < rates[i]; ++j) rateList.Add(i);
+
+                var index = Random.Range(0, rateList.Count);
+                return (ExerProMapNode.Type)rateList[index];
+            }
+
+            /// <summary>
+            /// 生成分叉据点
+            /// </summary>
+            bool generateForkNodes() {
+                if (stage == null) return false;
+
+                int cnt = 0, counter = 0;
+                int maxCnt = stage.maxForkNode;
+                int maxX = nodes.Length;
+
+                while(cnt < maxCnt && counter <= 10000) {
+                    if (maxX <= 2) break; counter++;
+
+                    // 随机生成一个点
+                    // 最后两步是无法进行分叉的
+                    int x = Random.Range(0, maxX - 2);
+                    var colNodes = nodes[x];
+                    int maxY = colNodes.Count;
+                    int y = Random.Range(0, maxY);
+
+                    // 若已经标记为 fork，跳过
+                    var node = colNodes[y];
+                    if (node.fork) continue;
+
+                    // 若该步的分支据点数目 > 下一步总数 - 1，则跳过
+                    int nextCnt = nodes[x + 1].Count;
+                    var forkCnt = _calcForkCount(colNodes);
+                    if (forkCnt >= nextCnt - 1) continue;
+
+                    node.fork = true; cnt++;
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// 计算分支结点数量
+            /// </summary>
+            /// <param name="nodes"></param>
+            /// <returns></returns>
+            int _calcForkCount(List<ExerProMapNode> nodes) {
+                int cnt = 0;
+                foreach (var node in nodes) if (node.fork) cnt++;
+                return cnt; 
+            }
+
+            /// <summary>
+            /// 生成线条连接
+            /// </summary>
+            bool generateLinks() {
+                if (stage == null) return false;
+
+                // 对每一步进行遍历
+                for (int x = 0; x < nodes.Length - 1; ++x) {
+
+                    int ny = 0; // 下一步的Y坐标
+                    ExerProMapNode node = null;
+
+                    // 对每个据点进行遍历
+                    for (int y = 0; y < nodes[x].Count; ++y) {
+                        node = nodes[x][y];
+
+                        // 如果不是分叉，添加第一个
+                        if (!node.fork) _addNext(node, ref ny, true);
+
+                        // 因为 random 为 true，所以这里直接进行 stage.maxFork 次循环
+                        else for (int n = 0; n < stage.maxFork; ++n)
+                            _addNext(node, ref ny, true);
+                    }
+
+                    // 剩余未分配的下一个据点则全部作为本步最后一个据点的下一步
+                    while(ny < nodes[x + 1].Count) _addNext(node, ref ny);
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// 添加下一步
+            /// </summary>
+            /// <param name="node">当前结点</param>
+            /// <param name="x">当前X坐标</param>
+            /// <param name="ny">下一步Y坐标</param>
+            /// <param name="random">是否随机增加下一步Y坐标</param>
+            /// <param name="incr">是否增加下一步Y坐标</param>
+            /// <returns>返回新的 ny 值</returns>
+            void _addNext(ExerProMapNode node, ref int ny, 
+                bool random = false, bool incr = true) {
+
+                var x = node.xOrder;
+                node?.addNext(nodes[x + 1][ny]);
+                if (random) incr = Random.Range(0, 2) > 0;
+                if (incr && ny < nodes[x + 1].Count - 1) ny++;
+            }
         }
     }
 

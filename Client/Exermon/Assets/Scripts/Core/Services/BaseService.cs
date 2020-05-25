@@ -189,7 +189,7 @@ namespace Core.Services {
                     onSuccess, onError, uid, emit), onError);
             if (uid) {
                 if (data == null) data = new JsonData();
-                data["uid"] = getPlayerID(); // 添加玩家信息
+                data["uid"] = getPlayerId(); // 添加玩家信息
             }
             networkSys.setupRequest(route, data, onSuccess, _onError, true, waitText, emit);
         }
@@ -226,9 +226,9 @@ namespace Core.Services {
         /// 获取当前玩家ID
         /// </summary>
         /// <returns>玩家ID</returns>
-        public static int getPlayerID() {
+        public static int getPlayerId() {
             var player = getPlayer();
-            return player == null ? -1 : player.getID();
+            return player == null ? -1 : player.id;
         }
 
         #endregion

@@ -62,7 +62,7 @@ namespace SeasonModule.Data {
         /// <param name="json"></param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-            icon = AssetLoader.getRankIconSprite(getID());
+            icon = AssetLoader.getRankIconSprite(id);
         }
     }
 

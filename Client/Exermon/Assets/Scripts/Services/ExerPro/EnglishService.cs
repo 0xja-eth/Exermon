@@ -276,7 +276,7 @@ namespace ExerPro.EnglishModule.Services {
                 onSuccess?.Invoke();
             };
 
-            answerWord(word.getID(), res, _onSuccess, onError);
+            answerWord(word.id, res, _onSuccess, onError);
         }
         /// <param name="wid">题目ID</param>
         public void answerWord(int wid, bool res, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
@@ -342,7 +342,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qid">题目ID</param>
         /// <returns>是否缓存</returns>
         public bool isQuestionCached<T>(int qid) where T: BaseData, new() {
-            return questionCache.getCacheList<T>().Exists(q => q.getID() == qid);
+            return questionCache.getCacheList<T>().Exists(q => q.id == qid);
         }
         
         /// <summary>
@@ -351,7 +351,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qid">题目ID</param>
         /// <returns>题目实例</returns>
         public T getQuestion<T>(int qid) where T : BaseData, new() {
-            return questionCache.getCacheList<T>().Find(q => q.getID() == qid);
+            return questionCache.getCacheList<T>().Find(q => q.id == qid);
         }
 
         #endregion

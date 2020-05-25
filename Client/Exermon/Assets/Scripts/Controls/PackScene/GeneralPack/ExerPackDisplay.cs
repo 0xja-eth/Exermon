@@ -86,7 +86,7 @@ namespace UI.PackScene.Controls.GeneralPack {
             for (int i = 1; i < res.Length; ++i) {
                 var _data = data[i-1];
                 res[i] = new Tuple<int, string>(
-                    _data.getID(), _data.name);
+                    _data.id, _data.name);
             }
 
             return res;
