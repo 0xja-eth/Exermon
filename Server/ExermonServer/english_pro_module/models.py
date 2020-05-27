@@ -399,6 +399,101 @@ class WordRecord(models.Model):
 
 # region 物品
 
+
+# ===================================================
+#  使用效果编号枚举
+# ===================================================
+class ExerProEffectCode(Enum):
+	Unset = 0  # 空
+
+	Attack = 1  # 造成伤害
+	AttackSlash = 2  # 造成伤害（完美斩击）
+	AttackBlack = 3  # 造成伤害（黑旋风）
+	AttackWave = 4  # 造成伤害（波动拳）
+	AttackRite = 5  # 造成伤害（仪式匕首）
+
+	Recover = 100  # 回复体力值
+
+	AddParam = 200  # 增加能力值
+	AddParamUrgent = 201  # 增加能力值（紧急按钮）
+	TempAddParam = 210  # 临时增加能力值
+	AddStatus = 220  # 增加状态
+
+	GetCards = 300  # 抽取卡牌
+	RemoveCards = 310  # 移除卡牌
+
+	ChangeCost = 400  # 更改耗能
+	ChangeCostDisc = 401  # 更改耗能（发现）
+	ChangeCostCrazy = 402  # 更改耗能（疯狂）
+
+	Sadistic = 500  # 残虐天性
+	ForceAddStatus = 600  # 增加己方状态
+
+
+# ===================================================
+#  特训使用效果表
+# ===================================================
+class ExerProEffect(models.Model):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训使用效果"
+
+	CODES = [
+		(ExerProEffectCode.Unset.value, '空'),
+
+		(ExerProEffectCode.Attack.value, '造成伤害'),
+		(ExerProEffectCode.AttackSlash.value, '造成伤害（完美斩击）'),
+		(ExerProEffectCode.AttackBlack.value, '造成伤害（黑旋风）'),
+		(ExerProEffectCode.AttackWave.value, '造成伤害（波动拳）'),
+		(ExerProEffectCode.AttackRite.value, '造成伤害（仪式匕首）'),
+
+		(ExerProEffectCode.Recover.value, '回复体力值'),
+
+		(ExerProEffectCode.AddParam.value, '增加能力值'),
+		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
+		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
+		(ExerProEffectCode.AddStatus.value, '增加状态'),
+
+		(ExerProEffectCode.GetCards.value, '抽取卡牌'),
+		(ExerProEffectCode.RemoveCards.value, '移除卡牌'),
+
+		(ExerProEffectCode.ChangeCost.value, '更改耗能'),
+		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
+		(ExerProEffectCode.ChangeCostCrazy.value, '更改耗能（疯狂）'),
+
+		(ExerProEffectCode.Sadistic.value, '残虐天性'),
+		(ExerProEffectCode.ForceAddStatus.value, '增加己方状态'),
+	]
+
+	# 效果编号
+	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
+
+	# 效果参数
+	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	# 转化为字典
+	def convertToDict(self):
+
+		return {
+			'code': self.code,
+			'params': self.params,
+		}
+
+
+# ===================================================
+#  特训物品使用效果表
+# ===================================================
+class ExerProItemEffect(ExerProEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "特训物品使用效果"
+
+	# 物品
+	item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
+							 verbose_name="物品")
+
+
 # ===================================================
 #  特训物品表
 # ===================================================
@@ -410,6 +505,19 @@ class ExerProItem(BaseItem):
 
 	# 道具类型
 	TYPE = ItemType.ExerProItem
+
+
+# ===================================================
+#  特训药水使用效果表
+# ===================================================
+class ExerProPotionEffect(ExerProEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "特训药水使用效果"
+
+	# 物品
+	item = models.ForeignKey('ExerProPotion', on_delete=models.CASCADE,
+							 verbose_name="物品")
 
 
 # ===================================================
@@ -450,6 +558,19 @@ class ExerProPotion(BaseItem):
 		res['power_rate'] = self.power_rate / 100
 
 		return res
+
+
+# ===================================================
+#  特训卡片使用效果表
+# ===================================================
+class ExerProCardEffect(ExerProEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "特训卡片使用效果"
+
+	# 物品
+	item = models.ForeignKey('ExerProCard', on_delete=models.CASCADE,
+							 verbose_name="物品")
 
 
 # ===================================================
@@ -550,6 +671,19 @@ class ExerProEnemy(BaseItem):
 		res['level'] = self.level
 
 		return res
+
+
+# ===================================================
+#  特训状态表
+# ===================================================
+class ExerProStatus(BaseItem):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训状态"
+
+	# 道具类型
+	TYPE = ItemType.ExerProStatus
 
 
 # endregion

@@ -42,6 +42,18 @@ class WrongItemsInline(object):
 	style = "table"
 
 
+class ExerProItemEffectsInline(BaseEffectsInline):
+	model = ExerProItemEffect
+
+
+class ExerProPotionEffectsInline(BaseEffectsInline):
+	model = ExerProPotionEffect
+
+
+class ExerProCardEffectsInline(BaseEffectsInline):
+	model = ExerProCardEffect
+
+
 class MapStagesInline(object):
 	model = ExerProMapStage
 	style = "accordion"
@@ -131,7 +143,7 @@ class ExerProItemAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [ExerProItemEffectsInline]
 
 
 @xadmin.sites.register(ExerProPotion)
@@ -147,7 +159,7 @@ class ExerProPotionAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [ExerProPotionEffectsInline]
 
 
 @xadmin.sites.register(ExerProCard)
@@ -163,7 +175,7 @@ class ExerProCardAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [ExerProCardEffectsInline]
 
 
 @xadmin.sites.register(ExerProEnemy)
@@ -176,6 +188,22 @@ class ExerProEnemyAdmin(BaseItemAdmin):
 				   ['mhp', 'power', 'level']
 
 	field_set = [Fieldset('特训敌人属性', 'mhp', 'power', 'level')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	inlines = []
+
+
+@xadmin.sites.register(ExerProStatus)
+class ExerProStatusAdmin(BaseItemAdmin):
+
+	list_display = BaseItemAdmin.list_display + \
+				   []
+
+	list_editable = BaseItemAdmin.list_editable + \
+				   []
+
+	field_set = [Fieldset('特训状态属性')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 

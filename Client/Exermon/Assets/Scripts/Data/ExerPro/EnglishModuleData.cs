@@ -243,6 +243,11 @@ namespace ExerPro.EnglishModule.Data {
         }
     }
 
+    /// <summary>
+    /// 特训状态数据
+    /// </summary>
+    public class ExerProStatus : BaseItem { }
+
     #endregion
 
     #region 容器项
@@ -398,16 +403,22 @@ namespace ExerPro.EnglishModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public int mhp { get; protected set; }
+        public int mhp { get; protected set; } = DefaultMHP;
         [AutoConvert]
-        public int hp { get; protected set; }
+        public int hp { get; protected set; } = DefaultMHP;
+        [AutoConvert]
+        public int power { get; protected set; } = DefaultPower;
+        [AutoConvert]
+        public int defense { get; protected set; } = DefaultDefense;
+        [AutoConvert]
+        public int agile { get; protected set; } = DefaultAgile;
 
         [AutoConvert]
-        public ExerProItemPack itemPack { get; protected set; }
+        public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
-        public ExerProPotionPack potionPack { get; protected set; }
+        public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
         [AutoConvert]
-        public ExerProCardPack cardPack { get; protected set; }
+        public ExerProCardPack cardPack { get; protected set; } = new ExerProCardPack();
     }
 
     /// <summary>
