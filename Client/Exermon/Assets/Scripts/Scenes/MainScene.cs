@@ -119,6 +119,8 @@ namespace UI.MainScene {
                     sceneName = SceneSystem.Scene.ShopScene; break;
                 case BuildingType.Library:
                     onLibraryClick(); break;
+                case BuildingType.Adventure:
+                    sceneName = SceneSystem.Scene.EnglishProMapScene; break;
             }
             if (sceneName != "") sceneSys.pushScene(sceneName);
         }

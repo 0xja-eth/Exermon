@@ -31,7 +31,7 @@ namespace GameModule.Services {
         /// <summary>
         /// 操作文本设定
         /// </summary>
-        public new const string FailTextFormat = "{0}发生错误，错误信息：\n{{0}}\n选择“重试”进行重试，选择“取消”退出游戏。";
+        public new const string FailTextFormat = "{0}发生错误，错误信息：\n{{0}}"; // \n选择“重试”进行重试，选择“取消”退出游戏。";
 
         public const string Initializing = "初始化数据";
         public const string Refresh = "刷新数据";

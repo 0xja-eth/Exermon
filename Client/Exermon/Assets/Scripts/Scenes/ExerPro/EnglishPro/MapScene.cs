@@ -1,15 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-using Core.UI;
-using Core.UI.Utils;
-
+﻿
 using Core.Systems;
+using Core.UI;
 
-using RecordModule.Services;
-
-using UI.ExerciseScene.Windows;
+using ExerPro.EnglishModule.Data;
 
 /// <summary>
 /// 艾瑟萌特训UI
@@ -26,10 +19,17 @@ namespace UI.ExerPro.EnglishPro { }
 /// </summary>
 namespace UI.ExerPro.EnglishPro.MapScene {
 
+    using Controls;
+
     /// <summary>
     /// 地图场景
     /// </summary>
     public class MapScene : BaseScene {
+
+        /// <summary>
+        /// 外部组件设置
+        /// </summary>
+        public MapDisplay mapDisplay;
 
         /// <summary>
         /// 场景名称
@@ -37,6 +37,21 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// <returns></returns>
         public override string sceneName() {
             return SceneSystem.Scene.EnglishProMapScene;
+        }
+
+        /// <summary>
+        /// 开始
+        /// </summary>
+        protected override void start() {
+            base.start();
+            test();
+        }
+
+        /// <summary>
+        /// 测试
+        /// </summary>
+        void test() {
+            mapDisplay.setItem(new MapStageRecord(1, 1));
         }
     }
 }

@@ -1,3 +1,5 @@
+#-*-coding:GBK -*-
+
 from django.db import models
 from django.conf import settings
 from item_module.models import *
@@ -558,9 +560,9 @@ class ExerProEnemy(BaseItem):
 # ===================================================
 #  地图表
 # ===================================================
-class Map(models.Model):
+class ExerProMap(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = "地图"
+		verbose_name = verbose_name_plural = "特训地图"
 
 	# 地图名称
 	name = models.CharField(max_length=24, verbose_name="地图名称")
@@ -573,6 +575,9 @@ class Map(models.Model):
 
 	# 等级要求
 	min_level = models.PositiveSmallIntegerField(default=1, verbose_name="等级要求")
+
+	def __str__(self):
+		return "%d. %s" % (self.id, self.name)
 
 	def convertToDict(self):
 		"""
@@ -598,7 +603,7 @@ class Map(models.Model):
 		Returns:
 			返回关卡 QuerySet
 		"""
-		return self.mapstage_set.all()
+		return self.exerpromapstage_set.all()
 
 
 # ===================================================
@@ -611,12 +616,13 @@ class NodeType(Enum):
 	Enemy = 3  # 敌人据点
 	Elite = 4  # 精英据点
 	Unknown = 5  # 未知据点
+	Boss = 6  # 精英据点
 
 
 # ===================================================
 #  地图关卡表
 # ===================================================
-class MapStage(models.Model):
+class ExerProMapStage(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = "地图关卡"
 
@@ -624,7 +630,7 @@ class MapStage(models.Model):
 	order = models.PositiveSmallIntegerField(default=1, verbose_name="序号")
 
 	# 地图
-	map = models.ForeignKey("Map", on_delete=models.CASCADE, verbose_name="地图")
+	map = models.ForeignKey("english_pro_module.ExerProMap", on_delete=models.CASCADE, verbose_name="地图")
 
 	# 敌人集合（本阶段会刷的敌人）
 	enemies = models.ManyToManyField("ExerProEnemy", verbose_name="敌人集合")
@@ -643,6 +649,9 @@ class MapStage(models.Model):
 
 	# 据点比例（一共6种据点，按照该比例的几率进行生成，实际不一定为该比例）
 	node_rate = jsonfield.JSONField(default=[1, 1, 1, 1, 1, 1], verbose_name="据点比例")
+
+	def __str__(self):
+		return "%s 第 %s 关" % (self.map, self.order)
 
 	def convertToDict(self):
 		"""

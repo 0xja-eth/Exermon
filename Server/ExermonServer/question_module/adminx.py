@@ -65,7 +65,7 @@ class BaseQuestionAdmin(object):
 
 class GroupQuestionAdmin(object):
 
-	list_display = ['id', 'material', 'source']
+	list_display = ['id', 'article', 'source']
 
 	list_editable = ['source']
 

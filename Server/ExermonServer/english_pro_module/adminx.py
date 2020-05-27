@@ -1,3 +1,5 @@
+#-*-coding:GBK -*-
+
 from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
 from game_module.adminx import ParamsInline
@@ -40,6 +42,16 @@ class WrongItemsInline(object):
 	style = "table"
 
 
+class MapStagesInline(object):
+	model = ExerProMapStage
+	style = "accordion"
+
+
+# class EnemiesInline(object):
+# 	model = ExerProEnemy
+# 	style = "table"
+
+
 # @xadmin.sites.register(QuesSugarPrice)
 # class QuesSugarPriceAdmin(object):
 #
@@ -68,12 +80,6 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 	inlines = [ReadingSubQuestionsInline]
 
 
-@xadmin.sites.register(QuesReport)
-class QuesReportAdmin(object):
-
-	list_display = ['id', 'player', 'question', 'type', 'description']
-
-
 @xadmin.sites.register(CorrectionQuestion)
 class CorrectionQuestionAdmin(object):
 
@@ -100,3 +106,99 @@ class WordAdmin(object):
 
 	list_editable = ['english', 'chinese', 'type',
 					 'level', 'is_middle', 'is_high']
+
+
+@xadmin.sites.register(WordRecord)
+class WordRecordAdmin(object):
+
+	list_display = ['id', 'word', 'player', 'count', 'correct',
+					'last_date', 'first_date', 'collected', 'wrong']
+
+	list_editable = ['count', 'correct',  'last_date',
+					 'first_date', 'collected', 'wrong']
+
+
+@xadmin.sites.register(ExerProItem)
+class ExerProItemAdmin(BaseItemAdmin):
+
+	list_display = BaseItemAdmin.list_display + \
+				   []
+
+	list_editable = BaseItemAdmin.list_editable + \
+				   []
+
+	field_set = [Fieldset('特训物品属性')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	inlines = []
+
+
+@xadmin.sites.register(ExerProPotion)
+class ExerProPotionAdmin(BaseItemAdmin):
+
+	list_display = BaseItemAdmin.list_display + \
+				   []
+
+	list_editable = BaseItemAdmin.list_editable + \
+				   []
+
+	field_set = [Fieldset('特训物品属性')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	inlines = []
+
+
+@xadmin.sites.register(ExerProCard)
+class ExerProCardAdmin(BaseItemAdmin):
+
+	list_display = BaseItemAdmin.list_display + \
+				   ['cost', 'card_type']
+
+	list_editable = BaseItemAdmin.list_editable + \
+				   ['cost', 'card_type']
+
+	field_set = [Fieldset('特训卡片属性', 'cost', 'card_type')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	inlines = []
+
+
+@xadmin.sites.register(ExerProEnemy)
+class ExerProEnemyAdmin(BaseItemAdmin):
+
+	list_display = BaseItemAdmin.list_display + \
+				   ['mhp', 'power', 'level']
+
+	list_editable = BaseItemAdmin.list_editable + \
+				   ['mhp', 'power', 'level']
+
+	field_set = [Fieldset('特训敌人属性', 'mhp', 'power', 'level')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	inlines = []
+
+
+@xadmin.sites.register(ExerProMap)
+class ExerProMapAdmin(object):
+
+	list_display = ['id', 'name', 'description', 'level', 'min_level']
+
+	list_editable = ['name', 'description', 'level', 'min_level']
+
+	inlines = [MapStagesInline]
+
+
+@xadmin.sites.register(ExerProMapStage)
+class ExerProMapStageAdmin(object):
+
+	list_display = ['id', 'order', 'map', 'enemies', 'max_battle_enemies',
+					'steps', 'max_fork_node', 'max_fork', 'node_rate']
+
+	list_editable = ['order', 'enemies', 'max_battle_enemies',
+					 'steps', 'max_fork_node', 'max_fork', 'node_rate']
+
+	# inlines = [EnemiesInline]

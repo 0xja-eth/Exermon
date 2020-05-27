@@ -715,7 +715,20 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器项
     /// </summary>
-    public abstract class PackContItem<T> : PackContItem where T : BaseItem {
+    public abstract class PackContItem<T> : PackContItem, 
+        ParamDisplay.IDisplayDataConvertable where T : BaseItem {
+
+        #region 属性显示数据生成
+
+        /// <summary>
+        /// 转化为属性信息集
+        /// </summary>
+        /// <returns>属性信息集</returns>
+        public JsonData convertToDisplayData(string type = "") {
+            return item().convertToDisplayData(type);
+        }
+
+        #endregion
 
         /// <summary>
         /// 物品

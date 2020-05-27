@@ -777,10 +777,12 @@ namespace GameModule.Services {
                 var steps = stage.steps;
                 var xCnt = steps.Length;
                 nodes = new List<ExerProMapNode>[xCnt];
-                for (int x = 0; x < xCnt; ++x) 
+                for (int x = 0; x < xCnt; ++x) {
+                    nodes[x] = new List<ExerProMapNode>();
                     for (int y = 0; y < steps[x]; ++y)
                         nodes[x].Add(stageRecord.createNode(
-                            x, y, generateNodeType()));
+                            x, y, generateNodeType(x, xCnt)));
+                }
 
                 return true;
             }
@@ -789,8 +791,8 @@ namespace GameModule.Services {
             /// 生成据点类型
             /// </summary>
             /// <returns></returns>
-            ExerProMapNode.Type generateNodeType() {
-                if (stage == null) return ExerProMapNode.Type.Unknown;
+            ExerProMapNode.Type generateNodeType(int x, int xCnt) {
+                if (x == xCnt - 1) return ExerProMapNode.Type.Boss;
 
                 var rates = stage.nodeRate;
                 var rateList = new List<int>();
@@ -873,7 +875,8 @@ namespace GameModule.Services {
                     }
 
                     // 剩余未分配的下一个据点则全部作为本步最后一个据点的下一步
-                    while(ny < nodes[x + 1].Count) _addNext(node, ref ny);
+                    for(; ny < nodes[x + 1].Count; ++ny)
+                        _addNext(node, ref ny, incr: false);
                 }
                 return true;
             }

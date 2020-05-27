@@ -1,10 +1,12 @@
 ﻿
+using System.Collections.Generic;
+
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-using HedgehogTeam.EasyTouch;
+using Core.UI.Utils;
 
-using Core.UI;
+using UI.Common.Controls.ItemDisplays;
+using ExerPro.EnglishModule.Data;
 
 /// <summary>
 /// 地图场景控件
@@ -12,235 +14,156 @@ using Core.UI;
 namespace UI.ExerPro.EnglishPro.MapScene.Controls {
 
     /// <summary>
-    /// 地图显示组件（可拖拽，已弃用）
+    /// 地图显示组件
     /// </summary>
-    class MapDisplay : BaseView,
-    IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class MapDisplay : SelectableContainerDisplay<ExerProMapNode>,
+        IItemDisplay<MapStageRecord> {
 
         /// <summary>
-        /// 外部组件设置
+        /// 外部组件定义
         /// </summary>
-        public RectTransform mask; // 遮罩
+        public GameObject linePerfab;
+        public Transform lineContainer;
 
         /// <summary>
-        /// 外部变量设置
+        /// 外部变量定义
         /// </summary>
-        public float gestureSens = 0.0002f;
-        public float scrollSens = 0.7f;
-        public float minScale = 0.4f, maxScale = 1f;
+        public float xPadding = 64;
+        public float yPadding = 64;
+        public float xSpacing = 192;
+        public float maxYSpacing = 128;
 
         /// <summary>
-        /// 内部变量声明
+        /// 线段储存池
         /// </summary>
-        RectTransform rTransform; // 自己的RectTransform
+        List<GameObject> lines;
 
-        Vector2 lastDragPos;
-        Vector2 maxDelta;
-
-        bool gesturing = false; // 手势事件标志
-        bool lastGesturing = false;
-
-        bool dragging = false;
-
-        #region 初始化
+        #region 界面绘制
 
         /// <summary>
-        /// 初始化
+        /// 根据结点获取具体显示位置
         /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            rTransform = transform as RectTransform;
-            setupMinScale();
-            updateMaxPositionDelta();
-        }
+        /// <param name="node"></param>
+        /// <returns></returns>
+        Vector2 getPosition(ExerProMapNode node) {
+            int x = node.xOrder, y = node.yOrder;
+            var maxY = record.stage().steps[x];
 
-        /// <summary>
-        /// 配置最小缩放
-        /// </summary>
-        void setupMinScale() {
-            var size = rTransform.rect.size;
-            var maskSize = mask.rect.size;
-            var min = maskSize / size;
-            minScale = Mathf.Max(min.x, min.y, minScale);
-        }
+            double posX = x * xSpacing + node.xOffset + xPadding, posY;
 
-        #endregion
+            if (maxY == 1) posY = 0;
+            else {
+                var height = container.rect.height - yPadding * 2;
+                var ySpacing = height / (maxY - 1);
 
-        #region 更新控制
+                ySpacing = Mathf.Min(ySpacing, maxYSpacing);
 
-        /// <summary>
-        /// 更新
-        /// </summary>
-        protected override void update() {
-            base.update();
-            updateGesture();
-            updateScroll();
-        }
+                posY = -(y - (maxY - 1) / 2.0) * ySpacing + node.yOffset;
+            }
 
-        /// <summary>
-        /// 更新手势
-        /// </summary>
-        void updateGesture() {
-            if (!lastGesturing) gesturing = false;
-            lastGesturing = false;
-        }
+            var pos = new Vector2((float)posX, (float)posY);
 
-        /// <summary>
-        /// 更新滚轮事件
-        /// </summary>
-        void updateScroll() {
-            var delta = Input.GetAxis("Mouse ScrollWheel");
-            if (delta != 0)
-                scaleDelta(delta * scrollSens, Input.mousePosition);
-        }
+            Debug.Log("getPosition: x: " + x + ", y:" + y + " => " + pos);
 
-        #endregion
-
-        #region 坐标控制
-
-        /// <summary>
-        /// 移动到
-        /// </summary>
-        /// <param name="pos"></param>
-        public void moveTo(Vector2 pos) {
-            var ori = rTransform.anchoredPosition;
-            rTransform.anchoredPosition = adjustPosition(pos);
-            if (ori != rTransform.anchoredPosition)
-                onPositionChanged(ori, rTransform.anchoredPosition);
-        }
-
-        /// <summary>
-        /// 移动
-        /// </summary>
-        /// <param name="delta">Delta 坐标</param>
-        public void moveDetla(Vector2 delta) {
-            moveTo(rTransform.anchoredPosition + delta);
-        }
-
-        /// <summary>
-        /// 调整位置
-        /// </summary>
-        /// <param name="pos">新位置</param>
-        /// <returns>最终位置是否有改变</returns>
-        Vector2 adjustPosition(Vector2 pos) {
-            // var oriPos = pos;
-            if (pos.x > maxDelta.x) pos.x = maxDelta.x;
-            if (pos.x < -maxDelta.x) pos.x = -maxDelta.x;
-            if (pos.y > maxDelta.y) pos.y = maxDelta.y;
-            if (pos.y < -maxDelta.y) pos.y = -maxDelta.y;
             return pos;
         }
 
         /// <summary>
-        /// 位置改变回调
+        /// 子节点创建回调
         /// </summary>
-        void onPositionChanged(Vector2 ori, Vector2 cur) { }
-
-        /// <summary>
-        /// 缩放到
-        /// </summary>
-        /// <param name="scale">目标缩放</param>
-        /// <param name="position">原点</param>
-        public void scaleTo(Vector3 scale, Vector2 position) {
-            var ori = rTransform.localScale;
-            rTransform.localScale = adjustScale(scale);
-            if (ori != rTransform.localScale)
-                onScaleChanged(ori, rTransform.localScale, position);
+        /// <param name="sub"></param>
+        /// <param name="index"></param>
+        protected override void onSubViewCreated(SelectableItemDisplay<ExerProMapNode> sub, int index) {
+            base.onSubViewCreated(sub, index);
+            var node = items[index];
+            var pos = getPosition(node);
+            var rt = sub.transform as RectTransform;
+            rt.anchoredPosition = pos;
+            drawLines(node);
         }
 
         /// <summary>
-        /// 缩放
+        /// 绘制线段
         /// </summary>
-        /// <param name="delta">缩放量</param>
-        /// <param name="position">原点</param>
-        public void scaleDelta(Vector2 delta, Vector2 position) {
-            var delta3 = new Vector3(delta.x, delta.y, 0);
-            scaleTo(rTransform.localScale + delta3, position);
-        }
-        public void scaleDelta(float delta, Vector2 position) {
-            scaleDelta(new Vector2(delta, delta), position);
-        }
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        void drawLine(Vector2 start, Vector2 end) {
+            var go = Instantiate(linePerfab, lineContainer);
+            var rt = go.transform as RectTransform;
 
-        /// <summary>
-        /// 缩放改变回调
-        /// </summary>
-        void onScaleChanged(Vector3 ori, Vector3 cur, Vector2 position) {
-            updateMaxPositionDelta();
-            adjustScaledPosition(cur - ori, position);
-        }
+            var delta = end - start;
+            var angle = Mathf.Atan(delta.y / delta.x) / Mathf.PI * 180;
+            var dist = delta.magnitude;
 
-        /// <summary>
-        /// 调整缩放
-        /// </summary>
-        Vector3 adjustScale(Vector3 scale) {
-            scale.x = Mathf.Clamp(scale.x, minScale, maxScale);
-            scale.y = Mathf.Clamp(scale.y, minScale, maxScale);
-            return scale;
+            var size = rt.sizeDelta; size.x = dist;
+            var rot = rt.eulerAngles; rot.z = angle;
+
+            rt.anchoredPosition = start;
+            rt.sizeDelta = size;
+            rt.eulerAngles = rot;
+        }
+        void drawLine(ExerProMapNode start, ExerProMapNode end) {
+            drawLine(getPosition(start), getPosition(end));
         }
 
         /// <summary>
-        /// 调整缩放后的位置
+        /// 绘制多个线条
         /// </summary>
-        void adjustScaledPosition(Vector2 delta, Vector2 position) {
-            var size = rTransform.rect.size * rTransform.localScale;
-            var maskSize = mask.rect.size;
-            var targetPos = size / 2 - rTransform.anchoredPosition +
-                (position - mask.anchoredPosition - maskSize / 2);
-            var deltaPos = size / 2 - targetPos;
-            var deltaMove = deltaPos * delta;
-
-            moveDetla(deltaMove);
+        /// <param name="node"></param>
+        void drawLines(ExerProMapNode node) {
+            var nexts = node.getNexts();
+            foreach (var next in nexts) drawLine(node, next);
         }
 
         /// <summary>
-        /// 更新最大位置偏移量
+        /// 更新内容尺寸
         /// </summary>
-        void updateMaxPositionDelta() {
-            var size = rTransform.rect.size * rTransform.localScale;
-            maxDelta = (size - mask.rect.size) / 2;
+        void updateContentSize() {
+            if (record == null) return;
+            var len = record.stage().steps.Length - 1;
+            SceneUtils.setRectWidth(container, xSpacing * len + xPadding * 2);
+        }
+
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        protected override void refresh() {
+            base.refresh();
+            updateContentSize();
         }
 
         #endregion
 
-        #region 事件控制
+        #region 接口实现
 
         /// <summary>
-        /// 开始拖拽事件
+        /// 关卡记录
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnBeginDrag(PointerEventData eventData) {
-            if (gesturing) return;
-            dragging = true;
-            lastDragPos = eventData.position;
+        MapStageRecord record = null;
+
+        /// <summary>
+        /// 获取物品
+        /// </summary>
+        /// <returns></returns>
+        public MapStageRecord getItem() {
+            return record;
         }
 
         /// <summary>
-        /// 拖拽中回调事件
+        /// 设置物品
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnDrag(PointerEventData eventData) {
-            if (!dragging || gesturing) return;
-            moveDetla(eventData.position - lastDragPos);
-            lastDragPos = eventData.position;
+        /// <param name="item"></param>
+        /// <param name="force"></param>
+        public void setItem(MapStageRecord item, bool force = false) {
+            record = item; setItems(item.nodes);
         }
 
         /// <summary>
-        /// 拖拽结束事件
+        /// 开启视图
         /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnEndDrag(PointerEventData eventData) {
-            dragging = false;
-        }
-
-        /// <summary>
-        /// 手势时间回调
-        /// </summary>
-        /// <param name="gesture">手势数据</param>
-        public void onGesture(Gesture gesture) {
-            lastGesturing = gesturing = true;
-            dragging = false;
-
-            scaleDelta(gesture.deltaPinch * gestureSens, gesture.position / 2);
+        /// <param name="item"></param>
+        public void startView(MapStageRecord item) {
+            setItem(item, true);
         }
 
         #endregion

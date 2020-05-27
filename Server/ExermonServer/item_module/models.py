@@ -253,9 +253,9 @@ class BaseItem(models.Model):
 		# ExerProItem
 		(ItemType.ExerProItem.value, '特训物品'),
 		(ItemType.ExerProPotion.value, '特训药水'),
-		(ItemType.ExerCard.value, '特训卡片'),
+		(ItemType.ExerProCard.value, '特训卡片'),
 
-		(ItemType.ExerEnemy.value, '特训敌人'),
+		(ItemType.ExerProEnemy.value, '特训敌人'),
 	]
 
 	# 道具类型

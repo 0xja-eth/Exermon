@@ -74,7 +74,7 @@ class Service:
 		from question_module.models import QuesSugar
 
 		# eng_pro
-		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy, Map
+		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy, ExerProMap
 
 		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
 		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
@@ -93,7 +93,7 @@ class Service:
 		exer_pro_cards = ModelUtils.objectsToDict(ExerProCard.objects.all())
 		exer_pro_enemies = ModelUtils.objectsToDict(ExerProEnemy.objects.all())
 
-		exer_pro_maps = ModelUtils.objectsToDict(Map)
+		exer_pro_maps = ModelUtils.objectsToDict(ExerProMap.objects.all())
 
 		return {
 			'exermons': exermons,

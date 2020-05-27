@@ -191,7 +191,7 @@ namespace ExerPro.EnglishModule.Data {
     }
 
     /// <summary>
-    /// 特训药水数据
+    /// 特训卡片数据
     /// </summary>
     public class ExerProCard : BaseItem {
 
@@ -245,6 +245,44 @@ namespace ExerPro.EnglishModule.Data {
 
     #endregion
 
+    #region 容器项
+
+    /// <summary>
+    /// 特训背包物品
+    /// </summary>
+    public class ExerProPackItem : PackContItem<ExerProItem> { }
+
+    /// <summary>
+    /// 特训背包药水
+    /// </summary>
+    public class ExerProPackPotion : PackContItem<ExerProPotion> { }
+
+    /// <summary>
+    /// 特训背包卡片
+    /// </summary>
+    public class ExerProPackCard : PackContItem<ExerProCard> { }
+
+    #endregion
+
+    #region 容器
+
+    /// <summary>
+    /// 特训物品背包
+    /// </summary>
+    public class ExerProItemPack : PackContainer<ExerProPackItem> { }
+
+    /// <summary>
+    /// 特训药水背包
+    /// </summary>
+    public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
+
+    /// <summary>
+    /// 特训卡片背包
+    /// </summary>
+    public class ExerProCardPack : PackContainer<ExerProPackCard> { }
+
+    #endregion
+
     #region 地图
 
     /// <summary>
@@ -286,6 +324,15 @@ namespace ExerPro.EnglishModule.Data {
             base.loadCustomAttributes(json);
             foreach (var stage in stages) stage.map = this;
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProMap() { }
+        public ExerProMap(string name, int level, int minLevel, ExerProMapStage[] stages) {
+            this.name = name; this.level = level; this.minLevel = minLevel;
+            this.stages = stages;
+        }
     }
 
     /// <summary>
@@ -298,7 +345,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         [AutoConvert]
         public int order { get; protected set; }
-        [AutoConvert("enemies")]
+        [AutoConvert]
         public int[] enemies { get; protected set; }
         [AutoConvert]
         public int maxBattleEnemies { get; protected set; }
@@ -315,6 +362,52 @@ namespace ExerPro.EnglishModule.Data {
         /// 地图
         /// </summary>
         public ExerProMap map { get; set; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProMapStage() { }
+        public ExerProMapStage(int order, int[] enemies, int maxBattleEnemies,
+            int[] steps, int maxForkNode, int maxFork, int[] nodeRate) {
+            this.order = order; this.enemies = enemies;
+            this.maxBattleEnemies = maxBattleEnemies;
+            this.steps = steps; this.maxFork = maxFork;
+            this.maxForkNode = maxForkNode;
+            this.nodeRate = nodeRate;
+        }
+    }
+
+    #endregion
+
+    #region 储存信息
+
+    /// <summary>
+    /// 特训玩家
+    /// </summary>
+    public class ExerProActor : BaseData {
+
+        /// <summary>
+        /// 默认属性
+        /// </summary>
+        public const int DefaultMHP = 50; // 初始体力值
+        public const int DefaultPower = 5; // 初始力量
+        public const int DefaultDefense = 5; // 初始格挡
+        public const int DefaultAgile = 5; // 初始敏捷
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int mhp { get; protected set; }
+        [AutoConvert]
+        public int hp { get; protected set; }
+
+        [AutoConvert]
+        public ExerProItemPack itemPack { get; protected set; }
+        [AutoConvert]
+        public ExerProPotionPack potionPack { get; protected set; }
+        [AutoConvert]
+        public ExerProCardPack cardPack { get; protected set; }
     }
 
     /// <summary>
@@ -334,7 +427,15 @@ namespace ExerPro.EnglishModule.Data {
         public bool initialized { get; protected set; } = false;
 
         [AutoConvert]
-        public List<ExerProMapNode> nodes { get; protected set; }
+        public List<ExerProMapNode> nodes { get; protected set; } = new List<ExerProMapNode>();
+
+        /// <summary>
+        /// 角色属性
+        /// </summary>
+        [AutoConvert]
+        public int currentId { get; protected set; } // 当前节点索引
+        [AutoConvert]
+        public ExerProActor actor { get; protected set; }
 
         /// <summary>
         /// 获取关卡
@@ -401,8 +502,7 @@ namespace ExerPro.EnglishModule.Data {
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
             for (int i = 0; i < nodes.Count; ++i) {
-                nodes[i].setId(i);
-                nodes[i].stage = this;
+                nodes[i].setId(i); nodes[i].stage = this;
             }
 
             generate();
@@ -442,6 +542,7 @@ namespace ExerPro.EnglishModule.Data {
 	        Enemy = 3, //敌人据点
 	        Elite = 4, //精英据点
 	        Unknown = 5, //未知据点
+            Boss = 6, // 最终BOSS
         }
 
         /// <summary>
