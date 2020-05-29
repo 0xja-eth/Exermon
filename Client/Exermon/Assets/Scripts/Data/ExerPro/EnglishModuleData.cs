@@ -161,6 +161,75 @@ namespace ExerPro.EnglishModule.Data {
     #region 物品
 
     /// <summary>
+    /// 特训效果数据
+    /// </summary>
+    public class ExerProEffectData : BaseData {
+
+        /// <summary>
+        /// 效果代码枚举
+        /// </summary>
+        public enum Code {
+            Unset = 0, // 空
+
+            Attack = 1, // 造成伤害
+            AttackSlash = 2, // 造成伤害（完美斩击）
+            AttackBlack = 3, // 造成伤害（黑旋风）
+            AttackWave = 4, // 造成伤害（波动拳）
+            AttackRite = 5, // 造成伤害（仪式匕首）
+            Recover = 100, // 回复体力值
+            AddParam = 200, // 增加能力值
+            AddParamUrgent = 201, // 增加能力值（紧急按钮）
+            TempAddParam = 210, // 临时增加能力值
+            AddStatus = 220, // 增加状态
+            GetCards = 300, // 抽取卡牌
+            RemoveCards = 310, // 移除卡牌
+            ChangeCost = 400, // 更改耗能
+            ChangeCostDisc = 401, // 更改耗能（发现）
+            ChangeCostCrazy = 402, // 更改耗能（疯狂）
+
+            Sadistic = 500, // 残虐天性
+            ForceAddStatus = 600, // 增加己方状态
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int code { get; protected set; }
+        [AutoConvert("params")]
+        public JsonData params_ { get; protected set; } // 参数（数组）
+
+        /*
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public EffectData() { }
+        public EffectData(Code code, JsonData params_,
+            string description, string shortDescription) {
+            this.code = (int)code;
+            this.params_ = params_;
+        }
+        */
+    }
+
+    /// <summary>
+    /// 特训物品数据
+    /// </summary>
+    public class BaseExerProItem : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int starId { get; protected set; }
+        [AutoConvert]
+        public int gold { get; protected set; }
+        [AutoConvert]
+        public ExerProEffectData[] effects { get; protected set; }
+
+    }
+
+    /// <summary>
     /// 特训物品数据
     /// </summary>
     public class ExerProItem : BaseItem {
@@ -399,6 +468,8 @@ namespace ExerPro.EnglishModule.Data {
         public const int DefaultDefense = 5; // 初始格挡
         public const int DefaultAgile = 5; // 初始敏捷
 
+        public const int DefaultGold = 100; // 初始金币
+
         /// <summary>
         /// 属性
         /// </summary>
@@ -412,6 +483,9 @@ namespace ExerPro.EnglishModule.Data {
         public int defense { get; protected set; } = DefaultDefense;
         [AutoConvert]
         public int agile { get; protected set; } = DefaultAgile;
+
+        [AutoConvert]
+        public int gold { get; protected set; } = DefaultGold;
 
         [AutoConvert]
         public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();

@@ -969,6 +969,9 @@ class GameConfigure(models.Model):
 
 		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
 
+		exer_pro_item_stars = ModelUtils.objectsToDict(self.exerproitemstar_set.all())
+		antonyms = ModelUtils.objectsToDict(self.antonym_set.all())
+
 		return {
 			'name': self.name,
 			'eng_name': self.eng_name,
@@ -1015,7 +1018,7 @@ class GameConfigure(models.Model):
 			# english_pro_module
 			'correct_types': WrongItem.TYPES,
 			'card_types': ExerProCard.CARD_TYPES,
-			'enemy_levels': ExerProEnemy.LEVELS,
+			'enemy_levels': ExerProEnemy.ENEMY_TYPES,
 
 			# 组合配置
 			'subjects': subjects,
@@ -1029,6 +1032,10 @@ class GameConfigure(models.Model):
 			'item_stars': item_stars,
 			'comp_ranks': comp_ranks,
 			'result_judges': result_judges,
+
+			'antonyms': antonyms,
+
+			'exer_pro_item_stars': exer_pro_item_stars,
 		}
 
 	def _convertDynamicDataToDict(self):

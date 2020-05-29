@@ -291,6 +291,18 @@ namespace GameModule.Data {
     }
 
     /// <summary>
+    /// 特训物品星级数据
+    /// </summary>
+    public class ExerProItemStar : TypeData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public Color color { get; protected set; }
+    }
+
+    /// <summary>
     /// 题目星级数据
     /// </summary>
     public class QuesStar : TypeData {
@@ -460,6 +472,9 @@ namespace GameModule.Data {
         public CompRank[] compRanks { get; protected set; }
         [AutoConvert]
         public ResultJudge[] resultJudges { get; protected set; }
+
+        [AutoConvert]
+        public ExerProItemStar[] exerProItemStars { get; protected set; }
     }
 
     /// <summary>

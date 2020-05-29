@@ -427,6 +427,10 @@ namespace GameModule.Services {
             return get(staticData.configure.resultJudges, id);
         }
 
+        public ExerProItemStar exerProItemStar(int id) {
+            return get(staticData.configure.exerProItemStars, id);
+        }
+
         /// <summary>
         /// 数据库
         /// </summary>

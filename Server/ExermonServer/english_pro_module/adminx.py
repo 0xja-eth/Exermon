@@ -25,16 +25,16 @@ class ListeningQuesChoicesInline(BaseQuesChoicesInline):
 	model = ListeningQuesChoice
 
 
-class ReadingQuesChoicesInline(BaseQuesChoicesInline):
-	model = ReadingQuesChoice
+# class ReadingQuesChoicesInline(BaseQuesChoicesInline):
+# 	model = ReadingQuesChoice
 
 
 class ListeningSubQuestionsInline(BaseQuestionsInline):
 	model = ListeningSubQuestion
 
 
-class ReadingSubQuestionsInline(BaseQuestionsInline):
-	model = ReadingSubQuestion
+# class ReadingSubQuestionsInline(BaseQuestionsInline):
+# 	model = ReadingSubQuestion
 
 
 class WrongItemsInline(object):
@@ -52,6 +52,14 @@ class ExerProPotionEffectsInline(BaseEffectsInline):
 
 class ExerProCardEffectsInline(BaseEffectsInline):
 	model = ExerProCardEffect
+
+
+class EnemyEffectsInline(BaseEffectsInline):
+	model = EnemyEffect
+
+
+class EnemyActionsInline(BaseEffectsInline):
+	model = EnemyAction
 
 
 class MapStagesInline(object):
@@ -77,9 +85,9 @@ class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 	inlines = [ListeningQuesChoicesInline]
 
 
-@xadmin.sites.register(ReadingSubQuestion)
-class ListeningSubQuestionAdmin(BaseQuestionAdmin):
-	inlines = [ReadingQuesChoicesInline]
+# @xadmin.sites.register(ReadingSubQuestion)
+# class ReadingSubQuestionAdmin(BaseQuestionAdmin):
+# 	inlines = [ReadingQuesChoicesInline]
 
 
 @xadmin.sites.register(ListeningQuestion)
@@ -87,9 +95,17 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 	inlines = [ListeningSubQuestionsInline]
 
 
-@xadmin.sites.register(ReadingQuestion)
-class ListeningQuestionAdmin(GroupQuestionAdmin):
-	inlines = [ReadingSubQuestionsInline]
+# @xadmin.sites.register(ReadingQuestion)
+# class ReadingQuestionAdmin(GroupQuestionAdmin):
+# 	inlines = [ReadingSubQuestionsInline]
+
+
+@xadmin.sites.register(InfinitiveQuestion)
+class InfinitiveQuestionAdmin(object):
+
+	list_display = ['id', 'word', 'chinese', 'infinitive']
+
+	list_editable = ['word', 'chinese', 'infinitive']
 
 
 @xadmin.sites.register(CorrectionQuestion)
@@ -130,6 +146,13 @@ class WordRecordAdmin(object):
 					 'first_date', 'collected', 'wrong']
 
 
+@xadmin.sites.register(Antonym)
+class AntonymAdmin(object):
+	list_display = ['id', 'card_word', 'enemy_word', 'hurt_rate']
+
+	list_editable = ['card_word', 'enemy_word', 'hurt_rate']
+
+
 @xadmin.sites.register(ExerProItem)
 class ExerProItemAdmin(BaseItemAdmin):
 
@@ -166,12 +189,15 @@ class ExerProPotionAdmin(BaseItemAdmin):
 class ExerProCardAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['cost', 'card_type']
+				   ['cost', 'card_type', 'inherent', 'disposable',
+					'character', 'target']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   ['cost', 'card_type']
+				   ['cost', 'card_type', 'inherent', 'disposable',
+					'character', 'target']
 
-	field_set = [Fieldset('特训卡片属性', 'cost', 'card_type')]
+	field_set = [Fieldset('特训卡片属性', 'cost', 'card_type',
+						  'inherent', 'disposable', 'character', 'target')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
@@ -182,16 +208,17 @@ class ExerProCardAdmin(BaseItemAdmin):
 class ExerProEnemyAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['mhp', 'power', 'level']
+				   ['type', 'mhp', 'power', 'defense', 'character']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   ['mhp', 'power', 'level']
+				   ['type', 'mhp', 'power', 'defense', 'character']
 
-	field_set = [Fieldset('特训敌人属性', 'mhp', 'power', 'level')]
+	field_set = [Fieldset('特训敌人属性', 'type', 'mhp', 'power',
+						  'defense', 'character')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [EnemyActionsInline, EnemyEffectsInline]
 
 
 @xadmin.sites.register(ExerProStatus)

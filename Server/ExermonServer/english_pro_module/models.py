@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.conf import settings
+from game_module.models import GroupConfigure
 from item_module.models import *
 from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
 from utils.model_utils import QuestionAudioUpload, Common as ModelUtils
@@ -129,6 +130,37 @@ class ReadingQuestion(GroupQuestion):
 			返回该听力题目的子题目
 		"""
 		return self.readingsubquestion_set.all()
+
+
+# ===================================================
+#  不定式题
+# ===================================================
+class InfinitiveQuestion(models.Model):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "不定式题"
+
+	# 单词
+	word = models.CharField(max_length=64, verbose_name="单词")
+
+	# 中文翻译
+	chinese = models.CharField(max_length=64, verbose_name="中文")
+
+	# 不定式项
+	infinitive = models.CharField(max_length=64, verbose_name="不定式项")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		return {
+			'id': self.id,
+			'word': self.word,
+			'chinese': self.chinese,
+			'infinitive': self.infinitive
+		}
 
 
 # ===================================================
@@ -482,6 +514,72 @@ class ExerProEffect(models.Model):
 
 
 # ===================================================
+#  特训物品星级表
+# ===================================================
+class ExerProItemStar(GroupConfigure):
+	class Meta:
+		verbose_name = verbose_name_plural = "特训物品星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
+
+	def __str__(self):
+		return self.name
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
+
+	def convertToDict(self):
+		return {
+			'id': self.id,
+			'name': self.name,
+			'color': self.color,
+		}
+
+
+# ===================================================
+#  基本特训物品表
+# ===================================================
+class BaseExerProItem(BaseItem):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训物品"
+
+	# 物品星级（稀罕度）
+	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
+
+	# 金币（0表示不可购买）
+	gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+
+	def convertToDict(self, **kwargs):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict(**kwargs)
+
+		effects = ModelUtils.objectsToDict(self.effects())
+
+		res['star_id'] = self.star_id
+		res['gold'] = self.gold
+		res['effects'] = effects
+
+		return res
+
+	def effects(self):
+		raise NotImplementedError
+
+
+# ===================================================
 #  特训物品使用效果表
 # ===================================================
 class ExerProItemEffect(ExerProEffect):
@@ -497,7 +595,7 @@ class ExerProItemEffect(ExerProEffect):
 # ===================================================
 #  特训物品表
 # ===================================================
-class ExerProItem(BaseItem):
+class ExerProItem(BaseExerProItem):
 
 	class Meta:
 
@@ -505,6 +603,9 @@ class ExerProItem(BaseItem):
 
 	# 道具类型
 	TYPE = ItemType.ExerProItem
+
+	def effects(self):
+		return self.exerproitemeffect_set.all()
 
 
 # ===================================================
@@ -523,7 +624,7 @@ class ExerProPotionEffect(ExerProEffect):
 # ===================================================
 #  特训药水表
 # ===================================================
-class ExerProPotion(BaseItem):
+class ExerProPotion(BaseExerProItem):
 
 	class Meta:
 
@@ -531,18 +632,6 @@ class ExerProPotion(BaseItem):
 
 	# 道具类型
 	TYPE = ItemType.ExerProPotion
-
-	# HP回复点数
-	hp_recover = models.SmallIntegerField(default=0, verbose_name="HP回复点数")
-
-	# HP回复率（*100）
-	hp_rate = models.IntegerField(default=0, verbose_name="HP回复率")
-
-	# 力量提升点数
-	power_add = models.SmallIntegerField(default=0, verbose_name="力量提升点数")
-
-	# 力量提升率（*100）（提升的概率，即计算中要+1）
-	power_rate = models.IntegerField(default=0, verbose_name="力量提升率")
 
 	def convertToDict(self):
 		"""
@@ -552,12 +641,10 @@ class ExerProPotion(BaseItem):
 		"""
 		res = super().convertToDict()
 
-		res['hp_recover'] = self.hp_recover
-		res['hp_rate'] = self.hp_rate / 100
-		res['power_add'] = self.power_add
-		res['power_rate'] = self.power_rate / 100
-
 		return res
+
+	def effects(self):
+		return self.exerpropotioneffect_set.all()
 
 
 # ===================================================
@@ -574,12 +661,58 @@ class ExerProCardEffect(ExerProEffect):
 
 
 # ===================================================
+#  反义词表
+# ===================================================
+class Antonym(GroupConfigure):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "反义词"
+
+	# 道具类型
+	TYPE = ItemType.ExerProCard
+
+	# 卡牌词
+	card_word = models.CharField(max_length=32, verbose_name="卡牌词")
+
+	# 敌人词
+	enemy_word = models.CharField(max_length=32, verbose_name="敌人词")
+
+	# 伤害比率（*100）
+	hurt_rate = models.SmallIntegerField(default=100, verbose_name="伤害比率")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		return {
+			'card_word': self.card_word,
+			'enemy_word': self.enemy_word,
+			'hurt_rate': self.hurt_rate / 100,
+		}
+
+
+# ===================================================
 #  卡片类型枚举
 # ===================================================
 class ExerProCardType(Enum):
 
-	Normal = 1  # 普通
-	Evil = 2  # 诅咒
+	Attack = 1  # 攻击
+	Skill = 2  # 技能
+	Ability = 3  # 能力
+	Evil = 4  # 诅咒
+
+
+# ===================================================
+#  卡片类目标举
+# ===================================================
+class ExerProCardTarget(Enum):
+
+	Default = 0  # 默认
+	One = 1  # 单体
+	All = 2  # 群体
 
 
 # ===================================================
@@ -595,16 +728,37 @@ class ExerProCard(BaseItem):
 	TYPE = ItemType.ExerProCard
 
 	CARD_TYPES = [
-		(ExerProCardType.Normal.value, '普通'),
+		(ExerProCardType.Attack.value, '攻击'),
+		(ExerProCardType.Skill.value, '技能'),
+		(ExerProCardType.Ability.value, '能力'),
 		(ExerProCardType.Evil.value, '诅咒'),
+	]
+
+	TARGETS = [
+		(ExerProCardTarget.Default.value, '默认'),
+		(ExerProCardTarget.One.value, '单体'),
+		(ExerProCardTarget.All.value, '群体'),
 	]
 
 	# 消耗能量
 	cost = models.PositiveSmallIntegerField(default=1, verbose_name="消耗能量")
 
 	# 卡片类型
-	card_type = models.PositiveSmallIntegerField(
-		default=ExerProCardType.Normal.value, choices=CARD_TYPES, verbose_name="卡片类型")
+	card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
+												 choices=CARD_TYPES, verbose_name="卡片类型")
+
+	# 固有
+	inherent = models.BooleanField(default=False, verbose_name="固有")
+
+	# 消耗（一次性的）
+	disposable = models.BooleanField(default=False, verbose_name="消耗")
+
+	# 性质
+	character = models.CharField(default="", blank=True, max_length=32, verbose_name="性质")
+
+	# 目标
+	target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
+											  choices=CARD_TYPES, verbose_name="目标")
 
 	def convertToDict(self):
 		"""
@@ -619,11 +773,89 @@ class ExerProCard(BaseItem):
 
 		return res
 
+	def effects(self):
+		return self.exerprocardeffect_set.all()
+
+
+# ===================================================
+#  特训敌人攻击效果表
+# ===================================================
+class EnemyEffect(ExerProEffect):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "特训敌人攻击效果"
+
+	# 敌人
+	enemy = models.ForeignKey('ExerProEnemy', on_delete=models.CASCADE,
+							 verbose_name="敌人")
+
+
+# ===================================================
+#  敌人行动类型枚举
+# ===================================================
+class EnemyActionType(Enum):
+
+	Attack = 1,  # 攻击
+	PowerUp = 2,  # 提升
+	PowerDown = 3,  # 削弱
+	Escape = 4,  # 逃跑
+	Unset = 5,  # 什么都不做
+
+
+# ===================================================
+#  敌人行动表
+# ===================================================
+class EnemyAction(models.Model):
+	class Meta:
+		verbose_name = verbose_name_plural = "敌人行动"
+
+	TYPES = [
+		(1, '攻击'),
+		(2, '提升'),
+		(3, '削弱'),
+		(4, '逃跑'),
+		(5, '无'),
+		# (EnemyActionType.Attack.value, '攻击'),
+		# (EnemyActionType.PowerUp.value, '提升'),
+		# (EnemyActionType.PowerDown.value, '削弱'),
+		# (EnemyActionType.Escape.value, '逃跑'),
+		# (EnemyActionType.Unset.value, '无'),
+	]
+
+	# 回合
+	round = jsonfield.JSONField(default=[], verbose_name="回合")
+
+	# 类型
+	type = models.PositiveSmallIntegerField(default=EnemyActionType.Unset.value,
+											choices=TYPES, verbose_name="类型")
+
+	# 参数
+	params = jsonfield.JSONField(default=[], verbose_name="参数")
+
+	# 权重
+	rate = models.PositiveSmallIntegerField(default=10, verbose_name="权重")
+
+	# 敌人
+	enemy = models.ForeignKey("ExerProEnemy", on_delete=models.CASCADE, verbose_name="敌人")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		return {
+			'round': self.round,
+			'type': self.type,
+			'params': self.params,
+			'rate': self.rate,
+		}
+
 
 # ===================================================
 #  敌人等级枚举
 # ===================================================
-class ExerProEnemyLevel(Enum):
+class ExerProEnemyType(Enum):
 
 	Normal = 1  # 普通
 	Elite = 2  # 精英
@@ -642,11 +874,15 @@ class ExerProEnemy(BaseItem):
 	# 道具类型
 	TYPE = ItemType.ExerProEnemy
 
-	LEVELS = [
-		(ExerProEnemyLevel.Normal.value, '普通'),
-		(ExerProEnemyLevel.Elite.value, '精英'),
-		(ExerProEnemyLevel.Boss.value, 'BOSS'),
+	ENEMY_TYPES = [
+		(ExerProEnemyType.Normal.value, '普通'),
+		(ExerProEnemyType.Elite.value, '精英'),
+		(ExerProEnemyType.Boss.value, 'BOSS'),
 	]
+
+	# 等级
+	type = models.PositiveSmallIntegerField(default=ExerProEnemyType.Normal.value,
+											choices=ENEMY_TYPES, verbose_name="等级")
 
 	# 最大体力值
 	mhp = models.PositiveSmallIntegerField(default=100, verbose_name="最大体力值")
@@ -654,9 +890,11 @@ class ExerProEnemy(BaseItem):
 	# 力量
 	power = models.PositiveSmallIntegerField(default=10, verbose_name="力量")
 
-	# 等级
-	level = models.PositiveSmallIntegerField(
-		default=ExerProEnemyLevel.Normal.value, choices=LEVELS, verbose_name="等级")
+	# 格挡
+	defense = models.PositiveSmallIntegerField(default=10, verbose_name="格挡")
+
+	# 格挡
+	character = models.CharField(default="", blank=True, max_length=32, verbose_name="性格")
 
 	def convertToDict(self):
 		"""
@@ -666,11 +904,33 @@ class ExerProEnemy(BaseItem):
 		"""
 		res = super().convertToDict()
 
+		actions = ModelUtils.objectsToDict(self.actions())
+		effects = ModelUtils.objectsToDict(self.effects())
+
 		res['mhp'] = self.mhp
 		res['power'] = self.power
-		res['level'] = self.level
+		res['type'] = self.type
+
+		res['actions'] = actions
+		res['effects'] = effects
 
 		return res
+
+	def actions(self):
+		"""
+		获取敌人的行动计划
+		Returns:
+			返回敌人行动计划
+		"""
+		return self.enemyaction_set.all()
+
+	def effects(self):
+		"""
+		获取敌人的攻击效果
+		Returns:
+			返回敌人攻击效果
+		"""
+		return self.enemyeffect_set.all()
 
 
 # ===================================================
