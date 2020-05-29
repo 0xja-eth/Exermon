@@ -16,7 +16,7 @@ from enum import Enum
 
 
 # ===================================================
-#  题目选项表
+#  听力题目选项表
 # ===================================================
 class ListeningQuesChoice(BaseQuesChoice):
 	class Meta:
@@ -28,7 +28,7 @@ class ListeningQuesChoice(BaseQuesChoice):
 
 
 # ===================================================
-#  听力题
+#  听力小题
 # ===================================================
 class ListeningSubQuestion(BaseQuestion):
 
@@ -88,7 +88,7 @@ class ListeningQuestion(GroupQuestion):
 
 
 # ===================================================
-#  题目选项表
+#  阅读题目选项表
 # ===================================================
 class ReadingQuesChoice(BaseQuesChoice):
 	class Meta:
@@ -100,14 +100,14 @@ class ReadingQuesChoice(BaseQuesChoice):
 
 
 # ===================================================
-#  听力题
+#  阅读小题
 # ===================================================
 class ReadingSubQuestion(BaseQuestion):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "阅读小题"
 
-	# 听力题目
+	# 阅读题目
 	question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
 								 verbose_name="阅读题目")
 
