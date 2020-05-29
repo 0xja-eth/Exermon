@@ -53,7 +53,7 @@ namespace ExerPro.EnglishModule.Data {
         public AudioClip audio { get; protected set; }
 
     }
-
+    /*
     /// <summary>
     /// 阅读小题
     /// </summary>
@@ -63,6 +63,24 @@ namespace ExerPro.EnglishModule.Data {
     /// 阅读题
     /// </summary>
     public class ReadingQuestion : GroupQuestion<ReadingSubQuestion> { }
+    */
+
+    /// <summary>
+    /// 不定式题目
+    /// </summary>
+    public class InfinitiveQuestion : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string word { get; protected set; }
+        [AutoConvert]
+        public string chinese { get; protected set; }
+        [AutoConvert]
+        public string infinitive { get; protected set; }
+
+    }
 
     /// <summary>
     /// 改错题
@@ -156,6 +174,22 @@ namespace ExerPro.EnglishModule.Data {
 
     }
 
+    /// <summary>
+    /// 反义词表
+    /// </summary>
+    public class Antonym : TypeData {
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string cardWord { get; protected set; }
+        [AutoConvert]
+        public string enemyWord { get; protected set; }
+        [AutoConvert]
+        public double hurtRate { get; protected set; }
+
+    }
+
     #endregion
 
     #region 物品
@@ -232,7 +266,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训物品数据
     /// </summary>
-    public class ExerProItem : BaseItem {
+    public class ExerProItem : BaseExerProItem {
 
         /// <summary>
         /// 属性
@@ -243,26 +277,27 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训药水数据
     /// </summary>
-    public class ExerProPotion : BaseItem {
+    public class ExerProPotion : BaseExerProItem {
 
         /// <summary>
         /// 属性
         /// </summary>
-        [AutoConvert]
-        public int hpRecover { get; protected set; }
-        [AutoConvert]
-        public double hpRate { get; protected set; }
-        [AutoConvert]
-        public int powerAdd { get; protected set; }
-        [AutoConvert]
-        public int powerRate { get; protected set; }
 
     }
 
     /// <summary>
     /// 特训卡片数据
     /// </summary>
-    public class ExerProCard : BaseItem {
+    public class ExerProCard : BaseExerProItem {
+
+        /// <summary>
+        /// 目标
+        /// </summary>
+        public enum Target {
+            Default = 0,  // 默认
+            One = 1,  // 敌方单体
+            All = 2,  // 敌方全体
+        }
 
         /// <summary>
         /// 属性
@@ -271,6 +306,14 @@ namespace ExerPro.EnglishModule.Data {
         public int cost { get; protected set; }
         [AutoConvert]
         public int cardType { get; protected set; }
+        [AutoConvert]
+        public bool inherent { get; protected set; }
+        [AutoConvert]
+        public bool disposable { get; protected set; }
+        [AutoConvert]
+        public string character { get; protected set; }
+        [AutoConvert]
+        public int target { get; protected set; }
 
         /// <summary>
         /// 类型文本
@@ -287,10 +330,37 @@ namespace ExerPro.EnglishModule.Data {
     public class ExerProEnemy : BaseItem {
 
         /// <summary>
-        /// 等级
+        /// 类型
         /// </summary>
-        public enum Level {
+        public enum EnemyType {
             Normal = 1, Elite = 2, Boss = 3
+        }
+
+        /// <summary>
+        /// 行动数据
+        /// </summary>
+        public class Action : BaseData {
+
+            /// <summary>
+            /// 类型
+            /// </summary>
+            public enum Type {
+                Attack = 1, PowerUp = 2, PowerDown = 3,
+                Escape = 4, Unset = 5
+            }
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int round { get; protected set; }
+            [AutoConvert]
+            public int type { get; protected set; }
+            [AutoConvert("params")]
+            public JsonData params_ { get; protected set; }
+            [AutoConvert]
+            public int rate { get; protected set; }
+
         }
 
         /// <summary>
@@ -301,14 +371,23 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int power { get; protected set; }
         [AutoConvert]
-        public int level { get; protected set; }
+        public int defense { get; protected set; }
+        [AutoConvert]
+        public int type { get; protected set; }
+        [AutoConvert]
+        public string character { get; protected set; }
+
+        [AutoConvert]
+        public Action[] actions { get; protected set; }
+        [AutoConvert]
+        public ExerProEffectData[] effects { get; protected set; }
 
         /// <summary>
         /// 类型文本
         /// </summary>
         /// <returns></returns>
-        public string levelText() {
-            return DataService.get().enemyLevel(level).Item2;
+        public string typeText() {
+            return DataService.get().enemyType(type).Item2;
         }
     }
 
@@ -316,9 +395,9 @@ namespace ExerPro.EnglishModule.Data {
     /// 特训状态数据
     /// </summary>
     public class ExerProStatus : BaseItem { }
-
+    
     #endregion
-
+    
     #region 容器项
 
     /// <summary>
@@ -343,7 +422,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训物品背包
     /// </summary>
-    public class ExerProItemPack : PackContainer<ExerProPackItem> { }
+    //public class ExerProItemPack : PackContainer<ExerProPackItem> { }
 
     /// <summary>
     /// 特训药水背包
@@ -351,9 +430,36 @@ namespace ExerPro.EnglishModule.Data {
     public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
 
     /// <summary>
-    /// 特训卡片背包
+    /// 特训抽牌堆
     /// </summary>
-    public class ExerProCardPack : PackContainer<ExerProPackCard> { }
+    public class ExerProCardDrawGroup : PackContainer<ExerProPackCard> { }
+
+    /// <summary>
+    /// 特训弃牌堆
+    /// </summary>
+    public class ExerProCardDiscardGroup : PackContainer<ExerProPackCard> { }
+
+    /// <summary>
+    /// 特训手牌
+    /// </summary>
+    public class ExerProCardHandGroup : PackContainer<ExerProPackCard> { }
+
+    /// <summary>
+    /// 特训卡组
+    /// </summary>
+    public class ExerProCardGroup : PackContainer<ExerProPackCard> {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public ExerProCardDrawGroup drawGroup { get; protected set; } = new ExerProCardDrawGroup();
+        [AutoConvert]
+        public ExerProCardDiscardGroup discardGroup { get; protected set; } = new ExerProCardDiscardGroup();
+        [AutoConvert]
+        public ExerProCardHandGroup handGroup { get; protected set; } = new ExerProCardHandGroup();
+
+    }
 
     #endregion
 
@@ -487,12 +593,12 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int gold { get; protected set; } = DefaultGold;
 
-        [AutoConvert]
-        public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
+        //[AutoConvert]
+        //public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
         public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
         [AutoConvert]
-        public ExerProCardPack cardPack { get; protected set; } = new ExerProCardPack();
+        public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
     }
 
     /// <summary>
@@ -558,7 +664,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回敌人数组</returns>
         public List<ExerProEnemy> bosses() {
-            return enemies().FindAll(e => e.type == (int)ExerProEnemy.Level.Boss);
+            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
         }
 
         /// <summary>

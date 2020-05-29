@@ -1018,7 +1018,7 @@ class GameConfigure(models.Model):
 			# english_pro_module
 			'correct_types': WrongItem.TYPES,
 			'card_types': ExerProCard.CARD_TYPES,
-			'enemy_levels': ExerProEnemy.ENEMY_TYPES,
+			'enemy_types': ExerProEnemy.ENEMY_TYPES,
 
 			# 组合配置
 			'subjects': subjects,

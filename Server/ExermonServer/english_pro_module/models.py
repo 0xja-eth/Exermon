@@ -770,6 +770,10 @@ class ExerProCard(BaseItem):
 
 		res['cost'] = self.cost
 		res['card_type'] = self.card_type
+		res['inherent'] = self.inherent
+		res['disposable'] = self.disposable
+		res['character'] = self.character
+		res['target'] = self.target
 
 		return res
 
@@ -909,6 +913,8 @@ class ExerProEnemy(BaseItem):
 
 		res['mhp'] = self.mhp
 		res['power'] = self.power
+		res['defense'] = self.defense
+		res['character'] = self.character
 		res['type'] = self.type
 
 		res['actions'] = actions

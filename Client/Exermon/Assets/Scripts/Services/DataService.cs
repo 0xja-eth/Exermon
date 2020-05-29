@@ -386,8 +386,8 @@ namespace GameModule.Services {
         public Tuple<int, string> cardType(int id) {
             return get(staticData.configure.cardTypes, id);
         }
-        public Tuple<int, string> enemyLevel(int id) {
-            return get(staticData.configure.enemyLevels, id);
+        public Tuple<int, string> enemyType(int id) {
+            return get(staticData.configure.enemyTypes, id);
         }
 
         /// <summary>

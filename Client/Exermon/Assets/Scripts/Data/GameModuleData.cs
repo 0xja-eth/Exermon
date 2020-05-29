@@ -445,7 +445,7 @@ namespace GameModule.Data {
         [AutoConvert]
         public Tuple<int, string>[] cardTypes { get; protected set; }
         [AutoConvert]
-        public Tuple<int, string>[] enemyLevels { get; protected set; }
+        public Tuple<int, string>[] enemyTypes { get; protected set; }
 
         /// <summary>
         /// 组合配置
