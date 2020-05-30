@@ -1241,7 +1241,7 @@ namespace ExermonModule.Data {
         public PlayerExermon playerExer {
             get {
                 var exerHub = exerSlot.player.packContainers.exerHub;
-                return exerHub.getItem(item => item.id == playerExerId);
+                return exerHub.findItem(item => item.id == playerExerId);
             }
             set {
                 playerExerId = value.id;
@@ -1254,12 +1254,12 @@ namespace ExermonModule.Data {
         public PlayerExerGift playerGift {
             get {
                 var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
-                var playerGift = exerGiftPool.getItem(item => item.id == playerGiftId);
+                var playerGift = exerGiftPool.findItem(item => item.id == playerGiftId);
                 return playerGift ?? tmpPlayerGift;
             }
             set {
                 var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
-                var playerGift = exerGiftPool.getItem(item => item.id == playerGiftId);
+                var playerGift = exerGiftPool.findItem(item => item.id == playerGiftId);
                 if (playerGift == null) {
                     tmpPlayerGift = value;
                     playerGiftId = tmpPlayerGift.id;
@@ -1892,10 +1892,10 @@ namespace ExermonModule.Data {
         /// <returns>物品</returns>
         public T getItem<T>(Predicate<T> p) where T : PackContItem {
             if (typeof(T) == typeof(ExerPackItem))
-                return (T)getItem(item => item.type ==
+                return (T)findItem(item => item.type ==
                     (int)BaseContItem.Type.ExerPackItem && p((T)item));
             if (typeof(T) == typeof(ExerPackEquip))
-                return (T)getItem(item => item.type ==
+                return (T)findItem(item => item.type ==
                     (int)BaseContItem.Type.ExerPackEquip && p((T)item));
             return null;
         }
@@ -2019,7 +2019,7 @@ namespace ExermonModule.Data {
         /// <param name="sid">科目ID</param>
         /// <returns>艾瑟萌槽项数据</returns>
         public override ExerSlotItem getSlotItem(int sid) {
-            return getItem((item) => item.subjectId == sid);
+            return findItem((item) => item.subjectId == sid);
         }
 
         /// <summary>

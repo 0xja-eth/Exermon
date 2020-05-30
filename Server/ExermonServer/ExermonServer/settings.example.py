@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'record_module',
     'season_module',
     'battle_module',
+
+	'english_pro_module',
+
     'werkzeug_debugger_runserver',
     'django_extensions',
     'channels',

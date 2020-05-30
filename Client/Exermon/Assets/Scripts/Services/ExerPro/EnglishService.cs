@@ -66,9 +66,9 @@ namespace ExerPro.EnglishModule.Services {
             public List<T> getCacheList<T>() {
                 if (typeof(T) == typeof(ListeningQuestion))
                     return listeningQuestions as List<T>;
+
                 //if (typeof(T) == typeof(ReadingQuestion))
-                    //return readingQuestions as List<T>;
-                if (typeof(T) == typeof(CorrectionQuestion))
+                //    return readingQuestions as List<T>;                if (typeof(T) == typeof(CorrectionQuestion))
                     return correctionQuestions as List<T>;
                 if (typeof(T) == typeof(Word))
                     return words as List<T>;
@@ -161,9 +161,11 @@ namespace ExerPro.EnglishModule.Services {
         int getQuestionType<T>() where T : BaseData, new() {
             if (typeof(T) == typeof(ListeningQuestion))
                 return ListeningQuestionType;
-            //if (typeof(T) == typeof(ReadingQuestion))
+<<<<<<< .mine            //if (typeof(T) == typeof(ReadingQuestion))
                 //return ReadingQuestionType;
-            if (typeof(T) == typeof(CorrectionQuestion))
+=======            //if (typeof(T) == typeof(ReadingQuestion))
+            //    return ReadingQuestionType;
+>>>>>>> .theirs            if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
             return 0;
         }

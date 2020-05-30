@@ -738,10 +738,10 @@ namespace PlayerModule.Data {
         /// <returns>物品</returns>
         public T getItem<T>(Predicate<T> p) where T : PackContItem {
             if (typeof(T) == typeof(HumanPackItem))
-                return (T)getItem(item => item.type ==
+                return (T)findItem(item => item.type ==
                     (int)BaseContItem.Type.HumanPackItem && p((T)item));
             if (typeof(T) == typeof(HumanPackEquip))
-                return (T)getItem(item => item.type ==
+                return (T)findItem(item => item.type ==
                     (int)BaseContItem.Type.HumanPackEquip && p((T)item));
             return null;
         }
