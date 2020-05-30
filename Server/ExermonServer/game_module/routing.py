@@ -618,6 +618,7 @@ WEBSOCKET_METHOD_ROUTER = {
     # 查询单词
     'engpro/word/get': [[
         ['uid', 'int'],
+        ['wids', 'int[]']
     ],
         EnglishPro.getWords,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应

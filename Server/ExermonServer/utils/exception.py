@@ -186,6 +186,12 @@ class ErrorType(Enum):
 	CompRankNotExist = 702  # 赛季排位不存在
 	ResultJudgeNotExist = 703  # 结果判断类型不存在
 
+	# EnglishPro
+	InvalidQuestionCount = 800  # 非法的题目数量
+	InvalidQuestionType = 801  # 非法的题目类型
+	InvalidQuestionDatabaseCount = 803  # 超过题库数量
+	WordNotExit = 804  # 单词不存在
+
 
 class GameException(Exception):
 
@@ -364,6 +370,11 @@ class GameException(Exception):
 		ErrorType.CompRankNotExist: "赛季排位不存在！",
 		ErrorType.ResultJudgeNotExist: "结果判断类型不存在！",
 
+		# EnglishPro
+		ErrorType.InvalidQuestionCount: "非法的题目数量！",
+		ErrorType.InvalidQuestionType: "非法的题目类型！",
+		ErrorType.InvalidQuestionDatabaseCount: "超过题库数量！",
+		ErrorType.WordNotExit: "单词不存在！",
 	}
 
 	def __init__(self, error_type: ErrorType):
