@@ -29,7 +29,9 @@ class Service:
 		Check.ensureQuestionCount(count)
 
 		# 返回对应类型的题目ID集
-		Common.generateQuestionList(count, type)
+		qids = Common.generateQuestionList(count, type)
+
+		return {'qids': qids}
 
 	# 查询英语特训题目
 	@classmethod
@@ -41,13 +43,13 @@ class Service:
 
 		if type == 1:
 			questions = Common.getQuestions(ids=qids, QuestionType=ListeningQuestion)
-			return {'questions': questions}
 		elif type == 2:
 			questions = Common.getQuestions(ids=qids, QuestionType=InfinitiveQuestion)
-			return {'questions': questions}
 		elif type == 3:
 			questions = Common.getQuestions(ids=qids, QuestionType=ReadingQuestion)
-			return {'questions': questions}
+
+		questions = ModelUtils.objectsToDict(questions)
+		return {'questions': questions}
 
 	# 生成当前轮单词
 	@classmethod
@@ -82,6 +84,7 @@ class Service:
 		records = ModelUtils.objectsToDict(records)
 
 		return {'records': records}
+
 
 # ======================
 # 英语模块校验类，封装英语模块业务数据格式校验的函数
@@ -120,16 +123,16 @@ class Common:
 			question_all = [question.id for question in ListeningQuestion.objects.all()]
 		elif question_type == QuestionType.Correction.value:
 			question_all = [question.id for question in CorrectionQuestion.objects.all()]
-		elif question_type == QuestionType.Infinitive.value:
-			question_all = [question.id for question in InfinitiveQuestion.objects.all()]
+		elif question_type == 3:
+			question_all = [question.id for question in ReadingQuestion.objects.all()]
 
 		if len(question_all) < count:
+			print(len(question_all))
 			raise GameException(ErrorType.InvalidQuestionDatabaseCount)
 		else:
 			random.seed(int(time.time()))
 			question_list = random.sample(question_all, count)
-
-		return {'qids':  question_list}
+		return question_list
 
 	# 获取多个题目
 	@classmethod
@@ -148,7 +151,6 @@ class Common:
 		"""
 		if ids is None:
 			questions = ViewUtils.getObjects(QuestionType, **kwargs)
-			questions = ModelUtils.objectsToDict(questions)
 			return questions
 
 		unique_ids = list(set(ids))
@@ -190,13 +192,11 @@ class Common:
 
 	# 获取单词记录
 	@classmethod
-	def getWordsRecords(cls, error: ErrorType = ErrorType.WordNotExit, **kwargs) -> list:
+	def getWordsRecords(cls, **kwargs) -> list:
 		"""
 		获取单词记录
-		Args:
-			error (ErrorType): 抛出异常
 		Returns:
 			返回当前玩家的所有单词记录
 		"""
-		words = ViewUtils.getObjects(WordRecord, **kwargs)
-		return words
+		records = ViewUtils.getObjects(WordRecord, **kwargs)
+		return records
