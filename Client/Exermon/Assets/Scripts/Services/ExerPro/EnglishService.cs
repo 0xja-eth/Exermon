@@ -51,8 +51,8 @@ namespace ExerPro.EnglishModule.Services {
             /// </summary>
             [AutoConvert]
             public List<ListeningQuestion> listeningQuestions { get; protected set; } = new List<ListeningQuestion>();
-            [AutoConvert]
-            public List<ReadingQuestion> readingQuestions { get; protected set; } = new List<ReadingQuestion>();
+            //[AutoConvert]
+            //public List<ReadingQuestion> readingQuestions { get; protected set; } = new List<ReadingQuestion>();
             [AutoConvert]
             public List<CorrectionQuestion> correctionQuestions { get; protected set; } = new List<CorrectionQuestion>();
             [AutoConvert]
@@ -66,8 +66,8 @@ namespace ExerPro.EnglishModule.Services {
             public List<T> getCacheList<T>() {
                 if (typeof(T) == typeof(ListeningQuestion))
                     return listeningQuestions as List<T>;
-                if (typeof(T) == typeof(ReadingQuestion))
-                    return readingQuestions as List<T>;
+                //if (typeof(T) == typeof(ReadingQuestion))
+                //    return readingQuestions as List<T>;
                 if (typeof(T) == typeof(CorrectionQuestion))
                     return correctionQuestions as List<T>;
                 if (typeof(T) == typeof(Word))
@@ -91,7 +91,7 @@ namespace ExerPro.EnglishModule.Services {
                 base.loadCustomAttributes(json);
 
                 listeningQuestions = listeningQuestions ?? new List<ListeningQuestion>();
-                readingQuestions = readingQuestions ?? new List<ReadingQuestion>();
+                //readingQuestions = readingQuestions ?? new List<ReadingQuestion>();
                 correctionQuestions = correctionQuestions ?? new List<CorrectionQuestion>();
                 words = words ?? new List<Word>();
             }
@@ -161,8 +161,8 @@ namespace ExerPro.EnglishModule.Services {
         int getQuestionType<T>() where T : BaseData, new() {
             if (typeof(T) == typeof(ListeningQuestion))
                 return ListeningQuestionType;
-            if (typeof(T) == typeof(ReadingQuestion))
-                return ReadingQuestionType;
+            //if (typeof(T) == typeof(ReadingQuestion))
+            //    return ReadingQuestionType;
             if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
             return 0;

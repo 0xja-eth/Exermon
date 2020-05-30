@@ -413,7 +413,14 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训背包卡片
     /// </summary>
-    public class ExerProPackCard : PackContItem<ExerProCard> { }
+    public class ExerProPackCard : PackContItem<ExerProCard> {
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProPackCard() { }
+        public ExerProPackCard(ExerProCard card) : base(card) {}
+    }
 
     #endregion
 
@@ -422,7 +429,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训物品背包
     /// </summary>
-    //public class ExerProItemPack : PackContainer<ExerProPackItem> { }
+    public class ExerProItemPack : PackContainer<ExerProPackItem> { }
 
     /// <summary>
     /// 特训药水背包
@@ -432,17 +439,63 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训抽牌堆
     /// </summary>
-    public class ExerProCardDrawGroup : PackContainer<ExerProPackCard> { }
+    public class ExerProCardDrawGroup : PackContainer<ExerProPackCard> {
+
+        /// <summary>
+        /// 卡组
+        /// </summary>
+        public ExerProCardGroup cardGroup { get; set; }
+
+        /// <summary>
+        /// 接受物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override void acceptItem(ExerProPackCard item) {
+            // 卡牌进入的时候洗牌
+            if (containItem(item)) return;
+            var index = UnityEngine.Random.Range(0, items.Count);
+            items.Insert(index, item);
+        }
+
+        /// <summary>
+        /// 洗牌
+        /// </summary>
+        public void shuffle() {
+            var tmpItems = items.ToArray();
+            foreach (var item in tmpItems)
+                transferItem(this, item);
+        }
+
+        /// <summary>
+        /// 获取第一个卡牌（最后一张）
+        /// </summary>
+        /// <returns></returns>
+        public ExerProPackCard firstCard() {
+            return items[items.Count - 1];
+        }
+    }
 
     /// <summary>
     /// 特训弃牌堆
     /// </summary>
-    public class ExerProCardDiscardGroup : PackContainer<ExerProPackCard> { }
+    public class ExerProCardDiscardGroup : PackContainer<ExerProPackCard> {
+
+        /// <summary>
+        /// 卡组
+        /// </summary>
+        public ExerProCardGroup cardGroup { get; set; }
+    }
 
     /// <summary>
     /// 特训手牌
     /// </summary>
-    public class ExerProCardHandGroup : PackContainer<ExerProPackCard> { }
+    public class ExerProCardHandGroup : PackContainer<ExerProPackCard> {
+
+        /// <summary>
+        /// 卡组
+        /// </summary>
+        public ExerProCardGroup cardGroup { get; set; }
+    }
 
     /// <summary>
     /// 特训卡组
@@ -458,6 +511,88 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProCardDiscardGroup discardGroup { get; protected set; } = new ExerProCardDiscardGroup();
         [AutoConvert]
         public ExerProCardHandGroup handGroup { get; protected set; } = new ExerProCardHandGroup();
+
+        #region 卡牌获取
+
+        /// <summary>
+        /// 获取卡牌
+        /// </summary>
+        public void addCard(ExerProCard card) {
+            pushItem(new ExerProPackCard(card));
+        }
+
+        #endregion
+
+        #region 卡牌转移
+
+        /// <summary>
+        /// 战斗开始，生成牌堆
+        /// </summary>
+        public void onBattleStart() {
+            var tmpItems = items.ToArray();
+            foreach (var item in tmpItems)
+                if (item.item().inherent) // 固有牌
+                    transferItem(handGroup, item);
+                else
+                    transferItem(drawGroup, item);
+        }
+
+        /// <summary>
+        /// 战斗结束，回收牌堆
+        /// </summary>
+        public void onBattleEnd() {
+            recycle(drawGroup); recycle(discardGroup); recycle(handGroup);
+        }
+
+        /// <summary>
+        /// 回合结束，自动弃牌
+        /// </summary>
+        public void onRoundEnd() {
+            var tmpItems = handGroup.items.ToArray();
+            foreach (var item in tmpItems)
+                handGroup.transferItem(discardGroup, item);
+        }
+
+        /// <summary>
+        /// 回合结束，自动弃牌
+        /// </summary>
+        public void recycle(PackContainer<ExerProPackCard> container) {
+            var tmpItems = container.items.ToArray();
+            foreach (var item in tmpItems)
+                container.transferItem(this, item);
+        }
+
+        /// <summary>
+        /// 抽牌
+        /// </summary>
+        public void drawCard() {
+            drawGroup.transferItem(handGroup, drawGroup.firstCard());
+        }
+
+        /// <summary>
+        /// 弃牌
+        /// </summary>
+        public void discardCard(ExerProPackCard card) {
+            handGroup.transferItem(discardGroup, card);
+        }
+
+        /// <summary>
+        /// 消耗牌（本次战斗不再出现）
+        /// </summary>
+        public void consumeCard(ExerProPackCard card) {
+            handGroup.transferItem(this, card);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 读取自定义数据
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            drawGroup.cardGroup = discardGroup.cardGroup = handGroup.cardGroup = this;
+        }
 
     }
 
@@ -593,8 +728,8 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int gold { get; protected set; } = DefaultGold;
 
-        //[AutoConvert]
-        //public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
+        [AutoConvert]
+        public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
         public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
         [AutoConvert]

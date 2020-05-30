@@ -911,7 +911,7 @@ namespace ItemModule.Data {
     /// <summary>
     /// 基本容器数据
     /// </summary>
-    public class BaseContainer<T> : BaseData where T : BaseContItem, new() {
+    public abstract class BaseContainer<T> : BaseData where T : BaseContItem, new() {
 
         /// <summary>
         /// 属性
@@ -931,7 +931,7 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="p">条件</param>
         /// <returns>物品</returns>
-        public T getItem(Predicate<T> p) {
+        public T findItem(Predicate<T> p) {
             return items.Find(p);
         }
 
@@ -940,8 +940,17 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="p">条件</param>
         /// <returns>物品列表</returns>
-        public List<T> getItems(Predicate<T> p) {
+        public List<T> findItems(Predicate<T> p) {
             return items.FindAll(p);
+        }
+
+        /// <summary>
+        /// 是否包含某容器项
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool containItem(T item) {
+            return items.Contains(item);
         }
 
         #endregion
@@ -990,12 +999,15 @@ namespace ItemModule.Data {
     /// </summary>
     public class PackContainer<T> : BaseContainer<T> where T : PackContItem, new() {
 
+        #region 数据操作
+
         /// <summary>
         /// 添加物品
         /// </summary>
         /// <param name="item">物品</param>
         public void pushItem(T item) {
             if (item == null) return;
+            if (containItem(item)) return;
             items.Add(item);
         }
 
@@ -1003,9 +1015,11 @@ namespace ItemModule.Data {
         /// 移除物品
         /// </summary>
         /// <param name="item">物品</param>
-        public void removeItem(T item) {
-            if (item == null) return;
+        public T removeItem(T item) {
+            if (item == null) return null;
+            if (!containItem(item)) return null;
             items.Remove(item);
+            return item;
         }
 
         /// <summary>
@@ -1037,14 +1051,41 @@ namespace ItemModule.Data {
             for (int i = items.Length - 1; i > leftIndex; --i)
                 removeItem(items[i]);
         }
+        
+        /// <summary>
+        /// 转移物品
+        /// </summary>
+        /// <param name="container"></param>
+        public void transferItem(PackContainer<T> container, T item) {
+            container.acceptItem(prepareIItem(item));
+        }
 
+        /// <summary>
+        /// 准备物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected virtual T prepareIItem(T item) {
+            return removeItem(item);
+        }
+
+        /// <summary>
+        /// 接受物品
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected virtual void acceptItem(T item) {
+            pushItem(item);
+        }
+
+        #endregion
     }
 
     /// <summary>
     /// 背包类容器数据
     /// </summary>
     public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new() {
-
+        
         /// <summary>
         /// 获取装备
         /// </summary>
@@ -1092,7 +1133,7 @@ namespace ItemModule.Data {
         /// <param name="index"></param>
         /// <returns>返回对应索引的装备槽项</returns>
         public virtual T getSlotItem(int slotIndex) {
-            return getItem(item => item.slotIndex == slotIndex);
+            return findItem(item => item.slotIndex == slotIndex);
         }
 
         /// <summary>
@@ -1101,7 +1142,7 @@ namespace ItemModule.Data {
         /// <param name="index">下标</param>
         /// <returns>返回对应索引的<装备槽项/returns>
         public virtual T getSlotItemByIndex(int index) {
-            return getItem(item => item.index == index);
+            return findItem(item => item.index == index);
         }
 
         /// <summary>
