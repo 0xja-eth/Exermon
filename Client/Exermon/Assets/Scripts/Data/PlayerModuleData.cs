@@ -606,8 +606,13 @@ namespace PlayerModule.Data {
         /// <summary>
         /// 获取艾瑟萌槽项
         /// </summary>
-        /// <param name="subject"></param>
-        /// <returns></returns>
+        /// <param name="subject">科目ID</param>
+        /// <returns>返回艾瑟萌槽项实例</returns>
+        public ExerSlotItem getExerSlotItem(int sid) {
+            var exerSlot = slotContainers.exerSlot;
+            return exerSlot.getSlotItem(sid);
+        }
+        /// <param name="subject">科目实例</param>
         public ExerSlotItem getExerSlotItem(Subject subject) {
             var exerSlot = slotContainers.exerSlot;
             return exerSlot.getSlotItem(subject.id);

@@ -128,7 +128,6 @@ namespace Core.Systems {
 
             public const string EngProWordRecordGet = "engpro/record/get";
 
-
         }
 
         /// <summary>

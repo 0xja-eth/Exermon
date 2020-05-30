@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 using Core.UI.Utils;
 
@@ -24,6 +25,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         public GameObject linePerfab;
         public Transform lineContainer;
+
+        public Image mapBackground; // 地图背景 
 
         /// <summary>
         /// 外部变量定义
@@ -61,11 +64,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
                 posY = -(y - (maxY - 1) / 2.0) * ySpacing + node.yOffset;
             }
 
-            var pos = new Vector2((float)posX, (float)posY);
-
-            Debug.Log("getPosition: x: " + x + ", y:" + y + " => " + pos);
-
-            return pos;
+            return new Vector2((float)posX, (float)posY);
+            //Debug.Log("getPosition: x: " + x + ", y:" + y + " => " + pos);
         }
 
         /// <summary>
