@@ -46,8 +46,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 
         public void test()
         {
-            //base.createSubView(0);
-            //base.createSubView(1);
+            base.createSubView(0);
+            base.createSubView(1);
         }
 
         public void startView(CorrectionQuestion item)

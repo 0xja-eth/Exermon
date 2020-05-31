@@ -60,8 +60,12 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         protected override void start() {
             base.start();
-            stageRecordDisplay.setItem(engSer.record);
+<<<<<<< HEAD
+            mapDisplay.setItem(engSer.record);
 
+=======
+            stageRecordDisplay.setItem(engSer.record);
+>>>>>>> 9480b06db5c7a76b50fa4352972c2889f8e749d6
         }
 
         #endregion

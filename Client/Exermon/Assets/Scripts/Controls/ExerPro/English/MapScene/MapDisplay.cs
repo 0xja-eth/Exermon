@@ -8,6 +8,7 @@ using Core.UI.Utils;
 
 using UI.Common.Controls.ItemDisplays;
 using ExerPro.EnglishModule.Data;
+using static ExerPro.EnglishModule.Data.MapStageRecord;
 
 /// <summary>
 /// 地图场景控件
@@ -155,7 +156,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item"></param>
         /// <param name="force"></param>
         public void setItem(MapStageRecord item, bool force = false) {
-            record = item; setItems(item.nodes);
+            record = item; setItems(item.nodes.ToArray());
         }
 
         /// <summary>

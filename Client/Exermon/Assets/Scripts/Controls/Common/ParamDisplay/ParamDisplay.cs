@@ -199,9 +199,12 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 配置
         /// </summary>
+        public override void configure() {
+            configure(new JsonData());
+        }
         /// <param name="configData">配置数据</param>
         public void configure(JsonData configData) {
-            configure(); setValue(configData, true);
+            base.configure(); setValue(configData, true);
         }
         /// <param name="obj">配置对象</param>
         public void configure(IDisplayDataConvertable obj, string type = "") {
@@ -228,12 +231,12 @@ namespace UI.Common.Controls.ParamDisplays {
 
         #endregion
 
-            #region 数据控制
+        #region 数据控制
 
-            /// <summary>
-            /// 默认值
-            /// </summary>
-            /// <returns>返回数据默认值</returns>
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        /// <returns>返回数据默认值</returns>
         protected override JsonData defaultValue() {
             return new JsonData();
         }

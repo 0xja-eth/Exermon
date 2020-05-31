@@ -8,7 +8,9 @@ using Core.Data.Loaders;
 using Core.UI.Utils;
 
 using ExermonModule.Data;
+
 using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
 
@@ -28,7 +30,88 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public Image full; // 艾瑟萌全身像
         public Text nickname; // 艾瑟萌昵称
 
+        public Animation animation; // 动画
+
+        /// <summary>
+        /// 内部变量定义
+        /// </summary>
+        public bool isMoving { get; set; } = false;
+
+        /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        EnglishService engSer;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            engSer = EnglishService.get();
+        }
+
+        #endregion
+
+        #region 更新控制
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        protected override void update() {
+            base.update();
+            updateAfterMove();
+        }
+
+        /// <summary>
+        /// 更新移动后处理
+        /// </summary>
+        void updateAfterMove() {
+            if (isMoving && !animation.isPlaying)
+                onAfterMove();
+        }
+
+        /// <summary>
+        /// 移动结束回调
+        /// </summary>
+        void onAfterMove() {
+            isMoving = false;
+            engSer.terminateMove();
+        }
+
+        #endregion
+
         #region 界面绘制
+
+        #region 动画控制
+
+        /// <summary>
+        /// 移动到指定据点
+        /// </summary>
+        /// <param name="node"></param>
+        public void gotoNode(ItemDisplay<ExerProMapNode> node, bool force = false) {
+            gotoNode(node.transform as RectTransform, force);
+        }
+        public void gotoNode(RectTransform rt, bool force = false) {
+            gotoNode(rt.anchoredPosition, force);
+        }
+        public void gotoNode(Vector2 pos, bool force = false) {
+            var rt = transform as RectTransform;
+            if (force) {
+                rt.anchoredPosition = pos;
+                onAfterMove();
+            } else {
+                isMoving = true;
+                var curPos = rt.anchoredPosition;
+                var ani = AnimationUtils.createAnimation();
+                ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.x", curPos.x, pos.x);
+                ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.y", curPos.y, pos.y);
+                ani.setupAnimation(animation);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 是否空物品
@@ -36,7 +119,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item"></param>
         /// <returns></returns>
         public override bool isNullItem(ExerProActor item) {
-            return base.isNullItem(item) && item.slotItem.isNullItem();
+            return base.isNullItem(item) || item.slotItem.isNullItem();
         }
 
         /// <summary>
@@ -71,6 +154,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
             full.gameObject.SetActive(false);
+            nickname.text = "";
         }
 
         #endregion
