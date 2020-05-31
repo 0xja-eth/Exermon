@@ -2032,3 +2032,16 @@ class NewSeasonStarNumCalc:
 			new_rank[1], new_rank[2], rank_id=new_rank[0])
 
 		return star_num
+
+
+# ===================================================
+# 生成当前轮单词
+# ===================================================
+class CurrentWordsCalc:
+
+	WordNum = 50
+	NewWordPercent = 0.2
+
+	@classmethod
+	def generateNewWords(cls):
+		pass

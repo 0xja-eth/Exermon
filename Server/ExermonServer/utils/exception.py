@@ -191,6 +191,7 @@ class ErrorType(Enum):
 	InvalidQuestionType = 801  # 非法的题目类型
 	InvalidQuestionDatabaseCount = 803  # 超过题库数量
 	WordNotExit = 804  # 单词不存在
+	AnswerNotFinish = 805  # 当前轮单词没有问答完毕
 
 
 class GameException(Exception):
@@ -375,6 +376,7 @@ class GameException(Exception):
 		ErrorType.InvalidQuestionType: "非法的题目类型！",
 		ErrorType.InvalidQuestionDatabaseCount: "超过题库数量！",
 		ErrorType.WordNotExit: "单词不存在！",
+		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！"
 	}
 
 	def __init__(self, error_type: ErrorType):

@@ -326,6 +326,12 @@ class WordRecord(models.Model):
     # 错题标志
     wrong = models.BooleanField(default=False, verbose_name="错题标志")
 
+    # 当前轮单词
+    current = models.BooleanField(default=False, verbose_name="是否是当前轮")
+
+    # 当前轮是否答对
+    current_correct = models.BooleanField(default=False, null=True, verbose_name="当前轮是否答对")
+
     # 转化为字符串
     def __str__(self):
         return '%s (%s)' % (self.word, self.player)
@@ -345,6 +351,8 @@ class WordRecord(models.Model):
             'last_date': last_date,
             'collected': self.collected,
             'wrong': self.wrong,
+            'current': self.current,
+            'current_correct': self.current_correct
         }
 
     # 创建新记录
@@ -356,6 +364,8 @@ class WordRecord(models.Model):
             record = cls()
             record.player = player
             record.word_id = word_id
+            record.current = True
+            record.current_correct = False
             record.save()
 
         return record
@@ -385,6 +395,35 @@ class WordRecord(models.Model):
         if self.count is None or self.count == 0:
             return 0
         return self.correct / self.count
+
+
+# ===================================================
+#  单词轮数表
+# ===================================================
+class ExerProRecord(models.Model):
+    class Meta:
+
+        verbose_name = verbose_name_plural = "单词轮数"
+
+    # 单词等级（同时也是玩家在英语模块的等级）
+    WordLevel = models.PositiveSmallIntegerField(default=1, verbose_name="单词等级")
+
+    # 当前轮包含的单词 ID 集
+    words = jsonfield.JSONField(default=[], verbose_name="单词ID集")
+
+    # 玩家
+    player = models.OneToOneField('player_module.Player', null=False,
+                               on_delete=models.CASCADE, verbose_name="玩家")
+
+    def __str__(self):
+        return "%d. %s" % (self.id, self.player)
+
+    def convertToDict(self):
+        return {
+            'id': self.id,
+            'words': self.words,
+            'WordLevel': self.WordLevel
+        }
 
 
 # # ===================================================

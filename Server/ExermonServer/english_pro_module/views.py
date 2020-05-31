@@ -81,7 +81,6 @@ class Service:
 		# 返回数据：
 		# records: 单词记录数据（数组） => 单词记录数据集
 		records = Common.getWordsRecords()
-		records = ModelUtils.objectsToDict(records)
 
 		return {'records': records}
 
@@ -177,7 +176,6 @@ class Common:
 		"""
 		if wids is None:
 			words = ViewUtils.getObjects(Word, **kwargs)
-			words = ModelUtils.objectsToDict(words)
 			return words
 
 		unique_ids = list(set(wids))
@@ -198,5 +196,5 @@ class Common:
 		Returns:
 			返回当前玩家的所有单词记录
 		"""
-		records = ViewUtils.getObjects(WordRecord, **kwargs)
+		records = ViewUtils.getObjects(WordRecord, return_type='dict', **kwargs)
 		return records
