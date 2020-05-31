@@ -12,6 +12,7 @@ using Core.UI.Utils;
 using GameModule.Services;
 using PlayerModule.Services;
 using ExermonModule.Services;
+using ExerPro.EnglishModule.Services;
 
 namespace UI.MainScene {
     using LitJson;
@@ -50,9 +51,11 @@ namespace UI.MainScene {
         /// <summary>
         /// 内部系统声明
         /// </summary>
+        GameService gameSer;
         PlayerService playerSer;
         ExermonService exermonSer;
-        GameService gameSer;
+
+        EnglishService engSer;
 
         #region 初始化
 
@@ -72,6 +75,7 @@ namespace UI.MainScene {
             gameSer = GameService.get();
             playerSer = PlayerService.get();
             exermonSer = ExermonService.get();
+            engSer = EnglishService.get();
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace UI.MainScene {
                 case BuildingType.Library:
                     onLibraryClick(); break;
                 case BuildingType.Adventure:
-                    sceneName = SceneSystem.Scene.EnglishProMapScene; break;
+                    onAdventureClick(); break;
             }
             if (sceneName != "") sceneSys.pushScene(sceneName);
         }
@@ -133,6 +137,13 @@ namespace UI.MainScene {
         /// </summary>
         void onLibraryClick() {
             exerciseWindow.startWindow();
+        }
+
+        /// <summary>
+        /// 冒险点击回调
+        /// </summary>
+        void onAdventureClick() {
+            engSer.start(1);
         }
 
         /// <summary>

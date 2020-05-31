@@ -26,6 +26,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public GameObject linePerfab;
         public Transform lineContainer;
 
+        public StageRecordDisplay recordDisplay;
+
         public Image mapBackground; // 地图背景 
 
         /// <summary>
@@ -35,11 +37,24 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public float yPadding = 64;
         public float xSpacing = 192;
         public float maxYSpacing = 128;
-
+        
         /// <summary>
         /// 线段储存池
         /// </summary>
         List<GameObject> lines;
+
+        #region 数据控制
+        
+        /// <summary>
+        /// 是否有效
+        /// </summary>
+        /// <returns></returns>
+        public override bool isEnabled(ExerProMapNode item) {
+            return (!recordDisplay || !recordDisplay.isMoving())
+                && item.status == (int)ExerProMapNode.Status.Active && base.isEnabled(item);
+        }
+
+        #endregion
 
         #region 界面绘制
 
@@ -82,6 +97,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
             drawLines(node);
         }
 
+        #region 线段绘制
+
         /// <summary>
         /// 绘制线段
         /// </summary>
@@ -114,6 +131,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
             var nexts = node.getNexts();
             foreach (var next in nexts) drawLine(node, next);
         }
+
+        #endregion
 
         /// <summary>
         /// 更新内容尺寸
@@ -154,7 +173,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         /// <param name="item"></param>
         /// <param name="force"></param>
-        public void setItem(MapStageRecord item, bool force = false) {
+        public void setItem(MapStageRecord item, bool _ = false) {
             record = item; setItems(item.nodes);
         }
 

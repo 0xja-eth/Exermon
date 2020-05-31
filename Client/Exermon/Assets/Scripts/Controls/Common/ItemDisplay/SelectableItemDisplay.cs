@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace UI.Common.Controls.ItemDisplays {
@@ -63,6 +64,11 @@ namespace UI.Common.Controls.ItemDisplays {
         public Color checkedColor = new Color(0.8f, 0.8f, 0.8f, 0); // 选中时背景颜色
         public Color highlightColor = new Color(0.8f, 0.8f, 0.8f, 0); // 高亮颜色
         public Color disableColor = new Color(0.5f, 0.5f, 0.5f, 0); // 无效时颜色
+
+        /// <summary>
+        /// 点击事件回调
+        /// </summary>
+        //public UnityAction onClick = null;
 
         /// <summary>
         /// 内部变量声明
@@ -363,6 +369,7 @@ namespace UI.Common.Controls.ItemDisplays {
                 if (isSelectable() && !isSelected()) select();
                 toggle(); 
             }
+            //onClick?.Invoke();
             refreshStatus();
         }
 

@@ -25,6 +25,25 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public MapDisplay mapDisplay;
         public PlayerDisplay playerDisplay;
 
+        #region 数据控制
+
+        /// <summary>
+        /// 当前据点
+        /// </summary>
+        public ExerProMapNode currentNode() {
+            return item.currentNode();
+        }
+
+        /// <summary>
+        /// 是否移动中
+        /// </summary>
+        /// <returns></returns>
+        public bool isMoving() {
+            return playerDisplay.isMoving;
+        }
+
+        #endregion
+
         #region 界面绘制
 
         /// <summary>

@@ -173,6 +173,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// <summary>
         /// 配置组件
         /// </summary>
+        /*
         public override void configure() {
             configure(new JsonData());
         }
@@ -185,7 +186,7 @@ namespace UI.Common.Controls.ParamDisplays {
         public void configure(IDisplayDataConvertable obj, string type = "") {
             configure(obj.convertToDisplayData(type));
         }
-
+        */
         #endregion
 
         #region 数据控制

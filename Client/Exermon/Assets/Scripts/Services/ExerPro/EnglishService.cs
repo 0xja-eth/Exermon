@@ -384,43 +384,39 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         /// <summary>
-        /// 选择一个初始据点
-        /// </summary>
-        /// <param name="id">据点ID</param>
-        public void selectFirstNode(int id) {
-            record.gotoNext(id, true, false);
-        }
-
-        /// <summary>
         /// 走到下一步
         /// </summary>
-        /// <param name="id">下一步结点ID</param>
-        public void gotoNext(int id) {
-            beforeMove(); record.gotoNext(id);
-            onMoved();
+        /// <param name="nid">下一步结点ID</param>
+        public void moveNext(int nid) {
+            if (!record.isFirstSelected())
+                selectFirstNode(nid);
+            else {
+                save(); record.moveNext(nid);
+            }
+        }
+        
+        /// <summary>
+        /// 选择一个初始据点
+        /// </summary>
+        /// <param name="nid">据点ID</param>
+        void selectFirstNode(int nid) {
+            record.moveNext(nid, true);
         }
 
         /// <summary>
-        /// 移动前回调
+        /// 移动结束回调（移动后界面层回调）
         /// </summary>
-        public void beforeMove() {
-            save();
-        }
-
-        /// <summary>
-        /// 移动结束回调
-        /// </summary>
-        public void onMoved() {
+        public void afterMoved() {
             processCurrentNode();
         }
 
         /// <summary>
         /// 处理当前据点
         /// </summary>
-        public void processCurrentNode() {
+        void processCurrentNode() {
             var node = record.currentNode();
             if (node == null) return;
-            switch (node.type) {
+            switch ((ExerProMapNode.Type)node.type) {
                 case ExerProMapNode.Type.Rest: onRestNode(); break;
                 case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
                 case ExerProMapNode.Type.Shop: onShopNode(); break;
@@ -429,6 +425,7 @@ namespace ExerPro.EnglishModule.Services {
                 case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
                 case ExerProMapNode.Type.Boss: onBossNode(); break;
             }
+            Debug.Log("processCurrentNode: " + node.type);
         }
 
         /// <summary>
