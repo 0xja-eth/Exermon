@@ -2,6 +2,7 @@
 using Core.UI;
 using Core.Systems;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
+using System.Collections.Generic;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene
 {
@@ -16,6 +17,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// 外部组件设置
         /// </summary>
         public ArticleDisplay articleDisplay;
+        public List<List<string>> article;
 
         //private string articleStr = "Bay is a phenomenon-the world's garage sale, online center, car dealer and auction site in 30 countries as of March 2005. You can find everything from encyclopedias to olives to snow boots to stereos to airplanes for sale. And if you stumble on it before the eBay overseers do, you might even find a human kidney or a virtual date.";
         //private string articleStr = "as of March 2005 .airplanes for sale.  a virtual date.";
@@ -41,7 +43,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         {
             base.start();
         }
-
         #endregion
 
         // Use this for initialization

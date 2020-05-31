@@ -120,8 +120,8 @@ namespace UI.MainScene {
                 case BuildingType.Library:
                     onLibraryClick(); break;
                 case BuildingType.Adventure:
-                    //sceneName = SceneSystem.Scene.EnglishProMapScene; break;
-                    sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
+                    sceneName = SceneSystem.Scene.EnglishProMapScene; break;
+                    //sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
             }
             if (sceneName != "") sceneSys.pushScene(sceneName);
         }

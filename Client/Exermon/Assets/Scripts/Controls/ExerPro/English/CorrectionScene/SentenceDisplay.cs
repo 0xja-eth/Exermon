@@ -17,7 +17,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         IItemDisplay<string>
     {
 
-
         /// <summary>
         /// 外部组件定义
         /// </summary>

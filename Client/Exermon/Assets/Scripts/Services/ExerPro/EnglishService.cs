@@ -161,11 +161,7 @@ namespace ExerPro.EnglishModule.Services {
         int getQuestionType<T>() where T : BaseData, new() {
             if (typeof(T) == typeof(ListeningQuestion))
                 return ListeningQuestionType;
-<<<<<<< .mine            //if (typeof(T) == typeof(ReadingQuestion))
-                //return ReadingQuestionType;
-=======            //if (typeof(T) == typeof(ReadingQuestion))
             //    return ReadingQuestionType;
->>>>>>> .theirs            if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
             return 0;
         }

@@ -102,4 +102,5 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
-  wordPerfab: {fileID: 0}
+  wordPerfab: {fileID: 4421015803614440390, guid: cb4374c9de942c44d9a5c27151863d3f,
+    type: 3}
