@@ -77,18 +77,20 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             var nodeDisplay = mapDisplay.selectedItemDisplay();
             var node = mapDisplay.selectedItem();
 
-            engSer.moveNext(node.id);
+            var record = engSer.record;
+            var first = !record.isFirstSelected();
+
+            engSer.startMove(node.id, first);
+            playerDisplay.gotoNode(nodeDisplay, first);
 
             stageRecordDisplay.requestRefresh();
-            playerDisplay.gotoNode(nodeDisplay);
         }
 
         /// <summary>
         /// 退出场景
         /// </summary>
         public override void popScene() {
-            engSer.save();
-            base.popScene();
+            engSer.terminate();
         }
 
         #endregion

@@ -50,8 +50,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         /// <returns></returns>
         public override bool isEnabled(ExerProMapNode item) {
-            return (!recordDisplay || !recordDisplay.isMoving())
-                && item.status == (int)ExerProMapNode.Status.Active && base.isEnabled(item);
+            return (!recordDisplay || !recordDisplay.isMoving()) && 
+                base.isEnabled(item) && item.status == (int)ExerProMapNode.Status.Active;
         }
 
         #endregion

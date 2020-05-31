@@ -571,6 +571,14 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 使用牌
+        /// </summary>
+        public void useCard(ExerProPackCard card) {
+            if (card.item().disposable) consumeCard(card);
+            else discardCard(card);
+        }
+
+        /// <summary>
         /// 弃牌
         /// </summary>
         public void discardCard(ExerProPackCard card) {
@@ -787,7 +795,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int currentId { get; protected set; } = -1; // 当前节点索引
         [AutoConvert]
-        public ExerProActor actor { get; protected set; }
+        public ExerProActor actor { get; protected set; } = new ExerProActor();
 
         /// <summary>
         /// 敌人（缓存用）
@@ -916,6 +924,7 @@ namespace ExerPro.EnglishModule.Data {
         void generate() {
             if (generated) return; 
             generated = CalcService.NodeGenerator.generate(this);
+            refreshNodeStatuses();
         }
 
         /// <summary>

@@ -77,7 +77,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         void onAfterMove() {
             isMoving = false;
-            engSer.afterMoved();
+            engSer.terminateMove();
         }
 
         #endregion
@@ -90,21 +90,25 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 移动到指定据点
         /// </summary>
         /// <param name="node"></param>
-        public void gotoNode(ItemDisplay<ExerProMapNode> node) {
-            gotoNode(node.transform as RectTransform);
+        public void gotoNode(ItemDisplay<ExerProMapNode> node, bool force = false) {
+            gotoNode(node.transform as RectTransform, force);
         }
-        public void gotoNode(RectTransform rt) {
-            gotoNode(rt.anchoredPosition);
+        public void gotoNode(RectTransform rt, bool force = false) {
+            gotoNode(rt.anchoredPosition, force);
         }
-        public void gotoNode(Vector2 pos) {
-            isMoving = true;
-
-            var cur = transform as RectTransform;
-            var curPos = cur.anchoredPosition;
-            var ani = AnimationUtils.createAnimation();
-            ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.x", curPos.x, pos.x);
-            ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.y", curPos.y, pos.y);
-            ani.setupAnimation(animation);
+        public void gotoNode(Vector2 pos, bool force = false) {
+            var rt = transform as RectTransform;
+            if (force) {
+                rt.anchoredPosition = pos;
+                onAfterMove();
+            } else {
+                isMoving = true;
+                var curPos = rt.anchoredPosition;
+                var ani = AnimationUtils.createAnimation();
+                ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.x", curPos.x, pos.x);
+                ani.addCurve(typeof(RectTransform), "m_AnchoredPosition.y", curPos.y, pos.y);
+                ani.setupAnimation(animation);
+            }
         }
 
         #endregion
@@ -115,7 +119,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item"></param>
         /// <returns></returns>
         public override bool isNullItem(ExerProActor item) {
-            return base.isNullItem(item) && item.slotItem.isNullItem();
+            return base.isNullItem(item) || item.slotItem.isNullItem();
         }
 
         /// <summary>
@@ -150,6 +154,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
             full.gameObject.SetActive(false);
+            nickname.text = "";
         }
 
         #endregion

@@ -44,14 +44,15 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 刷新状态
         /// </summary>
         protected override void refreshStatus() {
-            var status = (ExerProMapNode.Status)item.status;
+            if (item != null) {
+                var status = (ExerProMapNode.Status)item.status;
 
-            refreshActiveStatus(status == ExerProMapNode.Status.Active);
-            refreshDeactiveStatus(status == ExerProMapNode.Status.Deactive);
-            refreshCurrentStatus(status == ExerProMapNode.Status.Current);
-            refreshPassedStatus(status == ExerProMapNode.Status.Passed);
-            refreshOverStatus(status == ExerProMapNode.Status.Over);
-
+                refreshActiveStatus(status == ExerProMapNode.Status.Active);
+                refreshDeactiveStatus(status == ExerProMapNode.Status.Deactive);
+                refreshCurrentStatus(status == ExerProMapNode.Status.Current);
+                refreshPassedStatus(status == ExerProMapNode.Status.Passed);
+                refreshOverStatus(status == ExerProMapNode.Status.Over);
+            }
             base.refreshStatus();
         }
 
