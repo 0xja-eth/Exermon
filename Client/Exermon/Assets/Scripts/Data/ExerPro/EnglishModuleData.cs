@@ -952,7 +952,7 @@ namespace ExerPro.EnglishModule.Data {
                 nodes[i].setId(i); nodes[i].stage = this;
             }
 
-            generate();
+            //generate();
         }
 
         /// <summary>
