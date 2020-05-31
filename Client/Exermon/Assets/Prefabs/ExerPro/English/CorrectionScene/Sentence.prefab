@@ -89,9 +89,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9223608f3eda24c8bac2a0d441fd7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  container: {fileID: 0}
+  container: {fileID: 5342964172816998734}
   subViewNameFormat: 
-  subViewPrefab: {fileID: 0}
+  subViewPrefab: {fileID: 4421015803614440390, guid: cb4374c9de942c44d9a5c27151863d3f,
+    type: 3}
   mask: {fileID: 0}
   countText: {fileID: 0}
   maxCheck: 0
@@ -102,5 +103,3 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
-  wordPerfab: {fileID: 4421015803614440390, guid: cb4374c9de942c44d9a5c27151863d3f,
-    type: 3}

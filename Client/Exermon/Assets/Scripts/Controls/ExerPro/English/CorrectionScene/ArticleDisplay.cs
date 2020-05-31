@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Core.UI.Utils;
+using ExerPro.EnglishModule.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,31 +16,43 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     /// </summary
     public class ArticleDisplay :
         ContainerDisplay<string>,
-        IItemDisplay<string>
+        IItemDisplay<CorrectionQuestion>
     {
-        /// <summary>
-        /// 外部组件定义
-        /// </summary>
-        public GameObject sentencePerfab;
+
+        public List<List<string>> article;
 
         /// <summary>
         /// 句子储存池
         /// </summary>
         List<GameObject> sentences;
 
-        public string getItem()
+
+
+        public CorrectionQuestion getItem()
         {
-            return "";
+            return new CorrectionQuestion();
         }
 
-        public void setItem(string item, bool force = false)
+        public void setItem(CorrectionQuestion item, bool force = false)
         {
+            Debug.Log("setitem");
+            string[] items1 = { "aaa", "bbb" };
+            base.setItems(items1);
+            //base.setItems(items2);
+            //var a = Instantiate(subViewPrefab, container);
+            //SceneUtils.get<RectTransform>(a).SetParent(this)
 
         }
 
-        public void startView(string item)
+        public void test()
         {
+            //base.createSubView(0);
+            //base.createSubView(1);
+        }
 
+        public void startView(CorrectionQuestion item)
+        {
+            Debug.Log("article");
         }
     }
 }

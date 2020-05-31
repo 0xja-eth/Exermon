@@ -18,11 +18,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     {
 
         /// <summary>
-        /// 外部组件定义
-        /// </summary>
-        public GameObject wordPerfab;
-
-        /// <summary>
         /// 单词储存池
         /// </summary>
         List<GameObject> words;
@@ -37,6 +32,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 
         }
 
+        /// <summary>
+        /// 子节点创建回调
+        /// </summary>
+        /// <param name="sub"></param>
+        /// <param name="index"></param>
+        protected override void onSubViewCreated(SelectableItemDisplay<string> sub, int index)
+        {
+            base.onSubViewCreated(sub, index);
+
+        }
         public void startView(string item)
         {
 

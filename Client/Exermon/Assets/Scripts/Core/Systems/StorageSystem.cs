@@ -81,11 +81,12 @@ namespace Core.Systems {
         /// <summary>
         /// 缓存文件路径
         /// </summary>
-        const string StaticDataFilename = ".static";
-        const string CacheDataFilename = ".cache";
-        const string ConfigDataFilename = ".config";
+        public const string StaticDataFilename = ".static";
+        public const string CacheDataFilename = ".cache";
+        public const string ConfigDataFilename = ".config";
 
-        const string EngCacheDataFilename = ".eng.cache";
+        public const string EngCacheDataFilename = ".eng.cache";
+        public const string EngRecordFilename = ".eng.record";
 
         /// <summary>
         /// 加密盐
@@ -132,6 +133,7 @@ namespace Core.Systems {
             storageItems.Add(new StorageItem(quesSer.questionCache, CacheDataFilename));
 
             storageItems.Add(new StorageItem(engSer.questionCache, EngCacheDataFilename));
+            storageItems.Add(new StorageItem(engSer.record, EngRecordFilename));
         }
 
         #endregion
@@ -228,6 +230,15 @@ namespace Core.Systems {
         public void save() {
             foreach (var item in storageItems)
                 saveObjectIntoFile(item.data, SaveRootPath, item.filename);
+        }
+
+        /// <summary>
+        /// 储存储存项
+        /// </summary>
+        public void saveItem(string filename) {
+            foreach (var item in storageItems)
+                if (item.filename == filename)
+                    saveObjectIntoFile(item.data, SaveRootPath, item.filename);
         }
 
         /// <summary>

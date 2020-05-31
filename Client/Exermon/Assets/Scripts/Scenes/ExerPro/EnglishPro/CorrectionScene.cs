@@ -3,6 +3,9 @@ using Core.UI;
 using Core.Systems;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 using System.Collections.Generic;
+using UnityEngine;
+using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene
 {
@@ -17,8 +20,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// 外部组件设置
         /// </summary>
         public ArticleDisplay articleDisplay;
-        public List<List<string>> article;
 
+        /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        EnglishService engSer;
         //private string articleStr = "Bay is a phenomenon-the world's garage sale, online center, car dealer and auction site in 30 countries as of March 2005. You can find everything from encyclopedias to olives to snow boots to stereos to airplanes for sale. And if you stumble on it before the eBay overseers do, you might even find a human kidney or a virtual date.";
         //private string articleStr = "as of March 2005 .airplanes for sale.  a virtual date.";
 
@@ -28,6 +34,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         //private GameObject articleObj;
 
         #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems()
+        {
+            base.initializeSystems();
+            engSer = EnglishService.get();
+        }
+
         /// <summary>
         /// 场景名
         /// </summary>
@@ -42,8 +58,18 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         protected override void start()
         {
             base.start();
+            CorrectionQuestion question = new CorrectionQuestion();
+            //List<CorrectionQuestion> list = engSer.questionCache.getCacheList<CorrectionQuestion>();
+            //Debug.Log(list.ToArray().Length);
+            string[] items2 = { "aaa", "ewq", "ewq" };
+            //articleDisplay.setItem(question);
+            //articleDisplay.setItems(items2);
+            articleDisplay.test();
         }
         #endregion
+
+
+
 
         // Use this for initialization
         //void Start ()

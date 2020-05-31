@@ -248,9 +248,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 505c782821b9cab41a9a3b7b4dac952f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  container: {fileID: 0}
+  container: {fileID: 101941731}
   subViewNameFormat: 
-  subViewPrefab: {fileID: 0}
+  subViewPrefab: {fileID: 7604891707400715801, guid: 9126400718d4b0f479c0b17c91cfe896,
+    type: 3}
   defaultCapacity: 0
   sentencePerfab: {fileID: 7604891707400715801, guid: 9126400718d4b0f479c0b17c91cfe896,
     type: 3}
@@ -308,7 +309,7 @@ MonoBehaviour:
   m_IgnoreLayout: 0
   m_MinWidth: -1
   m_MinHeight: -1
-  m_PreferredWidth: 0
+  m_PreferredWidth: -1
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1

@@ -17,4 +17,13 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 
     }
 
+    /// <summary>
+    /// 绘制确切物品
+    /// </summary>
+    /// <param name="battler">对战者</param>
+    //protected override void drawExactlyItem(string battler)
+    //{
+
+    //}
+
 }
