@@ -115,7 +115,18 @@ namespace ExerPro.EnglishModule.Services {
         /// 缓存题目数据
         /// </summary>
         public QuestionCache questionCache { get; protected set; } = new QuestionCache();
-        
+
+        /// <summary>
+        /// 关卡记录
+        /// </summary>
+        public MapStageRecord record { get; protected set; } = new MapStageRecord();
+
+        /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        StorageSystem storageSys;
+        SceneSystem sceneSys;
+
         #region 初始化
 
         /// <summary>
@@ -123,6 +134,8 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
+            storageSys = StorageSystem.get();
+            sceneSys = SceneSystem.get();
         }
 
         /// <summary>
@@ -355,6 +368,111 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         #endregion
+
+        #endregion
+
+        #region 游戏控制
+
+        /// <summary>
+        /// 开始游戏
+        /// </summary>
+        public void start(int mapId) {
+            // 如果未开始或者开启新地图，覆盖原有的记录
+            if (record.started == false || record.mapId != mapId)
+                record.setup(mapId, 1, true);
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
+        }
+
+        /// <summary>
+        /// 选择一个初始据点
+        /// </summary>
+        /// <param name="id">据点ID</param>
+        public void selectFirstNode(int id) {
+            record.gotoNext(id, true, false);
+        }
+
+        /// <summary>
+        /// 走到下一步
+        /// </summary>
+        /// <param name="id">下一步结点ID</param>
+        public void gotoNext(int id) {
+            beforeMove(); record.gotoNext(id);
+            onMoved();
+        }
+
+        /// <summary>
+        /// 移动前回调
+        /// </summary>
+        public void beforeMove() {
+            save();
+        }
+
+        /// <summary>
+        /// 移动结束回调
+        /// </summary>
+        public void onMoved() {
+            processCurrentNode();
+        }
+
+        /// <summary>
+        /// 处理当前据点
+        /// </summary>
+        public void processCurrentNode() {
+            var node = record.currentNode();
+            if (node == null) return;
+            switch (node.type) {
+                case ExerProMapNode.Type.Rest: onRestNode(); break;
+                case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
+                case ExerProMapNode.Type.Shop: onShopNode(); break;
+                case ExerProMapNode.Type.Enemy: onEnemyNode(); break;
+                case ExerProMapNode.Type.Elite: onEliteNode(); break;
+                case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
+                case ExerProMapNode.Type.Boss: onBossNode(); break;
+            }
+        }
+
+        /// <summary>
+        /// 休息据点
+        /// </summary>
+        void onRestNode() { }
+
+        /// <summary>
+        /// 藏宝据点
+        /// </summary>
+        void onTreasureNode() { }
+
+        /// <summary>
+        /// 商人据点
+        /// </summary>
+        void onShopNode() { }
+
+        /// <summary>
+        /// 敌人据点
+        /// </summary>
+        void onEnemyNode() { }
+
+        /// <summary>
+        /// 精英据点
+        /// </summary>
+        void onEliteNode() { }
+
+        /// <summary>
+        /// 未知据点
+        /// </summary>
+        void onUnknownNode() { }
+
+        /// <summary>
+        /// Boss据点
+        /// </summary>
+        void onBossNode() { }
+
+        /// <summary>
+        /// 保存进度
+        /// </summary>
+        public void save() {
+            storageSys.saveItem(StorageSystem.EngCacheDataFilename);
+            storageSys.saveItem(StorageSystem.EngRecordFilename);
+        }
 
         #endregion
     }

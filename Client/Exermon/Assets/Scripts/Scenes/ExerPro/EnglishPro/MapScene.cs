@@ -3,6 +3,7 @@ using Core.Systems;
 using Core.UI;
 
 using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
 
 /// <summary>
 /// 艾瑟萌特训UI
@@ -32,6 +33,21 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         public MapDisplay mapDisplay;
 
         /// <summary>
+        /// 外部系统设置
+        /// </summary>
+        EnglishService engSer;
+
+        #region 初始化
+
+        /// <summary>
+        /// 初始化外部系统
+        /// </summary>
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            engSer = EnglishService.get();
+        }
+
+        /// <summary>
         /// 场景名称
         /// </summary>
         /// <returns></returns>
@@ -44,14 +60,9 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         protected override void start() {
             base.start();
-            test();
+            mapDisplay.setItem(engSer.record);
         }
 
-        /// <summary>
-        /// 测试
-        /// </summary>
-        void test() {
-            mapDisplay.setItem(new MapStageRecord(1, 1));
-        }
+        #endregion
     }
 }

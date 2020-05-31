@@ -12,10 +12,11 @@ using Core.Data.Loaders;
 using GameModule.Data;
 using GameModule.Services;
 
+using ItemModule.Data;
+using ExermonModule.Data;
 using QuestionModule.Data;
 
-using ItemModule.Data;
-using PlayerModule.Data;
+using PlayerModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
 
@@ -734,6 +735,19 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
         [AutoConvert]
         public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
+
+        /// <summary>
+        /// 对应的艾瑟萌槽项
+        /// </summary>
+        public ExerSlotItem slotItem { get; protected set; } = null;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProActor() {
+            var player = PlayerService.get().player;
+            slotItem = player.getExerSlotItem(3);
+        }
     }
 
     /// <summary>
@@ -749,9 +763,21 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int stageOrder { get; protected set; }
 
+        /// <summary>
+        /// 是否开始（游戏是否一开始，尚未结束）
+        /// </summary>
         [AutoConvert]
-        public bool initialized { get; protected set; } = false;
+        public bool started { get; protected set; } = false;
 
+        /// <summary>
+        /// 地图是否生成（本关卡的地图是否已经生成）
+        /// </summary>
+        [AutoConvert]
+        public bool generated { get; protected set; } = false;
+
+        /// <summary>
+        /// 生成的据点
+        /// </summary>
         [AutoConvert]
         public List<ExerProMapNode> nodes { get; protected set; } = new List<ExerProMapNode>();
 
@@ -762,6 +788,13 @@ namespace ExerPro.EnglishModule.Data {
         public int currentId { get; protected set; } // 当前节点索引
         [AutoConvert]
         public ExerProActor actor { get; protected set; }
+
+        /// <summary>
+        /// 敌人（缓存用）
+        /// </summary>
+        List<ExerProEnemy> _enemies = null;
+
+        #region 数据控制
 
         /// <summary>
         /// 获取关卡
@@ -786,12 +819,14 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回敌人数组</returns>
         public List<ExerProEnemy> enemies() {
-            var enemies = stage()?.enemies;
-            if (enemies == null) return null;
-            var res = new List<ExerProEnemy>(enemies.Length);
-            foreach (var enemy in enemies)
-                res.Add(DataService.get().exerProEnemy(enemy));
-            return res;
+            if (_enemies == null) {
+                var enemies = stage()?.enemies;
+                if (enemies == null) return null;
+                _enemies = new List<ExerProEnemy>(enemies.Length);
+                foreach (var enemy in enemies)
+                    _enemies.Add(DataService.get().exerProEnemy(enemy));
+            }
+            return _enemies;
         }
 
         /// <summary>
@@ -800,6 +835,62 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns>返回敌人数组</returns>
         public List<ExerProEnemy> bosses() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
+        }
+
+        /// <summary>
+        /// 获取据点对象
+        /// </summary>
+        /// <param name="id">据点ID</param>
+        /// <returns>返回据点对象</returns>
+        public ExerProMapNode getNode(int id) {
+            return nodes.Find(node => node.id == id);
+        }
+        /// <param name="xOrder">X顺序</param>
+        /// <param name="yOrder">Y顺序</param>
+        public ExerProMapNode getNode(int xOrder, int yOrder) {
+            return nodes.Find(node => node.xOrder == xOrder &&
+                node.yOrder == yOrder);
+        }
+
+        /// <summary>
+        /// 获取当前据点
+        /// </summary>
+        /// <returns>返回当前据点对象</returns>
+        public ExerProMapNode currentNode() {
+            return getNode(currentId);
+        }
+
+        #endregion
+
+        #region 据点生成
+
+        /// <summary>
+        /// 设置地图
+        /// </summary>
+        /// <param name="mapId">地图ID</param>
+        /// <param name="stageOrder">关卡序号</param>
+        /// <param name="restart">重新开始</param>
+        public void setup(int mapId, int stageOrder, bool restart = false) {
+            this.mapId = mapId; this.stageOrder = stageOrder;
+            reset(restart); generate();
+        }
+
+        /// <summary>
+        /// 重置地图
+        /// </summary>
+        /// <param name="restart">重新开始</param>
+        void reset(bool restart = false) {
+            if (restart) started = false;
+            _enemies = null; generated = false;
+            nodes.Clear();
+        }
+
+        /// <summary>
+        /// 生成地图
+        /// </summary>
+        void generate() {
+            if (generated) return; 
+            generated = CalcService.NodeGenerator.generate(this);
         }
 
         /// <summary>
@@ -813,13 +904,43 @@ namespace ExerPro.EnglishModule.Data {
             nodes.Add(node); return node;
         }
 
+        #endregion
+
+        #region 游戏控制
+
         /// <summary>
-        /// 生成地图
+        /// 走到下一步
         /// </summary>
-        void generate() {
-            if (initialized) return; 
-            initialized = CalcService.NodeGenerator.generate(this);
+        /// <param name="id">下一步的据点ID</param>
+        /// <param name="force">强制转移</param>
+        /// <param name="emit">是否发射事件</param>
+        public void gotoNext(int id, bool force = false, bool emit = true) {
+            if (force) changePosition(id, emit);
+            else {
+                var node = currentNode();
+                if (node == null) return;
+                foreach (var next in node.nexts)
+                    if (id == next) changePosition(id, emit);
+            }
         }
+
+        /// <summary>
+        /// 更改位置
+        /// </summary>
+        /// <param name="id">新结点ID</param>
+        /// <param name="emit">是否发射事件</param>
+        void changePosition(int id, bool emit = true) {
+            currentId = id; if (emit) onMoved();
+        }
+        
+        /// <summary>
+        /// 移动结束回调
+        /// </summary>
+        void onMoved() {}
+
+        #endregion
+
+        #region 数据读取
 
         /// <summary>
         /// 读取自定义数据
@@ -845,6 +966,8 @@ namespace ExerPro.EnglishModule.Data {
             this.mapId = mapId; this.stageOrder = stageOrder;
             generate();
         }
+
+        #endregion
     }
 
     /// <summary>
