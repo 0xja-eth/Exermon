@@ -365,7 +365,6 @@ class WordRecord(models.Model):
             record.player = player
             record.word_id = word_id
             record.current = True
-            record.current_correct = False
             record.save()
 
         return record
@@ -417,6 +416,31 @@ class ExerProRecord(models.Model):
 
     def __str__(self):
         return "%d. %s" % (self.id, self.player)
+
+    # 创建新记录
+    @classmethod
+    def create(cls, player, words):
+        record = cls.has_record(player)
+
+        if record is None:
+            record = cls()
+            record.player = player
+            record.words = words
+            record.save()
+
+        return record
+
+    # 查看是否已有记录
+    def has_record(self, player):
+        res = self.objects.filter(player=player)
+        if res.exists():
+            return res.first()
+        return None
+
+    def update(self, words):
+        self.WordLevel += 1
+        self.words = words
+        self.save()
 
     def convertToDict(self):
         return {

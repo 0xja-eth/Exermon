@@ -192,6 +192,7 @@ class ErrorType(Enum):
 	InvalidQuestionDatabaseCount = 803  # 超过题库数量
 	WordNotExit = 804  # 单词不存在
 	AnswerNotFinish = 805  # 当前轮单词没有问答完毕
+	NoEnoughNewWord = 806  # 单词库中没有足够的新单词
 
 
 class GameException(Exception):
@@ -376,7 +377,8 @@ class GameException(Exception):
 		ErrorType.InvalidQuestionType: "非法的题目类型！",
 		ErrorType.InvalidQuestionDatabaseCount: "超过题库数量！",
 		ErrorType.WordNotExit: "单词不存在！",
-		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！"
+		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！",
+		ErrorType.NoEnoughNewWord: "单词库中没有足够的新单词！",
 	}
 
 	def __init__(self, error_type: ErrorType):

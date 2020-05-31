@@ -1,6 +1,7 @@
-import math, random
+import math, random, time
 from .exception import GameException, ErrorType
 from enum import Enum
+
 
 
 # ================================
@@ -2042,6 +2043,18 @@ class CurrentWordsCalc:
 	WordNum = 50
 	NewWordPercent = 0.2
 
+	# 从上一轮单词列表中拿出80%的单词和20%的新单词组成当前轮单词
 	@classmethod
-	def generateNewWords(cls):
-		pass
+	def generateNewWords(cls, last_words, word_list):
+		if len(last_words) == 0:
+			words = random.sample(word_list, cls.WordNum * cls.NewWordPercent)
+		else:
+			random.seed(int(time.time()))
+			old_words = random.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
+			new_words = random.sample(word_list, cls.WordNum * cls.NewWordPercent)
+			words = old_words.extend(new_words)
+
+		words = random.shuffle(words)
+
+		return words
+

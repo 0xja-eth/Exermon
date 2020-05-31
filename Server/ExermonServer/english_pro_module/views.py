@@ -3,6 +3,7 @@ from typing import Any
 from .models import *
 from player_module.models import Player
 from utils.view_utils import Common as ViewUtils
+from utils.calc_utils import CurrentWordsCalc
 from utils.exception import ErrorType, GameException
 
 import time
@@ -41,12 +42,12 @@ class Service:
 		# 检验类型是否在枚举类型里面
 		Check.ensureQuestionType(type)
 
-		if type == 1:
+		if type == QuestionType.Listening.value:
 			questions = Common.getQuestions(ids=qids, QuestionType=ListeningQuestion)
-		elif type == 2:
+		elif type == QuestionType.Infinitive.value:
 			questions = Common.getQuestions(ids=qids, QuestionType=InfinitiveQuestion)
-		elif type == 3:
-			questions = Common.getQuestions(ids=qids, QuestionType=ReadingQuestion)
+		elif type == QuestionType.Correction.value:
+			questions = Common.getQuestions(ids=qids, QuestionType=CorrectionQuestion)
 
 		questions = ModelUtils.objectsToDict(questions)
 		return {'questions': questions}
@@ -56,7 +57,10 @@ class Service:
 	async def generateWords(cls, consumer, player: Player, ):
 		# 返回数据：
 		# words: 单词数据（数组） => 单词数据集
-		pass
+		words = Common.generateWords(player)
+		words = ModelUtils.objectsToDict(words)
+
+		return {'words': words}
 
 	# 回答当前轮单词
 	@classmethod
@@ -80,7 +84,8 @@ class Service:
 	async def getRecords(cls, consumer, player: Player, ):
 		# 返回数据：
 		# records: 单词记录数据（数组） => 单词记录数据集
-		records = Common.getWordsRecords()
+		records = Common.getWordsRecords(player)
+		records = ModelUtils.objectsToDict(records)
 
 		return {'records': records}
 
@@ -119,11 +124,13 @@ class Common:
 			返回对应类型题目的ID集，若超过题库数量抛出设置好的异常
 		"""
 		if question_type == QuestionType.Listening.value:
-			question_all = [question.id for question in ListeningQuestion.objects.all()]
+			question_all = ViewUtils.getObjects(ListeningQuestion)
 		elif question_type == QuestionType.Correction.value:
-			question_all = [question.id for question in CorrectionQuestion.objects.all()]
+			question_all = ViewUtils.getObjects(CorrectionQuestion)
 		elif question_type == 3:
-			question_all = [question.id for question in ReadingQuestion.objects.all()]
+			question_all = ViewUtils.getObjects(ReadingQuestion)
+
+		question_all = [question.id for question in question_all]
 
 		if len(question_all) < count:
 			print(len(question_all))
@@ -190,11 +197,98 @@ class Common:
 
 	# 获取单词记录
 	@classmethod
-	def getWordsRecords(cls, **kwargs) -> list:
+	def getWordsRecords(cls, player: Player, **kwargs) -> list:
 		"""
 		获取单词记录
 		Returns:
 			返回当前玩家的所有单词记录
 		"""
-		records = ViewUtils.getObjects(WordRecord, return_type='dict', **kwargs)
+		records = ViewUtils.getObjects(WordRecord, player=player)
 		return records
+
+	# 生成当前轮单词
+	@classmethod
+	def generateWords(cls, player: Player,):
+		"""
+		Args:
+			player (Player): 用户
+			error (ErrorType): 抛出异常
+		获取单词记录
+		Returns:
+			如果玩家有玩过的记录，则根据上一轮单词生成当前轮单词，否则随机生成当前轮单词并返回单词集
+		"""
+		ProRecord = ExerProRecord.objects.filter(player=player).first()
+		# 没有玩过的记录
+		if not ProRecord:
+			words = ViewUtils.getObjects(Word)
+			full_word_list = [word.id for word in words]
+			wids = CurrentWordsCalc.generateNewWords([], full_word_list)
+
+			# 更新轮数记录
+			ExerProRecord.create(player, wids)
+
+		# 有玩过的记录
+		else:
+			old_wids = ProRecord.words
+			# 获取旧单词
+			random.seed(int(time.time()))
+			old_wids = random.sample(old_wids, CurrentWordsCalc.WordNum * (1 - CurrentWordsCalc.NewWordPercent))
+			old_words_set = ViewUtils.getObjects(Word, player=player, id__in=old_wids)
+
+			new_wids, new_words_set = cls.getNewWords(old_wids, player)
+
+			words = old_words_set | new_words_set
+			wids = old_wids.extend(new_wids)
+
+			ProRecord.update(wids)
+
+		# 为生成的每个word建立wordRecord
+		for wid in wids:
+			WordRecord.create(player, wid)
+
+		return words
+
+	# 获取新单词集
+	@classmethod
+	def getNewWords(cls, old_words: list, player: Player, error: ErrorType = ErrorType.NoEnoughNewWord) -> QuerySet:
+		"""
+		Args:
+			player (Player): 用户
+			old_words (list): 旧单词 ID 列表
+			error (ErrorType): 异常
+		Returns:
+			如果题库有足够的新单词就返回，否则报错
+		"""
+		words = ViewUtils.getObjects(Word, player=player).exclude(id__in=old_words)
+		words_list = [word.id for word in words if cls.getNewWord(word, player) is not None]
+		if len(words_list) < CurrentWordsCalc.WordNum * CurrentWordsCalc.WordNum:
+			raise error
+
+		random.seed(int(time.time()))
+		new_wids = random.sample(words_list, CurrentWordsCalc.WordNum * CurrentWordsCalc.NewWordPercent)
+		new_words = ViewUtils.getObjects(Word, player=player, id__in=new_wids)
+
+		return new_wids, new_words
+
+	# 获取新单词
+	@classmethod
+	def getNewWord(cls, word: Word, player: Player):
+		"""
+		Args:
+			player (Player): 用户
+			word (Word): 单词
+		Returns:
+			如果该单词是新单词，则返回，否则返回None
+		"""
+		word_record = WordRecord.objects.filter(word=word, player=player)
+
+		# 先判断有无单词记录，无就是新单词
+		if not word_record:
+			return word
+		else:
+			# 再判断是否有答对过
+			record = word_record.filter(correct=0)
+			if not record:
+				return word
+			return None
+

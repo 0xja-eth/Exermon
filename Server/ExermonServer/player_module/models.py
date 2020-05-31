@@ -1195,15 +1195,15 @@ class Player(CacheableModel):
 		Returns:
 			所有与该玩家相关的单词记录 QuerySet 对象
 		"""
-		return self.questionrecord_set.all()
+		return self.wordrecord_set.all()
 
 	def wordRecord(self, word_id: int) -> 'WordRecord':
 		"""
-		通过题目ID查找单词记录
+		通过单词ID查找单词记录
 		Args:
-			word_id (int): 题目ID
+			word_id (int): 单词ID
 		Returns:
-			若存在题目记录，返回之，否则返回 None
+			若存在单词记录，返回之，否则返回 None
 		"""
 		res = self.wordRecords().filter(word_id=word_id)
 		if res.exists(): return res.first()
