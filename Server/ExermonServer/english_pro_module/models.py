@@ -437,9 +437,8 @@ class ExerProRecord(models.Model):
             return res.first()
         return None
 
-    def update(self, words):
+    def update(self):
         self.WordLevel += 1
-        self.words = words
         self.save()
 
     def convertToDict(self):

@@ -611,6 +611,8 @@ WEBSOCKET_METHOD_ROUTER = {
     # 回答当前轮单词
     'engpro/word/answer': [[
         ['uid', 'int'],
+        ['wid', 'int'],
+        ['chinese', 'str']
     ],
         EnglishPro.answerWord,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应

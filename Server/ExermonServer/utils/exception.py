@@ -193,6 +193,8 @@ class ErrorType(Enum):
 	WordNotExit = 804  # 单词不存在
 	AnswerNotFinish = 805  # 当前轮单词没有问答完毕
 	NoEnoughNewWord = 806  # 单词库中没有足够的新单词
+	NoInCurrentWords = 807  # 该单词不在当前轮中
+	NoFirstCurrentWords = 808  # 请先生成当前轮单词
 
 
 class GameException(Exception):
@@ -379,6 +381,8 @@ class GameException(Exception):
 		ErrorType.WordNotExit: "单词不存在！",
 		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！",
 		ErrorType.NoEnoughNewWord: "单词库中没有足够的新单词！",
+		ErrorType.NoInCurrentWords: "该单词不在当前轮中！",
+		ErrorType.NoFirstCurrentWords: "请先生成当前轮单词！",
 	}
 
 	def __init__(self, error_type: ErrorType):

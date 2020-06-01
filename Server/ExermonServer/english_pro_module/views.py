@@ -8,6 +8,7 @@ from utils.exception import ErrorType, GameException
 
 import time
 import random
+from random import choice
 
 
 # Create your views here.
@@ -64,10 +65,34 @@ class Service:
 
 	# 回答当前轮单词
 	@classmethod
-	async def answerWord(cls, consumer, player: Player, ):
+	async def answerWord(cls, consumer, player: Player, wid: int, chinese: str):
 		# 返回数据：
-		# correct: bool => 回答是否正确
-		pass
+		# correct: bool => 回答是否正确, new: bool => 是否进入下一轮, next: int => 下一个单词ID(可选）
+		Common.ensureWordInCurrentWords(wid, player)
+
+		exer_pro_record = ViewUtils.getObject(ExerProRecord, ErrorType.NoFirstCurrentWords, player=player)
+
+		words = exer_pro_record.words
+
+		if wid not in words:
+			raise ErrorType.NoInCurrentWords
+
+		# 判断该单词是否回答正确
+		correct = Common.isAnswerCorrect(wid, player, chinese, True)
+
+		# 判断是否该结束该轮单词回答
+		words_query_set = Common.getWords(words, player=player)
+		left_words = [word for word in words_query_set if not Common.isAnswerCorrect(word.id, player, word.chinese, False)]
+		if len(left_words) == 0:
+			exer_pro_record.update()
+			return {'new': True, 'correct': correct}
+		else:
+			return {
+				'next': ModelUtils.objectToDict(choice(left_words)),
+				'new': False,
+				'correct': correct
+			}
+
 
 	# 查询单词
 	@classmethod
@@ -203,7 +228,7 @@ class Common:
 		Returns:
 			返回当前玩家的所有单词记录
 		"""
-		records = ViewUtils.getObjects(WordRecord, player=player)
+		records = ViewUtils.getObjects(WordRecord, player=player, **kwargs)
 		return records
 
 	# 生成当前轮单词
@@ -224,22 +249,25 @@ class Common:
 			full_word_list = [word.id for word in words]
 			wids = CurrentWordsCalc.generateNewWords([], full_word_list)
 
+			words = ViewUtils.getObjects(Word, id__in=wids, player=player)
+
 			# 更新轮数记录
 			ExerProRecord.create(player, wids)
 
 		# 有玩过的记录
 		else:
 			old_wids = ProRecord.words
+			# 将旧单词记录中的 current 字段置为 False
+			cls.makeCurrentFalse(old_wids, player)
 			# 获取旧单词
 			random.seed(int(time.time()))
 			old_wids = random.sample(old_wids, CurrentWordsCalc.WordNum * (1 - CurrentWordsCalc.NewWordPercent))
 			old_words_set = ViewUtils.getObjects(Word, player=player, id__in=old_wids)
-
+			# 获取新单词
 			new_wids, new_words_set = cls.getNewWords(old_wids, player)
-
 			words = old_words_set | new_words_set
-			wids = old_wids.extend(new_wids)
 
+			wids = old_wids.extend(new_wids)
 			ProRecord.update(wids)
 
 		# 为生成的每个word建立wordRecord
@@ -250,14 +278,14 @@ class Common:
 
 	# 获取新单词集
 	@classmethod
-	def getNewWords(cls, old_words: list, player: Player, error: ErrorType = ErrorType.NoEnoughNewWord) -> QuerySet:
+	def getNewWords(cls, old_words: list, player: Player, error: ErrorType = ErrorType.NoEnoughNewWord):
 		"""
 		Args:
 			player (Player): 用户
 			old_words (list): 旧单词 ID 列表
 			error (ErrorType): 异常
 		Returns:
-			如果题库有足够的新单词就返回，否则报错
+			如果题库有足够的新单词就返回 单词ID集 和 单词集，否则报错
 		"""
 		words = ViewUtils.getObjects(Word, player=player).exclude(id__in=old_words)
 		words_list = [word.id for word in words if cls.getNewWord(word, player) is not None]
@@ -291,4 +319,70 @@ class Common:
 			if not record:
 				return word
 			return None
+
+	# 检验答词ID是否在当前轮中
+	@classmethod
+	def ensureWordInCurrentWords(cls, wid:int, player:Player):
+		"""
+		Args:
+			player (Player): 用户
+			wid (int): 单词
+		Returns:
+			如果单词不在当前轮中则报错
+		"""
+		record = ViewUtils.getObject(WordRecord, ErrorType.NoInCurrentWords, player=player, word_id=wid)
+
+		current = record.current
+		if not current:
+			raise GameException(ErrorType.NoInCurrentWords)
+
+	# 判断单词是否回答正确
+	@classmethod
+	def isAnswerCorrect(cls, wid: int, player: Player, chinese: str, isUpdate: bool) ->bool:
+		"""
+		Args:
+			player (Player): 用户
+			wid (int): 单词
+			chinese (str): 中文
+			isUpdate  (bool): 是否更新单词记录
+		Returns:
+			isUpdate = True时，更新单词记录并返回该单词是否正确
+			isUpdate = False时，仅仅返回该单词是否正确
+		"""
+		# 将回答结果记录到 WordRecord 表中
+		record = player.wordRecord(wid)
+		if record is not None:
+			word = ViewUtils.getObject(Word, ErrorType.WordNotExit, player=player, id=wid)
+			if isUpdate:
+				if word.chinese == chinese:
+					record.update(True)
+					return True
+				else:
+					record.update(False)
+					return False
+			else:
+				if not record.current:
+					raise ErrorType.NoInCurrentWords
+				elif record.current and not record.wrong:
+					return True
+				else:
+					return False
+		else:
+			raise ErrorType.NoInCurrentWords
+
+	# 将上一轮单词的 current 字段置为False
+	@classmethod
+	def makeCurrentFalse(cls, wids, player):
+		"""
+		Args:
+			player (Player): 用户
+			wid (int): 单词
+		Returns:
+			将上一轮单词的 current 字段置为False，无返回
+		"""
+		word_record_sets = cls.getWordsRecords(player, word_id__in=wids)
+		for word_record in word_record_sets:
+			word_record.current = False
+			word_record.save()
+
 

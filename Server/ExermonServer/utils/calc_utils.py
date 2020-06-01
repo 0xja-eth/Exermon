@@ -2040,8 +2040,8 @@ class NewSeasonStarNumCalc:
 # ===================================================
 class CurrentWordsCalc:
 
-	WordNum = 50
-	NewWordPercent = 0.2
+	WordNum = 1
+	NewWordPercent = 0
 
 	# 从上一轮单词列表中拿出80%的单词和20%的新单词组成当前轮单词
 	@classmethod
