@@ -68,14 +68,9 @@ class Service:
 	async def answerWord(cls, consumer, player: Player, wid: int, chinese: str):
 		# 返回数据：
 		# correct: bool => 回答是否正确, new: bool => 是否进入下一轮, next: int => 下一个单词ID(可选）
-		Common.ensureWordInCurrentWords(wid, player)
-
 		exer_pro_record = ViewUtils.getObject(ExerProRecord, ErrorType.NoFirstCurrentWords, player=player)
-
 		words = exer_pro_record.words
-
-		if wid not in words:
-			raise ErrorType.NoInCurrentWords
+		Common.ensureWordInCurrentWords(wid, player, words)
 
 		# 判断该单词是否回答正确
 		correct = Common.isAnswerCorrect(wid, player, chinese, True)
@@ -88,7 +83,7 @@ class Service:
 			return {'new': True, 'correct': correct}
 		else:
 			return {
-				'next': ModelUtils.objectToDict(choice(left_words)),
+				'next': choice(left_words).id,
 				'new': False,
 				'correct': correct
 			}
@@ -322,14 +317,18 @@ class Common:
 
 	# 检验答词ID是否在当前轮中
 	@classmethod
-	def ensureWordInCurrentWords(cls, wid:int, player:Player):
+	def ensureWordInCurrentWords(cls, wid: int, player: Player, words: list):
 		"""
 		Args:
 			player (Player): 用户
 			wid (int): 单词
+			words (list)：单词ID集
 		Returns:
 			如果单词不在当前轮中则报错
 		"""
+		if wid not in words:
+			raise ErrorType.NoInCurrentWords
+
 		record = ViewUtils.getObject(WordRecord, ErrorType.NoInCurrentWords, player=player, word_id=wid)
 
 		current = record.current
