@@ -127,38 +127,38 @@ class WebSocket:
 		route = data['route']
 		tag = ChannelLayerTag.Self
 
-		# try:
-		# 保证请求格式正确
-		cls._ensureRequestFormat(data)
+		try:
+			# 保证请求格式正确
+			cls._ensureRequestFormat(data)
 
-		# 从配置的路由中获取调用数据
-		params, method, tag = cls._getRouterData(route)
+			# 从配置的路由中获取调用数据
+			params, method, tag = cls._getRouterData(route)
 
-		# 处理请求数据
-		data = Common.getRequestDict(data['data'], params)
-		print('getRequestDict: ' + str(data))
-		#
-		if 'uid' in data:
-			player = consumer.getPlayer()
-		# 		if player is None or player.id != data['uid']:
-		# 			raise GameException(ErrorType.InvalidUserOper)
-		#
-			data.pop('uid')
-			data['player'] = player
+			# 处理请求数据
+			data = Common.getRequestDict(data['data'], params)
+			print('getRequestDict: ' + str(data))
 
-		# 执行
-		res['data'] = await method(consumer, **data)
+			if 'uid' in data:
+				player = consumer.getPlayer()
+				if player is None or player.id != data['uid']:
+					raise GameException(ErrorType.InvalidUserOper)
 
-		# except GameException as exception:
-		# 	# 打印错误路径
-		# 	traceback.print_exc()
-		#
-		# 	# 返回错误响应
-		# 	res = Common.getErrorResponseDict(exception)
+				data.pop('uid')
+				data['player'] = player
 
-		# else:
-		# 返回成功响应
-		res = Common.getSuccessResponseDict(res)
+			# 执行
+			res['data'] = await method(consumer, **data)
+
+		except GameException as exception:
+			# 打印错误路径
+			traceback.print_exc()
+
+			# 返回错误响应
+			res = Common.getErrorResponseDict(exception)
+
+		else:
+			# 返回成功响应
+			res = Common.getSuccessResponseDict(res)
 
 		# 封装其他数据
 		res['method'] = 'response'
@@ -341,4 +341,3 @@ class Common:
 			'status': exception.error_type.value,
 			'errmsg': str(exception)
 		}
-
