@@ -52,6 +52,8 @@ namespace Core.Data.Loaders {
         public const string RankIconsFileName = "RankIcons";
         public const string SmallRankIconsFileName = "SmallRankIcons";
 
+        public const string NodeIconFileName = "NodeTypes/Node";
+
         /// <summary>
         /// 其他常量定义
         /// </summary>
@@ -247,6 +249,15 @@ namespace Core.Data.Loaders {
         /// <returns>2D纹理</returns>
         public static Texture2D loadExerSkillTarget(int id) {
             return loadTexture2D(ExerSkillTargetPath, ExerSkillFileName, id);
+        }
+
+        /// <summary>
+        /// 读取据点类型图标
+        /// </summary>
+        /// <param name="id">据点类型ID</param>
+        /// <returns>2D纹理</returns>
+        public static Texture2D loadNodeIcon(int id) {
+            return loadTexture2D(SystemAssetPath, NodeIconFileName, id);
         }
 
         #endregion

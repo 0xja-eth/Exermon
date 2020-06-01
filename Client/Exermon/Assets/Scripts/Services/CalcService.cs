@@ -792,14 +792,16 @@ namespace GameModule.Services {
             /// </summary>
             /// <returns></returns>
             ExerProMapNode.Type generateNodeType(int x, int xCnt) {
+
+                // 最后一个为 BOSS
                 if (x == xCnt - 1) return ExerProMapNode.Type.Boss;
 
                 var rates = stage.nodeRate;
                 var rateList = new List<int>();
 
                 // 将比率填充为列表，然后从中抽取一个
-                for (int i = 0; i < rates.Length; ++i)
-                    for (int j = 0; j < rates[i]; ++j) rateList.Add(i);
+                for (int i = 1; i <= rates.Length; ++i)
+                    for (int j = 0; j < rates[i - 1]; ++j) rateList.Add(i);
 
                 var index = Random.Range(0, rateList.Count);
                 return (ExerProMapNode.Type)rateList[index];

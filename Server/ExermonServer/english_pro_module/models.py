@@ -669,9 +669,6 @@ class Antonym(GroupConfigure):
 
 		verbose_name = verbose_name_plural = "反义词"
 
-	# 道具类型
-	TYPE = ItemType.ExerProCard
-
 	# 卡牌词
 	card_word = models.CharField(max_length=32, verbose_name="卡牌词")
 
@@ -958,6 +955,31 @@ class ExerProStatus(BaseItem):
 
 
 # ===================================================
+#  据点类型表
+# ===================================================
+class NodeType(GroupConfigure):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "据点类型"
+
+	# 题型
+	ques_types = models.CharField(max_length=32, verbose_name="题型")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['ques_types'] = self.ques_types
+
+		return res
+
+
+# ===================================================
 #  地图表
 # ===================================================
 class ExerProMap(models.Model):
@@ -1006,17 +1028,17 @@ class ExerProMap(models.Model):
 		return self.exerpromapstage_set.all()
 
 
-# ===================================================
-#  据点类型表
-# ===================================================
-class NodeType(Enum):
-	Rest = 0  # 休息据点
-	Treasure = 1  # 藏宝据点
-	Shop = 2  # 商人据点
-	Enemy = 3  # 敌人据点
-	Elite = 4  # 精英据点
-	Unknown = 5  # 未知据点
-	Boss = 6  # 精英据点
+# # ===================================================
+# #  据点类型表
+# # ===================================================
+# class NodeType(Enum):
+# 	Rest = 0  # 休息据点
+# 	Treasure = 1  # 藏宝据点
+# 	Shop = 2  # 商人据点
+# 	Enemy = 3  # 敌人据点
+# 	Elite = 4  # 精英据点
+# 	Unknown = 5  # 未知据点
+# 	Boss = 6  # 精英据点
 
 
 # ===================================================

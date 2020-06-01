@@ -13,6 +13,7 @@ using GameModule.Data;
 using GameModule.Services;
 
 using ItemModule.Data;
+using PlayerModule.Data;
 using ExermonModule.Data;
 using QuestionModule.Data;
 
@@ -708,7 +709,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训玩家
     /// </summary>
-    public class ExerProActor : BaseData {
+    public class ExerProActor : BaseData, MultParamsDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 默认属性
@@ -719,6 +720,8 @@ namespace ExerPro.EnglishModule.Data {
         public const int DefaultAgile = 5; // 初始敏捷
 
         public const int DefaultGold = 100; // 初始金币
+
+        const int EnglishSubjectId = 3;
 
         /// <summary>
         /// 属性
@@ -749,19 +752,48 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerSlotItem slotItem { get; protected set; } = null;
 
+        #region 数据转化
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public JsonData convertToDisplayData(string type = "") {
+            switch (type) {
+                case "hp": return convertHp();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化状态
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertHp() {
+            var res = new JsonData();
+
+            res["hp"] = hp; res["mhp"] = mhp;
+            res["rate"] = hp * 1.0 / mhp;
+
+            return res;
+        }
+
+        #endregion
+
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ExerProActor() {
-            var player = PlayerService.get().player;
-            slotItem = player.getExerSlotItem(3);
+        public ExerProActor() { }
+        public ExerProActor(Player player) {
+            slotItem = player.getExerSlotItem(EnglishSubjectId);
         }
     }
 
     /// <summary>
     /// 地图关卡记录
     /// </summary>
-    public class MapStageRecord : BaseData {
+    public class MapStageRecord : BaseData, MultParamsDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 属性
@@ -795,12 +827,78 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int currentId { get; protected set; } = -1; // 当前节点索引
         [AutoConvert]
-        public ExerProActor actor { get; protected set; } = new ExerProActor();
+        public ExerProActor actor { get; protected set; } = null;
+
+        /// <summary>
+        /// 单词轮属性
+        /// </summary>
+        [AutoConvert]
+        public int level { get; protected set; }
+        [AutoConvert]
+        public int sum { get; protected set; }
+        [AutoConvert]
+        public int correct { get; protected set; }
+        [AutoConvert]
+        public int wrong { get; protected set; }
 
         /// <summary>
         /// 敌人（缓存用）
         /// </summary>
         List<ExerProEnemy> _enemies = null;
+
+        #region 数据转化
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public JsonData convertToDisplayData(string type = "") {
+            switch (type) {
+                case "map_progress": return convertMapProgressData();
+                case "word_progress": return convertWordProgressData();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化地图进度数据
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertMapProgressData() {
+            var node = currentNode();
+            var last = lastNode();
+            var res = new JsonData();
+
+            if (node != null && last != null)
+                res["rate"] = (node.xOrder * 1.0 / last.xOrder);
+
+            return res;
+        }
+
+        /// <summary>
+        /// 转化单词进度数据
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertWordProgressData() {
+            var res = new JsonData();
+            var corrRate = correct * 1.0 / sum;
+            var wrongRate = corrRate + wrong * 1.0 / sum;
+            var rest = sum - correct - wrong;
+
+            res["level"] = level;
+            res["sum"] = sum;
+            res["correct"] = correct;
+            res["wrong"] = wrong;
+            res["rest"] = rest;
+
+            res["corr_rate"] = corrRate;
+            res["wrong_rate"] = wrongRate;
+
+            return res;
+        }
+
+        #endregion
 
         #region 数据控制
 
@@ -874,6 +972,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public ExerProMapNode lastNode() {
+            if (nodes.Count <= 0) return null;
             return nodes[nodes.Count - 1];
         }
 
@@ -905,7 +1004,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="restart">重新开始</param>
         public void setup(int mapId, int stageOrder, bool restart = false) {
             this.mapId = mapId; this.stageOrder = stageOrder;
-            reset(restart); generate();
+            reset(restart); createActor(); generate();
         }
 
         /// <summary>
@@ -913,7 +1012,9 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <param name="restart">重新开始</param>
         void reset(bool restart = false) {
-            if (restart) started = false;
+            if (restart) {
+                started = false; actor = null;
+            }
             currentId = -1; _enemies = null;
             generated = false; nodes.Clear();
         }
@@ -1018,6 +1119,16 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 创建一个Actor
+        /// </summary>
+        public void createActor() {
+            var player = PlayerService.get().player;
+            if (player == null) return;
+
+            actor = actor ?? new ExerProActor(player);
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public MapStageRecord() { }
@@ -1030,6 +1141,33 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// 据点类型
+    /// </summary>
+    public class NodeType : TypeData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string quesTypes { get; protected set; }
+
+        /// <summary>
+        /// 图标
+        /// </summary>
+        public Texture2D icon { get; protected set; }
+
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            icon = AssetLoader.loadNodeIcon(id);
+        }
+
     }
 
     /// <summary>
@@ -1047,13 +1185,14 @@ namespace ExerPro.EnglishModule.Data {
         /// 据点类型
         /// </summary>
         public enum Type {
-            Rest = 0, //休息据点
-	        Treasure = 1, //藏宝据点
-	        Shop = 2, //商人据点
-	        Enemy = 3, //敌人据点
-	        Elite = 4, //精英据点
-	        Unknown = 5, //未知据点
-            Boss = 6, // 最终BOSS
+            Rest = 1, //休息据点
+            Treasure = 2, //藏宝据点
+            Shop = 3, //商人据点
+            Enemy = 4, //敌人据点
+            Elite = 5, //精英据点
+            Unknown = 6, //未知据点
+            Boss = 7, // 最终BOSS
+            Story = 8, // 剧情据点
         }
 
         /// <summary>
@@ -1079,7 +1218,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public double yOffset { get; protected set; }
         [AutoConvert]
-        public int type { get; protected set; }
+        public int typeId { get; protected set; }
 
         /// <summary>
         /// 下一个Y序号（数组）
@@ -1133,6 +1272,21 @@ namespace ExerPro.EnglishModule.Data {
         #region 数据控制
 
         /// <summary>
+        /// 获取类型
+        /// </summary>
+        /// <returns></returns>
+        public NodeType type() {
+            return DataService.get().nodeType(typeId);
+        }
+        /// <summary>
+        /// 获取类型枚举
+        /// </summary>
+        /// <returns></returns>
+        public Type typeEnum() {
+            return (Type)typeId;
+        }
+
+        /// <summary>
         /// 获取下一节点
         /// </summary>
         /// <returns></returns>
@@ -1165,7 +1319,7 @@ namespace ExerPro.EnglishModule.Data {
             int xOrder, int yOrder, Type type) {
             this.id = id; this.stage = stage;
             this.xOrder = xOrder; this.yOrder = yOrder;
-            this.type = (int)type; 
+            typeId = (int)type; 
 
             generatePosition();
         }

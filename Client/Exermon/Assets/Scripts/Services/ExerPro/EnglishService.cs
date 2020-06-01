@@ -35,9 +35,10 @@ namespace ExerPro.EnglishModule.Services {
         /// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
         /// </summary>
         static readonly int[] RandomNodeRates = { 3, 2, 1, 2, 2 };
-        static readonly State[] RandomNodeStates = {
-            State.StoryNode, State.RestNode, State.TreasureNode,
-            State.ShopNode, State.EnemyNode
+        static readonly ExerProMapNode.Type[] RandomNodeTypes = {
+            ExerProMapNode.Type.Story, ExerProMapNode.Type.Rest,
+            ExerProMapNode.Type.Treasure, ExerProMapNode.Type.Shop,
+            ExerProMapNode.Type.Enemy
         };
 
         /// <summary>
@@ -49,6 +50,7 @@ namespace ExerPro.EnglishModule.Services {
         const string WordGenerate = "生成单词";
         const string WordAnswer = "提交答案";
         const string WordGet = "获取单词";
+        const string WordQuery = "查询状态";
 
         const string WordRecordGet = "查询单词记录";
 
@@ -113,7 +115,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         public enum Oper {
             QuestionGenerate, QuestionGet,
-            WordGenerate, WordAnswer, WordGet,
+            WordGenerate, WordAnswer, WordGet, WordQuery,
             WordRecordGet,
         }
 
@@ -125,10 +127,12 @@ namespace ExerPro.EnglishModule.Services {
             NotInExerPro = 0, // 不在特训中
             Unstarted = 1, // 未开始（需要选择一个起始据点）
             Moving = 2, // 角色移动中
-            AfterMoved = 3, // 角色移动结束，准备进入据点事件
-            AfterEvent = 4, // 据点事件结束，保存中
+            //AfterMoved = 3, // 角色移动结束，准备进入据点事件
+            InNode = 3, // 在据点内
+            AfterNode = 4, // 据点事件结束，保存中
             Idle = 5, // 待机状态（选择下一个据点）
 
+            /*
             RestNode = 10, // 休息据点
             TreasureNode = 11, // 宝藏据点
             ShopNode = 12, // 宝藏据点
@@ -137,6 +141,7 @@ namespace ExerPro.EnglishModule.Services {
             UnknownNode = 15, // 未知据点
             BossNode = 16, // BOSS据点
             StoryNode = 20, // 剧情据点
+            */
         }
 
         /// <summary>
@@ -180,18 +185,11 @@ namespace ExerPro.EnglishModule.Services {
             addStateDict(State.Unstarted);
 
             addStateDict(State.Moving);
-            addStateDict(State.AfterMoved, updateAfterMoved);
-            addStateDict(State.AfterEvent, updateAfterEvent);
+            //addStateDict(State.AfterMoved, updateAfterMoved);
+            addStateDict(State.InNode, updateNode);
+            addStateDict(State.AfterNode, updateAfterNode);
             addStateDict(State.Idle);
 
-            addStateDict(State.RestNode, updateNode);
-            addStateDict(State.TreasureNode, updateNode);
-            addStateDict(State.ShopNode, updateNode);
-            addStateDict(State.EnemyNode, updateNode);
-            addStateDict(State.EliteNode, updateNode);
-            addStateDict(State.UnknownNode, updateUnknownNode);
-            addStateDict(State.BossNode, updateNode);
-            addStateDict(State.StoryNode, updateNode);
         }
 
         /// <summary>
@@ -211,9 +209,11 @@ namespace ExerPro.EnglishModule.Services {
                 NetworkSystem.Interfaces.EngProWordAnswer);
             addOperDict(Oper.WordGet, WordGet,
                 NetworkSystem.Interfaces.EngProWordGet);
+            addOperDict(Oper.WordQuery, WordQuery,
+                NetworkSystem.Interfaces.EngProWordQuery);
+
             addOperDict(Oper.WordRecordGet, WordRecordGet,
                 NetworkSystem.Interfaces.EngProWordRecordGet);
-
         }
 
         #endregion
@@ -242,7 +242,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateQuestions<T>(UnityAction onSuccess, 
+        public void generateQuestions<T>(UnityAction<T[]> onSuccess, 
             UnityAction onError = null) where T : BaseData, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -266,13 +266,13 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qids">题目ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getQuestions<T>(int[] qids, UnityAction onSuccess, 
+        public void getQuestions<T>(int[] qids, UnityAction<T[]> onSuccess, 
             UnityAction onError = null) where T : BaseData, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var questions = DataLoader.load<T[]>(res, "questions");
                 questionCache.addQuestions(questions);
-                onSuccess?.Invoke();
+                onSuccess?.Invoke(questions);
             };
 
             getQuestions(qids, getQuestionType<T>(), _onSuccess, onError);
@@ -292,12 +292,12 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
+        public void generateWords(UnityAction<Word[]> onSuccess, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
                 questionCache.addQuestions(words);
-                onSuccess?.Invoke();
+                onSuccess?.Invoke(words);
             };
 
             generateWords(_onSuccess, onError);
@@ -314,12 +314,12 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getWords(int[] wids, UnityAction onSuccess, UnityAction onError = null) {
+        public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
                 questionCache.addQuestions(words);
-                onSuccess?.Invoke();
+                onSuccess?.Invoke(words);
             };
 
             getWords(wids, _onSuccess, onError);
@@ -359,6 +359,26 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 获取单词数据
         /// </summary>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void queryWords(UnityAction onSuccess, UnityAction onError = null) {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                record.load(res); onSuccess?.Invoke();
+            };
+
+            queryWords(_onSuccess, onError);
+        }
+        public void queryWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+            JsonData data = new JsonData();
+
+            sendRequest(Oper.WordQuery, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 获取单词记录
+        /// </summary>
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
@@ -387,22 +407,27 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qid">题目ID</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void loadQuestion<T>(int qid, UnityAction onSuccess = null, 
+        public void loadQuestion<T>(int qid, UnityAction<T> onSuccess = null, 
             UnityAction onError = null) where T : BaseData, new() {
-            loadQuestions<T>(new int[] { qid }, onSuccess, onError);
+            UnityAction<T[]> _onSuccess = (res) => onSuccess.Invoke(res[0]);
+            loadQuestions<T>(new int[] { qid }, _onSuccess, onError);
         }
         /// <param name="qids">题目ID集</param>
-        public void loadQuestions<T>(int[] qids, UnityAction onSuccess = null, 
+        public void loadQuestions<T>(int[] qids, UnityAction<T[]> onSuccess = null, 
             UnityAction onError = null) where T : BaseData, new() {
             var cnt = qids.Length;
             var reqIds = new List<int>(); // 需要请求的题目ID数组
-            for (int i = 0; i < cnt; ++i)
-                // 如果没有缓存
-                if (!isQuestionCached<T>(qids[i])) reqIds.Add(qids[i]);
+            var questions = new List<T>(); // 已缓存的题目数组
+
+            for (int i = 0; i < cnt; ++i) {
+                var question = getQuestion<T>(qids[i]);
+                if (question == null) reqIds.Add(qids[i]);
+                else questions.Add(question);
+            }
 
             if (reqIds.Count > 0) // 如果需要请求
                 getQuestions<T>(reqIds.ToArray(), onSuccess, onError);
-            else onSuccess?.Invoke();
+            else onSuccess?.Invoke(questions.ToArray());
         }
 
         /// <summary>
@@ -428,47 +453,32 @@ namespace ExerPro.EnglishModule.Services {
         #endregion
 
         #region 更新控制
-
+        /*
         /// <summary>
         /// 更新移动结束
         /// </summary>
         void updateAfterMoved() {
-            processCurrentNode();
+            changeState(State.InNode);
         }
-
+        */
         /// <summary>
         /// 更新事件结束
         /// </summary>
-        void updateAfterEvent() {
+        void updateAfterNode() {
             save(); changeState(State.Idle);
         }
-
+        
         /// <summary>
         /// 更新据点
         /// </summary>
         void updateNode() {
+            Debug.Log("updateNode");
             if (isStateChanged()) {
+                Debug.Log("isStateChanged");
                 var node = record.currentNode();
-                if (node == null) return;
-                Debug.Log("updateNode: isStateChanged: " + node.type);
-
-                switch ((ExerProMapNode.Type)node.type) {
-                    case ExerProMapNode.Type.Rest: onRestNode(); break;
-                    case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
-                    case ExerProMapNode.Type.Shop: onShopNode(); break;
-                    case ExerProMapNode.Type.Enemy: onEnemyNode(); break;
-                    case ExerProMapNode.Type.Elite: onEliteNode(); break;
-                    case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
-                    case ExerProMapNode.Type.Boss: onBossNode(); break;
-                }
+                if (node == null) exitNode(false);
+                else switchNode(node.typeId);
             }
-        }
-
-        /// <summary>
-        /// 更新未知据点
-        /// </summary>
-        void updateUnknownNode() {
-            changeState(randomNode());
         }
 
         #endregion
@@ -498,8 +508,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns></returns>
         public bool isInBattle() {
-            return state == (int)State.EnemyNode || 
-                state == (int)State.EliteNode || state == (int)State.BossNode;
+            return state == (int)State.InNode && isBattleNode();
         }
 
         /// <summary>
@@ -511,25 +520,50 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         /// <summary>
-        /// 随机据点生成
+        /// 当前据点类型
         /// </summary>
         /// <returns></returns>
-        public State randomNode() {
-            var rates = RandomNodeRates;
-            var states = RandomNodeStates;
-            var rateList = new List<int>();
+        public ExerProMapNode.Type currentNodeType() {
+            return record.currentNode().typeEnum();
+        }
 
-            // 将比率填充为列表，然后从中抽取一个
-            for (int i = 0; i < rates.Length; ++i)
-                for (int j = 0; j < rates[i]; ++j) rateList.Add(i);
-
-            var index = Random.Range(0, rateList.Count);
-            return states[rateList[index]];
+        /// <summary>
+        /// 是否为战斗据点
+        /// </summary>
+        /// <returns></returns>
+        public bool isBattleNode() {
+            var type = currentNodeType();
+            return type == ExerProMapNode.Type.Enemy ||
+                type == ExerProMapNode.Type.Elite ||
+                type == ExerProMapNode.Type.Boss;
         }
 
         #endregion
 
         #region 据点入口
+
+        /// <summary>
+        /// 切换据点
+        /// </summary>
+        /// <param name="type">类型</param>
+        void switchNode(int type) {
+            switchNode((ExerProMapNode.Type)type);
+        }
+        void switchNode(ExerProMapNode.Type type) {
+            Debug.Log("switchNode: " + type);
+            switch (type) {
+                case ExerProMapNode.Type.Rest: onRestNode(); break;
+                case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
+                case ExerProMapNode.Type.Shop: onShopNode(); break;
+                case ExerProMapNode.Type.Story: onStoryNode(); break;
+                case ExerProMapNode.Type.Enemy: onEnemyNode(); break;
+                case ExerProMapNode.Type.Elite: onEliteNode(); break;
+                case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
+                case ExerProMapNode.Type.Boss: onBossNode(); break;
+            }
+            // 将下面这句删掉来测试具体的据点场景
+            exitNode(false);
+        }
 
         /// <summary>
         /// 休息据点
@@ -547,6 +581,11 @@ namespace ExerPro.EnglishModule.Services {
         void onShopNode() { }
 
         /// <summary>
+        /// 剧情据点
+        /// </summary>
+        void onStoryNode() { }
+
+        /// <summary>
         /// 敌人据点
         /// </summary>
         void onEnemyNode() { }
@@ -557,14 +596,41 @@ namespace ExerPro.EnglishModule.Services {
         void onEliteNode() { }
 
         /// <summary>
-        /// 未知据点
-        /// </summary>
-        void onUnknownNode() { }
-
-        /// <summary>
         /// Boss据点
         /// </summary>
         void onBossNode() { }
+
+        /// <summary>
+        /// 未知据点
+        /// </summary>
+        void onUnknownNode() {
+            switchNode(randomNode());
+        }
+
+        /// <summary>
+        /// 随机据点生成
+        /// </summary>
+        /// <returns></returns>
+        public ExerProMapNode.Type randomNode() {
+            var rates = RandomNodeRates;
+            var states = RandomNodeTypes;
+            var rateList = new List<int>();
+
+            // 将比率填充为列表，然后从中抽取一个
+            for (int i = 0; i < rates.Length; ++i)
+                for (int j = 0; j < rates[i]; ++j) rateList.Add(i);
+
+            var index = Random.Range(0, rateList.Count);
+            return states[rateList[index]];
+        }
+
+        /// <summary>
+        /// 退出据点（据点退出时候需要调用此函数！）
+        /// </summary>
+        public void exitNode(bool pop = true) {
+            if (pop) sceneSys.popScene();
+            changeState(State.Idle);
+        }
 
         #endregion
 
@@ -597,20 +663,16 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         public void terminateMove() {
             if (state == (int)State.Moving)
-                changeState(State.AfterMoved);
+                changeState(State.InNode);
         }
-
+        /*
         /// <summary>
         /// 处理当前据点
         /// </summary>
         void processCurrentNode() {
-            var node = record.currentNode();
-            if (node == null) return;
-
-            // 自动根据序号来切换状态
-            changeState((int)State.RestNode + node.type);
+            changeState(State.InNode);
         }
-
+        */
         /// <summary>
         /// 保存进度
         /// </summary>

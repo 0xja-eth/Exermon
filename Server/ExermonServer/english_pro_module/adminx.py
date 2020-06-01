@@ -257,3 +257,11 @@ class ExerProMapStageAdmin(object):
 					 'steps', 'max_fork_node', 'max_fork', 'node_rate']
 
 	# inlines = [EnemiesInline]
+
+
+@xadmin.sites.register(NodeType)
+class NodeTypeAdmin(object):
+	list_display = ['id', 'name', 'ques_types', 'configure']
+
+	list_editable = ['name', 'ques_types', 'configure']
+

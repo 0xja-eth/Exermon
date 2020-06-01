@@ -971,6 +971,7 @@ class GameConfigure(models.Model):
 
 		exer_pro_item_stars = ModelUtils.objectsToDict(self.exerproitemstar_set.all())
 		antonyms = ModelUtils.objectsToDict(self.antonym_set.all())
+		node_types = ModelUtils.objectsToDict(self.nodetype_set.all())
 
 		return {
 			'name': self.name,
@@ -1034,6 +1035,7 @@ class GameConfigure(models.Model):
 			'result_judges': result_judges,
 
 			'antonyms': antonyms,
+			'node_types': node_types,
 
 			'exer_pro_item_stars': exer_pro_item_stars,
 		}

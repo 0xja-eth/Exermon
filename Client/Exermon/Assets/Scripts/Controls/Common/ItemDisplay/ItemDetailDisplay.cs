@@ -82,6 +82,17 @@ namespace UI.Common.Controls.ItemDisplays {
             return container;
         }
 
+        /// <summary>
+        /// 获取当前对应的物品显示控件
+        /// </summary>
+        /// <returns></returns>
+        public virtual ItemDisplay<T> getItemDisplay() {
+            var displays = container.getItemDisplays();
+            if (index >= 0 && index < displays.Length)
+                return displays[index];
+            return null;
+        }
+
         #endregion
 
         /// <summary>

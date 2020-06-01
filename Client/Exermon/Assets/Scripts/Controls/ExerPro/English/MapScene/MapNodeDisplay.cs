@@ -23,14 +23,10 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public Image icon;
 
         public GameObject activedFlag; // 激活标志
+        public GameObject deactivedFlag; // 未激活标志
         public GameObject currentFlag; // 当前标志
         public GameObject passedFlag; // 经过标志
         public GameObject overFlag; // 结束标志
-
-        /// <summary>
-        /// 外部变量设置
-        /// </summary>
-        public Texture2D[] icons; // 每种据点的图标
         
         #region 数据控制
 
@@ -67,7 +63,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 刷新非激活状态
         /// </summary>
         void refreshDeactiveStatus(bool deactived) {
-            actived = !deactived;
+            if (deactivedFlag) deactivedFlag.SetActive(deactived);
         }
 
         /// <summary>
@@ -99,8 +95,10 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item">题目</param>
         protected override void drawExactlyItem(ExerProMapNode item) {
             base.drawExactlyItem(item);
+            var type = item.type();
+
             icon.gameObject.SetActive(true);
-            icon.overrideSprite = AssetLoader.generateSprite(icons[item.type]);
+            icon.overrideSprite = AssetLoader.generateSprite(type.icon);
         }
 
         /// <summary>

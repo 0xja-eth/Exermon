@@ -26,6 +26,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public GameObject linePerfab;
         public Transform lineContainer;
 
+        public MapNodeDetail nodeDetail;
+
         public StageRecordDisplay recordDisplay;
 
         public Image mapBackground; // 地图背景 
@@ -44,7 +46,15 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         List<GameObject> lines;
 
         #region 数据控制
-        
+
+        /// <summary>
+        /// 获取详情控件
+        /// </summary>
+        /// <returns></returns>
+        public override IItemDetailDisplay<ExerProMapNode> getItemDetail() {
+            return nodeDetail;
+        }
+
         /// <summary>
         /// 是否有效
         /// </summary>
@@ -90,7 +100,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="index"></param>
         protected override void onSubViewCreated(SelectableItemDisplay<ExerProMapNode> sub, int index) {
             base.onSubViewCreated(sub, index);
-            var node = items[index];
+            var node = items[index]; // var node = sub.getItem();
             var pos = getPosition(node);
             var rt = sub.transform as RectTransform;
             rt.anchoredPosition = pos;
