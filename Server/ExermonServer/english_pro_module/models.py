@@ -416,6 +416,9 @@ class ExerProRecord(models.Model):
     player = models.OneToOneField('player_module.Player', null=False,
                                on_delete=models.CASCADE, verbose_name="玩家")
 
+    # 是否回答完毕
+    finished = models.BooleanField(default=False, verbose_name="当前轮是否回答完毕")
+
     def __str__(self):
         return "%d. %s" % (self.id, self.player)
 
@@ -441,6 +444,7 @@ class ExerProRecord(models.Model):
 
     def update(self):
         self.WordLevel += 1
+        self.finished = True
         self.save()
 
     def convertToDict(self):

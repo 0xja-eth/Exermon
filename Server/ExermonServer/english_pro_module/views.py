@@ -58,6 +58,7 @@ class Service:
 	async def generateWords(cls, consumer, player: Player, ):
 		# 返回数据：
 		# words: 单词数据（数组） => 单词数据集
+		Common.ensureFinishLastWords(player)
 		words = Common.generateWords(player)
 		words = ModelUtils.objectsToDict(words)
 
@@ -407,4 +408,17 @@ class Common:
 			word_record.current = False
 			word_record.save()
 
+	# 检测上一轮是否
+	@classmethod
+	def ensureFinishLastWords(cls, player: Player, error: ErrorType = ErrorType.NoFirstCurrentWords):
+		"""
+		Args:
+			player (Player): 用户
+			error (ErrorType): 异常
+		Returns:
+			无返回
+		"""
+		exer_pro_record = ViewUtils.getObject(ExerProRecord, ErrorType.NoFirstCurrentWords, player=player)
+		if not exer_pro_record.finished:
+			raise error
 
