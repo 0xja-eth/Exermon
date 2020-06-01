@@ -88,7 +88,6 @@ class Service:
 				'correct': correct
 			}
 
-
 	# 查询单词
 	@classmethod
 	async def getWords(cls, consumer, player: Player, wids: list,):
@@ -245,7 +244,7 @@ class Common:
 
 			words = ViewUtils.getObjects(Word, id__in=wids, player=player)
 
-			# 更新轮数记录
+			# 创建轮数记录
 			ExerProRecord.create(player, wids)
 
 		# 有玩过的记录
@@ -336,7 +335,7 @@ class Common:
 
 	# 判断单词是否回答正确
 	@classmethod
-	def isAnswerCorrect(cls, wid: int, player: Player, chinese: str, isUpdate: bool) ->bool:
+	def isAnswerCorrect(cls, wid: int, player: Player, chinese: str, isUpdate: bool) -> bool:
 		"""
 		Args:
 			player (Player): 用户
@@ -345,7 +344,7 @@ class Common:
 			isUpdate  (bool): 是否更新单词记录
 		Returns:
 			isUpdate = True时，更新单词记录并返回该单词是否正确
-			isUpdate = False时，仅仅返回该单词是否正确
+			isUpdate = False时，返回值为False表明该单词回答错误或者未回答，返回值为True表明该单词已经回答正确了
 		"""
 		# 将回答结果记录到 WordRecord 表中
 		record = player.wordRecord(wid)
@@ -361,10 +360,10 @@ class Common:
 			else:
 				if not record.current:
 					raise ErrorType.NoInCurrentWords
-				elif record.current and not record.wrong:
-					return True
-				else:
+				elif record.current and record.correct == 0:
 					return False
+				else:
+					return True
 		else:
 			raise ErrorType.NoInCurrentWords
 
