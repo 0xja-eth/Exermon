@@ -88,6 +88,31 @@ class Service:
 				'correct': correct
 			}
 
+	# 查询当前轮单词
+	@classmethod
+	async def queryWords(cls, consumer, player: Player, ):
+		# 返回数据：
+		# level: int => 当前轮单词等级
+		# sum: int => 当前轮总单词数
+		# correct: int => 当前轮正确单词数
+		# wrong: int => 当前轮错误单词数
+		exer_pro_record = ViewUtils.getObject(ExerProRecord, ErrorType.NoFirstCurrentWords, player=player)
+		wids = exer_pro_record.words
+		level = exer_pro_record.WordLevel
+		sum = len(exer_pro_record.words)
+		word_records = Common.getWordsRecords(player, word_id__in=wids)
+		correct = 0
+		for word_record in word_records:
+			if word_record.current_correct:
+				correct += 1
+		wrong = sum - correct
+		return {
+			'level': level,
+			'sum': sum,
+			'correct': correct,
+			'wrong': wrong
+		}
+
 	# 查询单词
 	@classmethod
 	async def getWords(cls, consumer, player: Player, wids: list,):
@@ -249,15 +274,15 @@ class Common:
 
 		# 有玩过的记录
 		else:
-			old_wids = ProRecord.words
+			old_words = ProRecord.words
 			# 将旧单词记录中的 current 字段置为 False
-			cls.makeCurrentFalse(old_wids, player)
+			cls.makeCurrentFalse(old_words, player)
 			# 获取旧单词
 			random.seed(int(time.time()))
-			old_wids = random.sample(old_wids, CurrentWordsCalc.WordNum * (1 - CurrentWordsCalc.NewWordPercent))
+			old_wids = random.sample(old_words, CurrentWordsCalc.WordNum * (1 - CurrentWordsCalc.NewWordPercent))
 			old_words_set = ViewUtils.getObjects(Word, player=player, id__in=old_wids)
 			# 获取新单词
-			new_wids, new_words_set = cls.getNewWords(old_wids, player)
+			new_wids, new_words_set = cls.getNewWords(old_words, player)
 			words = old_words_set | new_words_set
 
 			wids = old_wids.extend(new_wids)
@@ -352,10 +377,10 @@ class Common:
 			word = ViewUtils.getObject(Word, ErrorType.WordNotExit, player=player, id=wid)
 			if isUpdate:
 				if word.chinese == chinese:
-					record.update(True)
+					record.updateRecord(True)
 					return True
 				else:
-					record.update(False)
+					record.updateRecord(False)
 					return False
 			else:
 				if not record.current:

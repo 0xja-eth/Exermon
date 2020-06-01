@@ -378,8 +378,10 @@ class WordRecord(models.Model):
 
         if correct:
             self.correct += 1
+            self.current_correct = True
         else:
             self.wrong = True
+            self.current_correct = False
 
         if self.count <= 0:
             self.first_date = datetime.datetime.now()

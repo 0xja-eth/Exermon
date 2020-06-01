@@ -632,5 +632,11 @@ WEBSOCKET_METHOD_ROUTER = {
         EnglishPro.getRecords,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
-
+    # 查询当前轮单词
+    'engpro/word/query': [[
+        ['uid', 'int'],
+    ],
+        EnglishPro.queryWords,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
 }
