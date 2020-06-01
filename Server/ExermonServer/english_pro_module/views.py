@@ -147,13 +147,12 @@ class Common:
 			question_all = ViewUtils.getObjects(ListeningQuestion)
 		elif question_type == QuestionType.Correction.value:
 			question_all = ViewUtils.getObjects(CorrectionQuestion)
-		elif question_type == 3:
-			question_all = ViewUtils.getObjects(ReadingQuestion)
+		elif question_type == QuestionType.Infinitive.value:
+			question_all = ViewUtils.getObjects(InfinitiveQuestion)
 
 		question_all = [question.id for question in question_all]
 
 		if len(question_all) < count:
-			print(len(question_all))
 			raise GameException(ErrorType.InvalidQuestionDatabaseCount)
 		else:
 			random.seed(int(time.time()))
