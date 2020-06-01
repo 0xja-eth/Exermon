@@ -578,6 +578,14 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 使用牌
+        /// </summary>
+        public void useCard(ExerProPackCard card) {
+            if (card.item().disposable) consumeCard(card);
+            else discardCard(card);
+        }
+
+        /// <summary>
         /// 弃牌
         /// </summary>
         public void discardCard(ExerProPackCard card) {
@@ -801,9 +809,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 角色属性
         /// </summary>
         [AutoConvert]
-        public int currentId { get; protected set; } // 当前节点索引
+        public int currentId { get; protected set; } = -1; // 当前节点索引
         [AutoConvert]
-        public ExerProActor actor { get; protected set; }
+        public ExerProActor actor { get; protected set; } = new ExerProActor();
 
         /// <summary>
         /// 敌人（缓存用）
@@ -859,7 +867,8 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="id">据点ID</param>
         /// <returns>返回据点对象</returns>
         public ExerProMapNode getNode(int id) {
-            return nodes.Find(node => node.id == id);
+            if (id < 0 || id >= nodes.Count) return null;
+            return nodes[id]; // nodes.Find(node => node.id == id);
         }
         /// <param name="xOrder">X顺序</param>
         /// <param name="yOrder">Y顺序</param>
@@ -869,11 +878,35 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 初始据点
+        /// </summary>
+        /// <returns></returns>
+        public List<ExerProMapNode> firstNodes() {
+            return nodes.FindAll(node => node.xOrder == 0);
+        }
+
+        /// <summary>
+        /// 最后据点
+        /// </summary>
+        /// <returns></returns>
+        public ExerProMapNode lastNode() {
+            return nodes[nodes.Count - 1];
+        }
+
+        /// <summary>
         /// 获取当前据点
         /// </summary>
         /// <returns>返回当前据点对象</returns>
         public ExerProMapNode currentNode() {
             return getNode(currentId);
+        }
+
+        /// <summary>
+        /// 是否已选择起点
+        /// </summary>
+        /// <returns></returns>
+        public bool isFirstSelected() {
+            return currentId >= 0;
         }
 
         #endregion
@@ -897,8 +930,8 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="restart">重新开始</param>
         void reset(bool restart = false) {
             if (restart) started = false;
-            _enemies = null; generated = false;
-            nodes.Clear();
+            currentId = -1; _enemies = null;
+            generated = false; nodes.Clear();
         }
 
         /// <summary>
@@ -907,6 +940,7 @@ namespace ExerPro.EnglishModule.Data {
         void generate() {
             if (generated) return; 
             generated = CalcService.NodeGenerator.generate(this);
+            refreshNodeStatuses();
         }
 
         /// <summary>
@@ -930,13 +964,13 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="id">下一步的据点ID</param>
         /// <param name="force">强制转移</param>
         /// <param name="emit">是否发射事件</param>
-        public void gotoNext(int id, bool force = false, bool emit = true) {
-            if (force) changePosition(id, emit);
+        public void moveNext(int id, bool force = false) {
+            if (force) changePosition(id);
             else {
                 var node = currentNode();
                 if (node == null) return;
                 foreach (var next in node.nexts)
-                    if (id == next) changePosition(id, emit);
+                    if (id == next) changePosition(id);
             }
         }
 
@@ -945,14 +979,42 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <param name="id">新结点ID</param>
         /// <param name="emit">是否发射事件</param>
-        void changePosition(int id, bool emit = true) {
-            currentId = id; if (emit) onMoved();
+        void changePosition(int id) {
+            currentId = id; onMoved();
         }
         
         /// <summary>
         /// 移动结束回调
         /// </summary>
-        void onMoved() {}
+        void onMoved() {
+            refreshNodeStatuses();
+        }
+
+        /// <summary>
+        /// 刷新据点状态
+        /// </summary>
+        void refreshNodeStatuses() {
+            var current = currentNode();
+            foreach(var node in nodes) {
+                if (node.status == (int)ExerProMapNode.Status.Passed) continue;
+
+                var status = ExerProMapNode.Status.Deactive;
+
+                if (current != null) {
+                    if (node == current)
+                        status = ExerProMapNode.Status.Current;
+                    else if (node.xOrder < current.xOrder)
+                        status = ExerProMapNode.Status.Over;
+                    else if (node.status == (int)ExerProMapNode.Status.Current)
+                        status = ExerProMapNode.Status.Passed;
+                    else if (current.nexts.Contains(node.id))
+                        status = ExerProMapNode.Status.Active;
+                } else if (node.xOrder <= 0)
+                    status = ExerProMapNode.Status.Active;
+
+                node.setStatus(status);
+            }
+        }
 
         #endregion
 
@@ -969,7 +1031,7 @@ namespace ExerPro.EnglishModule.Data {
             }
 
             //generate();
-        }
+		}
 
         /// <summary>
         /// 构造函数
@@ -1011,6 +1073,17 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 状态类型
+        /// </summary>
+        public enum Status {
+            Deactive = 0, // 未激活（未到达）
+            Active = 1, // 已激活（下一步）
+            Current = 2, // 当前
+            Passed = 3, // 已经过
+            Over = 4, // 已结束
+        }
+
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -1022,13 +1095,15 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public double yOffset { get; protected set; }
         [AutoConvert]
-        public Type type { get; protected set; }
+        public int type { get; protected set; }
 
         /// <summary>
         /// 下一个Y序号（数组）
         /// </summary>
         [AutoConvert]
-        public List<int> nexts { get; protected set; } = new List<int>();
+        public HashSet<int> nexts { get; protected set; } = new HashSet<int>();
+        [AutoConvert]
+        public int status { get; protected set; }
 
         /// <summary>
         /// 地图关卡
@@ -1039,6 +1114,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 分叉标记
         /// </summary>
         public bool fork = false;
+
+        #region 生成
 
         /// <summary>
         /// 生成位置
@@ -1061,12 +1138,15 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <param name="next"></param>
         public void addNext(int next) {
-            if (nexts.Contains(next)) return;
             nexts.Add(next);
         }
         public void addNext(ExerProMapNode next) {
             addNext(next.id);
         }
+
+        #endregion
+
+        #region 数据控制
 
         /// <summary>
         /// 获取下一节点
@@ -1081,6 +1161,19 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
+        /// 设置状态
+        /// </summary>
+        /// <param name="status">状态</param>
+        public void setStatus(Status status) {
+            this.status = (int)status;
+        }
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        #endregion
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ExerProMapNode() { }
@@ -1088,7 +1181,7 @@ namespace ExerPro.EnglishModule.Data {
             int xOrder, int yOrder, Type type) {
             this.id = id; this.stage = stage;
             this.xOrder = xOrder; this.yOrder = yOrder;
-            this.type = type; 
+            this.type = (int)type; 
 
             generatePosition();
         }

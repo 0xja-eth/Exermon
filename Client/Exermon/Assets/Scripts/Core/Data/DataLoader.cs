@@ -154,16 +154,20 @@ namespace Core.Data.Loaders {
             }
 
             // 处理列表情况
-            if (type.Name == typeof(List<>).Name) {
-                if (!data.IsArray) return default;
-                var cnt = data.Count;
-                var eleType = type.GetGenericArguments()[0];
-                var res = Activator.CreateInstance(type);
-                for (var i = 0; i < cnt; ++i)
-                    type.GetMethod("Add").Invoke(res,
-                        new object[] { load(eleType, data[i]) });
-                return res;
-            }
+            var interfaces = type.GetInterfaces();
+            foreach(var interf in interfaces) 
+                if (interf.Name == typeof(ICollection<>).Name) {
+                    if (!data.IsArray) return default;
+                    var cnt = data.Count;
+                    var eleType = type.GetGenericArguments()[0];
+                    var res = Activator.CreateInstance(type);
+                    for (var i = 0; i < cnt; ++i)
+                        type.GetMethod("Add").Invoke(res,
+                            new object[] { load(eleType, data[i]) });
+                    return res;
+                }
+            //if (type.Name == typeof(List<>).Name) {
+            //}
 
             // 处理特殊类型
             if (type == typeof(Color)) return loadColor(data);
@@ -323,8 +327,18 @@ namespace Core.Data.Loaders {
             // 处理数组情况
             if (isArray = type.IsArray)
                 eleType = type.GetElementType();
-            else if (isArray = (type.Name == typeof(List<>).Name))
-                eleType = type.GetGenericArguments()[0];
+            //else if (isArray = (type.Name == typeof(List<>).Name))
+            //    eleType = type.GetGenericArguments()[0];
+            else {
+                // 处理列表情况
+                var interfaces = type.GetInterfaces();
+                foreach (var interf in interfaces)
+                    if (interf.Name == typeof(ICollection<>).Name) {
+                        eleType = type.GetGenericArguments()[0];
+                        isArray = true; break;
+                    }
+            }
+
             if (isArray) {
                 var array = (IEnumerable)data;
                 var json = new JsonData();

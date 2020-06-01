@@ -758,7 +758,7 @@ class ExerProCard(BaseItem):
 
 	# 目标
 	target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
-											  choices=CARD_TYPES, verbose_name="目标")
+											  choices=TARGETS, verbose_name="目标")
 
 	def convertToDict(self):
 		"""

@@ -30,7 +30,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public MapDisplay mapDisplay;
+        public StageRecordDisplay stageRecordDisplay;
 
         /// <summary>
         /// 外部系统设置
@@ -60,9 +60,40 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         protected override void start() {
             base.start();
-            mapDisplay.setItem(engSer.record);
+            stageRecordDisplay.setItem(engSer.record);
         }
 
         #endregion
+
+        #region 流程控制
+
+        /// <summary>
+        /// 进入下一步
+        /// </summary>
+        public void moveNext() {
+            var mapDisplay = stageRecordDisplay.mapDisplay;
+            var playerDisplay = stageRecordDisplay.playerDisplay;
+
+            var nodeDisplay = mapDisplay.selectedItemDisplay();
+            var node = mapDisplay.selectedItem();
+
+            var record = engSer.record;
+            var first = !record.isFirstSelected();
+
+            engSer.startMove(node.id, first);
+            playerDisplay.gotoNode(nodeDisplay, first);
+
+            stageRecordDisplay.requestRefresh();
+        }
+
+        /// <summary>
+        /// 退出场景
+        /// </summary>
+        public override void popScene() {
+            engSer.terminate();
+        }
+
+        #endregion
+
     }
 }
