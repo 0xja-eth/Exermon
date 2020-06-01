@@ -409,7 +409,14 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训背包药水
     /// </summary>
-    public class ExerProPackPotion : PackContItem<ExerProPotion> { }
+    public class ExerProPackPotion : PackContItem<ExerProPotion>
+    {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProPackPotion() { }
+        public ExerProPackPotion(ExerProPotion card) : base(card) { }
+    }
 
     /// <summary>
     /// 特训背包卡片
@@ -747,6 +754,15 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProActor() {
             var player = PlayerService.get().player;
             slotItem = player.getExerSlotItem(3);
+        }
+
+        /// <summary>
+        /// 读取金钱
+        /// </summary>
+        /// <param name="money"></param>
+        public void gainGold(int gold)
+        {
+            this.gold += gold;
         }
     }
 
