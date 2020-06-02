@@ -861,9 +861,6 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ExerProActor() {
-            var player = PlayerService.get().player;
-            slotItem = player.getExerSlotItem(3);
         public ExerProActor() { }
         public ExerProActor(Player player) {
             slotItem = player.getExerSlotItem(EnglishSubjectId);
@@ -1295,7 +1292,6 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         public enum Type
         {
-            Boss = 6, // 最终BOSS
             Rest = 1, //休息据点
             Treasure = 2, //藏宝据点
             Shop = 3, //商人据点
@@ -1304,7 +1300,7 @@ namespace ExerPro.EnglishModule.Data
             Unknown = 6, //未知据点
             Boss = 7, // 最终BOSS
             Story = 8, // 剧情据点        }
-
+        }
         /// <summary>
         /// 状态类型
         /// </summary>
