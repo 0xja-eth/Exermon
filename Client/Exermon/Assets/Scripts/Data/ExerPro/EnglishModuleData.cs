@@ -70,7 +70,7 @@ namespace ExerPro.EnglishModule.Data {
     */
 
     /// <summary>
-    /// 不定式题目
+    /// 短语题目
     /// </summary>
     public class InfinitiveQuestion : BaseData {
 
@@ -83,6 +83,8 @@ namespace ExerPro.EnglishModule.Data {
         public string chinese { get; protected set; }
         [AutoConvert]
         public string infinitive { get; protected set; }
+        [AutoConvert]
+        public int type { get; protected set; }
 
     }
 

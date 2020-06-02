@@ -10,7 +10,6 @@ from utils.exception import ErrorType, GameException
 import os, base64, datetime, jsonfield, random
 from enum import Enum
 
-
 # Create your models here.
 
 # region 题目
@@ -22,7 +21,7 @@ from enum import Enum
 class QuestionType(Enum):
 	Listening = 1  # 听力题
 	Phrase = 2  # 不定式题
-	Correction = 3   # 改错题
+	Correction = 3  # 改错题
 
 
 # ===================================================
@@ -123,7 +122,6 @@ class ReadingSubQuestion(BaseQuestion):
 	def choices(self):
 		return self.readingqueschoice_set.all()
 
-
 # ===================================================
 #  阅读题
 # ===================================================
@@ -141,11 +139,26 @@ class ReadingQuestion(GroupQuestion):
 
 
 # ===================================================
+#  短语题目类型枚举
+# ===================================================
+class InfinitiveType(Enum):
+	SB = 1  # [sb. sth. 开头的短语选项]
+	Do = 2  # [to do, doing 开头的短语选项]
+	Prep = 3  # [介词短语选项]
+
+
+# ===================================================
 #  短语题
 # ===================================================
 class InfinitiveQuestion(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = "短语题"
+
+	TYPES = [
+		(InfinitiveType.SB.value, '[包含 sb. 的短语选项]'),
+		(InfinitiveType.Do.value, '[do 形式的短语选项]'),
+		(InfinitiveType.Prep.value, '[介词短语选项]'),
+	]
 
 	TYPE = QuestionType.Phrase
 
@@ -158,6 +171,10 @@ class InfinitiveQuestion(models.Model):
 	# 不定式项
 	infinitive = models.CharField(max_length=64, verbose_name="不定式项")
 
+	# 不定式项的类型
+	type = models.PositiveSmallIntegerField(default=InfinitiveType.Do.value,
+											choices=TYPES, verbose_name="修改类型")
+
 	def convertToDict(self):
 		"""
 		转化为字典
@@ -168,7 +185,8 @@ class InfinitiveQuestion(models.Model):
 			'id': self.id,
 			'word': self.word,
 			'chinese': self.chinese,
-			'infinitive': self.infinitive
+			'infinitive': self.infinitive,
+			'type': self.type
 		}
 
 
@@ -240,7 +258,7 @@ class WrongItem(models.Model):
 											choices=TYPES, verbose_name="修改类型")
 
 	# 正确单词
-	word = models.TextField(verbose_name="正确单词")
+	word = models.TextField(verbose_name="正确单词", null=True, blank=True)
 
 	# 对应题目
 	question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
@@ -268,10 +286,10 @@ class Word(models.Model):
 	english = models.CharField(max_length=64, verbose_name="英文")
 
 	# 中文
-	chinese = models.CharField(max_length=64, verbose_name="中文")
+	chinese = models.CharField(max_length=256, verbose_name="中文")
 
 	# 词性
-	type = models.CharField(max_length=32, verbose_name="词性")
+	type = models.CharField(max_length=64, verbose_name="词性", null=True, blank=True)
 
 	# 等级
 	level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
@@ -384,8 +402,10 @@ class WordRecord(models.Model):
 		"""
 		self.current_correct = correct
 
-		if correct: self.correct += 1
-		else: self.wrong = True
+		if correct:
+			self.correct += 1
+		else:
+			self.wrong = True
 
 		if self.count <= 0:
 			self.first_date = datetime.datetime.now()
@@ -508,9 +528,9 @@ class ExerProRecord(CacheableModel):
 			records = self.currentWordRecords()
 
 			corr_recs = [record for record in records
-				if record.current_correct is True]
+						 if record.current_correct is True]
 			wrong_recs = [record for record in records
-				if record.current_correct is False]
+						  if record.current_correct is False]
 
 			sum = len(records)
 			correct = len(corr_recs)
@@ -605,8 +625,7 @@ class ExerProRecord(CacheableModel):
 		"""
 		return ModelUtils.get(self.wordRecords(), word_id=word_id, **kwargs)
 
-	# endregion
-
+# endregion
 
 # # ===================================================
 # #  英语单词来源枚举
@@ -902,11 +921,11 @@ class Antonym(GroupConfigure):
 			'hurt_rate': self.hurt_rate / 100,
 		}
 
+
 # ===================================================
 #  卡片类型枚举
 # ===================================================
 class ExerProCardType(Enum):
-
 	Attack = 1  # 攻击
 	Skill = 2  # 技能
 	Ability = 3  # 能力
@@ -1151,7 +1170,6 @@ class ExerProStatus(BaseItem):
 	# 道具类型
 	TYPE = ItemType.ExerProStatus
 
-
 # endregion
 
 # region 地图
@@ -1161,9 +1179,7 @@ class ExerProStatus(BaseItem):
 #  据点类型表
 # ===================================================
 class NodeType(GroupConfigure):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "据点类型"
 
 	# 题型
@@ -1229,7 +1245,6 @@ class ExerProMap(models.Model):
 			返回关卡 QuerySet
 		"""
 		return self.exerpromapstage_set.all()
-
 
 # # ===================================================
 # #  据点类型表
