@@ -139,11 +139,26 @@ class ReadingQuestion(GroupQuestion):
 
 
 # ===================================================
+#  英语题目类型枚举
+# ===================================================
+class InfinitiveType(Enum):
+    sb = 1  # [sb. sth. 开头的短语选项]
+    todo = 2  # [to do, doing 开头的短语选项]
+    of = 3   # [sb. sth. 开头的短语选项]
+
+
+# ===================================================
 #  不定式题
 # ===================================================
 class InfinitiveQuestion(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "不定式题"
+
+    TYPES = [
+        (InfinitiveType.sb.value, '[sb. sth. 开头的短语选项]'),
+        (InfinitiveType.todo.value, '[to do, doing 开头的短语选项]'),
+        (InfinitiveType.of.value, '[sb. sth. 开头的短语选项]'),
+    ]
 
     # 单词
     word = models.CharField(max_length=64, verbose_name="单词")
@@ -153,6 +168,10 @@ class InfinitiveQuestion(models.Model):
 
     # 不定式项
     infinitive = models.CharField(max_length=64, verbose_name="不定式项")
+
+    # 不定式项的类型
+    infinitive_type = models.PositiveSmallIntegerField(default=InfinitiveType.todo.value,
+                                            choices=TYPES, verbose_name="修改类型")
 
     def convertToDict(self):
         """
@@ -234,7 +253,7 @@ class WrongItem(models.Model):
                                             choices=TYPES, verbose_name="修改类型")
 
     # 正确单词
-    word = models.TextField(verbose_name="正确单词")
+    word = models.TextField(verbose_name="正确单词", blank=True)
 
     # 对应题目
     question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
@@ -262,10 +281,10 @@ class Word(models.Model):
     english = models.CharField(max_length=64, verbose_name="英文")
 
     # 中文
-    chinese = models.CharField(max_length=64, verbose_name="中文")
+    chinese = models.CharField(max_length=128, verbose_name="中文")
 
     # 词性
-    type = models.CharField(max_length=32, verbose_name="词性")
+    type = models.CharField(max_length=32, verbose_name="词性", null=True,blank=True)
 
     # 等级
     level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
