@@ -30,7 +30,7 @@ def center_print(*args, **kwargs):
 
 # 插入单词
 def insert_words():
-    f = open(words_path)
+    f = open(words_path, encoding='utf-8')
     for line in f:
         str_list = line.strip().strip('\n').split(sep='?')
         if len(str_list) == 2:
@@ -43,13 +43,16 @@ def insert_words():
 
 # 插入不定式题目
 def insert_infinitive_question():
-    f = open(phrase_path)
+    f = open(phrase_path, encoding='utf-8')
     for line in f:
         str_list = line.strip().strip('\n').split(sep='?')
         if len(str_list) == 3:
             word = str_list[0]
             chinese = str_list[2]
             infinitive = str_list[1]
+
+            infinitive_type = None
+
             if infinitive in todo:
                 infinitive_type = InfinitiveType.Do.value
             elif infinitive in sb:
@@ -60,7 +63,7 @@ def insert_infinitive_question():
             InfinitiveQuestion.objects.create(word=word,
                                               chinese=chinese,
                                               infinitive=infinitive,
-                                              infinitive_type=infinitive_type)
+                                              type=infinitive_type)
     f.close()
     center_print('Done inserting InfinitiveQuestion')
 

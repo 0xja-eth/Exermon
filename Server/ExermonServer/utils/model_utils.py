@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.deconstruct import deconstructible
-import os
+import os, random
 
 
 # ===================================================
@@ -135,6 +135,12 @@ class CacheableModel(models.Model):
 # ===================================================
 @deconstructible
 class ImageUpload:
+
+	# 随机字符集
+	CHARSET = 'zyxwvutsrqponmlkjihgfedcba'
+
+	# 随机字符串长度
+	RANDOM_LEN = 5
 
 	def __init__(self, _dir):
 		self.dir = _dir
@@ -286,7 +292,8 @@ class QuestionImageUpload(SystemImageUpload):
 		ext = os.path.splitext(filename)[1]
 
 		# 定义文件名
-		filename = "question_%d" % instance.question.id
+		rand_str = random.sample(self.CHARSET, self.RANDOM_LEN)
+		filename = "question_%s" % rand_str
 
 		return filename+ext
 
@@ -305,7 +312,8 @@ class QuestionAudioUpload(SystemImageUpload):
 		ext = os.path.splitext(filename)[1]
 
 		# 定义文件名
-		filename = "question_%d" % instance.question.id
+		rand_str = random.sample(self.CHARSET, self.RANDOM_LEN)
+		filename = "question_%s" % rand_str
 
 		return filename+ext
 

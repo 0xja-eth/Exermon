@@ -386,6 +386,9 @@ class GroupQuestion(models.Model):
 	# 来源
 	source = models.TextField(null=True, blank=True, verbose_name="来源")
 
+	def __str__(self):
+		return "%s. %s" % (self.id, self.article)
+
 	def convertToDict(self):
 		sub_questions = ModelUtils.objectsToDict(self.subQuestions())
 
