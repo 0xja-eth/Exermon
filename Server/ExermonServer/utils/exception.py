@@ -186,6 +186,18 @@ class ErrorType(Enum):
 	CompRankNotExist = 702  # 赛季排位不存在
 	ResultJudgeNotExist = 703  # 结果判断类型不存在
 
+	# EnglishPro
+	InvalidQuestionCount = 800  # 非法的题目数量
+	InvalidQuestionType = 801  # 非法的题目类型
+	InvalidQuestionDatabaseCount = 802  # 超过题库数量
+	ExerProRecordNotExist = 803  # 特训记录不存在
+	WordNotExit = 804  # 单词不存在
+	WordRecordNotExit = 805  # 单词记录不存在
+	AnswerNotFinish = 806  # 当前轮单词没有问答完毕
+	NoEnoughNewWord = 807  # 单词库中没有足够的新单词
+	NoInCurrentWords = 808  # 该单词不在当前轮中
+	NoFirstCurrentWords = 809  # 请先生成当前轮单词
+
 
 class GameException(Exception):
 
@@ -364,6 +376,17 @@ class GameException(Exception):
 		ErrorType.CompRankNotExist: "赛季排位不存在！",
 		ErrorType.ResultJudgeNotExist: "结果判断类型不存在！",
 
+		# EnglishPro
+		ErrorType.InvalidQuestionCount: "非法的题目数量！",
+		ErrorType.InvalidQuestionType: "非法的题目类型！",
+		ErrorType.InvalidQuestionDatabaseCount: "超过题库数量！",
+		ErrorType.ExerProRecordNotExist: "特训记录不存在！",
+		ErrorType.WordNotExit: "单词不存在！",
+		ErrorType.WordRecordNotExit: "单词记录不存在！",
+		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！",
+		ErrorType.NoEnoughNewWord: "单词库中没有足够的新单词！",
+		ErrorType.NoInCurrentWords: "该单词不在当前轮中！",
+		ErrorType.NoFirstCurrentWords: "请先生成当前轮单词！",
 	}
 
 	def __init__(self, error_type: ErrorType):
