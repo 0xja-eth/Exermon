@@ -6,8 +6,10 @@ using UnityEngine.UI;
 
 using Core.UI.Utils;
 
-using UI.Common.Controls.ItemDisplays;
 using ExerPro.EnglishModule.Data;
+
+using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.ParamDisplays;
 
 /// <summary>
 /// 地图场景控件
@@ -24,6 +26,11 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         public MapDisplay mapDisplay;
         public PlayerDisplay playerDisplay;
+
+        public PlayerStatus playerStatus;
+
+        public MultParamsDisplay mapProgress;
+        public MultParamsDisplay wordProgress;
 
         #region 数据控制
 
@@ -52,22 +59,39 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item"></param>
         protected override void drawExactlyItem(MapStageRecord item) {
             base.drawExactlyItem(item);
-            drawMapInfo();
-            drawPlayerInfo();
+            drawMapInfo(item);
+            drawPlayerStatus(item);
+            drawPlayerDisplay(item);
+            drawProgresses(item);
         }
 
         /// <summary>
         /// 绘制地图信息
         /// </summary>
-        void drawMapInfo() {
+        void drawMapInfo(MapStageRecord item) {
             mapDisplay.setItem(item);
         }
 
         /// <summary>
         /// 绘制玩家信息
         /// </summary>
-        void drawPlayerInfo() {
+        void drawPlayerStatus(MapStageRecord item) {
+            playerStatus.setItem(item.actor);
+        }
+
+        /// <summary>
+        /// 绘制玩家信息
+        /// </summary>
+        void drawPlayerDisplay(MapStageRecord item) {
             playerDisplay.setItem(item.actor);
+        }
+
+        /// <summary>
+        /// 绘制进度
+        /// </summary>
+        void drawProgresses(MapStageRecord item) {
+            mapProgress.setValue(item, "map_progress");
+            wordProgress.setValue(item, "word_progress");
         }
 
         #endregion

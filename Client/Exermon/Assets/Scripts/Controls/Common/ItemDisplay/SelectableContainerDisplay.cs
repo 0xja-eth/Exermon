@@ -429,6 +429,13 @@ namespace UI.Common.Controls.ItemDisplays {
         public SelectableItemDisplay<T>[] getItemDisplays() {
             return subViews.ToArray();
         }
+        /// <summary>
+        /// 获取物品显示项数组
+        /// </summary>
+        /// <returns>物品显示项数组</returns>
+        ItemDisplay<T>[] IContainerDisplay<T>.getItemDisplays() {
+            return subViews.ToArray();
+        }
 
         /// <summary>
         /// 物品变更回调

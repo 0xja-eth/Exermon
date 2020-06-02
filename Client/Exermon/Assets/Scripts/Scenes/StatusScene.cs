@@ -52,7 +52,7 @@ namespace UI.StatusScene {
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override string sceneName() {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.StatusScene;
         }
 

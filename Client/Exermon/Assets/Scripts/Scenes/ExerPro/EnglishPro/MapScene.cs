@@ -32,6 +32,8 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         public StageRecordDisplay stageRecordDisplay;
 
+        public BaseWindow nodeDetail;
+
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -51,7 +53,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// 场景名称
         /// </summary>
         /// <returns></returns>
-        public override string sceneName() {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProMapScene;
         }
 
@@ -62,6 +64,18 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             base.start();
             stageRecordDisplay.setItem(engSer.record);
 
+        }
+
+        #endregion
+
+        #region 更新控制
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        protected override void update() {
+            base.update();
+            engSer?.update();
         }
 
         #endregion
@@ -85,6 +99,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             playerDisplay.gotoNode(nodeDisplay, first);
 
             stageRecordDisplay.requestRefresh();
+            nodeDetail.terminateWindow();
         }
 
         /// <summary>

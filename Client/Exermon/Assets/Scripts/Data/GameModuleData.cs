@@ -474,7 +474,11 @@ namespace GameModule.Data {
         public ResultJudge[] resultJudges { get; protected set; }
 
         [AutoConvert]
+        public Antonym[] antonyms { get; protected set; }
+        [AutoConvert]
         public ExerProItemStar[] exerProItemStars { get; protected set; }
+        [AutoConvert]
+        public NodeType[] nodeTypes { get; protected set; }
     }
 
     /// <summary>

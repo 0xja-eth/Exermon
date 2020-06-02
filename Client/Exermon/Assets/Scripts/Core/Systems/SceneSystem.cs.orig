@@ -27,6 +27,38 @@ namespace Core.Systems {
         /// <summary>
         /// 游戏场景数据
         /// </summary>
+<<<<<<< HEAD
+        public class Scene {
+
+            /// <summary>
+            /// 初始场景
+            /// </summary>
+            public const string FirstScene = TitleScene;
+
+            /// <summary>
+            /// 常量设定
+            /// </summary>
+            public const string TitleScene = "TitleScene";
+            public const string StartScene = "StartScene";
+            public const string MainScene = "MainScene";
+            public const string StatusScene = "StatusScene";
+
+            public const string ExerciseScene = "ExerciseScene";
+            public const string RecordScene = "RecordScene";
+            public const string PackScene = "PackScene";
+            public const string ShopScene = "ShopScene";
+
+            public const string BattleStartScene = "BattleStartScene";
+            public const string BattleMatchingScene = "BattleMatchingScene";
+            public const string BattleScene = "BattleScene";
+            public const string BattleResultScene = "BattleResultScene";
+            public const string BattleAnswerScene = "BattleAnswerScene";
+
+            public const string EnglishProMapScene = "Scenes/ExerPro/EnglishPro/MapScene";
+            public const string EnglishProCorrectionScene = "CorrectionScene";
+
+            public const string HelpScene = "HelpScene";
+=======
         public enum Scene {
 
             NoneScene = -1,
@@ -40,7 +72,6 @@ namespace Core.Systems {
             StatusScene, PackScene, ShopScene,
 
             ExerciseScene, RecordScene,
-            public const string EnglishProCorrectionScene = "CorrectionScene";
 
             BattleStartScene,
             BattleMatchingScene, 
@@ -51,6 +82,7 @@ namespace Core.Systems {
             EnglishProMapScene,
 
             HelpScene
+>>>>>>> 14793240676919f2e9e8d76cf77761e3cdaed984
         }
 
         /// <summary>

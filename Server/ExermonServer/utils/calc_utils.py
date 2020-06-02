@@ -1,5 +1,6 @@
-import math, random
+import math, random, time
 from .exception import GameException, ErrorType
+from .view_utils import Common as ViewUtils
 from enum import Enum
 
 
@@ -2032,3 +2033,49 @@ class NewSeasonStarNumCalc:
 			new_rank[1], new_rank[2], rank_id=new_rank[0])
 
 		return star_num
+
+
+# ===================================================
+# 生成当前轮单词
+# ===================================================
+class NewWordsGenerator:
+
+	WordNum = 50
+	NewWordPercent = 0.2
+
+	# 从上一轮单词列表中拿出80%的单词和20%的新单词组成当前轮单词
+	@classmethod
+	def generate(cls, level=1, last_words=[], words=None):
+		"""
+		执行生成
+		Args:
+			level (int): 单词等级
+			last_words (list): 上一轮单词ID数组
+			words (list): 新单词生成范围
+		Returns:
+			返回生成的单词ID数组
+		"""
+		from english_pro_module.models import Word
+		random.seed(int(time.time()))
+
+		# all_words 为空则自动生成
+		if words is None:
+			words = ViewUtils.getObjects(Word, level__gt=level)
+			words = words.exclude(id__in=last_words)
+			words = [word.id for word in words]
+
+		# 没有旧单词
+		if len(last_words) == 0:
+			words = random.sample(words, cls.WordNum)
+		# 已经没有新单词了
+		elif len(words) == 0:
+			words = random.sample(last_words, cls.WordNum)
+		else:
+			old_words = random.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
+			new_words = random.sample(words, cls.WordNum * cls.NewWordPercent)
+			words = old_words.extend(new_words)
+
+		words = random.shuffle(words)
+
+		return words
+

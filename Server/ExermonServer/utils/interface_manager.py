@@ -341,4 +341,3 @@ class Common:
 			'status': exception.error_type.value,
 			'errmsg': str(exception)
 		}
-
