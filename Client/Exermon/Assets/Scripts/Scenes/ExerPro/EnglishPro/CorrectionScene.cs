@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
+using static ExerPro.EnglishModule.Data.CorrectionQuestion;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene
 {
@@ -58,13 +59,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         protected override void start()
         {
             base.start();
-            CorrectionQuestion question = new CorrectionQuestion();
-            //List<CorrectionQuestion> list = engSer.questionCache.getCacheList<CorrectionQuestion>();
-            //Debug.Log(list.ToArray().Length);
-            string[] items2 = { "aaa", "ewq", "ewq" };
-            //articleDisplay.setItem(question);
+            articleDisplay.startView(CorrectionQuestion.sample());
             //articleDisplay.setItems(items2);
-            articleDisplay.test();
+            //articleDisplay.test();
         }
         #endregion
 

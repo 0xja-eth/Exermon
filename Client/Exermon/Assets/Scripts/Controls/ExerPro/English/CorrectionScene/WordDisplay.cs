@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UI.Common.Controls.ItemDisplays;
+using UnityEngine;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 {
@@ -14,16 +15,20 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     public class WordDisplay :
         SelectableItemDisplay<string>
     {
+        public GameObject textObj;
 
+        #region 界面绘制
+
+        /// <summary>
+        /// 绘制物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override void drawExactlyItem(string item)
+        {
+            base.drawExactlyItem(item);
+        }
+        #endregion
     }
 
-    /// <summary>
-    /// 绘制确切物品
-    /// </summary>
-    /// <param name="battler">对战者</param>
-    //protected override void drawExactlyItem(string battler)
-    //{
-
-    //}
 
 }

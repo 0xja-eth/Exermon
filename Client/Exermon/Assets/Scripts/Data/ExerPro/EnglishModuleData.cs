@@ -18,6 +18,7 @@ using QuestionModule.Data;
 using PlayerModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
+using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 
 /// <summary>
 /// 艾瑟萌特训模块
@@ -118,6 +119,17 @@ namespace ExerPro.EnglishModule.Data
                 return DataService.get().correctType(type).Item2;
             }
 
+            public static WrongItem[] sample()
+            {
+
+                WrongItem[] wrongItems = new WrongItem[1];
+                WrongItem wrongItem = new WrongItem();
+                wrongItem.sentenceIndex = 0;
+                wrongItem.wordIndex = 1;
+                wrongItem.word = "is";
+                wrongItems[0] = wrongItem;
+                return wrongItems;
+            }
         }
 
         /// <summary>
@@ -127,9 +139,29 @@ namespace ExerPro.EnglishModule.Data
         public string article { get; protected set; }
         [AutoConvert]
         public string description { get; protected set; }
-
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
+
+        public static CorrectionQuestion sample()
+        {
+
+            CorrectionQuestion question = new CorrectionQuestion();
+            question.wrongItems = WrongItem.sample();
+            question.article = "How is you? I am fine. Thank you!";
+            question.description = "test";
+
+            return question;
+        }
+
+        public string[] sentences()
+        {
+            string temp = article.Replace("? ","?+");
+            temp = temp.Replace(". ", ".+");
+            temp = temp.Replace("! ", "!+");
+            temp = temp.Replace(", ", ",-");
+            string[] sentences = temp.Split('+');
+            return sentences;
+        }
     }
 
     /// <summary>
@@ -801,7 +833,7 @@ namespace ExerPro.EnglishModule.Data
         public ExerProActor()
         {
             var player = PlayerService.get().player;
-            slotItem = player.getExerSlotItem(3);
+            //slotItem = player.getExerSlotItem(3);
         }
     }
 

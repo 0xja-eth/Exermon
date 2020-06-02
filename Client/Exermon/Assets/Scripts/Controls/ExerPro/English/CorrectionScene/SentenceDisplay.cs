@@ -12,39 +12,23 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     /// <summary>
     /// 句子
     /// </summary
-    public class SentenceDisplay :
-        SelectableContainerDisplay<string>,
-        IItemDisplay<string>
+    public class SentenceDisplay : ItemDisplay<string>
     {
+
 
         /// <summary>
         /// 单词储存池
         /// </summary>
         List<GameObject> words;
 
-        public string getItem()
-        {
-            return "";
-        }
-
-        public void setItem(string item, bool force = false)
-        {
-
-        }
-
         /// <summary>
-        /// 子节点创建回调
+        /// 开启视图
         /// </summary>
-        /// <param name="sub"></param>
-        /// <param name="index"></param>
-        protected override void onSubViewCreated(SelectableItemDisplay<string> sub, int index)
+        /// <param name="item"></param>
+        public override void startView(string item)
         {
-            base.onSubViewCreated(sub, index);
-
+            base.startView(item);
         }
-        public void startView(string item)
-        {
 
-        }
     }
 }

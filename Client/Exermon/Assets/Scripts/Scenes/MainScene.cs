@@ -126,7 +126,8 @@ namespace UI.MainScene {
                 case BuildingType.Adventure:
                     //sceneName = SceneSystem.Scene.EnglishProMapScene; break;
                     sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
-                    onAdventureClick(); break;            }
+                    onAdventureClick(); break;
+            }
             if (sceneName != "") sceneSys.pushScene(sceneName);
         }
         public void onBulidingsClick(int type) {

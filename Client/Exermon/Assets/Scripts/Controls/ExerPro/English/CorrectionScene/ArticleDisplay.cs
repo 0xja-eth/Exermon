@@ -14,12 +14,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     /// <summary>
     /// 文章
     /// </summary
-    public class ArticleDisplay :
-        ContainerDisplay<string>,
+    public class ArticleDisplay : ContainerDisplay<string>,
         IItemDisplay<CorrectionQuestion>
     {
 
         public List<List<string>> article;
+        CorrectionQuestion question;
 
         /// <summary>
         /// 句子储存池
@@ -27,32 +27,41 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         List<GameObject> sentences;
 
 
-
         public CorrectionQuestion getItem()
         {
-            return new CorrectionQuestion();
+            return question;
         }
 
         public void setItem(CorrectionQuestion item, bool force = false)
         {
-            Debug.Log("setitem");
-            string[] items1 = { "aaa", "bbb" };
-            base.setItems(items1);
+            //string[] items1 = { "aaa", "bbb" };
+            question = item; setItems(item.sentences());
+            //base.setItems(sentences);
             //base.setItems(items2);
-            //var a = Instantiate(subViewPrefab, container);
-            //SceneUtils.get<RectTransform>(a).SetParent(this)
-
+            
         }
 
-        public void test()
+        protected override void onSubViewCreated(ItemDisplay<string> sub, int index)
         {
-            base.createSubView(0);
-            base.createSubView(1);
-        }
+            base.onSubViewCreated(sub, index);
+            SceneUtils.get<SentenceContainer>(subViews[index].gameObject).setItem(items[index]);
+            Debug.Log("createsubview");
+            Debug.Log(items[index]);
 
+        }
+        //public void test()
+        //{
+        //    base.createSubViews();
+        //}
+
+
+        /// <summary>
+        /// 开启视图
+        /// </summary>
+        /// <param name="item"></param>
         public void startView(CorrectionQuestion item)
         {
-            Debug.Log("article");
+            setItem(item, true);
         }
     }
 }
