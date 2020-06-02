@@ -150,6 +150,11 @@ namespace ExerPro.EnglishModule.Services {
         public List<WordRecord> wordRecords { get; protected set; }
 
         /// <summary>
+        /// 下一个单词
+        /// </summary>
+        public Word nextWord { get; protected set; }
+
+        /// <summary>
         /// 缓存题目数据
         /// </summary>
         public QuestionCache questionCache { get; protected set; } = new QuestionCache();
@@ -238,8 +243,9 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         /// <summary>
-        /// 获取记录数据
+        /// 获取题目数据
         /// </summary>
+        /// <typeparam name="T">题目类型</typeparam>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void generateQuestions<T>(UnityAction<T[]> onSuccess, 
@@ -247,7 +253,7 @@ namespace ExerPro.EnglishModule.Services {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var ids = DataLoader.load<int[]>(res, "qids");
-                loadQuestions<T>(ids, onSuccess, onError);
+                loadQuestions(ids, onSuccess, onError);
             };
 
             generateQuestion(getQuestionType<T>(), _onSuccess, onError);
@@ -292,12 +298,13 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateWords(UnityAction<Word[]> onSuccess, UnityAction onError = null) {
+        public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
                 questionCache.addQuestions(words);
-                onSuccess?.Invoke(words);
+                record.resetWords(words);
+                onSuccess?.Invoke();
             };
 
             generateWords(_onSuccess, onError);
@@ -336,22 +343,31 @@ namespace ExerPro.EnglishModule.Services {
         /// 回答单词
         /// </summary>
         /// <param name="word">单词对象</param>
-        /// <param name="res">结果是否正确</param>
+        /// <param name="chinese">选择的选项文本</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void answerWord(Word word, bool res, UnityAction onSuccess, UnityAction onError = null) {
+        public void answerWord(Word word, string chinese, 
+            UnityAction<bool> onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (_) => {
-                onSuccess?.Invoke();
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                var correct = DataLoader.load<bool>(res, "correct");
+                var new_ = DataLoader.load<bool>(res, "new");
+
+                if (new_) // 如果需要新一轮单词，再发起一次请求 
+                    generateWords(() => onSuccess?.Invoke(correct), onError);
+                else {
+                    record.next = DataLoader.load<int>(res, "next");
+                    onSuccess?.Invoke(correct);
+                }
             };
 
-            answerWord(word.id, res, _onSuccess, onError);
+            answerWord(word.id, chinese, _onSuccess, onError);
         }
         /// <param name="wid">题目ID</param>
-        public void answerWord(int wid, bool res, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void answerWord(int wid, string chinese, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData();
-            data["wid"] = wid; data["result"] = res;
+            data["wid"] = wid; data["chinese"] = chinese;
 
             sendRequest(Oper.WordAnswer, data, onSuccess, onError, uid: true);
         }
@@ -643,7 +659,7 @@ namespace ExerPro.EnglishModule.Services {
             // 如果未开始或者开启新地图，覆盖原有的记录
             if (record.started == false || record.mapId != mapId) {
                 changeState(State.Unstarted);
-                record.setup(mapId, 1, true);
+                generateWords(() => record.setup(mapId, 1, true));
             } else changeState(State.Idle);
 
             sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
@@ -665,6 +681,7 @@ namespace ExerPro.EnglishModule.Services {
             if (state == (int)State.Moving)
                 changeState(State.InNode);
         }
+        
         /*
         /// <summary>
         /// 处理当前据点

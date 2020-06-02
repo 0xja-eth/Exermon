@@ -36,6 +36,8 @@ namespace ExerPro.EnglishModule { }
 /// </summary>
 namespace ExerPro.EnglishModule.Data {
 
+    using EnglishModule.Services;
+
     #region 题目
 
     /// <summary>
@@ -782,12 +784,20 @@ namespace ExerPro.EnglishModule.Data {
         #endregion
 
         /// <summary>
-        /// 构造函数
+        /// 配置玩家
         /// </summary>
-        public ExerProActor() { }
-        public ExerProActor(Player player) {
+        /// <param name="player"></param>
+        public void setupPlayer(Player player) {
             slotItem = player.getExerSlotItem(EnglishSubjectId);
         }
+
+        ///// <summary>
+        ///// 构造函数
+        ///// </summary>
+        //public ExerProActor() { }
+        //public ExerProActor(Player player) {
+        //    setupPlayer(player);
+        //}
     }
 
     /// <summary>
@@ -833,7 +843,10 @@ namespace ExerPro.EnglishModule.Data {
         /// 单词轮属性
         /// </summary>
         [AutoConvert]
-        public int level { get; protected set; }
+        public int level { get; protected set; } = 1;
+        [AutoConvert]
+        public int next { get; set; } = 0; // 下一个单词ID
+
         [AutoConvert]
         public int sum { get; protected set; }
         [AutoConvert]
@@ -992,32 +1005,17 @@ namespace ExerPro.EnglishModule.Data {
             return currentId >= 0;
         }
 
+        /// <summary>
+        /// 下一个单词
+        /// </summary>
+        /// <returns></returns>
+        public Word nextWord() {
+            return EnglishService.get().getQuestion<Word>(next);
+        }
+
         #endregion
 
-        #region 据点生成
-
-        /// <summary>
-        /// 设置地图
-        /// </summary>
-        /// <param name="mapId">地图ID</param>
-        /// <param name="stageOrder">关卡序号</param>
-        /// <param name="restart">重新开始</param>
-        public void setup(int mapId, int stageOrder, bool restart = false) {
-            this.mapId = mapId; this.stageOrder = stageOrder;
-            reset(restart); createActor(); generate();
-        }
-
-        /// <summary>
-        /// 重置地图
-        /// </summary>
-        /// <param name="restart">重新开始</param>
-        void reset(bool restart = false) {
-            if (restart) {
-                started = false; actor = null;
-            }
-            currentId = -1; _enemies = null;
-            generated = false; nodes.Clear();
-        }
+        #region 据点控制
 
         /// <summary>
         /// 生成地图
@@ -1042,6 +1040,47 @@ namespace ExerPro.EnglishModule.Data {
         #endregion
 
         #region 游戏控制
+
+        /// <summary>
+        /// 设置地图
+        /// </summary>
+        /// <param name="mapId">地图ID</param>
+        /// <param name="stageOrder">关卡序号</param>
+        /// <param name="restart">重新开始</param>
+        public void setup(int mapId, int stageOrder, bool restart = false) {
+            this.mapId = mapId; this.stageOrder = stageOrder;
+            reset(restart); createActor(); generate();
+        }
+
+        /// <summary>
+        /// 重置地图
+        /// </summary>
+        /// <param name="restart">重新开始</param>
+        void reset(bool restart = false) {
+            if (restart) {
+                started = false; actor = null;
+            }
+            resetMap();
+        }
+
+        /// <summary>
+        /// 重置地图
+        /// </summary>
+        /// <param name="restart">重新开始</param>
+        void resetMap() {
+            currentId = -1; _enemies = null;
+            generated = false; nodes.Clear();
+        }
+
+        /// <summary>
+        /// 重置单词
+        /// </summary>
+        /// <param name="words">单词集合</param>
+        public void resetWords(Word[] words) {
+            sum = words.Length;
+            correct = wrong = 0;
+            if (sum > 0) next = words[0].id;
+        }
 
         /// <summary>
         /// 走到下一步
@@ -1125,7 +1164,8 @@ namespace ExerPro.EnglishModule.Data {
             var player = PlayerService.get().player;
             if (player == null) return;
 
-            actor = actor ?? new ExerProActor(player);
+            actor = actor ?? new ExerProActor();
+            actor.setupPlayer(player);
         }
 
         /// <summary>

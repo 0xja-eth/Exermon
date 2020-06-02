@@ -67,7 +67,7 @@ class Service:
 
 		# 有玩过的记录
 		else:
-			Common.ensureFinishLastWords(player)
+			Common.ensureFinishLastWords(pro_record)
 			pro_record.upgrade()
 
 		return pro_record.convertToDict("words")
@@ -394,6 +394,10 @@ class Common:
 
 		record = pro_record.wordRecord(wid, current=True)
 		if record is None: raise GameException(ErrorType.NoInCurrentWords)
+
+	@classmethod
+	def ensureWordNotCorrect(cls, word_rec: WordRecord):
+		if word_rec.current_correct: raise GameException()
 
 	# 判断单词是否回答正确
 	# @classmethod

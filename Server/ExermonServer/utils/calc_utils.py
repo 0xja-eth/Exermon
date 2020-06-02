@@ -2066,16 +2066,23 @@ class NewWordsGenerator:
 
 		# 没有旧单词
 		if len(last_words) == 0:
-			words = random.sample(words, cls.WordNum)
+			words = cls.sample(words, cls.WordNum)
 		# 已经没有新单词了
 		elif len(words) == 0:
-			words = random.sample(last_words, cls.WordNum)
+			words = cls.sample(last_words, cls.WordNum)
 		else:
-			old_words = random.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
-			new_words = random.sample(words, cls.WordNum * cls.NewWordPercent)
+			old_words = cls.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
+			new_words = cls.sample(words, cls.WordNum * cls.NewWordPercent)
 			words = old_words.extend(new_words)
 
-		words = random.shuffle(words)
+		random.shuffle(words)
 
 		return words
+
+	@classmethod
+	def sample(cls, words, num):
+		cnt = len(words)
+		if cnt < num: return words
+		return random.sample(words, num)
+
 
