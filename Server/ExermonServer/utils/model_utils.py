@@ -559,3 +559,27 @@ class Common:
 				else: res.append(item)
 
 		return res
+	
+	@classmethod
+	def loadKey(cls, data, key, obj=None, attr=None, set_none=False):
+		"""
+		读取键
+		Args:
+			data (dict): 字典
+			key (str): 字典键
+			obj (object): 对象
+			attr (str): 属性键
+			set_none (bool): 是否设置 None 值
+		Returns:
+			返回字典指定键的值
+		"""
+		value = None
+		if key in data: value = data[key]
+
+		if obj is not None:
+
+			if attr is None: attr = key
+			if value is not None: setattr(obj, attr, value)
+			elif set_none: setattr(obj, attr, None)
+
+		return value

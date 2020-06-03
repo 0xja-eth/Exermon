@@ -122,6 +122,7 @@ class ReadingSubQuestion(BaseQuestion):
 	def choices(self):
 		return self.readingqueschoice_set.all()
 
+
 # ===================================================
 #  阅读题
 # ===================================================
@@ -141,7 +142,7 @@ class ReadingQuestion(GroupQuestion):
 # ===================================================
 #  短语题目类型枚举
 # ===================================================
-class InfinitiveType(Enum):
+class PhraseType(Enum):
 	SB = 1  # [sb. sth. 开头的短语选项]
 	Do = 2  # [to do, doing 开头的短语选项]
 	Prep = 3  # [介词短语选项]
@@ -150,14 +151,14 @@ class InfinitiveType(Enum):
 # ===================================================
 #  短语题
 # ===================================================
-class InfinitiveQuestion(models.Model):
+class PhraseQuestion(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = "短语题"
 
 	TYPES = [
-		(InfinitiveType.SB.value, '[包含 sb. 的短语选项]'),
-		(InfinitiveType.Do.value, '[do 形式的短语选项]'),
-		(InfinitiveType.Prep.value, '[介词短语选项]'),
+		(PhraseType.SB.value, '[包含 sb. 的短语选项]'),
+		(PhraseType.Do.value, '[do 形式的短语选项]'),
+		(PhraseType.Prep.value, '[介词短语选项]'),
 	]
 
 	TYPE = QuestionType.Phrase
@@ -169,10 +170,10 @@ class InfinitiveQuestion(models.Model):
 	chinese = models.CharField(max_length=64, verbose_name="中文")
 
 	# 不定式项
-	infinitive = models.CharField(max_length=64, verbose_name="不定式项")
+	phrase = models.CharField(max_length=64, verbose_name="不定式项")
 
 	# 不定式项的类型
-	type = models.PositiveSmallIntegerField(default=InfinitiveType.Do.value,
+	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
 											choices=TYPES, verbose_name="修改类型")
 
 	def convertToDict(self):
@@ -185,7 +186,7 @@ class InfinitiveQuestion(models.Model):
 			'id': self.id,
 			'word': self.word,
 			'chinese': self.chinese,
-			'infinitive': self.infinitive,
+			'phrase': self.phrase,
 			'type': self.type
 		}
 
@@ -283,7 +284,7 @@ class Word(models.Model):
 		verbose_name = verbose_name_plural = "单词"
 
 	# 英文
-	english = models.CharField(max_length=64, verbose_name="英文")
+	english = models.CharField(unique=True, max_length=64, verbose_name="英文")
 
 	# 中文
 	chinese = models.CharField(max_length=256, verbose_name="中文")
@@ -376,17 +377,19 @@ class WordRecord(models.Model):
 			'wrong': self.wrong,
 
 			'current': self.current,
-			'current_correct': self.current_correct
+			'current_correct': self.current_correct,
+			# 由于前段无法判断 None，需要返回一个附加的字段
+			'current_done': self.current_correct is not None,
 		}
 
 	# 创建新记录
 	@classmethod
-	def create(cls, record, word_id):
-		record = record.wordRecord(word_id)
+	def create(cls, pro_record, word_id):
+		record = pro_record.wordRecord(word_id)
 
 		if record is None:
 			record = cls()
-			record.record = record
+			record.record = pro_record
 			record.word_id = word_id
 
 		record.current = True
@@ -446,8 +449,33 @@ class ExerProRecord(CacheableModel):
 	# 当前单词缓存键
 	CUR_WORDS_CACHE_KEY = 'cur_words'
 
+	# 关卡
+	stage = models.ForeignKey('ExerProMapStage', null=True,
+							  on_delete=models.CASCADE, verbose_name="关卡")
+
+	# 开始标志
+	started = models.BooleanField(default=False, verbose_name="开始标志")
+
+	# 生成标志
+	generated = models.BooleanField(default=False, verbose_name="生成标志")
+
+	# 当前据点索引
+	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="当前据点索引")
+
 	# 单词等级（同时也是玩家在英语模块的等级）
 	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="单词等级")
+
+	# # 下一单词
+	# next = models.ForeignKey('Word', null=True, blank=True,
+	# 						 on_delete=models.CASCADE, verbose_name="下一单词")
+
+	# 据点数据
+	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
+								verbose_name="据点数据")
+
+	# 角色数据
+	actor = jsonfield.JSONField(default=None, null=True, blank=True,
+								verbose_name="角色数据")
 
 	# 玩家
 	player = models.OneToOneField('player_module.Player', null=False,
@@ -467,16 +495,122 @@ class ExerProRecord(CacheableModel):
 		"""
 		record = cls()
 		record.player = player
-		record._generateWordRecords()
 		record.save()
 
+		record._generateWordRecords()
+
 		return record
+
+	def convertToDict(self, type: str = None, **kwargs):
+		"""
+		转化为字典
+		Args:
+			type (str): 类型
+			**kwargs (**dict): 拓展参数
+		Returns:
+			返回转化后的字典
+		"""
+
+		if type == "records":
+			return ModelUtils.objectsToDict(self.wordRecords())
+
+		word_records = self.currentWordRecords()
+		words = [record.word for record in word_records]
+
+		if type == "words":
+
+			return {
+				'word_level': self.word_level,
+				'words': ModelUtils.objectsToDict(words),
+				'word_records': ModelUtils.objectsToDict(word_records),
+			}
+
+		# if type == "status":
+		# 	records = self.currentWordRecords()
+		#
+		# 	corr_recs = [record for record in records
+		# 				 if record.current_correct is True]
+		# 	wrong_recs = [record for record in records
+		# 				  if record.current_correct is False]
+		#
+		# 	sum = len(records)
+		# 	correct = len(corr_recs)
+		# 	wrong = len(wrong_recs)
+		#
+		# 	return {
+		# 		'level': self.word_level,
+		# 		'sum': sum,
+		# 		'correct': correct,
+		# 		'wrong': wrong
+		# 	}
+
+		cur_index = self.cur_index
+		if cur_index is None: cur_index = -1
+
+		return {
+			'id': self.id,
+			'map_id': self.stage.map_id,
+			'stage_order': self.stage.order,
+			'started': self.started,
+			'generated': self.generated,
+			'cur_index': cur_index,
+			'word_level': self.word_level,
+
+			'nodes': self.nodes,
+			'actor': self.actor,
+
+			'words': ModelUtils.objectsToDict(words),
+			'word_records': ModelUtils.objectsToDict(word_records),
+		}
+
+	def loadFromDict(self, data: dict):
+		"""
+		从字典中读取
+		Args:
+			data (dict): 字典
+		"""
+		from .views import Common
+
+		map_id = ModelUtils.loadKey(data, 'map_id')
+		stage_order = ModelUtils.loadKey(data, 'stage_order')
+
+		self.stage = Common.getMapStage(mid=map_id, order=stage_order)
+
+		ModelUtils.loadKey(data, 'started', self)
+		ModelUtils.loadKey(data, 'generated', self)
+		ModelUtils.loadKey(data, 'cur_index', self)
+		ModelUtils.loadKey(data, 'nodes', self)
+		ModelUtils.loadKey(data, 'actor', self)
+
+	# region 流程控制
+
+	def setupMap(self, map: 'ExerProMap'):
+		"""
+		设置地图
+		Args:
+			map (ExerProMap): 地图
+		"""
+		self.reset()
+		self.stage = map.stage(1)
+		self.started = True
+
+	def reset(self):
+		"""
+		重置，重置特训记录状态
+		"""
+		self.started = self.generated = False
+		self.cur_index = self.nodes = self.actor = None
 
 	def upgrade(self):
 		"""
 		升级单词
 		"""
-		self.word_level += 1
+		# 初始状态，为 None
+		if self.word_level is None:
+			self.word_level = 1
+		else:
+			self.word_level += 1
+
 		self._generateWordRecords()
 		self.save()
 
@@ -484,7 +618,7 @@ class ExerProRecord(CacheableModel):
 		"""
 		生成单词和记录
 		"""
-		word_recs = []
+		word_recs = self.wordRecords()
 
 		wids = self._generateWords()
 		self.clearCurrentWords()
@@ -507,48 +641,14 @@ class ExerProRecord(CacheableModel):
 
 		return NewWordsGenerator.generate(self.word_level, old_words)
 
-	def convertToDict(self, type: str = None, **kwargs):
+	def terminate(self):
 		"""
-		转化为字典
-		Args:
-			type (str): 类型
-			**kwargs (**dict): 拓展参数
-		Returns:
-			返回转化后的字典
+		结束特训
 		"""
-		if type == "words":
-			records = self.currentWordRecords()
-			words = [record.word for record in records]
+		self.started = self.generated = False
+		self.save()
 
-			return {
-				'words': ModelUtils.objectsToDict(words)
-			}
-
-		if type == "status":
-			records = self.currentWordRecords()
-
-			corr_recs = [record for record in records
-						 if record.current_correct is True]
-			wrong_recs = [record for record in records
-						  if record.current_correct is False]
-
-			sum = len(records)
-			correct = len(corr_recs)
-			wrong = len(wrong_recs)
-
-			return {
-				'level': self.word_level,
-				'sum': sum,
-				'correct': correct,
-				'wrong': wrong
-			}
-
-		records = ModelUtils.objectsToDict(self.wordRecords())
-
-		return {
-			'id': self.id,
-			'records': records
-		}
+	# endregion
 
 	# region 单词记录管理
 
@@ -558,6 +658,8 @@ class ExerProRecord(CacheableModel):
 		Returns:
 			返回本轮单词是否完成
 		"""
+		if self.word_level is None: return True
+
 		word_recs = self.currentWordRecords()
 
 		for word_rec in word_recs:
@@ -1245,6 +1347,20 @@ class ExerProMap(models.Model):
 			返回关卡 QuerySet
 		"""
 		return self.exerpromapstage_set.all()
+
+	def stage(self, order) -> 'ExerProMapStage':
+		"""
+		获取指定序号的关卡
+		Args:
+			order (int): 关卡序号
+		Returns:
+			返回指定序号的关卡对象
+		"""
+		stage = self.stages().filter(order=order)
+		
+		if stage.exists(): return stage.first()
+
+		return None
 
 # # ===================================================
 # #  据点类型表

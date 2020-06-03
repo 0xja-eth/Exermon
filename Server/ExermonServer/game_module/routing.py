@@ -30,9 +30,9 @@ WEBSOCKET_METHOD_ROUTER = {
     ],
     # 获取动态数据
     'game/data/dynamic': [[],
-                          Game.getDynamicData,  # 处理函数
-                          ChannelLayerTag.Self  # 是否需要响应
-                          ],
+        Game.getDynamicData,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
     # 玩家注册
     'player/player/register': [[
         ['un', 'str'],
@@ -581,6 +581,23 @@ WEBSOCKET_METHOD_ROUTER = {
         ['type', 'int'],
     ],
         Item.shopGet,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 开始英语特训
+    'engpro/record/start': [[
+        ['uid', 'int'],
+        ['mid', 'int'],
+    ],
+        EnglishPro.startRecord,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 保存英语特训
+    'engpro/record/save': [[
+        ['uid', 'int'],
+        ['record', 'dict'],
+        ['terminate', 'bool'],
+    ],
+        EnglishPro.saveRecord,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 生成英语特训题目

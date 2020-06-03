@@ -743,7 +743,7 @@ namespace GameModule.Services {
             /// <summary>
             /// 关卡
             /// </summary>
-            MapStageRecord stageRecord;
+            ExerProRecord stageRecord;
             ExerProMapStage stage;
 
             List<ExerProMapNode>[] nodes;
@@ -752,7 +752,7 @@ namespace GameModule.Services {
             /// 生成关卡地图
             /// </summary>
             /// <param name="stage">关卡</param>
-            public static bool generate(MapStageRecord stage) {
+            public static bool generate(ExerProRecord stage) {
                 var generator = new NodeGenerator(stage);
                 return generator.generateNodes() && 
                     generator.generateForkNodes() && 
@@ -762,7 +762,7 @@ namespace GameModule.Services {
             /// <summary>
             /// 构造函数
             /// </summary>
-            NodeGenerator(MapStageRecord stageRecord) {
+            NodeGenerator(ExerProRecord stageRecord) {
                 this.stageRecord = stageRecord;
                 stage = stageRecord.stage();
             }

@@ -28,7 +28,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 题目类型数值
         /// </summary>
         const int ListeningQuestionType = 1;
-        const int InfinitiveQuestionType = 2;
+        const int PhraseQuestionType = 2;
         const int CorrectionQuestionType = 3;
 
         /// <summary>
@@ -44,6 +44,9 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 操作文本设定
         /// </summary>
+        const string ExerProStart = "开始特训";
+        const string ExerProSave = "保存进度";
+
         const string QuestionGenerate = "生成题目";
         const string QuestionGet = "获取题目";
 
@@ -64,8 +67,8 @@ namespace ExerPro.EnglishModule.Services {
             /// </summary>
             [AutoConvert]
             public List<ListeningQuestion> listeningQuestions { get; protected set; } = new List<ListeningQuestion>();
-            //[AutoConvert]
-            //public List<ReadingQuestion> readingQuestions { get; protected set; } = new List<ReadingQuestion>();
+            [AutoConvert]
+            public List<PhraseQuestion> phraseQuestions { get; protected set; } = new List<PhraseQuestion>();
             [AutoConvert]
             public List<CorrectionQuestion> correctionQuestions { get; protected set; } = new List<CorrectionQuestion>();
             [AutoConvert]
@@ -79,8 +82,8 @@ namespace ExerPro.EnglishModule.Services {
             public List<T> getCacheList<T>() {
                 if (typeof(T) == typeof(ListeningQuestion))
                     return listeningQuestions as List<T>;
-                //if (typeof(T) == typeof(ReadingQuestion))
-                //    return readingQuestions as List<T>;
+                if (typeof(T) == typeof(PhraseQuestion))
+                    return phraseQuestions as List<T>;
                 if (typeof(T) == typeof(CorrectionQuestion))
                     return correctionQuestions as List<T>;
                 if (typeof(T) == typeof(Word))
@@ -104,7 +107,7 @@ namespace ExerPro.EnglishModule.Services {
                 base.loadCustomAttributes(json);
 
                 listeningQuestions = listeningQuestions ?? new List<ListeningQuestion>();
-                //readingQuestions = readingQuestions ?? new List<ReadingQuestion>();
+                phraseQuestions = phraseQuestions ?? new List<PhraseQuestion>();
                 correctionQuestions = correctionQuestions ?? new List<CorrectionQuestion>();
                 words = words ?? new List<Word>();
             }
@@ -114,6 +117,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 业务操作
         /// </summary>
         public enum Oper {
+            ExerProStart, ExerProSave,
             QuestionGenerate, QuestionGet,
             WordGenerate, WordAnswer, WordGet, WordQuery,
             WordRecordGet,
@@ -125,12 +129,13 @@ namespace ExerPro.EnglishModule.Services {
         public enum State {
 
             NotInExerPro = 0, // 不在特训中
-            Unstarted = 1, // 未开始（需要选择一个起始据点）
-            Moving = 2, // 角色移动中
+            Starting = 1, // 加载中
+
+            Idle = 2, // 待机状态（选择下一个据点）
+            Moving = 3, // 角色移动中
             //AfterMoved = 3, // 角色移动结束，准备进入据点事件
-            InNode = 3, // 在据点内
-            AfterNode = 4, // 据点事件结束，保存中
-            Idle = 5, // 待机状态（选择下一个据点）
+            InNode = 4, // 在据点内
+            AfterNode = 5, // 据点事件结束，保存中
 
             /*
             RestNode = 10, // 休息据点
@@ -145,16 +150,6 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         /// <summary>
-        /// 记录数据
-        /// </summary>
-        public List<WordRecord> wordRecords { get; protected set; }
-
-        /// <summary>
-        /// 下一个单词
-        /// </summary>
-        public Word nextWord { get; protected set; }
-
-        /// <summary>
         /// 缓存题目数据
         /// </summary>
         public QuestionCache questionCache { get; protected set; } = new QuestionCache();
@@ -162,7 +157,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 关卡记录
         /// </summary>
-        public MapStageRecord record { get; protected set; } = new MapStageRecord();
+        public ExerProRecord record { get; protected set; }
 
         /// <summary>
         /// 外部系统设置
@@ -187,14 +182,13 @@ namespace ExerPro.EnglishModule.Services {
         protected override void initializeStateDict() {
             base.initializeStateDict();
             addStateDict(State.NotInExerPro);
-            addStateDict(State.Unstarted);
+            addStateDict(State.Starting);
 
+            addStateDict(State.Idle);
             addStateDict(State.Moving);
             //addStateDict(State.AfterMoved, updateAfterMoved);
             addStateDict(State.InNode, updateNode);
             addStateDict(State.AfterNode, updateAfterNode);
-            addStateDict(State.Idle);
-
         }
 
         /// <summary>
@@ -203,11 +197,16 @@ namespace ExerPro.EnglishModule.Services {
         protected override void initializeOperDict() {
             base.initializeOperDict();
 
+            addOperDict(Oper.ExerProStart, ExerProStart,
+                NetworkSystem.Interfaces.EngProRecordStart);
+            addOperDict(Oper.ExerProSave, ExerProSave,
+                NetworkSystem.Interfaces.EngProRecordSave);
+
             addOperDict(Oper.QuestionGenerate, QuestionGenerate,
                 NetworkSystem.Interfaces.EngProQuestionGenerate);
             addOperDict(Oper.QuestionGet, QuestionGet,
                 NetworkSystem.Interfaces.EngProQuestionGet);
-            
+
             addOperDict(Oper.WordGenerate, WordGenerate,
                 NetworkSystem.Interfaces.EngProWordGenerate);
             addOperDict(Oper.WordAnswer, WordAnswer,
@@ -225,6 +224,59 @@ namespace ExerPro.EnglishModule.Services {
 
         #region 操作控制
 
+        #region 特训操作
+
+        /// <summary>
+        /// 开始特训
+        /// </summary>
+        /// <param name="map">地图</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void startExerPro(ExerProMap map, UnityAction onSuccess, UnityAction onError = null) {
+            startExerPro(map.id, onSuccess, onError);
+        }
+        public void startExerPro(int mapId, UnityAction onSuccess, UnityAction onError = null) {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                record = DataLoader.load<ExerProRecord>(res, "record");
+                onSuccess?.Invoke();
+            };
+
+            startExerPro(mapId, _onSuccess, onError);
+        }
+        /// <param name="mapId">地图ID</param>
+        public void startExerPro(int mapId, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+            JsonData data = new JsonData(); data["mid"] = mapId;
+            sendRequest(Oper.ExerProStart, data, onSuccess, onError, uid: true);
+        }
+
+        /// <summary>
+        /// 保存特训
+        /// </summary>
+        /// <param name="terminate">是否结束</param>
+        /// <param name="onSuccess">成功回调</param>
+        /// <param name="onError">失败回调</param>
+        public void saveExerPro(bool terminate = false, 
+            UnityAction onSuccess = null, UnityAction onError = null) {
+
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                // TODO: 保存奖励信息
+                record.load(res); onSuccess?.Invoke();
+            };
+
+            saveExerPro(terminate, _onSuccess, onError);
+        }
+        public void saveExerPro(bool terminate, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+            JsonData data = new JsonData();
+            data["record"] = record.toJson();
+            data["terminate"] = terminate;
+            sendRequest(Oper.ExerProSave, data, onSuccess, onError, uid: true);
+        }
+
+        #endregion
+
         #region 题目记录操作
 
         /// <summary>
@@ -235,8 +287,8 @@ namespace ExerPro.EnglishModule.Services {
         int getQuestionType<T>() where T : BaseData, new() {
             if (typeof(T) == typeof(ListeningQuestion))
                 return ListeningQuestionType;
-            //if (typeof(T) == typeof(ReadingQuestion))
-            //    return ReadingQuestionType;
+            if (typeof(T) == typeof(PhraseQuestion))
+                return PhraseQuestionType;
             if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
             return 0;
@@ -301,9 +353,9 @@ namespace ExerPro.EnglishModule.Services {
         public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                var words = DataLoader.load<Word[]>(res, "words");
-                questionCache.addQuestions(words);
-                record.resetWords(words);
+                //var words = DataLoader.load<Word[]>(res, "words");
+                //questionCache.addQuestions(words);
+                record = DataLoader.load(record, res, "record");
                 onSuccess?.Invoke();
             };
 
@@ -372,25 +424,25 @@ namespace ExerPro.EnglishModule.Services {
             sendRequest(Oper.WordAnswer, data, onSuccess, onError, uid: true);
         }
 
-        /// <summary>
-        /// 获取单词数据
-        /// </summary>
-        /// <param name="onSuccess">成功回调</param>
-        /// <param name="onError">失败回调</param>
-        public void queryWords(UnityAction onSuccess, UnityAction onError = null) {
+        ///// <summary>
+        ///// 获取单词数据
+        ///// </summary>
+        ///// <param name="onSuccess">成功回调</param>
+        ///// <param name="onError">失败回调</param>
+        //public void queryWords(UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                record.load(res); onSuccess?.Invoke();
-            };
+        //    NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+        //        record.load(res); onSuccess?.Invoke();
+        //    };
 
-            queryWords(_onSuccess, onError);
-        }
-        public void queryWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        //    queryWords(_onSuccess, onError);
+        //}
+        //public void queryWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
-            JsonData data = new JsonData();
+        //    JsonData data = new JsonData();
 
-            sendRequest(Oper.WordQuery, data, onSuccess, onError, uid: true);
-        }
+        //    sendRequest(Oper.WordQuery, data, onSuccess, onError, uid: true);
+        //}
 
         /// <summary>
         /// 获取单词记录
@@ -398,16 +450,19 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getWordRecords(int[] wids, UnityAction onSuccess, UnityAction onError = null) {
+        public void getWordRecords(UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-                wordRecords = DataLoader.load(wordRecords, res, "records");
-                onSuccess?.Invoke();
-            };
+            if (record == null) onSuccess?.Invoke();
+            else {
+                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                    record.load(res); var wids = record.recordWordIds();
+                    loadQuestions<Word>(wids, onSuccess, onError);                    
+                };
 
-            getWords(wids, _onSuccess, onError);
+                getWordRecords(_onSuccess, onError);
+            }
         }
-        public void getWordRecords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void getWordRecords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
             JsonData data = new JsonData();
             sendRequest(Oper.WordRecordGet, data, onSuccess, onError, uid: true);
@@ -429,7 +484,7 @@ namespace ExerPro.EnglishModule.Services {
             loadQuestions<T>(new int[] { qid }, _onSuccess, onError);
         }
         /// <param name="qids">题目ID集</param>
-        public void loadQuestions<T>(int[] qids, UnityAction<T[]> onSuccess = null, 
+        public void loadQuestions<T>(int[] qids, UnityAction<T[]> onSuccess = null,
             UnityAction onError = null) where T : BaseData, new() {
             var cnt = qids.Length;
             var reqIds = new List<int>(); // 需要请求的题目ID数组
@@ -444,6 +499,14 @@ namespace ExerPro.EnglishModule.Services {
             if (reqIds.Count > 0) // 如果需要请求
                 getQuestions<T>(reqIds.ToArray(), onSuccess, onError);
             else onSuccess?.Invoke(questions.ToArray());
+        }
+        public void loadQuestion<T>(int qid, UnityAction onSuccess = null,
+            UnityAction onError = null) where T : BaseData, new() {
+            loadQuestion<T>(qid, (_) => onSuccess?.Invoke(), onError);
+        }
+        public void loadQuestions<T>(int[] qids, UnityAction onSuccess = null,
+            UnityAction onError = null) where T : BaseData, new() {
+            loadQuestions<T>(qids, (_) => onSuccess?.Invoke(), onError);
         }
 
         /// <summary>
@@ -516,7 +579,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns></returns>
         public bool isStarted() {
-            return state != (int)State.NotInExerPro && state != (int)State.Unstarted;
+            return state > (int)State.Starting;
         }
 
         /// <summary>
@@ -532,7 +595,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns></returns>
         public bool isIdle() {
-            return state == (int)State.Unstarted || state == (int)State.Idle;
+            return state == (int)State.Starting || state == (int)State.Idle;
         }
 
         /// <summary>
@@ -657,11 +720,16 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         public void start(int mapId) {
             // 如果未开始或者开启新地图，覆盖原有的记录
-            if (record.started == false || record.mapId != mapId) {
-                changeState(State.Unstarted);
-                generateWords(() => record.setup(mapId, 1, true));
-            } else changeState(State.Idle);
+            changeState(State.Starting);
+            startExerPro(mapId, onStarted);
+        }
 
+        /// <summary>
+        /// 开始回调
+        /// </summary>
+        void onStarted() {
+            record.start();
+            changeState(State.Idle);
             sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
         }
 
@@ -672,6 +740,7 @@ namespace ExerPro.EnglishModule.Services {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
+            saveExerPro();
         }
 
         /// <summary>
@@ -695,7 +764,9 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         public void save() {
             storageSys.saveItem(StorageSystem.EngCacheDataFilename);
-            storageSys.saveItem(StorageSystem.EngRecordFilename);
+
+
+            //storageSys.saveItem(StorageSystem.EngRecordFilename);
         }
 
         /// <summary>
