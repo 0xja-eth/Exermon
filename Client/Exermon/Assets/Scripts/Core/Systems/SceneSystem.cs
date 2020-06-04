@@ -40,7 +40,6 @@ namespace Core.Systems {
             StatusScene, PackScene, ShopScene,
 
             ExerciseScene, RecordScene,
-            public const string EnglishProCorrectionScene = "CorrectionScene";
 
             BattleStartScene,
             BattleMatchingScene, 
@@ -49,6 +48,7 @@ namespace Core.Systems {
             BattleAnswerScene,
 
             EnglishProMapScene,
+            EnglishProCorrectionScene,
 
             HelpScene
         }

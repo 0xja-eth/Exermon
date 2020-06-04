@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.UI.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         {
             base.startView(item);
         }
+        
 
+        /// <summary>
+        /// 绘制物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override void drawExactlyItem(string item)
+        {
+            base.drawExactlyItem(item);
+            SceneUtils.get<SentenceContainer>(gameObject).setItem(item);
+        }
     }
 }

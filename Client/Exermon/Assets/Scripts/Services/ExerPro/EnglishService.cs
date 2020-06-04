@@ -17,12 +17,14 @@ using ExerPro.EnglishModule.Data;
 /// <summary>
 /// 记录模块服务
 /// </summary>
-namespace ExerPro.EnglishModule.Services {
+namespace ExerPro.EnglishModule.Services
+{
 
     /// <summary>
     /// 记录服务
     /// </summary>
-    public class EnglishService : BaseService<EnglishService> {
+    public class EnglishService : BaseService<EnglishService>
+    {
 
         /// <summary>
         /// 题目类型数值
@@ -57,7 +59,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 题目缓存
         /// </summary>
-        public class QuestionCache : BaseData {
+        public class QuestionCache : BaseData
+        {
 
             /// <summary>
             /// 缓存的题目
@@ -76,12 +79,13 @@ namespace ExerPro.EnglishModule.Services {
             /// </summary>
             /// <typeparam name="T">类型</typeparam>
             /// <returns>返回的缓存列表</returns>
-            public List<T> getCacheList<T>() {
+            public List<T> getCacheList<T>()
+            {
                 if (typeof(T) == typeof(ListeningQuestion))
                     return listeningQuestions as List<T>;
-
                 //if (typeof(T) == typeof(ReadingQuestion))
-                //    return readingQuestions as List<T>;                if (typeof(T) == typeof(CorrectionQuestion))
+                //    return readingQuestions as List<T>;
+                if (typeof(T) == typeof(CorrectionQuestion))
                     return correctionQuestions as List<T>;
                 if (typeof(T) == typeof(Word))
                     return words as List<T>;
@@ -92,7 +96,8 @@ namespace ExerPro.EnglishModule.Services {
             /// 添加题目
             /// </summary>
             /// <param name="json">题目数据</param>
-            public void addQuestions<T>(T[] questions) {
+            public void addQuestions<T>(T[] questions)
+            {
                 getCacheList<T>().AddRange(questions);
             }
 
@@ -100,7 +105,8 @@ namespace ExerPro.EnglishModule.Services {
             /// 读取自定义属性
             /// </summary>
             /// <param name="json">数据</param>
-            protected override void loadCustomAttributes(JsonData json) {
+            protected override void loadCustomAttributes(JsonData json)
+            {
                 base.loadCustomAttributes(json);
 
                 listeningQuestions = listeningQuestions ?? new List<ListeningQuestion>();
@@ -113,7 +119,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 业务操作
         /// </summary>
-        public enum Oper {
+        public enum Oper
+        {
             QuestionGenerate, QuestionGet,
             WordGenerate, WordAnswer, WordGet, WordQuery,
             WordRecordGet,
@@ -122,7 +129,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 特训状态
         /// </summary>
-        public enum State {
+        public enum State
+        {
 
             NotInExerPro = 0, // 不在特训中
             Unstarted = 1, // 未开始（需要选择一个起始据点）
@@ -170,7 +178,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 初始化外部系统
         /// </summary>
-        protected override void initializeSystems() {
+        protected override void initializeSystems()
+        {
             base.initializeSystems();
             storageSys = StorageSystem.get();
             sceneSys = SceneSystem.get();
@@ -179,7 +188,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 初始化状态字典
         /// </summary>
-        protected override void initializeStateDict() {
+        protected override void initializeStateDict()
+        {
             base.initializeStateDict();
             addStateDict(State.NotInExerPro);
             addStateDict(State.Unstarted);
@@ -195,14 +205,15 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 初始化操作字典
         /// </summary>
-        protected override void initializeOperDict() {
+        protected override void initializeOperDict()
+        {
             base.initializeOperDict();
 
             addOperDict(Oper.QuestionGenerate, QuestionGenerate,
                 NetworkSystem.Interfaces.EngProQuestionGenerate);
             addOperDict(Oper.QuestionGet, QuestionGet,
                 NetworkSystem.Interfaces.EngProQuestionGet);
-            
+
             addOperDict(Oper.WordGenerate, WordGenerate,
                 NetworkSystem.Interfaces.EngProWordGenerate);
             addOperDict(Oper.WordAnswer, WordAnswer,
@@ -227,10 +238,13 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        int getQuestionType<T>() where T : BaseData, new() {
+        int getQuestionType<T>() where T : BaseData, new()
+        {
             if (typeof(T) == typeof(ListeningQuestion))
                 return ListeningQuestionType;
+            //if (typeof(T) == typeof(ReadingQuestion))
             //    return ReadingQuestionType;
+            if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
             return 0;
         }
@@ -240,8 +254,9 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateQuestions<T>(UnityAction<T[]> onSuccess, 
-            UnityAction onError = null) where T : BaseData, new() {
+        public void generateQuestions<T>(UnityAction<T[]> onSuccess,
+            UnityAction onError = null) where T : BaseData, new()
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var ids = DataLoader.load<int[]>(res, "qids");
@@ -251,8 +266,9 @@ namespace ExerPro.EnglishModule.Services {
             generateQuestion(getQuestionType<T>(), _onSuccess, onError);
         }
         /// <param name="qids">题目类型</param>
-        public void generateQuestion(int type, 
-            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError) {
+        public void generateQuestion(int type,
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError)
+        {
 
             JsonData data = new JsonData(); data["type"] = type;
             sendRequest(Oper.QuestionGenerate, data, onSuccess, onError, uid: true);
@@ -264,8 +280,9 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qids">题目ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getQuestions<T>(int[] qids, UnityAction<T[]> onSuccess, 
-            UnityAction onError = null) where T : BaseData, new() {
+        public void getQuestions<T>(int[] qids, UnityAction<T[]> onSuccess,
+            UnityAction onError = null) where T : BaseData, new()
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var questions = DataLoader.load<T[]>(res, "questions");
@@ -276,7 +293,8 @@ namespace ExerPro.EnglishModule.Services {
             getQuestions(qids, getQuestionType<T>(), _onSuccess, onError);
         }
         public void getQuestions(int[] qids, int type,
-            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+            NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
             data["qids"] = DataLoader.convert(qids); data["type"] = type;
@@ -290,7 +308,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateWords(UnityAction<Word[]> onSuccess, UnityAction onError = null) {
+        public void generateWords(UnityAction<Word[]> onSuccess, UnityAction onError = null)
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
@@ -300,7 +319,8 @@ namespace ExerPro.EnglishModule.Services {
 
             generateWords(_onSuccess, onError);
         }
-        public void generateWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void generateWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
             sendRequest(Oper.WordGenerate, data, onSuccess, onError, uid: true);
@@ -312,7 +332,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
+        public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null)
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
@@ -322,7 +343,8 @@ namespace ExerPro.EnglishModule.Services {
 
             getWords(wids, _onSuccess, onError);
         }
-        public void getWords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void getWords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
             data["wids"] = DataLoader.convert(wids);
@@ -337,7 +359,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="res">结果是否正确</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void answerWord(Word word, bool res, UnityAction onSuccess, UnityAction onError = null) {
+        public void answerWord(Word word, bool res, UnityAction onSuccess, UnityAction onError = null)
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (_) => {
                 onSuccess?.Invoke();
@@ -346,7 +369,8 @@ namespace ExerPro.EnglishModule.Services {
             answerWord(word.id, res, _onSuccess, onError);
         }
         /// <param name="wid">题目ID</param>
-        public void answerWord(int wid, bool res, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void answerWord(int wid, bool res, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
             data["wid"] = wid; data["result"] = res;
@@ -359,7 +383,8 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void queryWords(UnityAction onSuccess, UnityAction onError = null) {
+        public void queryWords(UnityAction onSuccess, UnityAction onError = null)
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 record.load(res); onSuccess?.Invoke();
@@ -367,7 +392,8 @@ namespace ExerPro.EnglishModule.Services {
 
             queryWords(_onSuccess, onError);
         }
-        public void queryWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void queryWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
 
@@ -380,7 +406,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="wids">单词ID集</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void getWordRecords(int[] wids, UnityAction onSuccess, UnityAction onError = null) {
+        public void getWordRecords(int[] wids, UnityAction onSuccess, UnityAction onError = null)
+        {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 wordRecords = DataLoader.load(wordRecords, res, "records");
@@ -389,7 +416,8 @@ namespace ExerPro.EnglishModule.Services {
 
             getWords(wids, _onSuccess, onError);
         }
-        public void getWordRecords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+        public void getWordRecords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null)
+        {
 
             JsonData data = new JsonData();
             sendRequest(Oper.WordRecordGet, data, onSuccess, onError, uid: true);
@@ -405,19 +433,22 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="qid">题目ID</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void loadQuestion<T>(int qid, UnityAction<T> onSuccess = null, 
-            UnityAction onError = null) where T : BaseData, new() {
+        public void loadQuestion<T>(int qid, UnityAction<T> onSuccess = null,
+            UnityAction onError = null) where T : BaseData, new()
+        {
             UnityAction<T[]> _onSuccess = (res) => onSuccess.Invoke(res[0]);
             loadQuestions<T>(new int[] { qid }, _onSuccess, onError);
         }
         /// <param name="qids">题目ID集</param>
-        public void loadQuestions<T>(int[] qids, UnityAction<T[]> onSuccess = null, 
-            UnityAction onError = null) where T : BaseData, new() {
+        public void loadQuestions<T>(int[] qids, UnityAction<T[]> onSuccess = null,
+            UnityAction onError = null) where T : BaseData, new()
+        {
             var cnt = qids.Length;
             var reqIds = new List<int>(); // 需要请求的题目ID数组
             var questions = new List<T>(); // 已缓存的题目数组
 
-            for (int i = 0; i < cnt; ++i) {
+            for (int i = 0; i < cnt; ++i)
+            {
                 var question = getQuestion<T>(qids[i]);
                 if (question == null) reqIds.Add(qids[i]);
                 else questions.Add(question);
@@ -433,16 +464,18 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="qid">题目ID</param>
         /// <returns>是否缓存</returns>
-        public bool isQuestionCached<T>(int qid) where T: BaseData, new() {
+        public bool isQuestionCached<T>(int qid) where T : BaseData, new()
+        {
             return questionCache.getCacheList<T>().Exists(q => q.id == qid);
         }
-        
+
         /// <summary>
         /// 获取单个题目（需确保已经缓存）
         /// </summary>
         /// <param name="qid">题目ID</param>
         /// <returns>题目实例</returns>
-        public T getQuestion<T>(int qid) where T : BaseData, new() {
+        public T getQuestion<T>(int qid) where T : BaseData, new()
+        {
             return questionCache.getCacheList<T>().Find(q => q.id == qid);
         }
 
@@ -462,16 +495,19 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 更新事件结束
         /// </summary>
-        void updateAfterNode() {
+        void updateAfterNode()
+        {
             save(); changeState(State.Idle);
         }
-        
+
         /// <summary>
         /// 更新据点
         /// </summary>
-        void updateNode() {
+        void updateNode()
+        {
             Debug.Log("updateNode");
-            if (isStateChanged()) {
+            if (isStateChanged())
+            {
                 Debug.Log("isStateChanged");
                 var node = record.currentNode();
                 if (node == null) exitNode(false);
@@ -489,7 +525,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 是否已进入
         /// </summary>
         /// <returns></returns>
-        public bool isEntered() {
+        public bool isEntered()
+        {
             return state != (int)State.NotInExerPro;
         }
 
@@ -497,7 +534,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 是否已开始
         /// </summary>
         /// <returns></returns>
-        public bool isStarted() {
+        public bool isStarted()
+        {
             return state != (int)State.NotInExerPro && state != (int)State.Unstarted;
         }
 
@@ -505,7 +543,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 是否处于战斗中
         /// </summary>
         /// <returns></returns>
-        public bool isInBattle() {
+        public bool isInBattle()
+        {
             return state == (int)State.InNode && isBattleNode();
         }
 
@@ -513,7 +552,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 是否空闲
         /// </summary>
         /// <returns></returns>
-        public bool isIdle() {
+        public bool isIdle()
+        {
             return state == (int)State.Unstarted || state == (int)State.Idle;
         }
 
@@ -521,7 +561,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 当前据点类型
         /// </summary>
         /// <returns></returns>
-        public ExerProMapNode.Type currentNodeType() {
+        public ExerProMapNode.Type currentNodeType()
+        {
             return record.currentNode().typeEnum();
         }
 
@@ -529,7 +570,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 是否为战斗据点
         /// </summary>
         /// <returns></returns>
-        public bool isBattleNode() {
+        public bool isBattleNode()
+        {
             var type = currentNodeType();
             return type == ExerProMapNode.Type.Enemy ||
                 type == ExerProMapNode.Type.Elite ||
@@ -544,12 +586,15 @@ namespace ExerPro.EnglishModule.Services {
         /// 切换据点
         /// </summary>
         /// <param name="type">类型</param>
-        void switchNode(int type) {
+        void switchNode(int type)
+        {
             switchNode((ExerProMapNode.Type)type);
         }
-        void switchNode(ExerProMapNode.Type type) {
+        void switchNode(ExerProMapNode.Type type)
+        {
             Debug.Log("switchNode: " + type);
-            switch (type) {
+            switch (type)
+            {
                 case ExerProMapNode.Type.Rest: onRestNode(); break;
                 case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
                 case ExerProMapNode.Type.Shop: onShopNode(); break;
@@ -601,7 +646,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 未知据点
         /// </summary>
-        void onUnknownNode() {
+        void onUnknownNode()
+        {
             switchNode(randomNode());
         }
 
@@ -609,7 +655,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 随机据点生成
         /// </summary>
         /// <returns></returns>
-        public ExerProMapNode.Type randomNode() {
+        public ExerProMapNode.Type randomNode()
+        {
             var rates = RandomNodeRates;
             var states = RandomNodeTypes;
             var rateList = new List<int>();
@@ -625,7 +672,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 退出据点（据点退出时候需要调用此函数！）
         /// </summary>
-        public void exitNode(bool pop = true) {
+        public void exitNode(bool pop = true)
+        {
             if (pop) sceneSys.popScene();
             changeState(State.Idle);
         }
@@ -637,12 +685,15 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 开始游戏
         /// </summary>
-        public void start(int mapId) {
+        public void start(int mapId)
+        {
             // 如果未开始或者开启新地图，覆盖原有的记录
-            if (record.started == false || record.mapId != mapId) {
+            if (record.started == false || record.mapId != mapId)
+            {
                 changeState(State.Unstarted);
                 record.setup(mapId, 1, true);
-            } else changeState(State.Idle);
+            }
+            else changeState(State.Idle);
 
             sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
         }
@@ -650,7 +701,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 开始移动
         /// </summary>
-        public void startMove(int nid, bool force = false) {
+        public void startMove(int nid, bool force = false)
+        {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
@@ -659,7 +711,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 结束移动
         /// </summary>
-        public void terminateMove() {
+        public void terminateMove()
+        {
             if (state == (int)State.Moving)
                 changeState(State.InNode);
         }
@@ -674,7 +727,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 保存进度
         /// </summary>
-        public void save() {
+        public void save()
+        {
             storageSys.saveItem(StorageSystem.EngCacheDataFilename);
             storageSys.saveItem(StorageSystem.EngRecordFilename);
         }
@@ -682,7 +736,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 结束
         /// </summary>
-        public void terminate() {
+        public void terminate()
+        {
             changeState(State.NotInExerPro);
             save(); sceneSys.popScene();
         }

@@ -7,6 +7,9 @@ using UnityEngine;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 using static ExerPro.EnglishModule.Data.CorrectionQuestion;
+using UnityEngine.UI;
+using UI.CorrectionScene.Windows;
+using Core.UI.Utils;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene
 {
@@ -21,6 +24,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// 外部组件设置
         /// </summary>
         public ArticleDisplay articleDisplay;
+        public Text changedBeforeValue;
+        public GameObject correctionWindow;
 
         /// <summary>
         /// 外部系统设置
@@ -49,7 +54,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override string sceneName() {
+        public override SceneSystem.Scene sceneIndex()
+        {
             return SceneSystem.Scene.EnglishProCorrectionScene;
         }
 
@@ -59,13 +65,21 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         protected override void start()
         {
             base.start();
-            articleDisplay.startView(CorrectionQuestion.sample());
-            //articleDisplay.setItems(items2);
-            //articleDisplay.test();
+            articleDisplay.startView(sample());
         }
         #endregion
 
+        public void onWordSelected(SentenceContainer container,string word)
+        {
+            SceneUtils.get<CorrectionWindow>(correctionWindow).startView();
+            changedBeforeValue.text = word;
+            SceneUtils.get<CorrectionWindow>(correctionWindow).currentSenContainer = container;
+        }
 
+        public void onWordDeselected()
+        {
+            SceneUtils.get<CorrectionWindow>(correctionWindow).terminateView();
+        }
 
 
         // Use this for initialization

@@ -1,10 +1,12 @@
 ﻿using Core.UI.Utils;
+using ExerPro.EnglishModule.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UI.Common.Controls.ItemDisplays;
+using UI.CorrectionScene.Windows;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +14,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 {
     public class SentenceContainer : SelectableContainerDisplay<string>
     {
+        string ends = "!?.,";
 
         /// <summary>
         /// 子节点创建回调
@@ -22,19 +25,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         {
             base.onSubViewCreated(sub, index);
             SceneUtils.get<Text>(subViews[index].gameObject).text = items[index];
-            //SceneUtils.get<RectTransform>(subViews[index].gameObject).sizeDelta = SceneUtils.get<RectTransform>(SceneUtils.get<WordDisplay>(subViews[index].gameObject).textObj).sizeDelta;
         }
+
 
         public void setItem(string item, bool force = false)
         {
-            //item = item.Insert(item.Length - 1, " ");
-            Debug.Log(item);
-            Debug.Log(item.Insert(item.Length - 1, " "));
             List<string> items = item.Split(' ').ToList<string>();
             int size = items.ToArray().Length;
-            for(int i = 1; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
-                items.Insert(2 * i - 1, "  ");
+                items.Insert(2 * i, "  ");
             }
             string lastWord = items.Last<string>();
             string end = lastWord.Substring(lastWord.Length - 1);
@@ -44,5 +44,24 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
             items.Add(end);
             setItems(items);
         }
+
+
+        protected override void onSelectChanged()
+        {
+            base.onSelectChanged();
+            int index = getSelectedIndex();
+
+            if (index == -1)
+            {
+                ((CorrectionScene)SceneUtils.getSceneObject("Scene")).onWordDeselected();
+                return;
+            }
+            if (ends.IndexOf(items[index]) == -1)
+            {
+                ((CorrectionScene)SceneUtils.getSceneObject("Scene")).onWordSelected(this, items[index]);
+            }
+        }
+        
+
     }
 }

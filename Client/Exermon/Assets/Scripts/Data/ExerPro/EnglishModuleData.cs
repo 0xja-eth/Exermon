@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,6 @@ using QuestionModule.Data;
 using PlayerModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
-using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 
 /// <summary>
 /// 艾瑟萌特训模块
@@ -148,7 +148,7 @@ namespace ExerPro.EnglishModule.Data
 
             CorrectionQuestion question = new CorrectionQuestion();
             question.wrongItems = WrongItem.sample();
-            question.article = "How is you? I am fine. Thank you!";
+            question.article = "Hey guy, how is your? I am fine, how about you? Thank your very much!";
             question.description = "test";
 
             return question;
@@ -159,7 +159,7 @@ namespace ExerPro.EnglishModule.Data
             string temp = article.Replace("? ","?+");
             temp = temp.Replace(". ", ".+");
             temp = temp.Replace("! ", "!+");
-            temp = temp.Replace(", ", ",-");
+            temp = temp.Replace(", ", " , ");
             string[] sentences = temp.Split('+');
             return sentences;
         }
