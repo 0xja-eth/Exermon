@@ -88,6 +88,8 @@ namespace UI.ExerPro.BusinessManScene.Windows
         protected override void initializeOnce()
         {
             base.initializeOnce();
+            var name = gameObject.name;
+            var init = this.initialized;
             player = EnglishService.get().record.actor;
         }
 
@@ -158,9 +160,9 @@ namespace UI.ExerPro.BusinessManScene.Windows
         public PackContainer<T> operContainer<T>() where T : PackContItem, new()
         {
             if (typeof(T) == typeof(ExerProPackCard))
-                return (PackContainer<T>)(object)player.cardGroup;
+                return (PackContainer<T>)(object)player?.cardGroup;
             else if (typeof(T) == typeof(ExerProPackPotion))
-                return (PackContainer<T>)(object)player.potionPack;
+                return (PackContainer<T>)(object)player?.potionPack;
             return null;
         }
 
@@ -297,7 +299,7 @@ namespace UI.ExerPro.BusinessManScene.Windows
             if (container == null || item == null)
                 return;
             var price = item.gold;
-            player.gainGold(price);
+            player?.gainGold(price);
             container.addCard(item);
             onBuySuccess();
         }
@@ -309,7 +311,7 @@ namespace UI.ExerPro.BusinessManScene.Windows
             if (container == null || item == null)
                 return;
             var price = item.gold;
-            player.gainGold(price);
+            player?.gainGold(price);
             container.pushItem(new ExerProPackPotion(item));
             onBuySuccess();
         }

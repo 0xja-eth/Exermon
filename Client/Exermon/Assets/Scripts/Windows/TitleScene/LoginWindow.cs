@@ -116,6 +116,7 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         protected override void initializeScene() {
             scene = (TitleScene)SceneUtils.getSceneObject("Scene");
+            int a = 4;
         }
 
         /// <summary>

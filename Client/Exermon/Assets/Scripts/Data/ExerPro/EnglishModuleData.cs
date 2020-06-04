@@ -761,7 +761,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerProActor() {
             var player = PlayerService.get().player;
-            slotItem = player.getExerSlotItem(3);
+            slotItem = player?.getExerSlotItem(3);
         }
 
         /// <summary>
