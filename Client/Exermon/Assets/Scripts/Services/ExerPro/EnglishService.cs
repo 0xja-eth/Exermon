@@ -764,8 +764,6 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         public void save() {
             storageSys.saveItem(StorageSystem.EngCacheDataFilename);
-
-
             //storageSys.saveItem(StorageSystem.EngRecordFilename);
         }
 

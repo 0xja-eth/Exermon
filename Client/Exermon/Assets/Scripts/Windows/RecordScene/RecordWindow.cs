@@ -81,7 +81,7 @@ namespace UI.RecordScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (RecordScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<RecordScene>();
         }
 
         /// <summary>

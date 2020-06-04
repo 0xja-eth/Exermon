@@ -60,7 +60,7 @@ class Service:
 	# 生成英语特训题目
 	@classmethod
 	async def generateQuestions(cls, consumer, player: Player, type: int, count: int, ):
-		# 返回数据：
+		# 返回数据：getMap
 		# qids: int[] => 生成的题目ID集
 
 		# 检验数量是否合法
