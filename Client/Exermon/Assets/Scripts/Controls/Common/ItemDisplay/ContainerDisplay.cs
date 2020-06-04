@@ -50,6 +50,13 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <returns>物品集</returns>
         T[] getItems();
+        
+        /// <summary>
+        /// 获取物品对应的物品显示项
+        /// </summary>
+        /// <param name="item">物品</param>
+        /// <returns>物品显示项</returns>
+        ItemDisplay<T>[] getItemDisplays();
     }
 
     /// <summary>

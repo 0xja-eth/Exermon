@@ -33,8 +33,8 @@ namespace Core.Systems {
             /// </summary>
             //public const string ServerURL = "ws://111.230.227.84:8001/game/";
             //public const string ServerURL = "ws://111.230.227.84:8002/game/";            
-            public const string ServerURL = "ws://120.79.176.90:8001/game/";
-            //public const string ServerURL = "ws://127.0.0.1:8000/game/";
+            //public const string ServerURL = "ws://120.79.176.90:8001/game/";
+            public const string ServerURL = "ws://127.0.0.1:8000/game/";
 
             /// <summary>
             /// 路由配置
@@ -119,6 +119,9 @@ namespace Core.Systems {
             public const string BattleActionComplete = "battle/action/complete";
             public const string BattleResultComplete = "battle/result/complete";
 
+            public const string EngProRecordStart = "engpro/record/start";
+            public const string EngProRecordSave = "engpro/record/save";
+
             public const string EngProQuestionGenerate = "engpro/question/generate";
             public const string EngProQuestionGet = "engpro/question/get";
 
@@ -127,6 +130,7 @@ namespace Core.Systems {
             public const string EngProWordGet = "engpro/word/get";
 
             public const string EngProWordRecordGet = "engpro/record/get";
+            public const string EngProWordQuery = "engpro/word/query";
 
         }
 

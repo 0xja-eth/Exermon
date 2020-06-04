@@ -100,7 +100,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
             var rt = transform as RectTransform;
             if (force) {
                 rt.anchoredPosition = pos;
-                onAfterMove();
+                startView(); onAfterMove();
             } else {
                 isMoving = true;
                 var curPos = rt.anchoredPosition;

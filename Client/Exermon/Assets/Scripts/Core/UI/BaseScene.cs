@@ -50,7 +50,7 @@ namespace Core.UI {
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public abstract string sceneName();
+        public abstract SceneSystem.Scene sceneIndex();
 
         /// <summary>
         /// 初始化
@@ -68,7 +68,7 @@ namespace Core.UI {
         /// 初始化
         /// </summary>
         void initializeSceneUtils() {
-            SceneUtils.initialize(sceneName(), alertWindow, 
+            SceneUtils.initialize(sceneIndex(), alertWindow, 
                 loadingWindow, rebuildController);
             SceneUtils.depositSceneObject("Scene", this);
         }
@@ -94,7 +94,7 @@ namespace Core.UI {
         /// <returns></returns>
         public void checkFirstScene() {
             var first = SceneSystem.Scene.FirstScene;
-            if (gameSys.isConnectable() && sceneName() != first)
+            if (gameSys.isConnectable() && sceneIndex() != first)
                 sceneSys.gotoScene(first);
         }
 

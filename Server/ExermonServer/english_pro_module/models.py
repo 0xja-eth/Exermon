@@ -1,4 +1,4 @@
-#-*-coding:GBK -*-
+# -*-coding:GBK -*-
 
 from django.db import models
 from django.conf import settings
@@ -7,7 +7,7 @@ from item_module.models import *
 from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
 from utils.model_utils import QuestionAudioUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
-import os, base64, datetime, jsonfield
+import os, base64, datetime, jsonfield, random
 from enum import Enum
 
 # Create your models here.
@@ -16,7 +16,16 @@ from enum import Enum
 
 
 # ===================================================
-#  题目选项表
+#  英语题目类型枚举
+# ===================================================
+class QuestionType(Enum):
+	Listening = 1  # 听力题
+	Phrase = 2  # 不定式题
+	Correction = 3  # 改错题
+
+
+# ===================================================
+#  听力题目选项表
 # ===================================================
 class ListeningQuesChoice(BaseQuesChoice):
 	class Meta:
@@ -28,10 +37,9 @@ class ListeningQuesChoice(BaseQuesChoice):
 
 
 # ===================================================
-#  听力题
+#  听力小题
 # ===================================================
 class ListeningSubQuestion(BaseQuestion):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "听力小题"
 
@@ -47,9 +55,10 @@ class ListeningSubQuestion(BaseQuestion):
 #  听力题
 # ===================================================
 class ListeningQuestion(GroupQuestion):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "听力题"
+
+	TYPE = QuestionType.Listening
 
 	# 音频文件
 	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
@@ -88,7 +97,7 @@ class ListeningQuestion(GroupQuestion):
 
 
 # ===================================================
-#  题目选项表
+#  阅读题目选项表
 # ===================================================
 class ReadingQuesChoice(BaseQuesChoice):
 	class Meta:
@@ -100,14 +109,13 @@ class ReadingQuesChoice(BaseQuesChoice):
 
 
 # ===================================================
-#  听力题
+#  阅读小题
 # ===================================================
 class ReadingSubQuestion(BaseQuestion):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "阅读小题"
 
-	# 听力题目
+	# 阅读题目
 	question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
 								 verbose_name="阅读题目")
 
@@ -119,7 +127,6 @@ class ReadingSubQuestion(BaseQuestion):
 #  阅读题
 # ===================================================
 class ReadingQuestion(GroupQuestion):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "阅读题"
 
@@ -133,12 +140,28 @@ class ReadingQuestion(GroupQuestion):
 
 
 # ===================================================
-#  不定式题
+#  短语题目类型枚举
 # ===================================================
-class InfinitiveQuestion(models.Model):
+class PhraseType(Enum):
+	SB = 1  # [sb. sth. 开头的短语选项]
+	Do = 2  # [to do, doing 开头的短语选项]
+	Prep = 3  # [介词短语选项]
 
+
+# ===================================================
+#  短语题
+# ===================================================
+class PhraseQuestion(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = "不定式题"
+		verbose_name = verbose_name_plural = "短语题"
+
+	TYPES = [
+		(PhraseType.SB.value, '[包含 sb. 的短语选项]'),
+		(PhraseType.Do.value, '[do 形式的短语选项]'),
+		(PhraseType.Prep.value, '[介词短语选项]'),
+	]
+
+	TYPE = QuestionType.Phrase
 
 	# 单词
 	word = models.CharField(max_length=64, verbose_name="单词")
@@ -147,7 +170,11 @@ class InfinitiveQuestion(models.Model):
 	chinese = models.CharField(max_length=64, verbose_name="中文")
 
 	# 不定式项
-	infinitive = models.CharField(max_length=64, verbose_name="不定式项")
+	phrase = models.CharField(max_length=64, verbose_name="不定式项")
+
+	# 不定式项的类型
+	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
+											choices=TYPES, verbose_name="修改类型")
 
 	def convertToDict(self):
 		"""
@@ -159,7 +186,8 @@ class InfinitiveQuestion(models.Model):
 			'id': self.id,
 			'word': self.word,
 			'chinese': self.chinese,
-			'infinitive': self.infinitive
+			'phrase': self.phrase,
+			'type': self.type
 		}
 
 
@@ -167,9 +195,10 @@ class InfinitiveQuestion(models.Model):
 #  改错题
 # ===================================================
 class CorrectionQuestion(models.Model):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "改错题"
+
+	TYPE = QuestionType.Correction
 
 	# 文章
 	article = models.TextField(verbose_name="文章")
@@ -201,7 +230,6 @@ class CorrectionQuestion(models.Model):
 #  纠正类型
 # ===================================================
 class CorrectType(Enum):
-
 	Add = 1  # 增加
 	Edit = 2  # 修改
 	Delete = 3  # 删除
@@ -228,10 +256,10 @@ class WrongItem(models.Model):
 
 	# 修改类型
 	type = models.PositiveSmallIntegerField(default=CorrectType.Edit.value,
-		choices=TYPES, verbose_name="修改类型")
+											choices=TYPES, verbose_name="修改类型")
 
 	# 正确单词
-	word = models.TextField(verbose_name="正确单词")
+	word = models.TextField(verbose_name="正确单词", null=True, blank=True)
 
 	# 对应题目
 	question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
@@ -252,18 +280,17 @@ class WrongItem(models.Model):
 #  单词
 # ===================================================
 class Word(models.Model):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "单词"
 
 	# 英文
-	english = models.CharField(max_length=64, verbose_name="英文")
+	english = models.CharField(unique=True, max_length=64, verbose_name="英文")
 
 	# 中文
-	chinese = models.CharField(max_length=64, verbose_name="中文")
+	chinese = models.CharField(max_length=256, verbose_name="中文")
 
 	# 词性
-	type = models.CharField(max_length=32, verbose_name="词性")
+	type = models.CharField(max_length=64, verbose_name="词性", null=True, blank=True)
 
 	# 等级
 	level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
@@ -294,18 +321,15 @@ class Word(models.Model):
 #  单词记录表
 # ===================================================
 class WordRecord(models.Model):
-
 	class Meta:
 
 		verbose_name = verbose_name_plural = "单词记录"
 
 	# 单词
-	word = models.ForeignKey('Word', null=False,
-							 on_delete=models.CASCADE, verbose_name="单词")
+	word = models.ForeignKey('Word', on_delete=models.CASCADE, verbose_name="单词")
 
-	# 玩家
-	player = models.ForeignKey('player_module.Player', null=False,
-							   on_delete=models.CASCADE, verbose_name="玩家")
+	# 对应的特训记录
+	record = models.ForeignKey('ExerProRecord', on_delete=models.CASCADE, verbose_name="特训记录")
 
 	# 回答次数
 	count = models.PositiveSmallIntegerField(default=0, verbose_name="回答次数")
@@ -325,9 +349,15 @@ class WordRecord(models.Model):
 	# 错题标志
 	wrong = models.BooleanField(default=False, verbose_name="错题标志")
 
+	# 当前轮单词
+	current = models.BooleanField(default=False, verbose_name="是否是当前轮")
+
+	# 当前轮是否答对
+	current_correct = models.BooleanField(default=None, null=True, verbose_name="当前轮是否答对")
+
 	# 转化为字符串
 	def __str__(self):
-		return '%s (%s)' % (self.word, self.player)
+		return '%s (%s)' % (self.word, self.record)
 
 	# 转化为字典
 	def convertToDict(self, type=None):
@@ -342,20 +372,28 @@ class WordRecord(models.Model):
 			'correct': self.correct,
 			'first_date': first_date,
 			'last_date': last_date,
+
 			'collected': self.collected,
 			'wrong': self.wrong,
+
+			'current': self.current,
+			'current_correct': self.current_correct,
+			# 由于前段无法判断 None，需要返回一个附加的字段
+			'current_done': self.current_correct is not None,
 		}
 
 	# 创建新记录
 	@classmethod
-	def create(cls, player, word_id):
-		record = player.wordRecord(word_id)
+	def create(cls, pro_record, word_id):
+		record = pro_record.wordRecord(word_id)
 
 		if record is None:
 			record = cls()
-			record.player = player
+			record.record = pro_record
 			record.word_id = word_id
-			record.save()
+
+		record.current = True
+		record.save()
 
 		return record
 
@@ -365,9 +403,12 @@ class WordRecord(models.Model):
 		Args:
 			correct (bool): 是否正确
 		"""
+		self.current_correct = correct
 
-		if correct: self.correct += 1
-		else: self.wrong = True
+		if correct:
+			self.correct += 1
+		else:
+			self.wrong = True
 
 		if self.count <= 0:
 			self.first_date = datetime.datetime.now()
@@ -377,12 +418,316 @@ class WordRecord(models.Model):
 
 		self.save()
 
+	def answer(self, chinese):
+		"""
+		单词作答
+		Args:
+			chinese (str): 中文
+		Returns::
+			返回答案是否正确
+		"""
+		correct = chinese == self.word.chinese
+		self.updateRecord(correct)
+
+		return correct
+
 	# 正确率
 	def corrRate(self):
 		if self.count is None or self.count == 0:
 			return 0
 		return self.correct / self.count
 
+
+# ===================================================
+#  特训记录表
+# ===================================================
+class ExerProRecord(CacheableModel):
+	class Meta:
+
+		verbose_name = verbose_name_plural = "特训记录"
+
+	# 当前单词缓存键
+	CUR_WORDS_CACHE_KEY = 'cur_words'
+
+	# 关卡
+	stage = models.ForeignKey('ExerProMapStage', null=True,
+							  on_delete=models.CASCADE, verbose_name="关卡")
+
+	# 开始标志
+	started = models.BooleanField(default=False, verbose_name="开始标志")
+
+	# 生成标志
+	generated = models.BooleanField(default=False, verbose_name="生成标志")
+
+	# 当前据点索引
+	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="当前据点索引")
+
+	# 单词等级（同时也是玩家在英语模块的等级）
+	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="单词等级")
+
+	# # 下一单词
+	# next = models.ForeignKey('Word', null=True, blank=True,
+	# 						 on_delete=models.CASCADE, verbose_name="下一单词")
+
+	# 据点数据
+	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
+								verbose_name="据点数据")
+
+	# 角色数据
+	actor = jsonfield.JSONField(default=None, null=True, blank=True,
+								verbose_name="角色数据")
+
+	# 玩家
+	player = models.OneToOneField('player_module.Player', null=False,
+								  on_delete=models.CASCADE, verbose_name="玩家")
+
+	def __str__(self):
+		return "%d. %s 特训记录" % (self.id, self.player)
+
+	# 创建新记录
+	@classmethod
+	def create(cls, player):
+		"""
+		创建特训记录
+		Args:
+			player (Player): 顽疾
+			wids (list): 单词ID数组
+		"""
+		record = cls()
+		record.player = player
+		record.save()
+
+		record._generateWordRecords()
+
+		return record
+
+	def convertToDict(self, type: str = None, **kwargs):
+		"""
+		转化为字典
+		Args:
+			type (str): 类型
+			**kwargs (**dict): 拓展参数
+		Returns:
+			返回转化后的字典
+		"""
+
+		if type == "records":
+			return ModelUtils.objectsToDict(self.wordRecords())
+
+		word_records = self.currentWordRecords()
+		words = [record.word for record in word_records]
+
+		if type == "words":
+
+			return {
+				'word_level': self.word_level,
+				'words': ModelUtils.objectsToDict(words),
+				'word_records': ModelUtils.objectsToDict(word_records),
+			}
+
+		# if type == "status":
+		# 	records = self.currentWordRecords()
+		#
+		# 	corr_recs = [record for record in records
+		# 				 if record.current_correct is True]
+		# 	wrong_recs = [record for record in records
+		# 				  if record.current_correct is False]
+		#
+		# 	sum = len(records)
+		# 	correct = len(corr_recs)
+		# 	wrong = len(wrong_recs)
+		#
+		# 	return {
+		# 		'level': self.word_level,
+		# 		'sum': sum,
+		# 		'correct': correct,
+		# 		'wrong': wrong
+		# 	}
+
+		cur_index = self.cur_index
+		if cur_index is None: cur_index = -1
+
+		return {
+			'id': self.id,
+			'map_id': self.stage.map_id,
+			'stage_order': self.stage.order,
+			'started': self.started,
+			'generated': self.generated,
+			'cur_index': cur_index,
+			'word_level': self.word_level,
+
+			'nodes': self.nodes,
+			'actor': self.actor,
+
+			'words': ModelUtils.objectsToDict(words),
+			'word_records': ModelUtils.objectsToDict(word_records),
+		}
+
+	def loadFromDict(self, data: dict):
+		"""
+		从字典中读取
+		Args:
+			data (dict): 字典
+		"""
+		from .views import Common
+
+		map_id = ModelUtils.loadKey(data, 'map_id')
+		stage_order = ModelUtils.loadKey(data, 'stage_order')
+
+		self.stage = Common.getMapStage(mid=map_id, order=stage_order)
+
+		ModelUtils.loadKey(data, 'started', self)
+		ModelUtils.loadKey(data, 'generated', self)
+		ModelUtils.loadKey(data, 'cur_index', self)
+		ModelUtils.loadKey(data, 'nodes', self)
+		ModelUtils.loadKey(data, 'actor', self)
+
+	# region 流程控制
+
+	def setupMap(self, map: 'ExerProMap'):
+		"""
+		设置地图
+		Args:
+			map (ExerProMap): 地图
+		"""
+		self.reset()
+		self.stage = map.stage(1)
+		self.started = True
+
+	def reset(self):
+		"""
+		重置，重置特训记录状态
+		"""
+		self.started = self.generated = False
+		self.cur_index = self.nodes = self.actor = None
+
+	def upgrade(self):
+		"""
+		升级单词
+		"""
+		# 初始状态，为 None
+		if self.word_level is None:
+			self.word_level = 1
+		else:
+			self.word_level += 1
+
+		self._generateWordRecords()
+		self.save()
+
+	def _generateWordRecords(self):
+		"""
+		生成单词和记录
+		"""
+		word_recs = self.wordRecords()
+
+		wids = self._generateWords()
+		self.clearCurrentWords()
+
+		for wid in wids:
+			word_rec = WordRecord.create(self, wid)
+			word_recs.append(word_rec)
+
+	def _generateWords(self) -> list:
+		"""
+		生成单词
+		Returns:
+			返回生成单词ID数组
+		"""
+		from utils.calc_utils import NewWordsGenerator
+
+		# 获取旧单词的ID数组
+		old_words = self.currentWordRecords()
+		old_words = [record.word_id for record in old_words]
+
+		return NewWordsGenerator.generate(self.word_level, old_words)
+
+	def terminate(self):
+		"""
+		结束特训
+		"""
+		self.started = self.generated = False
+		self.save()
+
+	# endregion
+
+	# region 单词记录管理
+
+	def isFinished(self):
+		"""
+		本轮单词是否完成
+		Returns:
+			返回本轮单词是否完成
+		"""
+		if self.word_level is None: return True
+
+		word_recs = self.currentWordRecords()
+
+		for word_rec in word_recs:
+			if not word_rec.current_correct: return False
+
+		return True
+
+	def nextWord(self) -> WordRecord:
+		"""
+		生成下一个单词
+		Returns:
+			返回下一个单词记录
+		"""
+		word_recs = self.currentWordRecords()
+		word_recs = [word_rec for word_rec in word_recs
+					 if word_rec.current_correct is None]
+
+		if len(word_recs) <= 0: return None
+
+		return random.choice(word_recs)
+
+	def clearCurrentWords(self):
+		"""
+		清除当前单词
+		"""
+		word_recs = self.currentWordRecords()
+
+		for word_rec in word_recs:
+			word_rec.current = False
+			word_rec.current_correct = None
+
+	def wordRecords(self):
+		"""
+		全部单词记录（缓存）
+		Returns:
+			返回缓存的全部单词记录列表
+		"""
+		return self._getOrSetCache(self.CUR_WORDS_CACHE_KEY,
+								   lambda: list(self._wordRecords()))
+
+	def _wordRecords(self):
+		"""
+		全部单词记录（数据库）
+		Returns:
+			返回全部单词记录列表
+		"""
+		return self.wordrecord_set.all()
+
+	def currentWordRecords(self):
+		"""
+		当前单词记录
+		Returns:
+			返回当前单词记录列表
+		"""
+		return ModelUtils.query(self.wordRecords(), current=True)
+
+	def wordRecord(self, word_id: int, **kwargs) -> 'WordRecord':
+		"""
+		通过单词ID查找单词记录
+		Args:
+			word_id (int): 单词ID
+			**kwargs (**dict): 其他查询条件
+		Returns:
+			若存在单词记录，返回之，否则返回 None
+		"""
+		return ModelUtils.get(self.wordRecords(), word_id=word_id, **kwargs)
+
+# endregion
 
 # # ===================================================
 # #  英语单词来源枚举
@@ -466,7 +811,6 @@ class ExerProEffectCode(Enum):
 #  特训使用效果表
 # ===================================================
 class ExerProEffect(models.Model):
-
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特训使用效果"
@@ -506,7 +850,6 @@ class ExerProEffect(models.Model):
 
 	# 转化为字典
 	def convertToDict(self):
-
 		return {
 			'code': self.code,
 			'params': self.params,
@@ -548,7 +891,6 @@ class ExerProItemStar(GroupConfigure):
 #  基本特训物品表
 # ===================================================
 class BaseExerProItem(BaseItem):
-
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特训物品"
@@ -583,7 +925,6 @@ class BaseExerProItem(BaseItem):
 #  特训物品使用效果表
 # ===================================================
 class ExerProItemEffect(ExerProEffect):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "特训物品使用效果"
 
@@ -596,9 +937,7 @@ class ExerProItemEffect(ExerProEffect):
 #  特训物品表
 # ===================================================
 class ExerProItem(BaseExerProItem):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "特训物品"
 
 	# 道具类型
@@ -612,7 +951,6 @@ class ExerProItem(BaseExerProItem):
 #  特训药水使用效果表
 # ===================================================
 class ExerProPotionEffect(ExerProEffect):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "特训药水使用效果"
 
@@ -625,9 +963,7 @@ class ExerProPotionEffect(ExerProEffect):
 #  特训药水表
 # ===================================================
 class ExerProPotion(BaseExerProItem):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "特训物品"
 
 	# 道具类型
@@ -651,7 +987,6 @@ class ExerProPotion(BaseExerProItem):
 #  特训卡片使用效果表
 # ===================================================
 class ExerProCardEffect(ExerProEffect):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "特训卡片使用效果"
 
@@ -664,13 +999,8 @@ class ExerProCardEffect(ExerProEffect):
 #  反义词表
 # ===================================================
 class Antonym(GroupConfigure):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "反义词"
-
-	# 道具类型
-	TYPE = ItemType.ExerProCard
 
 	# 卡牌词
 	card_word = models.CharField(max_length=32, verbose_name="卡牌词")
@@ -698,7 +1028,6 @@ class Antonym(GroupConfigure):
 #  卡片类型枚举
 # ===================================================
 class ExerProCardType(Enum):
-
 	Attack = 1  # 攻击
 	Skill = 2  # 技能
 	Ability = 3  # 能力
@@ -709,7 +1038,6 @@ class ExerProCardType(Enum):
 #  卡片类目标举
 # ===================================================
 class ExerProCardTarget(Enum):
-
 	Default = 0  # 默认
 	One = 1  # 单体
 	All = 2  # 群体
@@ -719,9 +1047,7 @@ class ExerProCardTarget(Enum):
 #  特训卡片表
 # ===================================================
 class ExerProCard(BaseItem):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "特训卡片"
 
 	# 道具类型
@@ -785,20 +1111,18 @@ class ExerProCard(BaseItem):
 #  特训敌人攻击效果表
 # ===================================================
 class EnemyEffect(ExerProEffect):
-
 	class Meta:
 		verbose_name = verbose_name_plural = "特训敌人攻击效果"
 
 	# 敌人
 	enemy = models.ForeignKey('ExerProEnemy', on_delete=models.CASCADE,
-							 verbose_name="敌人")
+							  verbose_name="敌人")
 
 
 # ===================================================
 #  敌人行动类型枚举
 # ===================================================
 class EnemyActionType(Enum):
-
 	Attack = 1,  # 攻击
 	PowerUp = 2,  # 提升
 	PowerDown = 3,  # 削弱
@@ -860,7 +1184,6 @@ class EnemyAction(models.Model):
 #  敌人等级枚举
 # ===================================================
 class ExerProEnemyType(Enum):
-
 	Normal = 1  # 普通
 	Elite = 2  # 精英
 	Boss = 3  # BOSS
@@ -870,9 +1193,7 @@ class ExerProEnemyType(Enum):
 #  特训敌人表
 # ===================================================
 class ExerProEnemy(BaseItem):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "特训敌人"
 
 	# 道具类型
@@ -913,6 +1234,8 @@ class ExerProEnemy(BaseItem):
 
 		res['mhp'] = self.mhp
 		res['power'] = self.power
+		res['mhp'] = self.mhp
+		res['power'] = self.power
 		res['defense'] = self.defense
 		res['character'] = self.character
 		res['type'] = self.type
@@ -943,18 +1266,38 @@ class ExerProEnemy(BaseItem):
 #  特训状态表
 # ===================================================
 class ExerProStatus(BaseItem):
-
 	class Meta:
-
 		verbose_name = verbose_name_plural = "特训状态"
 
 	# 道具类型
 	TYPE = ItemType.ExerProStatus
 
-
 # endregion
 
 # region 地图
+
+
+# ===================================================
+#  据点类型表
+# ===================================================
+class NodeType(GroupConfigure):
+	class Meta:
+		verbose_name = verbose_name_plural = "据点类型"
+
+	# 题型
+	ques_types = models.CharField(max_length=32, verbose_name="题型")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['ques_types'] = self.ques_types
+
+		return res
 
 
 # ===================================================
@@ -1005,18 +1348,31 @@ class ExerProMap(models.Model):
 		"""
 		return self.exerpromapstage_set.all()
 
+	def stage(self, order) -> 'ExerProMapStage':
+		"""
+		获取指定序号的关卡
+		Args:
+			order (int): 关卡序号
+		Returns:
+			返回指定序号的关卡对象
+		"""
+		stage = self.stages().filter(order=order)
+		
+		if stage.exists(): return stage.first()
 
-# ===================================================
-#  据点类型表
-# ===================================================
-class NodeType(Enum):
-	Rest = 0  # 休息据点
-	Treasure = 1  # 藏宝据点
-	Shop = 2  # 商人据点
-	Enemy = 3  # 敌人据点
-	Elite = 4  # 精英据点
-	Unknown = 5  # 未知据点
-	Boss = 6  # 精英据点
+		return None
+
+# # ===================================================
+# #  据点类型表
+# # ===================================================
+# class NodeType(Enum):
+# 	Rest = 0  # 休息据点
+# 	Treasure = 1  # 藏宝据点
+# 	Shop = 2  # 商人据点
+# 	Enemy = 3  # 敌人据点
+# 	Elite = 4  # 精英据点
+# 	Unknown = 5  # 未知据点
+# 	Boss = 6  # 精英据点
 
 
 # ===================================================
@@ -1073,4 +1429,3 @@ class ExerProMapStage(models.Model):
 		}
 
 # endregion
-

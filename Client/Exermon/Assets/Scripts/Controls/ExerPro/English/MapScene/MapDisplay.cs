@@ -18,13 +18,15 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
     /// 地图显示组件
     /// </summary>
     public class MapDisplay : SelectableContainerDisplay<ExerProMapNode>,
-        IItemDisplay<MapStageRecord> {
+        IItemDisplay<ExerProRecord> {
 
         /// <summary>
         /// 外部组件定义
         /// </summary>
         public GameObject linePerfab;
         public Transform lineContainer;
+
+        public MapNodeDetail nodeDetail;
 
         public StageRecordDisplay recordDisplay;
 
@@ -44,7 +46,15 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         List<GameObject> lines;
 
         #region 数据控制
-        
+
+        /// <summary>
+        /// 获取详情控件
+        /// </summary>
+        /// <returns></returns>
+        public override IItemDetailDisplay<ExerProMapNode> getItemDetail() {
+            return nodeDetail;
+        }
+
         /// <summary>
         /// 是否有效
         /// </summary>
@@ -52,6 +62,14 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         public override bool isEnabled(ExerProMapNode item) {
             return (!recordDisplay || !recordDisplay.isMoving()) && 
                 base.isEnabled(item) && item.status == (int)ExerProMapNode.Status.Active;
+        }
+
+        /// <summary>
+        /// 获取当前据点显示控件
+        /// </summary>
+        /// <returns></returns>
+        public MapNodeDisplay currentNode() {
+            return subViews.Find(node => node.getItem().isCurrent()) as MapNodeDisplay;
         }
 
         #endregion
@@ -90,7 +108,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="index"></param>
         protected override void onSubViewCreated(SelectableItemDisplay<ExerProMapNode> sub, int index) {
             base.onSubViewCreated(sub, index);
-            var node = items[index];
+            var node = items[index]; // var node = sub.getItem();
             var pos = getPosition(node);
             var rt = sub.transform as RectTransform;
             rt.anchoredPosition = pos;
@@ -158,13 +176,13 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <summary>
         /// 关卡记录
         /// </summary>
-        MapStageRecord record = null;
+        ExerProRecord record = null;
 
         /// <summary>
         /// 获取物品
         /// </summary>
         /// <returns></returns>
-        public MapStageRecord getItem() {
+        public ExerProRecord getItem() {
             return record;
         }
 
@@ -173,7 +191,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         /// <param name="item"></param>
         /// <param name="force"></param>
-        public void setItem(MapStageRecord item, bool _ = false) {
+        public void setItem(ExerProRecord item, bool _ = false) {
             record = item; setItems(item.nodes);
         }
 
@@ -181,7 +199,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
-        public void startView(MapStageRecord item) {
+        public void startView(ExerProRecord item) {
             setItem(item, true);
         }
 

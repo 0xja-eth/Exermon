@@ -27,42 +27,36 @@ namespace Core.Systems {
         /// <summary>
         /// 游戏场景数据
         /// </summary>
-        public class Scene {
+        public enum Scene {
 
-            /// <summary>
-            /// 初始场景
-            /// </summary>
-            public const string FirstScene = TitleScene;
+            NoneScene = -1,
 
-            /// <summary>
-            /// 常量设定
-            /// </summary>
-            public const string TitleScene = "TitleScene";
-            public const string StartScene = "StartScene";
-            public const string MainScene = "MainScene";
-            public const string StatusScene = "StatusScene";
+            FirstScene = 0,
 
-            public const string ExerciseScene = "ExerciseScene";
-            public const string RecordScene = "RecordScene";
-            public const string PackScene = "PackScene";
-            public const string ShopScene = "ShopScene";
+            TitleScene = 0,
+            StartScene,
+            MainScene,
 
-            public const string BattleStartScene = "BattleStartScene";
-            public const string BattleMatchingScene = "BattleMatchingScene";
-            public const string BattleScene = "BattleScene";
-            public const string BattleResultScene = "BattleResultScene";
-            public const string BattleAnswerScene = "BattleAnswerScene";
+            StatusScene, PackScene, ShopScene,
 
-            public const string EnglishProMapScene = "Scenes/ExerPro/EnglishPro/MapScene";
+            ExerciseScene, RecordScene,
             public const string BusinessManScene = "Scenes/ExerPro/BusinessManScene";
 
-            public const string HelpScene = "HelpScene";
+            BattleStartScene,
+            BattleMatchingScene, 
+            BattleScene,
+            BattleResultScene,
+            BattleAnswerScene,
+
+            EnglishProMapScene,
+
+            HelpScene
         }
 
         /// <summary>
         /// 场景栈
         /// </summary>
-        Stack<string> sceneStack = new Stack<string>();
+        Stack<SceneSystem.Scene> sceneStack = new Stack<SceneSystem.Scene>();
 
         /// <summary>
         /// 通道数据
@@ -100,16 +94,16 @@ namespace Core.Systems {
         /// 当前场景名称
         /// </summary>
         /// <returns>场景名称</returns>
-        public string currentScene() {
-            return sceneStack.Count > 0 ? sceneStack.Peek() : "";
+        public Scene currentScene() {
+            return sceneStack.Count > 0 ? sceneStack.Peek() : Scene.NoneScene;
         }
 
         /// <summary>
         /// 真实当前场景名称
         /// </summary>
         /// <returns>场景名称</returns>
-        public string realCurrentScene() {
-            return SceneManager.GetActiveScene().name;
+        public Scene realCurrentScene() {
+            return (Scene)SceneManager.GetActiveScene().buildIndex;
         }
 
         /// <summary>
@@ -138,13 +132,13 @@ namespace Core.Systems {
         /// 添加场景（往当前追加场景）
         /// </summary>
         /// <param name="scene">场景名称</param>
-        public void pushScene(string scene, JsonData data, bool async = false) {
+        public void pushScene(Scene scene, JsonData data, bool async = false) {
             sceneStack.Push(scene); loadScene(data: data, async: async);
         }
-        public void pushScene(string scene, object data, bool async = false) {
+        public void pushScene(Scene scene, object data, bool async = false) {
             pushScene(scene, DataLoader.convert(data.GetType(), data), async);
         }
-        public void pushScene(string scene, bool async = false) {
+        public void pushScene(Scene scene, bool async = false) {
             pushScene(scene, (JsonData)null, async: async);
         }
 
@@ -152,14 +146,14 @@ namespace Core.Systems {
         /// 切换场景（替换掉当前场景）
         /// </summary>
         /// <param name="scene">场景名称</param>
-        public void changeScene(string scene, JsonData data, bool async = false) {
+        public void changeScene(Scene scene, JsonData data, bool async = false) {
             if (sceneStack.Count > 0) sceneStack.Pop();
             pushScene(scene, data, async);
         }
-        public void changeScene(string scene, object data, bool async = false) {
+        public void changeScene(Scene scene, object data, bool async = false) {
             changeScene(scene, DataLoader.convert(data.GetType(), data), async);
         }
-        public void changeScene(string scene, bool async = false) {
+        public void changeScene(Scene scene, bool async = false) {
             changeScene(scene, (JsonData)null, async: async);
         }
 
@@ -167,13 +161,13 @@ namespace Core.Systems {
         /// 转到场景（前面的场景将被清空）
         /// </summary>
         /// <param name="scene">场景名称</param>
-        public void gotoScene(string scene, JsonData data, bool async = false) {
+        public void gotoScene(Scene scene, JsonData data, bool async = false) {
             clearScene(); pushScene(scene, data, async);
         }
-        public void gotoScene(string scene, object data, bool async = false) {
+        public void gotoScene(Scene scene, object data, bool async = false) {
             gotoScene(scene, DataLoader.convert(data.GetType(), data), async);
         }
-        public void gotoScene(string scene, bool async = false) {
+        public void gotoScene(Scene scene, bool async = false) {
             gotoScene(scene, (JsonData)null, async: async);
         }
 
@@ -191,18 +185,18 @@ namespace Core.Systems {
         /// <param name="async">是否异步操作</param>
         public void loadScene(bool reload = false, JsonData data = null, bool async = false) {
             tunnelData = data;
-            string scene = currentScene();
+            Scene scene = currentScene();
             Debug.Log("loadScene: " + scene + " (real: " + realCurrentScene() + 
                 "), tunnel: "+ tunnelData?.ToJson());
-            if (scene == "") gameSer.exitGame();
+            if (scene == Scene.NoneScene) gameSer.exitGame();
             // 如果需要重载（强制LoadScene）或者场景分歧
             else if (reload || differentScene()) {
                 SceneUtils.clearSceneObjects();
                 if (async) {
-                    asyncOper = SceneManager.LoadSceneAsync(scene);
+                    asyncOper = SceneManager.LoadSceneAsync((int)scene);
                     asyncOper.allowSceneActivation = false;
                 } else
-                    SceneManager.LoadScene(scene);
+                    SceneManager.LoadScene((int)scene);
             }
         }
 

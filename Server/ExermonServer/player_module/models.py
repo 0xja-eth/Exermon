@@ -397,12 +397,6 @@ class Player(CacheableModel):
 	# 删除标志
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
-	# 当前 LoginInfo
-	cur_login_info = None
-
-	# 当前刷题
-	cur_exercise = None
-
 	def __str__(self):
 		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
@@ -575,7 +569,7 @@ class Player(CacheableModel):
 		question_records = self.questionRecords()
 
 		cnt = count = corr_cnt = corr_rate = 0
-		sum_timespan = avg_timespan = 0 # corr_timespan = 0
+		sum_timespan = avg_timespan = 0  # corr_timespan = 0
 		sum_exp = sum_gold = 0
 
 		for rec in question_records:
@@ -776,6 +770,13 @@ class Player(CacheableModel):
 	# 获取金钱
 	def playerMoney(self) -> PlayerMoney:
 		return self._getOneToOneCache(PlayerMoney)
+
+	# ExerPro 新增
+
+	# 获取特训记录
+	def exerProRecrod(self) -> 'ExerProRecord':
+		from english_pro_module.models import ExerProRecord
+		return self._getOneToOneCache(ExerProRecord)
 
 	# endregion
 
@@ -1195,19 +1196,7 @@ class Player(CacheableModel):
 		Returns:
 			所有与该玩家相关的单词记录 QuerySet 对象
 		"""
-		return self.questionrecord_set.all()
-
-	def wordRecord(self, word_id: int) -> 'WordRecord':
-		"""
-		通过题目ID查找单词记录
-		Args:
-			word_id (int): 题目ID
-		Returns:
-			若存在题目记录，返回之，否则返回 None
-		"""
-		res = self.wordRecords().filter(word_id=word_id)
-		if res.exists(): return res.first()
-		return None
+		return self.wordrecord_set.all()
 
 	# endregion
 

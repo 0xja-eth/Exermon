@@ -87,7 +87,7 @@ namespace Core.UI.Utils {
         /// <param name="scene">当前场景</param>
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
-        public static void initialize(string scene,
+        public static void initialize(SceneSystem.Scene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
             RebuildController rebuildController = null) {
             Debug.Log("initialize Scene: " + scene);
@@ -111,7 +111,7 @@ namespace Core.UI.Utils {
         /// <param name="scene">当前场景</param>
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
-        static void initializeScene(string scene,
+        static void initializeScene(SceneSystem.Scene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
             RebuildController rebuildController = null) {
             if (sceneSys.currentScene() != scene)

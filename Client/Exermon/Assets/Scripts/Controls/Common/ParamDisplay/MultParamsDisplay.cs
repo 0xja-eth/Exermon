@@ -273,6 +273,8 @@ namespace UI.Common.Controls.ParamDisplays {
                 case "Color": processColorDisplayItem(item, value); break;
                 case "ScaleX": processScaleXDisplayItem(item, value); break;
                 case "ScaleY": processScaleYDisplayItem(item, value); break;
+                case "AnchorX": processAnchorXDisplayItem(item, value); break;
+                case "AnchorY": processAnchorYDisplayItem(item, value); break;
                 case "Fill": processFillDisplayItem(item, value); break;
                 case "ParamDisplay": processParamDisplayItem(item, value); break;
                 default: processExtended(item, value); break;
@@ -533,6 +535,50 @@ namespace UI.Common.Controls.ParamDisplays {
                 tmpAni.setupAnimation(ani);
             } else
                 transform.localScale = new Vector3(ori.x, rate, ori.z);
+        }
+
+        /// <summary>
+        /// 处理X缩放类型的显示项
+        /// </summary>
+        /// <param name="item">显示项</param>
+        /// <param name="value">值</param>
+        void processAnchorXDisplayItem(DisplayItem item, JsonData value) {
+            if (!item.obj.activeSelf) return;
+            var transform = item.obj.transform as RectTransform;
+            if (transform == null) return;
+
+            var rate = DataLoader.load<float>(value);
+            var ani = SceneUtils.ani(item.obj);
+            var ori = transform.anchorMax;
+
+            if (!immediately && item.animated && ani != null) {
+                var tmpAni = AnimationUtils.createAnimation();
+                tmpAni.addCurve(typeof(RectTransform), "m_AnchorMax.x", ori.x, rate);
+                tmpAni.setupAnimation(ani);
+            } else
+                transform.anchorMax = new Vector2(rate, ori.y);
+        }
+
+        /// <summary>
+        /// 处理Y缩放类型的显示项
+        /// </summary>
+        /// <param name="item">显示项</param>
+        /// <param name="value">值</param>
+        void processAnchorYDisplayItem(DisplayItem item, JsonData value) {
+            if (!item.obj.activeSelf) return;
+            var transform = item.obj.transform as RectTransform;
+            if (transform == null) return;
+
+            var rate = DataLoader.load<float>(value);
+            var ani = SceneUtils.ani(item.obj);
+            var ori = transform.anchorMax;
+
+            if (item.animated && ani != null) {
+                var tmpAni = AnimationUtils.createAnimation();
+                tmpAni.addCurve(typeof(RectTransform), "m_AnchorMax.y", ori.y, rate);
+                tmpAni.setupAnimation(ani);
+            } else
+                transform.anchorMax = new Vector2(ori.x, rate);
         }
 
         /// <summary>

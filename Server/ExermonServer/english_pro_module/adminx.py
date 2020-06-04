@@ -100,7 +100,7 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 # 	inlines = [ReadingSubQuestionsInline]
 
 
-@xadmin.sites.register(InfinitiveQuestion)
+@xadmin.sites.register(PhraseQuestion)
 class InfinitiveQuestionAdmin(object):
 
 	list_display = ['id', 'word', 'chinese', 'infinitive']
@@ -257,3 +257,18 @@ class ExerProMapStageAdmin(object):
 					 'steps', 'max_fork_node', 'max_fork', 'node_rate']
 
 	# inlines = [EnemiesInline]
+
+
+@xadmin.sites.register(NodeType)
+class NodeTypeAdmin(object):
+	list_display = ['id', 'name', 'ques_types', 'configure']
+
+	list_editable = ['name', 'ques_types', 'configure']
+
+
+@xadmin.sites.register(ExerProRecord)
+class ExerProRecordAdmin(object):
+	list_display = ['id', 'word_level']
+
+	list_editable = ['word_level']
+
