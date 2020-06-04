@@ -35,6 +35,11 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         public BaseWindow nodeDetail;
 
         /// <summary>
+        /// 内部变量定义
+        /// </summary>
+        bool firstMove = true;
+
+        /// <summary>
         /// 外部系统设置
         /// </summary>
         EnglishService engSer;

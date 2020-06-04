@@ -45,7 +45,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <param name="item"></param>
         /// <returns></returns>
         public override bool isNullItem(ExerProActor item) {
-            return base.isNullItem(item) || item.slotItem.isNullItem();
+            return base.isNullItem(item) || item.slotItem == null || item.slotItem.isNullItem();
         }
 
         /// <summary>

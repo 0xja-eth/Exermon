@@ -32,6 +32,9 @@ HTML_TEST = True
 
 # Application definition
 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 26214400  #上传文件大小，改成25M
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400	#上传数据大小，也改成了25M
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

@@ -2,6 +2,7 @@ from typing import Any
 
 from .models import *
 from player_module.models import Player
+from item_module.views import Common as ItemCommon
 from utils.view_utils import Common as ViewUtils
 from utils.calc_utils import NewWordsGenerator
 from utils.exception import ErrorType, GameException
@@ -19,10 +20,47 @@ from random import choice
 # =======================
 class Service:
 
+	# 开始英语特训
+	@classmethod
+	async def startRecord(cls, consumer, player: Player, mid: int, ):
+		# 返回数据：
+		# record: 特训记录数据 => 特训记录数据
+
+		pro_record: ExerProRecord = player.exerProRecrod()
+
+		map: ExerProMap = Common.getMap(mid)
+
+		# 没有玩过的记录
+		if pro_record is None:
+			pro_record = ExerProRecord.create(player)
+
+		if not pro_record.started:
+			pro_record.setupMap(map)
+
+		return {'record': pro_record.convertToDict()}
+
+	# 保存英语特训
+	@classmethod
+	async def saveRecord(cls, consumer, player: Player, record: dict, terminate: bool, ):
+		# 返回数据：
+		# result: 特训结果数据 => 特训结果（可选）
+
+		# TODO: 在这里加入每个据点之后的校验代码
+
+		pro_record = Common.getExerProRecord(player)
+
+		pro_record.loadFromDict(record)
+
+		# pro_record.save()
+
+		if terminate:
+			# TODO: 加入奖励计算，并返回
+			pro_record.terminate()
+
 	# 生成英语特训题目
 	@classmethod
 	async def generateQuestions(cls, consumer, player: Player, type: int, count: int, ):
-		# 返回数据：
+		# 返回数据：getMap
 		# qids: int[] => 生成的题目ID集
 
 		# 检验数量是否合法
@@ -59,16 +97,18 @@ class Service:
 		# 返回数据：
 		# words: 单词数据（数组） => 单词数据集
 
-		pro_record: ExerProRecord = player.exerProRecrod()
+		pro_record = Common.getExerProRecord(player)
 
-		# 没有玩过的记录
-		if not pro_record:
-			pro_record = ExerProRecord.create(player)
+		# # 没有玩过的记录
+		# if not pro_record:
+		# 	pro_record = ExerProRecord.create(player)
+		#
+		# # 有玩过的记录
+		# else:
 
-		# 有玩过的记录
-		else:
-			Common.ensureFinishLastWords(player)
-			pro_record.upgrade()
+		Common.ensureFinishLastWords(pro_record)
+
+		pro_record.upgrade()
 
 		return pro_record.convertToDict("words")
 
@@ -142,10 +182,10 @@ class Service:
 	async def getRecords(cls, consumer, player: Player, ):
 		# 返回数据：
 		# records: 单词记录数据（数组） => 单词记录数据集
-		records = Common.getWordRecords(player)
-		records = ModelUtils.objectsToDict(records)
 
-		return {'records': records}
+		pro_record = Common.getExerProRecord(player)
+
+		return {'word_records': pro_record.convertToDict("records")}
 
 
 # ======================
@@ -171,6 +211,34 @@ class Check:
 class Common:
 
 	@classmethod
+	def getMap(cls, id) -> ExerProMap:
+		"""
+		获取地图
+		Args:
+			id (int): 地图ID
+		Returns:
+			返回地图对象
+		"""
+		return ViewUtils.getObject(ExerProMap, ErrorType.MapNotFound, id=id)
+
+	@classmethod
+	def getMapStage(cls, id=None, mid=None, order=None) -> ExerProMapStage:
+		"""
+		获取关卡
+		Args:
+			id (int): 关卡ID
+			mid (int): 地图ID
+			order (int): 关卡序号
+		Returns:
+			返回地图对象
+		"""
+		if id is not None:		
+			return ViewUtils.getObject(ExerProMapStage, ErrorType.StageNotFound, id=id)
+
+		if mid is not None and order is not None:
+			return ViewUtils.getObject(ExerProMapStage, ErrorType.StageNotFound, map_id=mid, order=order)
+
+	@classmethod
 	def getQuestionClass(cls, type_: int):
 		"""
 		获取题目类型
@@ -184,7 +252,7 @@ class Common:
 		if type_ == QuestionType.Listening.value:
 			return ListeningQuestion
 		elif type_ == QuestionType.Phrase.value:
-			return InfinitiveQuestion
+			return PhraseQuestion
 		elif type_ == QuestionType.Correction.value:
 			return CorrectionQuestion
 
@@ -395,6 +463,10 @@ class Common:
 		record = pro_record.wordRecord(wid, current=True)
 		if record is None: raise GameException(ErrorType.NoInCurrentWords)
 
+	@classmethod
+	def ensureWordNotCorrect(cls, word_rec: WordRecord):
+		if word_rec.current_correct: raise GameException()
+
 	# 判断单词是否回答正确
 	# @classmethod
 	# def isAnswerCorrect(cls, wid: int, player: Player, chinese: str, isUpdate: bool) -> bool:
@@ -440,3 +512,17 @@ class Common:
 		"""
 		if not pro_record.isFinished(): raise GameException(error)
 
+	@classmethod
+	def ensureMapEnable(cls, pro_record: ExerProRecord, map: ExerProMap):
+		"""
+		确保指定地图可用
+		Args:
+			pro_record (ExerProRecord): 特训记录
+			map (ExerProMap): 特训地图
+		"""
+
+		if pro_record.started and pro_record.stage \
+			and pro_record.stage.map != map:
+				raise GameException(ErrorType.ExerProStarted)
+
+		# TODO: 增加等级判断代码

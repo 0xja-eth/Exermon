@@ -18,9 +18,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
     /// 地图显示组件
     /// </summary>
     public class MapDisplay : SelectableContainerDisplay<ExerProMapNode>,
-        IItemDisplay<MapStageRecord>
-    {
-
+        IItemDisplay<ExerProRecord> {
         /// <summary>
         /// 外部组件定义
         /// </summary>
@@ -65,6 +63,14 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
         {
             return (!recordDisplay || !recordDisplay.isMoving()) &&
                 base.isEnabled(item) && item.status == (int)ExerProMapNode.Status.Active;
+        }
+
+        /// <summary>
+        /// 获取当前据点显示控件
+        /// </summary>
+        /// <returns></returns>
+        public MapNodeDisplay currentNode() {
+            return subViews.Find(node => node.getItem().isCurrent()) as MapNodeDisplay;
         }
 
         #endregion
@@ -179,15 +185,14 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
         /// <summary>
         /// 关卡记录
         /// </summary>
-        MapStageRecord record = null;
+        ExerProRecord record = null;
 
         /// <summary>
         /// 获取物品
         /// </summary>
         /// <returns></returns>
-        public MapStageRecord getItem()
-        {
-            return record;
+        
+        public ExerProRecord getItem() {            return record;
         }
 
         /// <summary>
@@ -195,18 +200,14 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
         /// </summary>
         /// <param name="item"></param>
         /// <param name="force"></param>
-        public void setItem(MapStageRecord item, bool _ = false)
-        {
-            record = item; setItems(item.nodes);
+        public void setItem(ExerProRecord item, bool _ = false) {            record = item; setItems(item.nodes);
         }
 
         /// <summary>
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
-        public void startView(MapStageRecord item)
-        {
-            setItem(item, true);
+        public void startView(ExerProRecord item) {            setItem(item, true);
         }
 
         #endregion

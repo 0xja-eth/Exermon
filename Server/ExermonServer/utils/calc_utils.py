@@ -2060,22 +2060,29 @@ class NewWordsGenerator:
 
 		# all_words 为空则自动生成
 		if words is None:
-			words = ViewUtils.getObjects(Word, level__gt=level)
+			words = ViewUtils.getObjects(Word, level__lte=level)
 			words = words.exclude(id__in=last_words)
 			words = [word.id for word in words]
 
-		# 没有旧单词
+		# 没有旧单词&8
 		if len(last_words) == 0:
-			words = random.sample(words, cls.WordNum)
+			words = cls.sample(words, cls.WordNum)
 		# 已经没有新单词了
 		elif len(words) == 0:
-			words = random.sample(last_words, cls.WordNum)
+			words = cls.sample(last_words, cls.WordNum)
 		else:
-			old_words = random.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
-			new_words = random.sample(words, cls.WordNum * cls.NewWordPercent)
+			old_words = cls.sample(last_words, cls.WordNum * (1-cls.NewWordPercent))
+			new_words = cls.sample(words, cls.WordNum * cls.NewWordPercent)
 			words = old_words.extend(new_words)
 
-		words = random.shuffle(words)
+		random.shuffle(words)
 
 		return words
+
+	@classmethod
+	def sample(cls, words, num):
+		cnt = len(words)
+		if cnt < num: return words
+		return random.sample(words, num)
+
 

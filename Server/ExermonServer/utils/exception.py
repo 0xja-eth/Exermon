@@ -196,7 +196,10 @@ class ErrorType(Enum):
 	AnswerNotFinish = 806  # 当前轮单词没有问答完毕
 	NoEnoughNewWord = 807  # 单词库中没有足够的新单词
 	NoInCurrentWords = 808  # 该单词不在当前轮中
-	NoFirstCurrentWords = 809  # 请先生成当前轮单词
+	WordAlreadyCorrect = 809  # 本轮该单词已答对
+	MapNotFound = 810  # 地图不存在
+	StageNotFound = 811  # 关卡不存在
+	ExerProStarted = 812  # 特训正在进行
 
 
 class GameException(Exception):
@@ -386,7 +389,11 @@ class GameException(Exception):
 		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！",
 		ErrorType.NoEnoughNewWord: "单词库中没有足够的新单词！",
 		ErrorType.NoInCurrentWords: "该单词不在当前轮中！",
-		ErrorType.NoFirstCurrentWords: "请先生成当前轮单词！",
+		ErrorType.WordAlreadyCorrect: "本轮该单词已答对！",
+		ErrorType.MapNotFound: "地图不存在！",
+		ErrorType.StageNotFound: "关卡不存在！",
+		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
+
 	}
 
 	def __init__(self, error_type: ErrorType):
