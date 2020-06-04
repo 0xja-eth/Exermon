@@ -40,7 +40,6 @@ namespace Core.Systems {
             StatusScene, PackScene, ShopScene,
 
             ExerciseScene, RecordScene,
-            public const string BusinessManScene = "Scenes/ExerPro/BusinessManScene";
 
             BattleStartScene,
             BattleMatchingScene, 
@@ -49,6 +48,7 @@ namespace Core.Systems {
             BattleAnswerScene,
 
             EnglishProMapScene,
+            EnglishProBusinessManScene,
 
             HelpScene
         }

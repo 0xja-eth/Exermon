@@ -3,6 +3,7 @@ using Core.Systems;
 using Core.UI;
 
 using UI.ExerPro.BusinessManScene.Windows;
+using ExerPro.EnglishModule.Services;
 
 /// <summary>
 /// 背包场景
@@ -25,15 +26,26 @@ namespace UI.ExerPro.BusinessManScene
         /// </summary>
         public BusinessManWindow shopWindow;
 
+        /// <summary>
+        /// 外部系统
+        /// </summary>
+        EnglishService engSer;
+
         #region 初始化
 
         /// <summary>
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override string sceneName()
+        public override SceneSystem.Scene sceneIndex()
         {
-            return SceneSystem.Scene.BusinessManScene;
+            return SceneSystem.Scene.EnglishProBusinessManScene;
+        }
+
+        protected override void initializeSystems()
+        {
+            base.initializeSystems();
+            engSer = EnglishService.get();
         }
 
         /// <summary>

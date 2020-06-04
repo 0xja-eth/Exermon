@@ -47,4 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ExerPro/EnglishPro/MapScene.unity
     guid: 50c16f7e7f804324fa93ec4de7228d93
+  - enabled: 1
+    path: Assets/Scenes/ExerPro/EnglishPro/BusinessManScene.unity
+    guid: ad2305c7a29884e47ba5b4c688c2a27f
   m_configObjects: {}

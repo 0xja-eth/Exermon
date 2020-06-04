@@ -90,7 +90,15 @@ namespace UI.ExerPro.BusinessManScene.Windows
             base.initializeOnce();
             var name = gameObject.name;
             var init = this.initialized;
-            player = EnglishService.get().record.actor;
+
+            player = englishSer.record.actor;
+        }
+
+        protected override void initializeEvery()
+        {
+            base.initializeEvery();
+            if (player == null)
+                player = englishSer.record.actor;
         }
 
         /// <summary>
@@ -143,13 +151,12 @@ namespace UI.ExerPro.BusinessManScene.Windows
         /// 当前商店显示容器
         /// </summary>
         /// <returns></returns>
-        public ShopDisplay currentPackContainer()
+        public ShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new()
         {
-            switch (view)
-            {
-                case View.CardItem: return cardItemShop;
-                case View.PotionItem: return potionItemShop;
-            }
+            if (typeof(T) == typeof(ExerProCard))
+                return (ShopDisplay<T>)(object)cardItemShop;
+            if (typeof(T) == typeof(ExerProPotion))
+                return (ShopDisplay<T>)(object)potionItemShop;
             return null;
         }
 
@@ -172,8 +179,15 @@ namespace UI.ExerPro.BusinessManScene.Windows
         /// <returns></returns>
         public BaseExerProItem operShopItem()
         {
-            var currPack = currentPackContainer();
-            return currPack?.selectedItem();
+            switch (view)
+            {
+                case View.CardItem:
+                    return cardItemShop.selectedItem();
+                
+                case View.PotionItem:
+                    return potionItemShop.selectedItem();
+            }
+            return null;
         }
 
         public
@@ -272,7 +286,7 @@ namespace UI.ExerPro.BusinessManScene.Windows
         {
             var item = operShopItem();
             if (item == null) return;
-
+            buyItem();
         }
 
         /// <summary>
@@ -298,8 +312,9 @@ namespace UI.ExerPro.BusinessManScene.Windows
             var item = (ExerProCard)operShopItem();
             if (container == null || item == null)
                 return;
-            var price = item.gold;
-            player?.gainGold(price);
+            //var price = item.gold;
+            var price = 1;
+            player?.gainGold(-price);
             container.addCard(item);
             onBuySuccess();
         }
@@ -311,7 +326,7 @@ namespace UI.ExerPro.BusinessManScene.Windows
             if (container == null || item == null)
                 return;
             var price = item.gold;
-            player?.gainGold(price);
+            player?.gainGold(-price);
             container.pushItem(new ExerProPackPotion(item));
             onBuySuccess();
         }

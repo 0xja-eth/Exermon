@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.BusinessManScene.Controls.PotionItem
+namespace UI.ExerPro.BusinessManScene.Controls.CardItem
 {
-    public class PotionItemShopDisplay : ShopDisplay
+    public class CardItemShopDisplay : ShopDisplay<ExerProCard>
     {
 
         #region 启动视图
@@ -21,7 +21,7 @@ namespace UI.ExerPro.BusinessManScene.Controls.PotionItem
             if (shopItems == null || shopItems.Length == 0)
             {
                 base.startView();
-                var d = dataSer.staticData.data.exerProPotions;
+                var d = dataSer.staticData.data.exerProCards;
                 setItems(d);
             }
             else

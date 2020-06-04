@@ -19,7 +19,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
     /// <summary>
     /// 装备背包显示
     /// </summary>
-    public class ShopItemDisplay : SelectableItemDisplay<BaseExerProItem>
+    public class ShopItemDisplay<T> : SelectableItemDisplay<T> where T : BaseExerProItem
     {
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         public Image icon, priceTag;
         public Text name, priceText;
 
-        public Texture2D goldTag, ticketTag, boundTicketTag;
+        public Texture2D goldTag;
 
         #region 初始化
 
@@ -54,7 +54,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// </summary>
         protected void initializeDrawFuncs()
         {
-            itemDisplay.registerItemType<BaseExerProItem>(drawItem);
+            itemDisplay.registerItemType<T>(drawItem);
         }
 
         #endregion
@@ -65,17 +65,16 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// 绘制基本信息
         /// </summary>
         /// <param name="item">物品</param>
-        protected virtual void drawBaseInfo(BaseExerProItem item)
+        protected virtual void drawBaseInfo(T item)
         {
             name.text = item.name;
-
             // 处理物品星级和图标情况
             if (item != null)
             {
                 starsDisplay?.setValue(item.starId);
 
                 icon.gameObject.SetActive(true);
-                icon.overrideSprite = item.icon;
+                //icon.overrideSprite = item.icon;
             }
         }
 
@@ -85,21 +84,11 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// <param name="item">商品</param>
         void drawPrice(BaseExerProItem item)
         {
-            var price = item.price;
-            if (price.gold > 0)
+            var price = item.gold;
+            if (price > 0)
             {
-                priceText.text = price.gold.ToString();
+                priceText.text = price.ToString();
                 setPriceTag(goldTag);
-            }
-            else if (price.boundTicket > 0)
-            {
-                priceText.text = price.boundTicket.ToString();
-                setPriceTag(boundTicketTag);
-            }
-            else if (price.ticket > 0)
-            {
-                priceText.text = price.ticket.ToString();
-                setPriceTag(ticketTag);
             }
             else
             {
@@ -127,7 +116,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// 绘制物品
         /// </summary>
         /// <param name="item">物品</param>
-        void drawItem(BaseExerProItem item)
+        void drawItem(T item)
         {
             drawBaseInfo(item);
         }
@@ -136,10 +125,10 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// 绘制确切物品
         /// </summary>
         /// <param name="shopItem"></param>
-        protected override void drawExactlyItem(ItemService.ShopItem<T> shopItem)
+        protected override void drawExactlyItem(T shopItem)
         {
             base.drawExactlyItem(shopItem);
-            itemDisplay.setItem(shopItem.item());
+            itemDisplay.setItem(shopItem);
             drawPrice(shopItem);
         }
 
@@ -155,6 +144,6 @@ namespace UI.ExerPro.BusinessManScene.Controls
         }
 
         #endregion
- 
+
     }
 }

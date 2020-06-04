@@ -730,7 +730,7 @@ namespace ExerPro.EnglishModule.Services {
         void onStarted() {
             record.start();
             changeState(State.Idle);
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
         }
 
         /// <summary>

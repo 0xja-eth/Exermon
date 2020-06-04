@@ -33,8 +33,8 @@ namespace Core.Systems {
             /// </summary>
             //public const string ServerURL = "ws://111.230.227.84:8001/game/";
             //public const string ServerURL = "ws://111.230.227.84:8002/game/";            
-            //public const string ServerURL = "ws://120.79.176.90:8001/game/";
-            public const string ServerURL = "ws://127.0.0.1:8000/game/";
+            public const string ServerURL = "ws://120.79.176.90:8001/game/";
+            //public const string ServerURL = "ws://127.0.0.1:8000/game/";
 
             /// <summary>
             /// 路由配置

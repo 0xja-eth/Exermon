@@ -799,11 +799,13 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerProActor() {
             var player = PlayerService.get().player;
-            slotItem = player.getExerSlotItem(3);        }
+            slotItem = player.getExerSlotItem(3);
+        }
 
         /// <param name="type">类型</param>
         /// <returns></returns>
-        public JsonData convertToDisplayData(string type = "") {
+        public JsonData convertToDisplayData(string type = "")
+        {
             switch (type) {
                 case "hp": return convertHp();
                 default: return toJson();
@@ -821,9 +823,9 @@ namespace ExerPro.EnglishModule.Data {
         }
 
 
-    /// <summary>
+        /// <summary>
         /// 转化状态
-    /// </summary>
+        /// </summary>
         /// <returns></returns>
         JsonData convertHp() {
             var res = new JsonData();

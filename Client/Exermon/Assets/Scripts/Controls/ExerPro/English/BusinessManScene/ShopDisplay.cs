@@ -20,8 +20,8 @@ namespace UI.ExerPro.BusinessManScene.Controls
     /// <summary>
     /// 商人据点显示
     /// </summary>
-    public abstract class ShopDisplay :
-        SelectableContainerDisplay<BaseExerProItem>
+    public abstract class ShopDisplay<T> :
+        SelectableContainerDisplay<T> where T : BaseExerProItem
     {
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// <summary>
         /// 商品缓存
         /// </summary>
-        public BaseExerProItem[] shopItems { get; set; } = null;
+        public T[] shopItems { get; set; } = null;
 
         /// <summary>
         /// 外部系统设置
@@ -105,7 +105,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// 设置商品集
         /// </summary>
         /// <param name="items"></param>
-        public override void setItems(BaseExerProItem[] items)
+        public override void setItems(T[] items)
         {
             shopItems = items;
             base.setItems(items);
@@ -116,7 +116,7 @@ namespace UI.ExerPro.BusinessManScene.Controls
         /// </summary>
         /// <param name="shopItem">物品</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
-        protected override bool isIncluded(BaseExerProItem shopItem)
+        protected override bool isIncluded(T shopItem)
         {
             if (!base.isIncluded(shopItem)) return false;
 

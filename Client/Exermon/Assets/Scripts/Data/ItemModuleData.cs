@@ -21,18 +21,21 @@ namespace ItemModule { }
 /// <summary>
 /// 物品模块数据
 /// </summary>
-namespace ItemModule.Data {
+namespace ItemModule.Data
+{
 
     /// <summary>
     /// 基本物品数据
     /// </summary>
     public class BaseItem : BaseData,
-        ParamDisplay.IDisplayDataConvertable {
+        ParamDisplay.IDisplayDataConvertable
+    {
 
         /// <summary>
         /// 物品类型
         /// </summary>
-        public enum Type {
+        public enum Type
+        {
             Unset = 0,  // 未设置
 
             // ===！！！！不能轻易修改序号！！！！===
@@ -52,6 +55,16 @@ namespace ItemModule.Data {
             ExerSkill = 202,  // 艾瑟萌技能
             ExerGift = 203,  // 艾瑟萌天赋
             ExerFrag = 204,  // 艾瑟萌碎片
+
+            // ExerProItem 301+
+            ExerProItem = 301,  // 特训物品
+            ExerProPotion = 302,  // 特训药水
+            ExerProCard = 303,  // 特训卡片
+
+
+            ExerProEnemy = 310,  // 特训敌人
+            ExerProStatus = 311,  // 特训状态
+
         }
 
         /// <summary>
@@ -63,14 +76,15 @@ namespace ItemModule.Data {
         public string description { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; } // 物品类型
-        
+
         #region 属性显示数据生成
 
         /// <summary>
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public virtual JsonData convertToDisplayData(string type = "") {
+        public virtual JsonData convertToDisplayData(string type = "")
+        {
             var res = new JsonData();
 
             res["name"] = name;
@@ -91,7 +105,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 物品价格数据
     /// </summary>
-    public class ItemPrice : BaseData {
+    public class ItemPrice : BaseData
+    {
 
         /// <summary>
         /// 属性
@@ -112,7 +127,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 有限物品数据
     /// </summary>
-    public class LimitedItem : BaseItem {
+    public class LimitedItem : BaseItem
+    {
 
         /// <summary>
         /// 常量定义
@@ -146,7 +162,8 @@ namespace ItemModule.Data {
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public override JsonData convertToDisplayData(string type = "") {
+        public override JsonData convertToDisplayData(string type = "")
+        {
             var res = base.convertToDisplayData(type);
 
             res["sell_price"] = sellPrice;
@@ -163,7 +180,8 @@ namespace ItemModule.Data {
         /// 获取星级实例
         /// </summary>
         /// <returns></returns>
-        public ItemStar star() {
+        public ItemStar star()
+        {
             return DataService.get().itemStar(starId);
         }
 
@@ -171,15 +189,17 @@ namespace ItemModule.Data {
         /// 可否出售
         /// </summary>
         /// <returns></returns>
-        public bool sellable() {
+        public bool sellable()
+        {
             return sellPrice > 0;
         }
-        
+
         /// <summary>
         /// 加载自定义属性
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json) {
+        protected override void loadCustomAttributes(JsonData json)
+        {
             base.loadCustomAttributes(json);
             icon = AssetLoader.getItemIconSprite(iconIndex);
         }
@@ -188,7 +208,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 可转化为效果数据的接口
     /// </summary>
-    public interface IEffectsConvertable {
+    public interface IEffectsConvertable
+    {
 
         /// <summary>
         /// 转化为效果数据数组（用于对战中显示）
@@ -200,22 +221,25 @@ namespace ItemModule.Data {
     /// <summary>
     /// 物品使用场合
     /// </summary>
-    public enum ItemUseOccasion {
+    public enum ItemUseOccasion
+    {
         Unknown = 0, // 未知
         Battle = 1, // 对战中
-	    Menu = 2, // 菜单（背包中）
-	    Adventure = 3, // 冒险中
+        Menu = 2, // 菜单（背包中）
+        Adventure = 3, // 冒险中
     }
 
     /// <summary>
     /// 使用效果数据
     /// </summary>
-    public class EffectData : BaseData {
+    public class EffectData : BaseData
+    {
 
         /// <summary>
         /// 效果代码枚举
         /// </summary>
-        public enum Code {
+        public enum Code
+        {
             Unset = 0, // 空
 
             RecoverHP = 10, // 回复体力值
@@ -250,7 +274,8 @@ namespace ItemModule.Data {
         /// 是否为恢复效果
         /// </summary>
         /// <returns>返回当前效果是否为恢复效果</returns>
-        public bool isRecovery() {
+        public bool isRecovery()
+        {
             return code == (int)Code.RecoverHP || code == (int)Code.RecoverMP;
         }
 
@@ -258,9 +283,10 @@ namespace ItemModule.Data {
         /// 是否为提升效果
         /// </summary>
         /// <returns>返回当前效果是否为提升效果</returns>
-        public bool isPromotion() {
-            return code == (int)Code.AddParam || 
-                code == (int)Code.TempAddParam || 
+        public bool isPromotion()
+        {
+            return code == (int)Code.AddParam ||
+                code == (int)Code.TempAddParam ||
                 code == (int)Code.BattleAddParam;
         }
 
@@ -268,8 +294,9 @@ namespace ItemModule.Data {
         /// 构造函数
         /// </summary>
         public EffectData() { }
-        public EffectData(Code code, JsonData params_, 
-            string description, string shortDescription) {
+        public EffectData(Code code, JsonData params_,
+            string description, string shortDescription)
+        {
             this.code = (int)code;
             this.params_ = params_;
             this.description = description;
@@ -280,7 +307,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 对战物品使用目标接口
     /// </summary>
-    public interface IBattleItemUseTarget {
+    public interface IBattleItemUseTarget
+    {
 
         /// <summary>
         /// 修改HP
@@ -325,12 +353,14 @@ namespace ItemModule.Data {
     /// <summary>
     /// 可用物品数据
     /// </summary>
-    public class UsableItem : LimitedItem, IEffectsConvertable {
+    public class UsableItem : LimitedItem, IEffectsConvertable
+    {
 
         /// <summary>
         /// 使用目标类型
         /// </summary>
-        public enum TargetType {
+        public enum TargetType
+        {
             Empty = 0, Human = 1, Exermon = 2
         }
 
@@ -380,7 +410,8 @@ namespace ItemModule.Data {
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public override JsonData convertToDisplayData(string type = "") {
+        public override JsonData convertToDisplayData(string type = "")
+        {
             var res = base.convertToDisplayData(type);
             var occasion = generateTimingText();
 
@@ -408,7 +439,8 @@ namespace ItemModule.Data {
         /// 生成使用场合文本
         /// </summary>
         /// <returns></returns>
-        string generateTimingText() {
+        string generateTimingText()
+        {
             List<string> texts = new List<string>();
 
             if (battleUse) texts.Add(BattleUseText);
@@ -424,7 +456,8 @@ namespace ItemModule.Data {
         /// 生成效果文本
         /// </summary>
         /// <returns></returns>
-        string generateEffectsText() {
+        string generateEffectsText()
+        {
             var res = "";
             foreach (var effect in effects)
                 res += effect.description + "\n";
@@ -437,7 +470,8 @@ namespace ItemModule.Data {
         /// 获取物品类型
         /// </summary>
         /// <returns>物品类型</returns>
-        public UsableItemType itemType() {
+        public UsableItemType itemType()
+        {
             return DataService.get().usableItemType(iType);
         }
 
@@ -445,7 +479,8 @@ namespace ItemModule.Data {
         /// 目标类型文本
         /// </summary>
         /// <returns>目标类型文本</returns>
-        public string targetText() {
+        public string targetText()
+        {
             return DataService.get().itemUseTargetType(target).Item2;
         }
 
@@ -454,12 +489,13 @@ namespace ItemModule.Data {
         /// </summary>
         /// <returns></returns>
         public override int maxCount() { return maxCount_; }
-        
+
         /// <summary>
         /// 转化为效果数据数组（用于对战中显示）
         /// </summary>
         /// <returns>返回对应的效果数据数组</returns>
-        public EffectData[] convertToEffectData() {
+        public EffectData[] convertToEffectData()
+        {
             return effects.ToArray();
         }
     }
@@ -468,7 +504,8 @@ namespace ItemModule.Data {
     /// 可装备物品数据
     /// </summary>
     public class EquipableItem : LimitedItem,
-        ParamDisplay.IDisplayDataArrayConvertable {
+        ParamDisplay.IDisplayDataArrayConvertable
+    {
 
         /// <summary>
         /// 属性类型
@@ -488,14 +525,15 @@ namespace ItemModule.Data {
         public ParamData[] baseParams { get; protected set; }
         [AutoConvert]
         public int minLevel { get; protected set; }
-        
+
         #region 数据转换
 
         /// <summary>
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public override JsonData convertToDisplayData(string type = "") {
+        public override JsonData convertToDisplayData(string type = "")
+        {
             var res = base.convertToDisplayData(type);
 
             res["min_level"] = minLevel;
@@ -509,11 +547,13 @@ namespace ItemModule.Data {
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public JsonData[] convertToDisplayDataArray(string type = "") {
+        public JsonData[] convertToDisplayDataArray(string type = "")
+        {
             var params_ = DataService.get().staticData.configure.baseParams;
             var count = params_.Length;
             var data = new JsonData[count];
-            for (int i = 0; i < count; ++i) {
+            for (int i = 0; i < count; ++i)
+            {
                 var json = new JsonData();
                 var paramId = params_[i].id;
 
@@ -535,7 +575,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamRateData getLevelParam(int paramId) {
+        public ParamRateData getLevelParam(int paramId)
+        {
             foreach (var param in levelParams)
                 if (param.paramId == paramId) return param;
             return new ParamRateData(paramId);
@@ -546,7 +587,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="paramId">属性ID</param>
         /// <returns>属性数据</returns>
-        public ParamData getBaseParam(int paramId) {
+        public ParamData getBaseParam(int paramId)
+        {
             foreach (var param in baseParams)
                 if (param.paramId == paramId) return param;
             return new ParamData(paramId);
@@ -556,12 +598,14 @@ namespace ItemModule.Data {
     /// <summary>
     /// 基本容器项
     /// </summary>
-    public abstract class BaseContItem : BaseData {
+    public abstract class BaseContItem : BaseData
+    {
 
         /// <summary>
         /// 容器项类型
         /// </summary>
-        public enum Type {
+        public enum Type
+        {
             Unset = 0,  // 未设置
 
             // ===！！！！不能轻易修改序号！！！！===
@@ -591,6 +635,11 @@ namespace ItemModule.Data {
 
             // 对战物资槽 
             BattleItemSlotItem = 301,  // 对战物资槽
+
+            //ExerProPackItem 401+
+            ExerProPackItem = 401, //特训背包物品
+            ExerProPackCard = 402, //特训背包卡片
+            ExerProPackPotion = 403, //特训背包药水
         }
 
         /// <summary>
@@ -614,7 +663,8 @@ namespace ItemModule.Data {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public BaseContItem() {
+        public BaseContItem()
+        {
             var typeName = GetType().Name;
             type = (int)Enum.Parse(typeof(Type), typeName);
         }
@@ -623,7 +673,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器项
     /// </summary>
-    public class PackContItem : BaseContItem {
+    public class PackContItem : BaseContItem
+    {
 
         /// <summary>
         /// 属性
@@ -651,7 +702,8 @@ namespace ItemModule.Data {
         /// 是否为空
         /// </summary>
         /// <returns></returns>
-        public override bool isNullItem() {
+        public override bool isNullItem()
+        {
             return itemId == 0;
         }
 
@@ -659,7 +711,8 @@ namespace ItemModule.Data {
         /// 移入
         /// </summary>
         /// <param name="count"></param>
-        public int enter(int count) {
+        public int enter(int count)
+        {
             this.count += count;
             if (capacity() <= 0) return 0; // 如果可以无限叠加
 
@@ -673,7 +726,8 @@ namespace ItemModule.Data {
         /// 移除
         /// </summary>
         /// <param name="count"></param>
-        public int leave(int count) {
+        public int leave(int count)
+        {
             this.count -= count;
             var res = -this.count;
             if (this.count < 0) this.count = 0;
@@ -695,7 +749,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="count">个数</param>
         /// <returns></returns>
-        public void setCount(int count) {
+        public void setCount(int count)
+        {
             this.count = count;
         }
 
@@ -705,7 +760,8 @@ namespace ItemModule.Data {
         public PackContItem() { }
         /// <param name="itemId">物品ID</param>
         /// <param name="count">数量</param>
-        public PackContItem(int itemId, int count = 1) {
+        public PackContItem(int itemId, int count = 1)
+        {
             this.itemId = itemId;
             this.count = count;
         }
@@ -715,8 +771,9 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器项
     /// </summary>
-    public abstract class PackContItem<T> : PackContItem, 
-        ParamDisplay.IDisplayDataConvertable where T : BaseItem {
+    public abstract class PackContItem<T> : PackContItem,
+        ParamDisplay.IDisplayDataConvertable where T : BaseItem
+    {
 
         #region 属性显示数据生成
 
@@ -724,7 +781,8 @@ namespace ItemModule.Data {
         /// 转化为属性信息集
         /// </summary>
         /// <returns>属性信息集</returns>
-        public JsonData convertToDisplayData(string type = "") {
+        public JsonData convertToDisplayData(string type = "")
+        {
             return item().convertToDisplayData(type);
         }
 
@@ -734,7 +792,8 @@ namespace ItemModule.Data {
         /// 物品
         /// </summary>
         /// <returns></returns>
-        public T item() {
+        public T item()
+        {
             return DataService.get().get<T>(itemId);
         }
 
@@ -742,7 +801,8 @@ namespace ItemModule.Data {
         /// 是否为空
         /// </summary>
         /// <returns></returns>
-        public override bool isNullItem() {
+        public override bool isNullItem()
+        {
             return base.isNullItem() || item() == null;
         }
 
@@ -767,7 +827,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 槽类容器项
     /// </summary>
-    public abstract class SlotContItem : BaseContItem {
+    public abstract class SlotContItem : BaseContItem
+    {
 
         /// <summary>
         /// 属性
@@ -778,7 +839,8 @@ namespace ItemModule.Data {
         /// <summary>
         /// 槽索引
         /// </summary>
-        public virtual int slotIndex {
+        public virtual int slotIndex
+        {
             get { return index; }
             set { index = value; }
         }
@@ -800,13 +862,14 @@ namespace ItemModule.Data {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public SlotContItem() : base() {}
+        public SlotContItem() : base() { }
     }
 
     /// <summary>
     /// 槽类容器项（单装备）
     /// </summary>
-    public abstract class SlotContItem<T> : SlotContItem where T : PackContItem, new() {
+    public abstract class SlotContItem<T> : SlotContItem where T : PackContItem, new()
+    {
 
         /// <summary>
         /// 装备
@@ -817,7 +880,8 @@ namespace ItemModule.Data {
         /// 是否为空
         /// </summary>
         /// <returns></returns>
-        public override bool isNullItem() {
+        public override bool isNullItem()
+        {
             return equip1 == null || equip1.isNullItem();
         }
 
@@ -826,7 +890,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
         /// <returns>装备</returns>
-        public override E getEquip<E>() {
+        public override E getEquip<E>()
+        {
             var et = typeof(E); var tt = typeof(T);
             if (et == tt || tt.IsSubclassOf(et)) return (E)(object)equip1;
             return null;
@@ -837,9 +902,11 @@ namespace ItemModule.Data {
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
         /// <param name="equipItem">装备物品</param>
-        public override void setEquip<E>(E equipItem) {
+        public override void setEquip<E>(E equipItem)
+        {
             var et = typeof(E); var tt = typeof(T);
-            if (et == tt || tt.IsSubclassOf(et)) {
+            if (et == tt || tt.IsSubclassOf(et))
+            {
                 var lastEquip = equip1;
                 equip1 = (T)(object)equipItem;
                 if (lastEquip != equip1) onEquipChanged();
@@ -861,7 +928,8 @@ namespace ItemModule.Data {
     /// 槽类容器项（双装备）
     /// </summary>
     public abstract class SlotContItem<T1, T2> : SlotContItem<T1>
-        where T1 : PackContItem, new() where T2 : PackContItem, new() {
+        where T1 : PackContItem, new() where T2 : PackContItem, new()
+    {
 
         /// <summary>
         /// 第二装备
@@ -872,7 +940,8 @@ namespace ItemModule.Data {
         /// 是否为空
         /// </summary>
         /// <returns></returns>
-        public override bool isNullItem() {
+        public override bool isNullItem()
+        {
             return base.isNullItem() && (equip2 == null || equip2.isNullItem());
         }
 
@@ -881,7 +950,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
         /// <returns>装备</returns>
-        public override E getEquip<E>() {
+        public override E getEquip<E>()
+        {
             var et = typeof(E); var t2t = typeof(T2);
             if (et == t2t || t2t.IsSubclassOf(et)) return (E)(object)equip2;
             return base.getEquip<E>();
@@ -892,13 +962,16 @@ namespace ItemModule.Data {
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
         /// <param name="equipItem">装备物品</param>
-        public override void setEquip<E>(E equipItem) {
+        public override void setEquip<E>(E equipItem)
+        {
             var et = typeof(E); var t2t = typeof(T2);
-            if (et == t2t || t2t.IsSubclassOf(et)) {
+            if (et == t2t || t2t.IsSubclassOf(et))
+            {
                 var lastEquip = equip2;
                 equip2 = (T2)(object)equipItem;
                 if (lastEquip != equip2) onEquipChanged();
-            } else base.setEquip(equipItem);
+            }
+            else base.setEquip(equipItem);
         }
 
         /// <summary>
@@ -911,7 +984,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 基本容器数据
     /// </summary>
-    public abstract class BaseContainer<T> : BaseData where T : BaseContItem, new() {
+    public abstract class BaseContainer<T> : BaseData where T : BaseContItem, new()
+    {
 
         /// <summary>
         /// 属性
@@ -931,7 +1005,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="p">条件</param>
         /// <returns>物品</returns>
-        public T findItem(Predicate<T> p) {
+        public T findItem(Predicate<T> p)
+        {
             return items.Find(p);
         }
 
@@ -940,7 +1015,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="p">条件</param>
         /// <returns>物品列表</returns>
-        public List<T> findItems(Predicate<T> p) {
+        public List<T> findItems(Predicate<T> p)
+        {
             return items.FindAll(p);
         }
 
@@ -949,7 +1025,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool containItem(T item) {
+        public bool containItem(T item)
+        {
             return items.Contains(item);
         }
 
@@ -961,13 +1038,16 @@ namespace ItemModule.Data {
         /// 读取自定义属性
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json) {
+        protected override void loadCustomAttributes(JsonData json)
+        {
             base.loadCustomAttributes(json);
             Debug.Log("loadCustomAttributes: " + json.ToJson());
             var data = DataLoader.load(json, "items");
-            if (data != null && data.IsArray) {
+            if (data != null && data.IsArray)
+            {
                 items.Clear();
-                for (int i = 0; i < data.Count; ++i) {
+                for (int i = 0; i < data.Count; ++i)
+                {
                     var item = loadItem(data[i]);
                     if (item != null) items.Add(item);
                 }
@@ -978,7 +1058,8 @@ namespace ItemModule.Data {
         /// 读取单个物品
         /// </summary>
         /// <param name="json">数据</param>
-        protected virtual T loadItem(JsonData json) {
+        protected virtual T loadItem(JsonData json)
+        {
             return DataLoader.load<T>(json);
         }
 
@@ -986,7 +1067,8 @@ namespace ItemModule.Data {
         /// 转化自定义数据
         /// </summary>
         /// <param name="json">数据</param>
-        protected override void convertCustomAttributes(ref JsonData json) {
+        protected override void convertCustomAttributes(ref JsonData json)
+        {
             base.convertCustomAttributes(ref json);
             json["items"] = DataLoader.convert(items);
         }
@@ -997,7 +1079,8 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器数据
     /// </summary>
-    public class PackContainer<T> : BaseContainer<T> where T : PackContItem, new() {
+    public class PackContainer<T> : BaseContainer<T> where T : PackContItem, new()
+    {
 
         #region 数据操作
 
@@ -1005,7 +1088,8 @@ namespace ItemModule.Data {
         /// 添加物品
         /// </summary>
         /// <param name="item">物品</param>
-        public void pushItem(T item) {
+        public void pushItem(T item)
+        {
             if (item == null) return;
             if (containItem(item)) return;
             items.Add(item);
@@ -1015,7 +1099,8 @@ namespace ItemModule.Data {
         /// 移除物品
         /// </summary>
         /// <param name="item">物品</param>
-        public T removeItem(T item) {
+        public T removeItem(T item)
+        {
             if (item == null) return null;
             if (!containItem(item)) return null;
             items.Remove(item);
@@ -1027,7 +1112,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="item">物品</param>
         /// <param name="count">数目</param>
-        public void splitItem(T item, int count) {
+        public void splitItem(T item, int count)
+        {
             if (count >= item.count) return;
             var copyItem = (T)item.copy(false);
             copyItem.setCount(count);
@@ -1039,10 +1125,12 @@ namespace ItemModule.Data {
         /// 拆分物品
         /// </summary>
         /// <param name="items">物品数组</param>
-        public void mergeItems(T[] items) {
+        public void mergeItems(T[] items)
+        {
             var leftIndex = 0;
             var leftItem = items[leftIndex];
-            for (int i = 1; i < items.Length; i++) {
+            for (int i = 1; i < items.Length; i++)
+            {
                 var item = items[i];
                 item.setCount(leftItem.enter(item.count));
                 if (leftItem.isFull()) // 如果最左物品已满，切换之
@@ -1051,12 +1139,13 @@ namespace ItemModule.Data {
             for (int i = items.Length - 1; i > leftIndex; --i)
                 removeItem(items[i]);
         }
-        
+
         /// <summary>
         /// 转移物品
         /// </summary>
         /// <param name="container"></param>
-        public void transferItem(PackContainer<T> container, T item) {
+        public void transferItem(PackContainer<T> container, T item)
+        {
             container.acceptItem(prepareIItem(item));
         }
 
@@ -1065,7 +1154,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        protected virtual T prepareIItem(T item) {
+        protected virtual T prepareIItem(T item)
+        {
             return removeItem(item);
         }
 
@@ -1074,7 +1164,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        protected virtual void acceptItem(T item) {
+        protected virtual void acceptItem(T item)
+        {
             pushItem(item);
         }
 
@@ -1084,14 +1175,16 @@ namespace ItemModule.Data {
     /// <summary>
     /// 背包类容器数据
     /// </summary>
-    public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new() {
-        
+    public abstract class SlotContainer<T> : BaseContainer<T> where T : SlotContItem, new()
+    {
+
         /// <summary>
         /// 获取装备
         /// </summary>
         /// <typeparam name="E">装备类型</typeparam>
         /// <returns>装备</returns>
-        public E getEquip<E>(T slotItem) where E : PackContItem, new() {
+        public E getEquip<E>(T slotItem) where E : PackContItem, new()
+        {
             return slotItem.getEquip<E>();
         }
 
@@ -1102,10 +1195,12 @@ namespace ItemModule.Data {
         /// <param name="container">装备容器</param>
         /// <param name="equipItem">装备物品</param>
         public void setEquip<E>(PackContainer<E> container, E equipItem = null)
-            where E : PackContItem, new() {
+            where E : PackContItem, new()
+        {
             setEquip(getSlotItemByEquipItem(equipItem), container, equipItem);
         }
-        public void setEquip<E>(T slotItem, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
+        public void setEquip<E>(T slotItem, PackContainer<E> container, E equipItem = null) where E : PackContItem, new()
+        {
             if (slotItem == null) return;
             var oriEquip = getEquip<E>(slotItem);
             container.removeItem(equipItem); // 移出装备
@@ -1114,16 +1209,20 @@ namespace ItemModule.Data {
             if (oriEquip != null) oriEquip.doDequip();
             if (equipItem != null) equipItem.doEquip();
         }
-        public void setEquip<E>(int slotIndex, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
+        public void setEquip<E>(int slotIndex, PackContainer<E> container, E equipItem = null) where E : PackContItem, new()
+        {
             setEquip(getSlotItem(slotIndex), container, equipItem);
         }
-        public void setEquip<E>(E equipItem = null) where E : PackContItem, new() {
+        public void setEquip<E>(E equipItem = null) where E : PackContItem, new()
+        {
             setEquip(getSlotItemByEquipItem(equipItem), equipItem);
         }
-        public void setEquip<E>(T slotItem, E equipItem = null) where E : PackContItem, new() {
+        public void setEquip<E>(T slotItem, E equipItem = null) where E : PackContItem, new()
+        {
             slotItem?.setEquip(equipItem);
         }
-        public void setEquip<E>(int slotIndex, E equipItem = null) where E : PackContItem, new() {
+        public void setEquip<E>(int slotIndex, E equipItem = null) where E : PackContItem, new()
+        {
             setEquip(getSlotItem(slotIndex), equipItem);
         }
 
@@ -1132,7 +1231,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="index"></param>
         /// <returns>返回对应索引的装备槽项</returns>
-        public virtual T getSlotItem(int slotIndex) {
+        public virtual T getSlotItem(int slotIndex)
+        {
             return findItem(item => item.slotIndex == slotIndex);
         }
 
@@ -1141,7 +1241,8 @@ namespace ItemModule.Data {
         /// </summary>
         /// <param name="index">下标</param>
         /// <returns>返回对应索引的<装备槽项/returns>
-        public virtual T getSlotItemByIndex(int index) {
+        public virtual T getSlotItemByIndex(int index)
+        {
             return findItem(item => item.index == index);
         }
 
@@ -1157,7 +1258,8 @@ namespace ItemModule.Data {
         /// 查找一个空的容器项
         /// </summary>
         /// <returns>返回第一个空的容器项</returns>
-        public T emptySlotItem() {
+        public T emptySlotItem()
+        {
             foreach (var item in items)
                 if (item.isNullItem()) return item;
             return items[0];

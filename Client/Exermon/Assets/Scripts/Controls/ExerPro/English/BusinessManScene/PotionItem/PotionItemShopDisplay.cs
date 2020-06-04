@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using ExerPro.EnglishModule.Data;
+using Core.Data.Loaders;
 
-namespace UI.ExerPro.BusinessManScene.Controls.CardItem
+namespace UI.ExerPro.BusinessManScene.Controls.PotionItem
 {
-    public class CardItemShopDisplay : ShopDisplay
+    public class PotionItemShopDisplay : ShopDisplay<ExerProPotion>
     {
 
         #region 启动视图
@@ -21,7 +22,12 @@ namespace UI.ExerPro.BusinessManScene.Controls.CardItem
             if (shopItems == null || shopItems.Length == 0)
             {
                 base.startView();
-                var d = dataSer.staticData.data.exerProCards;
+                var d = dataSer.staticData.data.exerProPotions;
+
+                //LitJson.JsonData data = new LitJson.JsonData();
+                //data["gold"] = 1;
+                //data["starId"] = 1;
+                //d = DataLoader.load(d, data);
                 setItems(d);
             }
             else
