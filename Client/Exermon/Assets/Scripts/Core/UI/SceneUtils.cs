@@ -26,6 +26,7 @@ namespace Core.UI.Utils {
         public const string AlertWindowKey = "AlertWindow";
         public const string LoadingWindowKey = "LoadingWindow";
         public const string RebuildControllerKey = "RebuildController";
+        public const string CurrentSceneKey = "Scene";
 
         /// <summary>
         /// 提示窗口（脚本）
@@ -52,7 +53,7 @@ namespace Core.UI.Utils {
         }
 
         /// <summary>
-        /// 加载窗口（脚本）
+        /// 界面重构控制器（脚本）
         /// </summary>
         public static RebuildController rebuildController {
             get {
@@ -61,6 +62,16 @@ namespace Core.UI.Utils {
             set {
                 depositSceneObject(RebuildControllerKey, value);
             }
+        }
+
+        /// <summary>
+        /// 获取/设置当前场景（脚本）
+        /// </summary>
+        public static T getCurrentScene<T>() where T : BaseScene {
+            return getSceneObject(CurrentSceneKey) as T;
+        }
+        public static void setCurrentScene(BaseScene scene) {
+            depositSceneObject(CurrentSceneKey, scene);
         }
 
         /// <summary>
@@ -87,7 +98,7 @@ namespace Core.UI.Utils {
         /// <param name="scene">当前场景</param>
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
-        public static void initialize(SceneSystem.Scene scene,
+        public static void initialize(BaseScene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
             RebuildController rebuildController = null) {
             Debug.Log("initialize Scene: " + scene);
@@ -111,11 +122,16 @@ namespace Core.UI.Utils {
         /// <param name="scene">当前场景</param>
         /// <param name="alertWindow">当前场景的提示弹窗</param>
         /// <param name="loadingWindow">当前场景的加载窗口</param>
-        static void initializeScene(SceneSystem.Scene scene,
+        static void initializeScene(BaseScene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
             RebuildController rebuildController = null) {
-            if (sceneSys.currentScene() != scene)
-                sceneSys.gotoScene(scene);
+
+            var sceneIndex = scene.sceneIndex();
+            if (sceneSys.currentScene() != sceneIndex)
+                sceneSys.gotoScene(sceneIndex);
+
+            SceneUtils.setCurrentScene(scene);
+
             SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
             SceneUtils.rebuildController = rebuildController;

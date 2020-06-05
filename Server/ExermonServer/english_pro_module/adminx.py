@@ -259,6 +259,13 @@ class ExerProMapStageAdmin(object):
 	# inlines = [EnemiesInline]
 
 
+@xadmin.sites.register(ExerProItemStar)
+class ExerProItemStarAdmin(object):
+	list_display = ['id', 'name', 'color', 'adminColor']
+
+	list_editable = ['name', 'color']
+
+
 @xadmin.sites.register(NodeType)
 class NodeTypeAdmin(object):
 	list_display = ['id', 'name', 'ques_types', 'configure']

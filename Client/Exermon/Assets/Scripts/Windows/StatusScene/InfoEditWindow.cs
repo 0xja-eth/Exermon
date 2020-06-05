@@ -88,7 +88,7 @@ namespace UI.StatusScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (StatusScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<StatusScene>();
         }
 
         /// <summary>

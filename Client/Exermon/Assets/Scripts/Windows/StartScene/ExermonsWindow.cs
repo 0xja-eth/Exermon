@@ -60,7 +60,7 @@ namespace UI.StartScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (StartScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<StartScene>();
         }
 
         /// <summary>

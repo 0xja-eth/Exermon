@@ -98,7 +98,7 @@ namespace UI.PackScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (PackScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<PackScene>();
         }
 
         /// <summary>

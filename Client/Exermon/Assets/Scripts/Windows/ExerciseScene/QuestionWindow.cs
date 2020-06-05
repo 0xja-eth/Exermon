@@ -63,7 +63,7 @@ namespace UI.ExerciseScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (ExerciseScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<ExerciseScene>();
         }
 
         /// <summary>
