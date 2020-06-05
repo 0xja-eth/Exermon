@@ -534,8 +534,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 281.85, y: 0}
-  m_SizeDelta: {x: 563.7, y: 0}
+  m_AnchoredPosition: {x: 419, y: 0}
+  m_SizeDelta: {x: 838, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &354631308
 MonoBehaviour:
@@ -557,8 +557,8 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 132, y: 132}
-  m_Spacing: {x: 0, y: 12}
+  m_CellSize: {x: 191, y: 256}
+  m_Spacing: {x: 20, y: 20}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &354631309
@@ -2056,8 +2056,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 281.85, y: 0}
-  m_SizeDelta: {x: 563.7, y: 0}
+  m_AnchoredPosition: {x: 419, y: 0}
+  m_SizeDelta: {x: 838, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1024974247
 MonoBehaviour:
@@ -2886,7 +2886,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.675, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3783,7 +3783,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   container: {fileID: 354631306}
   subViewNameFormat: 
-  subViewPrefab: {fileID: 1362005610588444207, guid: 3fa96e100d3fb89499cfb340eedc8af8,
+  subViewPrefab: {fileID: 2421270429970104420, guid: be1681e269c583344bc0ada35c3c6470,
     type: 3}
   mask: {fileID: 0}
   countText: {fileID: 652254771}
