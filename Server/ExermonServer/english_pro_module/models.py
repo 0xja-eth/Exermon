@@ -976,12 +976,12 @@ class ExerProEnemy(BaseItem):
 # ===================================================
 #  特训状态表
 # ===================================================
-class ExerProStatus(BaseItem):
+class ExerProState(BaseItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训状态"
 
 	# 道具类型
-	TYPE = ItemType.ExerProStatus
+	TYPE = ItemType.ExerProState
 
 # endregion
 
@@ -1163,6 +1163,9 @@ class ExerProRecord(CacheableModel):
 
 	# 当前据点索引
 	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="当前据点索引")
+
+	# 是否完成据点事件
+	node_flag = models.BooleanField(default=False, verbose_name="是否完成据点事件")
 
 	# 单词等级（同时也是玩家在英语模块的等级）
 	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="单词等级")

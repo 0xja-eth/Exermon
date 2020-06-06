@@ -221,7 +221,7 @@ class ExerProEnemyAdmin(BaseItemAdmin):
 	inlines = [EnemyActionsInline, EnemyEffectsInline]
 
 
-@xadmin.sites.register(ExerProStatus)
+@xadmin.sites.register(ExerProState)
 class ExerProStatusAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \

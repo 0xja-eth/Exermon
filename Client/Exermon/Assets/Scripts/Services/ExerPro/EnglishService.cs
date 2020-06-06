@@ -14,13 +14,10 @@ using Core.Services;
 
 using ExerPro.EnglishModule.Data;
 
-/// <summary>
-/// 记录模块服务
-/// </summary>
 namespace ExerPro.EnglishModule.Services {
 
     /// <summary>
-    /// 记录服务
+    /// 基本服务
     /// </summary>
     public class EnglishService : BaseService<EnglishService> {
 
@@ -630,54 +627,68 @@ namespace ExerPro.EnglishModule.Services {
         }
         void switchNode(ExerProMapNode.Type type) {
             Debug.Log("switchNode: " + type);
-            switch (type) {
-                case ExerProMapNode.Type.Rest: onRestNode(); break;
-                case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
-                case ExerProMapNode.Type.Shop: onShopNode(); break;
-                case ExerProMapNode.Type.Story: onStoryNode(); break;
-                case ExerProMapNode.Type.Enemy: onEnemyNode(); break;
-                case ExerProMapNode.Type.Elite: onEliteNode(); break;
-                case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
-                case ExerProMapNode.Type.Boss: onBossNode(); break;
-            }
-            // 将下面这句删掉来测试具体的据点场景
-            exitNode(false);
+            if (!record.nodeFlag)
+                switch (type) {
+                    case ExerProMapNode.Type.Rest: onRestNode(); break;
+                    case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
+                    case ExerProMapNode.Type.Shop: onShopNode(); break;
+                    case ExerProMapNode.Type.Story: onStoryNode(); break;
+                    case ExerProMapNode.Type.Enemy: onEnemyNode(); break;
+                    case ExerProMapNode.Type.Elite: onEliteNode(); break;
+                    case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
+                    case ExerProMapNode.Type.Boss: onBossNode(); break;
+                }
+            else exitNode(false);
         }
 
         /// <summary>
         /// 休息据点
         /// </summary>
-        void onRestNode() { }
+        void onRestNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 藏宝据点
         /// </summary>
-        void onTreasureNode() { }
+        void onTreasureNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 商人据点
         /// </summary>
-        void onShopNode() { }
+        void onShopNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 剧情据点
         /// </summary>
-        void onStoryNode() { }
+        void onStoryNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 敌人据点
         /// </summary>
-        void onEnemyNode() { }
+        void onEnemyNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 精英据点
         /// </summary>
-        void onEliteNode() { }
+        void onEliteNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// Boss据点
         /// </summary>
-        void onBossNode() { }
+        void onBossNode() {
+            exitNode(false);
+        }
 
         /// <summary>
         /// 未知据点
@@ -709,6 +720,8 @@ namespace ExerPro.EnglishModule.Services {
         public void exitNode(bool pop = true) {
             if (pop) sceneSys.popScene();
             changeState(State.Idle);
+            record.nodeFlag = true;
+            saveExerPro();
         }
 
         #endregion
@@ -740,6 +753,7 @@ namespace ExerPro.EnglishModule.Services {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
+            record.nodeFlag = false;
             saveExerPro();
         }
 

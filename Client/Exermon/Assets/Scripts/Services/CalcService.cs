@@ -901,6 +901,108 @@ namespace GameModule.Services {
                 if (incr && ny < nodes[x + 1].Count - 1) ny++;
             }
         }
+
+        /// <summary>
+        /// 战斗敌人生成器
+        /// </summary>
+        public class BattleEnemiesGenerator {
+
+            /// <summary>
+            /// 常量定义
+            /// </summary>
+            const int MaxEnemyCols = 3; // 最大敌人列数
+            const int MaxEnemyRows = 3; // 最大敌人行数
+
+            /// <summary>
+            /// 内部变量定义
+            /// </summary>
+            ExerProMapStage stage;
+            RuntimeActor actor;
+
+            List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
+
+            /// <summary>
+            /// 生成
+            /// </summary>
+            /// <param name="actor">角色对象</param>
+            /// <param name="stage">关卡对象</param>
+            /// <param name="type">类型</param>
+            public static List<RuntimeEnemy> generate(RuntimeActor actor, 
+                ExerProMapStage stage, ExerProMapNode.Type type) {
+                var generator = new BattleEnemiesGenerator(actor, stage, type);
+
+                return generator.enemies;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            BattleEnemiesGenerator(RuntimeActor actor,
+                ExerProMapStage stage, ExerProMapNode.Type type) {
+                this.actor = actor; this.stage = stage;
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                        generateEnemies(); break;
+                    case ExerProMapNode.Type.Elite:
+                        generateElites(); break;
+                    case ExerProMapNode.Type.Boss:
+                        generateBoss(); break;
+                }
+            }
+
+            /// <summary>
+            /// 生成常规敌人
+            /// </summary>
+            void generateEnemies() {
+                _generateRandomEnemies(stage.normalEnemies());
+            }
+
+            /// <summary>
+            /// 生成精英敌人
+            /// </summary>
+            void generateElites() {
+                _generateRandomEnemies(stage.eliteEnemies());
+            }
+
+            /// <summary>
+            /// 随机生成敌人
+            /// </summary>
+            void _generateRandomEnemies(List<ExerProEnemy> enemies) {
+                var posCnt = MaxEnemyCols * MaxEnemyRows;
+                var enemyCnt = Math.Min(posCnt, enemies.Count);
+                var posVis = new bool[posCnt];
+                var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+
+                for (int i = 0; i < cnt; ++i) {
+                    var enemy = enemies[Random.Range(0, enemyCnt)];
+                    var pos = Random.Range(0, posCnt);
+                    while (posVis[pos]) pos = Random.Range(0, posCnt);
+                    posVis[pos] = true;
+
+                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                }
+            }
+
+            /// <summary>
+            /// 生成BOSS
+            /// </summary>
+            void generateBoss() {
+                var enemies = stage.bosses();
+                var posCnt = MaxEnemyCols * MaxEnemyRows;
+                var posVis = new bool[posCnt];
+
+                var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+
+                foreach(var enemy in enemies) {
+                    var pos = Random.Range(0, posCnt);
+                    while (posVis[pos]) pos = Random.Range(0, posCnt);
+                    posVis[pos] = true;
+
+                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                }
+            }
+
+        }
     }
 
 }

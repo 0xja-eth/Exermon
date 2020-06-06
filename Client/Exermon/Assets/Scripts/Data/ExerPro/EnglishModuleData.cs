@@ -228,7 +228,7 @@ namespace ExerPro.EnglishModule.Data {
     #endregion
 
     #region 物品
-
+    
     /// <summary>
     /// 特训效果数据
     /// </summary>
@@ -410,7 +410,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int type { get; protected set; }
         [AutoConvert]
-        public string character { get; protected set; }
+        public string character { get; protected set; } // 性格
 
         [AutoConvert]
         public Action[] actions { get; protected set; }
@@ -429,7 +429,15 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训状态数据
     /// </summary>
-    public class ExerProStatus : BaseItem { }
+    public class ExerProState : BaseItem {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public bool isNege { get; protected set; } // 是否负面
+
+    }
     
     #endregion
     
@@ -530,6 +538,27 @@ namespace ExerPro.EnglishModule.Data {
         /// 卡组
         /// </summary>
         public ExerProCardGroup cardGroup { get; set; }
+
+        /// <summary>
+        /// 抽出的牌
+        /// </summary>
+        List<ExerProPackCard> drawnCards = new List<ExerProPackCard>();
+
+        /// <summary>
+        /// 获取并清除抽取的卡牌
+        /// </summary>
+        public ExerProPackCard[] getDrawnCards() {
+            var res = drawnCards.ToArray();
+            drawnCards.Clear(); return res;
+        }
+
+        /// <summary>
+        /// 接收物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override void acceptItem(ExerProPackCard item) {
+            base.acceptItem(item); drawnCards.Add(item);
+        }
     }
 
     /// <summary>
@@ -703,8 +732,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         [AutoConvert]
         public int order { get; protected set; }
-        [AutoConvert]
-        public int[] enemies { get; protected set; }
+        [AutoConvert("enemies")]
+        public int[] _enemies { get; protected set; }
         [AutoConvert]
         public int maxBattleEnemies { get; protected set; }
         [AutoConvert]
@@ -722,125 +751,66 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProMap map { get; set; }
 
         /// <summary>
+        /// 缓存敌人集合
+        /// </summary>
+        List<ExerProEnemy> tmpEnemies;
+
+        /// <summary>
+        /// 敌人数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> enemies() {
+            if (tmpEnemies == null) {
+                if (_enemies == null) return null;
+                tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
+                foreach (var enemy in _enemies)
+                    tmpEnemies.Add(DataService.get().exerProEnemy(enemy));
+            }
+            return tmpEnemies;
+        }
+
+        /// <summary>
+        /// BOSS数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> bosses() {
+            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
+        }
+
+        /// <summary>
+        /// BOSS数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> normalEnemies() {
+            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Normal);
+        }
+
+        /// <summary>
+        /// BOSS数组
+        /// </summary>
+        /// <returns>返回敌人数组</returns>
+        public List<ExerProEnemy> eliteEnemies() {
+            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Elite);
+        }
+        /*
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ExerProMapStage() { }
-        public ExerProMapStage(int order, int[] enemies, int maxBattleEnemies,
+        public ExerProMapStage(int order, int[] _enemies, int maxBattleEnemies,
             int[] steps, int maxForkNode, int maxFork, int[] nodeRate) {
-            this.order = order; this.enemies = enemies;
+            this.order = order; this._enemies = _enemies;
             this.maxBattleEnemies = maxBattleEnemies;
             this.steps = steps; this.maxFork = maxFork;
             this.maxForkNode = maxForkNode;
             this.nodeRate = nodeRate;
         }
+        */
     }
 
     #endregion
 
     #region 储存信息
-
-    /// <summary>
-    /// 特训玩家
-    /// </summary>
-    public class ExerProActor : BaseData, MultParamsDisplay.IDisplayDataConvertable {
-
-        /// <summary>
-        /// 默认属性
-        /// </summary>
-        public const int DefaultMHP = 50; // 初始体力值
-        public const int DefaultPower = 5; // 初始力量
-        public const int DefaultDefense = 5; // 初始格挡
-        public const int DefaultAgile = 5; // 初始敏捷
-
-        public const int DefaultGold = 100; // 初始金币
-
-        const int EnglishSubjectId = 3;
-
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
-        public int mhp { get; protected set; } = DefaultMHP;
-        [AutoConvert]
-        public int hp { get; protected set; } = DefaultMHP;
-        [AutoConvert]
-        public int power { get; protected set; } = DefaultPower;
-        [AutoConvert]
-        public int defense { get; protected set; } = DefaultDefense;
-        [AutoConvert]
-        public int agile { get; protected set; } = DefaultAgile;
-
-        [AutoConvert]
-        public int gold { get; protected set; } = DefaultGold;
-
-        [AutoConvert]
-        public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
-        [AutoConvert]
-        public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
-        [AutoConvert]
-        public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
-
-        /// <summary>
-        /// 对应的艾瑟萌槽项
-        /// </summary>
-        public ExerSlotItem slotItem { get; protected set; } = null;
-
-        #region 数据转化
-
-        /// <summary>
-        /// 转化为显示数据
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns></returns>
-        public JsonData convertToDisplayData(string type = "") {
-            switch (type) {
-                case "hp": return convertHp();
-                default: return toJson();
-            }
-        }
-
-        /// <summary>
-        /// 转化状态
-        /// </summary>
-        /// <returns></returns>
-        JsonData convertHp() {
-            var res = new JsonData();
-
-            res["hp"] = hp; res["mhp"] = mhp;
-            res["rate"] = hp * 1.0 / mhp;
-
-            return res;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 重置
-        /// </summary>
-        public void reset() {
-            mhp = hp = DefaultMHP;
-            power = DefaultPower;
-            defense = DefaultDefense;
-            agile = DefaultAgile;
-            gold = DefaultGold;
-        }
-
-        /// <summary>
-        /// 配置玩家
-        /// </summary>
-        /// <param name="player"></param>
-        public void setupPlayer(Player player) {
-            slotItem = player.getExerSlotItem(EnglishSubjectId);
-        }
-
-        ///// <summary>
-        ///// 构造函数
-        ///// </summary>
-        //public ExerProActor() { }
-        //public ExerProActor(Player player) {
-        //    setupPlayer(player);
-        //}
-    }
 
     /// <summary>
     /// 特训记录
@@ -879,17 +849,23 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int curIndex { get; protected set; } = -1; // 当前节点索引
         [AutoConvert]
-        public ExerProActor actor { get; protected set; } = null;
+        public bool nodeFlag { get; set; } = false; // 是否完成据点事件
+        [AutoConvert]
+        public RuntimeActor actor { get; protected set; } = null;
 
         /// <summary>
         /// 单词轮属性
         /// </summary>
         [AutoConvert]
         public int wordLevel { get; protected set; } = 1;
-        [AutoConvert]
-        public int next { get; set; } = 0; // 下一个单词ID
-        [AutoConvert]
+
+        [AutoConvert(autoConvert = false)]
         public List<WordRecord> wordRecords { get; protected set; }
+
+        /// <summary>
+        /// 下一单词ID
+        /// </summary>
+        public int next { get; set; } = 0;
 
         /*
         [AutoConvert]
@@ -982,7 +958,7 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProMapStage stage() {
             return map()?.stage(stageOrder);
         }
-
+        /*
         /// <summary>
         /// 敌人数组
         /// </summary>
@@ -1005,7 +981,7 @@ namespace ExerPro.EnglishModule.Data {
         public List<ExerProEnemy> bosses() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
         }
-
+        */
         /// <summary>
         /// 获取据点对象
         /// </summary>
@@ -1060,6 +1036,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public Word nextWord() {
+            if (next <= 0) return wordRecords[0].word();
             return EnglishService.get().getQuestion<Word>(next);
         }
 
@@ -1262,7 +1239,7 @@ namespace ExerPro.EnglishModule.Data {
             var player = PlayerService.get().player;
             if (player == null) return;
 
-            actor = actor ?? new ExerProActor();
+            actor = actor ?? new RuntimeActor();
             actor.setupPlayer(player);
         }
 
@@ -1467,6 +1444,820 @@ namespace ExerPro.EnglishModule.Data {
             typeId = (int)type; 
 
             generatePosition();
+        }
+    }
+
+    #endregion
+
+    #region 运行时数据
+
+    /// <summary>
+    /// 运行时BUFF
+    /// </summary>
+    public class RuntimeBuff : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int paramId { get; protected set; } // 属性ID
+        [AutoConvert]
+        public int value { get; protected set; } // 改变数值
+        [AutoConvert]
+        public double rate { get; protected set; } // 改变比率
+        [AutoConvert]
+        public int turns { get; protected set; } // BUFF回合
+
+        /// <summary>
+        /// 是否为Debuff
+        /// </summary>
+        /// <returns></returns>
+        public bool isDebuff() {
+            return value < 0 || rate < 1;
+        }
+
+        /// <summary>
+        /// BUFF是否过期
+        /// </summary>
+        /// <returns></returns>
+        public bool isOutOfDate() {
+            return turns <= 0;
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeBuff() { }
+        public RuntimeBuff(int paramId, 
+            int value = 0, double rate = 1, int turns=0) {
+            this.paramId = paramId; this.value = value;
+            this.rate = rate; this.turns = turns;
+        }
+
+    }
+
+    /// <summary>
+    /// 运行时状态
+    /// </summary>
+    public class RuntimeState : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int stateId { get; protected set; } // 状态ID
+        [AutoConvert]
+        public int turns { get; protected set; } // 状态回合
+
+        /// <summary>
+        /// 获取状态
+        /// </summary>
+        /// <returns></returns>
+        public ExerProState state() {
+            return DataService.get().exerProState(stateId);
+        }
+
+        /// <summary>
+        /// 是否为负面状态
+        /// </summary>
+        /// <returns></returns>
+        public bool isNege() {
+            return state().isNege;
+        }
+
+        /// <summary>
+        /// 状态是否过期
+        /// </summary>
+        /// <returns></returns>
+        public bool isOutOfDate() {
+            return turns <= 0;
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeState() { }
+        public RuntimeState(int stateId, int turns = 0) {
+            this.stateId = stateId; this.turns = turns;
+        }
+
+    }
+
+    /// <summary>
+    /// 运行时战斗者
+    /// </summary>
+    public abstract class RuntimeBattler : BaseData, ParamDisplay.IDisplayDataConvertable {
+
+        /// <summary>
+        /// 属性ID约定
+        /// </summary>
+        public const int MHPParamId = 1;
+        public const int PowerParamId = 2;
+        public const int DefenseParamId = 3;
+        public const int AgileParamId = 4;
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int hp { get; protected set; }
+
+        /// <summary>
+        /// 状态和BUFF
+        /// </summary>
+        [AutoConvert]
+        public List<RuntimeState> states { get; protected set; } = new List<RuntimeState>();
+        [AutoConvert]
+        public List<RuntimeBuff> buffs { get; protected set; } = new List<RuntimeBuff>();
+
+        #region 数据转化
+
+        /// <summary>
+        /// 转化为显示数据
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public virtual JsonData convertToDisplayData(string type = "") {
+            switch (type) {
+                case "hp": return convertHp();
+                default: return toJson();
+            }
+        }
+
+        /// <summary>
+        /// 转化状态
+        /// </summary>
+        /// <returns></returns>
+        JsonData convertHp() {
+            var res = new JsonData();
+
+            res["hp"] = hp; res["mhp"] = mhp();
+            res["rate"] = hp * 1.0 / mhp();
+
+            return res;
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        #region 属性控制
+
+        #region 属性快捷定义
+
+        /// <summary>
+        /// 最大生命值
+        /// </summary>
+        /// <returns></returns>
+        public int mhp() {
+            return param(MHPParamId);
+        }
+
+        /// <summary>
+        /// 力量
+        /// </summary>
+        /// <returns></returns>
+        public int power() {
+            return param(PowerParamId);
+        }
+
+        /// <summary>
+        /// 格挡
+        /// </summary>
+        /// <returns></returns>
+        public int defense() {
+            return param(DefenseParamId);
+        }
+
+        /// <summary>
+        /// 敏捷
+        /// </summary>
+        /// <returns></returns>
+        public int agile() {
+            return param(AgileParamId);
+        }
+
+        /// <summary>
+        /// 基础最大生命值
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int baseMHP() { return 0; }
+
+        /// <summary>
+        /// 基础力量
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int basePower() { return 0; }
+
+        /// <summary>
+        /// 基础格挡
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int baseDefense() { return 0; }
+
+        /// <summary>
+        /// 基础敏捷
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int baseAgile() { return 0; }
+
+        #endregion
+
+        #region HP控制
+
+        /// <summary>
+        /// 改变HP
+        /// </summary>
+        /// <param name="value">目标值</param>
+        public void changeHP(int value) {
+            hp = Mathf.Clamp(value, 0, mhp());
+            if (hp <= 0) onDie();
+        }
+
+        /// <summary>
+        /// 增加HP
+        /// </summary>
+        /// <param name="value">增加值</param>
+        public void addHP(int value) {
+            changeHP(hp + value);
+        }
+
+        /// <summary>
+        /// 增加HP
+        /// </summary>
+        /// <param name="rate">增加率</param>
+        public void addHP(double rate) {
+            changeHP((int)Math.Round(hp * rate));
+        }
+
+        /// <summary>
+        /// 死亡回调
+        /// </summary>
+        protected virtual void onDie() { }
+
+        #endregion
+
+        #region 属性统一接口
+
+        /// <summary>
+        /// 基本属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性值</returns>
+        public virtual int baseParam(int paramId) {
+            switch (paramId) {
+                case MHPParamId: return baseMHP();
+                case PowerParamId: return basePower();
+                case DefenseParamId: return baseDefense();
+                case AgileParamId: return baseAgile();
+                default: return 0;
+            }
+        }
+
+        /// <summary>
+        /// Buff附加值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public int buffValue(int paramId) {
+            int value = 0;
+            foreach (var buff in buffs)
+                if (!buff.isOutOfDate()) value += buff.value;
+            return value;
+        }
+
+        /// <summary>
+        /// Buff附加率
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public double buffRate(int paramId) {
+            double rate = 1;
+            foreach (var buff in buffs)
+                if (!buff.isOutOfDate()) rate *= buff.rate;
+            return rate;
+        }
+
+        /// <summary>
+        /// 额外属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public virtual int extraParam(int paramId) {
+            return 0;
+        }
+
+        /// <summary>
+        /// 属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性值</returns>
+        public int param(int paramId) {
+            var base_ = baseParam(paramId);
+            var rate = buffRate(paramId);
+            var value = buffValue(paramId);
+            var extra = extraParam(paramId);
+            return (int)Math.Round(base_ * rate + value + extra);
+        }
+        
+        /// <summary>
+        /// 属性相加
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">增加值</param>
+        public void addParam(int paramId, int value) {
+            addBuff(paramId, value);
+        }
+
+        /// <summary>
+        /// 属性相乘
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="rate">比率</param>
+        public void multParam(int paramId, double rate) {
+            addBuff(paramId, 0, rate);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Buff控制
+
+        /// <summary>
+        /// BUFF添加回调
+        /// </summary>
+        public virtual void onBuffAdded(RuntimeBuff buff) { }
+
+        /// <summary>
+        /// BUFF移除回调
+        /// </summary>
+        public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
+
+        /// <summary>
+        /// 添加Buff
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">变化值</param>
+        /// <param name="rate">变化率</param>
+        /// <param name="turns">持续回合</param>
+        /// <returns>返回添加的Buff</returns>
+        public RuntimeBuff addBuff(int paramId, 
+            int value = 0, double rate = 1, int turns = 0) {
+            var buff = new RuntimeBuff(paramId, value, rate, turns);
+            buffs.Add(buff); onBuffAdded(buff);
+            return buff;
+        }
+
+        /// <summary>
+        /// 移除Buff
+        /// </summary>
+        /// <param name="index">Buff索引</param>
+        public void removeBuff(int index, bool force = false) {
+            var buff = buffs[index];
+            buffs.RemoveAt(index);
+            onBuffRemoved(buff, force);
+        }
+        /// <param name="buff">Buff对象</param>
+        public void removeBuff(RuntimeBuff buff, bool force = false) {
+            buffs.Remove(buff);
+            onBuffRemoved(buff, force);
+        }
+
+        /// <summary>
+        /// 移除多个满足条件的Buff
+        /// </summary>
+        /// <param name="p">条件</param>
+        public void removeBuffs(Predicate<RuntimeBuff> p, bool force = true) {
+            for (int i = buffs.Count() - 1; i >= 0; --i)
+                if (p(buffs[i])) removeBuff(i, force);
+        }
+
+        /// <summary>
+        /// 清除所有Debuff
+        /// </summary>
+        public void removeDebuffs(bool force = true) {
+            removeBuffs(buff => buff.isDebuff(), force);
+        }
+
+        /// <summary>
+        /// 清除所有Buff
+        /// </summary>
+        public void clearBuffs(bool force = true) {
+            for (int i = buffs.Count() - 1; i >= 0; --i)
+                removeBuff(i, force);
+        }
+
+        #endregion
+
+        #region 状态控制
+
+        /// <summary>
+        /// 状态添加回调
+        /// </summary>
+        public virtual void onStateAdded(RuntimeState state) { }
+
+        /// <summary>
+        /// 状态解除回调
+        /// </summary>
+        public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
+
+        /// <summary>
+        /// 添加状态
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">变化值</param>
+        /// <param name="rate">变化率</param>
+        /// <param name="turns">持续回合</param>
+        /// <returns>返回添加的Buff</returns>
+        public RuntimeState addState(int stateId, int turns = 0) {
+            var state = new RuntimeState(stateId, turns);
+            states.Add(state); onStateAdded(state);
+            return state;
+        }
+
+        /// <summary>
+        /// 移除状态
+        /// </summary>
+        /// <param name="index">Buff索引</param>
+        public void removeState(int index, bool force = false) {
+            var state = states[index];
+            states.RemoveAt(index);
+            onStateRemoved(state, force);
+        }
+        /// <param name="buff">Buff对象</param>
+        public void removeState(RuntimeState state, bool force = false) {
+            states.Remove(state);
+            onStateRemoved(state, force);
+        }
+
+        /// <summary>
+        /// 移除多个满足条件的状态
+        /// </summary>
+        /// <param name="p">条件</param>
+        public void removeStates(Predicate<RuntimeState> p, bool force = true) {
+            for (int i = states.Count() - 1; i >= 0; --i)
+                if (p(states[i])) removeState(i, force);
+        }
+
+        /// <summary>
+        /// 清除所有Debuff
+        /// </summary>
+        public void removeNegeStates() {
+            removeStates(state => state.isNege());
+        }
+
+        /// <summary>
+        /// 清除所有Buff
+        /// </summary>
+        public void clearStates(bool force = true) {
+            for (int i = states.Count() - 1; i >= 0; --i)
+                removeState(i, force);
+        }
+
+        #endregion
+
+        #region 结果控制
+
+        /// <summary>
+        /// 当前结果
+        /// </summary>
+        RuntimeActionResult currentResult = null;
+
+        /// <summary>
+        /// 应用结果
+        /// </summary>
+        /// <param name="result"></param>
+        public void applyResult(RuntimeActionResult result) {
+            currentResult = result;
+            // TODO: 结果应用
+        }
+
+        /// <summary>
+        /// 获取当前结果
+        /// </summary>
+        /// <returns></returns>
+        public RuntimeActionResult getResult() {
+            var res = currentResult;
+            currentResult = null;
+            return res;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        public virtual void reset() {
+            hp = mhp();
+            clearStates();
+            clearBuffs();
+        }
+
+        #endregion
+
+    }
+
+    /// <summary>
+    /// 特训玩家
+    /// </summary>
+    public class RuntimeActor : RuntimeBattler {
+
+        /// <summary>
+        /// 默认属性
+        /// </summary>
+        public const int DefaultMHP = 50; // 初始体力值
+        public const int DefaultPower = 5; // 初始力量
+        public const int DefaultDefense = 5; // 初始格挡
+        public const int DefaultAgile = 5; // 初始敏捷
+
+        public const int DefaultGold = 100; // 初始金币
+
+        const int EnglishSubjectId = 3; // 英语科目ID
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert("mhp")]
+        public int _mhp { get; protected set; }
+        [AutoConvert("power")]
+        public int _power { get; protected set; }
+        [AutoConvert("defense")]
+        public int _defense { get; protected set; }
+        [AutoConvert("agile")]
+        public int _agile { get; protected set; }
+
+        [AutoConvert]
+        public int gold { get; protected set; }
+
+        [AutoConvert]
+        public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
+        [AutoConvert]
+        public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
+        [AutoConvert]
+        public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
+
+        /// <summary>
+        /// 对应的艾瑟萌槽项
+        /// </summary>
+        public ExerSlotItem slotItem { get; protected set; } = null;
+
+        #region 数据转化
+
+        ///// <summary>
+        ///// 转化为显示数据
+        ///// </summary>
+        ///// <param name="type">类型</param>
+        ///// <returns></returns>
+        //public JsonData convertToDisplayData(string type = "") {
+        //    switch (type) {
+        //        case "hp": return convertHp();
+        //        default: return toJson();
+        //    }
+        //}
+
+        #endregion
+
+        #region 属性定义
+
+        /// <summary>
+        /// 基础最大生命值
+        /// </summary>
+        /// <returns></returns>
+        protected override int baseMHP() { return _mhp; }
+
+        /// <summary>
+        /// 基础力量
+        /// </summary>
+        /// <returns></returns>
+        protected override int basePower() { return _power; }
+
+        /// <summary>
+        /// 基础格挡
+        /// </summary>
+        /// <returns></returns>
+        protected override int baseDefense() { return _defense; }
+
+        /// <summary>
+        /// 基础敏捷
+        /// </summary>
+        /// <returns></returns>
+        protected override int baseAgile() { return _agile; }
+
+        #endregion
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        public override void reset() {
+            _mhp = DefaultMHP;
+            _power = DefaultPower;
+            _defense = DefaultDefense;
+            _agile = DefaultAgile;
+            gold = DefaultGold;
+            base.reset();
+        }
+
+        /// <summary>
+        /// 配置玩家
+        /// </summary>
+        /// <param name="player"></param>
+        public void setupPlayer(Player player) {
+            slotItem = player.getExerSlotItem(EnglishSubjectId);
+        }
+
+        ///// <summary>
+        ///// 构造函数
+        ///// </summary>
+        //public ExerProActor() { }
+        //public ExerProActor(Player player) {
+        //    setupPlayer(player);
+        //}
+    }
+
+    /// <summary>
+    /// 运行时敌人数据
+    /// </summary>
+    public class RuntimeEnemy : RuntimeBattler {
+
+        /// <summary>
+        /// 最大偏移量
+        /// </summary>
+        const int MaxXOffset = 24;
+        const int MaxYOffset = 16;
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int pos { get; protected set; }
+        [AutoConvert]
+        public int xOffset { get; protected set; }
+        [AutoConvert]
+        public int yOffset { get; protected set; }
+
+        [AutoConvert]
+        public int enemyId { get; protected set; }
+
+        /// <summary>
+        /// 缓存敌人对象
+        /// </summary>
+        ExerProEnemy tempEnemy = null;
+
+        #region 数据控制
+
+        #region 属性控制
+
+        /// <summary>
+        /// 最大体力值
+        /// </summary>
+        /// <returns></returns>
+        protected override int baseMHP() {
+            return enemy().mhp;
+        }
+
+        /// <summary>
+        /// 力量
+        /// </summary>
+        /// <returns></returns>
+        protected override int basePower() {
+            return enemy().power;
+        }
+
+        /// <summary>
+        /// 格挡
+        /// </summary>
+        /// <returns></returns>
+        protected override int baseDefense() {
+            return enemy().defense;
+        }
+        
+        #endregion
+
+        /// <summary>
+        /// 敌人
+        /// </summary>
+        /// <returns></returns>
+        public ExerProEnemy enemy() {
+            if (tempEnemy != null) return tempEnemy;
+            return tempEnemy = DataService.get().exerProEnemy(enemyId);
+        }
+
+        /// <summary>
+        /// 生成位置
+        /// </summary>
+        public void generatePosition() {
+            xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
+            yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
+        }
+        
+        #endregion
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeEnemy() { }
+        public RuntimeEnemy(int pos, ExerProEnemy enemy) {
+            tempEnemy = enemy; enemyId = enemy.id;
+            this.pos = pos;
+
+            generatePosition();
+            reset();
+        }
+
+    }
+
+    /// <summary>
+    /// 运行时行动
+    /// </summary>
+    public class RuntimeAction : BaseData {
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public RuntimeBattler subject { get; protected set; } // 主体
+        [AutoConvert]
+        public RuntimeBattler[] objects { get; protected set; } // 对象
+        [AutoConvert]
+        public ExerProEffectData[] effects { get; protected set; } // 效果
+
+        /// <summary>
+        /// 结果
+        /// </summary>
+        [AutoConvert]
+        public List<RuntimeActionResult> results { get; protected set; } = new List<RuntimeActionResult>();
+
+        /// <summary>
+        /// 生成结果
+        /// </summary>
+        void generateResults() {
+            // TODO: 结果生成
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeAction() { }
+        public RuntimeAction(RuntimeBattler subject,
+            RuntimeBattler[] objects, ExerProEffectData[] effects = null) {
+            this.subject = subject; this.objects = objects;
+            this.effects = effects ?? new ExerProEffectData[0];
+            generateResults();
+        }
+        public RuntimeAction(RuntimeBattler subject,
+            RuntimeBattler[] objects, BaseExerProItem item) :
+            this(subject, objects, item.effects) { }
+    }
+
+    /// <summary>
+    /// 运行时行动结果
+    /// </summary>
+    public class RuntimeActionResult : BaseData {
+
+        /// <summary>
+        /// 状态改变
+        /// </summary>
+        public class StateChange : RuntimeState {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public bool remove { get; protected set; } // 是否移除状态（turns为0时移除全部回合）
+
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int hpDamage { get; protected set; }
+        [AutoConvert]
+        public int hpRecover { get; protected set; }
+        [AutoConvert]
+        public int hpDrain { get; protected set; }
+
+        [AutoConvert]
+        public StateChange[] stateChanges { get; protected set; }
+        [AutoConvert]
+        public RuntimeBuff[] addBuffs { get; protected set; }
+
+        /// <summary>
+        /// 行动
+        /// </summary>
+        public RuntimeAction action { get; protected set; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeActionResult() { }
+        public RuntimeActionResult(RuntimeAction action,
+            int damage, int recover, int drain,
+            StateChange[] states, RuntimeBuff[] buffs) {
+            this.action = action;
+            hpDamage = damage; hpRecover = recover; hpDrain = drain;
+            stateChanges = states; addBuffs = buffs;
         }
     }
 

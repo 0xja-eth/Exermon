@@ -42,7 +42,7 @@ class ItemType(Enum):
 	ExerProCard = 303  # 特训卡片
 
 	ExerProEnemy = 310  # 特训敌人
-	ExerProStatus = 311  # 特训状态
+	ExerProState = 311  # 特训状态
 
 
 # ===================================================
@@ -257,7 +257,7 @@ class BaseItem(models.Model):
 		(ItemType.ExerProCard.value, '特训卡片'),
 
 		(ItemType.ExerProEnemy.value, '特训敌人'),
-		(ItemType.ExerProStatus.value, '特训状态'),
+		(ItemType.ExerProState.value, '特训状态'),
 	]
 
 	# 道具类型
