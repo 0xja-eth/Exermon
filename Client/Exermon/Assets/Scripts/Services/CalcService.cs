@@ -1346,20 +1346,52 @@ namespace GameModule.Services {
             /// <summary>
             /// 属性
             /// </summary>
-            RuntimeEnemy enemy;
+            int round;
+            RuntimeEnemy runtimeEnemy;
+
+            ExerProEnemy enemy;
+            ExerProEnemy.Action[] actions;
 
             /// <summary>
             /// 计算
             /// </summary>
-            public static void calc(RuntimeEnemy enemy) {
-                var calc = new EnemyNextCalc(enemy);
+            public static ExerProEnemy.Action calc(int round, RuntimeEnemy enemy) {
+                var calc = new EnemyNextCalc(round, enemy);
+                return calc.generateAction();
             }
 
             /// <summary>
             /// 构造函数
             /// </summary>
-            EnemyNextCalc(RuntimeEnemy enemy) {
-                this.enemy = enemy;
+            EnemyNextCalc(int round, RuntimeEnemy enemy) {
+                this.round = round; runtimeEnemy = enemy;
+                this.enemy = enemy.enemy();
+
+                actions = filterActions(this.enemy.actions);
+            }
+
+            /// <summary>
+            /// 过滤行动
+            /// </summary>
+            /// <returns>过滤后的行动列表</returns>
+            ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
+                var res = new List<ExerProEnemy.Action>();
+                foreach (var action in actions)
+                    if (action.testRound(round)) res.Add(action);
+                return res.ToArray();
+            }
+
+            /// <summary>
+            /// 生成行动
+            /// </summary>
+            ExerProEnemy.Action generateAction() {
+                var list = new List<int>();
+                for(var i = 0; i < actions.Length; ++i) {
+                    var action = actions[i];
+                    for (var j = 0; j < action.rate; ++j) list.Add(i);
+                }
+                var index = Random.Range(0, list.Count);
+                return actions[list[index]];
             }
         }
     }

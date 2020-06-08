@@ -394,7 +394,7 @@ namespace ExerPro.EnglishModule.Data {
             /// 属性
             /// </summary>
             [AutoConvert]
-            public int round { get; protected set; }
+            public int[] rounds { get; protected set; }
             [AutoConvert]
             public int type { get; protected set; }
             [AutoConvert("params")]
@@ -402,6 +402,16 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public int rate { get; protected set; }
 
+            /// <summary>
+            /// 测试回合
+            /// </summary>
+            /// <param name="round">回合</param>
+            /// <returns>返回指定回合能否发动本行动</returns>
+            public bool testRound(int round) {
+                if (rounds.Length <= 0) return true;
+                foreach (var r in rounds) if (r == round) return true;
+                return false;
+            }
         }
 
         /// <summary>
@@ -2388,8 +2398,8 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 计算下一步
         /// </summary>
-        public void calcNext() {
-            CalcService.EnemyNextCalc.calc(this);
+        public void calcNext(int round) {
+            currentAction = CalcService.EnemyNextCalc.calc(round, this);
         }
 
         #endregion

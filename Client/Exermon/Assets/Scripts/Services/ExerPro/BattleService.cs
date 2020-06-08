@@ -65,6 +65,8 @@ namespace ExerPro.EnglishModule.Services {
         int corrCnt = 0, bonusCnt = 0;
         bool bonus = false;
 
+        int round = 0;
+
         #region 初始化
 
         /// <summary>
@@ -269,7 +271,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 计算敌人下一步行动
         /// </summary>
         void calcEnemyNext(RuntimeEnemy enemy) {
-            enemy.calcNext();
+            enemy.calcNext(round);
         }
 
         /// <summary>

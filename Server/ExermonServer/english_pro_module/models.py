@@ -870,7 +870,7 @@ class EnemyAction(models.Model):
 	]
 
 	# 回合
-	round = jsonfield.JSONField(default=[], verbose_name="回合")
+	rounds = jsonfield.JSONField(default=[], verbose_name="回合")
 
 	# 类型
 	type = models.PositiveSmallIntegerField(default=EnemyActionType.Unset.value,
@@ -892,7 +892,7 @@ class EnemyAction(models.Model):
 			返回转化后的字典
 		"""
 		return {
-			'round': self.round,
+			'rounds': self.rounds,
 			'type': self.type,
 			'params': self.params,
 			'rate': self.rate,
