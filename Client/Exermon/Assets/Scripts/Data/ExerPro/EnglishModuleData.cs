@@ -248,16 +248,22 @@ namespace ExerPro.EnglishModule.Data {
             Recover = 100, // 回复体力值
             AddParam = 200, // 增加能力值
             AddParamUrgent = 201, // 增加能力值（紧急按钮）
+
             TempAddParam = 210, // 临时增加能力值
-            AddStatus = 220, // 增加状态
-            GetCards = 300, // 抽取卡牌
-            RemoveCards = 310, // 移除卡牌
+
+            AddState = 220, // 增加状态
+            RemoveState = 221, // 移除状态
+            RemoveNegaState = 222, // 移除消极状态
+
+            DrawCards = 300, // 抽取卡牌
+            ConsumeCards = 310, // 消耗卡牌
+
             ChangeCost = 400, // 更改耗能
             ChangeCostDisc = 401, // 更改耗能（发现）
             ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
-            Sadistic = 500, // 残虐天性
-            ForceAddStatus = 600, // 增加己方状态
+            Sadistic = 1000, // 残虐天性
+            ForceAddStatus = 1100, // 增加己方状态
         }
 
         /// <summary>
@@ -435,7 +441,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 属性
         /// </summary>
         [AutoConvert]
-        public bool isNege { get; protected set; } // 是否负面
+        public int maxTurns { get; protected set; } // 最大状态叠加回合数
+        [AutoConvert]
+        public bool isNega { get; protected set; } // 是否负面
 
     }
     
@@ -647,11 +655,21 @@ namespace ExerPro.EnglishModule.Data {
         public void discardCard(ExerProPackCard card) {
             handGroup.transferItem(discardGroup, card);
         }
+        public void discardCard() {
+            var card = handGroup.getRandomItem(); // 随机
+            if (card == null) return;
+            handGroup.transferItem(discardGroup, card);
+        }
 
         /// <summary>
         /// 消耗牌（本次战斗不再出现）
         /// </summary>
         public void consumeCard(ExerProPackCard card) {
+            handGroup.transferItem(this, card);
+        }
+        public void consumeCard() {
+            var card = handGroup.getRandomItem(); // 随机
+            if (card == null) return;
             handGroup.transferItem(this, card);
         }
 
@@ -1481,7 +1499,14 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public bool isOutOfDate() {
-            return turns <= 0;
+            return turns == 0;
+        }
+
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        public void onRoundEnd() {
+            if (turns > 0) turns--;
         }
 
         /// <summary>
@@ -1521,8 +1546,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 是否为负面状态
         /// </summary>
         /// <returns></returns>
-        public bool isNege() {
-            return state().isNege;
+        public bool isNega() {
+            return state().isNega;
         }
 
         /// <summary>
@@ -1531,6 +1556,29 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public bool isOutOfDate() {
             return turns <= 0;
+        }
+
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        public void onRoundEnd() {
+            if (turns > 0) turns--;
+        }
+
+        /// <summary>
+        /// 移除状态
+        /// </summary>
+        /// <param name="turns">回合数</param>
+        public void remove(int turns) {
+            this.turns -= turns;
+        }
+
+        /// <summary>
+        /// 增加状态
+        /// </summary>
+        /// <param name="turns">回合数</param>
+        public void add(int turns) {
+            this.turns += turns;
         }
 
         /// <summary>
@@ -1566,7 +1614,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 状态和BUFF
         /// </summary>
         [AutoConvert]
-        public List<RuntimeState> states { get; protected set; } = new List<RuntimeState>();
+        public Dictionary<int, RuntimeState> states { get; protected set; } = new Dictionary<int, RuntimeState>();
         [AutoConvert]
         public List<RuntimeBuff> buffs { get; protected set; } = new List<RuntimeBuff>();
 
@@ -1794,6 +1842,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
 
+        #region Buff变更
+
         /// <summary>
         /// 添加Buff
         /// </summary>
@@ -1802,9 +1852,11 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="rate">变化率</param>
         /// <param name="turns">持续回合</param>
         /// <returns>返回添加的Buff</returns>
-        public RuntimeBuff addBuff(int paramId, 
+        public RuntimeBuff addBuff(int paramId,
             int value = 0, double rate = 1, int turns = 0) {
-            var buff = new RuntimeBuff(paramId, value, rate, turns);
+            return addBuff(new RuntimeBuff(paramId, value, rate, turns));
+        }
+        public RuntimeBuff addBuff(RuntimeBuff buff) {
             buffs.Add(buff); onBuffAdded(buff);
             return buff;
         }
@@ -1848,6 +1900,53 @@ namespace ExerPro.EnglishModule.Data {
                 removeBuff(i, force);
         }
 
+        /// <summary>
+        /// 是否处于指定条件的Buff
+        /// </summary>
+        public bool containsBuff(int paramId) {
+            return buffs.Exists(buff => buff.paramId == paramId);
+        }
+        public bool containsBuff(Predicate<RuntimeBuff> p) {
+            return buffs.Exists(p);
+        }
+
+        #endregion
+
+        #region Buff判断
+
+        /// <summary>
+        /// 是否处于指定条件的Debuff
+        /// </summary>
+        public bool containsDebuff(int paramId) {
+            return buffs.Exists(buff => buff.isDebuff() && buff.paramId == paramId);
+        }
+
+        /// <summary>
+        /// 是否存在Debuff
+        /// </summary>
+        public bool anyDebuff() {
+            return buffs.Exists(buff => buff.isDebuff());
+        }
+
+        /// <summary>
+        /// 获取指定条件的Buff
+        /// </summary>
+        public RuntimeBuff getBuff(int paramId) {
+            return buffs.Find(buff => buff.paramId == paramId);
+        }
+        public RuntimeBuff getBuff(Predicate<RuntimeBuff> p) {
+            return buffs.Find(p);
+        }
+
+        /// <summary>
+        /// 获取指定条件的Buff（多个）
+        /// </summary>
+        public List<RuntimeBuff> getBuffs(Predicate<RuntimeBuff> p) {
+            return buffs.FindAll(p);
+        }
+
+        #endregion
+
         #endregion
 
         #region 状态控制
@@ -1862,6 +1961,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
 
+        #region 状态变更
+
         /// <summary>
         /// 添加状态
         /// </summary>
@@ -1871,24 +1972,43 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="turns">持续回合</param>
         /// <returns>返回添加的Buff</returns>
         public RuntimeState addState(int stateId, int turns = 0) {
-            var state = new RuntimeState(stateId, turns);
-            states.Add(state); onStateAdded(state);
+            RuntimeState state;
+
+            if (states.ContainsKey(stateId)) {
+                state = states[stateId];
+                state.add(turns);
+            } else {
+                state = new RuntimeState(stateId, turns);
+                states.Add(stateId, state);
+                onStateAdded(state);
+            }
+
             return state;
         }
 
         /// <summary>
         /// 移除状态
         /// </summary>
-        /// <param name="index">Buff索引</param>
-        public void removeState(int index, bool force = false) {
-            var state = states[index];
-            states.RemoveAt(index);
-            onStateRemoved(state, force);
+        /// <param name="stateId">状态ID</param>
+        /// <param name="turns">移除回合数</param>
+        public RuntimeState removeState(int stateId, int turns = 0, bool force = false) {
+            if (!containsState(stateId)) return null;
+            var state = states[stateId];
+
+            if (turns <= 0) {
+                states.Remove(stateId);
+                onStateRemoved(state, force);
+            } else {
+                state.remove(turns);
+                if (state.isOutOfDate())
+                    removeState(stateId, force: force);
+            }
+
+            return state;
         }
         /// <param name="buff">Buff对象</param>
-        public void removeState(RuntimeState state, bool force = false) {
-            states.Remove(state);
-            onStateRemoved(state, force);
+        public RuntimeState removeState(RuntimeState state, int turns = 0, bool force = false) {
+            return removeState(state.stateId, turns, force);
         }
 
         /// <summary>
@@ -1897,23 +2017,70 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="p">条件</param>
         public void removeStates(Predicate<RuntimeState> p, bool force = true) {
             for (int i = states.Count() - 1; i >= 0; --i)
-                if (p(states[i])) removeState(i, force);
+                if (p(states[i])) removeState(i, force: force);
         }
 
         /// <summary>
         /// 清除所有Debuff
         /// </summary>
         public void removeNegeStates() {
-            removeStates(state => state.isNege());
+            removeStates(state => state.isNega());
         }
 
         /// <summary>
-        /// 清除所有Buff
+        /// 清除所有状态
         /// </summary>
         public void clearStates(bool force = true) {
-            for (int i = states.Count() - 1; i >= 0; --i)
-                removeState(i, force);
+            foreach (var pair in states)
+                removeState(pair.Value, force: force);
         }
+
+        #endregion
+
+        #region 状态判断
+
+        /// <summary>
+        /// 是否处于指定条件的状态
+        /// </summary>
+        public bool containsState(int stateId) {
+            return states.ContainsKey(stateId);
+        }
+        public bool containsState(Predicate<RuntimeState> p) {
+            foreach(var pair in states)
+                if (p(pair.Value)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// 是否存在负面状态
+        /// </summary>
+        public bool anyNegaState() {
+            return containsState(state => state.isNega());
+        }
+
+        /// <summary>
+        /// 获取指定条件的状态
+        /// </summary>
+        public RuntimeState getState(int stateId) {
+            return states[stateId];
+        }
+        public RuntimeState getState(Predicate<RuntimeState> p) {
+            foreach (var pair in states)
+                if (p(pair.Value)) return pair.Value;
+            return null;
+        }
+
+        /// <summary>
+        /// 获取指定条件的状态（多个）
+        /// </summary>
+        public List<RuntimeState> getStates(Predicate<RuntimeState> p) {
+            var res = new List<RuntimeState>();
+            foreach (var pair in states)
+                if (p(pair.Value)) res.Add(pair.Value);
+            return res;
+        }
+
+        #endregion
 
         #endregion
 
@@ -1931,6 +2098,7 @@ namespace ExerPro.EnglishModule.Data {
         public void applyResult(RuntimeActionResult result) {
             currentResult = result;
             // TODO: 结果应用
+            CalcService.ResultApplyCalc.apply(this, result);
         }
 
         /// <summary>
@@ -1944,6 +2112,25 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         #endregion
+
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        public virtual void onRoundEnd() {
+            var buffs = this.buffs.ToArray();
+            var states = this.states.ToArray();
+
+            for (int i = 0; i < buffs.Length; ++i) {
+                var buff = buffs[i]; buff.onRoundEnd();
+                if (buff.isOutOfDate()) removeBuff(i);
+            }
+            foreach (var pair in states) {
+                var state = pair.Value;
+                state.onRoundEnd();
+                if (state.isOutOfDate())
+                    removeState(state.stateId);
+            }
+        }
 
         /// <summary>
         /// 重置
@@ -2178,7 +2365,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public RuntimeBattler subject { get; protected set; } // 主体
         [AutoConvert]
-        public RuntimeBattler[] objects { get; protected set; } // 对象
+        public RuntimeBattler object_ { get; protected set; } // 对象
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; } // 效果
 
@@ -2186,13 +2373,14 @@ namespace ExerPro.EnglishModule.Data {
         /// 结果
         /// </summary>
         [AutoConvert]
-        public List<RuntimeActionResult> results { get; protected set; } = new List<RuntimeActionResult>();
+        public RuntimeActionResult result { get; protected set; } = null;
 
         /// <summary>
         /// 生成结果
         /// </summary>
         void generateResults() {
             // TODO: 结果生成
+            result = CalcService.ExerProActionResultGenerator.generate(this);
         }
 
         /// <summary>
@@ -2200,14 +2388,14 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public RuntimeAction() { }
         public RuntimeAction(RuntimeBattler subject,
-            RuntimeBattler[] objects, ExerProEffectData[] effects = null) {
-            this.subject = subject; this.objects = objects;
+            RuntimeBattler object_, ExerProEffectData[] effects = null) {
+            this.subject = subject; this.object_ = object_;
             this.effects = effects ?? new ExerProEffectData[0];
             generateResults();
         }
         public RuntimeAction(RuntimeBattler subject,
-            RuntimeBattler[] objects, BaseExerProItem item) :
-            this(subject, objects, item.effects) { }
+            RuntimeBattler object_, BaseExerProItem item) :
+            this(subject, object_, item.effects) { }
     }
 
     /// <summary>
@@ -2226,23 +2414,43 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public bool remove { get; protected set; } // 是否移除状态（turns为0时移除全部回合）
 
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public StateChange() { }
+            public StateChange(int stateId, int turns = 0, bool remove = false) : base(stateId, turns) {
+                this.remove = remove;
+            }
         }
 
         /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
-        public int hpDamage { get; protected set; }
+        public int hpDamage { get; set; }
         [AutoConvert]
-        public int hpRecover { get; protected set; }
+        public int hpRecover { get; set; }
         [AutoConvert]
-        public int hpDrain { get; protected set; }
+        public int hpDrain { get; set; }
 
+        /// <summary>
+        /// 状态/Buff变更
+        /// </summary>
         [AutoConvert]
-        public StateChange[] stateChanges { get; protected set; }
+        public StateChange[] stateChanges { get; set; }
         [AutoConvert]
-        public RuntimeBuff[] addBuffs { get; protected set; }
+        public RuntimeBuff[] addBuffs { get; set; }
 
+        /// <summary>
+        /// 抽牌数据
+        /// </summary>
+        [AutoConvert]
+        public int drawCardCnt { get; set; } // 抽牌数量
+        [AutoConvert]
+        public int consumeCardCnt { get; set; } // 消耗牌数量
+        [AutoConvert]
+        public bool consumeSelect { get; set; } // 消耗是否可选
+        
         /// <summary>
         /// 行动
         /// </summary>
@@ -2252,12 +2460,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 构造函数
         /// </summary>
         public RuntimeActionResult() { }
-        public RuntimeActionResult(RuntimeAction action,
-            int damage, int recover, int drain,
-            StateChange[] states, RuntimeBuff[] buffs) {
+        public RuntimeActionResult(RuntimeAction action) {
             this.action = action;
-            hpDamage = damage; hpRecover = recover; hpDrain = drain;
-            stateChanges = states; addBuffs = buffs;
         }
     }
 

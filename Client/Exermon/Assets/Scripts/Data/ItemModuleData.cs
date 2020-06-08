@@ -1,7 +1,9 @@
 ﻿
 using System;
 using System.Collections.Generic;
+
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 using LitJson;
 
@@ -945,12 +947,34 @@ namespace ItemModule.Data {
         }
 
         /// <summary>
+        /// 获得多个物品
+        /// </summary>
+        /// <param name="p">条件</param>
+        /// <returns>物品列表</returns>
+        public int countItems(Predicate<T> p) {
+            var cnt = 0;
+            foreach (var item in items) if (p(item)) cnt++;
+            return cnt;
+        }
+
+        /// <summary>
         /// 是否包含某容器项
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         public bool containItem(T item) {
             return items.Contains(item);
+        }
+
+        /// <summary>
+        /// 获取随机物品
+        /// </summary>
+        /// <returns>物品容器项</returns>
+        public T getRandomItem() {
+            var cnt = items.Count;
+            if (cnt <= 0) return null;
+            var index = Random.Range(0, cnt);
+            return items[index];
         }
 
         #endregion

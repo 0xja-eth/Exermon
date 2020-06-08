@@ -238,12 +238,15 @@ namespace ExerPro.EnglishModule.Services {
         #region 出牌控制
 
         /// <summary>
-        /// 
+        /// 出牌
         /// </summary>
-        /// <param name="card"></param>
-        /// <param name="targets"></param>
+        /// <param name="card">牌</param>
+        /// <param name="targets">目标</param>
         public void play(ExerProCard card, List<RuntimeEnemy> targets) {
-
+            foreach(var target in targets) {
+                var action = new RuntimeAction(record.actor, target, card);
+                target.applyResult(action.result);
+            }
         }
 
         #endregion

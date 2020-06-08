@@ -297,7 +297,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <typeparam name="T">题目类型</typeparam>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateQuestions<T>(UnityAction<T[]> onSuccess, 
+        public void generateQuestions<T>(int count, UnityAction<T[]> onSuccess, 
             UnityAction onError = null) where T : BaseData, new() {
 
             NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -305,13 +305,14 @@ namespace ExerPro.EnglishModule.Services {
                 loadQuestions(ids, onSuccess, onError);
             };
 
-            generateQuestion(getQuestionType<T>(), _onSuccess, onError);
+            generateQuestion(count, getQuestionType<T>(), _onSuccess, onError);
         }
         /// <param name="qids">题目类型</param>
-        public void generateQuestion(int type, 
+        public void generateQuestion(int count, int type, 
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError) {
 
-            JsonData data = new JsonData(); data["type"] = type;
+            JsonData data = new JsonData();
+            data["type"] = type; data["count"] = count;
             sendRequest(Oper.QuestionGenerate, data, onSuccess, onError, uid: true);
         }
 

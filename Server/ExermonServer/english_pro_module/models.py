@@ -504,11 +504,15 @@ class ExerProEffectCode(Enum):
 
 	AddParam = 200  # 增加能力值
 	AddParamUrgent = 201  # 增加能力值（紧急按钮）
-	TempAddParam = 210  # 临时增加能力值
-	AddStatus = 220  # 增加状态
 
-	GetCards = 300  # 抽取卡牌
-	RemoveCards = 310  # 移除卡牌
+	TempAddParam = 210  # 临时增加能力值
+
+	AddState = 220  # 增加状态
+	RemoveState = 221  # 移除状态
+	RemoveNegaState = 222  # 移除消极状态
+
+	DrawCards = 300  # 抽取卡牌
+	ConsumeCards = 310  # 消耗卡牌
 
 	ChangeCost = 400  # 更改耗能
 	ChangeCostDisc = 401  # 更改耗能（发现）
@@ -539,11 +543,15 @@ class ExerProEffect(models.Model):
 
 		(ExerProEffectCode.AddParam.value, '增加能力值'),
 		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
-		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
-		(ExerProEffectCode.AddStatus.value, '增加状态'),
 
-		(ExerProEffectCode.GetCards.value, '抽取卡牌'),
-		(ExerProEffectCode.RemoveCards.value, '移除卡牌'),
+		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
+
+		(ExerProEffectCode.AddState.value, '增加状态'),
+		(ExerProEffectCode.RemoveState.value, '移除状态'),
+		(ExerProEffectCode.RemoveNegaState.value, '移除消极状态'),
+
+		(ExerProEffectCode.DrawCards.value, '抽取卡牌'),
+		(ExerProEffectCode.ConsumeCards.value, '消耗卡牌'),
 
 		(ExerProEffectCode.ChangeCost.value, '更改耗能'),
 		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
@@ -982,6 +990,26 @@ class ExerProState(BaseItem):
 
 	# 道具类型
 	TYPE = ItemType.ExerProState
+
+	# 最大状态回合数
+	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
+
+	# 是否负面状态
+	is_nega = models.BooleanField(default=False, verbose_name="是否负面状态")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['max_turns'] = self.max_turns
+		res['is_nega'] = self.is_nega
+
+		return res
+
 
 # endregion
 
