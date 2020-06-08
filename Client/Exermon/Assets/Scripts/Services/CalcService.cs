@@ -1337,7 +1337,30 @@ namespace GameModule.Services {
             }
 
         }
+
+        /// <summary>
+        /// 敌人下一步行动计算类
+        /// </summary>
+        public class EnemyNextCalc {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            RuntimeEnemy enemy;
+
+            /// <summary>
+            /// 计算
+            /// </summary>
+            public static void calc(RuntimeEnemy enemy) {
+                var calc = new EnemyNextCalc(enemy);
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            EnemyNextCalc(RuntimeEnemy enemy) {
+                this.enemy = enemy;
+            }
+        }
     }
-
-
 }

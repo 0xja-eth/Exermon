@@ -60,6 +60,7 @@ namespace ExerPro.EnglishModule.Services {
         ExerProCardGroup cardGroup;
 
         List<RuntimeEnemy> enemies; // 敌人
+        int curEnemyIndex = 0; // 当前敌人索引
 
         int corrCnt = 0, bonusCnt = 0;
         bool bonus = false;
@@ -84,9 +85,9 @@ namespace ExerPro.EnglishModule.Services {
             addStateDict(State.NotInBattle);
             addStateDict(State.Answering);
             addStateDict(State.Drawing, updateDrawing);
-            addStateDict(State.Playing);
-            addStateDict(State.Discarding);
-            addStateDict(State.Enemy);
+            addStateDict(State.Playing, updatePlaying);
+            addStateDict(State.Discarding, updateDiscarding);
+            addStateDict(State.Enemy, updateEnemy);
             addStateDict(State.RoundEnd, updateRoundEnd);
             addStateDict(State.Result);
         }
@@ -109,21 +110,25 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新出牌
         /// </summary>
         void updatePlaying() {
-
+            if (isStateChanged())
+                foreach (var enemy in enemies)
+                    calcEnemyNext(enemy);
         }
 
         /// <summary>
         /// 更新弃牌
         /// </summary>
         void updateDiscarding() {
-
+            record.actor.cardGroup.onRoundEnd();
+            changeState(State.Enemy);
         }
 
         /// <summary>
         /// 更新敌人
         /// </summary>
         void updateEnemy() {
-
+            if (processEnemiesAction())
+                changeState(State.RoundEnd);
         }
 
         /// <summary>
@@ -132,6 +137,12 @@ namespace ExerPro.EnglishModule.Services {
         void updateRoundEnd() {
             bonus = false;
             corrCnt = bonusCnt = 0;
+            curEnemyIndex = 0;
+
+            record.actor.onRoundEnd();
+            foreach (var enemy in enemies)
+                enemy.onRoundEnd();
+
             changeState(State.Answering);
         }
 
@@ -139,7 +150,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新结果
         /// </summary>
         void updateResult() {
-
+            record.actor.onBattleEnd();
+            changeState(State.NotInBattle);
         }
 
         #endregion
@@ -247,6 +259,27 @@ namespace ExerPro.EnglishModule.Services {
                 var action = new RuntimeAction(record.actor, target, card);
                 target.applyResult(action.result);
             }
+        }
+
+        #endregion
+
+        #region 敌人控制
+
+        /// <summary>
+        /// 计算敌人下一步行动
+        /// </summary>
+        void calcEnemyNext(RuntimeEnemy enemy) {
+            enemy.calcNext();
+        }
+
+        /// <summary>
+        /// 处理敌人行动
+        /// </summary>
+        /// <returns>敌人是否全部行动完毕</returns>
+        bool processEnemiesAction() {
+            var enemy = enemies[curEnemyIndex];
+            if (enemy.updateAction()) curEnemyIndex++;
+            return curEnemyIndex >= enemies.Count;
         }
 
         #endregion

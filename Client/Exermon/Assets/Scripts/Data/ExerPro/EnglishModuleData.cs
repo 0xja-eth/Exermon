@@ -1566,7 +1566,7 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 移除状态
+        /// 移除状态回合
         /// </summary>
         /// <param name="turns">回合数</param>
         public void remove(int turns) {
@@ -1574,11 +1574,14 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 增加状态
+        /// 增加状态回合
         /// </summary>
         /// <param name="turns">回合数</param>
         public void add(int turns) {
             this.turns += turns;
+            var max = state().maxTurns;
+            if (max > 0 && this.turns > max)
+                this.turns = max; 
         }
 
         /// <summary>
@@ -2117,19 +2120,41 @@ namespace ExerPro.EnglishModule.Data {
         /// 回合结束回调
         /// </summary>
         public virtual void onRoundEnd() {
+            processBuffsRoundEnd();
+            processStatesRoundEnd();
+        }
+
+        /// <summary>
+        /// 处理状态回合结束
+        /// </summary>
+        void processBuffsRoundEnd() {
             var buffs = this.buffs.ToArray();
-            var states = this.states.ToArray();
 
             for (int i = 0; i < buffs.Length; ++i) {
                 var buff = buffs[i]; buff.onRoundEnd();
                 if (buff.isOutOfDate()) removeBuff(i);
             }
+        }
+
+        /// <summary>
+        /// 处理状态回合结束
+        /// </summary>
+        void processStatesRoundEnd() {
+            var states = this.states.ToArray();
+
             foreach (var pair in states) {
                 var state = pair.Value;
                 state.onRoundEnd();
                 if (state.isOutOfDate())
                     removeState(state.stateId);
             }
+        }
+
+        /// <summary>
+        /// 战斗结束回调
+        /// </summary>
+        public virtual void onBattleEnd() {
+
         }
 
         /// <summary>
@@ -2287,6 +2312,16 @@ namespace ExerPro.EnglishModule.Data {
         public int enemyId { get; protected set; }
 
         /// <summary>
+        /// 当前行动
+        /// </summary>
+        [AutoConvert]
+        public ExerProEnemy.Action currentAction { get; protected set; }
+        [AutoConvert]
+        public bool isActionEnd { get; protected set; } = false; // 当前行动是否结束
+        [AutoConvert]
+        public bool isActionStarted { get; protected set; } = false; // 当前行动是否开始
+
+        /// <summary>
         /// 缓存敌人对象
         /// </summary>
         ExerProEnemy tempEnemy = null;
@@ -2337,7 +2372,26 @@ namespace ExerPro.EnglishModule.Data {
             xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
             yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
         }
-        
+
+        #endregion
+
+        #region 行动控制
+
+        /// <summary>
+        /// 更新行动
+        /// </summary>
+        public bool updateAction() {
+            isActionStarted = true;
+            return isActionEnd;
+        }
+
+        /// <summary>
+        /// 计算下一步
+        /// </summary>
+        public void calcNext() {
+            CalcService.EnemyNextCalc.calc(this);
+        }
+
         #endregion
 
         /// <summary>
