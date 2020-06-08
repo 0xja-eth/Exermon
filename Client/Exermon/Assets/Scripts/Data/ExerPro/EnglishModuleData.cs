@@ -274,17 +274,14 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert("params")]
         public JsonData params_ { get; protected set; } // 参数（数组）
 
-        /*
         /// <summary>
         /// 构造函数
         /// </summary>
-        public EffectData() { }
-        public EffectData(Code code, JsonData params_,
-            string description, string shortDescription) {
-            this.code = (int)code;
-            this.params_ = params_;
+        public ExerProEffectData() { }
+        public ExerProEffectData(Code code, JsonData params_) {
+            this.code = (int)code; this.params_ = params_;
         }
-        */
+
     }
 
     /// <summary>
@@ -387,7 +384,7 @@ namespace ExerPro.EnglishModule.Data {
             /// </summary>
             public enum Type {
                 Attack = 1, PowerUp = 2, PowerDown = 3,
-                Escape = 4, Unset = 5
+                AddStates = 4, Escape = 5, Unset = 6
             }
 
             /// <summary>
@@ -2324,12 +2321,14 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 当前行动
         /// </summary>
-        [AutoConvert]
-        public ExerProEnemy.Action currentAction { get; protected set; }
-        [AutoConvert]
-        public bool isActionEnd { get; protected set; } = false; // 当前行动是否结束
-        [AutoConvert]
-        public bool isActionStarted { get; protected set; } = false; // 当前行动是否开始
+        public ExerProEnemy.Action currentAction;
+        public RuntimeAction currentRuntimeAction;
+
+        /// <summary>
+        /// 当前行动状态
+        /// </summary>
+        public bool isActionEnd = false; // 当前行动是否结束
+        public bool isActionStarted = false; // 当前行动是否开始
 
         /// <summary>
         /// 缓存敌人对象
@@ -2391,6 +2390,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 更新行动
         /// </summary>
         public bool updateAction() {
+            if (!isActionStarted) processAction();
             isActionStarted = true;
             return isActionEnd;
         }
@@ -2398,8 +2398,21 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 计算下一步
         /// </summary>
-        public void calcNext(int round) {
-            currentAction = CalcService.EnemyNextCalc.calc(round, this);
+        public void calcNext(int round, RuntimeActor actor) {
+            CalcService.EnemyNextCalc.calc(round, this, actor,
+                out currentAction, out currentRuntimeAction);
+        }
+
+        /// <summary>
+        /// 处理行动
+        /// </summary>
+        public void processAction() {
+            if (currentRuntimeAction != null) {
+                currentRuntimeAction.generateResult();
+                applyResult(currentRuntimeAction.result);
+            } else {
+                // TODO: 执行逃跑等逻辑
+            }
         }
 
         #endregion
@@ -2442,7 +2455,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 生成结果
         /// </summary>
-        void generateResults() {
+        public void generateResult() {
             // TODO: 结果生成
             result = CalcService.ExerProActionResultGenerator.generate(this);
         }
@@ -2455,7 +2468,6 @@ namespace ExerPro.EnglishModule.Data {
             RuntimeBattler object_, ExerProEffectData[] effects = null) {
             this.subject = subject; this.object_ = object_;
             this.effects = effects ?? new ExerProEffectData[0];
-            generateResults();
         }
         public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler object_, BaseExerProItem item) :

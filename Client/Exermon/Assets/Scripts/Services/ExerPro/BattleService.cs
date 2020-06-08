@@ -259,6 +259,7 @@ namespace ExerPro.EnglishModule.Services {
         public void play(ExerProCard card, List<RuntimeEnemy> targets) {
             foreach(var target in targets) {
                 var action = new RuntimeAction(record.actor, target, card);
+                action.generateResult();
                 target.applyResult(action.result);
             }
         }
@@ -271,7 +272,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 计算敌人下一步行动
         /// </summary>
         void calcEnemyNext(RuntimeEnemy enemy) {
-            enemy.calcNext(round);
+            enemy.calcNext(round, record.actor);
         }
 
         /// <summary>

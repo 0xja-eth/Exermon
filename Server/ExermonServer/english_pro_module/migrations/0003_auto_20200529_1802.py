@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('round', jsonfield.fields.JSONField(default=[], verbose_name='回合')),
-                ('type', models.PositiveSmallIntegerField(choices=[(1, '攻击'), (2, '提升'), (3, '削弱'), (4, '逃跑'), (5, '无')], default=(5,), verbose_name='类型')),
+                ('type', models.PositiveSmallIntegerField(choices=[(1, '攻击'), (2, '提升'), (3, '削弱'), (4, '逃跑'), (5, '无')], default=5, verbose_name='类型')),
                 ('params', jsonfield.fields.JSONField(default=[], verbose_name='参数')),
                 ('rate', models.PositiveSmallIntegerField(default=10, verbose_name='权重')),
                 ('enemy', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='english_pro_module.ExerProEnemy', verbose_name='敌人')),

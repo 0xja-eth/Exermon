@@ -19,6 +19,8 @@ using ExerPro.EnglishModule.Data;
 using SeasonModule.Services;
 using System.Collections.Generic;
 
+using LitJson;
+
 /// <summary>
 /// 游戏模块服务
 /// </summary>
@@ -1355,9 +1357,15 @@ namespace GameModule.Services {
             /// <summary>
             /// 计算
             /// </summary>
-            public static ExerProEnemy.Action calc(int round, RuntimeEnemy enemy) {
+            public static void calc(int round,
+                RuntimeEnemy enemy, RuntimeActor actor,
+                out ExerProEnemy.Action action, 
+                out ExerPro.EnglishModule.Data.RuntimeAction runtimeAction) {
+
                 var calc = new EnemyNextCalc(round, enemy);
-                return calc.generateAction();
+
+                action = calc.generateAction();
+                runtimeAction = calc.generateRuntimeAction(actor);
             }
 
             /// <summary>
@@ -1386,12 +1394,110 @@ namespace GameModule.Services {
             /// </summary>
             ExerProEnemy.Action generateAction() {
                 var list = new List<int>();
-                for(var i = 0; i < actions.Length; ++i) {
+                for (var i = 0; i < actions.Length; ++i) {
                     var action = actions[i];
                     for (var j = 0; j < action.rate; ++j) list.Add(i);
                 }
                 var index = Random.Range(0, list.Count);
                 return actions[list[index]];
+            }
+
+            /// <summary>
+            /// 生成运行时行动
+            /// </summary>
+            ExerPro.EnglishModule.Data.RuntimeAction 
+                generateRuntimeAction(RuntimeActor actor) {
+
+                RuntimeBattler object_;
+                var action = runtimeEnemy.currentAction;
+
+                var effects = new List<ExerProEffectData>();
+
+                switch ((ExerProEnemy.Action.Type)action.type) {
+                    case ExerProEnemy.Action.Type.Attack:
+                        _processAttack(effects, action.params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.PowerDown:
+                        _processPowerDown(effects, action.params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.AddStates:
+                        _processAddStates(effects, action.params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.PowerUp:
+                        _processPowerDown(effects, action.params_);
+                        object_ = runtimeEnemy; break;
+
+                    default: return null;
+                }
+
+                effects.AddRange(enemy.effects);
+
+                return new ExerPro.EnglishModule.Data.RuntimeAction(
+                    runtimeEnemy, object_, effects.ToArray());
+            }
+
+            /// <summary>
+            /// 处理攻击行动
+            /// </summary>
+            void _processAttack(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+
+                effects.Add(new ExerProEffectData(
+                    ExerProEffectData.Code.Attack, actionParams));
+            }
+
+            /// <summary>
+            /// 处理削弱
+            /// </summary>
+            void _processPowerDown(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                var t = actionParams.Count == 5 ?
+                    actionParams[4] : 1;
+
+                for (int i = 0; i < 4; ++i) {
+                    var params_ = new JsonData();
+                    var p = DataLoader.load<int>(actionParams[i]);
+                    params_.SetJsonType(JsonType.Array);
+                    params_[0] = i; params_[1] = -p;
+                    params_[2] = 0; params_[3] = t;
+
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam, params_));
+                }
+            }
+
+            /// <summary>
+            /// 处理状态
+            /// </summary>
+            void _processAddStates(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                for (int i = 0; i < actionParams.Count; ++i) 
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam,
+                        actionParams[i]));
+            }
+
+            /// <summary>
+            /// 处理削弱
+            /// </summary>
+            void _processPowerUp(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                var t = actionParams.Count == 5 ?
+                    actionParams[4] : 1;
+
+                for (int i = 0; i < 4; ++i) {
+                    var params_ = new JsonData();
+                    params_.SetJsonType(JsonType.Array);
+                    params_[0] = i;
+                    params_[1] = actionParams[i];
+                    params_[2] = 0; params_[3] = t;
+
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam, params_));
+                }
             }
         }
     }

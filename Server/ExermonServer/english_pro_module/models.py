@@ -842,11 +842,12 @@ class EnemyEffect(ExerProEffect):
 #  敌人行动类型枚举
 # ===================================================
 class EnemyActionType(Enum):
-	Attack = 1,  # 攻击
-	PowerUp = 2,  # 提升
-	PowerDown = 3,  # 削弱
-	Escape = 4,  # 逃跑
-	Unset = 5,  # 什么都不做
+	Attack = 1  # 攻击
+	PowerUp = 2  # 提升
+	PowerDown = 3  # 削弱
+	AddStates = 4  # 状态
+	Escape = 5  # 逃跑
+	Unset = 6  # 什么都不做
 
 
 # ===================================================
@@ -857,16 +858,18 @@ class EnemyAction(models.Model):
 		verbose_name = verbose_name_plural = "敌人行动"
 
 	TYPES = [
-		(1, '攻击'),
-		(2, '提升'),
-		(3, '削弱'),
-		(4, '逃跑'),
-		(5, '无'),
-		# (EnemyActionType.Attack.value, '攻击'),
-		# (EnemyActionType.PowerUp.value, '提升'),
-		# (EnemyActionType.PowerDown.value, '削弱'),
-		# (EnemyActionType.Escape.value, '逃跑'),
-		# (EnemyActionType.Unset.value, '无'),
+		# (1, '攻击'),
+		# (2, '提升'),
+		# (3, '削弱'),
+		# (4, '状态'),
+		# (5, '逃跑'),
+		# (6, '无'),
+		(EnemyActionType.Attack.value, '攻击'),
+		(EnemyActionType.PowerUp.value, '提升'),
+		(EnemyActionType.PowerDown.value, '削弱'),
+		(EnemyActionType.AddStates.value, '状态'),
+		(EnemyActionType.Escape.value, '逃跑'),
+		(EnemyActionType.Unset.value, '无'),
 	]
 
 	# 回合
