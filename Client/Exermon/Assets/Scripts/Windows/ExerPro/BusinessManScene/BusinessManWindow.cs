@@ -19,14 +19,14 @@ using RecordModule.Services;
 using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
-using UI.ExerPro.BusinessManScene.Controls;
-using UI.ExerPro.BusinessManScene.Controls.CardItem;
-using UI.ExerPro.BusinessManScene.Controls.PotionItem;
-using UI.ExerPro.BusinessManScene.ParamDisplays;
+using UI.ExerPro.EnglishPro.BusinessManScene.Controls;
+using UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem;
+using UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem;
+using UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays;
 
 using ExerPro.EnglishModule.Services;
 
-namespace UI.ExerPro.BusinessManScene.Windows
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
 {
 
     /// <summary>

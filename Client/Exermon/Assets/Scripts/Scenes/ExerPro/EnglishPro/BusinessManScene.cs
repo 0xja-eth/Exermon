@@ -2,13 +2,13 @@
 using Core.Systems;
 using Core.UI;
 
-using UI.ExerPro.BusinessManScene.Windows;
+using UI.ExerPro.EnglishPro.BusinessManScene.Windows;
 using ExerPro.EnglishModule.Services;
 
 /// <summary>
 /// 背包场景
 /// </summary>
-namespace UI.ExerPro.BusinessManScene
+namespace UI.ExerPro.EnglishPro.BusinessManScene
 {
 
     /// <summary>

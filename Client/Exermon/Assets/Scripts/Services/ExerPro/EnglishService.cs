@@ -747,7 +747,7 @@ namespace ExerPro.EnglishModule.Services {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
-            saveExerPro();
+            //saveExerPro();
         }
 
         /// <summary>

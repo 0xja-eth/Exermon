@@ -2,7 +2,7 @@
 using ExerPro.EnglishModule.Data;
 using Core.Data.Loaders;
 
-namespace UI.ExerPro.BusinessManScene.Controls.PotionItem
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem
 {
     public class PotionItemShopDisplay : ShopDisplay<ExerProPotion>
     {

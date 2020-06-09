@@ -1,9 +1,9 @@
 ﻿
 using Core.UI;
 
-using UI.ExerPro.BusinessManScene.Windows;
+using UI.ExerPro.EnglishPro.BusinessManScene.Windows;
 
-namespace UI.ExerPro.BusinessManScene.Controls
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
 {
 
     /// <summary>

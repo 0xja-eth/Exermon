@@ -14,7 +14,7 @@ using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.BusinessManScene.Controls
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
 {
 
     /// <summary>

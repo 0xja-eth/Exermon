@@ -7,7 +7,7 @@ using UI.Common.Controls.ParamDisplays;
 using Core.UI;
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.BusinessManScene.ParamDisplays
+namespace UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays
 {
 
     /// <summary>

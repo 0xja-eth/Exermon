@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.BusinessManScene.Controls.CardItem
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem
 {
     public class CardItemShopDisplay : ShopDisplay<ExerProCard>
     {

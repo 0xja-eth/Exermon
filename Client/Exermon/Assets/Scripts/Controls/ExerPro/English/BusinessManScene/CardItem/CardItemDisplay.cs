@@ -1,7 +1,7 @@
 ﻿using ExerPro.EnglishModule.Data;
 using UnityEngine;
 using UnityEngine.UI;
-namespace UI.ExerPro.BusinessManScene.Controls.CardItem
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem
 {
     /// <summary>
     /// 装备背包显示

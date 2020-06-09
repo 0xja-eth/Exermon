@@ -1,6 +1,6 @@
 ﻿using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.BusinessManScene.Controls.PotionItem
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem
 {
     /// <summary>
     /// 装备背包显示
