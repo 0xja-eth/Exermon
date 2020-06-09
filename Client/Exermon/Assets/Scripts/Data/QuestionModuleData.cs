@@ -16,6 +16,7 @@ using ItemModule.Data;
 using RecordModule.Data;
 
 using UI.Common.Controls.ParamDisplays;
+using System.Linq;
 
 /// <summary>
 /// 题目模块
@@ -90,7 +91,6 @@ namespace QuestionModule.Data {
         [AutoConvert]
         public int type { get; protected set; }
 
-        [AutoConvert]
         public Choice[] choices { get; protected set; }
 
         /// <summary>
@@ -107,6 +107,33 @@ namespace QuestionModule.Data {
         /// <returns>返回转化后的显示数据</returns>
         public virtual JsonData convertToDisplayData(string type = "") {
             return toJson();
+        }
+
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json)
+        {
+            base.loadCustomAttributes(json);
+            var data = DataLoader.load(json, "choices");
+            if (data != null && data.IsArray)
+            {
+                List<Choice> tempChoices = new List<Choice>();
+                for (int i = 0; i < data.Count; i++)
+                {
+                    var item = loadChoice(data[i]);
+                    if (item != null)
+                        tempChoices.Add(item);
+                }
+                choices = tempChoices.ToArray();
+                int a = 5;
+            }
+        }
+
+        protected virtual BaseQuestion.Choice loadChoice(JsonData data)
+        {
+            return DataLoader.load<Choice>(data);
         }
 
         #endregion

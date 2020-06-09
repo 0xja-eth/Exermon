@@ -30,6 +30,7 @@ namespace ExerPro.EnglishModule.Services {
         const int ListeningQuestionType = 1;
         const int PhraseQuestionType = 2;
         const int CorrectionQuestionType = 3;
+        const int PlotQuestionType = 4; 
 
         /// <summary>
         /// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
@@ -291,6 +292,8 @@ namespace ExerPro.EnglishModule.Services {
                 return PhraseQuestionType;
             if (typeof(T) == typeof(CorrectionQuestion))
                 return CorrectionQuestionType;
+            if (typeof(T) == typeof(PlotQuestion))
+                return PlotQuestionType;
             return 0;
         }
 
@@ -730,7 +733,7 @@ namespace ExerPro.EnglishModule.Services {
         void onStarted() {
             record.start();
             changeState(State.Idle);
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
         }
 
         /// <summary>

@@ -225,6 +225,49 @@ namespace ExerPro.EnglishModule.Data {
 
     }
 
+    /// <summary>
+    /// 剧情题目
+    /// </summary>
+    public class PlotQuestion : BaseQuestion {
+        public new class Choice : BaseQuestion.Choice {
+            [AutoConvert]
+            public ExerProEffectData[] effects { get; protected set; }
+            [AutoConvert]
+            public string resultText { get; protected set; }
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string eventName { get; protected set; }
+        [AutoConvert]
+        public Texture2D picture { get; protected set; }
+
+        /// <summary>
+        /// 加载选项Item属性
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected override BaseQuestion.Choice loadChoice(JsonData data)
+        {
+            return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
+        }
+
+        public new Choice[] choices
+        {
+            get
+            {
+                var choices = base.choices;
+                List<Choice> listTemp = new List<Choice>();
+                foreach (var choice in choices)
+                    listTemp.Add(choice as Choice);
+                return listTemp.ToArray();
+            }
+        }
+    }
+    
+
     #endregion
 
     #region 物品
@@ -256,8 +299,12 @@ namespace ExerPro.EnglishModule.Data {
             ChangeCostDisc = 401, // 更改耗能（发现）
             ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
-            Sadistic = 500, // 残虐天性
-            ForceAddStatus = 600, // 增加己方状态
+            //剧情效果-测试用
+            PlotAddMoney = 500, //获得金币
+
+            Sadistic = 1000, // 残虐天性
+            ForceAddStatus = 1100, // 增加己方状态
+
         }
 
         /// <summary>
