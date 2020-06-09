@@ -110,7 +110,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
             jsonData["event_name"] = "蛇";
             jsonData["picture"] = DataLoader.convert(loadPictureHelp("F:/Snake.png"));
 
-            PlotQuestion.Choice[] tempArray = new PlotQuestion.Choice[2];
+            PlotQuestion.Choice[] tempArray = new PlotQuestion.Choice[5];
             LitJson.JsonData choiceData = new LitJson.JsonData();
             choiceData["text"] = "【同意】 得到 175 金币。被诅咒——疑虑。";
             choiceData["result_text"] = "“对～！\n" +
@@ -125,6 +125,12 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
             choiceData["result_text"] = "蛇非常失望地看着你。";
             PlotQuestion.Choice temp1 = DataLoader.load<PlotQuestion.Choice>(choiceData);
             tempArray[1] = temp1;
+            choiceData["text"] = "【拒绝】";
+            choiceData["result_text"] = "蛇非常失望地看着你。";
+            PlotQuestion.Choice temp2 = DataLoader.load<PlotQuestion.Choice>(choiceData);
+            //tempArray[2] = temp2;
+            //tempArray[3] = temp2;
+            //tempArray[4] = temp2;
 
             jsonData["choices"] = DataLoader.convert(tempArray);
 
