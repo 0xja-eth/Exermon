@@ -69,6 +69,10 @@ namespace UI.ExerPro.BusinessManScene
             shopWindow.startWindow();
         }
 
+        public override void popScene()
+        {
+            engSer.exitNode();
+        }
         #endregion
 
     }

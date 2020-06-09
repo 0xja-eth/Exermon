@@ -660,12 +660,16 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 商人据点
         /// </summary>
-        void onShopNode() { }
+        void onShopNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
+        }
 
         /// <summary>
         /// 剧情据点
         /// </summary>
-        void onStoryNode() { }
+        void onStoryNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+        }
 
         /// <summary>
         /// 敌人据点
@@ -733,7 +737,7 @@ namespace ExerPro.EnglishModule.Services {
         void onStarted() {
             record.start();
             changeState(State.Idle);
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
         }
 
         /// <summary>

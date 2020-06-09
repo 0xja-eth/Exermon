@@ -64,6 +64,11 @@ namespace UI.ExerPro.EnglishPro.PlotScene
             plotWindow.startWindow();
         }
 
+        public override void popScene()
+        {
+            engSer.exitNode();
+        }
+
         #endregion
 
     }
