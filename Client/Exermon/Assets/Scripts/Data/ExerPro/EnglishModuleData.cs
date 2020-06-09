@@ -74,7 +74,8 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 短语题目
     /// </summary>
-    public class PhraseQuestion : BaseData {
+    public class PhraseQuestion : BaseData
+    {
         /// <summary>
         /// 属性
         /// </summary>
@@ -86,7 +87,56 @@ namespace ExerPro.EnglishModule.Data
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
+        public string[] option1 = { "sb. to do sth.", "sb. doing sth.", "sb. to do sth.", "sb. into doing sth.", "sb. of sth" };
+        public string[] option2 = { "doing sth.", "to do sth." };
+        public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
+        public string[] option4 = { "for", "in", "of", "to" };
+        public string[] options()
+        {
+            if (option1.ToList<string>().IndexOf(phrase) != -1)
+                return option1;
+            else if (option2.ToList<string>().IndexOf(phrase) != -1)
+                return option2;
+            else if (option4.ToList<string>().IndexOf(phrase) != -1)
+                return option4;
+            else if (option3.ToList<string>().IndexOf(phrase) != -1)
+                return option3;
+            return new string[] { };
+        }
+        public static PhraseQuestion sample()
+        {
+            long i = UnityEngine.Random.Range(0, 10000);
 
+            PhraseQuestion question = new PhraseQuestion();
+            switch (i % 4)
+            {
+                case 0:
+                    question.word = "persuade";
+                    question.chinese = "说服某人做某事";
+                    question.phrase = "sb. into doing sth.";
+                    return question;
+                case 1:
+                    question.word = "hesitate";
+                    question.chinese = "犹豫做某事";
+                    question.phrase = "to do sth.";
+                    return question;
+                case 2:
+                    question.word = "be certain";
+                    question.chinese = "确信……";
+                    question.phrase = "about";
+                    return question;
+                case 3:
+                    question.word = "in [with] reference";
+                    question.chinese = "关于";
+                    question.phrase = "to";
+                    return question;
+                default:
+                    question.word = "hope";
+                    question.chinese = "希望某人做某事";
+                    question.phrase = "sb. to do sth.";
+                    return question;
+            }
+        }
     }
 
     /// <summary>
@@ -130,6 +180,7 @@ namespace ExerPro.EnglishModule.Data
                 wrongItem.sentenceIndex = 0;
                 wrongItem.wordIndex = 1;
                 wrongItem.word = "is";
+
                 wrongItems[0] = wrongItem;
                 return wrongItems;
             }
@@ -150,7 +201,7 @@ namespace ExerPro.EnglishModule.Data
 
             CorrectionQuestion question = new CorrectionQuestion();
             question.wrongItems = WrongItem.sample();
-            question.article = "Hey guy, how is your? I am fine, how about you? Thank your very much!";
+            question.article = "When I was in high school, most of my friend had bicycles. I hoped I could also have it. One day I saw a second-hand bicycle that was only one hundred yuan.";
             question.description = "test";
 
             return question;
@@ -158,7 +209,7 @@ namespace ExerPro.EnglishModule.Data
 
         public string[] sentences()
         {
-            string temp = article.Replace("? ","?+");
+            string temp = article.Replace("? ", "?+");
             temp = temp.Replace(". ", ".+");
             temp = temp.Replace("! ", "!+");
             temp = temp.Replace(", ", " , ");

@@ -33,14 +33,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         {
             question = item; base.setItems(item.sentences());
         }
-
-        //protected override void onSubViewCreated(ItemDisplay<string> sub, int index)
-        //{
-        //base.onSubViewCreated(sub, index);
-        //SceneUtils.get<CorrectionWindow>(correctionWindow).question = question;
-
-        //SceneUtils.get<SentenceContainer>(gameObject).correctionWindow = correctionWindow;
-        //}
+        
 
         /// <summary>
         /// 开启视图
@@ -51,7 +44,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
             base.startView();
             setItem(item, true);
         }
-        
 
         public void revert()
         {
@@ -65,8 +57,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
                 SceneUtils.get<SentenceContainer>(item.gameObject).clearItems();
                 SceneUtils.get<SentenceContainer>(item.gameObject).setItem(items[index++]);
             }
-            //startView(question);
-            Debug.Log("aaa" + question.article);
+            startView(question);
         }
+        
     }
 }

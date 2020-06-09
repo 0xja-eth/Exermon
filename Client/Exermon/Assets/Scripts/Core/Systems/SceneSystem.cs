@@ -49,6 +49,7 @@ namespace Core.Systems {
 
             EnglishProMapScene,
             EnglishProCorrectionScene,
+            EnglishProPhraseScene,
 
             HelpScene
         }

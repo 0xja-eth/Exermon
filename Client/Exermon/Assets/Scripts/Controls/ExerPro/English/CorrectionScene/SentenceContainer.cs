@@ -48,6 +48,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
 
         protected override void onSelectChanged()
         {
+
             base.onSelectChanged();
             int index = getSelectedIndex();
 
