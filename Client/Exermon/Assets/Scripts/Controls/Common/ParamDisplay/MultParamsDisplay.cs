@@ -12,6 +12,8 @@ using Core.Data.Loaders;
 using Core.UI;
 using Core.UI.Utils;
 
+using UI.Common.Controls.AnimationSystem;
+
 /// <summary>
 /// 属性显示类控件
 /// </summary>
@@ -450,18 +452,22 @@ namespace UI.Common.Controls.ParamDisplays {
                     else color = normalColor();
                 }
 
-            var ani = SceneUtils.ani(item.obj);
-
-            if (!immediately && item.animated && ani != null) {
-                var ori = graphic.color;
-                var tmpAni = AnimationUtils.createAnimation();
-                tmpAni.addCurve(typeof(Graphic), "m_Color.r", ori.r, color.r);
-                tmpAni.addCurve(typeof(Graphic), "m_Color.g", ori.g, color.g);
-                tmpAni.addCurve(typeof(Graphic), "m_Color.b", ori.b, color.b);
-                tmpAni.addCurve(typeof(Graphic), "m_Color.a", ori.a, color.a);
-                tmpAni.setupAnimation(ani);
-            } else graphic.color = color;
-        }
+			// 动画
+			if (immediately || !item.animated) graphic.color = color;
+			else {
+				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				if (aniItem == null) {
+					var ori = graphic.color;
+					var ani = SceneUtils.ani(item.obj);
+					var tmpAni = AnimationUtils.createAnimation();
+					tmpAni.addCurve(typeof(Graphic), "m_Color.r", ori.r, color.r);
+					tmpAni.addCurve(typeof(Graphic), "m_Color.g", ori.g, color.g);
+					tmpAni.addCurve(typeof(Graphic), "m_Color.b", ori.b, color.b);
+					tmpAni.addCurve(typeof(Graphic), "m_Color.a", ori.a, color.a);
+					tmpAni.setupAnimation(ani);
+				} else aniItem.colorTo(color, play: true);
+			}
+		}
 
         /// <summary>
         /// 获取正确颜色
@@ -505,36 +511,50 @@ namespace UI.Common.Controls.ParamDisplays {
 
             var rate = DataLoader.load<float>(value);
             var ani = SceneUtils.ani(item.obj);
-            var ori = transform.localScale;
 
-            if (!immediately && item.animated && ani != null) {
-                var tmpAni = AnimationUtils.createAnimation();
-                tmpAni.addCurve(typeof(Transform), "m_LocalScale.x", ori.x, rate);
-                tmpAni.setupAnimation(ani);
-            } else
-                transform.localScale = new Vector3(rate, ori.y, ori.z);
-        }
+			var ori = transform.localScale;
+            var target = new Vector3(rate, ori.y, ori.z);
 
-        /// <summary>
-        /// 处理Y缩放类型的显示项
-        /// </summary>
-        /// <param name="item">显示项</param>
-        /// <param name="value">值</param>
-        void processScaleYDisplayItem(DisplayItem item, JsonData value) {
+			// 动画
+			if (immediately || !item.animated) 
+				transform.localScale = target;
+			else {
+				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				if (aniItem == null) {
+					var tmpAni = AnimationUtils.createAnimation();
+					tmpAni.addCurve(typeof(Transform), "m_LocalScale.x", ori.x, rate);
+					tmpAni.setupAnimation(ani);
+				} else aniItem.scaleTo(target, play: true);
+			}
+		}
+
+		/// <summary>
+		/// 处理Y缩放类型的显示项
+		/// </summary>
+		/// <param name="item">显示项</param>
+		/// <param name="value">值</param>
+		void processScaleYDisplayItem(DisplayItem item, JsonData value) {
             if (!item.obj.activeSelf) return;
             var transform = item.obj.transform;
             if (transform == null) return;
 
             var rate = DataLoader.load<float>(value);
             var ani = SceneUtils.ani(item.obj);
-            var ori = transform.localScale;
 
-            if (item.animated && ani != null) {
-                var tmpAni = AnimationUtils.createAnimation();
-                tmpAni.addCurve(typeof(Transform), "m_LocalScale.y", ori.y, rate);
-                tmpAni.setupAnimation(ani);
-            } else
-                transform.localScale = new Vector3(ori.x, rate, ori.z);
+			var ori = transform.localScale;
+			var target = new Vector3(ori.x, rate, ori.z);
+
+			// 动画
+			if (immediately || !item.animated)
+				transform.localScale = target;
+			else {
+				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				if (aniItem == null) {
+					var tmpAni = AnimationUtils.createAnimation();
+					tmpAni.addCurve(typeof(Transform), "m_LocalScale.y", ori.y, rate);
+					tmpAni.setupAnimation(ani);
+				} else aniItem.scaleTo(target, play: true);
+			}
         }
 
         /// <summary>

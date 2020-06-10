@@ -7,21 +7,6 @@ using UnityEngine.UI;
 using Core.UI;
 
 /// <summary>
-/// 游戏界面层，按照场景进行划分命名空间
-/// </summary>
-namespace UI { }
-
-/// <summary>
-/// 公用的界面类
-/// </summary>
-namespace UI.Common { }
-
-/// <summary>
-/// 公用控件
-/// </summary>
-namespace UI.Common.Controls { }
-
-/// <summary>
 /// 输入域类控件
 /// </summary>
 namespace UI.Common.Controls.InputFields {

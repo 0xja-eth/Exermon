@@ -33,17 +33,38 @@ namespace Core.UI.Utils {
         /// 临时动画对象
         /// </summary>
         public struct TempAnimation {
-            AnimationClip clip; // 动画片段
 
             /// <summary>
-            /// 构造函数
+            /// 动画片段
             /// </summary>
-            /// <param name="name">动画片段名称</param>
-            /// <param name="legacy">是否用在 Animation 组件中</param>
-            public TempAnimation(string name = AniClipName, bool legacy = true) {
-                clip = new AnimationClip();
-                clip.legacy = legacy;
-                clip.name = name;
+            AnimationClip clip;
+
+            /// <summary>
+            /// 动画组件
+            /// </summary>
+            Animation animation;
+
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			/// <param name="name">动画片段名称</param>
+			/// <param name="legacy">是否用在 Animation 组件中</param>
+			public TempAnimation(string name = AniClipName, bool legacy = true) {
+				animation = null;
+				clip = new AnimationClip();
+				clip.legacy = legacy;
+				clip.name = name;
+			}
+			public TempAnimation(AnimationClip clip) {
+				this.clip = clip; animation = null;
+			}
+
+			/// <summary>
+			/// 获取动画名称
+			/// </summary>
+			/// <returns>返回动画名称</returns>
+			public string getName() {
+                return clip.name;
             }
 
             /// <summary>
@@ -82,18 +103,45 @@ namespace Core.UI.Utils {
             /// </summary>
             /// <param name="ani">动画对象</param>
             public string setupAnimation(Animation ani, bool play = true) {
-                ani.AddClip(clip, clip.name);
-                if (play) ani.Play(clip.name);
+                animation = ani;
+                animation.AddClip(clip, clip.name);
+                if (play) this.play();
                 return clip.name;
+            }
+
+            /// <summary>
+            /// 是否正在播放
+            /// </summary>
+            /// <returns></returns>
+            public bool isPlaying() {
+                return animation && animation.IsPlaying(clip.name);
+            }
+
+            /// <summary>
+            /// 是否播放完毕
+            /// </summary>
+            /// <returns></returns>
+            public bool isPlayed() {
+                return animation && !animation.IsPlaying(clip.name);
+            }
+
+            /// <summary>
+            /// 播放
+            /// </summary>
+            public void play() {
+                animation?.Play(clip.name);
             }
         }
 
-        /// <summary>
-        /// 生成一个动画
-        /// </summary>
-        /// <returns>临时动画数据</returns>
-        public static TempAnimation createAnimation(string name = AniClipName, bool legacy = true) {
-            return new TempAnimation(name, legacy);
-        }
-    }
+		/// <summary>
+		/// 生成一个动画
+		/// </summary>
+		/// <returns>临时动画数据</returns>
+		public static TempAnimation createAnimation(string name = AniClipName, bool legacy = true) {
+			return new TempAnimation(name, legacy);
+		}
+		public static TempAnimation createAnimation(AnimationClip clip) {
+			return new TempAnimation(clip);
+		}
+	}
 }

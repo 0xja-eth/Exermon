@@ -400,6 +400,22 @@ namespace ExerPro.EnglishModule.Data {
             public int rate { get; protected set; }
 
             /// <summary>
+            /// 是否为逃跑
+            /// </summary>
+            /// <returns></returns>
+            public bool isEscape() {
+                return type == (int)Type.Escape;
+            }
+
+            /// <summary>
+            /// 是否无操作
+            /// </summary>
+            /// <returns></returns>
+            public bool isUnset() {
+                return type == (int)Type.Unset;
+            }
+
+            /// <summary>
             /// 测试回合
             /// </summary>
             /// <param name="round">回合</param>
@@ -420,8 +436,8 @@ namespace ExerPro.EnglishModule.Data {
         public int power { get; protected set; }
         [AutoConvert]
         public int defense { get; protected set; }
-        [AutoConvert]
-        public int type { get; protected set; }
+        [AutoConvert("type_")]
+        public int type_ { get; protected set; }
         [AutoConvert]
         public string character { get; protected set; } // 性格
 
@@ -435,7 +451,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public string typeText() {
-            return DataService.get().enemyType(type).Item2;
+            return DataService.get().enemyType(type_).Item2;
         }
     }
 
@@ -1753,6 +1769,14 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         protected virtual void onDie() { }
 
+        /// <summary>
+        /// 是否死亡
+        /// </summary>
+        /// <returns></returns>
+        public bool isDeath() {
+            return hp <= 0;
+        }
+
         #endregion
 
         #region 属性统一接口
@@ -1971,6 +1995,17 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
 
+        /// <summary>
+        /// 获取所有状态
+        /// </summary>
+        /// <returns></returns>
+        public ExerProState[] allStates() {
+            var res = new List<ExerProState>(states.Count);
+            foreach(var pair in states) 
+                res.Add(pair.Value.state());
+            return res.ToArray();
+        }
+
         #region 状态变更
 
         /// <summary>
@@ -2112,7 +2147,7 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 获取当前结果
+        /// 获取当前结果（用于显示）
         /// </summary>
         /// <returns></returns>
         public RuntimeActionResult getResult() {
@@ -2122,6 +2157,16 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         #endregion
+
+        #region 回调控制
+
+        /// <summary>
+        /// 是否处于可移动状态
+        /// </summary>
+        /// <returns></returns>
+        public bool isMovableState() {
+            return !isDeath();
+        }
 
         /// <summary>
         /// 回合结束回调
@@ -2163,6 +2208,8 @@ namespace ExerPro.EnglishModule.Data {
         public virtual void onBattleEnd() {
 
         }
+
+        #endregion
 
         /// <summary>
         /// 重置
@@ -2390,8 +2437,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 更新行动
         /// </summary>
         public bool updateAction() {
+            if (!isMovableState())
+                return isActionEnd = isActionStarted = true;
             if (!isActionStarted) processAction();
-            isActionStarted = true;
             return isActionEnd;
         }
 
@@ -2407,12 +2455,12 @@ namespace ExerPro.EnglishModule.Data {
         /// 处理行动
         /// </summary>
         public void processAction() {
+            isActionStarted = true;
             if (currentRuntimeAction != null) {
                 currentRuntimeAction.generateResult();
                 applyResult(currentRuntimeAction.result);
-            } else {
-                // TODO: 执行逃跑等逻辑
-            }
+            } else if (currentAction.isUnset())
+                isActionEnd = true;
         }
 
         #endregion
@@ -2488,7 +2536,7 @@ namespace ExerPro.EnglishModule.Data {
             /// 属性
             /// </summary>
             [AutoConvert]
-            public bool remove { get; protected set; } // 是否移除状态（turns为0时移除全部回合）
+            public new bool remove { get; protected set; } // 是否移除状态（turns为0时移除全部回合）
 
             /// <summary>
             /// 构造函数

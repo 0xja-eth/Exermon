@@ -31,11 +31,11 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
         /// </summary>
-        static readonly int[] RandomNodeRates = { 3, 2, 1, 2, 2 };
+        static readonly int[] RandomNodeRates = { 6, 2, 2, 1, 29 };
         static readonly ExerProMapNode.Type[] RandomNodeTypes = {
-            ExerProMapNode.Type.Story, ExerProMapNode.Type.Rest,
-            ExerProMapNode.Type.Treasure, ExerProMapNode.Type.Shop,
-            ExerProMapNode.Type.Enemy
+            ExerProMapNode.Type.Enemy, ExerProMapNode.Type.Treasure,
+            ExerProMapNode.Type.Shop, ExerProMapNode.Type.Elite,
+            ExerProMapNode.Type.Story,
         };
 
         /// <summary>

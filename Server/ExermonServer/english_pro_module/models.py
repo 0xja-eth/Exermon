@@ -960,7 +960,7 @@ class ExerProEnemy(BaseItem):
 		res['power'] = self.power
 		res['defense'] = self.defense
 		res['character'] = self.character
-		res['type'] = self.type
+		res['type_'] = self.type
 
 		res['actions'] = actions
 		res['effects'] = effects
