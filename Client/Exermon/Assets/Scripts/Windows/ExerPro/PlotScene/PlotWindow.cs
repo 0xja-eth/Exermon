@@ -7,13 +7,11 @@ using ExerPro.EnglishModule.Services;
 using Core.Data.Loaders;
 using System.IO;
 
-namespace UI.ExerPro.EnglishPro.PlotScene.Windows
-{
+namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
     /// <summary>
     /// 剧情窗口
     /// </summary>
-    public class PlotWindow : BaseWindow
-    {
+    public class PlotWindow : BaseWindow {
         /// <summary>
         /// 外部变量
         /// </summary>
@@ -37,15 +35,13 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
         #region 初始化
         /// 初始化场景
         /// </summary>
-        protected override void initializeScene()
-        {
+        protected override void initializeScene() {
             scene = SceneUtils.getCurrentScene<PlotScene>();
         }
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce()
-        {
+        protected override void initializeOnce() {
             base.initializeOnce();
             engServ = EnglishService.get();
             configureQuestion();
@@ -54,8 +50,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
         /// <summary>
         /// 配置题目
         /// </summary>
-        void configureQuestion()
-        {
+        void configureQuestion() {
             engServ.generateQuestions<PlotQuestion>(onGetQuestionSuccess, onGetQuestionFailed);
             onGetQuestionFailed();
         }
@@ -68,8 +63,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
         /// 当前题目
         /// </summary>
         /// <returns></returns>
-        public PlotQuestion currentQuestion()
-        {
+        public PlotQuestion currentQuestion() {
             return questionDisplay.getItem();
         }
 
@@ -80,10 +74,8 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
         /// 获取题目回调
         /// </summary>
         /// <param name="questions"></param>
-        void onGetQuestionSuccess(PlotQuestion[] questions)
-        {
-            if (questions.Length <= 0)
-            {
+        void onGetQuestionSuccess(PlotQuestion[] questions) {
+            if (questions.Length <= 0) {
                 Debug.Log("Plot Quesion get failed!");
                 return;
             }
@@ -91,8 +83,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
             questionDisplay.startView(question);
         }
 
-        void onGetQuestionFailed()
-        {
+        void onGetQuestionFailed() {
             //test
             PlotQuestion testQuestion = generateTestData();
             question = testQuestion;
@@ -100,8 +91,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
         }
         #endregion
 
-        PlotQuestion generateTestData()
-        {
+        PlotQuestion generateTestData() {
             LitJson.JsonData jsonData = new LitJson.JsonData();
             jsonData["id"] = 100;
             jsonData["title"] = "你走进一间房间，看见地上有一个大洞。当你靠近洞时，一条巨大的蛇形生物从里面钻了出来。\n\n" +
@@ -138,8 +128,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows
             return testQuestion;
         }
 
-        Texture2D loadPictureHelp(string fileName)
-        {
+        Texture2D loadPictureHelp(string fileName) {
             //创建文件读取流
             FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             fileStream.Seek(0, SeekOrigin.Begin);

@@ -14,15 +14,13 @@ using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
     /// <summary>
     /// 商人据点显示
     /// </summary>
     public abstract class ShopDisplay<T> :
-        SelectableContainerDisplay<T> where T : BaseExerProItem
-    {
+        SelectableContainerDisplay<T> where T : BaseExerProItem {
 
         /// <summary>
         /// 常量设置
@@ -52,8 +50,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeEvery()
-        {
+        protected override void initializeEvery() {
             base.initializeEvery();
             configureSelectors();
         }
@@ -61,8 +58,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 配置筛选器
         /// </summary>
-        void configureSelectors()
-        {
+        void configureSelectors() {
             starSelector.configure(generateStarsData());
             starSelector.onChanged = onSelectorChanged;
         }
@@ -71,14 +67,12 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 生成类型下拉框数据
         /// </summary>
         /// <returns></returns>
-        Tuple<int, string>[] generateStarsData()
-        {
+        Tuple<int, string>[] generateStarsData() {
             var data = dataSer.staticData.configure.exerProItemStars;
             var res = new Tuple<int, string>[data.Length + 1];
 
             res[0] = new Tuple<int, string>(UnlimitedIndex, UnlimitedText);
-            for (int i = 1; i < res.Length; ++i)
-            {
+            for (int i = 1; i < res.Length; ++i) {
                 var _data = data[i - 1];
                 res[i] = new Tuple<int, string>(
                     _data.id, _data.name);
@@ -90,8 +84,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 初始化外部系统
         /// </summary>
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             dataSer = DataService.get();
             itemSer = ItemService.get();
@@ -105,8 +98,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 设置商品集
         /// </summary>
         /// <param name="items"></param>
-        public override void setItems(T[] items)
-        {
+        public override void setItems(T[] items) {
             shopItems = items;
             base.setItems(items);
         }
@@ -116,8 +108,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// </summary>
         /// <param name="shopItem">物品</param>
         /// <returns>返回指定物品能否包含在容器中</returns>
-        protected override bool isIncluded(T shopItem)
-        {
+        protected override bool isIncluded(T shopItem) {
             if (!base.isIncluded(shopItem)) return false;
 
             // 判断星级
@@ -131,8 +122,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 筛选器变化回调
         /// </summary>
         /// <param name="index"></param>
-        void onSelectorChanged(Tuple<int, string> data)
-        {
+        void onSelectorChanged(Tuple<int, string> data) {
             if (data != null)
                 Debug.Log("onSelectorChanged: " + name + ": " + data.Item1);
             else

@@ -34,8 +34,7 @@ namespace ExerPro.EnglishModule { }
 /// <summary>
 /// 英语特训模块数据
 /// </summary>
-namespace ExerPro.EnglishModule.Data
-{
+namespace ExerPro.EnglishModule.Data {
 
     using EnglishModule.Services;
 
@@ -49,8 +48,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 听力题
     /// </summary>
-    public class ListeningQuestion : GroupQuestion<ListeningSubQuestion>
-    {
+    public class ListeningQuestion : GroupQuestion<ListeningSubQuestion> {
 
         /// <summary>
         /// 属性
@@ -92,14 +90,12 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 改错题
     /// </summary>
-    public class CorrectionQuestion : BaseData
-    {
+    public class CorrectionQuestion : BaseData {
 
         /// <summary>
         /// 错误项
         /// </summary>
-        public class WrongItem : BaseData
-        {
+        public class WrongItem : BaseData {
 
             /// <summary>
             /// 属性
@@ -117,13 +113,11 @@ namespace ExerPro.EnglishModule.Data
             /// 类型文本
             /// </summary>
             /// <returns></returns>
-            public string typeText()
-            {
+            public string typeText() {
                 return DataService.get().correctType(type).Item2;
             }
 
-            public static WrongItem[] sample()
-            {
+            public static WrongItem[] sample() {
 
                 WrongItem[] wrongItems = new WrongItem[1];
                 WrongItem wrongItem = new WrongItem();
@@ -132,7 +126,7 @@ namespace ExerPro.EnglishModule.Data
                 wrongItem.word = "is";
                 wrongItems[0] = wrongItem;
                 return wrongItems;
-        }
+            }
         }
 
         /// <summary>
@@ -145,8 +139,7 @@ namespace ExerPro.EnglishModule.Data
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
 
-        public static CorrectionQuestion sample()
-        {
+        public static CorrectionQuestion sample() {
 
             CorrectionQuestion question = new CorrectionQuestion();
             question.wrongItems = WrongItem.sample();
@@ -154,11 +147,10 @@ namespace ExerPro.EnglishModule.Data
             question.description = "test";
 
             return question;
-    }
+        }
 
-        public string[] sentences()
-        {
-            string temp = article.Replace("? ","?+");
+        public string[] sentences() {
+            string temp = article.Replace("? ", "?+");
             temp = temp.Replace(". ", ".+");
             temp = temp.Replace("! ", "!+");
             temp = temp.Replace(", ", " , ");
@@ -170,8 +162,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 单词
     /// </summary>
-    public class Word : BaseData
-    {
+    public class Word : BaseData {
 
         /// <summary>
         /// 属性
@@ -194,8 +185,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 单词记录
     /// </summary>
-    public class WordRecord : BaseData
-    {
+    public class WordRecord : BaseData {
 
         /// <summary>
         /// 属性
@@ -225,17 +215,15 @@ namespace ExerPro.EnglishModule.Data
         /// 获取单词实例
         /// </summary>
         /// <returns></returns>
-        public Word word()
-        {
+        public Word word() {
             return EnglishService.get().getQuestion<Word>(wordId);
-    }
+        }
 
-    /// <summary>
+        /// <summary>
         /// 是否当前轮正确单词
         /// </summary>
         /// <returns></returns>
-        public bool isCurrentCorrect()
-        {
+        public bool isCurrentCorrect() {
             return currentDone && currentCorrect;
         }
 
@@ -243,8 +231,7 @@ namespace ExerPro.EnglishModule.Data
         /// 是否当前轮错误单词
         /// </summary>
         /// <returns></returns>
-        public bool isCurrentWrong()
-        {
+        public bool isCurrentWrong() {
             return currentDone && !currentCorrect;
         }
     }
@@ -252,8 +239,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 反义词表
     /// </summary>
-    public class Antonym : TypeData
-    {
+    public class Antonym : TypeData {
         /// <summary>
         /// 属性
         /// </summary>
@@ -290,15 +276,12 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        protected override BaseQuestion.Choice loadChoice(JsonData data)
-        {
+        protected override BaseQuestion.Choice loadChoice(JsonData data) {
             return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
         }
 
-        public new Choice[] choices
-        {
-            get
-            {
+        public new Choice[] choices {
+            get {
                 var choices = base.choices;
                 List<Choice> listTemp = new List<Choice>();
                 foreach (var choice in choices)
@@ -307,7 +290,7 @@ namespace ExerPro.EnglishModule.Data
             }
         }
     }
-    
+
 
     #endregion
 
@@ -316,14 +299,12 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训效果数据
     /// </summary>
-    public class ExerProEffectData : BaseData
-    {
+    public class ExerProEffectData : BaseData {
 
         /// <summary>
         /// 效果代码枚举
         /// </summary>
-        public enum Code
-        {
+        public enum Code {
             Unset = 0, // 空
 
             Attack = 1, // 造成伤害
@@ -374,8 +355,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训物品数据
     /// </summary>
-    public class BaseExerProItem : BaseItem
-    {
+    public class BaseExerProItem : BaseItem {
 
         /// <summary>
         /// 属性
@@ -392,8 +372,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训物品数据
     /// </summary>
-    public class ExerProItem : BaseExerProItem
-    {
+    public class ExerProItem : BaseExerProItem {
 
         /// <summary>
         /// 属性
@@ -404,8 +383,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训药水数据
     /// </summary>
-    public class ExerProPotion : BaseExerProItem
-    {
+    public class ExerProPotion : BaseExerProItem {
 
         /// <summary>
         /// 属性
@@ -416,14 +394,12 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训卡片数据
     /// </summary>
-    public class ExerProCard : BaseExerProItem
-    {
+    public class ExerProCard : BaseExerProItem {
 
         /// <summary>
         /// 目标
         /// </summary>
-        public enum Target
-        {
+        public enum Target {
             Default = 0,  // 默认
             One = 1,  // 敌方单体
             All = 2,  // 敌方全体
@@ -449,8 +425,7 @@ namespace ExerPro.EnglishModule.Data
         /// 类型文本
         /// </summary>
         /// <returns></returns>
-        public string typeText()
-        {
+        public string typeText() {
             return DataService.get().cardType(cardType).Item2;
         }
     }
@@ -458,28 +433,24 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训敌人数据
     /// </summary>
-    public class ExerProEnemy : BaseItem
-    {
+    public class ExerProEnemy : BaseItem {
 
         /// <summary>
         /// 类型
         /// </summary>
-        public enum EnemyType
-        {
+        public enum EnemyType {
             Normal = 1, Elite = 2, Boss = 3
         }
 
         /// <summary>
         /// 行动数据
         /// </summary>
-        public class Action : BaseData
-        {
+        public class Action : BaseData {
 
             /// <summary>
             /// 类型
             /// </summary>
-            public enum Type
-            {
+            public enum Type {
                 Attack = 1, PowerUp = 2, PowerDown = 3,
                 Escape = 4, Unset = 5
             }
@@ -521,8 +492,7 @@ namespace ExerPro.EnglishModule.Data
         /// 类型文本
         /// </summary>
         /// <returns></returns>
-        public string typeText()
-        {
+        public string typeText() {
             return DataService.get().enemyType(type).Item2;
         }
     }
@@ -544,8 +514,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训背包药水
     /// </summary>
-    public class ExerProPackPotion : PackContItem<ExerProPotion>
-    {
+    public class ExerProPackPotion : PackContItem<ExerProPotion> {
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -556,8 +525,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训背包卡片
     /// </summary>
-    public class ExerProPackCard : PackContItem<ExerProCard>
-    {
+    public class ExerProPackCard : PackContItem<ExerProCard> {
 
         /// <summary>
         /// 构造函数
@@ -583,8 +551,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训抽牌堆
     /// </summary>
-    public class ExerProCardDrawGroup : PackContainer<ExerProPackCard>
-    {
+    public class ExerProCardDrawGroup : PackContainer<ExerProPackCard> {
 
         /// <summary>
         /// 卡组
@@ -595,8 +562,7 @@ namespace ExerPro.EnglishModule.Data
         /// 接受物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void acceptItem(ExerProPackCard item)
-        {
+        protected override void acceptItem(ExerProPackCard item) {
             // 卡牌进入的时候洗牌
             if (containItem(item)) return;
             var index = UnityEngine.Random.Range(0, items.Count);
@@ -606,8 +572,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 洗牌
         /// </summary>
-        public void shuffle()
-        {
+        public void shuffle() {
             var tmpItems = items.ToArray();
             foreach (var item in tmpItems)
                 transferItem(this, item);
@@ -617,8 +582,7 @@ namespace ExerPro.EnglishModule.Data
         /// 获取第一个卡牌（最后一张）
         /// </summary>
         /// <returns></returns>
-        public ExerProPackCard firstCard()
-        {
+        public ExerProPackCard firstCard() {
             return items[items.Count - 1];
         }
     }
@@ -626,8 +590,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训弃牌堆
     /// </summary>
-    public class ExerProCardDiscardGroup : PackContainer<ExerProPackCard>
-    {
+    public class ExerProCardDiscardGroup : PackContainer<ExerProPackCard> {
 
         /// <summary>
         /// 卡组
@@ -638,8 +601,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训手牌
     /// </summary>
-    public class ExerProCardHandGroup : PackContainer<ExerProPackCard>
-    {
+    public class ExerProCardHandGroup : PackContainer<ExerProPackCard> {
 
         /// <summary>
         /// 卡组
@@ -650,8 +612,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训卡组
     /// </summary>
-    public class ExerProCardGroup : PackContainer<ExerProPackCard>
-    {
+    public class ExerProCardGroup : PackContainer<ExerProPackCard> {
 
         /// <summary>
         /// 属性
@@ -668,8 +629,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 获取卡牌
         /// </summary>
-        public void addCard(ExerProCard card)
-        {
+        public void addCard(ExerProCard card) {
             pushItem(new ExerProPackCard(card));
         }
 
@@ -680,8 +640,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 战斗开始，生成牌堆
         /// </summary>
-        public void onBattleStart()
-        {
+        public void onBattleStart() {
             var tmpItems = items.ToArray();
             foreach (var item in tmpItems)
                 if (item.item().inherent) // 固有牌
@@ -693,16 +652,14 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 战斗结束，回收牌堆
         /// </summary>
-        public void onBattleEnd()
-        {
+        public void onBattleEnd() {
             recycle(drawGroup); recycle(discardGroup); recycle(handGroup);
         }
 
         /// <summary>
         /// 回合结束，自动弃牌
         /// </summary>
-        public void onRoundEnd()
-        {
+        public void onRoundEnd() {
             var tmpItems = handGroup.items.ToArray();
             foreach (var item in tmpItems)
                 handGroup.transferItem(discardGroup, item);
@@ -711,8 +668,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 回合结束，自动弃牌
         /// </summary>
-        public void recycle(PackContainer<ExerProPackCard> container)
-        {
+        public void recycle(PackContainer<ExerProPackCard> container) {
             var tmpItems = container.items.ToArray();
             foreach (var item in tmpItems)
                 container.transferItem(this, item);
@@ -721,16 +677,14 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 抽牌
         /// </summary>
-        public void drawCard()
-        {
+        public void drawCard() {
             drawGroup.transferItem(handGroup, drawGroup.firstCard());
         }
 
         /// <summary>
         /// 使用牌
         /// </summary>
-        public void useCard(ExerProPackCard card)
-        {
+        public void useCard(ExerProPackCard card) {
             if (card.item().disposable) consumeCard(card);
             else discardCard(card);
         }
@@ -738,16 +692,14 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 弃牌
         /// </summary>
-        public void discardCard(ExerProPackCard card)
-        {
+        public void discardCard(ExerProPackCard card) {
             handGroup.transferItem(discardGroup, card);
         }
 
         /// <summary>
         /// 消耗牌（本次战斗不再出现）
         /// </summary>
-        public void consumeCard(ExerProPackCard card)
-        {
+        public void consumeCard(ExerProPackCard card) {
             handGroup.transferItem(this, card);
         }
 
@@ -757,8 +709,7 @@ namespace ExerPro.EnglishModule.Data
         /// 读取自定义数据
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json)
-        {
+        protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
             drawGroup.cardGroup = discardGroup.cardGroup = handGroup.cardGroup = this;
         }
@@ -772,8 +723,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 地图阶段数据
     /// </summary>
-    public class ExerProMap : BaseData
-    {
+    public class ExerProMap : BaseData {
 
         /// <summary>
         /// 属性
@@ -795,8 +745,7 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="order">序号</param>
         /// <returns>返回对应序号的关卡</returns>
-        public ExerProMapStage stage(int order)
-        {
+        public ExerProMapStage stage(int order) {
             foreach (var stage in stages)
                 if (stage.order == order) return stage;
             return null;
@@ -806,8 +755,7 @@ namespace ExerPro.EnglishModule.Data
         /// 读取自定义数据
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json)
-        {
+        protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
             foreach (var stage in stages) stage.map = this;
         }
@@ -816,8 +764,7 @@ namespace ExerPro.EnglishModule.Data
         /// 构造函数
         /// </summary>
         public ExerProMap() { }
-        public ExerProMap(string name, int level, int minLevel, ExerProMapStage[] stages)
-        {
+        public ExerProMap(string name, int level, int minLevel, ExerProMapStage[] stages) {
             this.name = name; this.level = level; this.minLevel = minLevel;
             this.stages = stages;
         }
@@ -826,8 +773,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 地图关卡
     /// </summary>
-    public class ExerProMapStage : BaseData
-    {
+    public class ExerProMapStage : BaseData {
 
         /// <summary>
         /// 属性
@@ -857,8 +803,7 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         public ExerProMapStage() { }
         public ExerProMapStage(int order, int[] enemies, int maxBattleEnemies,
-            int[] steps, int maxForkNode, int maxFork, int[] nodeRate)
-        {
+            int[] steps, int maxForkNode, int maxFork, int[] nodeRate) {
             this.order = order; this.enemies = enemies;
             this.maxBattleEnemies = maxBattleEnemies;
             this.steps = steps; this.maxFork = maxFork;
@@ -874,8 +819,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训玩家
     /// </summary>
-    public class ExerProActor : BaseData, MultParamsDisplay.IDisplayDataConvertable
-    {
+    public class ExerProActor : BaseData, MultParamsDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 默认属性
@@ -931,7 +875,8 @@ namespace ExerPro.EnglishModule.Data
         /// <param name="type">类型</param>
         /// <returns></returns>
         public JsonData convertToDisplayData(string type = "") {
-            switch (type) {                case "hp": return convertHp();
+            switch (type) {
+                case "hp": return convertHp();
                 default: return toJson();
             }
         }
@@ -941,8 +886,7 @@ namespace ExerPro.EnglishModule.Data
         /// 读取金钱
         /// </summary>
         /// <param name="money"></param>
-        public void gainGold(int gold)
-        {
+        public void gainGold(int gold) {
             this.gold += gold;
         }
 
@@ -951,8 +895,7 @@ namespace ExerPro.EnglishModule.Data
         /// 转化状态
         /// </summary>
         /// <returns></returns>
-        JsonData convertHp()
-        {
+        JsonData convertHp() {
             var res = new JsonData();
 
             res["hp"] = hp; res["mhp"] = mhp;
@@ -966,8 +909,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 重置
         /// </summary>
-        public void reset()
-        {
+        public void reset() {
             mhp = hp = DefaultMHP;
             power = DefaultPower;
             defense = DefaultDefense;
@@ -979,8 +921,7 @@ namespace ExerPro.EnglishModule.Data
         /// 配置玩家
         /// </summary>
         /// <param name="player"></param>
-        public void setupPlayer(Player player)
-        {
+        public void setupPlayer(Player player) {
             slotItem = player.getExerSlotItem(EnglishSubjectId);
         }
 
@@ -996,8 +937,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 特训记录
     /// </summary>
-    public class ExerProRecord : BaseData, ParamDisplay.IDisplayDataConvertable
-    {
+    public class ExerProRecord : BaseData, ParamDisplay.IDisplayDataConvertable {
 
         /// <summary>
         /// 属性
@@ -1064,10 +1004,8 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns></returns>
-        public JsonData convertToDisplayData(string type = "")
-        {
-            switch (type)
-            {
+        public JsonData convertToDisplayData(string type = "") {
+            switch (type) {
                 case "map_progress": return convertMapProgressData();
                 case "word_progress": return convertWordProgressData();
                 default: return toJson();
@@ -1078,8 +1016,7 @@ namespace ExerPro.EnglishModule.Data
         /// 转化地图进度数据
         /// </summary>
         /// <returns></returns>
-        JsonData convertMapProgressData()
-        {
+        JsonData convertMapProgressData() {
             var node = currentNode();
             var last = lastNode();
             var res = new JsonData();
@@ -1094,8 +1031,7 @@ namespace ExerPro.EnglishModule.Data
         /// 转化单词进度数据
         /// </summary>
         /// <returns></returns>
-        JsonData convertWordProgressData()
-        {
+        JsonData convertWordProgressData() {
             var res = new JsonData();
             var sum = wordRecords.Count;
             var corrCnt = getCorrCnt();
@@ -1126,8 +1062,7 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="order">序号</param>
         /// <returns>返回对应序号的关卡</returns>
-        public ExerProMap map()
-        {
+        public ExerProMap map() {
             return DataService.get().exerProMap(mapId);
         }
 
@@ -1136,8 +1071,7 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="order">序号</param>
         /// <returns>返回对应序号的关卡</returns>
-        public ExerProMapStage stage()
-        {
+        public ExerProMapStage stage() {
             return map()?.stage(stageOrder);
         }
 
@@ -1145,10 +1079,8 @@ namespace ExerPro.EnglishModule.Data
         /// 敌人数组
         /// </summary>
         /// <returns>返回敌人数组</returns>
-        public List<ExerProEnemy> enemies()
-        {
-            if (_enemies == null)
-            {
+        public List<ExerProEnemy> enemies() {
+            if (_enemies == null) {
                 var enemies = stage()?.enemies;
                 if (enemies == null) return null;
                 _enemies = new List<ExerProEnemy>(enemies.Length);
@@ -1162,8 +1094,7 @@ namespace ExerPro.EnglishModule.Data
         /// BOSS数组
         /// </summary>
         /// <returns>返回敌人数组</returns>
-        public List<ExerProEnemy> bosses()
-        {
+        public List<ExerProEnemy> bosses() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
         }
 
@@ -1172,15 +1103,13 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="id">据点ID</param>
         /// <returns>返回据点对象</returns>
-        public ExerProMapNode getNode(int id)
-        {
+        public ExerProMapNode getNode(int id) {
             if (id < 0 || id >= nodes.Count) return null;
             return nodes[id]; // nodes.Find(node => node.id == id);
         }
         /// <param name="xOrder">X顺序</param>
         /// <param name="yOrder">Y顺序</param>
-        public ExerProMapNode getNode(int xOrder, int yOrder)
-        {
+        public ExerProMapNode getNode(int xOrder, int yOrder) {
             return nodes.Find(node => node.xOrder == xOrder &&
                 node.yOrder == yOrder);
         }
@@ -1189,8 +1118,7 @@ namespace ExerPro.EnglishModule.Data
         /// 初始据点
         /// </summary>
         /// <returns></returns>
-        public List<ExerProMapNode> firstNodes()
-        {
+        public List<ExerProMapNode> firstNodes() {
             return nodes.FindAll(node => node.xOrder == 0);
         }
 
@@ -1198,8 +1126,7 @@ namespace ExerPro.EnglishModule.Data
         /// 最后据点
         /// </summary>
         /// <returns></returns>
-        public ExerProMapNode lastNode()
-        {
+        public ExerProMapNode lastNode() {
             if (nodes.Count <= 0) return null;
             return nodes[nodes.Count - 1];
         }
@@ -1208,8 +1135,7 @@ namespace ExerPro.EnglishModule.Data
         /// 获取当前据点
         /// </summary>
         /// <returns>返回当前据点对象</returns>
-        public ExerProMapNode currentNode()
-        {
+        public ExerProMapNode currentNode() {
             return getNode(curIndex);
         }
 
@@ -1217,8 +1143,7 @@ namespace ExerPro.EnglishModule.Data
         /// 是否已选择起点
         /// </summary>
         /// <returns></returns>
-        public bool isFirstSelected()
-        {
+        public bool isFirstSelected() {
             return curIndex >= 0;
         }
 
@@ -1226,8 +1151,7 @@ namespace ExerPro.EnglishModule.Data
         /// 下一个单词
         /// </summary>
         /// <returns></returns>
-        public Word nextWord()
-        {
+        public Word nextWord() {
             return EnglishService.get().getQuestion<Word>(next);
         }
 
@@ -1235,8 +1159,7 @@ namespace ExerPro.EnglishModule.Data
         /// 下一个单词
         /// </summary>
         /// <returns></returns>
-        public int[] recordWordIds()
-        {
+        public int[] recordWordIds() {
             var cnt = wordRecords.Count;
             var res = new int[cnt];
             for (int i = 0; i < cnt; ++i)
@@ -1250,8 +1173,7 @@ namespace ExerPro.EnglishModule.Data
         /// 获取本轮单词正确数量
         /// </summary>
         /// <returns></returns>
-        public int getCorrCnt()
-        {
+        public int getCorrCnt() {
             int cnt = 0;
             foreach (var record in wordRecords)
                 if (record.isCurrentCorrect()) cnt++;
@@ -1262,8 +1184,7 @@ namespace ExerPro.EnglishModule.Data
         /// 获取本轮单词错误数量
         /// </summary>
         /// <returns></returns>
-        public int getWrongCnt()
-        {
+        public int getWrongCnt() {
             int cnt = 0;
             foreach (var record in wordRecords)
                 if (record.isCurrentWrong()) cnt++;
@@ -1279,8 +1200,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 生成地图
         /// </summary>
-        void generate()
-        {
+        void generate() {
             if (generated) return;
             generated = CalcService.NodeGenerator.generate(this);
             refreshNodeStatuses();
@@ -1292,8 +1212,7 @@ namespace ExerPro.EnglishModule.Data
         /// <param name="xOrder">X序号</param>
         /// <param name="yOrder">Y序号</param>
         /// <param name="type">据点类型</param>
-        public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type)
-        {
+        public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type) {
             var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
             nodes.Add(node); return node;
         }
@@ -1305,8 +1224,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 开始特训
         /// </summary>
-        public void start()
-        {
+        public void start() {
             createActor(); generate();
         }
         /*
@@ -1341,8 +1259,7 @@ namespace ExerPro.EnglishModule.Data
         /// 重置单词
         /// </summary>
         /// <param name="words">单词集合</param>
-        public void setupWords(Word[] words)
-        {
+        public void setupWords(Word[] words) {
             if (words.Length > 0) next = words[0].id;
             else next = 0;
         }
@@ -1353,11 +1270,9 @@ namespace ExerPro.EnglishModule.Data
         /// <param name="id">下一步的据点ID</param>
         /// <param name="force">强制转移</param>
         /// <param name="emit">是否发射事件</param>
-        public void moveNext(int id, bool force = false)
-        {
+        public void moveNext(int id, bool force = false) {
             if (force) changePosition(id);
-            else
-            {
+            else {
                 var node = currentNode();
                 if (node == null) return;
                 foreach (var next in node.nexts)
@@ -1370,33 +1285,28 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         /// <param name="id">新结点ID</param>
         /// <param name="emit">是否发射事件</param>
-        void changePosition(int id)
-        {
+        void changePosition(int id) {
             curIndex = id; onMoved();
         }
 
         /// <summary>
         /// 移动结束回调
         /// </summary>
-        void onMoved()
-        {
+        void onMoved() {
             refreshNodeStatuses();
         }
 
         /// <summary>
         /// 刷新据点状态
         /// </summary>
-        void refreshNodeStatuses()
-        {
+        void refreshNodeStatuses() {
             var current = currentNode();
-            foreach (var node in nodes)
-            {
+            foreach (var node in nodes) {
                 if (node.status == (int)ExerProMapNode.Status.Passed) continue;
 
                 var status = ExerProMapNode.Status.Deactive;
 
-                if (current != null)
-                {
+                if (current != null) {
                     if (node == current)
                         status = ExerProMapNode.Status.Current;
                     else if (node.xOrder < current.xOrder)
@@ -1421,31 +1331,27 @@ namespace ExerPro.EnglishModule.Data
         /// 读取自定义数据
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json)
-        {
+        protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
 
             nodes = nodes ?? new List<ExerProMapNode>();
 
-            for (int i = 0; i < nodes.Count; ++i)
-            {
+            for (int i = 0; i < nodes.Count; ++i) {
                 nodes[i].setId(i); nodes[i].stage = this;
             }
 
-            if (DataLoader.contains(json, "words"))
-            {
+            if (DataLoader.contains(json, "words")) {
                 var words = DataLoader.load<Word[]>(json, "words");
                 EnglishService.get().questionCache.addQuestions(words);
                 setupWords(words);
             }
             // generate();
-		}
+        }
 
         /// <summary>
         /// 创建一个Actor
         /// </summary>
-        public void createActor()
-        {
+        public void createActor() {
             var player = PlayerService.get().player;
             if (player == null) return;
 
@@ -1460,8 +1366,7 @@ namespace ExerPro.EnglishModule.Data
         public ExerProRecord(ExerProMapStage stage) : this(stage.map.id, stage.order) { }
         public ExerProRecord(ExerProMap map, int order) : this(map.id, order) { }
 
-        public ExerProRecord(int mapId, int stageOrder)
-        {
+        public ExerProRecord(int mapId, int stageOrder) {
             this.mapId = mapId; this.stageOrder = stageOrder;
             generate();
         }
@@ -1472,8 +1377,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 据点类型
     /// </summary>
-    public class NodeType : TypeData
-    {
+    public class NodeType : TypeData {
 
         /// <summary>
         /// 属性
@@ -1490,8 +1394,7 @@ namespace ExerPro.EnglishModule.Data
         /// 读取自定义属性
         /// </summary>
         /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json)
-        {
+        protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
             icon = AssetLoader.loadNodeIcon(id);
         }
@@ -1501,8 +1404,7 @@ namespace ExerPro.EnglishModule.Data
     /// <summary>
     /// 地图据点
     /// </summary>
-    public class ExerProMapNode : BaseData
-    {
+    public class ExerProMapNode : BaseData {
 
         /// <summary>
         /// 最大偏移量
@@ -1513,8 +1415,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 据点类型
         /// </summary>
-        public enum Type
-        {
+        public enum Type {
             Rest = 1, //休息据点
             Treasure = 2, //藏宝据点
             Shop = 3, //商人据点
@@ -1528,8 +1429,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 状态类型
         /// </summary>
-        public enum Status
-        {
+        public enum Status {
             Deactive = 0, // 未激活（未到达）
             Active = 1, // 已激活（下一步）
             Current = 2, // 当前
@@ -1574,8 +1474,7 @@ namespace ExerPro.EnglishModule.Data
         /// <summary>
         /// 生成位置
         /// </summary>
-        public void generatePosition()
-        {
+        public void generatePosition() {
             xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
             yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
         }
@@ -1584,8 +1483,7 @@ namespace ExerPro.EnglishModule.Data
         /// 设置ID
         /// </summary>
         /// <param name="id"></param>
-        public void setId(int id)
-        {
+        public void setId(int id) {
             this.id = id;
         }
 
@@ -1593,12 +1491,10 @@ namespace ExerPro.EnglishModule.Data
         /// 添加下一步
         /// </summary>
         /// <param name="next"></param>
-        public void addNext(int next)
-        {
+        public void addNext(int next) {
             nexts.Add(next);
         }
-        public void addNext(ExerProMapNode next)
-        {
+        public void addNext(ExerProMapNode next) {
             addNext(next.id);
         }
 
@@ -1610,16 +1506,14 @@ namespace ExerPro.EnglishModule.Data
         /// 获取类型
         /// </summary>
         /// <returns></returns>
-        public NodeType type()
-        {
+        public NodeType type() {
             return DataService.get().nodeType(typeId);
         }
         /// <summary>
         /// 获取类型枚举
         /// </summary>
         /// <returns></returns>
-        public Type typeEnum()
-        {
+        public Type typeEnum() {
             return (Type)typeId;
         }
 
@@ -1627,8 +1521,7 @@ namespace ExerPro.EnglishModule.Data
         /// 获取下一节点
         /// </summary>
         /// <returns></returns>
-        public List<ExerProMapNode> getNexts()
-        {
+        public List<ExerProMapNode> getNexts() {
             if (stage == null) return null;
             var nodes = new List<ExerProMapNode>();
             foreach (var next in nexts)
@@ -1640,20 +1533,17 @@ namespace ExerPro.EnglishModule.Data
         /// 设置状态
         /// </summary>
         /// <param name="status">状态</param>
-        public void setStatus(Status status)
-        {
+        public void setStatus(Status status) {
             this.status = (int)status;
         }
-        public void setStatus(int status)
-        {
+        public void setStatus(int status) {
             this.status = status;
         }
 
         /// <summary>
         /// 是否当前据点
         /// </summary>
-        public bool isCurrent()
-        {
+        public bool isCurrent() {
             return status == (int)Status.Current;
         }
 
@@ -1664,8 +1554,7 @@ namespace ExerPro.EnglishModule.Data
         /// </summary>
         public ExerProMapNode() { }
         public ExerProMapNode(int id, ExerProRecord stage,
-            int xOrder, int yOrder, Type type)
-        {
+            int xOrder, int yOrder, Type type) {
             this.id = id; this.stage = stage;
             this.xOrder = xOrder; this.yOrder = yOrder;
             typeId = (int)type;

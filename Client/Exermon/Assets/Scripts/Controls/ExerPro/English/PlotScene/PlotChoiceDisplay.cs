@@ -8,14 +8,12 @@ using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.SystemExtend.QuestionText;
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.EnglishPro.PlotScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
     /// <summary>
     /// 题目选项显示
     /// </summary
     public class PlotChoiceDisplay :
-        SelectableItemDisplay<PlotQuestion.Choice>
-    {
+        SelectableItemDisplay<PlotQuestion.Choice> {
 
         /// <summary>
         /// 常量定义
@@ -38,14 +36,12 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 绘制确切物品
         /// </summary>
         /// <param name="choice">选项</param>
-        protected override void drawExactlyItem(PlotQuestion.Choice choice)
-        {
+        protected override void drawExactlyItem(PlotQuestion.Choice choice) {
             base.drawExactlyItem(choice);
             //if (canvasGroup)
             //    canvasGroup.alpha = isHighlighting() ? 1 : noAnswerAlpha;
 
-            if (text)
-            {
+            if (text) {
                 text.text = generateChoiceText(choice);
             }
         }
@@ -55,8 +51,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// </summary>
         /// <param name="choice">选项</param>
         /// <returns></returns>
-        string generateChoiceText(PlotQuestion.Choice choice)
-        {
+        string generateChoiceText(PlotQuestion.Choice choice) {
             return choice.text;
             //var alph = ((char)('A' + index)).ToString();
             //return string.Format(TextFormat, alph, choice.text);
@@ -65,8 +60,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem()
-        {
+        protected override void drawEmptyItem() {
             //if (canvasGroup) canvasGroup.alpha = 1;
             if (text) text.text = "";
         }
@@ -78,8 +72,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 处理点击事件回调
         /// </summary>
         /// <param name="eventData">事件数据</param>
-        public override void OnPointerClick(PointerEventData eventData)
-        {
+        public override void OnPointerClick(PointerEventData eventData) {
             base.OnPointerClick(eventData);
             Debug.Log("Plot Choice Clicked!");
 

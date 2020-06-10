@@ -3,14 +3,12 @@ using Core.UI;
 
 using UI.ExerPro.EnglishPro.BusinessManScene.Windows;
 
-namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
     /// <summary>
     /// 状态页控制组
     /// </summary>
-    public class PackTabController : TabView<BusinessManWindow>
-    {
+    public class PackTabController : TabView<BusinessManWindow> {
 
         #region 界面绘制
 
@@ -18,8 +16,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 显示内容页
         /// </summary>
         /// <param name="content"></param>
-        protected override void showContent(BusinessManWindow content, int index)
-        {
+        protected override void showContent(BusinessManWindow content, int index) {
             content.switchView(index);
         }
 
@@ -27,8 +24,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 隐藏内容页
         /// </summary>
         /// <param name="content"></param>
-        protected override void hideContent(BusinessManWindow content, int index)
-        {
+        protected override void hideContent(BusinessManWindow content, int index) {
             content.clearView();
         }
 

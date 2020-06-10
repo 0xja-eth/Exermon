@@ -5,10 +5,8 @@ using UI.Common.Controls.ItemDisplays;
 using ExerPro.EnglishModule.Data;
 using UI.Common.Controls.SystemExtend.QuestionText;
 
-namespace UI.ExerPro.EnglishPro.PlotScene.Controls
-{
-    public class PlotQuestionDisplay : ItemDetailDisplay<PlotQuestion>
-    {
+namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
+    public class PlotQuestionDisplay : ItemDetailDisplay<PlotQuestion> {
         /// <summary>
         /// 外部变量
         /// </summary>
@@ -22,11 +20,9 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 显示答案解析
         /// </summary>
         bool _showAnswer = false;
-        public bool showAnswer
-        {
+        public bool showAnswer {
             get { return _showAnswer; }
-            set
-            {
+            set {
                 _showAnswer = value;
                 requestRefresh();
             }
@@ -36,8 +32,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce()
-        {
+        protected override void initializeOnce() {
             base.initializeOnce();
             choiceContainer?.addClickedCallback(onChoiceSelected);
         }
@@ -48,15 +43,13 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// <summary>
         /// 物品变更回调
         /// </summary>
-        protected override void onItemChanged()
-        {
+        protected override void onItemChanged() {
             base.onItemChanged();
             content.anchoredPosition = new Vector2(0, 0);
             // result = null; showAnswer = false;
         }
 
-        void onChoiceSelected(int index)
-        {
+        void onChoiceSelected(int index) {
             showAnswer = true;
 
             var question = choiceContainer.getItem();
@@ -75,18 +68,15 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 绘制确切物品
         /// </summary>
         /// <param name="question">题目</param>
-        protected override void drawExactlyItem(PlotQuestion question)
-        {
+        protected override void drawExactlyItem(PlotQuestion question) {
             base.drawExactlyItem(question);
             drawBaseInfo(question);
-            if (showAnswer)
-            {
+            if (showAnswer) {
                 if (title) title.gameObject.SetActive(false);
                 if (choiceContainer) choiceContainer.gameObject.SetActive(false);
                 if (description) description.gameObject.SetActive(true);
             }
-            else
-            {
+            else {
                 if (title) title.gameObject.SetActive(true);
                 if (choiceContainer) choiceContainer.gameObject.SetActive(true);
                 if (description) description.gameObject.SetActive(false);
@@ -98,8 +88,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// <summary>
         /// 绘制基本信息
         /// </summary>
-        void drawBaseInfo(PlotQuestion question)
-        {
+        void drawBaseInfo(PlotQuestion question) {
             if (tipName)
                 tipName.text = question.eventName;
             if (image)
@@ -110,9 +99,8 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 绘制题干
         /// </summary>
         /// <param name="question">题目</param>
-        void drawTitle(PlotQuestion question)
-        {
-            if(title)
+        void drawTitle(PlotQuestion question) {
+            if (title)
                 title.text = question.title;
         }
 
@@ -120,16 +108,14 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls
         /// 绘制图片和选项
         /// </summary>
         /// <param name="question">题目</param>
-        void drawChoices(PlotQuestion question)
-        {
+        void drawChoices(PlotQuestion question) {
             choiceContainer?.startView(question);
         }
 
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem()
-        {
+        protected override void drawEmptyItem() {
             base.drawEmptyItem();
             title.text = description.text = "";
 

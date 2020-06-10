@@ -1,8 +1,7 @@
 ﻿using ExerPro.EnglishModule.Data;
 using UnityEngine;
 using UnityEngine.UI;
-namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
     /// <summary>
     /// 装备背包显示
     /// </summary>
@@ -17,8 +16,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem
         /// 绘制基本信息
         /// </summary>
         /// <param name="item">物品</param>
-        protected override void drawBaseInfo(ExerProCard item)
-        {
+        protected override void drawBaseInfo(ExerProCard item) {
             base.drawBaseInfo(item);
             cost.text = item.cost.ToString();
             description.text = item.description;

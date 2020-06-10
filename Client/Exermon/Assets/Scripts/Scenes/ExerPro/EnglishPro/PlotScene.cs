@@ -8,14 +8,12 @@ using ExerPro.EnglishModule.Services;
 /// <summary>
 /// 背包场景
 /// </summary>
-namespace UI.ExerPro.EnglishPro.PlotScene
-{
+namespace UI.ExerPro.EnglishPro.PlotScene {
 
     /// <summary>
     /// 商店场景
     /// </summary>
-    public class PlotScene : BaseScene
-    {
+    public class PlotScene : BaseScene {
         /// <summary>
         /// 外部变量
         /// </summary>
@@ -32,13 +30,11 @@ namespace UI.ExerPro.EnglishPro.PlotScene
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex()
-        {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProPlotScene;
         }
 
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -46,8 +42,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene
         /// <summary>
         /// 开始
         /// </summary>
-        protected override void start()
-        {
+        protected override void start() {
             base.start();
             refresh();
         }
@@ -59,13 +54,11 @@ namespace UI.ExerPro.EnglishPro.PlotScene
         /// <summary>
         /// 刷新场景
         /// </summary>
-        public void refresh()
-        {
+        public void refresh() {
             plotWindow.startWindow();
         }
 
-        public override void popScene()
-        {
+        public override void popScene() {
             engSer.exitNode();
         }
 

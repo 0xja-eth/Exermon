@@ -8,14 +8,12 @@ using ExerPro.EnglishModule.Services;
 /// <summary>
 /// 背包场景
 /// </summary>
-namespace UI.ExerPro.EnglishPro.BusinessManScene
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene {
 
     /// <summary>
     /// 商店场景
     /// </summary>
-    public class BusinessManScene : BaseScene
-    {
+    public class BusinessManScene : BaseScene {
 
         /// <summary>
         /// 文本定义
@@ -37,13 +35,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex()
-        {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProBusinessManScene;
         }
 
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -51,8 +47,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene
         /// <summary>
         /// 开始
         /// </summary>
-        protected override void start()
-        {
+        protected override void start() {
             base.start();
             refresh();
         }
@@ -64,13 +59,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene
         /// <summary>
         /// 刷新场景
         /// </summary>
-        public void refresh()
-        {
+        public void refresh() {
             shopWindow.startWindow();
         }
 
-        public override void popScene()
-        {
+        public override void popScene() {
             engSer.exitNode();
         }
         #endregion

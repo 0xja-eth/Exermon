@@ -13,14 +13,12 @@ using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
     /// <summary>
     /// 装备背包显示
     /// </summary>
-    public class ShopItemDisplay<T> : SelectableItemDisplay<T> where T : BaseExerProItem
-    {
+    public class ShopItemDisplay<T> : SelectableItemDisplay<T> where T : BaseExerProItem {
 
         /// <summary>
         /// 常量定义
@@ -43,8 +41,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce()
-        {
+        protected override void initializeOnce() {
             base.initializeOnce();
             initializeDrawFuncs();
         }
@@ -52,8 +49,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 初始化绘制函数
         /// </summary>
-        protected void initializeDrawFuncs()
-        {
+        protected void initializeDrawFuncs() {
             itemDisplay.registerItemType<T>(drawItem);
         }
 
@@ -65,12 +61,10 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 绘制基本信息
         /// </summary>
         /// <param name="item">物品</param>
-        protected virtual void drawBaseInfo(T item)
-        {
+        protected virtual void drawBaseInfo(T item) {
             name.text = item.name;
             // 处理物品星级和图标情况
-            if (item != null)
-            {
+            if (item != null) {
                 starsDisplay?.setValue(item.starId);
 
                 icon.gameObject.SetActive(true);
@@ -82,16 +76,13 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 绘制物品价格
         /// </summary>
         /// <param name="item">商品</param>
-        void drawPrice(BaseExerProItem item)
-        {
+        void drawPrice(BaseExerProItem item) {
             var price = item.gold;
-            if (price > 0)
-            {
+            if (price > 0) {
                 priceText.text = price.ToString();
                 setPriceTag(goldTag);
             }
-            else
-            {
+            else {
                 priceText.text = "";
                 setPriceTag(null);
             }
@@ -101,12 +92,10 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 设置物品价格标签
         /// </summary>
         /// <param name="obj"></param>
-        void setPriceTag(Texture2D texture)
-        {
+        void setPriceTag(Texture2D texture) {
             if (texture == null)
                 priceTag.gameObject.SetActive(false);
-            else
-            {
+            else {
                 priceTag.gameObject.SetActive(true);
                 priceTag.overrideSprite = AssetLoader.generateSprite(texture);
             }
@@ -116,8 +105,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 绘制物品
         /// </summary>
         /// <param name="item">物品</param>
-        void drawItem(T item)
-        {
+        void drawItem(T item) {
             drawBaseInfo(item);
         }
 
@@ -125,8 +113,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// 绘制确切物品
         /// </summary>
         /// <param name="shopItem"></param>
-        protected override void drawExactlyItem(T shopItem)
-        {
+        protected override void drawExactlyItem(T shopItem) {
             base.drawExactlyItem(shopItem);
             itemDisplay.setItem(shopItem);
             drawPrice(shopItem);
@@ -135,8 +122,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls
         /// <summary>
         /// 清除物品
         /// </summary>
-        protected override void drawEmptyItem()
-        {
+        protected override void drawEmptyItem() {
             base.drawEmptyItem();
             name.text = priceText.text = "";
             icon.gameObject.SetActive(false);

@@ -1,4 +1,4 @@
-
+﻿
 using Core.UI;
 using Core.Systems;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
@@ -81,6 +81,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
             SceneUtils.get<CorrectionWindow>(correctionWindow).terminateView();
         }
 
+        #region 场景控制
+        public override void popScene() {
+            engSer.exitNode();
+        }
+
+        #endregion
 
         // Use this for initialization
         //void Start ()

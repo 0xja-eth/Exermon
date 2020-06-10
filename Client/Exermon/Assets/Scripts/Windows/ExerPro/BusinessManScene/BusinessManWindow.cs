@@ -26,14 +26,12 @@ using UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays;
 
 using ExerPro.EnglishModule.Services;
 
-namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
 
     /// <summary>
     /// 状态窗口
     /// </summary>
-    public class BusinessManWindow : BaseWindow
-    {
+    public class BusinessManWindow : BaseWindow {
 
         /// <summary>
         /// 文本常量定义
@@ -43,8 +41,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 视图枚举
         /// </summary>
-        public enum View
-        {
+        public enum View {
             CardItem, PotionItem,
         }
 
@@ -85,8 +82,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce()
-        {
+        protected override void initializeOnce() {
             base.initializeOnce();
             var name = gameObject.name;
             var init = this.initialized;
@@ -94,8 +90,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
             player = englishSer.record.actor;
         }
 
-        protected override void initializeEvery()
-        {
+        protected override void initializeEvery() {
             base.initializeEvery();
             if (player == null)
                 player = englishSer.record.actor;
@@ -104,16 +99,14 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 初始化场景
         /// </summary>
-        protected override void initializeScene()
-        {
+        protected override void initializeScene() {
             scene = (BusinessManScene)SceneUtils.getSceneObject("Scene");
         }
 
         /// <summary>
         /// 初始化系统/服务
         /// </summary>
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
             playerSer = PlayerService.get();
@@ -129,16 +122,14 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 开始窗口
         /// </summary>
-        public override void startWindow()
-        {
+        public override void startWindow() {
             startWindow(View.CardItem);
         }
 
         /// <summary>
         /// 开始窗口
         /// </summary>
-        public void startWindow(View view)
-        {
+        public void startWindow(View view) {
             base.startWindow();
             tabController.startView((int)view);
         }
@@ -151,8 +142,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// 当前商店显示容器
         /// </summary>
         /// <returns></returns>
-        public ShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new()
-        {
+        public ShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new() {
             if (typeof(T) == typeof(ExerProCard))
                 return (ShopDisplay<T>)(object)cardItemShop;
             if (typeof(T) == typeof(ExerProPotion))
@@ -164,8 +154,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// 当前操作背包容器
         /// </summary>
         /// <returns></returns>
-        public PackContainer<T> operContainer<T>() where T : PackContItem, new()
-        {
+        public PackContainer<T> operContainer<T>() where T : PackContItem, new() {
             if (typeof(T) == typeof(ExerProPackCard))
                 return (PackContainer<T>)(object)player?.cardGroup;
             else if (typeof(T) == typeof(ExerProPackPotion))
@@ -177,13 +166,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// 操作商品
         /// </summary>
         /// <returns></returns>
-        public BaseExerProItem operShopItem()
-        {
-            switch (view)
-            {
+        public BaseExerProItem operShopItem() {
+            switch (view) {
                 case View.CardItem:
                     return cardItemShop.selectedItem();
-                
+
                 case View.PotionItem:
                     return potionItemShop.selectedItem();
             }
@@ -198,11 +185,9 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 刷新视窗
         /// </summary>
-        void refreshView()
-        {
+        void refreshView() {
             clearView();
-            switch (view)
-            {
+            switch (view) {
                 case View.CardItem: onCardItemShop(); break;
                 case View.PotionItem: onPotionItemShop(); break;
             }
@@ -211,32 +196,28 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 卡牌物品商店
         /// </summary>
-        void onCardItemShop()
-        {
+        void onCardItemShop() {
             cardItemShop.startView();
         }
 
         /// <summary>
         /// 药水物品商店
         /// </summary>
-        void onPotionItemShop()
-        {
+        void onPotionItemShop() {
             potionItemShop.startView();
         }
 
         /// <summary>
         /// 刷新金钱
         /// </summary>
-        void refreshMoney()
-        {
+        void refreshMoney() {
             moneyDisplay.setValue(player.gold);
         }
 
         /// <summary>
         /// 清除视图
         /// </summary>
-        public void clearView()
-        {
+        public void clearView() {
             cardItemShop.terminateView();
             potionItemShop.terminateView();
         }
@@ -244,8 +225,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 刷新窗口
         /// </summary>
-        protected override void refresh()
-        {
+        protected override void refresh() {
             base.refresh();
             refreshMoney();
             refreshView();
@@ -254,8 +234,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 清除窗口
         /// </summary>
-        protected override void clear()
-        {
+        protected override void clear() {
             base.clear();
             clearView();
         }
@@ -267,12 +246,10 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 切换视图
         /// </summary>
-        public void switchView(int view)
-        {
+        public void switchView(int view) {
             switchView((View)view);
         }
-        public void switchView(View view)
-        {
+        public void switchView(View view) {
             this.view = view;
             requestRefresh(true);
         }
@@ -282,8 +259,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 使用物品
         /// </summary>
-        public void onBuy()
-        {
+        public void onBuy() {
             var item = operShopItem();
             if (item == null) return;
             buyItem();
@@ -293,10 +269,8 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// 购买道具
         /// </summary>
         /// <param name="count"></param>
-        public void buyItem()
-        {
-            switch (view)
-            {
+        public void buyItem() {
+            switch (view) {
                 case View.CardItem:
                     buyCardItem();
                     break;
@@ -306,8 +280,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
             }
         }
 
-        public void buyCardItem()
-        {
+        public void buyCardItem() {
             var container = (ExerProCardGroup)operContainer<ExerProPackCard>();
             var item = (ExerProCard)operShopItem();
             if (container == null || item == null)
@@ -319,8 +292,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
             onBuySuccess();
         }
 
-        public void buyPotionItem()
-        {
+        public void buyPotionItem() {
             var container = (ExerProPotionPack)operContainer<ExerProPackPotion>();
             var item = (ExerProPotion)operShopItem();
             if (container == null || item == null)
@@ -333,8 +305,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows
         /// <summary>
         /// 操作成功回调
         /// </summary>
-        protected virtual void onBuySuccess()
-        {
+        protected virtual void onBuySuccess() {
             gameSys.requestAlert(BuySuccessText);
             refreshMoney();
         }

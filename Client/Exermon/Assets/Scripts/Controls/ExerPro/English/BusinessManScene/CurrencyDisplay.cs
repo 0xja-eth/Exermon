@@ -7,14 +7,12 @@ using UI.Common.Controls.ParamDisplays;
 using Core.UI;
 using ExerPro.EnglishModule.Data;
 
-namespace UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays
-{
+namespace UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays {
 
     /// <summary>
     /// 信誉积分显示
     /// </summary>
-    public class CurrencyDisplay : ParamDisplay<int>
-    {
+    public class CurrencyDisplay : ParamDisplay<int> {
         /// <summary>
         /// 外部变量设置
         /// </summary>
@@ -30,8 +28,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays
         /// <summary>
         /// 绘制值
         /// </summary>
-        protected override void drawExactlyValue(int data)
-        {
+        protected override void drawExactlyValue(int data) {
             base.drawExactlyValue(base.data);
             gold.text = string.Format(goldFormat, data);
         }
@@ -39,8 +36,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays
         /// <summary>
         /// 绘制空值
         /// </summary>
-        protected override void drawEmptyValue()
-        {
+        protected override void drawEmptyValue() {
             base.drawEmptyValue();
             gold.text = string.Format(goldFormat, 0);
         }
