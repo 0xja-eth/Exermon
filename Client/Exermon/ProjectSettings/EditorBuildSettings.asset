@@ -53,4 +53,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ExerPro/EnglishPro/PlotScene.unity
     guid: 89a5236cea14ee748985095619559cf9
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/Scenes/ExerPro/EnglishPro/CorrectionScene.unity
+    guid: 71db381ae53a9ef4390bc58b25e19b61  m_configObjects: {}

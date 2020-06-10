@@ -63,7 +63,7 @@ namespace UI.MainScene {
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex() {
+        public override string sceneName() {
             return SceneSystem.Scene.MainScene;
         }
 
@@ -113,7 +113,7 @@ namespace UI.MainScene {
         /// </summary>
         /// <param name="type"></param>
         public void onBulidingsClick(BuildingType type) {
-            SceneSystem.Scene sceneName = SceneSystem.Scene.NoneScene;
+            string sceneName = "";
             switch (type) {
                 case BuildingType.Dormitory:
                     sceneName = SceneSystem.Scene.StatusScene; break;
@@ -124,12 +124,14 @@ namespace UI.MainScene {
                 case BuildingType.Library:
                     onLibraryClick(); break;
                 case BuildingType.Adventure:
+<<<<<<< HEAD
                     //sceneName = SceneSystem.Scene.EnglishProMapScene; break;
-                    //sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
+                    sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
+=======
                     onAdventureClick(); break;
+>>>>>>> 9480b06db5c7a76b50fa4352972c2889f8e749d6
             }
-            if (sceneName != SceneSystem.Scene.NoneScene)
-                sceneSys.pushScene(sceneName);
+            if (sceneName != "") sceneSys.pushScene(sceneName);
         }
         public void onBulidingsClick(int type) {
             onBulidingsClick((BuildingType)type);
