@@ -238,8 +238,7 @@ namespace ExerPro.EnglishModule.Services {
         }
         public void startExerPro(int mapId, UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 record = DataLoader.load<ExerProRecord>(res, "record");
                 onSuccess?.Invoke();
             };
@@ -262,8 +261,7 @@ namespace ExerPro.EnglishModule.Services {
         public void saveExerPro(bool terminate = false,
             UnityAction onSuccess = null, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 // TODO: 保存奖励信息
                 record.load(res); onSuccess?.Invoke();
             };
@@ -308,8 +306,7 @@ namespace ExerPro.EnglishModule.Services {
         public void generateQuestions<T>(int count, UnityAction<T[]> onSuccess,
             UnityAction onError = null) where T : BaseData, new() {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var ids = DataLoader.load<int[]>(res, "qids");
                 loadQuestions(ids, onSuccess, onError);
             };
@@ -334,8 +331,7 @@ namespace ExerPro.EnglishModule.Services {
         public void getQuestions<T>(int[] qids, UnityAction<T[]> onSuccess,
             UnityAction onError = null) where T : BaseData, new() {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var questions = DataLoader.load<T[]>(res, "questions");
                 questionCache.addQuestions(questions);
                 onSuccess?.Invoke(questions);
@@ -360,8 +356,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="onError">失败回调</param>
         public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 //var words = DataLoader.load<Word[]>(res, "words");
                 //questionCache.addQuestions(words);
                 record = DataLoader.load(record, res, "record");
@@ -384,8 +379,7 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="onError">失败回调</param>
         public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var words = DataLoader.load<Word[]>(res, "words");
                 questionCache.addQuestions(words);
                 onSuccess?.Invoke(words);
@@ -411,8 +405,7 @@ namespace ExerPro.EnglishModule.Services {
         public void answerWord(Word word, string chinese,
             UnityAction<bool> onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-            {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                 var correct = DataLoader.load<bool>(res, "correct");
                 var new_ = DataLoader.load<bool>(res, "new");
 
@@ -465,8 +458,7 @@ namespace ExerPro.EnglishModule.Services {
 
             if (record == null) onSuccess?.Invoke();
             else {
-                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
-                {
+                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
                     record.load(res); var wids = record.recordWordIds();
                     loadQuestions<Word>(wids, onSuccess, onError);
                 };
@@ -665,7 +657,13 @@ namespace ExerPro.EnglishModule.Services {
         /// 藏宝据点
         /// </summary>
         void onTreasureNode() {
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene);
+            long i = UnityEngine.Random.Range(0, 10000);
+            switch (i % 2) {
+                case 0:
+                    sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+                case 1:
+                    sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+            }
         }
 
         /// <summary>
@@ -758,7 +756,8 @@ namespace ExerPro.EnglishModule.Services {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
-            //saveExerPro();        }
+            //saveExerPro();        
+        }
 
         /// <summary>
         /// 结束移动

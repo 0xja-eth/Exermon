@@ -51,7 +51,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
         /// 配置题目
         /// </summary>
         void configureQuestion() {
-            engServ.generateQuestions<PlotQuestion>(onGetQuestionSuccess, onGetQuestionFailed);
+            engServ.generateQuestions<PlotQuestion>(1, onGetQuestionSuccess, onGetQuestionFailed);
             onGetQuestionFailed();
         }
 

@@ -58,7 +58,7 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro
 
         public void onSubmit()
         {
-            sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+            engSer.exitNode();
         }
     }
 }

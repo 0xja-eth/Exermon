@@ -1,4 +1,4 @@
-
+﻿
 using Core.UI;
 using Core.Systems;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
@@ -88,7 +88,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
 
         public void onSubmit()
         {
-            sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+            engSer.exitNode();
         }
     }
 

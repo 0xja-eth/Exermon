@@ -72,8 +72,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 短语题目
     /// </summary>
-    public class PhraseQuestion : BaseData
-    {
+    public class PhraseQuestion : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
@@ -89,8 +88,7 @@ namespace ExerPro.EnglishModule.Data {
         public string[] option2 = { "doing sth.", "to do sth." };
         public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
         public string[] option4 = { "for", "in", "of", "to" };
-        public string[] options()
-        {
+        public string[] options() {
             if (option1.ToList<string>().IndexOf(phrase) != -1)
                 return option1;
             else if (option2.ToList<string>().IndexOf(phrase) != -1)
@@ -101,13 +99,11 @@ namespace ExerPro.EnglishModule.Data {
                 return option3;
             return new string[] { };
         }
-        public static PhraseQuestion sample()
-        {
+        public static PhraseQuestion sample() {
             long i = UnityEngine.Random.Range(0, 10000);
 
             PhraseQuestion question = new PhraseQuestion();
-            switch (i % 4)
-            {
+            switch (i % 4) {
                 case 0:
                     question.word = "persuade";
                     question.chinese = "说服某人做某事";
@@ -133,7 +129,7 @@ namespace ExerPro.EnglishModule.Data {
                     question.chinese = "希望某人做某事";
                     question.phrase = "sb. to do sth.";
                     return question;
-    }
+            }
         }
     }
 
@@ -200,9 +196,9 @@ namespace ExerPro.EnglishModule.Data {
             return question;
         }
 
-        public string[] sentences()
-        {
-            string temp = article.Replace("? ","?+");            temp = temp.Replace(". ", ".+");
+        public string[] sentences() {
+            string temp = article.Replace("? ", "?+");
+            temp = temp.Replace(". ", ".+");
             temp = temp.Replace("! ", "!+");
             temp = temp.Replace(", ", " , ");
             string[] sentences = temp.Split('+');

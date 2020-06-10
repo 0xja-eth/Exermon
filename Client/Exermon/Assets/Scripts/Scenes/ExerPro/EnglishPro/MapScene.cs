@@ -112,21 +112,6 @@ namespace UI.ExerPro.EnglishPro.MapScene
 
             stageRecordDisplay.requestRefresh();
             nodeDetail.terminateWindow();
-            if (node.typeEnum() == ExerProMapNode.Type.Treasure)
-            {
-
-                long i = UnityEngine.Random.Range(0, 10000);
-                //long i = 0;
-
-                PhraseQuestion question = new PhraseQuestion();
-                switch (i % 2)
-                {
-                    case 0:
-                        sceneSys.gotoScene(SceneSystem.Scene.EnglishProCorrectionScene);break;
-                    case 1:
-                        sceneSys.gotoScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-                }
-            }
         }
 
         /// <summary>
