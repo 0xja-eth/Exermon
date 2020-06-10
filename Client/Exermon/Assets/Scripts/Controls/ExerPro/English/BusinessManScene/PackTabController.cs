@@ -13,10 +13,23 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         #region 界面绘制
 
         /// <summary>
+        /// 初次打开时初始化（子类中重载）
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+        }
+
+        /// <summary>
         /// 显示内容页
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(BusinessManWindow content, int index) {
+            foreach (var toggle in subViews) {
+                var a = toggle.IsActive();
+                var c = toggle.isOn;
+                int b = 4;
+            }
+
             content.switchView(index);
         }
 

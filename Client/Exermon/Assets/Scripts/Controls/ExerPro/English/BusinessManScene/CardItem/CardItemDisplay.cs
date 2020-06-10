@@ -1,5 +1,6 @@
 ﻿using ExerPro.EnglishModule.Data;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
     /// <summary>
@@ -21,5 +22,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
             cost.text = item.cost.ToString();
             description.text = item.description;
         }
+
     }
 }

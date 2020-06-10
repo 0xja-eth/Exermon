@@ -118,9 +118,9 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
             choiceData["text"] = "【拒绝】";
             choiceData["result_text"] = "蛇非常失望地看着你。";
             PlotQuestion.Choice temp2 = DataLoader.load<PlotQuestion.Choice>(choiceData);
-            //tempArray[2] = temp2;
-            //tempArray[3] = temp2;
-            //tempArray[4] = temp2;
+            tempArray[2] = temp2;
+            tempArray[3] = temp2;
+            tempArray[4] = temp2;
 
             jsonData["choices"] = DataLoader.convert(tempArray);
 

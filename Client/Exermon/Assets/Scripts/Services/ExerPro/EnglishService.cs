@@ -683,7 +683,9 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 敌人据点
         /// </summary>
-        void onEnemyNode() { }
+        void onEnemyNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+        }
 
         /// <summary>
         /// 精英据点
