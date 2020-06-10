@@ -98,7 +98,8 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
                 "“~嚯嚯嚯！你好，你好啊！这是谁啊？”\n" +
                 "你同意吗？";
             jsonData["event_name"] = "蛇";
-            jsonData["picture"] = DataLoader.convert(loadPictureHelp("F:/Snake.png"));
+            var loadPath = System.Environment.CurrentDirectory + "\\Assets\\Sprites\\ExerPro\\PlotScene\\Snake.png";
+            jsonData["picture"] = DataLoader.convert(loadPictureHelp(loadPath));
 
             PlotQuestion.Choice[] tempArray = new PlotQuestion.Choice[5];
             LitJson.JsonData choiceData = new LitJson.JsonData();
