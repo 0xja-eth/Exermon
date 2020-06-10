@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 using UI.Common.Controls.ItemDisplays;
 using UnityEngine;
 
-namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
+namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene
 {
-
-    /// <summary>
-    /// 单词
-    /// </summary
-    public class WordDisplay :
+    class OptionDisplay :
         SelectableItemDisplay<string>
     {
 
@@ -28,6 +24,4 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         }
         #endregion
     }
-
-
 }

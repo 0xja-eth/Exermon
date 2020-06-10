@@ -238,7 +238,8 @@ namespace ExerPro.EnglishModule.Services {
         }
         public void startExerPro(int mapId, UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 record = DataLoader.load<ExerProRecord>(res, "record");
                 onSuccess?.Invoke();
             };
@@ -261,7 +262,8 @@ namespace ExerPro.EnglishModule.Services {
         public void saveExerPro(bool terminate = false,
             UnityAction onSuccess = null, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 // TODO: 保存奖励信息
                 record.load(res); onSuccess?.Invoke();
             };
@@ -303,21 +305,23 @@ namespace ExerPro.EnglishModule.Services {
         /// <typeparam name="T">题目类型</typeparam>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
-        public void generateQuestions<T>(UnityAction<T[]> onSuccess,
+        public void generateQuestions<T>(int count, UnityAction<T[]> onSuccess,
             UnityAction onError = null) where T : BaseData, new() {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 var ids = DataLoader.load<int[]>(res, "qids");
                 loadQuestions(ids, onSuccess, onError);
             };
 
-            generateQuestion(getQuestionType<T>(), _onSuccess, onError);
+            generateQuestion(count, getQuestionType<T>(), _onSuccess, onError);
         }
         /// <param name="qids">题目类型</param>
-        public void generateQuestion(int type,
+        public void generateQuestion(int count, int type,
             NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError) {
 
-            JsonData data = new JsonData(); data["type"] = type;
+            JsonData data = new JsonData();
+            data["type"] = type; data["count"] = count;
             sendRequest(Oper.QuestionGenerate, data, onSuccess, onError, uid: true);
         }
 
@@ -330,7 +334,8 @@ namespace ExerPro.EnglishModule.Services {
         public void getQuestions<T>(int[] qids, UnityAction<T[]> onSuccess,
             UnityAction onError = null) where T : BaseData, new() {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 var questions = DataLoader.load<T[]>(res, "questions");
                 questionCache.addQuestions(questions);
                 onSuccess?.Invoke(questions);
@@ -355,7 +360,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="onError">失败回调</param>
         public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 //var words = DataLoader.load<Word[]>(res, "words");
                 //questionCache.addQuestions(words);
                 record = DataLoader.load(record, res, "record");
@@ -378,7 +384,8 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="onError">失败回调</param>
         public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 var words = DataLoader.load<Word[]>(res, "words");
                 questionCache.addQuestions(words);
                 onSuccess?.Invoke(words);
@@ -404,7 +411,8 @@ namespace ExerPro.EnglishModule.Services {
         public void answerWord(Word word, string chinese,
             UnityAction<bool> onSuccess, UnityAction onError = null) {
 
-            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+            NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+            {
                 var correct = DataLoader.load<bool>(res, "correct");
                 var new_ = DataLoader.load<bool>(res, "new");
 
@@ -457,7 +465,8 @@ namespace ExerPro.EnglishModule.Services {
 
             if (record == null) onSuccess?.Invoke();
             else {
-                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+                NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) =>
+                {
                     record.load(res); var wids = record.recordWordIds();
                     loadQuestions<Word>(wids, onSuccess, onError);
                 };
@@ -749,8 +758,7 @@ namespace ExerPro.EnglishModule.Services {
             if (!isIdle()) return;
             changeState(State.Moving);
             record.moveNext(nid, force);
-            //saveExerPro();
-        }
+            //saveExerPro();        }
 
         /// <summary>
         /// 结束移动

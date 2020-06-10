@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.68084735, g: 0.9622642, b: 0.54013884, a: 0.3882353}
+  m_Color: {r: 0.77849144, g: 0.8018868, b: 0.17021184, a: 0.43137255}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -142,9 +142,6 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
-  correctionWindow: {fileID: 3306432326710654494, guid: d66aa7942ac740c4a9e48c41c5ad79cb,
-    type: 3}
-  window: {fileID: 0}
 --- !u!114 &8118868055064732003
 MonoBehaviour:
   m_ObjectHideFlags: 0

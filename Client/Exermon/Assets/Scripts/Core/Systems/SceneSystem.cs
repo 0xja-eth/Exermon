@@ -51,6 +51,7 @@ namespace Core.Systems {
             EnglishProBusinessManScene,
             EnglishProPlotScene,
             EnglishProCorrectionScene,
+            EnglishProPhraseScene,
             HelpScene
         }
 

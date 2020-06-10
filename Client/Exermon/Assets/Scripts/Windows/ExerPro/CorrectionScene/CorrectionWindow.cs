@@ -45,7 +45,7 @@ namespace UI.CorrectionScene.Windows
             inputField.text = "";
             inputField.ActivateInputField();
         }
-
+        
         public void confirm()
         {
             List<string> items = currentSenContainer.getItems().ToList<string>();
