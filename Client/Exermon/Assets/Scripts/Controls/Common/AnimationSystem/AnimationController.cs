@@ -34,12 +34,12 @@ namespace UI.Common.Controls.AnimationSystem {
         /// <summary>
         /// 动画队列
         /// </summary>
-        public Queue<AnimationItem> animations = new Queue<AnimationItem>();
+        public Queue<AnimationView> animations = new Queue<AnimationView>();
 
         /// <summary>
         /// 当前播放列表
         /// </summary>
-        public List<AnimationItem> playingAnimations = new List<AnimationItem>();
+        public List<AnimationView> playingAnimations = new List<AnimationView>();
 
         #region 更新控制
 
@@ -66,21 +66,29 @@ namespace UI.Common.Controls.AnimationSystem {
         /// 更新动画项
         /// </summary>
         /// <param name="ani"></param>
-        void updateAnimationItem(AnimationItem ani) {
+        void updateAnimationItem(AnimationView ani) {
             if (!ani.isPlaying()) ani.play();
 			if (ani.isPlayed()) playingAnimations.Remove(ani);
        }
 
-        #endregion
+		#endregion
 
-        #region 动画控制
+		#region 动画控制
+
+		/// <summary>
+		/// 加入动画项
+		/// </summary>
+		/// <param name="ani">动画项</param>
+		public void join(AnimationView ani) {
+			ani.controller = this;
+		}
 
 		/// <summary>
 		/// 添加动画项
 		/// </summary>
 		/// <param name="ani">动画项</param>
 		/// <param name="force">是否直接添加到播放列表</param>
-		public void addAnimationItem(AnimationItem ani, bool force = false) {
+		public void add(AnimationView ani, bool force = false) {
 			if (force) playingAnimations.Add(ani);
 			else animations.Enqueue(ani);
 		}

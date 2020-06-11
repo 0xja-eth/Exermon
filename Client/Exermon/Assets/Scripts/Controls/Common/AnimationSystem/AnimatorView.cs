@@ -6,15 +6,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Core.UI {
+using Core.UI;
 
-    /// <summary>
-    /// 带有动画功能的视窗类
-    /// </summary>
-    /// <remarks>
-    /// 一般挂载在带有 BaseView 的物体上
-    /// </remarks>
-    public class AnimatorView : BaseView {
+namespace UI.Common.Controls.AnimationSystem {
+
+	/// <summary>
+	/// 带有动画功能的视窗类
+	/// </summary>
+	/// <remarks>
+	/// 一般挂载在带有 BaseView 的物体上
+	/// </remarks>
+	public class AnimatorView : BaseView {
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -41,10 +43,15 @@ namespace Core.UI {
         /// </summary>
         Dictionary<string, UnityAction> changeEvents = new Dictionary<string, UnityAction>();
 
-        /// <summary>
-        /// 状态更新回调函数
-        /// </summary>
-        Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
+		/// <summary>
+		/// 状态结束回调函数（key 为 "" 时表示任意状态）
+		/// </summary>
+		Dictionary<string, UnityAction> endEvents = new Dictionary<string, UnityAction>();
+
+		/// <summary>
+		/// 状态更新回调函数
+		/// </summary>
+		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
         #region 初始化
 
@@ -94,6 +101,7 @@ namespace Core.UI {
         public T addStateBehaviour<T>(string stateName) where T : StateMachineBehaviour {
             return addStateBehaviour<T>(layerIndex, stateName);
         }
+
         /// <summary>
         /// 添加状态切换事件
         /// </summary>
@@ -111,12 +119,29 @@ namespace Core.UI {
             changeEvents.Remove(stateName);
         }
 
-        /// <summary>
-        /// 添加状态更新事件
-        /// </summary>
-        /// <param name="stateName">状态名</param>
-        /// <param name="action">事件</param>
-        public void addUpdateEvent(string stateName, UnityAction action) {
+		/// <summary>
+		/// 添加状态结束事件
+		/// </summary>
+		/// <param name="stateName">状态名</param>
+		/// <param name="action">事件</param>
+		public void addEndEvent(string stateName, UnityAction action) {
+			endEvents.Add(stateName, action);
+		}
+
+		/// <summary>
+		/// 移除状态结束事件
+		/// </summary>
+		/// <param name="stateName">状态名</param>
+		public void removeEndEvent(string stateName) {
+			endEvents.Remove(stateName);
+		}
+
+		/// <summary>
+		/// 添加状态更新事件
+		/// </summary>
+		/// <param name="stateName">状态名</param>
+		/// <param name="action">事件</param>
+		public void addUpdateEvent(string stateName, UnityAction action) {
             updateEvents.Add(stateName, action);
         }
 
@@ -160,12 +185,17 @@ namespace Core.UI {
         /// </summary>
         void updateAnimatorState() {
             if (animator == null) return;
-            foreach (var key in changeEvents.Keys) {
-                var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-                if (key != eventState && (key == "" || state.IsName(key)))
-                    changeEvents[eventState = key]?.Invoke();
-            }
-            foreach (var key in updateEvents.Keys) {
+			foreach (var key in endEvents.Keys) {
+				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
+				if (key != eventState && (key == "" || state.IsName(key)))
+					endEvents[eventState]?.Invoke();
+			}
+			foreach (var key in changeEvents.Keys) {
+				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
+				if (key != eventState && (key == "" || state.IsName(key))) 
+					changeEvents[eventState = key]?.Invoke();
+			}
+			foreach (var key in updateEvents.Keys) {
                 var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
                 if (state.IsName(key)) updateEvents[key]?.Invoke();
             }

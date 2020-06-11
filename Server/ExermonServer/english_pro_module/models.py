@@ -272,7 +272,6 @@ class WrongItem(models.Model):
 			'word_index': self.word_index,
 			'type': self.type,
 			'word': self.word,
-			'question': self.question,
 		}
 
 

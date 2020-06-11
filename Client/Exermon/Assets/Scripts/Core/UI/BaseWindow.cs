@@ -1,6 +1,8 @@
 ﻿
 using UnityEngine;
 
+using UI.Common.Controls.AnimationSystem;
+
 namespace Core.UI {
 
     /// <summary>

@@ -269,8 +269,6 @@ namespace ExerPro.EnglishModule.Services {
         public void play(ExerProCard card, List<RuntimeEnemy> targets) {
             foreach(var target in targets) {
                 var action = new RuntimeAction(record.actor, target, card);
-                action.generateResult();
-                target.applyResult(action.result);
             }
         }
 

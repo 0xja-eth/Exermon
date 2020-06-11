@@ -7,6 +7,7 @@ using Core.UI;
 
 using ExerPro.EnglishModule.Data;
 
+using UI.Common.Windows;
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.ExerPro.EnglishPro.MapScene.Controls {
@@ -29,7 +30,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public BaseWindow window;
+        public ToggleWindow window;
         public Text name, description, pos, quesTypes;
 
         public Button confirm;
@@ -91,26 +92,21 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
                 pos.text = quesTypes.text = "";
             confirm.interactable = false;
         }
+		
+		/// <summary>
+		/// 是否需要更新位置
+		/// </summary>
+		/// <returns></returns>
+		protected override bool needUpdatePosition() {
+			return true;
+		}
 
-        /// <summary>
-        /// 更新位置
-        /// </summary>
-        void updatePosition() {
-            var display = getItemDisplay();
-            if (display == null) return;
-
-            var displayRt = display.transform as RectTransform;
-            var rt = transform as RectTransform;
-
-            rt.anchoredPosition = calcPosition(displayRt);
-        }
-
-        /// <summary>
-        /// 根据ItemDisplay计算一个位置
-        /// </summary>
-        /// <param name="rt"></param>
-        /// <returns></returns>
-        Vector2 calcPosition(RectTransform rt) {
+		/// <summary>
+		/// 根据ItemDisplay计算一个位置
+		/// </summary>
+		/// <param name="rt"></param>
+		/// <returns></returns>
+		protected override Vector2 calcPosition(RectTransform rt) {
             var rect = (transform as RectTransform).rect;
             var pos = Camera.main.WorldToScreenPoint(rt.position);
             int maxW = Screen.width / 2, maxH = Screen.height / 2;
@@ -135,15 +131,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
 
             return outPos;
         }
-
-        /// <summary>
-        /// 刷新
-        /// </summary>
-        protected override void refresh() {
-            base.refresh();
-            updatePosition();
-        }
-
+		
         #endregion
 
     }

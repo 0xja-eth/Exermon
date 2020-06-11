@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 using Core.UI;
 using Core.UI.Utils;
@@ -30,7 +31,7 @@ namespace UI.Common.Controls.AnimationSystem {
     /// <summary>
     /// 动画项
     /// </summary>
-    public class AnimationItem : BaseView {
+    public class AnimationView : BaseView {
 
         /// <summary>
         /// 外部组件设置
@@ -38,25 +39,37 @@ namespace UI.Common.Controls.AnimationSystem {
         public Animation animation;
         public AnimationController controller;
 
-        /// <summary>
-        /// 动画栈/缓冲队列
-        /// </summary>
-        Stack<AnimationUtils.TempAnimation> animations = 
-            new Stack<AnimationUtils.TempAnimation>();
-        Queue<AnimationUtils.TempAnimation> tmpAnimations = 
-            new Queue<AnimationUtils.TempAnimation>();
+		public RectTransform rectTransform;
+		public CanvasGroup canvasGroup;
+		public Graphic graphic;
 
 		/// <summary>
-		/// RectTransform
+		/// 动画栈/缓冲队列
 		/// </summary>
-		RectTransform rectTransform;
-		CanvasGroup canvasGroup;
-		Graphic graphic;
+		Queue<AnimationUtils.TempAnimation> animations = 
+            new Queue<AnimationUtils.TempAnimation>();
+		//Queue<AnimationUtils.TempAnimation> tmpAnimations = 
+		//    new Queue<AnimationUtils.TempAnimation>();
 
-        /// <summary>
-        /// 开始标志
-        /// </summary>
-        bool isStarted = false;
+		/// <summary>
+		/// 动画切换（开始）回调函数（key 为 "" 时表示任意状态）
+		/// </summary>
+		Dictionary<string, UnityAction> changeEvents = new Dictionary<string, UnityAction>();
+
+		/// <summary>
+		/// 动画结束回调函数（key 为 "" 时表示任意状态）
+		/// </summary>
+		Dictionary<string, UnityAction> endEvents = new Dictionary<string, UnityAction>();
+
+		/// <summary>
+		/// 动画更新回调函数
+		/// </summary>
+		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
+
+		/// <summary>
+		/// 开始标志
+		/// </summary>
+		bool isStarted = false;
 
         #region 初始化
 
@@ -73,9 +86,90 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 配置动画物体
 		/// </summary>
 		void setupAnimationObjects(){
-			rectTransform = transform as RectTransform;
-			canvasGroup = SceneUtils.get<CanvasGroup>(gameObject);
-			graphic = SceneUtils.get<Graphic>(gameObject);
+			rectTransform = rectTransform ?? transform as RectTransform;
+			canvasGroup = canvasGroup ?? SceneUtils.get<CanvasGroup>(gameObject);
+			graphic = graphic ?? SceneUtils.get<Graphic>(gameObject);
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 添加状态切换事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		/// <param name="action">事件</param>
+		public void addChangeEvent(string aniName, UnityAction action) {
+			changeEvents.Add(aniName, action);
+		}
+
+		/// <summary>
+		/// 移除状态切换事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		public void removeChangeEvent(string aniName) {
+			changeEvents.Remove(aniName);
+		}
+
+		/// <summary>
+		/// 添加状态结束事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		/// <param name="action">事件</param>
+		public void addEndEvent(string aniName, UnityAction action) {
+			endEvents.Add(aniName, action);
+		}
+
+		/// <summary>
+		/// 移除状态结束事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		public void removeEndEvent(string aniName) {
+			endEvents.Remove(aniName);
+		}
+
+		/// <summary>
+		/// 添加状态更新事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		/// <param name="action">事件</param>
+		public void addUpdateEvent(string aniName, UnityAction action) {
+			updateEvents.Add(aniName, action);
+		}
+
+		/// <summary>
+		/// 移除状态更新事件
+		/// </summary>
+		/// <param name="aniName">状态名</param>
+		public void removeUpdateEvent(string aniName) {
+			updateEvents.Remove(aniName);
+		}
+		
+		/// <summary>
+		/// 动画播放完毕回调
+		/// </summary>
+		void onAnimationPlayed(AnimationUtils.TempAnimation ani) {
+			var name = ani.getName();
+			if (updateEvents.ContainsKey(""))
+				updateEvents[""]?.Invoke();
+			else if (endEvents.ContainsKey(name))
+				endEvents[name]?.Invoke();
+			next(); onNextAnimationPlay(curAni());
+		}
+
+		/// <summary>
+		/// 下一动画播放开始回调
+		/// </summary>
+		void onNextAnimationPlay(AnimationUtils.TempAnimation? ani_) {
+			if (ani_ == null) return;
+
+			var ani = (AnimationUtils.TempAnimation)ani_;
+			var name = ani.getName();
+			if (updateEvents.ContainsKey(""))
+				updateEvents[""]?.Invoke();
+			else if (changeEvents.ContainsKey(name))
+				changeEvents[name]?.Invoke();
 		}
 
 		#endregion
@@ -87,41 +181,42 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		protected override void update() {
             base.update();
-            updateAnimation();
+			var ani_ = curAni();
+			if (ani_ == null) return;
+
+			var ani = (AnimationUtils.TempAnimation)ani_;
+			updateCurrentEvent(ani);
+            updateAnimation(ani);
         }
 
-        /// <summary>
-        /// 更新动画
-        /// </summary>
-        void updateAnimation() {
-            if (curAni().isPlayed())
-                onAnimationPlayed();
-        }
+		/// <summary>
+		/// 更新当前动画事件
+		/// </summary>
+		void updateCurrentEvent(AnimationUtils.TempAnimation ani) {
+			if (ani.isPlaying()) {
+				var name = ani.getName();
+				if (updateEvents.ContainsKey(name))
+					updateEvents[name]?.Invoke();
+			}
+		}
 
-        /// <summary>
-        /// 动画播放完毕回调
-        /// </summary>
-        void onAnimationPlayed() {
-            next(); updateTempAnimations();
-        }
+		/// <summary>
+		/// 更新动画
+		/// </summary>
+		void updateAnimation(AnimationUtils.TempAnimation ani) {
+			if (ani.isPlayed()) onAnimationPlayed(ani);
+		}
 
-        /// <summary>
-        /// 更新临时动画
-        /// </summary>
-        void updateTempAnimations() {
-            while(tmpAnimations.Count > 0) 
-				animations.Push(tmpAnimations.Dequeue());
-        }
+		#endregion
 
-        #endregion
+		#region 动画控制
 
-        #region 动画控制
-
-        /// <summary>
-        /// 当前动画
-        /// </summary>
-        /// <returns></returns>
-        public AnimationUtils.TempAnimation curAni() {
+		/// <summary>
+		/// 当前动画
+		/// </summary>
+		/// <returns></returns>
+		public AnimationUtils.TempAnimation? curAni() {
+			if (animations.Count <= 0) return null;
             return animations.Peek();
         }
 
@@ -149,7 +244,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="force">是否直接添加到播放列表</param>
 		public void addToPlayQueue(bool force) {
 			if (controller == null) return;
-			controller.addAnimationItem(this, force);
+			controller.add(this, force);
 		}
 		public void addToPlayQueue() {
 			addToPlayQueue(false);
@@ -163,7 +258,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 播放
 		/// </summary>
 		public void play() {
-            curAni().setupAnimation(animation);
+			curAni()?.setupAnimation(animation);
         }
 
         /// <summary>
@@ -177,7 +272,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// 切换到下一个动画
         /// </summary>
         public void next() {
-            animations.Pop();
+            animations.Dequeue();
         }
 
         /// <summary>
@@ -204,8 +299,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public AnimationUtils.TempAnimation addAnimation(
             AnimationUtils.TempAnimation ani) {
-            if (isPlaying()) tmpAnimations.Enqueue(ani);
-            else animations.Push(ani); return ani;
+            animations.Enqueue(ani); return ani;
         }
 
 		#endregion
@@ -219,9 +313,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void moveTo(Vector2 target, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Move", bool play = false) {
+		public void moveTo(Vector2 target, string name = "Move", 
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ani = addAnimation(name, true);
@@ -242,13 +335,12 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void moveDelta(Vector2 delta, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Move", bool play = false) {
+		public void moveDelta(Vector2 delta, string name = "Move",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ori = rectTransform.anchoredPosition;
-			moveTo(ori + delta, duration, name, play);
+			moveTo(ori + delta, name, duration, play);
 		}
 
 		/// <summary>
@@ -258,9 +350,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void scaleTo(Vector3 target, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Scale", bool play = false) {
+		public void scaleTo(Vector3 target, string name = "Scale",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ani = addAnimation(name, true);
@@ -283,13 +374,12 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void scaleDelta(Vector3 delta, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Scale", bool play = false) {
+		public void scaleDelta(Vector3 delta, string name = "Scale",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ori = rectTransform.localScale;
-			scaleTo(ori + delta, duration, name, play);
+			scaleTo(ori + delta, name, duration, play);
 		}
 
 		/// <summary>
@@ -299,9 +389,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void rotateTo(Vector3 target, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Rotate", bool play = false) {
+		public void rotateTo(Vector3 target, string name = "Rotate",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ani = addAnimation(name, true);
@@ -324,13 +413,12 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void rotateDelta(Vector3 delta, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Rotate", bool play = false) {
+		public void rotateDelta(Vector3 delta, string name = "Rotate",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (rectTransform == null) return;
 
 			var ori = rectTransform.localEulerAngles;
-			rotateTo(ori + delta, duration, name, play);
+			rotateTo(ori + delta, name, duration, play);
 		}
 
 		/// <summary>
@@ -340,9 +428,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void colorTo(Color target, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Color", bool play = false) {
+		public void colorTo(Color target, string name = "Color",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (graphic == null) return;
 
 			var ani = addAnimation(name, true);
@@ -367,9 +454,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void fadeTo(float alpha, 
-			float duration = AnimationUtils.AniDuration, 
-			string name = "Fade", bool play = false) {
+		public void fadeTo(float alpha, string name = "Fade",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
 			if (canvasGroup == null) return;
 
 			var ani = addAnimation(name, true);
@@ -387,9 +473,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void fadeIn(float duration = AnimationUtils.AniDuration, 
-			string name = "FadeIn", bool play = false) {
-			fadeTo(1, duration, name, play);
+		public void fadeIn(string name = "FadeIn", 
+			float duration = AnimationUtils.AniDuration, bool play = false) {
+			fadeTo(1, name, duration, play);
 		}
 
 		/// <summary>
@@ -398,9 +484,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="duration">时间</param>
 		/// <param name="name">动画名</param>
 		/// <param name="play">立即播放</param>
-		public void fadeOut(float duration = AnimationUtils.AniDuration, 
-			string name = "FadeOut", bool play = false) {
-			fadeTo(0, duration, name, play);
+		public void fadeOut(string name = "FadeOut",
+			float duration = AnimationUtils.AniDuration, bool play = false) {
+			fadeTo(0, name, duration, play);
 		}
 
 		#endregion

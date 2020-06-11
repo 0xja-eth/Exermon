@@ -14,7 +14,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 	/// <summary>
 	/// 据点显示控件
 	/// </summary
-	public class HPResultDisplay : ItemDisplay<RuntimeActionResult> {
+	public class HPResultDisplay : ItemDisplay<RuntimeBattler.DeltaHP> {
 
 		/// <summary>
 		/// 受击动画
@@ -43,7 +43,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 			base.initializeOnce();
 			animation = animation ?? SceneUtils.ani(gameObject);
 		}
-		
+		/*
 		/// <summary>
 		/// 配置
 		/// </summary>
@@ -51,7 +51,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 			this.battler = battler;
 			configure();
 		}
-
+		*/
 		#endregion
 
 		#region 更新控制
@@ -77,28 +77,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		#region 数据控制
 
 		/// <summary>
-		/// 是否为目标
-		/// </summary>
-		/// <returns></returns>
-		public bool isObject() {
-			return item.action.object_ == getBattler();
-		}
-
-		/// <summary>
-		/// 是否为物品
-		/// </summary>
-		/// <returns></returns>
-		public bool isSubject() {
-			return item.action.subject == getBattler();
-		}
-
-		/// <summary>
 		/// 是否为伤害
 		/// </summary>
 		/// <returns></returns>
 		public bool isDamage() {
-			return item.hpDamage > 0 && isObject() ||
-				item.hpDrain > 0 && isObject();
+			return item.value < 0;
 		}
 
 		/// <summary>
@@ -106,30 +89,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		public bool isRecover() {
-			return item.hpRecover > 0 && isObject() ||
-				item.hpDrain > 0 && isSubject();
+			return item.value > 0;
 		}
-
-		/// <summary>
-		/// 获取伤害值
-		/// </summary>
-		/// <returns></returns>
-		public int getDamageValue() {
-			if (item.hpDamage > 0 && isObject()) return item.hpDamage;
-			if (item.hpDrain > 0 && isObject()) return item.hpDrain;
-			return 0;
-		}
-
-		/// <summary>
-		/// 获取恢复值
-		/// </summary>
-		/// <returns></returns>
-		public int getRecoverValue() {
-			if (item.hpRecover > 0 && isObject()) return item.hpRecover;
-			if (item.hpDrain > 0 && isSubject()) return item.hpDrain;
-			return 0;
-		}
-
+		
 		/// <summary>
 		/// 获取战斗者
 		/// </summary>
@@ -146,7 +108,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// 绘制确切物品
 		/// </summary>
 		/// <param name="item">结果</param>
-		protected override void drawExactlyItem(RuntimeActionResult item) {
+		protected override void drawExactlyItem(RuntimeBattler.DeltaHP item) {
             base.drawExactlyItem(item);
 			if (isDamage()) drawDamage(item);
 			else if (isRecover()) drawRecover(item);
@@ -157,18 +119,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// 绘制伤害点数
 		/// </summary>		
 		/// <param name="item">结果</param>
-		void drawDamage(RuntimeActionResult item) {
+		void drawDamage(RuntimeBattler.DeltaHP item) {
 			animation.Play(DamageAnimation);
-			drawValue(getDamageValue());
+			drawValue(Mathf.Abs(item.value));
 		}
 
 		/// <summary>
 		/// 绘制恢复点数
 		/// </summary>
 		/// <param name="item">结果</param>
-		void drawRecover(RuntimeActionResult item) {
+		void drawRecover(RuntimeBattler.DeltaHP item) {
 			animation.Play(RecoverAnimation);
-			drawValue(getRecoverValue());
+			drawValue(Mathf.Abs(item.value));
 		}
 
 		/// <summary>

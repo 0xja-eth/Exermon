@@ -14,7 +14,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 	/// <summary>
 	/// HP结果显示容器
 	/// </summary
-	public class HPResultsContainer : ContainerDisplay<RuntimeActionResult> {
+	public class HPResultsContainer : ContainerDisplay<RuntimeBattler.DeltaHP> {
 
 		/// <summary>
 		/// 位置偏移量设置
@@ -25,16 +25,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public BattlerDisplay battler;
 
 		#region 界面绘制
 
 		/// <summary>
 		/// 子视窗创建回调
 		/// </summary>
-		protected override void onSubViewCreated(ItemDisplay<RuntimeActionResult> sub, int index) {
-			var hpRes = sub as HPResultDisplay;
-			if (hpRes != null) hpRes.configure(battler);
+		protected override void onSubViewCreated(ItemDisplay<RuntimeBattler.DeltaHP> sub, int index) {
+			//var hpRes = sub as HPResultDisplay;
+			//if (hpRes != null) hpRes.configure(battler);
 
 			base.onSubViewCreated(sub, index);
 

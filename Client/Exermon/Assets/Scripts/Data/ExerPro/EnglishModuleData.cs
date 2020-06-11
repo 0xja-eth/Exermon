@@ -287,41 +287,91 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训物品数据
     /// </summary>
-    public class BaseExerProItem : BaseItem {
+    public abstract class BaseExerProItem : BaseItem {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int iconIndex { get; protected set; }
+		[AutoConvert]
         public int starId { get; protected set; }
         [AutoConvert]
         public int gold { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
 
-    }
+		/// <summary>
+		/// 物品图标
+		/// </summary>
+		public Sprite icon { get; protected set; }
+
+		/// <summary>
+		/// 读取函数
+		/// </summary>
+		/// <param name="index">索引</param>
+		/// <returns>返回裁剪后的精灵</returns>
+		public delegate Sprite LoadFun(int index);
+
+		/// <summary>
+		/// 获取读取函数
+		/// </summary>
+		/// <returns>读取函数</returns>
+		protected abstract LoadFun loadFun();
+
+		/// <summary>
+		/// 物品星级
+		/// </summary>
+		/// <returns>返回物品星级对象</returns>
+		public ExerProItemStar star() {
+			return DataService.get().exerProItemStar(starId);
+		}
+
+		/// <summary>
+		/// 加载自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			icon = loadFun()?.Invoke(iconIndex);
+		}
+	}
 
     /// <summary>
     /// 特训物品数据
     /// </summary>
     public class ExerProItem : BaseExerProItem {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
+		/// <summary>
+		/// 属性
+		/// </summary>
 
-    }
+		/// <summary>
+		/// 获取读取函数
+		/// </summary>
+		/// <returns>读取函数</returns>
+		protected override LoadFun loadFun() {
+			return AssetLoader.getExerProItemIconSprite;
+		}
+	}
 
     /// <summary>
     /// 特训药水数据
     /// </summary>
     public class ExerProPotion : BaseExerProItem {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-
-    }
+		/// <summary>
+		/// 属性
+		/// </summary>
+		
+		/// <summary>
+		/// 获取读取函数
+		/// </summary>
+		/// <returns>读取函数</returns>
+		protected override LoadFun loadFun() {
+			return AssetLoader.getExerProItemIconSprite;
+		}
+	}
 
     /// <summary>
     /// 特训卡片数据
@@ -353,11 +403,19 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int target { get; protected set; }
 
-        /// <summary>
-        /// 类型文本
-        /// </summary>
-        /// <returns></returns>
-        public string typeText() {
+		/// <summary>
+		/// 获取读取函数
+		/// </summary>
+		/// <returns>读取函数</returns>
+		protected override LoadFun loadFun() {
+			return AssetLoader.getExerProCardIconSprite;
+		}
+
+		/// <summary>
+		/// 类型文本
+		/// </summary>
+		/// <returns></returns>
+		public string typeText() {
             return DataService.get().cardType(cardType).Item2;
         }
     }
@@ -399,6 +457,14 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public int rate { get; protected set; }
 
+			/// <summary>
+			/// 获取类型枚举
+			/// </summary>
+			/// <returns></returns>
+			public Type typeEnum() {
+				return (Type)type;
+			}
+			
             /// <summary>
             /// 是否为逃跑
             /// </summary>
@@ -446,29 +512,55 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
 
-        /// <summary>
-        /// 类型文本
-        /// </summary>
-        /// <returns></returns>
-        public string typeText() {
+		public Texture2D battle { get; protected set; }
+
+		/// <summary>
+		/// 类型文本
+		/// </summary>
+		/// <returns></returns>
+		public string typeText() {
             return DataService.get().enemyType(type_).Item2;
-        }
-    }
+		}
+
+		/// <summary>
+		/// 数据加载
+		/// </summary>
+		/// <param name="json">数据</param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			battle = AssetLoader.loadExerProEnemyBattle(id);
+		}
+	}
 
     /// <summary>
     /// 特训状态数据
     /// </summary>
     public class ExerProState : BaseItem {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
-        public int maxTurns { get; protected set; } // 最大状态叠加回合数
-        [AutoConvert]
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int iconIndex { get; protected set; } 
+		[AutoConvert]
+		public int maxTurns { get; protected set; } // 最大状态叠加回合数
+		[AutoConvert]
         public bool isNega { get; protected set; } // 是否负面
-
-    }
+		
+		/// <summary>
+		/// 物品图标
+		/// </summary>
+		public Sprite icon { get; protected set; }
+		
+		/// <summary>
+		/// 加载自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			icon = AssetLoader.getExerProStateIconSprite(iconIndex);
+		}
+	}
     
     #endregion
     
@@ -1644,14 +1736,19 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public List<RuntimeBuff> buffs { get; protected set; } = new List<RuntimeBuff>();
 
-        #region 数据转化
+		/// <summary>
+		/// 是否逃跑
+		/// </summary>
+		public bool isEscaped = false;
 
-        /// <summary>
-        /// 转化为显示数据
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns></returns>
-        public virtual JsonData convertToDisplayData(string type = "") {
+		#region 数据转化
+
+		/// <summary>
+		/// 转化为显示数据
+		/// </summary>
+		/// <param name="type">类型</param>
+		/// <returns></returns>
+		public virtual JsonData convertToDisplayData(string type = "") {
             switch (type) {
                 case "hp": return convertHp();
                 default: return toJson();
@@ -1671,19 +1768,37 @@ namespace ExerPro.EnglishModule.Data {
             return res;
         }
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
 
-        #region 属性控制
+		/// <summary>
+		/// 是否玩家
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool isActor() { return false; }
 
-        #region 属性快捷定义
+		/// <summary>
+		/// 是否敌人
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool isEnemy() { return false; }
 
-        /// <summary>
-        /// 最大生命值
-        /// </summary>
-        /// <returns></returns>
-        public int mhp() {
+		/// <summary>
+		/// 获取战斗图
+		/// </summary>
+		/// <returns></returns>
+		public abstract Texture2D getBattlePicture();
+
+		#region 属性控制
+
+		#region 属性快捷定义
+
+		/// <summary>
+		/// 最大生命值
+		/// </summary>
+		/// <returns></returns>
+		public int mhp() {
             return param(MHPParamId);
         }
 
@@ -1735,33 +1850,97 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         protected virtual int baseAgile() { return 0; }
 
-        #endregion
+		#endregion
 
-        #region HP控制
+		#region HP控制
 
-        /// <summary>
-        /// 改变HP
-        /// </summary>
-        /// <param name="value">目标值</param>
-        public void changeHP(int value) {
-            hp = Mathf.Clamp(value, 0, mhp());
+		#region HP变化显示
+
+		/// <summary>
+		/// HP该变量
+		/// </summary>
+		public class DeltaHP {
+
+			public int value = 0; // 值
+
+			public bool critical = false; // 是否暴击
+			public bool miss = false; // 是否闪避
+
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			/// <param name="value"></param>
+			public DeltaHP(int value = 0, bool critical = false, bool miss = false) {
+				this.value = value; this.critical = critical; this.miss = miss;
+			}
+		}
+
+		/// <summary>
+		/// HP变化量
+		/// </summary>
+		DeltaHP _deltaHP = null;
+		public DeltaHP deltaHP {
+			get {
+				var res = _deltaHP;
+				_deltaHP = null; return res;
+			}
+		}
+
+		/// <summary>
+		/// 设置闪避标志
+		/// </summary>
+		public void setMissFlag() {
+			_deltaHP = _deltaHP ?? new DeltaHP();
+			_deltaHP.miss = true;
+		}
+
+		/// <summary>
+		/// 设置暴击标志
+		/// </summary>
+		public void setCriticalFlag() {
+			_deltaHP = _deltaHP ?? new DeltaHP();
+			_deltaHP.critical = true;
+		}
+
+		/// <summary>
+		/// 设置值变化
+		/// </summary>
+		/// <param name="value"></param>
+		public void setHPChange(int value) {
+			_deltaHP = _deltaHP ?? new DeltaHP();
+			_deltaHP.value = value;
+		}
+		
+		#endregion
+
+		/// <summary>
+		/// 改变HP
+		/// </summary>
+		/// <param name="value">目标值</param>
+		/// <param name="show">是否显示</param>
+		public void changeHP(int value, bool show = true) {
+			var oriHp = hp;
+			hp = Mathf.Clamp(value, 0, mhp());
+			if (show) setHPChange(hp - oriHp);
             if (hp <= 0) onDie();
         }
 
-        /// <summary>
-        /// 增加HP
-        /// </summary>
-        /// <param name="value">增加值</param>
-        public void addHP(int value) {
-            changeHP(hp + value);
+		/// <summary>
+		/// 增加HP
+		/// </summary>
+		/// <param name="value">增加值</param>
+		/// <param name="show">是否显示</param>
+		public void addHP(int value, bool show = true) {
+            changeHP(hp + value, show);
         }
 
-        /// <summary>
-        /// 增加HP
-        /// </summary>
-        /// <param name="rate">增加率</param>
-        public void addHP(double rate) {
-            changeHP((int)Math.Round(hp * rate));
+		/// <summary>
+		/// 增加HP
+		/// </summary>
+		/// <param name="rate">增加率</param>
+		/// <param name="show">是否显示</param>
+		public void addHP(double rate, bool show = true) {
+            changeHP((int)Math.Round(hp * rate), show);
         }
 
         /// <summary>
@@ -1979,12 +2158,23 @@ namespace ExerPro.EnglishModule.Data {
             return buffs.FindAll(p);
         }
 
-        #endregion
+		#endregion
 
-        #endregion
+		#endregion
 
-        #region 状态控制
+		#region 状态控制
 
+		/// <summary>
+		/// 状态是否改变
+		/// </summary>
+		bool _isStateChanged = false;
+		public bool isStateChanged {
+			get {
+				var res = _isStateChanged;
+				_isStateChanged = false; return res;
+			}
+		}
+		
         /// <summary>
         /// 状态添加回调
         /// </summary>
@@ -1995,31 +2185,42 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
 
-        /// <summary>
-        /// 获取所有状态
-        /// </summary>
-        /// <returns></returns>
-        public ExerProState[] allStates() {
-            var res = new List<ExerProState>(states.Count);
-            foreach(var pair in states) 
-                res.Add(pair.Value.state());
-            return res.ToArray();
-        }
+		/// <summary>
+		/// 获取所有状态
+		/// </summary>
+		/// <returns></returns>
+		public List<ExerProState> allStates() {
+			var res = new List<ExerProState>(states.Count);
+			foreach (var pair in states)
+				res.Add(pair.Value.state());
+			return res;
+		}
 
-        #region 状态变更
+		/// <summary>
+		/// 获取所有运行时状态
+		/// </summary>
+		/// <returns></returns>
+		public List<RuntimeState> allRuntimeStates() {
+			var res = new List<RuntimeState>(states.Count);
+			foreach (var pair in states) res.Add(pair.Value);
+			return res;
+		}
 
-        /// <summary>
-        /// 添加状态
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <param name="value">变化值</param>
-        /// <param name="rate">变化率</param>
-        /// <param name="turns">持续回合</param>
-        /// <returns>返回添加的Buff</returns>
-        public RuntimeState addState(int stateId, int turns = 0) {
+		#region 状态变更
+
+		/// <summary>
+		/// 添加状态
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <param name="value">变化值</param>
+		/// <param name="rate">变化率</param>
+		/// <param name="turns">持续回合</param>
+		/// <returns>返回添加的Buff</returns>
+		public RuntimeState addState(int stateId, int turns = 0) {
             RuntimeState state;
+			_isStateChanged = true;
 
-            if (states.ContainsKey(stateId)) {
+			if (states.ContainsKey(stateId)) {
                 state = states[stateId];
                 state.add(turns);
             } else {
@@ -2039,8 +2240,9 @@ namespace ExerPro.EnglishModule.Data {
         public RuntimeState removeState(int stateId, int turns = 0, bool force = false) {
             if (!containsState(stateId)) return null;
             var state = states[stateId];
+			_isStateChanged = true;
 
-            if (turns <= 0) {
+			if (turns <= 0) {
                 states.Remove(stateId);
                 onStateRemoved(state, force);
             } else {
@@ -2115,26 +2317,34 @@ namespace ExerPro.EnglishModule.Data {
             return null;
         }
 
-        /// <summary>
-        /// 获取指定条件的状态（多个）
-        /// </summary>
-        public List<RuntimeState> getStates(Predicate<RuntimeState> p) {
-            var res = new List<RuntimeState>();
-            foreach (var pair in states)
-                if (p(pair.Value)) res.Add(pair.Value);
-            return res;
-        }
+		/// <summary>
+		/// 获取指定条件的状态（多个）
+		/// </summary>
+		public List<RuntimeState> getStates(Predicate<RuntimeState> p) {
+			var res = new List<RuntimeState>();
+			foreach (var pair in states)
+				if (p(pair.Value)) res.Add(pair.Value);
+			return res;
+		}
 
-        #endregion
+		/// <summary>
+		/// 是否处于可移动状态
+		/// </summary>
+		/// <returns></returns>
+		public bool isMovableState() {
+			return !isEscaped && !isDeath();
+		}
 
-        #endregion
+		#endregion
 
-        #region 结果控制
+		#endregion
 
-        /// <summary>
-        /// 当前结果
-        /// </summary>
-        RuntimeActionResult currentResult = null;
+		#region 结果控制
+
+		/// <summary>
+		/// 当前结果
+		/// </summary>
+		RuntimeActionResult currentResult = null;
 
         /// <summary>
         /// 应用结果
@@ -2156,17 +2366,56 @@ namespace ExerPro.EnglishModule.Data {
             return res;
         }
 
-        #endregion
+		#endregion
 
-        #region 回调控制
+		#region 行动控制
 
-        /// <summary>
-        /// 是否处于可移动状态
-        /// </summary>
-        /// <returns></returns>
-        public bool isMovableState() {
-            return !isDeath();
-        }
+		/// <summary>
+		/// 行动序列
+		/// </summary>
+		Queue<RuntimeAction> actions;
+
+		/// <summary>
+		/// 当前行动
+		/// </summary>
+		/// <returns></returns>
+		public virtual RuntimeAction currentAction() {
+			if (actions.Count <= 0) return null;
+			return actions.Peek();
+		}
+
+		/// <summary>
+		/// 增加行动
+		/// </summary>
+		/// <param name="action">行动</param>
+		public void addAction(RuntimeAction action) {
+			actions.Enqueue(action);
+		}
+
+		/// <summary>
+		/// 处理当前行动（处理后移出队列）
+		/// </summary>
+		public void processAction() {
+			if (actions.Count <= 0) return;
+
+			var action = actions.Peek();
+			if (!isMovableState()) return;
+
+			action.generateResult();
+			action.object_.applyResult(action.result);
+		}
+
+		/// <summary>
+		/// 结束当前行动
+		/// </summary>
+		public void endAction() {
+			if (actions.Count <= 0) return;
+			actions.Dequeue();
+		}
+
+		#endregion
+
+		#region 回调控制
 
         /// <summary>
         /// 回合结束回调
@@ -2197,7 +2446,8 @@ namespace ExerPro.EnglishModule.Data {
             foreach (var pair in states) {
                 var state = pair.Value;
                 state.onRoundEnd();
-                if (state.isOutOfDate())
+				_isStateChanged = true;
+				if (state.isOutOfDate())
                     removeState(state.stateId);
             }
         }
@@ -2268,83 +2518,101 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerSlotItem slotItem { get; protected set; } = null;
 
-        #region 数据转化
+		#region 数据转化
 
-        ///// <summary>
-        ///// 转化为显示数据
-        ///// </summary>
-        ///// <param name="type">类型</param>
-        ///// <returns></returns>
-        //public JsonData convertToDisplayData(string type = "") {
-        //    switch (type) {
-        //        case "hp": return convertHp();
-        //        default: return toJson();
-        //    }
-        //}
+		///// <summary>
+		///// 转化为显示数据
+		///// </summary>
+		///// <param name="type">类型</param>
+		///// <returns></returns>
+		//public JsonData convertToDisplayData(string type = "") {
+		//    switch (type) {
+		//        case "hp": return convertHp();
+		//        default: return toJson();
+		//    }
+		//}
 
-        #endregion
+		#endregion
 
-        #region 属性定义
+		#region 数据控制
 
-        /// <summary>
-        /// 基础最大生命值
-        /// </summary>
-        /// <returns></returns>
-        protected override int baseMHP() { return _mhp; }
+		/// <summary>
+		/// 获取战斗图
+		/// </summary>
+		public override Texture2D getBattlePicture() {
+			if (slotItem == null || slotItem.isNullItem()) return null;
+			return slotItem.playerExer.exermon().battle;
+		}
 
-        /// <summary>
-        /// 基础力量
-        /// </summary>
-        /// <returns></returns>
-        protected override int basePower() { return _power; }
+		/// <summary>
+		/// 是否玩家
+		/// </summary>
+		/// <returns></returns>
+		public override bool isActor() { return true; }
 
-        /// <summary>
-        /// 基础格挡
-        /// </summary>
-        /// <returns></returns>
-        protected override int baseDefense() { return _defense; }
+		#region 属性定义
 
-        /// <summary>
-        /// 基础敏捷
-        /// </summary>
-        /// <returns></returns>
-        protected override int baseAgile() { return _agile; }
+		/// <summary>
+		/// 基础最大生命值
+		/// </summary>
+		/// <returns></returns>
+		protected override int baseMHP() { return _mhp; }
 
-        #endregion
+		/// <summary>
+		/// 基础力量
+		/// </summary>
+		/// <returns></returns>
+		protected override int basePower() { return _power; }
 
-        /// <summary>
-        /// 重置
-        /// </summary>
-        public override void reset() {
-            _mhp = DefaultMHP;
-            _power = DefaultPower;
-            _defense = DefaultDefense;
-            _agile = DefaultAgile;
-            gold = DefaultGold;
-            base.reset();
-        }
+		/// <summary>
+		/// 基础格挡
+		/// </summary>
+		/// <returns></returns>
+		protected override int baseDefense() { return _defense; }
 
-        /// <summary>
-        /// 配置玩家
-        /// </summary>
-        /// <param name="player"></param>
-        public void setupPlayer(Player player) {
-            slotItem = player.getExerSlotItem(EnglishSubjectId);
-        }
+		/// <summary>
+		/// 基础敏捷
+		/// </summary>
+		/// <returns></returns>
+		protected override int baseAgile() { return _agile; }
 
-        ///// <summary>
-        ///// 构造函数
-        ///// </summary>
-        //public ExerProActor() { }
-        //public ExerProActor(Player player) {
-        //    setupPlayer(player);
-        //}
-    }
+		#endregion
 
-    /// <summary>
-    /// 运行时敌人数据
-    /// </summary>
-    public class RuntimeEnemy : RuntimeBattler {
+		/// <summary>
+		/// 重置
+		/// </summary>
+		public override void reset() {
+			_mhp = DefaultMHP;
+			_power = DefaultPower;
+			_defense = DefaultDefense;
+			_agile = DefaultAgile;
+			gold = DefaultGold;
+			base.reset();
+		}
+
+		/// <summary>
+		/// 配置玩家
+		/// </summary>
+		/// <param name="player"></param>
+		public void setupPlayer(Player player) {
+			slotItem = player.getExerSlotItem(EnglishSubjectId);
+		}
+
+		#endregion
+
+		///// <summary>
+		///// 构造函数
+		///// </summary>
+		//public ExerProActor() { }
+		//public ExerProActor(Player player) {
+		//    setupPlayer(player);
+		//}
+	}
+
+	/// <summary>
+	/// 运行时敌人数据
+	/// </summary>
+	public class RuntimeEnemy : RuntimeBattler {
 
         /// <summary>
         /// 最大偏移量
@@ -2365,16 +2633,10 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int enemyId { get; protected set; }
 
-        /// <summary>
-        /// 当前行动
-        /// </summary>
-        public ExerProEnemy.Action currentAction;
-        public RuntimeAction currentRuntimeAction;
-
-        /// <summary>
-        /// 当前行动状态
-        /// </summary>
-        public bool isActionEnd = false; // 当前行动是否结束
+		/// <summary>
+		/// 当前行动状态
+		/// </summary>
+		public bool isActionEnd = false; // 当前行动是否结束
         public bool isActionStarted = false; // 当前行动是否开始
 
         /// <summary>
@@ -2382,15 +2644,30 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         ExerProEnemy tempEnemy = null;
 
-        #region 数据控制
+		#region 数据控制
 
-        #region 属性控制
+		/// <summary>
+		/// 获取战斗图
+		/// </summary>
+		public override Texture2D getBattlePicture() {
+			var enemy = this.enemy();
+			if (enemy == null) return null;
+			return enemy.battle;
+		}
 
-        /// <summary>
-        /// 最大体力值
-        /// </summary>
-        /// <returns></returns>
-        protected override int baseMHP() {
+		/// <summary>
+		/// 是否玩家
+		/// </summary>
+		/// <returns></returns>
+		public override bool isEnemy() { return true; }
+		
+		#region 属性控制
+
+		/// <summary>
+		/// 最大体力值
+		/// </summary>
+		/// <returns></returns>
+		protected override int baseMHP() {
             return enemy().mhp;
         }
 
@@ -2429,38 +2706,81 @@ namespace ExerPro.EnglishModule.Data {
             yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
         }
 
-        #endregion
+		#endregion
 
-        #region 行动控制
+		#region 行动控制
 
-        /// <summary>
-        /// 更新行动
-        /// </summary>
-        public bool updateAction() {
-            if (!isMovableState())
-                return isActionEnd = isActionStarted = true;
-            if (!isActionStarted) processAction();
-            return isActionEnd;
+		/// <summary>
+		/// 当前行动
+		/// </summary>
+		ExerProEnemy.Action _currentEnemyAction = null;
+		public ExerProEnemy.Action currentEnemyAction {
+			get {
+				if (!isActionStarted) return null;
+				var res = _currentEnemyAction;
+				_currentEnemyAction = null;
+				return res;
+			}
+		}
+
+		/// <summary>
+		/// 当前行动类型
+		/// </summary>
+		/// <returns></returns>
+		public int currentActionType() {
+			return _currentEnemyAction.type;
+		}
+
+		/// <summary>
+		/// 当前行动类型枚举
+		/// </summary>
+		/// <returns></returns>
+		public ExerProEnemy.Action.Type currentActionTypeEnum() {
+			return _currentEnemyAction.typeEnum();
+		}
+
+		/// <summary>
+		/// 当前行动参数
+		/// </summary>
+		/// <returns></returns>
+		public JsonData currentActionParams() {
+			return _currentEnemyAction.params_;
+		}
+
+		/// <summary>
+		/// 当前行动
+		/// </summary>
+		/// <returns></returns>
+		public override RuntimeAction currentAction() {
+			if (!isActionStarted) return null;
+			return base.currentAction();
+		}
+
+		/// <summary>
+		/// 更新行动
+		/// </summary>
+		public bool updateAction() {
+            if (!isMovableState()) return isActionEnd = true;
+			processEnemyAction(); return isActionEnd;
         }
 
         /// <summary>
         /// 计算下一步
         /// </summary>
         public void calcNext(int round, RuntimeActor actor) {
+			RuntimeAction action;
             CalcService.EnemyNextCalc.calc(round, this, actor,
-                out currentAction, out currentRuntimeAction);
+                out _currentEnemyAction, out action);
+			addAction(action);
         }
 
         /// <summary>
-        /// 处理行动
+        /// 处理敌人行动
         /// </summary>
-        public void processAction() {
-            isActionStarted = true;
-            if (currentRuntimeAction != null) {
-                currentRuntimeAction.generateResult();
-                applyResult(currentRuntimeAction.result);
-            } else if (currentAction.isUnset())
-                isActionEnd = true;
+        public void processEnemyAction() {
+			isActionStarted = true;
+			if (_currentEnemyAction.isUnset())
+				isActionEnd = true;
         }
 
         #endregion
@@ -2508,10 +2828,10 @@ namespace ExerPro.EnglishModule.Data {
             result = CalcService.ExerProActionResultGenerator.generate(this);
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public RuntimeAction() { }
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public RuntimeAction() { }
         public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler object_, ExerProEffectData[] effects = null) {
             this.subject = subject; this.object_ = object_;

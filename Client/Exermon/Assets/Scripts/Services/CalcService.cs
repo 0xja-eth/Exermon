@@ -912,8 +912,8 @@ namespace GameModule.Services {
             /// <summary>
             /// 常量定义
             /// </summary>
-            const int MaxEnemyCols = 3; // 最大敌人列数
-            const int MaxEnemyRows = 3; // 最大敌人行数
+            public const int MaxEnemyCols = 3; // 最大敌人列数
+			public const int MaxEnemyRows = 3; // 最大敌人行数
 
             /// <summary>
             /// 内部变量定义
@@ -1349,9 +1349,9 @@ namespace GameModule.Services {
             /// 属性
             /// </summary>
             int round;
-            RuntimeEnemy runtimeEnemy;
+            RuntimeEnemy enemy;
 
-            ExerProEnemy enemy;
+            ExerProEnemy enemyData;
             ExerProEnemy.Action[] actions;
 
             /// <summary>
@@ -1372,10 +1372,10 @@ namespace GameModule.Services {
             /// 构造函数
             /// </summary>
             EnemyNextCalc(int round, RuntimeEnemy enemy) {
-                this.round = round; runtimeEnemy = enemy;
-                this.enemy = enemy.enemy();
+                this.round = round; this.enemy = enemy;
+                this.enemyData = enemy.enemy();
 
-                actions = filterActions(this.enemy.actions);
+                actions = filterActions(this.enemyData.actions);
             }
 
             /// <summary>
@@ -1409,34 +1409,33 @@ namespace GameModule.Services {
                 generateRuntimeAction(RuntimeActor actor) {
 
                 RuntimeBattler object_;
-                var action = runtimeEnemy.currentAction;
-
+                var params_ = enemy.currentActionParams();
                 var effects = new List<ExerProEffectData>();
 
-                switch ((ExerProEnemy.Action.Type)action.type) {
+                switch (enemy.currentActionTypeEnum()) {
                     case ExerProEnemy.Action.Type.Attack:
-                        _processAttack(effects, action.params_);
+                        _processAttack(effects, params_);
                         object_ = actor; break;
 
                     case ExerProEnemy.Action.Type.PowerDown:
-                        _processPowerDown(effects, action.params_);
+                        _processPowerDown(effects, params_);
                         object_ = actor; break;
 
                     case ExerProEnemy.Action.Type.AddStates:
-                        _processAddStates(effects, action.params_);
+                        _processAddStates(effects, params_);
                         object_ = actor; break;
 
                     case ExerProEnemy.Action.Type.PowerUp:
-                        _processPowerDown(effects, action.params_);
-                        object_ = runtimeEnemy; break;
+                        _processPowerDown(effects, params_);
+                        object_ = enemy; break;
 
                     default: return null;
                 }
 
-                effects.AddRange(enemy.effects);
+                effects.AddRange(enemyData.effects);
 
                 return new ExerPro.EnglishModule.Data.RuntimeAction(
-                    runtimeEnemy, object_, effects.ToArray());
+                    enemy, object_, effects.ToArray());
             }
 
             /// <summary>

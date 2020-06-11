@@ -455,7 +455,7 @@ namespace UI.Common.Controls.ParamDisplays {
 			// 动画
 			if (immediately || !item.animated) graphic.color = color;
 			else {
-				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				var aniItem = SceneUtils.get<AnimationView>(item.obj);
 				if (aniItem == null) {
 					var ori = graphic.color;
 					var ani = SceneUtils.ani(item.obj);
@@ -519,7 +519,7 @@ namespace UI.Common.Controls.ParamDisplays {
 			if (immediately || !item.animated) 
 				transform.localScale = target;
 			else {
-				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				var aniItem = SceneUtils.get<AnimationView>(item.obj);
 				if (aniItem == null) {
 					var tmpAni = AnimationUtils.createAnimation();
 					tmpAni.addCurve(typeof(Transform), "m_LocalScale.x", ori.x, rate);
@@ -548,7 +548,7 @@ namespace UI.Common.Controls.ParamDisplays {
 			if (immediately || !item.animated)
 				transform.localScale = target;
 			else {
-				var aniItem = SceneUtils.get<AnimationItem>(item.obj);
+				var aniItem = SceneUtils.get<AnimationView>(item.obj);
 				if (aniItem == null) {
 					var tmpAni = AnimationUtils.createAnimation();
 					tmpAni.addCurve(typeof(Transform), "m_LocalScale.y", ori.y, rate);

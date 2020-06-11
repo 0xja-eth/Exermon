@@ -211,11 +211,11 @@ GameObject:
   - component: {fileID: 113555061}
   - component: {fileID: 113555064}
   - component: {fileID: 113555063}
-  - component: {fileID: 113555067}
   - component: {fileID: 113555066}
   - component: {fileID: 113555065}
   - component: {fileID: 113555068}
   - component: {fileID: 113555069}
+  - component: {fileID: 113555067}
   m_Layer: 5
   m_Name: NodeDetail
   m_TagString: Untagged
@@ -237,7 +237,7 @@ RectTransform:
   - {fileID: 1764578693}
   - {fileID: 1977873883}
   m_Father: {fileID: 1642722875}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 949e9a273ee26824280ec46355b6deeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  window: {fileID: 113555067}
+  window: {fileID: 0}
   name: {fileID: 1411054212}
   description: {fileID: 170309276}
   pos: {fileID: 88828736}
@@ -365,7 +365,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 113555059}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69f43b3f73fe6f84a97610090959abc7, type: 3}
+  m_Script: {fileID: 11500000, guid: c7c9913eeae1b2049aff7c779abd4a1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 113555066}
@@ -390,7 +390,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 113555067}
+        - m_Target: {fileID: 0}
           m_MethodName: terminateWindow
           m_Mode: 1
           m_Arguments:
@@ -954,12 +954,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1280, y: 720}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -1375,7 +1375,7 @@ RectTransform:
   - {fileID: 1943209617}
   - {fileID: 247789800}
   m_Father: {fileID: 1642722875}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -2716,7 +2716,7 @@ MonoBehaviour:
   loadingWindow: {fileID: 2029800016}
   rebuildController: {fileID: 2029800017}
   stageRecordDisplay: {fileID: 2043421240}
-  nodeDetail: {fileID: 113555067}
+  nodeDetail: {fileID: 0}
 --- !u!1 &1468656397
 GameObject:
   m_ObjectHideFlags: 0
@@ -2949,8 +2949,8 @@ RectTransform:
   m_Children:
   - {fileID: 1764487209}
   - {fileID: 470434170}
-  - {fileID: 113555060}
   - {fileID: 531328585}
+  - {fileID: 113555060}
   m_Father: {fileID: 269654356}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

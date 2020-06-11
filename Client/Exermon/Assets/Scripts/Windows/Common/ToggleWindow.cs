@@ -4,12 +4,12 @@ using UnityEngine.EventSystems;
 
 using Core.UI;
 
-namespace UI.RecordScene.Controls {
+namespace UI.Common.Windows {
 
-    /// <summary>
-    /// 日期选择器
-    /// </summary>
-    public class JumpPlane : BaseWindow,
+	/// <summary>
+	/// 反转窗口，点击窗口外触发onCancel
+	/// </summary>
+	public class ToggleWindow : BaseWindow,
     IPointerEnterHandler, IPointerExitHandler {
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace UI.RecordScene.Controls {
         /// 内部变量设置
         /// </summary>
         bool enter = false;
-
+		
         #region 更新控制
 
         /// <summary>
@@ -35,11 +35,11 @@ namespace UI.RecordScene.Controls {
         /// 更新取消事件
         /// </summary>
         void updateCancel() {
-            if (!enter && (
-                Input.GetMouseButtonDown(0) ||
-                Input.GetMouseButtonDown(1) ||
-                Input.touchCount > 0)) terminateWindow();
-        }
+			if (!enter && (
+				Input.GetMouseButtonDown(0) ||
+				Input.GetMouseButtonDown(1) ||
+				Input.touchCount > 0)) onCancel();
+		}
 
         #endregion
 
@@ -60,6 +60,13 @@ namespace UI.RecordScene.Controls {
         public void OnPointerExit(PointerEventData eventData) {
             enter = false;
         }
+
+		/// <summary>
+		/// 取消回调
+		/// </summary>
+		protected virtual void onCancel() {
+			terminateWindow();
+		}
 
         #endregion
     }
