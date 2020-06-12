@@ -53,6 +53,9 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         public CardItemShopDisplay cardItemShop;
         public PotionItemShopDisplay potionItemShop;
 
+        public RectTransform leftView;
+        public RectTransform rightView;
+
         //public NumberInputWindow numberWindow;
 
         public CurrencyDisplay moneyDisplay;
@@ -197,6 +200,8 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 卡牌物品商店
         /// </summary>
         void onCardItemShop() {
+            leftView.anchorMax = new Vector2(1, 1);
+            rightView.gameObject.SetActive(false);
             cardItemShop.startView();
         }
 
@@ -204,6 +209,8 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 药水物品商店
         /// </summary>
         void onPotionItemShop() {
+            leftView.anchorMax = new Vector2(0.67f, 1);
+            rightView.gameObject.SetActive(true);
             potionItemShop.startView();
         }
 

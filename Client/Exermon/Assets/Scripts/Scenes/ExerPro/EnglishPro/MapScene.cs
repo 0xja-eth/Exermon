@@ -18,16 +18,14 @@ namespace UI.ExerPro.EnglishPro { }
 /// <summary>
 /// 地图场景
 /// </summary>
-namespace UI.ExerPro.EnglishPro.MapScene
-{
+namespace UI.ExerPro.EnglishPro.MapScene {
 
     using Controls;
 
     /// <summary>
     /// 地图场景
     /// </summary>
-    public class MapScene : BaseScene
-    {
+    public class MapScene : BaseScene {
 
         /// <summary>
         /// 外部组件设置
@@ -51,8 +49,7 @@ namespace UI.ExerPro.EnglishPro.MapScene
         /// <summary>
         /// 初始化外部系统
         /// </summary>
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -61,16 +58,14 @@ namespace UI.ExerPro.EnglishPro.MapScene
         /// 场景名称
         /// </summary>
         /// <returns></returns>
-        public override SceneSystem.Scene sceneIndex()
-        {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProMapScene;
         }
 
         /// <summary>
         /// 开始
         /// </summary>
-        protected override void start()
-        {
+        protected override void start() {
             base.start();
             stageRecordDisplay.setItem(engSer.record);
 
@@ -83,8 +78,7 @@ namespace UI.ExerPro.EnglishPro.MapScene
         /// <summary>
         /// 更新
         /// </summary>
-        protected override void update()
-        {
+        protected override void update() {
             base.update();
             engSer?.update();
         }
@@ -96,8 +90,7 @@ namespace UI.ExerPro.EnglishPro.MapScene
         /// <summary>
         /// 进入下一步
         /// </summary>
-        public void moveNext()
-        {
+        public void moveNext() {
             var mapDisplay = stageRecordDisplay.mapDisplay;
             var playerDisplay = stageRecordDisplay.playerDisplay;
 
@@ -112,13 +105,12 @@ namespace UI.ExerPro.EnglishPro.MapScene
 
             stageRecordDisplay.requestRefresh();
             nodeDetail.terminateWindow();
-                  }
+        }
 
         /// <summary>
         /// 退出场景
         /// </summary>
-        public override void popScene()
-        {
+        public override void popScene() {
             engSer.terminate();
         }
 

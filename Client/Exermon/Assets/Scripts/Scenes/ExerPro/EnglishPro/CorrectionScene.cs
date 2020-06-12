@@ -1,4 +1,4 @@
-
+﻿
 using Core.UI;
 using Core.Systems;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
@@ -54,15 +54,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// </summary>
         protected override void start() {
             base.start();
-            //if (engSer.questionCache.getCacheList<CorrectionQuestion>().ToArray().Length == 0)
-            //    engSer.generateQuestions<CorrectionQuestion>(10, (res) =>
-            //    {
-            //        articleDisplay.startView(res[0]);
-            //        index = 1;
-            //    });
-            //else {
-            articleDisplay.startView(engSer.questionCache.correctionQuestions[index++]);
-            //}
+            if (engSer.questionCache.getCacheList<CorrectionQuestion>().ToArray().Length == 0)
+                engSer.generateQuestions<CorrectionQuestion>(10, (res) => {
+                    articleDisplay.startView(res[0]);
+                    index = 1;
+                });
+            else {
+                articleDisplay.startView(engSer.questionCache.correctionQuestions[index++]);
+            }
         }
         #endregion
 
