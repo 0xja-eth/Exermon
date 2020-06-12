@@ -24,9 +24,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// <summary>
 		/// 动画名称定义
 		/// </summary>
-		public const string PowerUpAnimation = "PowerUp";
-		public const string PowerDownAnimation = "PowerDown";
-		public const string AddStatesAnimation = "AddStates";
 
 		/// <summary>
 		/// 字符串常量定义
@@ -41,38 +38,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		public Image think;
 
 		/// <summary>
-		/// 外部系统定义
-		/// </summary>
-		BattleService battleSer;
-
-		/// <summary>
 		/// 内部变量定义
 		/// </summary>
-		Vector2 oriPosition;
-		RuntimeAction currentAction;
-
-		RectTransform rectTransform;
-		
-		#region 初始化
-
-		/// <summary>
-		/// 初始化
-		/// </summary>
-		protected override void initializeOnce() {
-			base.initializeOnce();
-			rectTransform = transform as RectTransform;
-
-		}
-
-		/// <summary>
-		/// 初始化外部系统
-		/// </summary>
-		protected override void initializeSystems() {
-			base.initializeSystems();
-			battleSer = BattleService.get();
-		}
-
-		#endregion
+		ExerProEnemy.Action currentEnemyAction = null;
 
 		#region 更新控制
 
@@ -88,9 +56,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// 更新敌人行动
 		/// </summary>
 		void updateEnemyAction() {
-			var action = enemy().currentEnemyAction;
-			if (action != null) processEnemyAction(action);
+			currentEnemyAction = enemy().currentEnemyAction;
+			if (currentEnemyAction != null)
+				processEnemyAction(currentEnemyAction);
 		}
+
+		#endregion
+
+		#region 行动处理
 
 		/// <summary>
 		/// 处理敌人行动
@@ -121,28 +94,61 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// 处理提升
 		/// </summary>
 		void processPowerUp(ExerProEnemy.Action action) {
-
+			skill();
 		}
 
 		/// <summary>
 		/// 处理削弱
 		/// </summary>
 		void processPowerDown(ExerProEnemy.Action action) {
-
+			skill();
 		}
 
 		/// <summary>
 		/// 处理附加状态
 		/// </summary>
 		void processAddStates(ExerProEnemy.Action action) {
-
+			skill();
 		}
 
 		/// <summary>
 		/// 处理逃走
 		/// </summary>
 		void processEscape(ExerProEnemy.Action action) {
+			escape();
+		}
 
+		#endregion
+
+		#region 数据控制
+
+		/// <summary>
+		/// 是否空物品
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public override bool isNullItem(RuntimeBattler item) {
+			return base.isNullItem(item) || !isEnemy();
+		}
+
+		#endregion
+
+		#region 动画控制
+
+		/// <summary>
+		/// 击中回调
+		/// </summary>
+		protected override void playHitAnimation() {
+			switch(currentEnemyAction.typeEnum()) {
+				case ExerProEnemy.Action.Type.Attack:
+					base.playHitAnimation(); break;
+				case ExerProEnemy.Action.Type.PowerUp:
+					powerUp(); onSkillEnd(); break;
+				case ExerProEnemy.Action.Type.PowerDown:
+				case ExerProEnemy.Action.Type.AddStates:
+					target()?.powerDown();
+					onSkillEnd(); break;
+			}
 		}
 
 		#endregion

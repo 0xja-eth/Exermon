@@ -26,13 +26,19 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// 动画名称定义
 		/// </summary>
 		public const string IdleAnimation = "Idle";
-		public const string HurtedAnimation = "Hurt";
+		public const string HurtAnimation = "Hurt";
 		public const string AttackAnimation = "Attack";
 		public const string MovingAnimation = "Move";
 		public const string EscapeAnimation = "Escape";
+		public const string PowerUpAnimation = "PowerUp";
+		public const string PowerDownAnimation = "PowerDown";
 
 		public const string MovingAttr = "moving";
 		public const string AttackAttr = "attack";
+		public const string HurtAttr = "hurt";
+		public const string SkillAttr = "skill";
+		public const string PowerUpAttr = "power_up";
+		public const string PowerDownAttr = "power_down";
 
 		/// <summary>
 		/// 外部组件设置
@@ -56,7 +62,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// <summary>
 		/// 外部系统定义
 		/// </summary>
-		BattleService battleSer;
+		protected BattleService battleSer;
 
 		/// <summary>
 		/// 内部变量定义
@@ -83,7 +89,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		void initializeAnimationEvents() {
 			animation.addEndEvent(MovingAnimation, onMoveEnd);
 			animation.addEndEvent(EscapeAnimation, onMoveEnd);
-			animator.addEndEvent(AttackAttr, onAttackEnd);
+
+			animator.addEndEvent(HurtAnimation, onActionEnd);
+			animator.addEndEvent(AttackAnimation, onActionEnd);
+			animator.addEndEvent(PowerUpAnimation, onActionEnd);
+			animator.addEndEvent(PowerDownAnimation, onActionEnd);
 		}
 
 		/// <summary>
@@ -167,6 +177,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		/// <returns></returns>
 		public bool isEnemy() {
 			return item != null && item.isEnemy();
+		}
+
+		/// <summary>
+		/// 是否为角色
+		/// </summary>
+		/// <returns></returns>
+		public bool isActor() {
+			return item != null && item.isActor();
 		}
 
 		/// <summary>
@@ -290,25 +308,91 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 		#region 攻击动画
 
 		/// <summary>
-		/// 击中回调
-		/// </summary>
-		public virtual void onHit() {
-			item.processAction();
-		}
-
-		/// <summary>
 		/// 攻击
 		/// </summary>
-		public virtual void attack() {
+		public void attack() {
 			animator.setVar(AttackAttr, true);
 		}
 
 		/// <summary>
-		/// 结束攻击
+		/// 攻击结束回调
 		/// </summary>
-		public virtual void onAttackEnd() {
+		public void onAttackEnd() {
+			animator.setVar(AttackAttr, false);
+		}
+
+		/// <summary>
+		/// 发动技能
+		/// </summary>
+		public void skill() {
+			animator.setVar(SkillAttr, true);
+		}
+
+		/// <summary>
+		/// 技能结束回调
+		/// </summary>
+		public void onSkillEnd() {
+			animator.setVar(SkillAttr, false);
+		}
+
+		#endregion
+
+		#region 目标动画
+
+		/// <summary>
+		/// 提升
+		/// </summary>
+		public void powerUp() {
+			animator.setVar(PowerUpAttr, true);
+		}
+
+		/// <summary>
+		/// 削弱
+		/// </summary>
+		public void powerDown() {
+			animator.setVar(PowerDownAttr, true);
+		}
+
+		/// <summary>
+		/// 削弱
+		/// </summary>
+		public void hurt() {
+			animator.setVar(HurtAttr, true);
+		}
+
+		#endregion
+
+		#region 动画行动控制
+
+		/// <summary>
+		/// 击中回调
+		/// </summary>
+		public void onHit() {
+			item.processAction();
+			playHitAnimation();
 			item.endAction();
 		}
+
+		/// <summary>
+		/// 播放击中动画
+		/// </summary>
+		protected virtual void playHitAnimation() {
+			target().hurt();
+			onAttackEnd();
+		}
+
+		/// <summary>
+		/// 结束行动 
+		/// </summary>
+		public void onActionEnd() {
+			animator.setVar(HurtAttr, false);
+			animator.setVar(PowerUpAttr, false);
+			animator.setVar(PowerDownAttr, false);
+		}
+
+		#endregion
+
+		#region 其他动画
 
 		#endregion
 

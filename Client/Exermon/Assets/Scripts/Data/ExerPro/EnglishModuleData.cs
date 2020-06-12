@@ -2408,9 +2408,16 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 结束当前行动
 		/// </summary>
-		public void endAction() {
+		public virtual void endAction() {
 			if (actions.Count <= 0) return;
 			actions.Dequeue();
+		}
+
+		/// <summary>
+		/// 清除所有行动
+		/// </summary>
+		public void clearActions() {
+			actions.Clear();
 		}
 
 		#endregion
@@ -2421,7 +2428,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 回合结束回调
         /// </summary>
         public virtual void onRoundEnd() {
-            processBuffsRoundEnd();
+			clearActions();
+
+			processBuffsRoundEnd();
             processStatesRoundEnd();
         }
 
@@ -2757,6 +2766,14 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		/// <summary>
+		/// 结束行动
+		/// </summary>
+		public override void endAction() {
+			base.endAction();
+			isActionEnd = true;
+		}
+
+		/// <summary>
 		/// 更新行动
 		/// </summary>
 		public bool updateAction() {
@@ -2783,12 +2800,20 @@ namespace ExerPro.EnglishModule.Data {
 				isActionEnd = true;
         }
 
-        #endregion
+		/// <summary>
+		/// 回合结束回调
+		/// </summary>
+		public override void onRoundEnd() {
+			base.onRoundEnd();
+			_currentEnemyAction = null;
+		}
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public RuntimeEnemy() { }
+		#endregion
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public RuntimeEnemy() { }
         public RuntimeEnemy(int pos, ExerProEnemy enemy) {
             tempEnemy = enemy; enemyId = enemy.id;
             this.pos = pos;
