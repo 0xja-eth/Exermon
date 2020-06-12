@@ -124,8 +124,6 @@ namespace UI.MainScene {
                 case BuildingType.Library:
                     onLibraryClick(); break;
                 case BuildingType.Adventure:
-                    //sceneName = SceneSystem.Scene.EnglishProMapScene; break;
-                    //sceneName = SceneSystem.Scene.EnglishProCorrectionScene; break;
                     onAdventureClick(); break;
             }
             if (sceneName != SceneSystem.Scene.NoneScene)

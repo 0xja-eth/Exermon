@@ -23,22 +23,6 @@ namespace UI.CorrectionScene.Windows
         public string selectedChangedAfterWord;
         public SentenceContainer currentSenContainer;
 
-        ///// <summary>
-        ///// 初始化外部系统
-        ///// </summary>
-        //protected override void initializeSystems()
-        //{
-        //    base.initializeSystems();
-        //}
-
-        ///// <summary>
-        ///// 初始化
-        ///// </summary>
-        //protected override void initializeOnce()
-        //{
-        //    base.initializeOnce();
-        //}
-
         public override void startView()
         {
             base.startView();
@@ -78,11 +62,14 @@ namespace UI.CorrectionScene.Windows
                 {
                     items[currentWordIndex] = selectedChangedAfterWord;
                 }
-            } 
+            }
+
             currentSenContainer.clearItems();
-            currentSenContainer.setItems(items);
+            currentSenContainer.setItem(string.Join("",items));
             base.terminateView();
         }
-
+        public void cancel() {
+            base.terminateView();
+        }
     }
 }

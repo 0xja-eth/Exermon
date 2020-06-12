@@ -112,7 +112,7 @@ namespace UI.ExerPro.EnglishPro.MapScene
 
             stageRecordDisplay.requestRefresh();
             nodeDetail.terminateWindow();
-        }
+                  }
 
         /// <summary>
         /// 退出场景

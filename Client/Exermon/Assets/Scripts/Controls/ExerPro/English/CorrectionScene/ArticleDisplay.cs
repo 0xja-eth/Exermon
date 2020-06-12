@@ -10,55 +10,44 @@ using UI.CorrectionScene.Windows;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 
     /// <summary>
     /// 文章
     /// </summary
     public class ArticleDisplay : ContainerDisplay<string>,
-        IItemDisplay<CorrectionQuestion>
-    {
+        IItemDisplay<CorrectionQuestion> {
         CorrectionQuestion question;
         public GameObject correctionWindow;
         public Text changedBeforeValue;
 
-        public CorrectionQuestion getItem()
-        {
+        public CorrectionQuestion getItem() {
             return question;
         }
 
-        public void setItem(CorrectionQuestion item, bool force = false)
-        {
+        public void setItem(CorrectionQuestion item, bool force = false) {
             question = item; base.setItems(item.sentences());
         }
-        
+
 
         /// <summary>
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
-        public void startView(CorrectionQuestion item)
-        {
+        public void startView(CorrectionQuestion item) {
             base.startView();
             setItem(item, true);
         }
 
-        public void revert()
-        {
-            //setItem(question, false);
-
-            //getSubViews();
-            //base.setItems(question.sentences());
+        public void revert() {
             int index = 0;
-            foreach(ItemDisplay<string> item in getSubViews())
-            {
+            foreach (ItemDisplay<string> item in getSubViews()) {
                 SceneUtils.get<SentenceContainer>(item.gameObject).clearItems();
                 SceneUtils.get<SentenceContainer>(item.gameObject).setItem(items[index++]);
             }
             startView(question);
         }
-        
+
     }
 }

@@ -15,12 +15,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     /// </summary
     public class SentenceDisplay : ItemDisplay<string>
     {
-
-
-        /// <summary>
-        /// 单词储存池
-        /// </summary>
-        List<GameObject> words;
+        
 
         /// <summary>
         /// 开启视图

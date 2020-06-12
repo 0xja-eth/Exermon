@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static ExerPro.EnglishModule.Data.PhraseQuestion;
 
-namespace Assets.Scripts.Scenes.ExerPro.EnglishPro
-{
-    class PhraseScene : BaseScene
-    {
+namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
+    class PhraseScene : BaseScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -30,8 +28,7 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro
         /// <summary>
         /// 初始化外部系统
         /// </summary>
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -41,24 +38,22 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex()
-        {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProPhraseScene;
         }
 
         /// <summary>
         /// 开始
         /// </summary>
-        protected override void start()
-        {
+        protected override void start() {
             base.start();
             Debug.Log(sample().word);
             optionAreaDisplay.startView(sample());
         }
 
-        public void onSubmit()
-        {
-            engSer.exitNode();
+        public void onSubmit() {
+            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+            engSer.exitNode(true);
         }
     }
 }
