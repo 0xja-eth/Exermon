@@ -804,6 +804,7 @@ namespace GameModule.Services {
                     for (int j = 0; j < rates[i - 1]; ++j) rateList.Add(i);
 
                 var index = Random.Range(0, rateList.Count);
+                return ExerProMapNode.Type.Treasure;
                 return (ExerProMapNode.Type)rateList[index];
             }
 

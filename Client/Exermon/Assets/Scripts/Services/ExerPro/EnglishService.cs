@@ -804,7 +804,7 @@ namespace ExerPro.EnglishModule.Services
         {
             if (!isIdle()) return;
             changeState(State.Moving);
-            record.moveNext(4, force);
+            record.moveNext(nid, force);
             //record.moveNext(-1, true);
             //saveExerPro();
         }

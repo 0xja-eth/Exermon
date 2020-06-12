@@ -20,6 +20,7 @@ using QuestionModule.Data;
 using PlayerModule.Services;
 
 using UI.Common.Controls.ParamDisplays;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// 艾瑟萌特训模块
@@ -38,6 +39,7 @@ namespace ExerPro.EnglishModule.Data
 {
 
     using EnglishModule.Services;
+    using System.IO;
 
     #region 题目
 
@@ -201,7 +203,7 @@ namespace ExerPro.EnglishModule.Data
 
             CorrectionQuestion question = new CorrectionQuestion();
             question.wrongItems = WrongItem.sample();
-            question.article = "When I was in high school, most of my friend had bicycles. I hoped I could also have it. One day I saw a second-hand bicycle that was only one hundred yuan.";
+            question.article = "When I was in high school, most of my friend had bicycles. I hoped I could also have it. One day I saw a second-hand bicycle that was only one hundred yuan, I saw a second-hand bicycle that was only one hundred yuan.";
             question.description = "test";
 
             return question;
@@ -209,11 +211,58 @@ namespace ExerPro.EnglishModule.Data
 
         public string[] sentences()
         {
-            string temp = article.Replace("? ", "?+");
-            temp = temp.Replace(". ", ".+");
-            temp = temp.Replace("! ", "!+");
-            temp = temp.Replace(", ", " , ");
-            string[] sentences = temp.Split('+');
+            //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
+            string temp = article.Replace("\n", "");
+            temp = temp.Replace("\t", "");
+            temp = temp.Replace("\r", "");
+
+            Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
+            List<string> wordList = new List<string>();
+            using (StreamReader sr = new StreamReader("word.txt")) {
+                string line;
+                while ((line = sr.ReadLine()) != null) {
+                    wordList.Add(line);
+                }
+            }
+
+            foreach(string word in wordList) {
+                Regex regex = new Regex(word);
+                Debug.Log("aaa" + word);
+                Debug.Log("aaa" + regex.IsMatch(temp));
+                if (regex.IsMatch(temp)) {
+                    string match = Regex.Match(temp, word).Value;
+                    string hashCode = match.GetHashCode().ToString();
+                    temp = temp.Replace(match, hashCode);
+                    matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
+                }
+            }
+
+
+            temp = temp.Replace("”", "\"");
+            temp = temp.Replace("“", "\"");
+
+            temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
+
+            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
+            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
+            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
+
+            temp = temp.Replace(" ? ", " ?&");
+            temp = temp.Replace(" . ", " .&");
+            temp = temp.Replace(" ! ", " !&");
+
+            temp = temp.Replace("#", ".");
+            
+            while (matchWordList.Count != 0) {
+                KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
+                temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
+            }
+            
+
+            //去除重复空格
+            temp = Regex.Replace(temp, " {2,}", " ");
+
+            string[] sentences = temp.Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
             return sentences;
         }
     }

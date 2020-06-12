@@ -12,14 +12,12 @@ using UI.CorrectionScene.Windows;
 using Core.UI.Utils;
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.CorrectionScene
-{
+namespace UI.ExerPro.EnglishPro.CorrectionScene {
 
     /// <summary>
     /// 场景
     /// </summary>
-    public class CorrectionScene : BaseScene
-    {
+    public class CorrectionScene : BaseScene {
 
         /// <summary>
         /// 外部组件设置
@@ -27,7 +25,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         public ArticleDisplay articleDisplay;
         public Text changedBeforeValue;
         public GameObject correctionWindow;
-
+        int index = 0;
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -38,8 +36,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// <summary>
         /// 初始化外部系统
         /// </summary>
-        protected override void initializeSystems()
-        {
+        protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -48,30 +45,30 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
         /// 场景名
         /// </summary>
         /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex()
-        {
+        public override SceneSystem.Scene sceneIndex() {
             return SceneSystem.Scene.EnglishProCorrectionScene;
         }
 
         /// <summary>
         /// 开始
         /// </summary>
-        protected override void start()
-        {
+        protected override void start() {
             base.start();
-            //engSer.generateQuestions<CorrectionQuestion>(5, (res) =>
-             //{
-                 //Debug.Log("aaa" + engSer.questionCache.correctionQuestions.ToArray().Length);
-                 articleDisplay.startView(sample());
-             //});
+            //if (engSer.questionCache.getCacheList<CorrectionQuestion>().ToArray().Length == 0)
+            //    engSer.generateQuestions<CorrectionQuestion>(10, (res) =>
+            //    {
+            //        articleDisplay.startView(res[0]);
+            //        index = 1;
+            //    });
+            //else {
+            articleDisplay.startView(engSer.questionCache.correctionQuestions[index++]);
+            //}
         }
         #endregion
 
-        public void onWordSelected(SentenceContainer container, string word)
-        {
+        public void onWordSelected(SentenceContainer container, string word) {
             //清除其他句子选择
-            foreach (ItemDisplay<string> item in articleDisplay.getSubViews())
-            {
+            foreach (ItemDisplay<string> item in articleDisplay.getSubViews()) {
                 if (SceneUtils.get<SentenceContainer>(item.gameObject) == container)
                     continue;
                 SceneUtils.get<SentenceContainer>(item.gameObject).deselect();
@@ -81,14 +78,13 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene
             SceneUtils.get<CorrectionWindow>(correctionWindow).currentSenContainer = container;
         }
 
-        public void onWordDeselected()
-        {
+        public void onWordDeselected() {
             SceneUtils.get<CorrectionWindow>(correctionWindow).terminateView();
         }
 
-        public void onSubmit()
-        {
-            sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+        public void onSubmit() {
+            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+            engSer.exitNode(true);
         }
     }
 

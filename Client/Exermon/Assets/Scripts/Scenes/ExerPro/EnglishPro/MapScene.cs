@@ -122,9 +122,9 @@ namespace UI.ExerPro.EnglishPro.MapScene
                 switch (i % 2)
                 {
                     case 0:
-                        sceneSys.gotoScene(SceneSystem.Scene.EnglishProCorrectionScene);break;
+                        sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene);break;
                     case 1:
-                        sceneSys.gotoScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+                        sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
                 }
             }
         }
