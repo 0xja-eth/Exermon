@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
     /// <summary>
     /// 装备背包显示

@@ -239,21 +239,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 20000
---- !u!114 &5329862675586393494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2421270429970104420}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12cf514b3e032344980c8dc8822d34cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  name: {fileID: 0}
-  icon: {fileID: 0}
---- !u!114 &6267346411178990842
+--- !u!114 &475669710232619939
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -283,7 +269,7 @@ MonoBehaviour:
   checkedColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
   highlightColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
   disableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-  itemDisplay: {fileID: 5329862675586393494}
+  itemDisplay: {fileID: 8278210759743081422}
   starsDisplay: {fileID: 0}
   icon: {fileID: 2328092949721497199}
   priceTag: {fileID: 6618211390225027970}
@@ -292,6 +278,20 @@ MonoBehaviour:
   goldTag: {fileID: 2800000, guid: 4d6a7f8696dd15249b5c311e4a87e3cf, type: 3}
   cost: {fileID: 8104641866060224674}
   description: {fileID: 6751850268765573944}
+--- !u!114 &8278210759743081422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2421270429970104420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12cf514b3e032344980c8dc8822d34cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: {fileID: 0}
+  icon: {fileID: 0}
 --- !u!1 &7331828298556460807
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,6 +377,26 @@ PrefabInstance:
       propertyPath: m_Text
       value: "\u9020\u62101000000\u70B9\u4F24\u5BB3\u3002"
       objectReference: {fileID: 0}
+    - target: {fileID: 4535792247677758868, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: selectedFlag
+      value: 
+      objectReference: {fileID: 217649279629921384}
+    - target: {fileID: 4535792247677758868, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: highlightFlag
+      value: 
+      objectReference: {fileID: 7331828298556460807}
+    - target: {fileID: 4535792247677758868, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: priceTag
+      value: 
+      objectReference: {fileID: 6618211390225027970}
+    - target: {fileID: 4535792247677758868, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: priceText
+      value: 
+      objectReference: {fileID: 321909042017569155}
     - target: {fileID: 9120931410325961305, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
       propertyPath: m_Name

@@ -9,7 +9,7 @@ using ExerPro.EnglishModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	/// <summary>
 	/// 状态详情控件

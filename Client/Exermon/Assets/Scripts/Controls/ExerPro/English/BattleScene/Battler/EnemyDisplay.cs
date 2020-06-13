@@ -15,7 +15,7 @@ using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.AnimationSystem;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	/// <summary>
 	/// 敌人显示控件
