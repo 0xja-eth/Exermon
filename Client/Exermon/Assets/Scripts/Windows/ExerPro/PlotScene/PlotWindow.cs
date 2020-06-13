@@ -6,6 +6,8 @@ using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 using Core.Data.Loaders;
 using System.IO;
+using Core.Systems;
+using GameModule.Services;
 
 namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
     /// <summary>
@@ -98,8 +100,10 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
                 "“~嚯嚯嚯！你好，你好啊！这是谁啊？”\n" +
                 "你同意吗？";
             jsonData["event_name"] = "蛇";
-            var loadPath = System.Environment.CurrentDirectory + "\\Assets\\Sprites\\ExerPro\\PlotScene\\Snake.png";
-            jsonData["picture"] = DataLoader.convert(loadPictureHelp(loadPath));
+            //var loadPath = System.Environment.CurrentDirectory + "\\Assets\\Sprites\\ExerPro\\PlotScene\\Snake.png";
+            //jsonData["picture"] = DataLoader.convert(loadPictureHelp(loadPath));
+            const string loadPath = "ExerPro/Test/";
+            jsonData["picture"] = DataLoader.convert(AssetLoader.loadTexture2D(loadPath, "Snake"));
 
             PlotQuestion.Choice[] tempArray = new PlotQuestion.Choice[5];
             LitJson.JsonData choiceData = new LitJson.JsonData();

@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 949e9a273ee26824280ec46355b6deeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  window: {fileID: 0}
+  window: {fileID: 113555067}
   name: {fileID: 1411054212}
   description: {fileID: 170309276}
   pos: {fileID: 88828736}

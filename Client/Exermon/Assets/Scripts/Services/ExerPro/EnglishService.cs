@@ -678,19 +678,19 @@ namespace ExerPro.EnglishModule.Services {
 			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
 		}
 
-		/// <summary>
-		/// 敌人据点
-		/// </summary>
-		void onEnemyNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
-		}
+        /// <summary>
+        /// 敌人据点
+        /// </summary>
+        void onEnemyNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
+        }
 
-		/// <summary>
-		/// 精英据点
-		/// </summary>
-		void onEliteNode() {
-			exitNode(false);
-		}
+        /// <summary>
+        /// 精英据点
+        /// </summary>
+        void onEliteNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+        }
 
 		/// <summary>
 		/// Boss据点

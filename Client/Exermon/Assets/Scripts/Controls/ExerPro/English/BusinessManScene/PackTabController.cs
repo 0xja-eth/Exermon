@@ -24,12 +24,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(BusinessManWindow content, int index) {
-            foreach (var toggle in subViews) {
-                var a = toggle.IsActive();
-                var c = toggle.isOn;
-                int b = 4;
-            }
-
             content.switchView(index);
         }
 

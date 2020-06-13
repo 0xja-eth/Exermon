@@ -9,40 +9,34 @@ using UI.Common.Controls.ItemDisplays;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene
-{
+namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene {
     class OptionAreaDisplay : SelectableContainerDisplay<string>,
-         IItemDisplay<PhraseQuestion>
-    {
+         IItemDisplay<PhraseQuestion> {
         public PhraseQuestion question;
         public Text chineseDisplay;
         public Text phraseDispaly;
         string blank = " ____________";
 
 
-        public void setItem(PhraseQuestion item, bool force = false)
-        {
+        public void setItem(PhraseQuestion item, bool force = false) {
             question = item;
             base.setItems(item.options());
         }
 
-        public void startView(PhraseQuestion item)
-        {
+        public void startView(PhraseQuestion item) {
             base.startView();
             chineseDisplay.text = item.chinese;
             phraseDispaly.text = item.word + blank;
             setItem(item);
         }
 
-        protected override void onSelectChanged()
-        {
+        protected override void onSelectChanged() {
             base.onSelectChanged();
-            if(getSelectedIndex() != -1)
+            if (getSelectedIndex() != -1)
                 phraseDispaly.text = question.word + " " + items[getSelectedIndex()];
         }
 
-        public PhraseQuestion getItem()
-        {
+        public PhraseQuestion getItem() {
             return question;
         }
 
@@ -51,11 +45,10 @@ namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene
         /// </summary>
         /// <param name="sub"></param>
         /// <param name="index"></param>
-        protected override void onSubViewCreated(SelectableItemDisplay<string> sub, int index)
-        {
+        protected override void onSubViewCreated(SelectableItemDisplay<string> sub, int index) {
             base.onSubViewCreated(sub, index);
             SceneUtils.get<Text>(subViews[index].gameObject).text = items[index];
         }
-        
+
     }
 }
