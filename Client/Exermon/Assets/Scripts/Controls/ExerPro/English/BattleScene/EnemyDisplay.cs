@@ -3,9 +3,10 @@ using System;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 using Core.Data.Loaders;
-using Core.UI;
+using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
@@ -19,7 +20,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 	/// <summary>
 	/// 敌人显示控件
 	/// </summary
-	public class EnemyDisplay : BattlerDisplay {
+	public class EnemyDisplay : BattlerDisplay { //, IDropHandler {
 
 		/// <summary>
 		/// 动画名称定义
@@ -196,6 +197,28 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls {
 			think.gameObject.SetActive(false);
 		}
 
+		#endregion
+
+		#region 事件控制
+		/*
+		/// <summary>
+		/// 拖拽释放回调
+		/// </summary>
+		public void OnDrop(PointerEventData eventData){
+
+		}
+
+		/// <summary>
+		/// 获取拖拽中的物品显示项
+		/// </summary>
+		/// <param name="data">事件数据</param>
+		/// <returns>物品显示项</returns>
+		DraggableItemDisplay<ExerProPackCard> getDraggingItemDisplay(
+			PointerEventData data) {
+			var obj = data.pointerDrag; if (obj == null) return null;
+			return SceneUtils.get<DraggableItemDisplay<ExerProPackCard>>(obj);
+		}
+		*/
 		#endregion
 
 	}
