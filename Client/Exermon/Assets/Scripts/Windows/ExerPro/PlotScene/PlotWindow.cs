@@ -102,10 +102,8 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
             jsonData["event_name"] = "蛇";
             //var loadPath = System.Environment.CurrentDirectory + "\\Assets\\Sprites\\ExerPro\\PlotScene\\Snake.png";
             //jsonData["picture"] = DataLoader.convert(loadPictureHelp(loadPath));
-            //const string loadPath = "ExerPro/Test/";
-            //const string loadPath = "ExerGift/Icon/";
-            //jsonData["picture"] = DataLoader.convert(AssetLoader.loadTexture2D(loadPath, "BigExerGift_1"));
-            //jsonData["picture"] = DataLoader.convert(loadPictureHelp("F:\\Snake.png"));
+            const string loadPath = "ExerPro/Test/";
+            jsonData["picture"] = DataLoader.convert(AssetLoader.loadTexture2D(loadPath, "Snake"));
 
             PlotQuestion.Choice[] tempArray = new PlotQuestion.Choice[5];
             LitJson.JsonData choiceData = new LitJson.JsonData();
