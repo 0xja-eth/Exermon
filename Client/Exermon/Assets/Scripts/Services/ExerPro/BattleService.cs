@@ -66,7 +66,7 @@ namespace ExerPro.EnglishModule.Services {
         ExerProRecord record;
         ExerProCardGroup cardGroup;
 
-        List<RuntimeEnemy> enemies; // 敌人
+        List<RuntimeEnemy> _enemies; // 敌人
         int curEnemyIndex = 0; // 当前敌人索引
 
         int corrCnt = 0, bonusCnt = 0;
@@ -85,7 +85,7 @@ namespace ExerPro.EnglishModule.Services {
             base.initializeSystems();
             engSer = EnglishService.get();
             record = engSer.record;
-            cardGroup = record.actor.cardGroup;
+            cardGroup = actor().cardGroup;
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         void updatePlaying() {
             if (isStateChanged())
-                foreach (var enemy in enemies)
+                foreach (var enemy in _enemies)
                     calcEnemyNext(enemy);
         }
 
@@ -130,7 +130,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新弃牌
         /// </summary>
         void updateDiscarding() {
-            record.actor.cardGroup.onRoundEnd();
+            actor().cardGroup.onRoundEnd();
             changeState(State.Enemy);
         }
 
@@ -154,7 +154,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新结果
         /// </summary>
         void updateResult() {
-            record.actor.onBattleEnd();
+            actor().onBattleEnd();
             changeState(State.NotInBattle);
         }
         */
@@ -185,11 +185,17 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="type"></param>
         void generateEnemies(ExerProMapNode.Type type) {
-            var actor = record.actor;
             var stage = record.stage();
-            enemies = CalcService.BattleEnemiesGenerator.
-                generate(actor, stage, type);
+            _enemies = CalcService.BattleEnemiesGenerator.
+                generate(actor(), stage, type);
         }
+
+		/// <summary>
+		/// 结束出牌阶段
+		/// </summary>
+		public void pass() {
+			changeState(State.Discarding);
+		}
 
         /// <summary>
         /// 结束
@@ -198,13 +204,47 @@ namespace ExerPro.EnglishModule.Services {
             cardGroup.onBattleEnd();
         }
 
-        #region 答题/抽卡控制
+		#region 数据获取
 
-        /// <summary>
-        /// 当前题目
-        /// </summary>
-        /// <returns></returns>
-        public Word currentWord() {
+		/// <summary>
+		/// 获取玩家
+		/// </summary>
+		/// <returns></returns>
+		public RuntimeActor actor() {
+			return record.actor;
+		}
+
+		/// <summary>
+		/// 获取敌人
+		/// </summary>
+		/// <returns></returns>
+		public List<RuntimeBattler> enemies() {
+			var res = new List<RuntimeBattler>();
+			foreach (var enemy in _enemies) res.Add(enemy);
+			return res;
+		}
+
+		/// <summary>
+		/// 获取所有战斗者
+		/// </summary>
+		/// <returns></returns>
+		public List<RuntimeBattler> battlers() {
+			var res = new List<RuntimeBattler>();
+
+			res.Add(actor());
+			foreach (var enemy in _enemies) res.Add(enemy);
+			return res;
+		}
+
+		#endregion
+
+		#region 答题/抽卡控制
+
+		/// <summary>
+		/// 当前题目
+		/// </summary>
+		/// <returns></returns>
+		public Word currentWord() {
             return record.nextWord();
         }
 
@@ -257,30 +297,32 @@ namespace ExerPro.EnglishModule.Services {
             else bonus = true;
         }
 
-        #endregion
+		#endregion
 
-        #region 出牌控制
+		#region 出牌控制
 
-        /// <summary>
-        /// 出牌
-        /// </summary>
-        /// <param name="card">牌</param>
-        /// <param name="targets">目标</param>
-        public void play(ExerProCard card, List<RuntimeEnemy> targets) {
-            foreach(var target in targets) {
-                var action = new RuntimeAction(record.actor, target, card);
-            }
-        }
+		/// <summary>
+		/// 使用
+		/// </summary>
+		/// <param name="effect">效果</param>
+		/// <param name="targets">目标</param>
+		public void use(ExerProEffectData[] effects, List<RuntimeBattler> targets) {
+			var actor = this.actor();
+			foreach (var target in targets) {
+				actor.addAction(new RuntimeAction(
+					actor, target, effects));
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region 敌人控制
+		#region 敌人控制
 
-        /// <summary>
-        /// 计算敌人下一步行动
-        /// </summary>
-        void calcEnemyNext(RuntimeEnemy enemy) {
-            enemy.calcNext(round, record.actor);
+		/// <summary>
+		/// 计算敌人下一步行动
+		/// </summary>
+		void calcEnemyNext(RuntimeEnemy enemy) {
+            enemy.calcNext(round, actor());
         }
 
         /// <summary>
@@ -288,9 +330,9 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns>敌人是否全部行动完毕</returns>
         bool processEnemiesAction() {
-            var enemy = enemies[curEnemyIndex];
+            var enemy = _enemies[curEnemyIndex];
             if (enemy.updateAction()) curEnemyIndex++;
-            return curEnemyIndex >= enemies.Count;
+            return curEnemyIndex >= _enemies.Count;
         }
 
         #endregion
@@ -319,8 +361,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 处理战斗者回合结束
         /// </summary>
         void battlersRoundEnd() {
-            record.actor.onRoundEnd();
-            foreach (var enemy in enemies)
+            actor().onRoundEnd();
+            foreach (var enemy in _enemies)
                 enemy.onRoundEnd();
         }
 
@@ -338,7 +380,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns></returns>
         bool isActorDeath() {
-            return record.actor.isDeath();
+            return actor().isDeath();
         }
 
         /// <summary>
@@ -346,7 +388,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns></returns>
         bool isEnemiesDeath() {
-            foreach (var enemy in enemies)
+            foreach (var enemy in _enemies)
                 if (!enemy.isDeath()) return false;
             return true;
         }
@@ -355,8 +397,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 战斗结束回调
         /// </summary>
         void onBattleEnd() {
-            // TODO: 生成奖励
-            record.actor.onBattleEnd();
+			// TODO: 生成奖励
+			actor().onBattleEnd();
             changeState(State.Result);
         }
 

@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+using Core.UI.Utils;
+
 /// <summary>
 /// 雷达图控件
 /// </summary>
@@ -139,9 +141,9 @@ namespace UI.Common.Controls.RadarDisplay {
         /// <returns>是否击中</returns>
         public bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera) {
             if (raycastTarget) {
-                Vector2 local; // sp 转换为当前 RT 内的点的位置
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    rectTransform, sp, eventCamera, out local);
+                // sp 转换为当前 RT 内的点的位置
+				Vector2 local = SceneUtils.screen2Local(
+					sp, rectTransform, eventCamera);
 
                 int cnt = getEdgeCount();
                 float deltaAngle = 360f / cnt;

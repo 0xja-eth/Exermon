@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
+using Core.UI.Utils;
+
 namespace UnityEngine.UI {
     #region 源码部分
 
@@ -183,12 +185,7 @@ namespace UI.Common.Controls.SystemExtend.PaintableImage {
         /// <param name="mouse"></param>
         /// <returns></returns>
         Vector2 mousePosToLocalPos(Vector2 mouse) {
-            Vector2 realPos;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                rectTransform, mouse, eventCamera, out realPos)) realPos = mouse;
-            // 成功输出的 realPos 为鼠标在 container 内的相对于自己的 RectTransform 的 pivot 点的坐标差
-
-            return realPos;
+			return SceneUtils.screen2Local(mouse, rectTransform, eventCamera);
         }
 
         #endregion

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 using Core.UI;
+using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Data;
 
@@ -112,10 +113,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
             int maxW = Screen.width / 2, maxH = Screen.height / 2;
             var offset = XOffset + rect.width / 2;
 
-            Vector2 outPos;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                transform.parent as RectTransform, pos, Camera.main, out outPos)) {
-            } else outPos = pos;
+            Vector2 outPos = SceneUtils.screen2Local(
+				pos, transform.parent as RectTransform);
 
             outPos.x += offset;
             

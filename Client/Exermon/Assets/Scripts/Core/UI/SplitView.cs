@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 namespace Core.UI {
 
+	using Utils;
+
     /// <summary>
     /// 分隔栏
     /// </summary>
@@ -131,10 +133,8 @@ namespace Core.UI {
         /// <returns></returns>
         float calcRate(PointerEventData eventData) {
             // transform the screen point to world point int rectangle
-            Vector2 realPos;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                container, eventData.position, eventData.pressEventCamera, out realPos)) ;
-            else realPos = eventData.position;
+            Vector2 realPos = SceneUtils.screen2Local(
+				eventData.position, container, eventData.pressEventCamera);
             // 成功输出的 realPos 为鼠标在 container 内的相对于自己的 RectTransform 的 pivot 点的坐标差
 
             // rect.position 为 自身 RectTransform 左下角坐标相对于 pivot 坐标的坐标差

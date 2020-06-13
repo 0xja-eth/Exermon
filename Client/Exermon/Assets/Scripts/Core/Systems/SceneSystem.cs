@@ -52,7 +52,9 @@ namespace Core.Systems {
             EnglishProPlotScene,
             EnglishProCorrectionScene,
             EnglishProPhraseScene,
-            HelpScene
+			EnglishProBattleScene,
+
+			HelpScene
         }
 
         /// <summary>

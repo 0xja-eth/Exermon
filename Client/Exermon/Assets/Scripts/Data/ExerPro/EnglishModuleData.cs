@@ -742,17 +742,34 @@ namespace ExerPro.EnglishModule.Data {
     /// 特训背包药水
     /// </summary>
     public class ExerProPackPotion : PackContItem<ExerProPotion> {
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public ExerProPackPotion() { }
-        public ExerProPackPotion(ExerProPotion card) : base(card) { }
+
+		/// <summary>
+		/// 获取效果数组
+		/// </summary>
+		/// <returns></returns>
+		public ExerProEffectData[] effects() {
+			return item().effects;
+		}
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProPackPotion() { }
+        public ExerProPackPotion(ExerProPotion potion) : base(potion) { }
     }
 
     /// <summary>
     /// 特训背包卡片
     /// </summary>
     public class ExerProPackCard : PackContItem<ExerProCard> {
+
+		/// <summary>
+		/// 获取效果数组
+		/// </summary>
+		/// <returns></returns>
+		public ExerProEffectData[] effects() {
+			return item().effects;
+		}
 
         /// <summary>
         /// 构造函数
@@ -914,7 +931,7 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 回合结束，自动弃牌
+        /// 回收牌堆
         /// </summary>
         public void recycle(PackContainer<ExerProPackCard> container) {
             var tmpItems = container.items.ToArray();
@@ -2747,6 +2764,22 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public override bool isActor() { return true; }
 
+		/// <summary>
+		/// 使用药水
+		/// </summary>
+		/// <param name="potion">药水</param>
+		public void usePotion(ExerProPackPotion potion) {
+			potionPack.removeItem(potion);
+		}
+
+		/// <summary>
+		/// 使用卡牌
+		/// </summary>
+		/// <param name="card">卡牌</param>
+		public void useCard(ExerProPackCard card) {
+			cardGroup.useCard(card);
+		}
+
 		#region 属性定义
 
 		/// <summary>
@@ -2772,6 +2805,26 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		protected override int baseAgile() { return _agile; }
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 回合结束回调
+		/// </summary>
+		public override void onRoundEnd() {
+			base.onRoundEnd();
+			cardGroup.onRoundEnd();
+		}
+
+		/// <summary>
+		/// 战斗结束回调
+		/// </summary>
+		public override void onBattleEnd() {
+			base.onBattleEnd();
+			cardGroup.onBattleEnd();
+		}
 
 		#endregion
 
