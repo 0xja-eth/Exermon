@@ -93,7 +93,7 @@ namespace UI.MainScene {
         /// </summary>
         protected override void start() {
             base.start();
-            //engSer.start(1);
+            engSer.start(1);
         }
 
         #endregion

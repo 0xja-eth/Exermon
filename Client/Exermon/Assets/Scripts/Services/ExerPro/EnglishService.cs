@@ -690,7 +690,9 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 精英据点
         /// </summary>
-        void onEliteNode() { }
+        void onEliteNode() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+        }
 
         /// <summary>
         /// Boss据点

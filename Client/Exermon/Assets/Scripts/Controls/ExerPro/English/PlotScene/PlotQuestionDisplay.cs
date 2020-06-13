@@ -91,8 +91,8 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         void drawBaseInfo(PlotQuestion question) {
             if (tipName)
                 tipName.text = question.eventName;
-            if (image)
-                image.texture = question.picture;
+            //if (image)
+            //    image.texture = question.picture;
         }
 
         /// <summary>

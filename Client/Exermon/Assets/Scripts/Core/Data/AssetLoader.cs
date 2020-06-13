@@ -75,7 +75,7 @@ namespace Core.Data.Loaders {
         /// <param name="path">路径</param>
         /// <param name="fileName">文件名</param>
         /// <returns>2D纹理</returns>
-        static Texture2D loadTexture2D(string path, string fileName) {
+        public static Texture2D loadTexture2D(string path, string fileName) {
             var key = path + fileName;
             if (!cache.ContainsKey(key))
                 cache[key] = Resources.Load<Texture2D>(key);
