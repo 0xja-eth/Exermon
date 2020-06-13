@@ -73,7 +73,6 @@ namespace ExerPro.EnglishModule.Data {
     /// 短语题目
     /// </summary>
     public class PhraseQuestion : BaseData {
-
         /// <summary>
         /// 属性
         /// </summary>
@@ -85,7 +84,53 @@ namespace ExerPro.EnglishModule.Data {
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
+        public string[] option1 = { "sb. to do sth.", "sb. doing sth.", "sb. to do sth.", "sb. into doing sth.", "sb. of sth" };
+        public string[] option2 = { "doing sth.", "to do sth." };
+        public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
+        public string[] option4 = { "for", "in", "of", "to" };
+        public string[] options() {
+            if (option1.ToList<string>().IndexOf(phrase) != -1)
+                return option1;
+            else if (option2.ToList<string>().IndexOf(phrase) != -1)
+                return option2;
+            else if (option4.ToList<string>().IndexOf(phrase) != -1)
+                return option4;
+            else if (option3.ToList<string>().IndexOf(phrase) != -1)
+                return option3;
+            return new string[] { };
+        }
+        public static PhraseQuestion sample() {
+            long i = UnityEngine.Random.Range(0, 10000);
 
+            PhraseQuestion question = new PhraseQuestion();
+            switch (i % 4) {
+                case 0:
+                    question.word = "persuade";
+                    question.chinese = "说服某人做某事";
+                    question.phrase = "sb. into doing sth.";
+                    return question;
+                case 1:
+                    question.word = "hesitate";
+                    question.chinese = "犹豫做某事";
+                    question.phrase = "to do sth.";
+                    return question;
+                case 2:
+                    question.word = "be certain";
+                    question.chinese = "确信……";
+                    question.phrase = "about";
+                    return question;
+                case 3:
+                    question.word = "in [with] reference";
+                    question.chinese = "关于";
+                    question.phrase = "to";
+                    return question;
+                default:
+                    question.word = "hope";
+                    question.chinese = "希望某人做某事";
+                    question.phrase = "sb. to do sth.";
+                    return question;
+            }
+        }
     }
 
     /// <summary>
@@ -118,6 +163,17 @@ namespace ExerPro.EnglishModule.Data {
                 return DataService.get().correctType(type).Item2;
             }
 
+            public static WrongItem[] sample() {
+
+                WrongItem[] wrongItems = new WrongItem[1];
+                WrongItem wrongItem = new WrongItem();
+                wrongItem.sentenceIndex = 0;
+                wrongItem.wordIndex = 1;
+                wrongItem.word = "is";
+
+                wrongItems[0] = wrongItem;
+                return wrongItems;
+            }
         }
 
         /// <summary>
@@ -127,9 +183,27 @@ namespace ExerPro.EnglishModule.Data {
         public string article { get; protected set; }
         [AutoConvert]
         public string description { get; protected set; }
-
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
+
+        public static CorrectionQuestion sample() {
+
+            CorrectionQuestion question = new CorrectionQuestion();
+            question.wrongItems = WrongItem.sample();
+            question.article = "When I was in high school, most of my friend had bicycles. I hoped I could also have it. One day I saw a second-hand bicycle that was only one hundred yuan.";
+            question.description = "test";
+
+            return question;
+        }
+
+        public string[] sentences() {
+            string temp = article.Replace("? ", "?+");
+            temp = temp.Replace(". ", ".+");
+            temp = temp.Replace("! ", "!+");
+            temp = temp.Replace(", ", " , ");
+            string[] sentences = temp.Split('+');
+            return sentences;
+        }
     }
 
     /// <summary>
@@ -159,7 +233,7 @@ namespace ExerPro.EnglishModule.Data {
     /// 单词记录
     /// </summary>
     public class WordRecord : BaseData {
-        
+
         /// <summary>
         /// 属性
         /// </summary>
@@ -225,6 +299,46 @@ namespace ExerPro.EnglishModule.Data {
 
     }
 
+    /// <summary>
+    /// 剧情题目
+    /// </summary>
+    public class PlotQuestion : BaseQuestion {
+        public new class Choice : BaseQuestion.Choice {
+            [AutoConvert]
+            public ExerProEffectData[] effects { get; protected set; }
+            [AutoConvert]
+            public string resultText { get; protected set; }
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string eventName { get; protected set; }
+        [AutoConvert]
+        public Texture2D picture { get; protected set; }
+
+        /// <summary>
+        /// 加载选项Item属性
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected override BaseQuestion.Choice loadChoice(JsonData data) {
+            return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
+        }
+
+        public new Choice[] choices {
+            get {
+                var choices = base.choices;
+                List<Choice> listTemp = new List<Choice>();
+                foreach (var choice in choices)
+                    listTemp.Add(choice as Choice);
+                return listTemp.ToArray();
+            }
+        }
+    }
+
+
     #endregion
 
     #region 物品
@@ -262,8 +376,12 @@ namespace ExerPro.EnglishModule.Data {
             ChangeCostDisc = 401, // 更改耗能（发现）
             ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
+            //剧情效果-测试用
+            PlotAddMoney = 500, //获得金币
+
             Sadistic = 1000, // 残虐天性
             ForceAddStatus = 1100, // 增加己方状态
+
         }
 
         /// <summary>
@@ -563,7 +681,7 @@ namespace ExerPro.EnglishModule.Data {
 	}
     
     #endregion
-    
+
     #region 容器项
 
     /// <summary>
@@ -574,7 +692,13 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训背包药水
     /// </summary>
-    public class ExerProPackPotion : PackContItem<ExerProPotion> { }
+    public class ExerProPackPotion : PackContItem<ExerProPotion> {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProPackPotion() { }
+        public ExerProPackPotion(ExerProPotion card) : base(card) { }
+    }
 
     /// <summary>
     /// 特训背包卡片
@@ -585,7 +709,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 构造函数
         /// </summary>
         public ExerProPackCard() { }
-        public ExerProPackCard(ExerProCard card) : base(card) {}
+        public ExerProPackCard(ExerProCard card) : base(card) { }
     }
 
     #endregion
@@ -905,23 +1029,23 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// BOSS数组
         /// </summary>
-        /// <returns>返回敌人数组</returns>
+        /// <returns>返回BOSS敌人数组</returns>
         public List<ExerProEnemy> bosses() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
         }
 
         /// <summary>
-        /// BOSS数组
+        /// 普通敌人数组
         /// </summary>
-        /// <returns>返回敌人数组</returns>
+        /// <returns>返回普通敌人数组</returns>
         public List<ExerProEnemy> normalEnemies() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Normal);
         }
 
         /// <summary>
-        /// BOSS数组
+        /// 精英数组
         /// </summary>
-        /// <returns>返回敌人数组</returns>
+        /// <returns>返回精英敌人数组</returns>
         public List<ExerProEnemy> eliteEnemies() {
             return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Elite);
         }
@@ -1219,7 +1343,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 生成地图
         /// </summary>
         void generate() {
-            if (generated) return; 
+            if (generated) return;
             generated = CalcService.NodeGenerator.generate(this);
             refreshNodeStatuses();
         }
@@ -1306,7 +1430,7 @@ namespace ExerPro.EnglishModule.Data {
         void changePosition(int id) {
             curIndex = id; onMoved();
         }
-        
+
         /// <summary>
         /// 移动结束回调
         /// </summary>
@@ -1319,7 +1443,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         void refreshNodeStatuses() {
             var current = currentNode();
-            foreach(var node in nodes) {
+            foreach (var node in nodes) {
                 if (node.status == (int)ExerProMapNode.Status.Passed) continue;
 
                 var status = ExerProMapNode.Status.Deactive;
@@ -1333,7 +1457,8 @@ namespace ExerPro.EnglishModule.Data {
                         status = ExerProMapNode.Status.Passed;
                     else if (current.nexts.Contains(node.id))
                         status = ExerProMapNode.Status.Active;
-                } else if (node.xOrder <= 0)
+                }
+                else if (node.xOrder <= 0)
                     status = ExerProMapNode.Status.Active;
 
                 node.setStatus(status);
@@ -1501,7 +1626,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <param name="id"></param>
         public void setId(int id) {
-            this.id = id; 
+            this.id = id;
         }
 
         /// <summary>
@@ -1570,11 +1695,11 @@ namespace ExerPro.EnglishModule.Data {
         /// 构造函数
         /// </summary>
         public ExerProMapNode() { }
-        public ExerProMapNode(int id, ExerProRecord stage, 
+        public ExerProMapNode(int id, ExerProRecord stage,
             int xOrder, int yOrder, Type type) {
             this.id = id; this.stage = stage;
             this.xOrder = xOrder; this.yOrder = yOrder;
-            typeId = (int)type; 
+            typeId = (int)type;
 
             generatePosition();
         }
@@ -2544,6 +2669,14 @@ namespace ExerPro.EnglishModule.Data {
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 读取金钱
+		/// </summary>
+		/// <param name="gold"></param>
+		public void gainGold(int gold) {
+			this.gold = Math.Max(0, this.gold + gold);
+		}
 
 		/// <summary>
 		/// 获取战斗图

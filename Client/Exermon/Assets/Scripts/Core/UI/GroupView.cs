@@ -152,6 +152,7 @@ namespace Core.UI {
             if (index < subViews.Count) return subViews[index];
             var obj = Instantiate(getSubViewPerfab(index), container);
             var sub = SceneUtils.get<T>(obj);
+            Debug.Log(typeof(T));
             obj.name = subViewName(index);
             onSubViewCreated(sub, index);
             return sub;

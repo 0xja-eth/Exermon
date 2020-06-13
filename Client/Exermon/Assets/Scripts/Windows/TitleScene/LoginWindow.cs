@@ -116,6 +116,7 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         protected override void initializeScene() {
             scene = SceneUtils.getCurrentScene<TitleScene>();
+
         }
 
         /// <summary>

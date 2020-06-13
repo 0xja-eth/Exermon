@@ -7803,6 +7803,12 @@ PrefabInstance:
       propertyPath: humanItemDetail
       value: 
       objectReference: {fileID: 1529243192}
+    - target: {fileID: 9025660709036798552, guid: 5ac59c677b749b44086cb1a7d0c9a3f6,
+        type: 3}
+      propertyPath: subViewPrefab
+      value: 
+      objectReference: {fileID: 1535080019825993216, guid: 8536bdbe5f0125f44bd659440a9d8977,
+        type: 3}
     - target: {fileID: 9025660709036798553, guid: 5ac59c677b749b44086cb1a7d0c9a3f6,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -252,6 +252,16 @@ namespace UI.Common.Controls.ItemDisplays {
             container.toggle(index);
         }
 
+        /// <summary>
+        /// 点击
+        /// </summary>
+        public virtual void click()
+        {
+            if (container == null) return;
+            if (!isSelectable()) return;
+            container.click(index);
+        }
+
         #endregion
 
         #endregion
@@ -369,6 +379,7 @@ namespace UI.Common.Controls.ItemDisplays {
                 if (isSelectable() && !isSelected()) select();
                 toggle(); 
             }
+            click();
             //onClick?.Invoke();
             refreshStatus();
         }
