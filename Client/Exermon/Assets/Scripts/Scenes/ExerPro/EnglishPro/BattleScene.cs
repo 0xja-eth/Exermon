@@ -135,6 +135,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// </summary>
 		/// <param name="potion"></param>
 		public void usePotion(ExerProPackPotion packPotion) {
+			if (packPotion == null ||
+				packPotion.isNullItem()) return;
+
 			var targets = makePotionTargets(packPotion.item());
 
 			battleSer.use(packPotion.effects(), targets);
@@ -147,6 +150,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
 		public void useCard(ExerProPackCard packCard, RuntimeEnemy enemy) {
+			if (packCard == null ||
+				packCard.isNullItem()) return;
+
 			var targets = makeCardTargets(packCard.item(), enemy);
 
 			battleSer.use(packCard.effects(), targets);

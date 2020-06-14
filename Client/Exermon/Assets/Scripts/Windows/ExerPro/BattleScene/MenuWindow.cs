@@ -20,6 +20,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 外部组件设置
 		/// </summary>
 		public HandCardGroupDisplay handCards;
+		public PotionSlotDisplay potionSlot;
 		
 		/// <summary>
 		/// 场景组件引用
@@ -60,6 +61,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			base.refresh();
 			var actor = battleSer.actor();
 			setupHandCards(actor);
+			setupPotionSlot(actor);
 		}
 
 		/// <summary>
@@ -70,17 +72,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			handCards.setItems(actor.cardGroup.handGroup.items);
 		}
 
+		void setupPotionSlot(RuntimeActor actor) {
+			potionSlot.setItems(actor.potionSlot.items);
+		}
+
 		#endregion
 
 		#region 流程控制
-		
+
 		/// <summary>
 		/// 使用药水
 		/// </summary>
 		/// <param name="potion"></param>
-		//public void usePotion(ExerProPackPotion packPotion) {
-		//	scene.usePotion(packPotion);
-		//}
+		public void usePotion(PotionSlotItemDisplay slotDisplay) {
+			scene.usePotion(slotDisplay?.getItem()?.packPotion);
+		}
 
 		/// <summary>
 		/// 使用卡牌
@@ -88,7 +94,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
 		public void useCard(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
-			scene.useCard(cardDisplay.getItem(), enemyDisplay.enemy());
+			scene.useCard(cardDisplay?.getItem(), enemyDisplay?.enemy());
 		}
 
 		#endregion

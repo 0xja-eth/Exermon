@@ -1,18 +1,11 @@
 ﻿
 using System;
 
-using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-using Core.Data.Loaders;
-using Core.UI;
+using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Data;
-using ExerPro.EnglishModule.Services;
-
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.ParamDisplays;
-using UI.Common.Controls.AnimationSystem;
 
 /// <summary>
 /// 特训战斗场景控件
@@ -24,10 +17,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls { }
 /// </summary>
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
+	using Menu;
+
 	/// <summary>
 	/// 角色显示控件
 	/// </summary
-	public class ActorDisplay : BattlerDisplay {
+	public class ActorDisplay : BattlerDisplay, IDropHandler {
 		
 		#region 数据控制
 
@@ -43,7 +38,29 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 动画控制
-		
+
+		#endregion
+
+		#region 事件控制
+
+		/// <summary>
+		/// 拖拽释放回调
+		/// </summary>
+		public void OnDrop(PointerEventData eventData) {
+			var dragger = getSlotItemDisplay(eventData);
+			dragger.use();
+		}
+
+		/// <summary>
+		/// 获取拖拽中的物品显示项
+		/// </summary>
+		/// <param name="data">事件数据</param>
+		/// <returns>物品显示项</returns>
+		PotionSlotItemDisplay getSlotItemDisplay(PointerEventData data) {
+			var obj = data.pointerDrag; if (obj == null) return null;
+			return SceneUtils.get<PotionSlotItemDisplay>(obj);
+		}
+
 		#endregion
 
 	}

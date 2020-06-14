@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 using LitJson;
@@ -67,12 +69,105 @@ namespace Core.Data {
     /// </summary>
     public class BaseData {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        //int id; // ID（只读）
+		#region 缓存池操作
 
-        public int id { get; protected set; }
+		/// <summary>
+		/// 对象缓存池
+		/// </summary>
+		public static Dictionary<Type, List<BaseData>> objects = new Dictionary<Type, List<BaseData>>();
+
+		/// <summary>
+		/// 添加对象到缓存池
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="data"></param>
+		public static void poolAdd(Type type, BaseData data) {
+			if (!poolContains(type))
+				objects[type] = new List<BaseData>();
+			objects[type].Add(data);
+		}
+
+		/// <summary>
+		/// 缓存池是否存在指定类型
+		/// </summary>
+		static bool poolContains(Type type) {
+			return objects.ContainsKey(type);
+		}
+		static bool poolContains<T>() where T: BaseData {
+			return poolContains(typeof(T));
+		}
+
+		/// <summary>
+		/// 缓存池对象数量
+		/// </summary>
+		static int poolCount(Type type) {
+			if (!poolContains(type)) return 0;
+			return objects[type].Count;
+		}
+		static int poolCount<T>() where T : BaseData {
+			return poolCount(typeof(T));
+		}
+
+		/// <summary>
+		/// 获取缓存池指定条件对象
+		/// </summary>
+		public static List<BaseData> poolGet(Type type) {
+			if (!poolContains(type)) return new List<BaseData>();
+			return objects[type];
+		}
+		public static BaseData poolGet(Type type, int id) {
+			if (!poolContains(type)) return null;
+			return objects[type].Find(data => data.id == id);
+		}
+		public static List<T> poolGet<T>() where T : BaseData {
+			var type = typeof(T);
+			var list = new List<T>();
+			var objects = poolGet(type);
+
+			foreach (var object_ in objects)
+				list.Add(object_ as T);
+
+			return list;
+		}
+		public static T poolGet<T>(int id) where T : BaseData {
+			return poolGet(typeof(T), id) as T;
+		}
+		public static T poolGet<T>(Predicate<T> p) where T : BaseData {
+			return poolGet<T>().Find(p);
+		}
+
+		/// <summary>
+		/// 添加自己到缓存池
+		/// </summary>
+		protected void addToPool() {
+			poolAdd(GetType(), this);
+		}
+
+		/// <summary>
+		/// 当前ID
+		/// </summary>
+		protected int currentId() {
+			return poolCount(GetType()) + 1;
+		}
+
+		/// <summary>
+		/// 是否使用缓存池
+		/// </summary>
+		protected virtual bool useObjectsPool() { return false; }
+
+		/// <summary>
+		/// 是否自动分配ID
+		/// </summary>
+		protected virtual bool autoId() { return false; }
+
+		#endregion
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		//int id; // ID（只读）
+
+		public int id { get; protected set; }
 
         //public int id { return id; }
 
@@ -207,6 +302,16 @@ namespace Core.Data {
         public T convert<T>() where T : BaseData, new() {
             return DataLoader.load<T>(rawData);
         }
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public BaseData() {
+			if (useObjectsPool()) {
+				if (autoId()) id = currentId();
+				addToPool();
+			}
+		}
 
     }
 

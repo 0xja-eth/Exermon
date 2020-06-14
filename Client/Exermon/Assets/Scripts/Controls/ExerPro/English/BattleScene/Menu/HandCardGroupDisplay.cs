@@ -25,8 +25,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 	/// 战场控件
 	/// </summary
 	public class HandCardGroupDisplay : 
-		SelectableContainerDisplay<ExerProPackCard>,
-		IPointerDownHandler, IPointerUpHandler {
+		SelectableContainerDisplay<ExerProPackCard> {
+		// IPointerDownHandler, IPointerUpHandler {
 
 		/// <summary>
 		/// 常量定义
@@ -54,7 +54,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		bool isDown = false;
 		bool firstDown = false;
+		bool _isRotating = false;
+
 		Vector2 lastPos;
+		Vector2 localPos; // 相对位置
+
+		RectTransform rectTransform;
 
 		#region 初始化
 
@@ -64,6 +69,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		protected override void initializeOnce() {
 			base.initializeOnce();
 			animation = animation ?? SceneUtils.get<AnimationView>(container);
+			rectTransform = transform as RectTransform;
 		}
 
 		#endregion
@@ -82,23 +88,48 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 更新指针移动
 		/// </summary>
 		void updatePointerMove() {
-			if (!isDown) return;
-			var pos = getPointerPosition();
+			if (!(isDown = isPointerDown()))
+				firstDown = true;
+			else {
+				var pos = getPointerPosition();
+				var delta = pos - lastPos;
 
-			if (firstDown) firstDown = false;
-			else onPointerMove(pos - lastPos);
-			lastPos = pos;
+				Debug.Log("getPointerPosition: " + pos);
+
+				localPos = getPointerLocalPosition(lastPos = pos);
+				_isRotating = isRotating(localPos);
+
+				if (firstDown) firstDown = false;
+				else onPointerMove(delta);
+			}
+		}
+
+		/// <summary>
+		/// 指针是否按下
+		/// </summary>
+		/// <returns></returns>
+		bool isPointerDown() {
+			return Input.GetMouseButtonDown(0) ||
+				Input.GetMouseButtonDown(1) ||
+				Input.touchCount > 0;
 		}
 
 		/// <summary>
 		/// 获取指针位置
 		/// </summary>
-		/// <param name="pos"></param>
 		/// <returns></returns>
 		Vector2 getPointerPosition() {
-			if (Input.touchCount > 0) 
+			if (Input.touchCount > 0)
 				return Input.touches[0].position;
 			return Input.mousePosition;
+		}
+
+		/// <summary>
+		/// 获取指针相对位置
+		/// </summary>
+		/// <returns></returns>
+		Vector2 getPointerLocalPosition(Vector2 pos) {
+			return SceneUtils.screen2Local(pos, rectTransform);
 		}
 
 		/// <summary>
@@ -106,9 +137,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <returns></returns>
 		public bool isRotating() {
-			if (!isDown) return false;
-			var pos = SceneUtils.screen2Local(lastPos, container);
-			return pos.y <= container.rect.height / 2;
+			return isDown && _isRotating;
+		}
+		public bool isRotating(Vector2 pos) {
+			return pos.y <= rectTransform.rect.height / 2;
 		}
 
 		#endregion
@@ -209,7 +241,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		#endregion
 
 		#region 事件控制
-
+		/*
 		/// <summary>
 		/// 按下事件
 		/// </summary>
@@ -223,16 +255,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerUp(PointerEventData eventData) {
-			isDown = false;
+			isDown = _isRotating = false;
 			lastPos = default;
 		}
-
+		*/
 		/// <summary>
 		/// 指针移动回调
 		/// </summary>
 		/// <param name="delta">移动量</param>
 		void onPointerMove(Vector2 delta) {
-			if (isDragging) return;
+			if (isDragging || !isRotating()) return;
+
 			Debug.Log("onPointerMove: " + delta);
 			if (delta.x >= RotateThreshold)
 				rotateDelta(delta.x * RotateSpeed);
