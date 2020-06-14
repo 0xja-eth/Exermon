@@ -761,9 +761,9 @@ namespace ExerPro.EnglishModule.Services {
 		public void startMove(int nid, bool force = false) {
 			if (!isIdle()) return;
 			changeState(State.Moving);
-			record.moveNext(nid, force);
+			record.moveNext(-1, force);
 			record.nodeFlag = false;
-			saveExerPro();
+			//saveExerPro();
 		}
 
 		/// <summary>

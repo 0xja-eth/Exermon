@@ -15,7 +15,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
     /// </summary
     public class SentenceDisplay : ItemDisplay<string>
     {
-        
+
+        public SentenceContainer container; 
 
         /// <summary>
         /// 开启视图
@@ -25,7 +26,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         {
             base.startView(item);
         }
-        
+
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            container = SceneUtils.get<SentenceContainer>(gameObject);
+        }
 
         /// <summary>
         /// 绘制物品
@@ -34,7 +39,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         protected override void drawExactlyItem(string item)
         {
             base.drawExactlyItem(item);
-            SceneUtils.get<SentenceContainer>(gameObject).setItem(item);
+            container.setItem(item);
         }
     }
 }

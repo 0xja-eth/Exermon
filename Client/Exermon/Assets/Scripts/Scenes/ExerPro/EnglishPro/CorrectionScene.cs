@@ -24,7 +24,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// </summary>
         public ArticleDisplay articleDisplay;
         public Text changedBeforeValue;
-        public GameObject correctionWindow;
+        public GameObject windowObj;
+        public CorrectionWindow correctionWindow;
         int index = 0;
         /// <summary>
         /// 外部系统设置
@@ -39,6 +40,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
+            correctionWindow = SceneUtils.get<CorrectionWindow>(windowObj);
+
         }
 
         /// <summary>
@@ -59,26 +62,27 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
             });
             base.start();
         }
+
         #endregion
 
         public void onWordSelected(SentenceContainer container, string word) {
             //清除其他句子选择
             foreach (ItemDisplay<string> item in articleDisplay.getSubViews()) {
-                if (SceneUtils.get<SentenceContainer>(item.gameObject) == container)
+                SentenceContainer each = SceneUtils.get<SentenceContainer>(item.gameObject);
+                if (each == container || each.getSelectedIndex() == -1)
                     continue;
-                SceneUtils.get<SentenceContainer>(item.gameObject).deselect();
+                each.deselect();
             }
-            SceneUtils.get<CorrectionWindow>(correctionWindow).startView();
+            correctionWindow.startView();
             changedBeforeValue.text = word;
-            SceneUtils.get<CorrectionWindow>(correctionWindow).currentSenContainer = container;
+            correctionWindow.currentSenContainer = container;
         }
 
         public void onWordDeselected() {
-            SceneUtils.get<CorrectionWindow>(correctionWindow).terminateView();
+            correctionWindow.terminateView();
         }
 
         public void onSubmit() {
-            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
             engSer.exitNode(true);
         }
     }

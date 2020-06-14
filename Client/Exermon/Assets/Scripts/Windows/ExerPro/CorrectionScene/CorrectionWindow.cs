@@ -60,7 +60,7 @@ namespace UI.CorrectionScene.Windows {
 			}
 
 			currentSenContainer.clearItems();
-			currentSenContainer.setItem(string.Join("", items));
+			currentSenContainer.setItems(items);
 			cancel();
 		}
 

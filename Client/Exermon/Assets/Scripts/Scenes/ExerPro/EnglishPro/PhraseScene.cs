@@ -47,12 +47,10 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         /// </summary>
         protected override void start() {
             base.start();
-            Debug.Log(sample().word);
             optionAreaDisplay.startView(sample());
         }
 
         public void onSubmit() {
-            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
             engSer.exitNode(true);
         }
     }

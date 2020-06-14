@@ -14,6 +14,14 @@ using UnityEngine.UI;
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
     public class SentenceContainer : SelectableContainerDisplay<string> {
         string ends = "!?.,";
+        public CorrectionScene correctionScene;
+
+        #region 初始化
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            correctionScene = ((CorrectionScene)SceneUtils.getSceneObject("Scene"));
+        }
+        #endregion
 
         /// <summary>
         /// 子节点创建回调
@@ -49,11 +57,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
             int index = getSelectedIndex();
 
             if (index == -1) {
-                ((CorrectionScene)SceneUtils.getSceneObject("Scene")).onWordDeselected();
+                correctionScene.onWordDeselected();
                 return;
             }
             if (ends.IndexOf(items[index]) == -1) {
-                ((CorrectionScene)SceneUtils.getSceneObject("Scene")).onWordSelected(this, items[index]);
+                correctionScene.onWordSelected(this, items[index]);
             }
         }
 

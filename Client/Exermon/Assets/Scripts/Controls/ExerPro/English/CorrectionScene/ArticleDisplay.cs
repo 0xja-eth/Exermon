@@ -43,8 +43,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
         public void revert() {
             int index = 0;
             foreach (ItemDisplay<string> item in getSubViews()) {
-                SceneUtils.get<SentenceContainer>(item.gameObject).clearItems();
-                SceneUtils.get<SentenceContainer>(item.gameObject).setItem(items[index++]);
+                SentenceContainer each = SceneUtils.get<SentenceContainer>(item.gameObject);
+                each.clearItems();
+                each.setItem(items[index++]);
             }
             startView(question);
         }
