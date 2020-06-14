@@ -12,6 +12,8 @@ using Core.Data.Loaders;
 using Core.Systems;
 using Core.Services;
 
+using GameModule.Services;
+
 using ExerPro.EnglishModule.Data;
 
 namespace ExerPro.EnglishModule.Services {
@@ -529,6 +531,20 @@ namespace ExerPro.EnglishModule.Services {
 		}
 
 		#endregion
+
+		#endregion
+
+		#region 题目控制
+
+		/// <summary>
+		/// 生成单词选项
+		/// </summary>
+		/// <param name="word"></param>
+		/// <returns></returns>
+		public List<string> generateWordChoices(Word word) {
+			var words = questionCache.getCacheList<Word>();
+			return CalcService.WordChoicesGenerator.generate(word, words);
+		}
 
 		#endregion
 

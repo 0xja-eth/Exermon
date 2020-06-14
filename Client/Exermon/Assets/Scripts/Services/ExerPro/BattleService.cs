@@ -193,7 +193,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// <summary>
 		/// 结束出牌阶段
 		/// </summary>
-		public void pass() {
+		public void jump() {
 			changeState(State.Discarding);
 		}
 

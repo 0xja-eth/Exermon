@@ -69,7 +69,30 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
         /// </summary>
         protected override void update() {
             base.update();
+			if (battleSer.isStateChanged())
+				onStateChanged();
 			battleSer?.update();
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 状态改变回调
+		/// </summary>
+		void onStateChanged() {
+			switch ((BattleService.State)battleSer.state) {
+				case BattleService.State.Playing:
+					onPlay(); break;
+			}
+		}
+
+		/// <summary>
+		/// 开始出牌
+		/// </summary>
+		void onPlay() {
+			menu.startWindow();
 		}
 
 		#endregion
@@ -167,6 +190,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 跳过
+		/// </summary>
+		public void jump() {
+			battleSer.jump();
+			menu.terminateWindow();
+		}
 
 		/// <summary>
 		/// 退出场景
