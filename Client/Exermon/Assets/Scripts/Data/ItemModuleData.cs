@@ -1227,8 +1227,8 @@ namespace ItemModule.Data
         {
             if (slotItem == null) return;
             var oriEquip = getEquip<E>(slotItem);
-            container.removeItem(equipItem); // 移出装备
-            container.pushItem(oriEquip); // 卸下原装备
+            //container.removeItem(equipItem); // 移出装备
+            //container.pushItem(oriEquip); // 卸下原装备
             setEquip(slotItem, equipItem); // 设置新装备
             if (oriEquip != null) oriEquip.doDequip();
             if (equipItem != null) equipItem.doEquip();

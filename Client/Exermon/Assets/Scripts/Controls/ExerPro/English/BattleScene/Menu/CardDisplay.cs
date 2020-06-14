@@ -7,7 +7,9 @@ using ExerPro.EnglishModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
+
+	using Battler;
 
 	/// <summary>
 	/// 卡牌显示
@@ -26,11 +28,45 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#region 数据控制
 
 		/// <summary>
-		/// 物品改变回调
+		/// 获取容器
 		/// </summary>
-		protected override void onItemChanged() {
-			base.onItemChanged();
-			dragger?.setItem(item as ExerProPackCard);
+		/// <returns></returns>
+		public new HandCardGroupDisplay getContainer() {
+			return container as HandCardGroupDisplay;
+		}
+
+		/// <summary>
+		/// 是否处于拖拽状态
+		/// </summary>
+		public bool isDragging() {
+			return dragger.isDragging;
+		}
+
+		/// <summary>
+		/// 能否进行拖拽操作
+		/// </summary>
+		public bool isDraggable() {
+			var container = getContainer();
+			if (container == null) return true;
+			return !container.isRotating();
+		}
+
+		/// <summary>
+		/// 设置拖拽状态
+		/// </summary>
+		public void setDragging(bool value) {
+			var container = getContainer();
+			if (container == null) return;
+			container.isDragging = value;
+		}
+
+		/// <summary>
+		/// 使用卡牌
+		/// </summary>
+		public void use(EnemyDisplay enemy) {
+			var container = getContainer();
+			if (container == null) return;
+			container.use(this, enemy);
 		}
 
 		#endregion

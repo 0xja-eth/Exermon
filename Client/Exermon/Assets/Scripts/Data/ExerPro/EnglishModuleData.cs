@@ -728,32 +728,81 @@ namespace ExerPro.EnglishModule.Data {
 			icon = AssetLoader.getExerProStateIconSprite(iconIndex);
 		}
 	}
-    
-    #endregion
 
-    #region 容器项
+	#endregion
 
-    /// <summary>
-    /// 特训背包物品
-    /// </summary>
-    public class ExerProPackItem : PackContItem<ExerProItem> { }
+	#region 容器项
 
-    /// <summary>
-    /// 特训背包药水
-    /// </summary>
-    public class ExerProPackPotion : PackContItem<ExerProPotion> {
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public ExerProPackPotion() { }
-        public ExerProPackPotion(ExerProPotion card) : base(card) { }
+	/// <summary>
+	/// 特训背包物品
+	/// </summary>
+	public abstract class ExerProPackItem<T> : PackContItem<T> where T: BaseExerProItem {
+
+		/// <summary>
+		/// 使用对象池
+		/// </summary>
+		/// <returns></returns>
+		protected override bool useObjectsPool() {
+			return true;
+		}
+
+		/// <summary>
+		/// 自动分配ID
+		/// </summary>
+		/// <returns></returns>
+		protected override bool autoId() {
+			return true;
+		}
+
+		/// <summary>
+		/// 获取效果数组
+		/// </summary>
+		/// <returns></returns>
+		public ExerProEffectData[] effects() {
+			return item().effects;
+		}
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProPackItem() : base() { }
+		/// <param name="itemId">物品ID</param>
+		/// <param name="count">数量</param>
+		public ExerProPackItem(int itemId, int count = 1) : base(itemId, count) { }
+		/// <param name="item">物品</param>
+		public ExerProPackItem(T item, int count = 1) : base(item, count) { }
+
+	}
+
+	/// <summary>
+	/// 特训背包道具
+	/// </summary>
+	public class ExerProPackItem : ExerProPackItem<ExerProItem> {
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProPackItem() { }
+		public ExerProPackItem(ExerProItem item) : base(item) { }
+	}
+
+	/// <summary>
+	/// 特训背包药水
+	/// </summary>
+	public class ExerProPackPotion : ExerProPackItem<ExerProPotion> {
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProPackPotion() { }
+        public ExerProPackPotion(ExerProPotion potion) : base(potion) { }
     }
 
     /// <summary>
     /// 特训背包卡片
     /// </summary>
-    public class ExerProPackCard : PackContItem<ExerProCard> {
-
+    public class ExerProPackCard : ExerProPackItem<ExerProCard> {
+		
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -761,14 +810,57 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPackCard(ExerProCard card) : base(card) { }
     }
 
-    #endregion
+	/// <summary>
+	/// 特训药水槽项
+	/// </summary>
+	public class ExerProSlotPotion : SlotContItem<ExerProPackPotion> {
 
-    #region 容器
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int packPotionId { get; protected set; }
 
-    /// <summary>
-    /// 特训物品背包
-    /// </summary>
-    public class ExerProItemPack : PackContainer<ExerProPackItem> { }
+		/// <summary>
+		/// 药水槽
+		/// </summary>
+		public ExerProPotionSlot potionSlot { get; set; }
+
+		/// <summary>
+		/// 玩家艾瑟萌实例
+		/// </summary>
+		ExerProPackPotion _packPotion;
+		public ExerProPackPotion packPotion {
+			get {
+				if (_packPotion == null) {
+					var potionPack = potionSlot.actor.potionPack;
+					_packPotion = potionPack.findItem(item => item.id == packPotionId);
+				}
+				return _packPotion;
+			}
+			set {
+				packPotionId = value.id;
+				_packPotion = null;
+			}
+		}
+
+		/// <summary>
+		/// 装备
+		/// </summary>
+		public override ExerProPackPotion equip1 {
+			get { return packPotion; }
+			protected set { packPotion = value; }
+		}
+	}
+
+	#endregion
+
+	#region 容器
+
+	/// <summary>
+	/// 特训物品背包
+	/// </summary>
+	public class ExerProItemPack : PackContainer<ExerProPackItem> { }
 
     /// <summary>
     /// 特训药水背包
@@ -914,7 +1006,7 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 回合结束，自动弃牌
+        /// 回收牌堆
         /// </summary>
         public void recycle(PackContainer<ExerProPackCard> container) {
             var tmpItems = container.items.ToArray();
@@ -974,14 +1066,47 @@ namespace ExerPro.EnglishModule.Data {
 
     }
 
-    #endregion
+	/// <summary>
+	/// 特训药水槽
+	/// </summary>
+	public class ExerProPotionSlot : SlotContainer<ExerProSlotPotion> {
 
-    #region 地图
+		/// <summary>
+		/// 所属玩家
+		/// </summary>
+		public RuntimeActor actor { get; set; }
 
-    /// <summary>
-    /// 地图阶段数据
-    /// </summary>
-    public class ExerProMap : BaseData {
+		/// <summary>
+		/// 通过装备物品获取槽ID
+		/// </summary>
+		/// <typeparam name="E">装备物品类型</typeparam>
+		/// <param name="equipItem">装备物品</param>
+		/// <returns>槽ID</returns>
+		public override ExerProSlotPotion getSlotItemByEquipItem<E>(E equipItem) {
+			return emptySlotItem();
+		}
+
+		/// <summary>
+		/// 读取物品
+		/// </summary>
+		/// <param name="json">数据</param>
+		/// <returns>物品对象</returns>
+		protected override ExerProSlotPotion loadItem(JsonData json) {
+			var slotItem = base.loadItem(json);
+			slotItem.potionSlot = this;
+			return slotItem;
+		}
+
+	}
+
+	#endregion
+
+	#region 地图
+
+	/// <summary>
+	/// 地图阶段数据
+	/// </summary>
+	public class ExerProMap : BaseData {
 
         /// <summary>
         /// 属性
@@ -2702,10 +2827,13 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
 
-        /// <summary>
-        /// 对应的艾瑟萌槽项
-        /// </summary>
-        public ExerSlotItem slotItem { get; protected set; } = null;
+		[AutoConvert]
+		public ExerProPotionSlot potionSlot { get; protected set; } = new ExerProPotionSlot();
+
+		/// <summary>
+		/// 对应的艾瑟萌槽项
+		/// </summary>
+		public ExerSlotItem slotItem { get; protected set; } = null;
 
 		#region 数据转化
 
@@ -2747,6 +2875,26 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public override bool isActor() { return true; }
 
+		/// <summary>
+		/// 使用药水
+		/// </summary>
+		/// <param name="potion">药水</param>
+		public void usePotion(ExerProPackPotion potion) {
+			if (potion.equiped) {
+				var slotItem = potionSlot.getSlotItemByEquipItem(potion);
+				potionSlot.setEquip(slotItem, potionPack, null);
+			}
+			potionPack.removeItem(potion);
+		}
+
+		/// <summary>
+		/// 使用卡牌
+		/// </summary>
+		/// <param name="card">卡牌</param>
+		public void useCard(ExerProPackCard card) {
+			cardGroup.useCard(card);
+		}
+
 		#region 属性定义
 
 		/// <summary>
@@ -2775,6 +2923,26 @@ namespace ExerPro.EnglishModule.Data {
 
 		#endregion
 
+		#region 回调控制
+
+		/// <summary>
+		/// 回合结束回调
+		/// </summary>
+		public override void onRoundEnd() {
+			base.onRoundEnd();
+			cardGroup.onRoundEnd();
+		}
+
+		/// <summary>
+		/// 战斗结束回调
+		/// </summary>
+		public override void onBattleEnd() {
+			base.onBattleEnd();
+			cardGroup.onBattleEnd();
+		}
+
+		#endregion
+
 		/// <summary>
 		/// 重置
 		/// </summary>
@@ -2796,6 +2964,15 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 读取自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			potionSlot.actor = this;
+		}
 
 		/*
 		public ExerProActor(Player player) {

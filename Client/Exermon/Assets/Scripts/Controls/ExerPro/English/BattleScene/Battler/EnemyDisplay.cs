@@ -17,10 +17,12 @@ using UI.Common.Controls.AnimationSystem;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
+	using Menu;
+
 	/// <summary>
 	/// 敌人显示控件
 	/// </summary
-	public class EnemyDisplay : BattlerDisplay { //, IDropHandler {
+	public class EnemyDisplay : BattlerDisplay, IDropHandler {
 
 		/// <summary>
 		/// 动画名称定义
@@ -200,12 +202,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 事件控制
-		/*
+		
 		/// <summary>
 		/// 拖拽释放回调
 		/// </summary>
 		public void OnDrop(PointerEventData eventData){
-
+			var dragger = getCardDragger(eventData);
+			dragger.use(this);
 		}
 
 		/// <summary>
@@ -213,12 +216,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="data">事件数据</param>
 		/// <returns>物品显示项</returns>
-		DraggableItemDisplay<ExerProPackCard> getDraggingItemDisplay(
-			PointerEventData data) {
+		CardDragger getCardDragger(PointerEventData data) {
 			var obj = data.pointerDrag; if (obj == null) return null;
-			return SceneUtils.get<DraggableItemDisplay<ExerProPackCard>>(obj);
+			return SceneUtils.get<CardDragger>(obj);
 		}
-		*/
+		
 		#endregion
 
 	}
