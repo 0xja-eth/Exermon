@@ -19,6 +19,8 @@ using ExerPro.EnglishModule.Data;
 using SeasonModule.Services;
 using System.Collections.Generic;
 
+using LitJson;
+
 /// <summary>
 /// 游戏模块服务
 /// </summary>
@@ -689,7 +691,7 @@ namespace GameModule.Services {
             /// <param name="self">发动者</param>
             /// <param name="target">目标</param>
             /// <param name="action">行动</param>
-            public static void process(RuntimeAction action) {
+            public static void process(BattleModule.Data.RuntimeAction action) {
                 var self = action.player;
                 var target = generateTargets(action);
 
@@ -723,7 +725,7 @@ namespace GameModule.Services {
             /// <param name="action">攻击行动</param>
             /// <returns>返回目标对战玩家数组</returns>
             public static RuntimeBattlePlayer generateTargets(
-                RuntimeAction action) {
+                BattleModule.Data.RuntimeAction action) {
                 var self = action.player;
                 var oppo = self.getOppo();
                 switch ((ExerSkill.TargetType)action.targetType) {
@@ -804,7 +806,6 @@ namespace GameModule.Services {
                     for (int j = 0; j < rates[i - 1]; ++j) rateList.Add(i);
 
                 var index = Random.Range(0, rateList.Count);
-                return ExerProMapNode.Type.Treasure;
                 return (ExerProMapNode.Type)rateList[index];
             }
 
@@ -902,7 +903,602 @@ namespace GameModule.Services {
                 if (incr && ny < nodes[x + 1].Count - 1) ny++;
             }
         }
-    }
 
+        /// <summary>
+        /// 战斗敌人生成器
+        /// </summary>
+        public class BattleEnemiesGenerator {
+
+            /// <summary>
+            /// 常量定义
+            /// </summary>
+            public const int MaxEnemyCols = 3; // 最大敌人列数
+			public const int MaxEnemyRows = 3; // 最大敌人行数
+
+            /// <summary>
+            /// 内部变量定义
+            /// </summary>
+            ExerProMapStage stage;
+            RuntimeActor actor;
+
+            List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
+
+            /// <summary>
+            /// 生成
+            /// </summary>
+            /// <param name="actor">角色对象</param>
+            /// <param name="stage">关卡对象</param>
+            /// <param name="type">类型</param>
+            public static List<RuntimeEnemy> generate(RuntimeActor actor, 
+                ExerProMapStage stage, ExerProMapNode.Type type) {
+                var generator = new BattleEnemiesGenerator(actor, stage, type);
+
+                return generator.enemies;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            BattleEnemiesGenerator(RuntimeActor actor,
+                ExerProMapStage stage, ExerProMapNode.Type type) {
+                this.actor = actor; this.stage = stage;
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                        generateEnemies(); break;
+                    case ExerProMapNode.Type.Elite:
+                        generateElites(); break;
+                    case ExerProMapNode.Type.Boss:
+                        generateBoss(); break;
+                }
+            }
+
+            /// <summary>
+            /// 生成常规敌人
+            /// </summary>
+            void generateEnemies() {
+                _generateRandomEnemies(stage.normalEnemies());
+            }
+
+            /// <summary>
+            /// 生成精英敌人
+            /// </summary>
+            void generateElites() {
+                _generateRandomEnemies(stage.eliteEnemies());
+            }
+
+            /// <summary>
+            /// 随机生成敌人
+            /// </summary>
+            void _generateRandomEnemies(List<ExerProEnemy> enemies) {
+                var posCnt = MaxEnemyCols * MaxEnemyRows;
+                var enemyCnt = Math.Min(posCnt, enemies.Count);
+                var posVis = new bool[posCnt];
+                var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+
+                for (int i = 0; i < cnt; ++i) {
+                    var enemy = enemies[Random.Range(0, enemyCnt)];
+                    var pos = Random.Range(0, posCnt);
+                    while (posVis[pos]) pos = Random.Range(0, posCnt);
+                    posVis[pos] = true;
+
+                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                }
+            }
+
+            /// <summary>
+            /// 生成BOSS
+            /// </summary>
+            void generateBoss() {
+                var enemies = stage.bosses();
+                var posCnt = MaxEnemyCols * MaxEnemyRows;
+                var posVis = new bool[posCnt];
+
+                var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+
+                foreach(var enemy in enemies) {
+                    var pos = Random.Range(0, posCnt);
+                    while (posVis[pos]) pos = Random.Range(0, posCnt);
+                    posVis[pos] = true;
+
+                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 特训行动结果生成器
+        /// </summary>
+        public class ExerProActionResultGenerator {
+
+            /// <summary>
+            /// 类型代号设置
+            /// </summary>
+            public const int HPDamageType = 1;
+            public const int HPDrainType = 2;
+            public const int HPRecoverType = 3;
+
+            /// <summary>
+            /// 行动
+            /// </summary>
+            ExerPro.EnglishModule.Data.RuntimeAction action;
+            RuntimeActionResult result;
+
+            RuntimeBattler subject, object_;
+
+            List<RuntimeActionResult.StateChange> stateChanges;
+            List<RuntimeBuff> addBuffs;
+
+            /// <summary>
+            /// 生成
+            /// </summary>
+            /// <param name="action">行动</param>
+            /// <returns>返回结果</returns>
+            public static RuntimeActionResult generate(
+                ExerPro.EnglishModule.Data.RuntimeAction action) {
+                var generator = new ExerProActionResultGenerator(action);
+                return generator.result;
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="action">行动</param>
+            ExerProActionResultGenerator(
+                ExerPro.EnglishModule.Data.RuntimeAction action) {
+                result = new RuntimeActionResult(action);
+                this.action = action;
+                _generate(); _setup();
+            }
+
+            /// <summary>
+            /// 生成
+            /// </summary>
+            void _generate() {
+                foreach (var effect in action.effects) processEffect(effect);
+            }
+
+            /// <summary>
+            /// 配置结果
+            /// </summary>
+            void _setup() {
+                result.stateChanges = stateChanges.ToArray();
+                result.addBuffs = addBuffs.ToArray();
+            }
+
+            /// <summary>
+            /// 处理效果
+            /// </summary>
+            /// <param name="effect">效果</param>
+            void processEffect(ExerProEffectData effect) {
+                var params_ = effect.params_;
+                var len = params_.Count;
+                int a, b, h, p, n, s, r;
+                bool select = false;
+
+                switch ((ExerProEffectData.Code)effect.code) {
+                    case ExerProEffectData.Code.Attack:
+                    case ExerProEffectData.Code.AttackBlack:
+                        a = DataLoader.load<int>(params_[0]); h = HPDamageType;
+                        if (len >= 3) h = DataLoader.load<int>(params_[2]);
+                        processDamage(a, h); break;
+
+                    case ExerProEffectData.Code.AttackSlash:
+                        a = DataLoader.load<int>(params_[0]); b = 2;
+                        if (len == 2) b = DataLoader.load<int>(params_[1]);
+                        _processSlashAttack(a, b); break;
+
+                    case ExerProEffectData.Code.Recover:
+                        a = DataLoader.load<int>(params_[0]); b = 0;
+                        if (len == 2) b += DataLoader.load<int>(params_[1]);
+                        var val = Math.Round(a + object_.hp * b / 100.0);
+                        processDamage((int)val, HPRecoverType); break;
+
+                    case ExerProEffectData.Code.AddParam:
+                    case ExerProEffectData.Code.TempAddParam:
+                        p = DataLoader.load<int>(params_[0]); n = -1;
+                        a = DataLoader.load<int>(params_[1]); b = 100;
+                        if (len == 3) b += DataLoader.load<int>(params_[2]);
+                        if (len == 4) n = DataLoader.load<int>(params_[3]);
+                        processBuff(p, a, b, n); break;
+
+                    case ExerProEffectData.Code.AddState:
+                        s = DataLoader.load<int>(params_[0]);
+                        r = DataLoader.load<int>(params_[1]); p = 100;
+                        if (len == 3) p += DataLoader.load<int>(params_[2]);
+                        processAddState(s, r, p); break;
+
+                    case ExerProEffectData.Code.RemoveState:
+                        s = DataLoader.load<int>(params_[0]);
+                        r = DataLoader.load<int>(params_[1]); p = 100;
+                        if (len == 3) p += DataLoader.load<int>(params_[2]);
+                        processRemoveState(s, r, p); break;
+
+                    case ExerProEffectData.Code.RemoveNegaState:
+                        _processRemoveNegaStates(); break;
+
+                    case ExerProEffectData.Code.DrawCards:
+                        n = DataLoader.load<int>(params_[0]);
+                        drawCards(n); break;
+
+                    case ExerProEffectData.Code.ConsumeCards:
+                        n = DataLoader.load<int>(params_[0]); select = true;
+                        if (len == 2) select = DataLoader.load<bool>(params_[1]);
+                        consumeCards(n, select); break;
+                }
+            }
+
+            /// <summary>
+            /// 处理完美斩击
+            /// </summary>
+            void _processSlashAttack(int a, int b = 2) {
+                const string SlashStr = "斩击";
+                var actor = subject as RuntimeActor;
+                if (actor == null) return;
+
+                var hand = actor.cardGroup.handGroup;
+                var cnt = hand.countItems(card =>
+                    card.item().name.Contains(SlashStr));
+
+                processDamage(a + b * cnt);
+            }
+
+            /// <summary>
+            /// 处理消除消极状态
+            /// </summary>
+            void _processRemoveNegaStates() {
+                var states = DataService.get().staticData.data.exerProStates;
+                foreach (var state in states) removeState(state.id);
+            }
+
+            /// <summary>
+            /// 计算伤害值
+            /// </summary>
+            /// <param name="a">伤害点数</param>
+            /// <param name="h">伤害类型</param>
+            void processDamage(int a, int h = HPDamageType) {
+                if (h == HPRecoverType) result.hpRecover = a;
+                else {
+                    var val = a + subject.power() - object_.defense();
+                    if (h == HPDamageType) result.hpDamage = val;
+                    if (h == HPDrainType) result.hpDrain = val;
+                }
+            }
+
+            /// <summary>
+            /// 处理Buff
+            /// </summary>
+            /// <param name="p">属性ID</param>
+            /// <param name="a">点数</param>
+            /// <param name="b">比率</param>
+            /// <param name="n">回合数（为-1则为永久）</param>
+            void processBuff(int p, int a = 0, int b = 100, int n = 0) {
+                addBuff(p, a, b / 100.0, n);
+            }
+
+            /// <summary>
+            /// 处理添加状态
+            /// </summary>
+            /// <param name="s">状态ID</param>
+            /// <param name="r">回合数</param>
+            /// <param name="p">几率</param>
+            void processAddState(int s, int r = 0, int p = 100) {
+                var rand = Random.Range(0, 100);
+                if (rand < p) addState(s, r);
+            }
+
+            /// <summary>
+            /// 处理移除状态
+            /// </summary>
+            /// <param name="s">状态ID</param>
+            /// <param name="r">回合数</param>
+            /// <param name="p">几率</param>
+            void processRemoveState(int s, int r = 0, int p = 100) {
+                var rand = Random.Range(0, 100);
+                if (rand < p) removeState(s, r);
+            }
+
+            /// <summary>
+            /// 添加状态
+            /// </summary>
+            /// <param name="stateId">状态ID</param>
+            /// <param name="turns">持续回合</param>
+            void addState(int stateId, int turns) {
+                stateChanges.Add(new RuntimeActionResult.StateChange(stateId, turns));
+            }
+
+            /// <summary>
+            /// 移除状态
+            /// </summary>
+            /// <param name="stateId">状态ID</param>
+            /// <param name="turns">持续回合</param>
+            void removeState(int stateId, int turns = 0) {
+                stateChanges.Add(new RuntimeActionResult.StateChange(stateId, turns, true));
+            }
+
+            /// <summary>
+            /// 添加Buff
+            /// </summary>
+            /// <param name="paramId">状态ID</param>
+            /// <param name="value">状态ID</param>
+            /// <param name="rate">状态ID</param>
+            /// <param name="turns">持续回合</param>
+            void addBuff(int paramId, int value = 0, double rate = 1, int turns = 0) {
+                addBuffs.Add(new RuntimeBuff(paramId, value, rate, turns));
+            }
+
+            /// <summary>
+            /// 抽取卡牌
+            /// </summary>
+            /// <param name="count">数量</param>
+            void drawCards(int count) {
+                result.drawCardCnt = count;
+            }
+
+            /// <summary>
+            /// 消耗卡牌
+            /// </summary>
+            /// <param name="count">数量</param>
+            /// <param name="show">是否显示并选择</param>
+            void consumeCards(int count, bool select = true) {
+                result.consumeCardCnt = count;
+                result.consumeSelect = select;
+            }
+
+        }
+
+        /// <summary>
+        /// 结果应用计算类
+        /// </summary>
+        public class ResultApplyCalc {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            RuntimeBattler battler;
+            RuntimeActionResult result;
+
+            RuntimeBattler subject;
+
+            /// <summary>
+            /// 应用
+            /// </summary>
+            /// <param name="battler">对战者</param>
+            /// <param name="result">结果</param>
+            public static void apply(RuntimeBattler battler, RuntimeActionResult result) {
+                var calc = new ResultApplyCalc(battler, result);
+                calc.processHP();
+                calc.processAddBuffs();
+                calc.processAddStates();
+                calc.processConsume();
+                calc.processDraw();
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            /// <param name="battler">对战者</param>
+            /// <param name="result">结果</param>
+            ResultApplyCalc(RuntimeBattler battler, RuntimeActionResult result) {
+                this.battler = battler; this.result = result;
+                subject = result.action.subject;
+            }
+
+            /// <summary>
+            /// 处理HP
+            /// </summary>
+            void processHP() {
+                battler.addHP(result.hpRecover);
+                battler.addHP(-result.hpDamage);
+                battler.addHP(-result.hpDrain);
+
+                subject.addHP(result.hpDrain);
+            }
+
+            /// <summary>
+            /// 处理Buff增加
+            /// </summary>
+            void processAddBuffs() {
+                foreach (var buff in result.addBuffs)
+                    battler.addBuff(buff);
+            }
+
+            /// <summary>
+            /// 处理状态增加
+            /// </summary>
+            void processAddStates() {
+                foreach (var state in result.stateChanges) 
+                    if (state.remove)
+                        battler.removeState(state.stateId, state.turns);
+                    else
+                        battler.addState(state.stateId, state.turns);
+            }
+
+            /// <summary>
+            /// 处理抽牌
+            /// </summary>
+            void processDraw() {
+                var actor = battler as RuntimeActor;
+                if (actor == null) return;
+
+                for (int i = 0; i < result.drawCardCnt; ++i)
+                    actor.cardGroup.drawCard();
+            }
+
+            /// <summary>
+            /// 处理消耗
+            /// </summary>
+            void processConsume() {
+                if (result.consumeSelect) return;
+
+                var actor = battler as RuntimeActor;
+                if (actor == null) return;
+
+                for (int i = 0; i < result.drawCardCnt; ++i)
+                    actor.cardGroup.consumeCard();
+            }
+
+        }
+
+        /// <summary>
+        /// 敌人下一步行动计算类
+        /// </summary>
+        public class EnemyNextCalc {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            int round;
+            RuntimeEnemy enemy;
+
+            ExerProEnemy enemyData;
+            ExerProEnemy.Action[] actions;
+
+            /// <summary>
+            /// 计算
+            /// </summary>
+            public static void calc(int round,
+                RuntimeEnemy enemy, RuntimeActor actor,
+                out ExerProEnemy.Action action, 
+                out ExerPro.EnglishModule.Data.RuntimeAction runtimeAction) {
+
+                var calc = new EnemyNextCalc(round, enemy);
+
+                action = calc.generateAction();
+                runtimeAction = calc.generateRuntimeAction(actor);
+            }
+
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            EnemyNextCalc(int round, RuntimeEnemy enemy) {
+                this.round = round; this.enemy = enemy;
+                this.enemyData = enemy.enemy();
+
+                actions = filterActions(this.enemyData.actions);
+            }
+
+            /// <summary>
+            /// 过滤行动
+            /// </summary>
+            /// <returns>过滤后的行动列表</returns>
+            ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
+                var res = new List<ExerProEnemy.Action>();
+                foreach (var action in actions)
+                    if (action.testRound(round)) res.Add(action);
+                return res.ToArray();
+            }
+
+            /// <summary>
+            /// 生成行动
+            /// </summary>
+            ExerProEnemy.Action generateAction() {
+                var list = new List<int>();
+                for (var i = 0; i < actions.Length; ++i) {
+                    var action = actions[i];
+                    for (var j = 0; j < action.rate; ++j) list.Add(i);
+                }
+                var index = Random.Range(0, list.Count);
+                return actions[list[index]];
+            }
+
+            /// <summary>
+            /// 生成运行时行动
+            /// </summary>
+            ExerPro.EnglishModule.Data.RuntimeAction 
+                generateRuntimeAction(RuntimeActor actor) {
+
+                RuntimeBattler object_;
+                var params_ = enemy.currentActionParams();
+                var effects = new List<ExerProEffectData>();
+
+                switch (enemy.currentActionTypeEnum()) {
+                    case ExerProEnemy.Action.Type.Attack:
+                        _processAttack(effects, params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.PowerDown:
+                        _processPowerDown(effects, params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.AddStates:
+                        _processAddStates(effects, params_);
+                        object_ = actor; break;
+
+                    case ExerProEnemy.Action.Type.PowerUp:
+                        _processPowerDown(effects, params_);
+                        object_ = enemy; break;
+
+                    default: return null;
+                }
+
+                effects.AddRange(enemyData.effects);
+
+                return new ExerPro.EnglishModule.Data.RuntimeAction(
+                    enemy, object_, effects.ToArray());
+            }
+
+            /// <summary>
+            /// 处理攻击行动
+            /// </summary>
+            void _processAttack(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+
+                effects.Add(new ExerProEffectData(
+                    ExerProEffectData.Code.Attack, actionParams));
+            }
+
+            /// <summary>
+            /// 处理削弱
+            /// </summary>
+            void _processPowerDown(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                var t = actionParams.Count == 5 ?
+                    actionParams[4] : 1;
+
+                for (int i = 0; i < 4; ++i) {
+                    var params_ = new JsonData();
+                    var p = DataLoader.load<int>(actionParams[i]);
+                    params_.SetJsonType(JsonType.Array);
+                    params_[0] = i; params_[1] = -p;
+                    params_[2] = 0; params_[3] = t;
+
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam, params_));
+                }
+            }
+
+            /// <summary>
+            /// 处理状态
+            /// </summary>
+            void _processAddStates(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                for (int i = 0; i < actionParams.Count; ++i) 
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam,
+                        actionParams[i]));
+            }
+
+            /// <summary>
+            /// 处理削弱
+            /// </summary>
+            void _processPowerUp(
+                List<ExerProEffectData> effects, JsonData actionParams) {
+                var t = actionParams.Count == 5 ?
+                    actionParams[4] : 1;
+
+                for (int i = 0; i < 4; ++i) {
+                    var params_ = new JsonData();
+                    params_.SetJsonType(JsonType.Array);
+                    params_[0] = i;
+                    params_[1] = actionParams[i];
+                    params_[2] = 0; params_[3] = t;
+
+                    effects.Add(new ExerProEffectData(
+                        ExerProEffectData.Code.AddParam, params_));
+                }
+            }
+        }
+    }
 
 }

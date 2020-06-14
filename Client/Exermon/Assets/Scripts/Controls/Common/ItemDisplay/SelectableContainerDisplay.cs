@@ -127,6 +127,7 @@ namespace UI.Common.Controls.ItemDisplays {
         List<UnityAction> onItemsChangedCallbacks = new List<UnityAction>();
         List<UnityAction> onSelectChangedCallbacks = new List<UnityAction>();
         List<UnityAction> onCheckChangedCallbacks = new List<UnityAction>();
+        List<UnityAction<int>> onClickedCallbacks = new List<UnityAction<int>>();
 
         /// <summary>
         /// 内部变量声明
@@ -193,30 +194,60 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 启动视窗
         /// </summary>
-        public override void startView() {
-            startView(0);
-        }
         public virtual void startView(int index) {
             base.startView();
             select(index);
         }
 
-        #endregion
+		#endregion
 
-        #region 回调控制
+		#region 更新控制
 
-        /// <summary>
-        /// 添加回调函数
-        /// </summary>
-        /// <param name="cb">回调函数</param>
-        /// <param name="type">回调类型（0：物品变更，1：选择变更，2：选中变更）</param>
-        public void addCallback(UnityAction cb, int type = 0) {
+		/// <summary>
+		/// 更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			updateDisplays();
+		}
+
+		/// <summary>
+		/// 更新显示
+		/// </summary>
+		void updateDisplays() {
+			for (int i = 0; i < itemDisplaysCount(); ++i) {
+				var itemDisplay = subViews[i];
+				if (itemDisplay.isRequestDestroy())
+					removeItem(itemDisplay.getItem());
+			}
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 添加回调函数
+		/// </summary>
+		/// <param name="cb">回调函数</param>
+		/// <param name="type">回调类型（0：物品变更，1：选择变更，2：选中变更）</param>
+		public void addCallback(UnityAction cb, int type = 0) {
             if (cb == null) return;
             switch (type) {
                 case 0: onItemsChangedCallbacks.Add(cb); break;
                 case 1: onSelectChangedCallbacks.Add(cb); break;
                 case 2: onCheckChangedCallbacks.Add(cb); break;
             }
+        }
+
+        /// <summary>
+        /// 添加点击回调函数
+        /// </summary>
+        /// <param name="cb"></param>
+        public void addClickedCallback(UnityAction<int> cb)
+        {
+            if (cb == null) return;
+            onClickedCallbacks.Add(cb);
         }
 
         #endregion
@@ -734,6 +765,27 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void callbackCheckChange() {
             foreach (var cb in onCheckChangedCallbacks) cb?.Invoke();
+        }
+
+        #endregion
+
+        #region 点击控制
+        /// <summary>
+        /// 点击控制
+        /// </summary>
+        /// <param name="index"></param>
+        public virtual void click(int index)
+        {
+            Debug.Log("click: " + name + ": " + index);
+            callbackClicked(index);
+        }
+
+        /// <summary>
+        /// 处理点击发送回调
+        /// </summary>
+        void callbackClicked(int index)
+        {
+            foreach (var cb in onClickedCallbacks) cb?.Invoke(index);
         }
 
         #endregion

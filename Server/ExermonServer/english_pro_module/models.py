@@ -272,7 +272,6 @@ class WrongItem(models.Model):
 			'word_index': self.word_index,
 			'type': self.type,
 			'word': self.word,
-			'question': self.question,
 		}
 
 
@@ -504,11 +503,15 @@ class ExerProEffectCode(Enum):
 
 	AddParam = 200  # 增加能力值
 	AddParamUrgent = 201  # 增加能力值（紧急按钮）
-	TempAddParam = 210  # 临时增加能力值
-	AddStatus = 220  # 增加状态
 
-	GetCards = 300  # 抽取卡牌
-	RemoveCards = 310  # 移除卡牌
+	TempAddParam = 210  # 临时增加能力值
+
+	AddState = 220  # 增加状态
+	RemoveState = 221  # 移除状态
+	RemoveNegaState = 222  # 移除消极状态
+
+	DrawCards = 300  # 抽取卡牌
+	ConsumeCards = 310  # 消耗卡牌
 
 	ChangeCost = 400  # 更改耗能
 	ChangeCostDisc = 401  # 更改耗能（发现）
@@ -539,11 +542,15 @@ class ExerProEffect(models.Model):
 
 		(ExerProEffectCode.AddParam.value, '增加能力值'),
 		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
-		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
-		(ExerProEffectCode.AddStatus.value, '增加状态'),
 
-		(ExerProEffectCode.GetCards.value, '抽取卡牌'),
-		(ExerProEffectCode.RemoveCards.value, '移除卡牌'),
+		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
+
+		(ExerProEffectCode.AddState.value, '增加状态'),
+		(ExerProEffectCode.RemoveState.value, '移除状态'),
+		(ExerProEffectCode.RemoveNegaState.value, '移除消极状态'),
+
+		(ExerProEffectCode.DrawCards.value, '抽取卡牌'),
+		(ExerProEffectCode.ConsumeCards.value, '消耗卡牌'),
 
 		(ExerProEffectCode.ChangeCost.value, '更改耗能'),
 		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
@@ -834,11 +841,12 @@ class EnemyEffect(ExerProEffect):
 #  敌人行动类型枚举
 # ===================================================
 class EnemyActionType(Enum):
-	Attack = 1,  # 攻击
-	PowerUp = 2,  # 提升
-	PowerDown = 3,  # 削弱
-	Escape = 4,  # 逃跑
-	Unset = 5,  # 什么都不做
+	Attack = 1  # 攻击
+	PowerUp = 2  # 提升
+	PowerDown = 3  # 削弱
+	AddStates = 4  # 状态
+	Escape = 5  # 逃跑
+	Unset = 6  # 什么都不做
 
 
 # ===================================================
@@ -849,20 +857,22 @@ class EnemyAction(models.Model):
 		verbose_name = verbose_name_plural = "敌人行动"
 
 	TYPES = [
-		(1, '攻击'),
-		(2, '提升'),
-		(3, '削弱'),
-		(4, '逃跑'),
-		(5, '无'),
-		# (EnemyActionType.Attack.value, '攻击'),
-		# (EnemyActionType.PowerUp.value, '提升'),
-		# (EnemyActionType.PowerDown.value, '削弱'),
-		# (EnemyActionType.Escape.value, '逃跑'),
-		# (EnemyActionType.Unset.value, '无'),
+		# (1, '攻击'),
+		# (2, '提升'),
+		# (3, '削弱'),
+		# (4, '状态'),
+		# (5, '逃跑'),
+		# (6, '无'),
+		(EnemyActionType.Attack.value, '攻击'),
+		(EnemyActionType.PowerUp.value, '提升'),
+		(EnemyActionType.PowerDown.value, '削弱'),
+		(EnemyActionType.AddStates.value, '状态'),
+		(EnemyActionType.Escape.value, '逃跑'),
+		(EnemyActionType.Unset.value, '无'),
 	]
 
 	# 回合
-	round = jsonfield.JSONField(default=[], verbose_name="回合")
+	rounds = jsonfield.JSONField(default=[], verbose_name="回合")
 
 	# 类型
 	type = models.PositiveSmallIntegerField(default=EnemyActionType.Unset.value,
@@ -884,7 +894,7 @@ class EnemyAction(models.Model):
 			返回转化后的字典
 		"""
 		return {
-			'round': self.round,
+			'rounds': self.rounds,
 			'type': self.type,
 			'params': self.params,
 			'rate': self.rate,
@@ -949,7 +959,7 @@ class ExerProEnemy(BaseItem):
 		res['power'] = self.power
 		res['defense'] = self.defense
 		res['character'] = self.character
-		res['type'] = self.type
+		res['type_'] = self.type
 
 		res['actions'] = actions
 		res['effects'] = effects
@@ -976,12 +986,32 @@ class ExerProEnemy(BaseItem):
 # ===================================================
 #  特训状态表
 # ===================================================
-class ExerProStatus(BaseItem):
+class ExerProState(BaseItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训状态"
 
 	# 道具类型
-	TYPE = ItemType.ExerProStatus
+	TYPE = ItemType.ExerProState
+
+	# 最大状态回合数
+	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
+
+	# 是否负面状态
+	is_nega = models.BooleanField(default=False, verbose_name="是否负面状态")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res['max_turns'] = self.max_turns
+		res['is_nega'] = self.is_nega
+
+		return res
+
 
 # endregion
 
@@ -1163,6 +1193,9 @@ class ExerProRecord(CacheableModel):
 
 	# 当前据点索引
 	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="当前据点索引")
+
+	# 是否完成据点事件
+	node_flag = models.BooleanField(default=False, verbose_name="是否完成据点事件")
 
 	# 单词等级（同时也是玩家在英语模块的等级）
 	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="单词等级")

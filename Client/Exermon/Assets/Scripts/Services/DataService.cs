@@ -482,6 +482,9 @@ namespace GameModule.Services {
         public ExerProEnemy exerProEnemy(int id) {
             return get(staticData.data.exerProEnemies, id);
         }
+        public ExerProState exerProState(int id) {
+            return get(staticData.data.exerProStates, id);
+        }
         public ExerProMap exerProMap(int id) {
             return get(staticData.data.exerProMaps, id);
         }

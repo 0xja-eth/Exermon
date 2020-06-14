@@ -521,7 +521,9 @@ namespace GameModule.Data {
         public ExerProCard[] exerProCards { get; protected set; }
         [AutoConvert]
         public ExerProEnemy[] exerProEnemies { get; protected set; }
-
+        [AutoConvert]
+        public ExerProState[] exerProStates { get; protected set; }
+        
         [AutoConvert]
         public ExerProMap[] exerProMaps { get; protected set; }
 

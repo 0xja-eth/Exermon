@@ -130,16 +130,39 @@ namespace UI.Common.Controls.ItemDisplays {
             base.startView();
         }
 
-        #endregion
+		#endregion
 
-        #region 回调控制
+		#region 更新控制
 
-        /// <summary>
-        /// 添加回调函数
-        /// </summary>
-        /// <param name="cb">回调函数</param>
-        /// <param name="type">回调类型（0：物品变更）</param>
-        public void addCallback(UnityAction cb, int type = 0) {
+		/// <summary>
+		/// 更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			updateDisplays();
+		}
+
+		/// <summary>
+		/// 更新显示
+		/// </summary>
+		void updateDisplays() {
+			for(int i = 0; i < itemDisplaysCount(); ++i) {
+				var itemDisplay = subViews[i];
+				if (itemDisplay.isRequestDestroy())
+					removeItem(itemDisplay.getItem());
+			}
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 添加回调函数
+		/// </summary>
+		/// <param name="cb">回调函数</param>
+		/// <param name="type">回调类型（0：物品变更）</param>
+		public void addCallback(UnityAction cb, int type = 0) {
             if (cb == null) return;
             switch (type) {
                 case 0: onItemsChangedCallbacks.Add(cb); break;
