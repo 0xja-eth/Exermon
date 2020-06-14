@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using ExerPro.EnglishModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.Common.Controls.AnimationSystem;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 
@@ -18,12 +19,32 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		<ExerProPackCard, ExerProCard> {
 
 		/// <summary>
+		/// 显示动画
+		/// </summary>
+		const string ShowAnimation = "Show";
+
+		/// <summary>
 		/// 外部组件定义
 		/// </summary>
 		public Text cost;
 		public Text description;
 
+		public AnimationView animation;
 		public CardDragger dragger;
+
+		#region 启动控制
+
+		/// <summary>
+		/// 显示视窗
+		/// </summary>
+		protected override void showView() {
+			if (animation) {
+				var ani = animation.addAnimation(ShowAnimation);
+				ani.setBeforeEvent(base.showView);
+			} else base.showView();
+		}
+
+		#endregion
 
 		#region 数据控制
 
@@ -39,7 +60,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 是否处于拖拽状态
 		/// </summary>
 		public bool isDragging() {
-			return dragger.isDragging;
+			return dragger && dragger.isDragging;
 		}
 
 		/// <summary>

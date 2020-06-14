@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// UI核心代码
@@ -45,6 +46,11 @@ namespace Core.UI.Utils {
             Animation animation;
 
 			/// <summary>
+			/// 动画开始前事件
+			/// </summary>
+			UnityAction beforeEvent;
+
+			/// <summary>
 			/// 构造函数
 			/// </summary>
 			/// <param name="name">动画片段名称</param>
@@ -54,9 +60,11 @@ namespace Core.UI.Utils {
 				clip = new AnimationClip();
 				clip.legacy = legacy;
 				clip.name = name;
+				beforeEvent = null;
 			}
 			public TempAnimation(AnimationClip clip) {
 				this.clip = clip; animation = null;
+				beforeEvent = null;
 			}
 
 			/// <summary>
@@ -66,6 +74,14 @@ namespace Core.UI.Utils {
 			public string getName() {
                 return clip.name;
             }
+
+			/// <summary>
+			/// 设置前置事件
+			/// </summary>
+			/// <param name="action">事件</param>
+			public void setBeforeEvent(UnityAction action) {
+				beforeEvent = action;
+			}
 
             /// <summary>
             /// 添加曲线
@@ -105,7 +121,8 @@ namespace Core.UI.Utils {
             public string setupAnimation(Animation ani, bool play = true) {
                 animation = ani;
                 animation.AddClip(clip, clip.name);
-                if (play) this.play();
+				beforeEvent?.Invoke();
+				if (play) this.play();
                 return clip.name;
             }
 

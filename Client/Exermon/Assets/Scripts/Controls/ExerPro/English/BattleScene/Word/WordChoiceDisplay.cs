@@ -4,15 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using ExerPro.EnglishModule.Services;
-using ExerPro.EnglishModule.Data;
-
-using Core.UI;
-using Core.UI.Utils;
+using WordData = ExerPro.EnglishModule.Data.Word;
 
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 
 	/// <summary>
 	/// 单词选项显示控件
@@ -40,7 +36,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 获取单词
 		/// </summary>
 		/// <returns></returns>
-		Word getWord() {
+		WordData getWord() {
 			return getContainer()?.getItem();
 		}
 

@@ -2716,7 +2716,7 @@ MonoBehaviour:
   loadingWindow: {fileID: 2029800016}
   rebuildController: {fileID: 2029800017}
   stageRecordDisplay: {fileID: 2043421240}
-  nodeDetail: {fileID: 0}
+  nodeDetail: {fileID: 113555067}
 --- !u!1 &1468656397
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,17 +1,20 @@
 ﻿
 using ExerPro.EnglishModule.Services;
-using ExerPro.EnglishModule.Data;
+
+using WordData = ExerPro.EnglishModule.Data.Word;
 
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 
 	using Windows;
 
 	/// <summary>
 	/// 单词选项组显示控件
 	/// </summary>
-	public class WordChoiceContainer : SelectableContainerDisplay<string>, IItemDisplay<Word> {
+	public class WordChoiceContainer : 
+		SelectableContainerDisplay<string>, 
+		IItemDisplay<WordData> {
 
 		/// <summary>
 		/// 外部组件设置
@@ -49,13 +52,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 
 		#region 接口实现
 
-		Word word;
+		WordData word;
 
 		/// <summary>
 		/// 获取单词
 		/// </summary>
 		/// <returns></returns>
-		public Word getItem() {
+		public WordData getItem() {
 			return word;
 		}
 
@@ -64,7 +67,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="item"></param>
 		/// <param name="force"></param>
-		public void setItem(Word item, bool _ = false) {
+		public void setItem(WordData item, bool _ = false) {
 			// TODO:生成选项：后期需要移到后台执行
 			setItems(engSer.generateWordChoices(word = item));
 		}
@@ -73,7 +76,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 开始视窗
 		/// </summary>
 		/// <param name="item"></param>
-		public void startView(Word item) {
+		public void startView(WordData item) {
 			setItem(item);
 		}
 

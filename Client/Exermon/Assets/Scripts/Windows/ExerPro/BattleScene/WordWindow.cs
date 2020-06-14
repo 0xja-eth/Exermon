@@ -9,7 +9,7 @@ using ExerPro.EnglishModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 
-	using Controls.Menu;
+	using Controls.Word;
 
 	/// <summary>
 	/// 单词窗口
@@ -40,6 +40,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		BattleService battleSer;
 		EnglishService engSer;
 
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		bool terminated = false; // 作答完毕
+
 		#region 初始化
 
 		/// <summary>
@@ -57,6 +62,29 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			base.initializeSystems();
 			battleSer = BattleService.get();
 			engSer = EnglishService.get();
+		}
+
+		#endregion
+
+		#region 启动/关闭
+
+		/// <summary>
+		/// 打开窗口
+		/// </summary>
+		public override void startWindow() {
+			terminated = false;
+			base.startWindow();
+		}
+
+		/// <summary>
+		/// 关闭窗口
+		/// </summary>
+		public override void terminateWindow() {
+			if (terminated) base.terminateWindow();
+		}
+		public void terminateWindow(bool force) {
+			if (force) terminated = true;
+			terminateWindow();
 		}
 
 		#endregion
@@ -111,7 +139,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			wordQuestionDisplay.showAnswer = true;
 			if (correct) onAnswerCorrect();
 			else onAnswerWrong();
-			requestRefresh(true);
+
+			terminated = battleSer.isStateChanged();
+			requestRefresh();
 		}
 
 		/// <summary>

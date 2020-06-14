@@ -272,11 +272,11 @@ namespace ExerPro.EnglishModule.Services {
             return record.nextWord();
         }
 
-        /// <summary>
-        /// 当前抽卡
-        /// </summary>
-        /// <returns></returns>
-        public ExerProPackCard[] drawnCards() {
+		/// <summary>
+		/// 当前抽卡（自动清空）
+		/// </summary>
+		/// <returns></returns>
+		public ExerProPackCard[] drawnCards() {
             return cardGroup.handGroup.getDrawnCards();
         }
 
@@ -320,7 +320,7 @@ namespace ExerPro.EnglishModule.Services {
             if (bonus) changeState(State.Drawing);
             else bonus = true;
         }
-
+		
 		#endregion
 
 		#region 出牌控制

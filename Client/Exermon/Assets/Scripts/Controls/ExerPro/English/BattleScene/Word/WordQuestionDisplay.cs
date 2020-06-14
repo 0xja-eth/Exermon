@@ -7,17 +7,19 @@ using UnityEngine.UI;
 using ExerPro.EnglishModule.Services;
 using ExerPro.EnglishModule.Data;
 
+using WordData = ExerPro.EnglishModule.Data.Word;
+
 using Core.UI;
 using Core.UI.Utils;
 
 using UI.Common.Controls.ItemDisplays;
 
-namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
+namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 
 	/// <summary>
 	/// 单词题目
 	/// </summary>
-	public class WordQuestionDisplay : ItemDetailDisplay<Word> {
+	public class WordQuestionDisplay : ItemDetailDisplay<WordData> {
 
 		/// <summary>
 		/// 外部组件设置
@@ -69,7 +71,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 绘制物品
 		/// </summary>
 		/// <param name="item"></param>
-		protected override void drawExactlyItem(Word item) {
+		protected override void drawExactlyItem(WordData item) {
 			base.drawExactlyItem(item);
 			english.text = item.english;
 		}
