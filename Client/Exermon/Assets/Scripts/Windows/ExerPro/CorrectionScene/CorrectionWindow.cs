@@ -69,6 +69,7 @@ namespace UI.CorrectionScene.Windows
             base.terminateView();
         }
         public void cancel() {
+            currentSenContainer.deselect();
             base.terminateView();
         }
     }

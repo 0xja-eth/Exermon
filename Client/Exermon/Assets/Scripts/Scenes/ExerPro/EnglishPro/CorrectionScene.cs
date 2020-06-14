@@ -53,16 +53,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// 开始
         /// </summary>
         protected override void start() {
+            engSer.generateQuestions<CorrectionQuestion>(1, (res) =>
+            {
+                articleDisplay.startView(res[0]);
+            });
             base.start();
-            //if (engSer.questionCache.getCacheList<CorrectionQuestion>().ToArray().Length == 0)
-            //    engSer.generateQuestions<CorrectionQuestion>(10, (res) =>
-            //    {
-            //        articleDisplay.startView(res[0]);
-            //        index = 1;
-            //    });
-            //else {
-            articleDisplay.startView(engSer.questionCache.correctionQuestions[index++]);
-            //}
         }
         #endregion
 
