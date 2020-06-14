@@ -21,7 +21,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		public HandCardGroupDisplay handCards;
 		public PotionSlotDisplay potionSlot;
-		
+
 		/// <summary>
 		/// 场景组件引用
 		/// </summary>

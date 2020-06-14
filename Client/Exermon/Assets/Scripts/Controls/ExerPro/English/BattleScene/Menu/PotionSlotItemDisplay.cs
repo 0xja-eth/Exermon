@@ -33,10 +33,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
             return base.isEnabled() && item != null && item.isNullItem();
         }
 
-		#endregion
-
-		#region 数据控制
-
 		/// <summary>
 		/// 获取容器
 		/// </summary>

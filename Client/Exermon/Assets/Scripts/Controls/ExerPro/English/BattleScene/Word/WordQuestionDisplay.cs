@@ -27,9 +27,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public WordChoiceContainer choiceContainer;
 
 		/// <summary>
-		/// 内部变量定义
+		/// 显示答案
 		/// </summary>
-		List<string> choices = new List<string>();
+		public bool showAnswer {
+			get { return choiceContainer.showAnswer; }
+			set { choiceContainer.showAnswer = value; }
+		}
 
 		/// <summary>
 		/// 外部系统设置
@@ -55,17 +58,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		protected override void onItemChanged() {
 			base.onItemChanged();
-			generateChoices();
+			choiceContainer.setItem(item);
 		}
-
-		/// <summary>
-		/// 生成选项（后期需要移到后台执行）
-		/// </summary>
-		void generateChoices() {
-			choices = engSer.generateWordChoices(item);
-			choiceContainer.setItems(choices);
-		}
-
+		
 		#endregion
 
 		#region 界面绘制
