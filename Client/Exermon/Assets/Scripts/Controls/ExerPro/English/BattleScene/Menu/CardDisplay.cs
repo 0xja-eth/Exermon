@@ -21,7 +21,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 显示动画
 		/// </summary>
-		const string ShowAnimation = "Show";
+		const string ShowAnimation = "CardShow";
 
 		/// <summary>
 		/// 外部组件定义

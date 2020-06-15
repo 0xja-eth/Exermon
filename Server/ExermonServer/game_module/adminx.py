@@ -69,6 +69,13 @@ class ExerGiftParamRateRangesInline(ParamsInline):
 	model = ExerGiftParamRateRange
 
 
+@xadmin.sites.register(GameTip)
+class GameTipAdmin(object):
+	list_display = ['id', 'name', 'description']
+
+	list_editable = ['name', 'description']
+
+
 @xadmin.sites.register(Subject)
 class SubjectAdmin(object):
 	list_display = ['id', 'name', 'max_score', 'force', 'color', 'adminColor', 'configure']

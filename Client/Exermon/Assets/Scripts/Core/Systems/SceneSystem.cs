@@ -31,8 +31,6 @@ namespace Core.Systems {
 
             NoneScene = -1,
 
-            FirstScene = 0,
-
             TitleScene = 0,
             StartScene,
             MainScene,

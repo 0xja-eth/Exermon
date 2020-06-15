@@ -40,12 +40,12 @@ namespace ExerPro.EnglishModule.Data {
     using EnglishModule.Services;
     using System.IO;
 
-    #region 题目
+	#region 题目
 
-    /// <summary>
-    /// 听力小题
-    /// </summary>
-    public class ListeningSubQuestion : BaseQuestion { }
+	/// <summary>
+	/// 听力小题
+	/// </summary>
+	public class ListeningSubQuestion : BaseQuestion { }
 
     /// <summary>
     /// 听力题
