@@ -19,7 +19,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
     /// <summary>
     /// 关卡记录显示组件
     /// </summary>
-    public class StageRecordDisplay : ItemDisplay<MapStageRecord> {
+    public class StageRecordDisplay : ItemDisplay<ExerProRecord> {
 
         /// <summary>
         /// 外部组件定义
@@ -57,7 +57,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 绘制物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void drawExactlyItem(MapStageRecord item) {
+        protected override void drawExactlyItem(ExerProRecord item) {
             base.drawExactlyItem(item);
             drawMapInfo(item);
             drawPlayerStatus(item);
@@ -68,28 +68,33 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <summary>
         /// 绘制地图信息
         /// </summary>
-        void drawMapInfo(MapStageRecord item) {
+        void drawMapInfo(ExerProRecord item) {
             mapDisplay.setItem(item);
         }
 
         /// <summary>
         /// 绘制玩家信息
         /// </summary>
-        void drawPlayerStatus(MapStageRecord item) {
+        void drawPlayerStatus(ExerProRecord item) {
             playerStatus.setItem(item.actor);
+            // 需要显示
+            if (item.isFirstSelected()) {
+                var nodeDisplay = mapDisplay.currentNode();
+                playerDisplay.gotoNode(nodeDisplay, true);
+            }
         }
 
         /// <summary>
         /// 绘制玩家信息
         /// </summary>
-        void drawPlayerDisplay(MapStageRecord item) {
+        void drawPlayerDisplay(ExerProRecord item) {
             playerDisplay.setItem(item.actor);
         }
 
         /// <summary>
         /// 绘制进度
         /// </summary>
-        void drawProgresses(MapStageRecord item) {
+        void drawProgresses(ExerProRecord item) {
             mapProgress.setValue(item, "map_progress");
             wordProgress.setValue(item, "word_progress");
         }

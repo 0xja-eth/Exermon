@@ -88,7 +88,7 @@ namespace UI.ShopScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (ShopScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<ShopScene>();
         }
 
         /// <summary>

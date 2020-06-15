@@ -23,7 +23,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
     /// <summary>
     /// 玩家显示组件
     /// </summary>
-    public class PlayerStatus : ItemDisplay<ExerProActor> {
+    public class PlayerStatus : ItemDisplay<RuntimeActor> {
 
         /// <summary>
         /// HP文本格式
@@ -44,15 +44,15 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override bool isNullItem(ExerProActor item) {
-            return base.isNullItem(item) || item.slotItem.isNullItem();
+        public override bool isNullItem(RuntimeActor item) {
+            return base.isNullItem(item) || item.slotItem == null || item.slotItem.isNullItem();
         }
 
         /// <summary>
         /// 绘制物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void drawExactlyItem(ExerProActor item) {
+        protected override void drawExactlyItem(RuntimeActor item) {
             base.drawExactlyItem(item);
 
             drawStatus(item);
@@ -62,8 +62,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// <summary>
         /// 绘制状态
         /// </summary>
-        void drawStatus(ExerProActor item) {
-            hp.text = string.Format(HPTextFormat, item.hp, item.mhp);
+        void drawStatus(RuntimeActor item) {
+            hp.text = string.Format(HPTextFormat, item.hp, item.mhp());
             hpBar.setValue(item, "hp");
         }
 

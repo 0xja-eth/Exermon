@@ -761,22 +761,22 @@ MonoBehaviour:
     configData: 0
     format: "\u5355\u8BCD\u8FDB\u5EA6 Lv.{0}"
     trigger: 
-  - key: correct
+  - key: rest
     obj: {fileID: 3291866333815997417}
     type: Text
     animated: 0
     configData: 0
     format: 
     trigger: 
-  - key: wrong
-    obj: {fileID: 8767063201058176056}
+  - key: corr_cnt
+    obj: {fileID: 6147623230456445596}
     type: Text
     animated: 0
     configData: 0
     format: 
     trigger: 
-  - key: unknown
-    obj: {fileID: 6147623230456445596}
+  - key: wrong_cnt
+    obj: {fileID: 8767063201058176056}
     type: Text
     animated: 0
     configData: 0

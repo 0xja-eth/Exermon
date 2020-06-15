@@ -125,11 +125,20 @@ namespace Core.UI {
 
         #region 界面控制
 
-        /// <summary>
-        /// 创建物品显示组件
-        /// </summary>
-        /// <param name="item">物品</param>
-        protected virtual T createSubView(int index) {
+		/// <summary>
+		/// 获取预制件
+		/// </summary>
+		/// <param name="index">索引</param>
+		/// <returns></returns>
+		protected virtual GameObject getSubViewPerfab(int index) {
+			return subViewPrefab;
+		}
+
+		/// <summary>
+		/// 创建物品显示组件
+		/// </summary>
+		/// <param name="index">索引</param>
+		protected virtual T createSubView(int index) {
             Debug.Log(name + ": createSubView: " + index);
             var res = getOrCreateSubView(index);
             return res;
@@ -141,8 +150,9 @@ namespace Core.UI {
         /// <returns>ItemDisplay</returns>
         T getOrCreateSubView(int index) {
             if (index < subViews.Count) return subViews[index];
-            var obj = Instantiate(subViewPrefab, container);
+            var obj = Instantiate(getSubViewPerfab(index), container);
             var sub = SceneUtils.get<T>(obj);
+            Debug.Log(typeof(T));
             obj.name = subViewName(index);
             onSubViewCreated(sub, index);
             return sub;

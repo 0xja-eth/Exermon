@@ -30,7 +30,7 @@ namespace Core.Data.Loaders {
         public const string CharacterBustPath = "Character/Bust/";
         public const string CharacterFacePath = "Character/Face/";
         public const string CharacterBattlePath = "Character/Battle/";
-        public const string ItemIconPath = "Item/Icon/";
+        public const string ItemIconPath = "Item/";
         public const string ExermonFullPath = "Exermon/Full/";
         public const string ExermonIconPath = "Exermon/Icon/";
         public const string ExermonBattlePath = "Exermon/Battle/";
@@ -40,11 +40,16 @@ namespace Core.Data.Loaders {
         public const string ExerSkillTargetPath = "Exermon/Skill/Target";
         public const string SystemAssetPath = "System/";
 
+		public const string ExerProEnemyBattlePath = "ExerPro/Enemy/";
+		public const string ExerProItemIconPath = "ExerPro/Item/";
+		public const string ExerProCardIconPath = "ExerPro/Card/";
+		public const string ExerProStateIconPath = "ExerPro/State/";
+        public const string ExerProListeningAudioPath = "ExerPro/ListeningAudio/";
         /// <summary>
         /// 文件主体名称定义
         /// </summary>
         public const string CharacterFileName = "Character";
-        public const string ItemFileName = "ItemIcons";
+        public const string IconsFileName = "Icons";
         public const string ExermonFileName = "Exermon";
         public const string ExerGiftFileName = "BigExerGift";
         public const string BigExerGiftFileName = "BigExerGift";
@@ -52,21 +57,27 @@ namespace Core.Data.Loaders {
         public const string RankIconsFileName = "RankIcons";
         public const string SmallRankIconsFileName = "SmallRankIcons";
 
-        public const string NodeIconFileName = "NodeTypes/Node";
+		public const string NodeIconFileName = "ExerPro/Node/Type";
+		public const string ThinkIconFileName = "ExerPro/Enemy/Think";
+		public const string ExerProEnemyFileName = "Enemy";
+        public const string ExerProListeningAudioFileName = "ListeningAudio";
 
         /// <summary>
         /// 其他常量定义
         /// </summary>
         //public const int ItemIconCols = 10; // 物品图标列数
         public const int ItemIconSize = 96; // 物品尺寸（正方形）
-        public const int RankIconCnt = 6; // 段位数量
+		public const int RankIconCnt = 6; // 段位数量
         public const int MaxSubRank = 5; // 最大子段位数目
 
-        /// <summary>
-        /// 纹理缓存
-        /// </summary>
-        static Dictionary<string, Texture2D> cache = new Dictionary<string, Texture2D>();
+		public static readonly Vector2 CardIconSize = new Vector2(96, 144); // 卡牌尺寸
+		public const int StateIconSize = 64; // 状态图标尺寸（正方形）
 
+		/// <summary>
+		/// 纹理缓存
+		/// </summary>
+		static Dictionary<string, Texture2D> cache = new Dictionary<string, Texture2D>();
+        static Dictionary<string, AudioClip> cacheAudio = new Dictionary<string, AudioClip>();
         #region 加载资源封装
 
         /// <summary>
@@ -75,7 +86,7 @@ namespace Core.Data.Loaders {
         /// <param name="path">路径</param>
         /// <param name="fileName">文件名</param>
         /// <returns>2D纹理</returns>
-        static Texture2D loadTexture2D(string path, string fileName) {
+        public static Texture2D loadTexture2D(string path, string fileName) {
             var key = path + fileName;
             if (!cache.ContainsKey(key))
                 cache[key] = Resources.Load<Texture2D>(key);
@@ -258,46 +269,145 @@ namespace Core.Data.Loaders {
         /// <returns>2D纹理</returns>
         public static Texture2D loadNodeIcon(int id) {
             return loadTexture2D(SystemAssetPath, NodeIconFileName, id);
-        }
+		}
 
-        #endregion
+		/// <summary>
+		/// 读取敌人行动思考类型图标
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public static Texture2D loadEnemyThink(int id) {
+			return loadTexture2D(SystemAssetPath, ThinkIconFileName, id);
+		}
 
-        #region 加载组合资源
+		/// <summary>
+		/// 读取特训敌人全身像
+		/// </summary>
+		/// <param name="id">艾瑟萌ID</param>
+		/// <returns>2D纹理</returns>
+		public static Texture2D loadExerProEnemyBattle(int id) {
+			return loadTexture2D(ExerProEnemyBattlePath, ExerProEnemyFileName, id);
+		}
+
+		/// <summary>
+		/// 读取音频
+		/// </summary>
+		/// <param name="path">路径</param>
+		/// <param name="fileName">文件名</param>
+		/// <returns>音频文件</returns>
+		public static AudioClip loadAudio(string path, string fileName)
+		{
+			var key = path + fileName;
+			if (!cacheAudio.ContainsKey(key))
+				cacheAudio[key] = Resources.Load<AudioClip>(key);
+			Debug.Log("loadAudioClip: " + key + ": " + (cacheAudio[key] != null));
+			return cacheAudio[key];
+		}
 
         /// <summary>
-        /// 读取物品图标
+        /// 读取音频
         /// </summary>
-        /// <param name="id">物品ID</param>
-        /// <returns>返回物品图标集纹理</returns>
-        public static Texture2D loadItemIcons() {
-            return loadTexture2D(ItemIconPath, ItemFileName);
-        }
+        /// <param name="path">路径</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="id">文件id</param>
+        /// <returns>音频文件</returns>
+        public static AudioClip loadAudio(string path, string fileName, int id)
+		{
+            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName + "_" + id);
+		}
 
-        /// <summary>
-        /// 获取物品图标所占的区域 
-        /// </summary>
-        /// <param name="index">图标索引</param>
-        /// <returns>返回对应图标索引的矩形区域</returns>
-        public static Rect getItemIconRect(int index) {
-            return calcRect(loadItemIcons(), ItemIconSize, ItemIconSize, index);
+		/// <summary>
+		/// 读取听力音频
+		/// </summary>
+		/// <param name="id">音频ID</param>
+		/// <returns>音频</returns>
+		public static AudioClip loadListeningAudioClip(int id) {
+            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName, id);
         }
+		#endregion
 
-        /// <summary>
-        /// 获取物品图标精灵
-        /// </summary>
-        /// <param name="index">图标索引</param>
-        /// <returns>返回对应图标索引的精灵</returns>
-        public static Sprite getItemIconSprite(int index) {
-            var rect = getItemIconRect(index);
-            return generateSprite(loadItemIcons(), rect);
-        }
+		#region 加载组合资源
 
-        /// <summary>
-        /// 读取段位图标
-        /// </summary>
-        /// <param name="id">物品ID</param>
-        /// <returns>返回段位图标集纹理</returns>
-        public static Texture2D loadRankIcons(bool small = false) {
+		/// <summary>
+		/// 获取组合资源所占的区域（图标类资源）
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <param name="path">路径</param>
+		/// <param name="name">文件名</param>
+		/// <param name="xSize">X尺寸</param>
+		/// <param name="ySize">Y尺寸</param>
+		/// <returns>返回对应图标索引的矩形区域</returns>
+		public static Rect getGroupAssetsRect(int index, 
+			string path, string name, int xSize, int ySize) {
+			return calcRect(loadTexture2D(path, name), xSize, ySize, index);
+		}
+
+		/// <summary>
+		/// 读取组合资源精灵（图标类资源）
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <param name="path">路径</param>
+		/// <param name="name">文件名</param>
+		/// <param name="xSize">X尺寸</param>
+		/// <param name="ySize">Y尺寸</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getGroupAssetsSprite(int index,
+			string path, string name, int xSize, int ySize) {
+			var texture = loadTexture2D(path, name);
+			var rect = calcRect(texture, xSize, ySize, index);
+			return generateSprite(texture, rect);
+		}
+
+		/// <summary>
+		/// 获取物品图标精灵
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getItemIconSprite(int index) {
+			return getGroupAssetsSprite(index,
+				ItemIconPath, IconsFileName, 
+				ItemIconSize, ItemIconSize);
+		}
+
+		/// <summary>
+		/// 获取特训物品图标精灵
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getExerProItemIconSprite(int index) {
+			return getGroupAssetsSprite(index,
+				ExerProItemIconPath, IconsFileName, 
+				ItemIconSize, ItemIconSize);
+		}
+
+		/// <summary>
+		/// 获取卡牌图标所占的区域
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getExerProCardIconSprite(int index) {
+			return getGroupAssetsSprite(index,
+				ExerProCardIconPath, IconsFileName,
+				(int)CardIconSize.x, (int)CardIconSize.y);
+		}
+
+		/// <summary>
+		/// 获取特训物品图标精灵
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getExerProStateIconSprite(int index) {
+			return getGroupAssetsSprite(index,
+				ExerProStateIconPath, IconsFileName, 
+				StateIconSize, StateIconSize);
+		}
+		
+		/// <summary>
+		/// 读取段位图标
+		/// </summary>
+		/// <param name="id">物品ID</param>
+		/// <returns>返回段位图标集纹理</returns>
+		public static Texture2D loadRankIcons(bool small = false) {
             return loadTexture2D(SystemAssetPath, small ? 
                 SmallRankIconsFileName : RankIconsFileName);
         }

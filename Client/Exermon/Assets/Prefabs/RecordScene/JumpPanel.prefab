@@ -89,9 +89,9 @@ GameObject:
   - component: {fileID: 7362744144285543521}
   - component: {fileID: 7362744144285543522}
   - component: {fileID: 7362744144285543523}
-  - component: {fileID: 7362744144285543527}
   - component: {fileID: 7362744144285543520}
   - component: {fileID: 7362744144285543526}
+  - component: {fileID: 9189978706107727257}
   m_Layer: 5
   m_Name: JumpPanel
   m_TagString: Untagged
@@ -176,23 +176,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 2
---- !u!114 &7362744144285543527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7362744144285543453}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c01ae4929bb8992449602a2222b2dda5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 7362744144285543520}
-  background: {fileID: 0}
-  shownState: Shown
-  hiddenState: Hidden
-  shownAttr: shown
 --- !u!95 &7362744144285543520
 Animator:
   serializedVersion: 3
@@ -224,6 +207,23 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &9189978706107727257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7362744144285543453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c9913eeae1b2049aff7c779abd4a1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 7362744144285543520}
+  background: {fileID: 0}
+  shownState: Shown
+  hiddenState: Hidden
+  shownAttr: shown
 --- !u!1 &7362744144601339109
 GameObject:
   m_ObjectHideFlags: 0

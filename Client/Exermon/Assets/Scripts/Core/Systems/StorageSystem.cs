@@ -86,7 +86,7 @@ namespace Core.Systems {
         public const string ConfigDataFilename = ".config";
 
         public const string EngCacheDataFilename = ".eng.cache";
-        public const string EngRecordFilename = ".eng.record";
+        //public const string EngRecordFilename = ".eng.record";
 
         /// <summary>
         /// 加密盐
@@ -133,7 +133,7 @@ namespace Core.Systems {
             storageItems.Add(new StorageItem(quesSer.questionCache, CacheDataFilename));
 
             storageItems.Add(new StorageItem(engSer.questionCache, EngCacheDataFilename));
-            storageItems.Add(new StorageItem(engSer.record, EngRecordFilename));
+            //storageItems.Add(new StorageItem(engSer.record, EngRecordFilename));
         }
 
         #endregion

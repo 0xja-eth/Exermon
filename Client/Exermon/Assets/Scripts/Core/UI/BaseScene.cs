@@ -61,16 +61,14 @@ namespace Core.UI {
             initializeSceneUtils();
             initializeSystems();
             initializeOthers();
-            checkFirstScene();
+            //checkFirstScene();
         }
 
         /// <summary>
         /// 初始化
         /// </summary>
         void initializeSceneUtils() {
-            SceneUtils.initialize(sceneIndex(), alertWindow, 
-                loadingWindow, rebuildController);
-            SceneUtils.depositSceneObject("Scene", this);
+            SceneUtils.initialize(this, alertWindow, loadingWindow, rebuildController);
         }
 
         /// <summary>
@@ -93,7 +91,7 @@ namespace Core.UI {
         /// </summary>
         /// <returns></returns>
         public void checkFirstScene() {
-            var first = SceneSystem.Scene.FirstScene;
+            var first = SceneSystem.Scene.TitleScene;
             if (gameSys.isConnectable() && sceneIndex() != first)
                 sceneSys.gotoScene(first);
         }
@@ -131,6 +129,20 @@ namespace Core.UI {
         public void createCoroutine(IEnumerator func) {
             StartCoroutine(func);
         }
+
+        #endregion
+
+        #region 流程控制
+
+        ///// <summary>
+        ///// 场景开始回调
+        ///// </summary>
+        //public virtual void onStarted() { }
+
+        /// <summary>
+        /// 场景结束回调
+        /// </summary>
+        public virtual void onTerminated() { }
 
         #endregion
 

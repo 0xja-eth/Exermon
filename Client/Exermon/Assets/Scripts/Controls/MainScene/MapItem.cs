@@ -57,7 +57,7 @@ namespace UI.MainScene.Controls {
         /// </summary>
         /// <returns></returns>
         MainScene scene() {
-            return (MainScene)SceneUtils.getSceneObject("Scene");
+            return SceneUtils.getCurrentScene<MainScene>();
         }
 
         #endregion

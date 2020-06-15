@@ -5549,18 +5549,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 7362744144834506147}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1623753156 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7362744144285543527, guid: 4c9d26619672cc44aa31279bf8ff6e18,
-    type: 3}
-  m_PrefabInstance: {fileID: 7362744144834506147}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c01ae4929bb8992449602a2222b2dda5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &1651515323 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3763697235470476024, guid: c5cd6cb589620db47bcd3fe2cece1fd9,
@@ -5648,7 +5636,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1623753156}
+      - m_Target: {fileID: 0}
         m_MethodName: toggleWindow
         m_Mode: 1
         m_Arguments:
@@ -8466,7 +8454,8 @@ PrefabInstance:
       propertyPath: mask
       value: 
       objectReference: {fileID: 7362744144834506148}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7362744144285543527, guid: 4c9d26619672cc44aa31279bf8ff6e18, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4c9d26619672cc44aa31279bf8ff6e18, type: 3}
 --- !u!224 &7362744144834506148 stripped
 RectTransform:

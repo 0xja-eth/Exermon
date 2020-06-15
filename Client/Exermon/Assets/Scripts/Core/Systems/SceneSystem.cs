@@ -48,7 +48,11 @@ namespace Core.Systems {
             BattleAnswerScene,
 
             EnglishProMapScene,
-
+            EnglishProBusinessManScene,
+            EnglishProPlotScene,
+            EnglishProListenScene,
+            EnglishProCorrectionScene,
+            EnglishProPhraseScene,
             HelpScene
         }
 
@@ -184,7 +188,7 @@ namespace Core.Systems {
         /// <param name="async">是否异步操作</param>
         public void loadScene(bool reload = false, JsonData data = null, bool async = false) {
             tunnelData = data;
-            Scene scene = currentScene();
+            var scene = currentScene();
             Debug.Log("loadScene: " + scene + " (real: " + realCurrentScene() + 
                 "), tunnel: "+ tunnelData?.ToJson());
             if (scene == Scene.NoneScene) gameSer.exitGame();

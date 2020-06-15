@@ -73,7 +73,7 @@ namespace UI.BattleStartScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (BattleStartScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<BattleStartScene>();
         }
 
         /// <summary>

@@ -1,4 +1,7 @@
-﻿using Core.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
+
+using Core.UI;
 
 namespace UI.Common.Controls.ItemDisplays {
 
@@ -106,7 +109,51 @@ namespace UI.Common.Controls.ItemDisplays {
             this.index = index; setValue(item);
         }
 
-        #endregion
+		#endregion
 
-    }
+		#region 画面控制
+
+		/// <summary>
+		/// 更新位置
+		/// </summary>
+		void updatePosition() {
+			if (!needUpdatePosition()) return;
+
+			var display = getItemDisplay();
+			if (display == null) return;
+
+			var displayRt = display.transform as RectTransform;
+			var rt = transform as RectTransform;
+
+			rt.anchoredPosition = calcPosition(displayRt);
+		}
+
+		/// <summary>
+		/// 是否需要更新位置
+		/// </summary>
+		/// <returns></returns>
+		protected virtual bool needUpdatePosition() {
+			return false;
+		}
+
+		/// <summary>
+		/// 根据ItemDisplay计算一个位置
+		/// </summary>
+		/// <param name="rt"></param>
+		/// <returns></returns>
+		protected virtual Vector2 calcPosition(RectTransform rt) {
+			return new Vector2(0, 0);
+		}
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		protected override void refresh() {
+			base.refresh();
+			updatePosition();
+		}
+
+		#endregion
+
+	}
 }

@@ -115,7 +115,8 @@ namespace UI.TitleScene.Windows {
         /// 初始化场景
         /// </summary>
         protected override void initializeScene() {
-            scene = (TitleScene)SceneUtils.getSceneObject("Scene");
+            scene = SceneUtils.getCurrentScene<TitleScene>();
+
         }
 
         /// <summary>
@@ -166,6 +167,7 @@ namespace UI.TitleScene.Windows {
         /// </summary>
         protected override void update() {
             base.update();
+            passwordInput.inputField.ForceLabelUpdate();
             updateShowPassword();
         }
 
@@ -506,5 +508,16 @@ namespace UI.TitleScene.Windows {
         }
 
         #endregion
+
+        public void click() {
+            //passwordInput.inputField.interactable = false;
+            //Invoke("click1", 0.01f);
+            //passwordInput.setValue("*****");
+        }
+        public void click1() {
+            //passwordInput.inputField.ActivateInputField();
+            //passwordInput.inputField.interactable = true;
+        }
+
     }
 }

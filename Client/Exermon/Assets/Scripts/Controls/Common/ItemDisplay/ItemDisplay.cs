@@ -46,7 +46,7 @@ namespace UI.Common.Controls.ItemDisplays {
                 data = value;
             }
         }
-        /*
+		/*
         #region 启动控制
 
         /// <summary>
@@ -61,13 +61,27 @@ namespace UI.Common.Controls.ItemDisplays {
 
         #endregion
         */
-        #region 数据控制
 
-        /// <summary>
-        /// 默认值
-        /// </summary>
-        /// <returns>返回数据默认值</returns>
-        protected override T defaultValue() {
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		protected bool requestDestroy = false; // 请求释放
+
+		#region 数据控制
+
+		/// <summary>
+		/// 是否请求释放
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool isRequestDestroy() {
+			return requestDestroy;
+		}
+
+		/// <summary>
+		/// 默认值
+		/// </summary>
+		/// <returns>返回数据默认值</returns>
+		protected override T defaultValue() {
             return null;
         }
 
