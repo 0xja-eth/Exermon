@@ -48,6 +48,7 @@ namespace Core.Systems {
             EnglishProMapScene,
             EnglishProBusinessManScene,
             EnglishProPlotScene,
+            EnglishProListenScene,
             EnglishProCorrectionScene,
             EnglishProPhraseScene,
 			EnglishProBattleScene,
