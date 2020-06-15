@@ -195,6 +195,14 @@ namespace Core.UI {
             return shown;
         }
 
+		/// <summary>
+		/// 忙碌中（Showing/Hiding)
+		/// </summary>
+		/// <returns></returns>
+		public bool isBusy() {
+			return isShowing || isHiding;
+		}
+
         #endregion
 
     }

@@ -301,7 +301,7 @@ namespace UI.Common.Controls.AnimationSystem {
             AnimationUtils.TempAnimation ani) {
             animations.Enqueue(ani); return ani;
         }
-
+		
 		#endregion
 
 		#region 预设动画

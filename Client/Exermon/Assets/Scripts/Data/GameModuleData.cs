@@ -32,12 +32,12 @@ namespace GameModule.Data {
     /// </summary>
     public class GameStaticData : BaseData {
 
-        /// <summary>
-        /// 本地版本
-        /// </summary>
-        //public string localVersion = PlayerSettings.bundleVersion;
-        public const string LocalMainVersion = "0.3.2";
-        public const string LocalSubVersion = "20200527";
+		/// <summary>
+		/// 本地版本
+		/// </summary>
+		//public string localVersion = PlayerSettings.bundleVersion;
+		public const string LocalMainVersion = Config.LocalMainVersion; // "0.3.2";
+        public const string LocalSubVersion = Config.LocalSubVersion; // "20200527";
 
         /// <summary>
         /// 后台版本
@@ -327,10 +327,23 @@ namespace GameModule.Data {
 
     }
 
-    /// <summary>
-    /// 游戏版本数据
-    /// </summary>
-    public class GameVersionData : BaseData {
+	/// <summary>
+	/// 游戏小贴士
+	/// </summary>
+	public class GameTip : TypeData {
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int type { get; protected set; }
+
+	}
+
+	/// <summary>
+	/// 游戏版本数据
+	/// </summary>
+	public class GameVersionData : BaseData {
 
         /// <summary>
         /// 更新日志格式
@@ -479,7 +492,9 @@ namespace GameModule.Data {
         public ExerProItemStar[] exerProItemStars { get; protected set; }
         [AutoConvert]
         public NodeType[] nodeTypes { get; protected set; }
-    }
+		[AutoConvert]
+		public GameTip[] gameTips { get; protected set; }
+	}
 
     /// <summary>
     /// 游戏资料数据

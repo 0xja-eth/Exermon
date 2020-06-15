@@ -1235,28 +1235,38 @@ namespace ExermonModule.Data {
         [AutoConvert]
         public ParamRateData[] rateParams { get; protected set; }
 
-        /// <summary>
-        /// 玩家艾瑟萌实例
-        /// </summary>
-        public PlayerExermon playerExer {
+		/// <summary>
+		/// 玩家艾瑟萌实例
+		/// </summary>
+		PlayerExermon _playerExer = null;
+		public PlayerExermon playerExer {
             get {
-                var exerHub = exerSlot.player.packContainers.exerHub;
-                return exerHub.findItem(item => item.id == playerExerId);
-            }
+				if (_playerExer == null) {
+					var exerHub = exerSlot.player.packContainers.exerHub;
+					_playerExer = exerHub.findItem(item => item.id == playerExerId);
+				}
+				return _playerExer;
+			}
             set {
                 playerExerId = value.id;
-            }
+				_playerExer = null;
+
+			}
         }
 
-        /// <summary>
-        /// 玩家艾瑟萌天赋实例
-        /// </summary>
-        public PlayerExerGift playerGift {
+		/// <summary>
+		/// 玩家艾瑟萌天赋实例
+		/// </summary>
+		PlayerExerGift _playerGift = null;
+		public PlayerExerGift playerGift {
             get {
-                var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
-                var playerGift = exerGiftPool.findItem(item => item.id == playerGiftId);
-                return playerGift ?? tmpPlayerGift;
-            }
+				if (_playerGift == null) {
+					var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
+					var playerGift = exerGiftPool.findItem(item => item.id == playerGiftId);
+					_playerGift = playerGift ?? tmpPlayerGift;
+				}
+				return _playerGift;
+			}
             set {
                 var exerGiftPool = exerSlot.player.packContainers.exerGiftPool;
                 var playerGift = exerGiftPool.findItem(item => item.id == playerGiftId);
@@ -1267,7 +1277,8 @@ namespace ExermonModule.Data {
                     tmpPlayerGift = null;
                     playerGiftId = value.id;
                 }
-            }
+				_playerGift = null;
+			}
         }
 
         /// <summary>
@@ -2030,7 +2041,8 @@ namespace ExermonModule.Data {
         /// <returns>槽ID</returns>
         public override ExerSlotItem getSlotItemByEquipItem<E>(E equipItem) {
             if (typeof(E) == typeof(PlayerExermon)) {
-                var sid = ((PlayerExermon)(object)equipItem).exermon().subjectId;
+				var playerExer = equipItem as PlayerExermon;
+				var sid = playerExer.exermon().subjectId;
                 return getSlotItem(sid);
             }
             return null;

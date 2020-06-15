@@ -12,6 +12,9 @@ using Core.Data.Loaders;
 using Core.Systems;
 using Core.Services;
 
+using GameModule.Services;
+using GameModule.Data;
+
 using ExerPro.EnglishModule.Data;
 
 namespace ExerPro.EnglishModule.Services {
@@ -38,6 +41,11 @@ namespace ExerPro.EnglishModule.Services {
 			ExerProMapNode.Type.Shop, ExerProMapNode.Type.Elite,
 			ExerProMapNode.Type.Story,
 		};
+
+		/// <summary>
+		/// 休息恢复率
+		/// </summary>
+		const double RecoverRate = 0.3;
 
 		/// <summary>
 		/// 操作文本设定
@@ -163,6 +171,10 @@ namespace ExerPro.EnglishModule.Services {
 		StorageSystem storageSys;
 		SceneSystem sceneSys;
 
+		DataService dataSer;
+
+		bool restFlag = false; // 休息据点标志
+
 		#region 初始化
 
 		/// <summary>
@@ -172,6 +184,8 @@ namespace ExerPro.EnglishModule.Services {
 			base.initializeSystems();
 			storageSys = StorageSystem.get();
 			sceneSys = SceneSystem.get();
+
+			dataSer = DataService.get();
 		}
 
 		/// <summary>
@@ -544,6 +558,20 @@ namespace ExerPro.EnglishModule.Services {
 
 		#endregion
 
+		#region 题目控制
+
+		/// <summary>
+		/// 生成单词选项
+		/// </summary>
+		/// <param name="word"></param>
+		/// <returns></returns>
+		public List<string> generateWordChoices(Word word) {
+			var words = questionCache.getCacheList<Word>();
+			return CalcService.WordChoicesGenerator.generate(word, words);
+		}
+
+		#endregion
+
 		#region 更新控制
 		/*
         /// <summary>
@@ -656,12 +684,36 @@ namespace ExerPro.EnglishModule.Services {
 				} else exitNode(false);
 		}
 
+		#region 休息据点
+
 		/// <summary>
 		/// 休息据点
 		/// </summary>
 		void onRestNode() {
-			exitNode(false);
+			restFlag = true;
+			record.actor.addHP(RecoverRate);
 		}
+
+		/// <summary>
+		/// 是否休息据点（自动重置）
+		/// </summary>
+		/// <returns></returns>
+		public bool isRestNode() {
+			var res = restFlag;
+			restFlag = false; return res;
+		}
+
+		/// <summary>
+		/// 获取随机小贴士
+		/// </summary>
+		/// <returns></returns>
+		public GameTip randomTips() {
+			var tips = dataSer.staticData.configure.gameTips;
+			var index = Random.Range(0, tips.Length);
+			return tips[index];
+		}
+
+		#endregion
 
 		/// <summary>
 		/// 藏宝据点
