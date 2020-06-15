@@ -308,10 +308,10 @@ namespace ExerPro.EnglishModule.Services {
 				loadQuestions(ids, onSuccess, onError);
 			};
 
-			generateQuestion(count, getQuestionType<T>(), _onSuccess, onError);
+			generateQuestions(count, getQuestionType<T>(), _onSuccess, onError);
 		}
 		/// <param name="qids">题目类型</param>
-		public void generateQuestion(int count, int type,
+		public void generateQuestions(int count, int type,
 			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError) {
 
 			JsonData data = new JsonData();
@@ -319,6 +319,18 @@ namespace ExerPro.EnglishModule.Services {
 			sendRequest(Oper.QuestionGenerate, data, onSuccess, onError, uid: true);
 		}
 
+		/// <summary>
+		/// 获取题目数据
+		/// </summary>
+		/// <typeparam name="T">题目类型</typeparam>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void generateQuestion<T>(UnityAction<T> onSuccess,
+			UnityAction onError = null) where T : BaseData, new()
+		{
+			UnityAction<T[]> _onSuccess = (res) => onSuccess.Invoke(res[0]);
+			generateQuestions(1, _onSuccess, onError);
+		}
 		/// <summary>
 		/// 获取记录数据
 		/// </summary>

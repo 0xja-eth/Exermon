@@ -54,6 +54,9 @@ EditorBuildSettings:
     path: Assets/Scenes/ExerPro/EnglishPro/PlotScene.unity
     guid: 89a5236cea14ee748985095619559cf9
   - enabled: 1
+    path: Assets/Scenes/ExerPro/EnglishPro/ListenScene.unity
+    guid: d6b2283f145c04043819c37dc3ec15bd
+  - enabled: 1
     path: Assets/Scenes/ExerPro/EnglishPro/CorrectionScene.unity
     guid: 71db381ae53a9ef4390bc58b25e19b61
   - enabled: 1

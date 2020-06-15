@@ -45,12 +45,27 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 听力小题
     /// </summary>
-    public class ListeningSubQuestion : BaseQuestion { }
+    public class ListeningSubQuestion : BaseQuestion {
+		/// <summary>
+		/// 加载选项Item属性
+		/// </summary>
+		/// <param name="data"></param>
+		/// <returns></returns>
 
-    /// <summary>
-    /// 听力题
-    /// </summary>
-    public class ListeningQuestion : GroupQuestion<ListeningSubQuestion> {
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+        public ListeningSubQuestion()
+        {
+            
+        }
+	}
+
+	/// <summary>
+	/// 听力题
+	/// </summary>
+	public class ListeningQuestion : GroupQuestion<ListeningSubQuestion> {
 
         /// <summary>
         /// 属性
@@ -58,8 +73,25 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public AudioClip audio { get; protected set; }
 
-    }
-    /*
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public string eventName { get; protected set; }
+		[AutoConvert]
+		public Texture2D picture { get; protected set; }
+
+        public ListeningQuestion() {
+        }
+        public static ListeningQuestion sample() {
+            ListeningQuestion returnSample = new ListeningQuestion();
+            returnSample.article = "海贼王";
+            returnSample.audio = AssetLoader.loadListeningAudioClip(1);
+            ListeningSubQuestion testSubQuestion1 = new ListeningSubQuestion();
+            return returnSample;
+        }
+	}
+	/*
     /// <summary>
     /// 阅读小题
     /// </summary>
@@ -71,10 +103,10 @@ namespace ExerPro.EnglishModule.Data {
     public class ReadingQuestion : GroupQuestion<ReadingSubQuestion> { }
     */
 
-    /// <summary>
-    /// 短语题目
-    /// </summary>
-    public class PhraseQuestion : BaseData {
+	/// <summary>
+	/// 短语题目
+	/// </summary>
+	public class PhraseQuestion : BaseData {
         /// <summary>
         /// 属性
         /// </summary>
