@@ -881,11 +881,13 @@ namespace ExerPro.EnglishModule.Data {
         /// 接受物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void acceptItem(ExerProPackCard item) {
-            // 卡牌进入的时候洗牌
-            if (containItem(item)) return;
+        protected override bool acceptItem(ExerProPackCard item) {
+			// 卡牌进入的时候洗牌
+			if (isFull()) return false;
+            if (containItem(item)) return false;
             var index = UnityEngine.Random.Range(0, items.Count);
             items.Insert(index, item);
+			return true;
         }
 
         /// <summary>
@@ -922,10 +924,23 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProCardHandGroup : PackContainer<ExerProPackCard> {
 
+		/// <summary>
+		/// 常量定义
+		/// </summary>
+		public const int DefaultCapacity = 10;
+
         /// <summary>
         /// 卡组
         /// </summary>
         public ExerProCardGroup cardGroup { get; set; }
+
+		/// <summary>
+		/// 默认容量
+		/// </summary>
+		/// <returns></returns>
+		public override int defaultCapacity() {
+			return DefaultCapacity;
+		}
 
         /// <summary>
         /// 抽出的牌
@@ -944,9 +959,11 @@ namespace ExerPro.EnglishModule.Data {
         /// 接收物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void acceptItem(ExerProPackCard item) {
-            base.acceptItem(item); drawnCards.Add(item);
-        }
+        protected override bool acceptItem(ExerProPackCard item) {
+            var res = base.acceptItem(item);
+			if (res) drawnCards.Add(item);
+			return res;
+		}
     }
 
     /// <summary>
