@@ -192,7 +192,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
         /// </summary>
         /// <returns></returns>
         
-        public ExerProRecord getItem() {            return record;
+        public ExerProRecord getItem() {
+			return record;
         }
 
         /// <summary>
@@ -207,7 +208,8 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
-        public void startView(ExerProRecord item) {            setItem(item, true);
+        public void startView(ExerProRecord item) {
+			setItem(item, true);
         }
 
         #endregion

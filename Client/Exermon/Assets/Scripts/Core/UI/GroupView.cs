@@ -205,9 +205,7 @@ namespace Core.UI {
         /// </summary>
         /// <param name="sub">子视图</param>
         protected virtual void refreshSubView(T sub, int index) {
-            if (typeof(T).IsSubclassOf(typeof(BaseView)) ||
-                typeof(T) == typeof(BaseView))
-                ((BaseView)(object)sub).requestRefresh(true);
+			(sub as BaseView)?.requestRefresh(true);
         }
 
         /// <summary>
@@ -223,9 +221,7 @@ namespace Core.UI {
         /// </summary>
         /// <param name="sub">子视图</param>
         protected virtual void clearSubView(T sub) {
-            if (typeof(T).IsSubclassOf(typeof(BaseView)) ||
-                typeof(T) == typeof(BaseView))
-                ((BaseView)(object)sub).requestClear(true);
+			(sub as BaseView)?.requestClear(true);
         }
 
         /// <summary>

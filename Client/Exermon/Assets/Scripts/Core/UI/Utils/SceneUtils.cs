@@ -654,6 +654,25 @@ namespace Core.UI.Utils {
             return text.ToString();
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region 坐标转换
+
+		/// <summary>
+		/// 屏幕坐标到本地坐标
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="rt"></param>
+		/// <returns></returns>
+		public static Vector2 screen2Local(
+			Vector2 pos, RectTransform rt, Camera camera = null) {
+			Vector2 res; if (camera == null) camera = Camera.main;
+			
+			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				rt, pos, camera, out res)) return res;
+			return pos;
+		}
+
+		#endregion
+	}
 }

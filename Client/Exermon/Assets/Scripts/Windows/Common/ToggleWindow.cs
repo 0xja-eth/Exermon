@@ -35,10 +35,17 @@ namespace UI.Common.Windows {
         /// 更新取消事件
         /// </summary>
         void updateCancel() {
-			if (!enter && (
-				Input.GetMouseButtonDown(0) ||
+			if (!enter && isPointerDown()) onCancel();
+		}
+
+		/// <summary>
+		/// 指针是否按下
+		/// </summary>
+		/// <returns></returns>
+		bool isPointerDown() {
+			return Input.GetMouseButtonDown(0) ||
 				Input.GetMouseButtonDown(1) ||
-				Input.touchCount > 0)) onCancel();
+				Input.touchCount > 0;
 		}
 
         #endregion

@@ -69,7 +69,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 绘制地图信息
         /// </summary>
         void drawMapInfo(ExerProRecord item) {
-            mapDisplay.setItem(item);
+            mapDisplay.setItem(item, true);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 绘制玩家信息
         /// </summary>
         void drawPlayerDisplay(ExerProRecord item) {
-            playerDisplay.setItem(item.actor);
+            playerDisplay.setItem(item.actor, true);
         }
 
         /// <summary>

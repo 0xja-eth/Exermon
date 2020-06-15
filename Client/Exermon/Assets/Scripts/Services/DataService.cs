@@ -425,9 +425,12 @@ namespace GameModule.Services {
         }
         public ResultJudge resultJudge(int id) {
             return get(staticData.configure.resultJudges, id);
-        }
+		}
+		public GameTip gameTip(int id) {
+			return get(staticData.configure.gameTips, id);
+		}
 
-        public Antonym antonym(int id) {
+		public Antonym antonym(int id) {
             return get(staticData.configure.antonyms, id);
         }
         public ExerProItemStar exerProItemStar(int id) {
@@ -437,10 +440,10 @@ namespace GameModule.Services {
             return get(staticData.configure.nodeTypes, id);
         }
 
-        /// <summary>
-        /// 数据库
-        /// </summary>
-        public Character character(int id) {
+		/// <summary>
+		/// 数据库
+		/// </summary>
+		public Character character(int id) {
             return get(staticData.data.characters, id);
         }
         public Exermon exermon(int id) {

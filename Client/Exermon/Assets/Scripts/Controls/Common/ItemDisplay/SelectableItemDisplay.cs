@@ -53,6 +53,7 @@ namespace UI.Common.Controls.ItemDisplays {
         public bool selectable = true; // 能否选择
         public bool checkable = false; // 能否选中
         public bool highlightable = true; // 能否高亮
+		public bool clickable = true; // 能否点击
 
         public bool forceChecked = false; // 强制选中
 
@@ -171,11 +172,19 @@ namespace UI.Common.Controls.ItemDisplays {
             return isActived() && deselectable;
         }
 
-        /// <summary>
-        /// 是否选中
-        /// </summary>
-        /// <returns>是否选中</returns>
-        public virtual bool isChecked() {
+		/// <summary>
+		/// 是否可以选择
+		/// </summary>
+		/// <returns>可否选择</returns>
+		public virtual bool isClickable() {
+			return isSelectable() && clickable;
+		}
+
+		/// <summary>
+		/// 是否选中
+		/// </summary>
+		/// <returns>是否选中</returns>
+		public virtual bool isChecked() {
             if (isForceChecked()) return true;
             if (!container) return false;
             // if (!isCheckable()) return false;
@@ -252,28 +261,18 @@ namespace UI.Common.Controls.ItemDisplays {
             container.toggle(index);
         }
 
-        /// <summary>
-        /// 点击
-        /// </summary>
-        public virtual void click()
-        {
-            if (container == null) return;
-            if (!isSelectable()) return;
-            container.click(index);
-        }
+		#endregion
 
-        #endregion
+		#endregion
 
-        #endregion
+		#region 界面控制
 
-        #region 界面控制
+		#region 状态刷新
 
-        #region 状态刷新
-
-        /// <summary>
-        /// 改变背景颜色
-        /// </summary>
-        protected virtual void changeBackgroundColor(Color color) {
+		/// <summary>
+		/// 改变背景颜色
+		/// </summary>
+		protected virtual void changeBackgroundColor(Color color) {
             if (!background) return;
             if (color.a <= 0) return;
             background.color = color;
@@ -379,11 +378,20 @@ namespace UI.Common.Controls.ItemDisplays {
                 if (isSelectable() && !isSelected()) select();
                 toggle(); 
             }
-            click();
+            onClick();
             //onClick?.Invoke();
             refreshStatus();
         }
 
-        #endregion
-    }
+		/// <summary>
+		/// 点击回调
+		/// </summary>
+		public virtual void onClick() {
+			if (container == null) return;
+			if (!isSelectable()) return;
+			container.onClick(index);
+		}
+
+		#endregion
+	}
 }
