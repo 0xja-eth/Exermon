@@ -2,111 +2,184 @@
 
 if __name__ == '__main__':
 
-    import os
-    import uuid
-    import json
-    import django
-    from django.core.files import File
+	import os
+	import uuid
+	import json
+	import django
+	from django.core.files import File
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ExermonServer.settings")
+	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ExermonServer.settings")
 
-    if django.VERSION >= (1, 7):  # 自动判断版本
-        django.setup()
+	if django.VERSION >= (1, 7):  # 自动判断版本
+		django.setup()
 
-    # 这个模型不能放在文件头部导入
-    from english_pro_module.models import Word, PhraseQuestion, PhraseType, ListeningQuestion, ListeningSubQuestion, \
-        ListeningQuesChoice
+	# 这个模型不能放在文件头部导入
+	from english_pro_module.models import Word, PhraseQuestion, PhraseType, ListeningQuestion, ListeningSubQuestion, \
+		ListeningQuesChoice
 
-    # 英语单词的路径
-    words_path = 'english_materials/words.txt'
-    # 短语的路径
-    phrase_path = 'english_materials/phrase.txt'
-    # 听力题的路径
-    learning_question_path = 'english_materials/LearningQuestion.json'
-    # 判断短语的分类
-    todo = ['to do sth.', 'doing sth.']
-    sb = ['sb. to do sth.', 'sb. doing sth.', 'sb. do sth.', 'sth. for sb.', 'sb. of sth.', 'sb. for doing sth.', 'sb. into doing sth.']
-    of = ['about', 'at', 'for', 'from', 'in', 'of', 'to', 'with', 'of', 'to']
-    # 听力题辅助词判断
-    learning_list = ['groupQuestion', 'audioPath', 'article', 'question', 'Answer1', 'Answer2', 'Answer3', 'option']
+	base_path = 'english_pro_module/raw_data/'
 
-    def center_print(*args, **kwargs):
-        print(10 * '*', end=' ')
-        print(*args, **kwargs, end=' ')
-        print(10 * '*')
+	# 英语单词的路径
+	words_path = base_path + 'words.txt'
+	# 短语的路径
+	phrase_path = base_path + 'phrase.txt'
+	# 听力题的路径
+	learning_question_path = base_path + 'listening.json'
+	# 判断短语的分类
+	todo = ['to do sth.', 'doing sth.']
+	sb = ['sb. to do sth.', 'sb. doing sth.', 'sb. do sth.', 'sth. for sb.', 'sb. of sth.', 'sb. for doing sth.', 'sb. into doing sth.']
+	of = ['about', 'at', 'for', 'from', 'in', 'of', 'to', 'with', 'of', 'to']
+	# 听力题辅助词判断
+	learning_list = ['groupQuestion', 'audioPath', 'article', 'question', 'Answer1', 'Answer2', 'Answer3', 'option']
 
-    # 插入单词
-    def insert_words():
-        f = open(words_path, encoding='utf-8')
+	def center_print(*args, **kwargs):
+		print(10 * '*', end=' ')
+		print(*args, **kwargs, end=' ')
+		print(10 * '*')
 
-        for line in f:
-            str_list = line.strip().strip('\n').split(sep='?')
-            if len(str_list) == 2:
-                english = str_list[0]
-                chinese = str_list[1]
-                Word.objects.create(english=english, chinese=chinese)
+	# 插入单词
+	def insert_words():
+		f = open(words_path, encoding='utf-8')
 
-        f.close()
+		for line in f:
+			str_list = line.strip().strip('\n').split(sep='?')
+			if len(str_list) == 2: save_word(str_list)
 
-        center_print('Done inserting words')
+		f.close()
 
-    # 插入不定式题目
-    def insert_infinitive_question():
-        f = open(phrase_path, encoding='utf-8')
+		center_print('Done inserting words')
 
-        for line in f:
-            str_list = line.strip().strip('\n').split(sep='?')
-            if len(str_list) == 3:
-                word = str_list[0]
-                chinese = str_list[2]
-                phrase = str_list[1]
+	# 保存单个单词
+	def save_word(str_list):
+		english = str_list[0]
+		chinese = str_list[1]
 
-                type = None
+		word = Word.objects.filter(english=english)
+		flag = word.exists()
 
-                if phrase in todo:
-                    type = PhraseType.Do.value
-                elif phrase in sb:
-                    type = PhraseType.SB.value
-                elif phrase in of:
-                    type = PhraseType.Prep.value
+		if not flag:
+			word = Word.objects.create(english=english, chinese=chinese)
+		else:
+			word = word.first()
+			word.chinese = chinese
+			word.save()
 
-                PhraseQuestion.objects.create(word=word, chinese=chinese,
-                                              phrase=phrase, type=type)
+		print("%d. %s saved" % (word.id, word.english))
 
-        f.close()
-        center_print('Done inserting InfinitiveQuestion')
+	# 插入不定式题目
+	def insert_phrase_questions():
+		f = open(phrase_path, encoding='utf-8')
 
-    def select_answer(option, answers, question):
-        for i in range(3):
-            if option == i + 1:
-                ListeningQuesChoice.objects.create(order=i+1, text=answers[i], answer=True, question=question)
-            else:
-                ListeningQuesChoice.objects.create(order=i+1, text=answers[i], answer=False, question=question)
+		for line in f:
+			str_list = line.strip().strip('\n').split(sep='?')
+			if len(str_list) == 3: save_phrase_question(str_list)
 
-    # 插入听力题目
-    def insert_learning_questions():
-        with open(learning_question_path, encoding='utf-8') as f:
-            pop_data = json.load(f)
-            for pop_dict in pop_data:
-                audio = pop_dict['audio']
-                with open(audio, 'rb') as file:
-                    _f = File(file)
-                    group_questions = pop_dict['groupQuestions']
-                    for group_question in group_questions:
-                        article = group_question['article']
-                        if article != "":
-                            learning_question = ListeningQuestion.objects.create(audio=_f, article=article)
-                        else:
-                            learning_question = ListeningQuestion.objects.create(audio=_f)
-                        questions = group_question['questions']
-                        for question in questions:
-                            title = question['title']
-                            answers = question['answers']
-                            option = question['option']
-                            learning_sub_question = ListeningSubQuestion.objects.create(title=title,
-                                                                                        question=learning_question)
-                            select_answer(option, answers, learning_sub_question)
+		f.close()
+		center_print('Done inserting PhraseQuestion')
 
-    # insert_words()
-    # insert_infinitive_question()
-    insert_learning_questions()
+	# 保存短语题目
+	def save_phrase_question(str_list):
+		word = str_list[0]
+		chinese = str_list[2]
+		phrase = str_list[1]
+
+		ques = PhraseQuestion.objects.filter(word=word, chinese=chinese)
+		flag = ques.exists()
+
+		type = None
+
+		if phrase in todo:
+			type = PhraseType.Do.value
+		elif phrase in sb:
+			type = PhraseType.SB.value
+		elif phrase in of:
+			type = PhraseType.Prep.value
+
+		if not flag:
+			ques = PhraseQuestion.objects.create(word=word, chinese=chinese,
+										  phrase=phrase, type=type)
+		else:
+			ques = ques.first()
+			ques.phrase = phrase
+			ques.type = type
+			ques.save()
+
+		print("%d. %s %s saved" % (ques.id, ques.word, ques.phrase))
+
+	# 插入听力题目
+	def insert_listening_questions():
+		with open(learning_question_path, encoding='utf-8') as f:
+			pop_data = json.load(f)
+			index = 0
+			for pop_dict in pop_data:
+				group_questions = pop_dict['groupQuestions']
+				for group_question in group_questions:
+					index += 1
+					save_listening_question(index, group_question)
+
+		f.close()
+		center_print('Done inserting ListeningQuestion')
+
+	# 保存短语题目
+	def save_listening_question(id, group_question):
+		article = group_question['article']
+		audio = base_path + group_question['audio']
+
+		ques = ListeningQuestion.objects.filter(id=id)
+		flag = ques.exists()
+
+		if not flag:
+			ques = ListeningQuestion()
+		else:
+			ques = ques.first()
+
+		with open(audio, 'rb') as file:
+			_f = File(file)
+
+			ques.article = article
+			ques.audio = _f
+
+			questions = group_question['questions']
+			ques.times = 1 if len(questions) <= 1 else 2
+
+			ques.save()
+
+			sub_queses = ques.listeningsubquestion_set.all()
+			sub_cnt = sub_queses.count()
+
+			index = 0
+			for question in questions:
+				title = question['title']
+				answers = question['answers']
+				option = question['option']
+
+				if index < sub_cnt: sub_ques = sub_queses[index]
+				else: sub_ques = ListeningSubQuestion()
+
+				sub_ques.question_id = id
+				sub_ques.title = title
+				sub_ques.save()
+
+				select_answer(option, answers, sub_ques)
+				index += 1
+
+		print("%d. %s saved" % (ques.id, ques.audio))
+
+	def select_answer(option, answers, question: ListeningSubQuestion):
+
+		choices = question.listeningqueschoice_set.all()
+		cho_cnt = choices.count()
+
+		for i in range(len(answers)):
+			if i < cho_cnt: choice = choices[i]
+			else: choice = ListeningQuesChoice()
+
+			choice.order = i + 1
+			choice.text = answers[i]
+			choice.answer = (option == i+1)
+			choice.question = question
+			choice.save()
+
+	insert_words()
+	insert_phrase_questions()
+	insert_listening_questions()

@@ -92,6 +92,13 @@ class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 
 @xadmin.sites.register(ListeningQuestion)
 class ListeningQuestionAdmin(GroupQuestionAdmin):
+
+	list_display = GroupQuestionAdmin.list_display + \
+				   ['times']
+
+	list_editable = GroupQuestionAdmin.list_editable + \
+				   ['times']
+
 	inlines = [ListeningSubQuestionsInline]
 
 
@@ -103,9 +110,9 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 @xadmin.sites.register(PhraseQuestion)
 class InfinitiveQuestionAdmin(object):
 
-	list_display = ['id', 'word', 'chinese', 'infinitive']
+	list_display = ['id', 'word', 'chinese', 'phrase']
 
-	list_editable = ['word', 'chinese', 'infinitive']
+	list_editable = ['word', 'chinese', 'phrase']
 
 
 @xadmin.sites.register(CorrectionQuestion)

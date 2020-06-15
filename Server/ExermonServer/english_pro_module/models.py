@@ -60,6 +60,9 @@ class ListeningQuestion(GroupQuestion):
 
 	TYPE = QuestionType.Listening
 
+	# 重复次数
+	times = models.PositiveSmallIntegerField(default=2, verbose_name="重复次数")
+
 	# 音频文件
 	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
 
@@ -83,6 +86,7 @@ class ListeningQuestion(GroupQuestion):
 	def convertToDict(self):
 		res = super().convertToDict()
 
+		res['times'] = self.times
 		res['audio'] = self.convertToBase64()
 
 		return res
