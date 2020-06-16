@@ -433,42 +433,50 @@ namespace ExerPro.EnglishModule.Data {
         /// 效果代码枚举
         /// </summary>
         public enum Code {
-            Unset = 0, // 空
+			Unset = 0, // 空
 
-            Attack = 1, // 造成伤害
-            AttackSlash = 2, // 造成伤害（完美斩击）
-            AttackBlack = 3, // 造成伤害（黑旋风）
-            AttackWave = 4, // 造成伤害（波动拳）
-            AttackRite = 5, // 造成伤害（仪式匕首）
-            Recover = 100, // 回复体力值
-            AddParam = 200, // 增加能力值
-            AddParamUrgent = 201, // 增加能力值（紧急按钮）
+			Attack = 1, // 造成伤害
+			AttackSlash = 2, // 造成伤害（完美斩击）
+			AttackBlack = 3, // 造成伤害（黑旋风）
+			AttackWave = 4, // 造成伤害（波动拳）
+			AttackRite = 5, // 造成伤害（仪式匕首）
 
-            TempAddParam = 210, // 临时增加能力值
+			Recover = 100, // 回复体力值
 
-            AddState = 220, // 增加状态
-            RemoveState = 221, // 移除状态
-            RemoveNegaState = 222, // 移除消极状态
+			AddParam = 200, // 增加能力值
+			AddMHP = 201, // 获得MHP
+			AddPower = 202, // 获得力量
+			AddDefense = 203, // 获得格挡
+			AddAgile = 204, // 获得敏捷
+			AddParamUrgent = 205, // 增加能力值（紧急按钮）
 
-            DrawCards = 300, // 抽取卡牌
-            ConsumeCards = 310, // 消耗卡牌
+			TempAddParam = 210, // 临时增加能力值
+			TempAddMHP = 211, // 临时获得MHP
+			TempAddPower = 212, // 临时获得力量
+			TempAddDefense = 213, // 临时获得格挡
+			TempAddAgile = 214, // 临时获得敏捷
 
-            ChangeCost = 400, // 更改耗能
-            ChangeCostDisc = 401, // 更改耗能（发现）
-            ChangeCostCrazy = 402, // 更改耗能（疯狂）
+			AddState = 220, // 增加状态
+			RemoveState = 221, // 移除状态
+			RemoveNegaState = 222, // 移除消极状态
 
-            //剧情效果-测试用
-            PlotAddMoney = 500, //获得金币
+			AddEnergy = 230, // 回复能量
 
-            Sadistic = 1000, // 残虐天性
-            ForceAddStatus = 1100, // 增加己方状态
+			DrawCards = 300, // 抽取卡牌
+			ConsumeCards = 310, // 消耗卡牌
 
-        }
+			ChangeCost = 400, // 更改耗能
+			ChangeCostDisc = 401, // 更改耗能（发现）
+			ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+			PlotAddMoney = 500, // 获得金币
+
+		}
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public int code { get; protected set; }
         [AutoConvert("params")]
         public JsonData params_ { get; protected set; } // 参数（数组）
@@ -640,8 +648,10 @@ namespace ExerPro.EnglishModule.Data {
             /// 类型
             /// </summary>
             public enum Type {
-                Attack = 1, PowerUp = 2, PowerDown = 3,
-                AddStates = 4, Escape = 5, Unset = 6
+                Attack = 1,
+				PowerUp = 2, PosStates = 3,
+				PowerDown = 4, NegStates = 5,
+				Escape = 6, Unset = 7
             }
 
             /// <summary>
