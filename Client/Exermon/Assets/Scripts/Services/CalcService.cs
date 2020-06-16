@@ -1095,14 +1095,71 @@ namespace GameModule.Services {
                         processDamage((int)val, HPRecoverType); break;
 
                     case ExerProEffectData.Code.AddParam:
-                    case ExerProEffectData.Code.TempAddParam:
-                        p = DataLoader.load<int>(params_[0]); n = -1;
-                        a = DataLoader.load<int>(params_[1]); b = 100;
-                        if (len == 3) b += DataLoader.load<int>(params_[2]);
-                        if (len == 4) n = DataLoader.load<int>(params_[3]);
-                        processBuff(p, a, b, n); break;
+						p = DataLoader.load<int>(params_[0]);
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 3) b += DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, -1); break;
 
-                    case ExerProEffectData.Code.AddState:
+					case ExerProEffectData.Code.AddMHP:
+						p = RuntimeBattler.MHPParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddPower:
+						p = RuntimeBattler.PowerParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddDefense:
+						p = RuntimeBattler.DefenseParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddAgile:
+						p = RuntimeBattler.AgileParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.TempAddParam:
+						p = DataLoader.load<int>(params_[0]); n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 3) b += DataLoader.load<int>(params_[2]);
+						if (len == 4) n = DataLoader.load<int>(params_[3]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddMHP:
+						p = RuntimeBattler.MHPParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddPower:
+						p = RuntimeBattler.PowerParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddDefense:
+						p = RuntimeBattler.DefenseParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddAgile:
+						p = RuntimeBattler.AgileParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.AddState:
                         s = DataLoader.load<int>(params_[0]);
                         r = DataLoader.load<int>(params_[1]); p = 100;
                         if (len == 3) p += DataLoader.load<int>(params_[2]);
@@ -1417,13 +1474,17 @@ namespace GameModule.Services {
                         _processAttack(effects, params_);
                         object_ = actor; break;
 
-                    case ExerProEnemy.Action.Type.PowerDown:
+					case ExerProEnemy.Action.Type.NegStates:
+						_processAddStates(effects, params_);
+						object_ = actor; break;
+
+					case ExerProEnemy.Action.Type.PowerDown:
                         _processPowerDown(effects, params_);
                         object_ = actor; break;
 
-                    case ExerProEnemy.Action.Type.AddStates:
+                    case ExerProEnemy.Action.Type.PosStates:
                         _processAddStates(effects, params_);
-                        object_ = actor; break;
+                        object_ = enemy; break;
 
                     case ExerProEnemy.Action.Type.PowerUp:
                         _processPowerDown(effects, params_);
@@ -1499,6 +1560,102 @@ namespace GameModule.Services {
                 }
             }
         }
+
+		/// <summary>
+		/// 单词选项生成器
+		/// </summary>
+		public class WordChoicesGenerator {
+
+			/// <summary>
+			/// 最大选项数
+			/// </summary>
+			public const int MaxChoices = 4;
+			
+			/// <summary>
+			/// 属性
+			/// </summary>
+			Word word;
+			List<Word> words;
+
+			List<string> result;
+
+			/// <summary>
+			/// 距离字典
+			/// </summary>
+			Dictionary<Word, double> chi, eng;
+
+			/// <summary>
+			/// 生成
+			/// </summary>
+			/// <param name="word">单词</param>
+			/// <param name="words">单词集</param>
+			/// <returns></returns>
+			public static List<string> generate(Word word, List<Word> words) {
+				var generator = new WordChoicesGenerator(word, words);
+				return generator.result;
+			}
+
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			WordChoicesGenerator(Word word, List<Word> words) {
+				this.word = word; this.words = words;
+				result = new List<string>(MaxChoices);
+
+				// 正确答案位置
+				var corrIndex = Random.Range(0, MaxChoices);
+
+				for (var i = 0; i < MaxChoices; ++i)
+					if (corrIndex == i)
+						result.Add(word.chinese);
+					else 
+						result.Add(generateWordChoice(
+							Random.Range(0, 2) == 1).chinese);
+			}
+
+			/// <summary>
+			/// 生成距离字典
+			/// </summary>
+			/// <param name="chi">中文距离</param>
+			/// <param name="eng">英文距离</param>
+			Word generateWordChoice(bool english) {
+				var minVal = 999.0;
+				var minWord = words[0];
+				foreach (var word_ in words) {
+					var val = calcDistance(word, word_, english);
+					if (val < minVal && word_ != word &&
+						!result.Contains(word_.chinese))
+						minWord = word_;
+				}
+				return minWord;
+			}
+			
+			/// <summary>
+			/// 以s1为基准，计算s2到s1的距离
+			/// </summary>
+			/// <returns>返回距离</returns>
+			static double calcDistance(Word w1, Word w2, bool english = false) {
+				if (english) return calcDistance(w1.english, w2.english);
+				return calcDistance(w1.chinese, w2.chinese);
+			}
+			static double calcDistance(string s1, string s2) {
+				int sum = 0, j = 0, k = 0;
+				int len1 = s1.Length, len2 = s2.Length;
+				for (var i = 0; i < len1; ++i) {
+					j = k; k = 0;
+					while (j < len2) {
+						if (s2[j] == s1[i]) {
+							if (k == 0) k = j;
+							j++; break;
+						}
+						if (k == 0) k = j;
+						sum++; j++;
+					}
+				}
+				return sum * 1.0 / len2;
+			}
+
+		}
     }
 
 }

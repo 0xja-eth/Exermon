@@ -22,7 +22,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 	using Windows;
 
 	/// <summary>
-	/// 战场控件
+	/// 手牌控件
 	/// </summary
 	public class HandCardGroupDisplay : 
 		SelectableContainerDisplay<ExerProPackCard> {

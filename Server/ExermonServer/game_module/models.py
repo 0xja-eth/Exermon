@@ -4,6 +4,7 @@ from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import GameException, ErrorType
+from enum import Enum
 import jsonfield, traceback
 
 # Create your models here.
@@ -456,6 +457,45 @@ class GroupConfigure(models.Model):
 		"""
 		if cls.Count is None: cls.load()
 		return cls.Count
+
+
+# ===================================================
+# 小贴士类型枚举
+# ===================================================
+class TipType(Enum):
+
+	Study = 1  # 学习知识
+	Game = 2  # 游戏知识
+	Others = 0  # 其他知识
+
+
+# ===================================================
+# 游戏小贴士
+# ===================================================
+class GameTip(GroupConfigure):
+
+	class Meta:
+
+		verbose_name = verbose_name_plural = "游戏小贴士"
+
+	TYPES = [
+		(TipType.Study.value, '学习小贴士'),
+		(TipType.Game.value, '游戏小贴士'),
+		(TipType.Others.value, '其他小贴士'),
+	]
+
+	NOT_EXIST_ERROR = ErrorType.TypeNotExist
+
+	# 小贴士类型
+	type = models.PositiveSmallIntegerField(default=TipType.Study.value,
+											choices=TYPES, verbose_name="小贴士类型")
+
+	def convertToDict(self, type: str = None, **kwargs):
+		res = super().convertToDict()
+
+		res['type'] = self.type
+
+		return res
 
 
 # ===================================================
@@ -966,6 +1006,7 @@ class GameConfigure(models.Model):
 		item_stars = ModelUtils.objectsToDict(self.itemstar_set.all())
 		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
 		result_judges = ModelUtils.objectsToDict(self.battleresultjudge_set.all())
+		game_tips = ModelUtils.objectsToDict(self.gametip_set.all())
 
 		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
 
@@ -1033,6 +1074,7 @@ class GameConfigure(models.Model):
 			'item_stars': item_stars,
 			'comp_ranks': comp_ranks,
 			'result_judges': result_judges,
+			'game_tips': game_tips,
 
 			'antonyms': antonyms,
 			'node_types': node_types,

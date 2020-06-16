@@ -236,29 +236,28 @@ namespace UI.Common.Controls.ItemDisplays {
             switch (type) {
                 case 0: onItemsChangedCallbacks.Add(cb); break;
                 case 1: onSelectChangedCallbacks.Add(cb); break;
-                case 2: onCheckChangedCallbacks.Add(cb); break;
-            }
-        }
+				case 2: onCheckChangedCallbacks.Add(cb); break;
+			}
+		}
 
-        /// <summary>
-        /// 添加点击回调函数
-        /// </summary>
-        /// <param name="cb"></param>
-        public void addClickedCallback(UnityAction<int> cb)
-        {
-            if (cb == null) return;
-            onClickedCallbacks.Add(cb);
-        }
+		/// <summary>
+		/// 添加点击回调函数
+		/// </summary>
+		/// <param name="cb"></param>
+		public void addClickedCallback(UnityAction<int> cb) {
+			if (cb == null) return;
+			onClickedCallbacks.Add(cb);
+		}
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
 
-        /// <summary>
-        /// 数目文本格式
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string countTextFormat() {
+		/// <summary>
+		/// 数目文本格式
+		/// </summary>
+		/// <returns></returns>
+		protected virtual string countTextFormat() {
             return defaultCountTextFormat;
         }
 
@@ -453,6 +452,15 @@ namespace UI.Common.Controls.ItemDisplays {
             return items.ToArray();
         }
 
+		/// <summary>
+		/// 获取物品
+		/// </summary>
+		/// <param name="index">索引</param>
+		/// <returns></returns>
+		public T getItem(int index) {
+			return items[index];
+		}
+
         /// <summary>
         /// 获取物品显示项数组
         /// </summary>
@@ -468,10 +476,19 @@ namespace UI.Common.Controls.ItemDisplays {
             return subViews.ToArray();
         }
 
-        /// <summary>
-        /// 物品变更回调
-        /// </summary>
-        protected virtual void onItemsChanged() {
+		/// <summary>
+		/// 获取物品显示项
+		/// </summary>
+		/// <param name="index">索引</param>
+		/// <returns></returns>
+		public SelectableItemDisplay<T> getItemDisplay(int index) {
+			return subViews[index];
+		}
+
+		/// <summary>
+		/// 物品变更回调
+		/// </summary>
+		protected virtual void onItemsChanged() {
             refreshItemDisplays();
             processForceCheckItems();
             requestRefresh();
@@ -767,39 +784,38 @@ namespace UI.Common.Controls.ItemDisplays {
             foreach (var cb in onCheckChangedCallbacks) cb?.Invoke();
         }
 
-        #endregion
+		#endregion
 
-        #region 点击控制
-        /// <summary>
-        /// 点击控制
-        /// </summary>
-        /// <param name="index"></param>
-        public virtual void click(int index)
-        {
-            Debug.Log("click: " + name + ": " + index);
-            callbackClicked(index);
-        }
+		#region 点击控制
 
-        /// <summary>
-        /// 处理点击发送回调
-        /// </summary>
-        void callbackClicked(int index)
-        {
-            foreach (var cb in onClickedCallbacks) cb?.Invoke(index);
-        }
+		/// <summary>
+		/// 点击回调
+		/// </summary>
+		/// <param name="index"></param>
+		public virtual void onClick(int index) {
+			Debug.Log("onClick: " + name + ": " + index);
+			callbackClicked(index);
+		}
 
-        #endregion
+		/// <summary>
+		/// 处理点击发送回调
+		/// </summary>
+		void callbackClicked(int index) {
+			foreach (var cb in onClickedCallbacks) cb?.Invoke(index);
+		}
 
-        #endregion
+		#endregion
 
-        #region 界面控制
+		#endregion
 
-        /// <summary>
-        /// 滚动到指定位置
-        /// </summary>
-        /// <param name="x">x位置</param>
-        /// <param name="y">y位置</param>
-        public void scrollTo(float x, float y) {
+		#region 界面控制
+
+		/// <summary>
+		/// 滚动到指定位置
+		/// </summary>
+		/// <param name="x">x位置</param>
+		/// <param name="y">y位置</param>
+		public void scrollTo(float x, float y) {
             container.anchoredPosition = new Vector2(x, y);
         }
         /// <param name="rt">RectTransform</param>

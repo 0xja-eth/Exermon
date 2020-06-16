@@ -127,7 +127,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 物品背包
         /// </summary>
         void onItemPack() {
-            var container = engSer.record.actor.itemPack;
+            //var container = engSer.record.actor.itemPack;
             ExerProPackItem[] items = new ExerProPackItem[8];
             items[0] = ExerProPackItem.sample();
             items[1] = ExerProPackItem.sample();

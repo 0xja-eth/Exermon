@@ -7,6 +7,10 @@ using Core.UI;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
+using UI.Common.Controls.ParamDisplays;
+
+using UI.ExerPro.EnglishPro.MapScene.Controls;
+
 /// <summary>
 /// 地图场景
 /// </summary>
@@ -26,11 +30,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		public BattleGround battleGround;
 
 		public MenuWindow menu;
+		public WordWindow wordWindow;
+		public DrawWindow drawWindow;
 
-        /// <summary>
-        /// 外部系统设置
-        /// </summary>
-        EnglishService engSer;
+		public PlayerStatus playerStatue;
+		public MultParamsDisplay wordProgress;
+
+		/// <summary>
+		/// 外部系统设置
+		/// </summary>
+		EnglishService engSer;
 		BattleService battleSer;
 
         #region 初始化
@@ -58,6 +67,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
         protected override void start() {
             base.start();
 			battleGround.setItems(battleSer.battlers());
+			refreshStatus();
 		}
 
         #endregion
@@ -69,7 +79,62 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
         /// </summary>
         protected override void update() {
             base.update();
+			if (battleSer.isStateChanged())
+				onStateChanged();
 			battleSer?.update();
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 状态改变回调
+		/// </summary>
+		void onStateChanged() {
+			switch ((BattleService.State)battleSer.state) {
+				case BattleService.State.Answering: onAnswer(); break;
+				case BattleService.State.Drawing: onDraw(); break;
+				case BattleService.State.Playing: onPlay(); break;
+				case BattleService.State.Discarding: onDiscard(); break;
+				case BattleService.State.Enemy: onEnemy(); break;
+				case BattleService.State.RoundEnd: refreshStatus(); break;
+			}
+		}
+
+		/// <summary>
+		/// 答题
+		/// </summary>
+		void onAnswer() {
+			wordWindow.startWindow();
+		}
+
+		/// <summary>
+		/// 抽卡
+		/// </summary>
+		void onDraw() {
+			drawWindow.startWindow();
+		}
+
+		/// <summary>
+		/// 开始出牌
+		/// </summary>
+		void onPlay() {
+			menu.startWindow();
+		}
+
+		/// <summary>
+		/// 弃牌
+		/// </summary>
+		void onDiscard() {
+			menu.terminateView();
+		}
+
+		/// <summary>
+		/// 敌人
+		/// </summary>
+		void onEnemy() {
+
 		}
 
 		#endregion
@@ -163,10 +228,41 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 刷新状态
 		/// </summary>
 		public void refreshStatus() {
+			drawPlayerDisplay();
+			drawProgresses();
+		}
 
+		/// <summary>
+		/// 绘制玩家信息
+		/// </summary>
+		void drawPlayerDisplay() {
+			playerStatue.setItem(battleSer.actor());
+		}
+
+		/// <summary>
+		/// 绘制进度
+		/// </summary>
+		void drawProgresses() {
+			wordProgress.setValue(engSer.record, "word_progress");
+		}
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		protected override void awake() {
+			base.awake();
+			refreshStatus();
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 跳过
+		/// </summary>
+		public void jump() {
+			battleSer.jump();
+			menu.terminateWindow();
+		}
 
 		/// <summary>
 		/// 退出场景

@@ -69,12 +69,12 @@ namespace ExerPro.EnglishModule.Services {
         List<RuntimeEnemy> _enemies; // 敌人
         int curEnemyIndex = 0; // 当前敌人索引
 
-        int corrCnt = 0, bonusCnt = 0;
+		int corrCnt = 0, bonusCnt = 0;
         bool bonus = false;
-
-        int round = 0;
-
-        Result result = Result.None;
+		
+		int round = 0;
+		
+		Result result = Result.None;
 
         #region 初始化
 
@@ -193,7 +193,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// <summary>
 		/// 结束出牌阶段
 		/// </summary>
-		public void pass() {
+		public void jump() {
 			changeState(State.Discarding);
 		}
 
@@ -241,6 +241,30 @@ namespace ExerPro.EnglishModule.Services {
 		#region 答题/抽卡控制
 
 		/// <summary>
+		/// 是否Bonus
+		/// </summary>
+		/// <returns></returns>
+		public bool isBonus() {
+			return bonus;
+		}
+
+		/// <summary>
+		/// 单词量
+		/// </summary>
+		/// <returns></returns>
+		public int wordCount() {
+			return bonus ? BonusWordCount : NormalWordCount;
+		}
+
+		/// <summary>
+		/// 单词索引
+		/// </summary>
+		/// <returns></returns>
+		public int wordIndex() {
+			return bonus ? bonusCnt : corrCnt;
+		}
+
+		/// <summary>
 		/// 当前题目
 		/// </summary>
 		/// <returns></returns>
@@ -248,11 +272,11 @@ namespace ExerPro.EnglishModule.Services {
             return record.nextWord();
         }
 
-        /// <summary>
-        /// 当前抽卡
-        /// </summary>
-        /// <returns></returns>
-        public ExerProPackCard[] drawnCards() {
+		/// <summary>
+		/// 当前抽卡（自动清空）
+		/// </summary>
+		/// <returns></returns>
+		public ExerProPackCard[] drawnCards() {
             return cardGroup.handGroup.getDrawnCards();
         }
 
@@ -296,7 +320,7 @@ namespace ExerPro.EnglishModule.Services {
             if (bonus) changeState(State.Drawing);
             else bonus = true;
         }
-
+		
 		#endregion
 
 		#region 出牌控制
@@ -335,14 +359,22 @@ namespace ExerPro.EnglishModule.Services {
             return curEnemyIndex >= _enemies.Count;
         }
 
-        #endregion
+		#endregion
 
-        #region 回合控制
+		#region 回合控制
 
-        /// <summary>
-        /// 回合结束回调
-        /// </summary>
-        void onRoundEnd() {
+		/// <summary>
+		/// 当前回合
+		/// </summary>
+		/// <returns></returns>
+		public int currentRound() {
+			return round;
+		}
+
+		/// <summary>
+		/// 回合结束回调
+		/// </summary>
+		void onRoundEnd() {
             resetStates();
             battlersRoundEnd();
             judgeResult();

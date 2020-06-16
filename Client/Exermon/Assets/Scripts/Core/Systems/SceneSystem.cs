@@ -31,8 +31,6 @@ namespace Core.Systems {
 
             NoneScene = -1,
 
-            FirstScene = 0,
-
             TitleScene = 0,
             StartScene,
             MainScene,
@@ -50,10 +48,11 @@ namespace Core.Systems {
             EnglishProMapScene,
             EnglishProBusinessManScene,
             EnglishProPlotScene,
+            EnglishProListenScene,
             EnglishProCorrectionScene,
             EnglishProPhraseScene,
-            EnglishProPackScene,
             EnglishProBattleScene,
+            EnglishProPackScene,
 
             HelpScene
         }

@@ -44,11 +44,11 @@ namespace Core.Data.Loaders {
 		public const string ExerProItemIconPath = "ExerPro/Item/";
 		public const string ExerProCardIconPath = "ExerPro/Card/";
 		public const string ExerProStateIconPath = "ExerPro/State/";
-
-		/// <summary>
-		/// 文件主体名称定义
-		/// </summary>
-		public const string CharacterFileName = "Character";
+        public const string ExerProListeningAudioPath = "ExerPro/ListeningAudio/";
+        /// <summary>
+        /// 文件主体名称定义
+        /// </summary>
+        public const string CharacterFileName = "Character";
         public const string IconsFileName = "Icons";
         public const string ExermonFileName = "Exermon";
         public const string ExerGiftFileName = "BigExerGift";
@@ -60,12 +60,13 @@ namespace Core.Data.Loaders {
 		public const string NodeIconFileName = "ExerPro/Node/Type";
 		public const string ThinkIconFileName = "ExerPro/Enemy/Think";
 		public const string ExerProEnemyFileName = "Enemy";
+        public const string ExerProListeningAudioFileName = "ListeningAudio";
 
-		/// <summary>
-		/// 其他常量定义
-		/// </summary>
-		//public const int ItemIconCols = 10; // 物品图标列数
-		public const int ItemIconSize = 96; // 物品尺寸（正方形）
+        /// <summary>
+        /// 其他常量定义
+        /// </summary>
+        //public const int ItemIconCols = 10; // 物品图标列数
+        public const int ItemIconSize = 96; // 物品尺寸（正方形）
 		public const int RankIconCnt = 6; // 段位数量
         public const int MaxSubRank = 5; // 最大子段位数目
 
@@ -76,7 +77,7 @@ namespace Core.Data.Loaders {
 		/// 纹理缓存
 		/// </summary>
 		static Dictionary<string, Texture2D> cache = new Dictionary<string, Texture2D>();
-
+        static Dictionary<string, AudioClip> cacheAudio = new Dictionary<string, AudioClip>();
         #region 加载资源封装
 
         /// <summary>
@@ -288,6 +289,41 @@ namespace Core.Data.Loaders {
 			return loadTexture2D(ExerProEnemyBattlePath, ExerProEnemyFileName, id);
 		}
 
+		/// <summary>
+		/// 读取音频
+		/// </summary>
+		/// <param name="path">路径</param>
+		/// <param name="fileName">文件名</param>
+		/// <returns>音频文件</returns>
+		public static AudioClip loadAudio(string path, string fileName)
+		{
+			var key = path + fileName;
+			if (!cacheAudio.ContainsKey(key))
+				cacheAudio[key] = Resources.Load<AudioClip>(key);
+			Debug.Log("loadAudioClip: " + key + ": " + (cacheAudio[key] != null));
+			return cacheAudio[key];
+		}
+
+        /// <summary>
+        /// 读取音频
+        /// </summary>
+        /// <param name="path">路径</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="id">文件id</param>
+        /// <returns>音频文件</returns>
+        public static AudioClip loadAudio(string path, string fileName, int id)
+		{
+            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName + "_" + id);
+		}
+
+		/// <summary>
+		/// 读取听力音频
+		/// </summary>
+		/// <param name="id">音频ID</param>
+		/// <returns>音频</returns>
+		public static AudioClip loadListeningAudioClip(int id) {
+            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName, id);
+        }
 		#endregion
 
 		#region 加载组合资源
