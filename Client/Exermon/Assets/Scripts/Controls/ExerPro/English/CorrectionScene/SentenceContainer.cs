@@ -1,14 +1,7 @@
-﻿using Core.UI;
-using Core.UI.Utils;
-using ExerPro.EnglishModule.Data;
-using System;
+﻿using Core.UI.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UI.Common.Controls.ItemDisplays;
-using UI.CorrectionScene.Windows;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
@@ -47,7 +40,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
             //items.Add(lastWord.Substring(0, lastWord.Length - 1));
             //items.Add("  ");
             //items.Add(end);
-            setItems(items);
+            base.setItems(items);
         }
 
 

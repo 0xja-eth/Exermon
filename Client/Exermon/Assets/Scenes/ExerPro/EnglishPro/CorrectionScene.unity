@@ -2363,7 +2363,8 @@ MonoBehaviour:
   rebuildController: {fileID: 1904598182}
   articleDisplay: {fileID: 101941736}
   changedBeforeValue: {fileID: 1772817999}
-  correctionWindow: {fileID: 748181166}
+  windowObj: {fileID: 0}
+  correctionWindow: {fileID: 748181168}
 --- !u!1001 &1904598178
 PrefabInstance:
   m_ObjectHideFlags: 0

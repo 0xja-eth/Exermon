@@ -164,18 +164,7 @@ namespace ExerPro.EnglishModule.Data {
             public string typeText() {
                 return DataService.get().correctType(type).Item2;
             }
-
-            public static WrongItem[] sample() {
-
-                WrongItem[] wrongItems = new WrongItem[1];
-                WrongItem wrongItem = new WrongItem();
-                wrongItem.sentenceIndex = 0;
-                wrongItem.wordIndex = 1;
-                wrongItem.word = "is";
-
-                wrongItems[0] = wrongItem;
-                return wrongItems;
-            }
+            
         }
 
         /// <summary>
@@ -187,16 +176,7 @@ namespace ExerPro.EnglishModule.Data {
         public string description { get; protected set; }
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
-
-        public static CorrectionQuestion sample() {
-
-            CorrectionQuestion question = new CorrectionQuestion();
-            question.wrongItems = WrongItem.sample();
-            question.article = "When I was in high school, most of my friend had bicycles. I hoped I could also have it. One day I saw a second-hand bicycle that was only one hundred yuan, I saw a second-hand bicycle that was only one hundred yuan.";
-            question.description = "test";
-
-            return question;
-        }
+        
 
         public string[] sentences() {
             //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
@@ -519,8 +499,13 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns>读取函数</returns>
 		protected override LoadFun loadFun() {
 			return AssetLoader.getExerProItemIconSprite;
-		}
-	}
+        }
+
+        public static ExerProItem sample() {
+            ExerProItem item = new ExerProItem();
+            return item;
+        }
+    }
 
     /// <summary>
     /// 特训药水数据
@@ -537,8 +522,12 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns>读取函数</returns>
 		protected override LoadFun loadFun() {
 			return AssetLoader.getExerProItemIconSprite;
-		}
-	}
+        }
+        public static ExerProPotion sample() {
+            ExerProPotion item = new ExerProPotion();
+            return item;
+        }
+    }
 
     /// <summary>
     /// 特训卡片数据
@@ -584,6 +573,18 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public string typeText() {
             return DataService.get().cardType(cardType).Item2;
+        }
+
+        public static ExerProCard sample() {
+            ExerProCard card = new ExerProCard();
+            card.cost = 1;
+            card.cardType = 0;
+            card.inherent = false;
+            card.disposable = false;
+            card.character = "character";
+            card.target = 1;
+            card.iconIndex = 2;
+            return card;
         }
     }
 
@@ -784,7 +785,15 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		public ExerProPackItem() { }
 		public ExerProPackItem(ExerProItem item) : base(item) { }
-	}
+
+        public static ExerProPackItem sample() {
+
+            ExerProPackItem sample = new ExerProPackItem(ExerProItem.sample());
+            sample.itemId = UnityEngine.Random.Range(1, 3);
+            
+            return sample;
+        }
+    }
 
 	/// <summary>
 	/// 特训背包药水
@@ -796,6 +805,13 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		public ExerProPackPotion() { }
         public ExerProPackPotion(ExerProPotion potion) : base(potion) { }
+        public static ExerProPackPotion sample() {
+
+            ExerProPackPotion sample = new ExerProPackPotion(ExerProPotion.sample());
+            sample.itemId = UnityEngine.Random.Range(1, 3);
+
+            return sample;
+        }
     }
 
     /// <summary>
@@ -808,6 +824,14 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerProPackCard() { }
         public ExerProPackCard(ExerProCard card) : base(card) { }
+
+        public static ExerProPackCard sample() {
+
+            ExerProPackCard sample = new ExerProPackCard(ExerProCard.sample());
+            sample.itemId = UnityEngine.Random.Range(1, 3) ;
+            
+            return sample;
+        }
     }
 
 	/// <summary>

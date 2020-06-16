@@ -154,6 +154,7 @@ namespace Core.UI {
             var sub = SceneUtils.get<T>(obj);
             Debug.Log(typeof(T));
             obj.name = subViewName(index);
+            Debug.Log("ccc" + obj + sub);
             onSubViewCreated(sub, index);
             return sub;
         }

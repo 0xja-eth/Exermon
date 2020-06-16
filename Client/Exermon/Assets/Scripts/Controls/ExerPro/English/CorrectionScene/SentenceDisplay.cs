@@ -7,23 +7,20 @@ using System.Threading.Tasks;
 using UI.Common.Controls.ItemDisplays;
 using UnityEngine;
 
-namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
-{
+namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
     /// <summary>
     /// 句子
     /// </summary
-    public class SentenceDisplay : ItemDisplay<string>
-    {
+    public class SentenceDisplay : ItemDisplay<string> {
 
-        public SentenceContainer container; 
+        public SentenceContainer container;
 
         /// <summary>
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
-        public override void startView(string item)
-        {
+        public override void startView(string item) {
             base.startView(item);
         }
 
@@ -36,8 +33,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls
         /// 绘制物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void drawExactlyItem(string item)
-        {
+        protected override void drawExactlyItem(string item) {
             base.drawExactlyItem(item);
             container.setItem(item);
         }

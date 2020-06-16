@@ -80,6 +80,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		protected override void drawItem(ExerProCard card) {
 			cost.text = card.cost.ToString();
 			description.text = card.description;
+            name.text = card.name;
 		}
 
 		/// <summary>
@@ -89,8 +90,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			base.drawEmptyItem();
 			cost.text = description.text = "";
 		}
-
-		#endregion
-	}
+        
+        #endregion
+    }
 
 }

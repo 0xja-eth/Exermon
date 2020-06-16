@@ -1,23 +1,31 @@
 ﻿
 using Core.UI;
 
-using UI.PackScene.Windows;
+using UI.ExerPro.EnglishPro.ExerProPackScene.Windows;
 using UnityEngine;
 
-namespace UI.PackScene.Controls {
+namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls {
 
     /// <summary>
     /// 状态页控制组
     /// </summary>
-    public class PackTabController : TabView<PackWindow> {
+    public class PackTabController : TabView<ExerProPackWindow> {
+        
 
         #region 界面绘制
+
+        /// <summary>
+        /// 初次打开时初始化（子类中重载）
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+        }
 
         /// <summary>
         /// 显示内容页
         /// </summary>
         /// <param name="content"></param>
-        protected override void showContent(PackWindow content, int index) {
+        protected override void showContent(ExerProPackWindow content, int index) {
             Debug.Log("showContent" + index);
             content.switchView(index);
         }
@@ -26,7 +34,7 @@ namespace UI.PackScene.Controls {
         /// 隐藏内容页
         /// </summary>
         /// <param name="content"></param>
-        protected override void hideContent(PackWindow content, int index) {
+        protected override void hideContent(ExerProPackWindow content, int index) {
             Debug.Log("hideContent" + index);
             content.clearView();
         }
