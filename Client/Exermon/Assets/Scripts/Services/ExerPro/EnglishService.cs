@@ -794,7 +794,7 @@ namespace ExerPro.EnglishModule.Services {
 			if (pop) sceneSys.popScene();
 			changeState(State.Idle);
 			record.nodeFlag = true;
-			saveExerPro();
+			//saveExerPro();
 		}
 
 		#endregion
