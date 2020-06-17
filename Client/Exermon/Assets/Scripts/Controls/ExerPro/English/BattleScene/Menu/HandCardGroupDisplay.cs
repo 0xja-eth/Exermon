@@ -31,9 +31,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 常量定义
 		/// </summary>
-		const int MaxDeltaAngle = 12; // 最大相差角度
-		const int MaxRotateAngle = 90; // 最大旋转角度
-
 		const float RotateSpeed = 0.5f; // 旋转速度
 		const float RotateThreshold = 2.5f; // 旋转阈值
 
@@ -42,12 +39,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public MenuWindow menu; // 菜单窗口
 
+		public AnimationView animation; // 动画
+
 		/// <summary>
 		/// 外部变量定义
 		/// </summary>
 		public Vector2 cardPivot = new Vector2(0.5f, -2);
-
-		public AnimationView animation; // 动画
+		public float maxDeltaAngle = 20;
+		public float maxRotateAngle = 90;
 
 		/// <summary>
 		/// 内部变量定义
@@ -156,7 +155,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 最大角度范围
 		/// </summary>
 		/// <returns></returns>
-		float maxAngleRange() { return MaxRotateAngle*2; }
+		float maxAngleRange() { return maxRotateAngle*2; }
 
 		/// <summary>
 		/// 角度范围
@@ -169,7 +168,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <returns></returns>
 		float deltaAngle() {
-			return Mathf.Min(maxAngleRange() / itemsCount(), MaxDeltaAngle);
+			return Mathf.Min(maxAngleRange() / itemsCount(), maxDeltaAngle);
 		}
 		
 		/// <summary>
