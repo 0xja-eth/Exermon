@@ -61,7 +61,7 @@ namespace Core.UI {
             initializeSceneUtils();
             initializeSystems();
             initializeOthers();
-            //checkFirstScene();
+            checkFirstScene();
         }
 
         /// <summary>

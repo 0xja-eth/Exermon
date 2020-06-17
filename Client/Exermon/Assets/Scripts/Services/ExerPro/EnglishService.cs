@@ -827,7 +827,7 @@ namespace ExerPro.EnglishModule.Services {
 			changeState(State.Moving);
 			record.moveNext(nid, force);
 			record.nodeFlag = false;
-			saveExerPro();
+			//saveExerPro();
 		}
 
 		/// <summary>
