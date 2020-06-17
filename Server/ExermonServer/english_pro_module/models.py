@@ -10,264 +10,265 @@ from utils.exception import ErrorType, GameException
 import os, base64, datetime, jsonfield, random
 from enum import Enum
 
+
 # Create your models here.
 
-# region ÌâÄ¿
+# region ï¿½ï¿½Ä¿
 
 
 # ===================================================
-#  Ó¢ÓïÌâÄ¿ÀàÐÍÃ¶¾Ù
+#  Ó¢ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class QuestionType(Enum):
-	Listening = 1  # ÌýÁ¦Ìâ
-	Phrase = 2  # ²»¶¨Ê½Ìâ
-	Correction = 3  # ¸Ä´íÌâ
+    Listening = 1  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    Phrase = 2  # ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
+    Correction = 3  # ï¿½Ä´ï¿½ï¿½ï¿½
 
 
 # ===================================================
-#  ÌýÁ¦ÌâÄ¿Ñ¡Ïî±í
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Ñ¡ï¿½ï¿½ï¿½
 # ===================================================
 class ListeningQuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌýÁ¦ÌâÄ¿Ñ¡Ïî"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Ñ¡ï¿½ï¿½"
 
-	# ËùÊôÎÊÌâ
-	question = models.ForeignKey('ListeningSubQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="ËùÊôÎÊÌâ")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    question = models.ForeignKey('ListeningSubQuestion', null=False, on_delete=models.CASCADE,
+                                 verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
 
 # ===================================================
-#  ÌýÁ¦Ð¡Ìâ
+#  ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½
 # ===================================================
 class ListeningSubQuestion(BaseQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌýÁ¦Ð¡Ìâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½"
 
-	# ÌýÁ¦ÌâÄ¿
-	question = models.ForeignKey('ListeningQuestion', on_delete=models.CASCADE,
-								 verbose_name="ÌýÁ¦ÌâÄ¿")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+    question = models.ForeignKey('ListeningQuestion', on_delete=models.CASCADE,
+                                 verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿")
 
-	def choices(self):
-		return self.listeningqueschoice_set.all()
+    def choices(self):
+        return self.listeningqueschoice_set.all()
 
 
 # ===================================================
-#  ÌýÁ¦Ìâ
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class ListeningQuestion(GroupQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌýÁ¦Ìâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
 
-	TYPE = QuestionType.Listening
+    TYPE = QuestionType.Listening
 
-	# ÖØ¸´´ÎÊý
-	times = models.PositiveSmallIntegerField(default=2, verbose_name="ÖØ¸´´ÎÊý")
+	# ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½
+	times = models.PositiveSmallIntegerField(default=2, verbose_name="ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ÒôÆµÎÄ¼þ
-	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="ÒôÆµÎÄ¼þ")
+	# ï¿½ï¿½Æµï¿½Ä¼ï¿½
+	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="ï¿½ï¿½Æµï¿½Ä¼ï¿½")
 
-	# »ñÈ¡ÍêÕûÂ·¾¶
-	def getExactlyPath(self):
-		base = settings.STATIC_URL
-		path = os.path.join(base, str(self.audio))
-		if os.path.exists(path):
-			return path
-		else:
-			raise GameException(ErrorType.PictureFileNotFound)
+    # ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
+    def getExactlyPath(self):
+        base = settings.STATIC_URL
+        path = os.path.join(base, str(self.audio))
+        if os.path.exists(path):
+            return path
+        else:
+            raise GameException(ErrorType.PictureFileNotFound)
 
-	# »ñÈ¡ÊÓÆµbase64±àÂë
-	def convertToBase64(self):
+    # ï¿½ï¿½È¡ï¿½ï¿½Æµbase64ï¿½ï¿½ï¿½ï¿½
+    def convertToBase64(self):
 
-		with open(self.getExactlyPath(), 'rb') as f:
-			data = base64.b64encode(f.read())
+        with open(self.getExactlyPath(), 'rb') as f:
+            data = base64.b64encode(f.read())
 
-		return data.decode()
+        return data.decode()
 
-	def convertToDict(self):
-		res = super().convertToDict()
+    def convertToDict(self):
+        res = super().convertToDict()
 
 		res['times'] = self.times
 		res['audio'] = self.convertToBase64()
 
-		return res
+        return res
 
-	def subQuestions(self) -> QuerySet:
-		"""
-		×ÓÌâÄ¿
-		Returns:
-			·µ»Ø¸ÃÌýÁ¦ÌâÄ¿µÄ×ÓÌâÄ¿
-		"""
-		return self.listeningsubquestion_set.all()
+    def subQuestions(self) -> QuerySet:
+        """
+        ï¿½ï¿½ï¿½ï¿½Ä¿
+        Returns:
+            ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+        """
+        return self.listeningsubquestion_set.all()
 
 
 # ===================================================
-#  ÔÄ¶ÁÌâÄ¿Ñ¡Ïî±í
+#  ï¿½Ä¶ï¿½ï¿½ï¿½Ä¿Ñ¡ï¿½ï¿½ï¿½
 # ===================================================
 class ReadingQuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÔÄ¶ÁÌâÄ¿Ñ¡Ïî"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ä¶ï¿½ï¿½ï¿½Ä¿Ñ¡ï¿½ï¿½"
 
-	# ËùÊôÎÊÌâ
-	question = models.ForeignKey('ReadingSubQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="ËùÊôÎÊÌâ")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    question = models.ForeignKey('ReadingSubQuestion', null=False, on_delete=models.CASCADE,
+                                 verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
 
 # ===================================================
-#  ÔÄ¶ÁÐ¡Ìâ
+#  ï¿½Ä¶ï¿½Ð¡ï¿½ï¿½
 # ===================================================
 class ReadingSubQuestion(BaseQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÔÄ¶ÁÐ¡Ìâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ä¶ï¿½Ð¡ï¿½ï¿½"
 
-	# ÔÄ¶ÁÌâÄ¿
-	question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
-								 verbose_name="ÔÄ¶ÁÌâÄ¿")
+    # ï¿½Ä¶ï¿½ï¿½ï¿½Ä¿
+    question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
+                                 verbose_name="ï¿½Ä¶ï¿½ï¿½ï¿½Ä¿")
 
-	def choices(self):
-		return self.readingqueschoice_set.all()
+    def choices(self):
+        return self.readingqueschoice_set.all()
 
 
 # ===================================================
-#  ÔÄ¶ÁÌâ
+#  ï¿½Ä¶ï¿½ï¿½ï¿½
 # ===================================================
 class ReadingQuestion(GroupQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÔÄ¶ÁÌâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ä¶ï¿½ï¿½ï¿½"
 
-	def subQuestions(self) -> QuerySet:
-		"""
-		×ÓÌâÄ¿
-		Returns:
-			·µ»Ø¸ÃÌýÁ¦ÌâÄ¿µÄ×ÓÌâÄ¿
-		"""
-		return self.readingsubquestion_set.all()
+    def subQuestions(self) -> QuerySet:
+        """
+        ï¿½ï¿½ï¿½ï¿½Ä¿
+        Returns:
+            ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+        """
+        return self.readingsubquestion_set.all()
 
 
 # ===================================================
-#  ¶ÌÓïÌâÄ¿ÀàÐÍÃ¶¾Ù
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class PhraseType(Enum):
-	SB = 1  # [sb. sth. ¿ªÍ·µÄ¶ÌÓïÑ¡Ïî]
-	Do = 2  # [to do, doing ¿ªÍ·µÄ¶ÌÓïÑ¡Ïî]
-	Prep = 3  # [½é´Ê¶ÌÓïÑ¡Ïî]
+    SB = 1  # [sb. sth. ï¿½ï¿½Í·ï¿½Ä¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]
+    Do = 2  # [to do, doing ï¿½ï¿½Í·ï¿½Ä¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]
+    Prep = 3  # [ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]
 
 
 # ===================================================
-#  ¶ÌÓïÌâ
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class PhraseQuestion(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "¶ÌÓïÌâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
 
-	TYPES = [
-		(PhraseType.SB.value, '[°üº¬ sb. µÄ¶ÌÓïÑ¡Ïî]'),
-		(PhraseType.Do.value, '[do ÐÎÊ½µÄ¶ÌÓïÑ¡Ïî]'),
-		(PhraseType.Prep.value, '[½é´Ê¶ÌÓïÑ¡Ïî]'),
-	]
+    TYPES = [
+        (PhraseType.SB.value, '[ï¿½ï¿½ï¿½ï¿½ sb. ï¿½Ä¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]'),
+        (PhraseType.Do.value, '[do ï¿½ï¿½Ê½ï¿½Ä¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]'),
+        (PhraseType.Prep.value, '[ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½]'),
+    ]
 
-	TYPE = QuestionType.Phrase
+    TYPE = QuestionType.Phrase
 
-	# µ¥´Ê
-	word = models.CharField(max_length=64, verbose_name="µ¥´Ê")
+    # ï¿½ï¿½ï¿½ï¿½
+    word = models.CharField(max_length=64, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ÖÐÎÄ·­Òë
-	chinese = models.CharField(max_length=64, verbose_name="ÖÐÎÄ")
+    # ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
+    chinese = models.CharField(max_length=64, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ²»¶¨Ê½Ïî
-	phrase = models.CharField(max_length=64, verbose_name="²»¶¨Ê½Ïî")
+    # ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
+    phrase = models.CharField(max_length=64, verbose_name="ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½")
 
-	# ²»¶¨Ê½ÏîµÄÀàÐÍ
-	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
-											choices=TYPES, verbose_name="ÐÞ¸ÄÀàÐÍ")
+    # ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
+                                            choices=TYPES, verbose_name="ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		return {
-			'id': self.id,
-			'word': self.word,
-			'chinese': self.chinese,
-			'phrase': self.phrase,
-			'type': self.type
-		}
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        return {
+            'id': self.id,
+            'word': self.word,
+            'chinese': self.chinese,
+            'phrase': self.phrase,
+            'type': self.type
+        }
 
 
 # ===================================================
-#  ¸Ä´íÌâ
+#  ï¿½Ä´ï¿½ï¿½ï¿½
 # ===================================================
 class CorrectionQuestion(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "¸Ä´íÌâ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ä´ï¿½ï¿½ï¿½"
 
-	TYPE = QuestionType.Correction
+    TYPE = QuestionType.Correction
 
-	# ÎÄÕÂ
-	article = models.TextField(verbose_name="ÎÄÕÂ")
+    # ï¿½ï¿½ï¿½ï¿½
+    article = models.TextField(verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ½âÎö
-	description = models.TextField(null=True, blank=True, verbose_name="½âÎö")
+    # ï¿½ï¿½ï¿½ï¿½
+    description = models.TextField(null=True, blank=True, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	def convertToDict(self):
-		wrong_items = ModelUtils.objectsToDict(self.wrongItems())
+    def convertToDict(self):
+        wrong_items = ModelUtils.objectsToDict(self.wrongItems())
 
-		return {
-			'id': self.id,
-			'article': self.article,
-			'description': self.description,
+        return {
+            'id': self.id,
+            'article': self.article,
+            'description': self.description,
 
-			'wrong_items': wrong_items
-		}
+            'wrong_items': wrong_items
+        }
 
-	def wrongItems(self) -> QuerySet:
-		"""
-		´íÎóÏî
-		Returns:
-			·µ»Ø¸Ã¸Ä´íÌâÄ¿µÄ´íÎóÏî
-		"""
-		return self.wrongitem_set.all()
+    def wrongItems(self) -> QuerySet:
+        """
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Returns:
+            ï¿½ï¿½ï¿½Ø¸Ã¸Ä´ï¿½ï¿½ï¿½Ä¿ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½
+        """
+        return self.wrongitem_set.all()
 
 
 # ===================================================
-#  ¾ÀÕýÀàÐÍ
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class CorrectType(Enum):
-	Add = 1  # Ôö¼Ó
-	Edit = 2  # ÐÞ¸Ä
-	Delete = 3  # É¾³ý
+    Add = 1  # ï¿½ï¿½ï¿½ï¿½
+    Edit = 2  # ï¿½Þ¸ï¿½
+    Delete = 3  # É¾ï¿½ï¿½
 
 
 # ===================================================
-#  ¸Ä´íÌâ´íÎóÏî
+#  ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class WrongItem(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "¸Ä´íÌâ´íÎóÏî"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
 
-	TYPES = [
-		(CorrectType.Add.value, 'Ôö¼Ó'),
-		(CorrectType.Edit.value, 'ÐÞ¸Ä'),
-		(CorrectType.Delete.value, 'É¾³ý'),
-	]
+    TYPES = [
+        (CorrectType.Add.value, 'ï¿½ï¿½ï¿½ï¿½'),
+        (CorrectType.Edit.value, 'ï¿½Þ¸ï¿½'),
+        (CorrectType.Delete.value, 'É¾ï¿½ï¿½'),
+    ]
 
-	# ¾ä×Ó±àºÅ
-	sentence_index = models.PositiveSmallIntegerField(verbose_name="¾ä×Ó±àºÅ")
+    # ï¿½ï¿½ï¿½Ó±ï¿½ï¿½
+    sentence_index = models.PositiveSmallIntegerField(verbose_name="ï¿½ï¿½ï¿½Ó±ï¿½ï¿½")
 
-	# µ¥´Ê±àºÅ
-	word_index = models.PositiveSmallIntegerField(verbose_name="µ¥´Ê±àºÅ")
+    # ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    word_index = models.PositiveSmallIntegerField(verbose_name="ï¿½ï¿½ï¿½Ê±ï¿½ï¿½")
 
-	# ÐÞ¸ÄÀàÐÍ
-	type = models.PositiveSmallIntegerField(default=CorrectType.Edit.value,
-											choices=TYPES, verbose_name="ÐÞ¸ÄÀàÐÍ")
+    # ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½
+    type = models.PositiveSmallIntegerField(default=CorrectType.Edit.value,
+                                            choices=TYPES, verbose_name="ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ÕýÈ·µ¥´Ê
-	word = models.TextField(verbose_name="ÕýÈ·µ¥´Ê", null=True, blank=True)
+    # ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½
+    word = models.TextField(verbose_name="ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½", null=True, blank=True)
 
-	# ¶ÔÓ¦ÌâÄ¿
-	question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
-								 verbose_name="¸Ä´íÌâÄ¿")
+    # ï¿½ï¿½Ó¦ï¿½ï¿½Ä¿
+    question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
+                                 verbose_name="ï¿½Ä´ï¿½ï¿½ï¿½Ä¿")
 
 	def convertToDict(self):
 		return {
@@ -280,207 +281,207 @@ class WrongItem(models.Model):
 
 
 # ===================================================
-#  µ¥´Ê
+#  ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class Word(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "µ¥´Ê"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½"
 
-	# Ó¢ÎÄ
-	english = models.CharField(unique=True, max_length=64, verbose_name="Ó¢ÎÄ")
+    # Ó¢ï¿½ï¿½
+    english = models.CharField(unique=True, max_length=64, verbose_name="Ó¢ï¿½ï¿½")
 
-	# ÖÐÎÄ
-	chinese = models.CharField(max_length=256, verbose_name="ÖÐÎÄ")
+    # ï¿½ï¿½ï¿½ï¿½
+    chinese = models.CharField(max_length=256, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ´ÊÐÔ
-	type = models.CharField(max_length=64, verbose_name="´ÊÐÔ", null=True, blank=True)
+    # ï¿½ï¿½ï¿½ï¿½
+    type = models.CharField(max_length=64, verbose_name="ï¿½ï¿½ï¿½ï¿½", null=True, blank=True)
 
-	# µÈ¼¶
-	level = models.PositiveSmallIntegerField(default=1, verbose_name="µÈ¼¶")
+    # ï¿½È¼ï¿½
+    level = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½È¼ï¿½")
 
-	# ÊÇ·ñ³õÖÐÌâÄ¿
-	is_middle = models.BooleanField(default=True, verbose_name="ÊÇ·ñ³õÖÐÌâÄ¿")
+    # ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+    is_middle = models.BooleanField(default=True, verbose_name="ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿")
 
-	# ÊÇ·ñ¸ßÖÐÌâÄ¿
-	is_high = models.BooleanField(default=True, verbose_name="ÊÇ·ñ¸ßÖÐÌâÄ¿")
+    # ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+    is_high = models.BooleanField(default=True, verbose_name="ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿")
 
-	def __str__(self):
-		return "%d. %s" % (self.id, self.english)
+    def __str__(self):
+        return "%d. %s" % (self.id, self.english)
 
-	def convertToDict(self):
-		return {
-			'id': self.id,
-			'english': self.english,
-			'chinese': self.chinese,
-			'type': self.type,
-			'level': self.level,
+    def convertToDict(self):
+        return {
+            'id': self.id,
+            'english': self.english,
+            'chinese': self.chinese,
+            'type': self.type,
+            'level': self.level,
 
-			'is_middle': self.is_middle,
-			'is_high': self.is_high,
-		}
+            'is_middle': self.is_middle,
+            'is_high': self.is_high,
+        }
 
 
 # ===================================================
-#  µ¥´Ê¼ÇÂ¼±í
+#  ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½ï¿½
 # ===================================================
 class WordRecord(models.Model):
-	class Meta:
+    class Meta:
 
-		verbose_name = verbose_name_plural = "µ¥´Ê¼ÇÂ¼"
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½Ê¼ï¿½Â¼"
 
-	# µ¥´Ê
-	word = models.ForeignKey('Word', on_delete=models.CASCADE, verbose_name="µ¥´Ê")
+    # ï¿½ï¿½ï¿½ï¿½
+    word = models.ForeignKey('Word', on_delete=models.CASCADE, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ¶ÔÓ¦µÄÌØÑµ¼ÇÂ¼
-	record = models.ForeignKey('ExerProRecord', on_delete=models.CASCADE, verbose_name="ÌØÑµ¼ÇÂ¼")
+    # ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ñµï¿½ï¿½Â¼
+    record = models.ForeignKey('ExerProRecord', on_delete=models.CASCADE, verbose_name="ï¿½ï¿½Ñµï¿½ï¿½Â¼")
 
-	# »Ø´ð´ÎÊý
-	count = models.PositiveSmallIntegerField(default=0, verbose_name="»Ø´ð´ÎÊý")
+    # ï¿½Ø´ï¿½ï¿½ï¿½ï¿½
+    count = models.PositiveSmallIntegerField(default=0, verbose_name="ï¿½Ø´ï¿½ï¿½ï¿½ï¿½")
 
-	# ÕýÈ·´ÎÊý
-	correct = models.PositiveSmallIntegerField(default=0, verbose_name="ÕýÈ·Êý")
+    # ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½
+    correct = models.PositiveSmallIntegerField(default=0, verbose_name="ï¿½ï¿½È·ï¿½ï¿½")
 
-	# ÉÏ´Î»Ø´ðÈÕÆÚ
-	last_date = models.DateTimeField(null=True, verbose_name="ÉÏ´Î»Ø´ðÈÕÆÚ")
+    # ï¿½Ï´Î»Ø´ï¿½ï¿½ï¿½ï¿½ï¿½
+    last_date = models.DateTimeField(null=True, verbose_name="ï¿½Ï´Î»Ø´ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ³õ´Î»Ø´ðÈÕÆÚ
-	first_date = models.DateTimeField(null=True, verbose_name="³õ´Î»Ø´ðÈÕÆÚ")
+    # ï¿½ï¿½ï¿½Î»Ø´ï¿½ï¿½ï¿½ï¿½ï¿½
+    first_date = models.DateTimeField(null=True, verbose_name="ï¿½ï¿½ï¿½Î»Ø´ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ÊÕ²Ø±êÖ¾
-	collected = models.BooleanField(default=False, verbose_name="ÊÕ²Ø±êÖ¾")
+    # ï¿½Õ²Ø±ï¿½Ö¾
+    collected = models.BooleanField(default=False, verbose_name="ï¿½Õ²Ø±ï¿½Ö¾")
 
-	# ´íÌâ±êÖ¾
-	wrong = models.BooleanField(default=False, verbose_name="´íÌâ±êÖ¾")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾
+    wrong = models.BooleanField(default=False, verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾")
 
-	# µ±Ç°ÂÖµ¥´Ê
-	current = models.BooleanField(default=False, verbose_name="ÊÇ·ñÊÇµ±Ç°ÂÖ")
+    # ï¿½ï¿½Ç°ï¿½Öµï¿½ï¿½ï¿½
+    current = models.BooleanField(default=False, verbose_name="ï¿½Ç·ï¿½ï¿½Çµï¿½Ç°ï¿½ï¿½")
 
-	# µ±Ç°ÂÖÊÇ·ñ´ð¶Ô
-	current_correct = models.BooleanField(default=None, null=True, verbose_name="µ±Ç°ÂÖÊÇ·ñ´ð¶Ô")
+    # ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½
+    current_correct = models.BooleanField(default=None, null=True, verbose_name="ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½")
 
-	# ×ª»¯Îª×Ö·û´®
-	def __str__(self):
-		return '%s (%s)' % (self.word, self.record)
+    # ×ªï¿½ï¿½Îªï¿½Ö·ï¿½ï¿½ï¿½
+    def __str__(self):
+        return '%s (%s)' % (self.word, self.record)
 
-	# ×ª»¯Îª×Öµä
-	def convertToDict(self, type=None):
+    # ×ªï¿½ï¿½Îªï¿½Öµï¿½
+    def convertToDict(self, type=None):
 
-		last_date = ModelUtils.timeToStr(self.last_date)
-		first_date = ModelUtils.timeToStr(self.first_date)
+        last_date = ModelUtils.timeToStr(self.last_date)
+        first_date = ModelUtils.timeToStr(self.first_date)
 
-		return {
-			'id': self.id,
-			'word_id': self.word_id,
-			'count': self.count,
-			'correct': self.correct,
-			'first_date': first_date,
-			'last_date': last_date,
+        return {
+            'id': self.id,
+            'word_id': self.word_id,
+            'count': self.count,
+            'correct': self.correct,
+            'first_date': first_date,
+            'last_date': last_date,
 
-			'collected': self.collected,
-			'wrong': self.wrong,
+            'collected': self.collected,
+            'wrong': self.wrong,
 
-			'current': self.current,
-			'current_correct': self.current_correct,
-			# ÓÉÓÚÇ°¶ÎÎÞ·¨ÅÐ¶Ï None£¬ÐèÒª·µ»ØÒ»¸ö¸½¼ÓµÄ×Ö¶Î
-			'current_done': self.current_correct is not None,
-		}
+            'current': self.current,
+            'current_correct': self.current_correct,
+            # ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Ð¶ï¿½ Noneï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½Ö¶ï¿½
+            'current_done': self.current_correct is not None,
+        }
 
-	# ´´½¨ÐÂ¼ÇÂ¼
-	@classmethod
-	def create(cls, pro_record, word_id):
-		record = pro_record.wordRecord(word_id)
+    # ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½Â¼
+    @classmethod
+    def create(cls, pro_record, word_id):
+        record = pro_record.wordRecord(word_id)
 
-		if record is None:
-			record = cls()
-			record.record = pro_record
-			record.word_id = word_id
+        if record is None:
+            record = cls()
+            record.record = pro_record
+            record.word_id = word_id
 
-		record.current = True
-		record.save()
+        record.current = True
+        record.save()
 
-		return record
+        return record
 
-	def updateRecord(self, correct):
-		"""
-		¸üÐÂÒÑÓÐ¼ÇÂ¼
-		Args:
-			correct (bool): ÊÇ·ñÕýÈ·
-		"""
-		self.current_correct = correct
+    def updateRecord(self, correct):
+        """
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¼ï¿½Â¼
+        Args:
+            correct (bool): ï¿½Ç·ï¿½ï¿½ï¿½È·
+        """
+        self.current_correct = correct
 
-		if correct:
-			self.correct += 1
-		else:
-			self.wrong = True
+        if correct:
+            self.correct += 1
+        else:
+            self.wrong = True
 
-		if self.count <= 0:
-			self.first_date = datetime.datetime.now()
+        if self.count <= 0:
+            self.first_date = datetime.datetime.now()
 
-		self.last_date = datetime.datetime.now()
-		self.count += 1
+        self.last_date = datetime.datetime.now()
+        self.count += 1
 
-		self.save()
+        self.save()
 
-	def answer(self, chinese):
-		"""
-		µ¥´Ê×÷´ð
-		Args:
-			chinese (str): ÖÐÎÄ
-		Returns::
-			·µ»Ø´ð°¸ÊÇ·ñÕýÈ·
-		"""
-		correct = chinese == self.word.chinese
-		self.updateRecord(correct)
+    def answer(self, chinese):
+        """
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Args:
+            chinese (str): ï¿½ï¿½ï¿½ï¿½
+        Returns::
+            ï¿½ï¿½ï¿½Ø´ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È·
+        """
+        correct = chinese == self.word.chinese
+        self.updateRecord(correct)
 
-		return correct
+        return correct
 
-	# ÕýÈ·ÂÊ
-	def corrRate(self):
-		if self.count is None or self.count == 0:
-			return 0
-		return self.correct / self.count
+    # ï¿½ï¿½È·ï¿½ï¿½
+    def corrRate(self):
+        if self.count is None or self.count == 0:
+            return 0
+        return self.correct / self.count
 
 
 # endregion
 
 # # ===================================================
-# #  Ó¢Óïµ¥´ÊÀ´Ô´Ã¶¾Ù
+# #  Ó¢ï¿½ïµ¥ï¿½ï¿½ï¿½ï¿½Ô´Ã¶ï¿½ï¿½
 # # ===================================================
 # class EnglishWordSourceType(Enum):
 #
-# 	MiddleSchool = 1  # ³õÖÐ
-# 	HighSchool = 2  # ¸ßÖÐ
-# 	CET4 = 3  # ËÄ¼¶
-# 	CET6 = 4  # Áù¼¶
-# 	Postgraduate = 5  # ¿¼ÑÐ
+# 	MiddleSchool = 1  # ï¿½ï¿½ï¿½ï¿½
+# 	HighSchool = 2  # ï¿½ï¿½ï¿½ï¿½
+# 	CET4 = 3  # ï¿½Ä¼ï¿½
+# 	CET6 = 4  # ï¿½ï¿½ï¿½ï¿½
+# 	Postgraduate = 5  # ï¿½ï¿½ï¿½ï¿½
 #
 # 	Unknown = 0  # Î´Öª
 #
 #
 # # ===================================================
-# #  Ó¢Óïµ¥´ÊÀ´Ô´±í
+# #  Ó¢ï¿½ïµ¥ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½
 # # ===================================================
 # class EnglishWordSource(models.Model):
 #
 # 	class Meta:
-# 		verbose_name = verbose_name_plural = "Ó¢Óïµ¥´ÊÀ´Ô´"
+# 		verbose_name = verbose_name_plural = "Ó¢ï¿½ïµ¥ï¿½ï¿½ï¿½ï¿½Ô´"
 #
 # 	TYPES = [
-# 		(EnglishWordSourceType.MiddleSchool.value, '³õÖÐ'),
-# 		(EnglishWordSourceType.HighSchool.value, '¸ßÖÐ'),
-# 		(EnglishWordSourceType.CET4.value, 'ËÄ¼¶'),
-# 		(EnglishWordSourceType.CET6.value, 'Áù¼¶'),
-# 		(EnglishWordSourceType.Postgraduate.value, '¿¼ÑÐ'),
+# 		(EnglishWordSourceType.MiddleSchool.value, 'ï¿½ï¿½ï¿½ï¿½'),
+# 		(EnglishWordSourceType.HighSchool.value, 'ï¿½ï¿½ï¿½ï¿½'),
+# 		(EnglishWordSourceType.CET4.value, 'ï¿½Ä¼ï¿½'),
+# 		(EnglishWordSourceType.CET6.value, 'ï¿½ï¿½ï¿½ï¿½'),
+# 		(EnglishWordSourceType.Postgraduate.value, 'ï¿½ï¿½ï¿½ï¿½'),
 #
 # 		(EnglishWordSourceType.Unknown.value, 'Î´Öª'),
 # 	]
 #
-# 	# À´Ô´
+# 	# ï¿½ï¿½Ô´
 # 	source = models.PositiveSmallIntegerField(default=EnglishWordSourceType.Unknown.value,
-# 											choices=TYPES, verbose_name="À´Ô´")
+# 											choices=TYPES, verbose_name="ï¿½ï¿½Ô´")
 #
-# 	# µ¥´Ê
-# 	word = models.ForeignKey('EnglishWord', on_delete=models.CASCADE, verbose_name="µ¥´Ê")
+# 	# ï¿½ï¿½ï¿½ï¿½
+# 	word = models.ForeignKey('EnglishWord', on_delete=models.CASCADE, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 #
 # 	def convertToDict(self):
 # 		return self.source
@@ -488,431 +489,434 @@ class WordRecord(models.Model):
 
 # endregion
 
-# region ÎïÆ·
+# region ï¿½ï¿½Æ·
 
 
 # ===================================================
-#  Ê¹ÓÃÐ§¹û±àºÅÃ¶¾Ù
+#  Ê¹ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class ExerProEffectCode(Enum):
-	Unset = 0  # ¿Õ
+    Unset = 0  # ï¿½ï¿½
 
-	Attack = 1  # Ôì³ÉÉËº¦
-	AttackSlash = 2  # Ôì³ÉÉËº¦£¨ÍêÃÀÕ¶»÷£©
-	AttackBlack = 3  # Ôì³ÉÉËº¦£¨ºÚÐý·ç£©
-	AttackWave = 4  # Ôì³ÉÉËº¦£¨²¨¶¯È­£©
-	AttackRite = 5  # Ôì³ÉÉËº¦£¨ÒÇÊ½Ø°Ê×£©
+    Attack = 1  # ï¿½ï¿½ï¿½ï¿½Ëºï¿½
+    AttackSlash = 2  # ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¶ï¿½ï¿½ï¿½ï¿½
+    AttackBlack = 3  # ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç£©
+    AttackWave = 4  # ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È­ï¿½ï¿½
+    AttackRite = 5  # ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½Ê½Ø°ï¿½×£ï¿½
 
-	Recover = 100  # »Ø¸´ÌåÁ¦Öµ
+    Recover = 100  # ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 
-	AddParam = 200  # Ôö¼ÓÄÜÁ¦Öµ
-	AddMHP = 201  # »ñµÃMHP
-	AddPower = 202  # »ñµÃÁ¦Á¿
-	AddDefense = 203  # »ñµÃ¸ñµ²
-	AddAgile = 204  # »ñµÃÃô½Ý
-	AddParamUrgent = 205  # Ôö¼ÓÄÜÁ¦Öµ£¨½ô¼±°´Å¥£©
+	AddParam = 200  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	AddMHP = 201  # ï¿½ï¿½ï¿½MHP
+	AddPower = 202  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	AddDefense = 203  # ï¿½ï¿½Ã¸ï¿½
+	AddAgile = 204  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	AddParamUrgent = 205  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¥ï¿½ï¿½
 
-	TempAddParam = 210  # ÁÙÊ±Ôö¼ÓÄÜÁ¦Öµ
-	TempAddMHP = 211  # ÁÙÊ±»ñµÃMHP
-	TempAddPower = 212  # ÁÙÊ±»ñµÃÁ¦Á¿
-	TempAddDefense = 213  # ÁÙÊ±»ñµÃ¸ñµ²
-	TempAddAgile = 214  # ÁÙÊ±»ñµÃÃô½Ý
+	TempAddParam = 210  # ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	TempAddMHP = 211  # ï¿½ï¿½Ê±ï¿½ï¿½ï¿½MHP
+	TempAddPower = 212  # ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	TempAddDefense = 213  # ï¿½ï¿½Ê±ï¿½ï¿½Ã¸ï¿½
+	TempAddAgile = 214  # ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	AddState = 220  # Ôö¼Ó×´Ì¬
-	RemoveState = 221  # ÒÆ³ý×´Ì¬
-	RemoveNegaState = 222  # ÒÆ³ýÏû¼«×´Ì¬
+	AddState = 220  # ï¿½ï¿½ï¿½ï¿½×´Ì¬
+	RemoveState = 221  # ï¿½Æ³ï¿½×´Ì¬
+	RemoveNegaState = 222  # ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 
-	AddEnergy = 230  # »Ø¸´ÄÜÁ¿
+	AddEnergy = 230  # ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	DrawCards = 300  # ³éÈ¡¿¨ÅÆ
-	ConsumeCards = 310  # ÏûºÄ¿¨ÅÆ
+	DrawCards = 300  # ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
+	ConsumeCards = 310  # ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½
 
-	ChangeCost = 400  # ¸ü¸ÄºÄÄÜ
-	ChangeCostDisc = 401  # ¸ü¸ÄºÄÄÜ£¨·¢ÏÖ£©
-	ChangeCostCrazy = 402  # ¸ü¸ÄºÄÄÜ£¨·è¿ñ£©
+    ChangeCost = 400  # ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½
+    ChangeCostDisc = 401  # ï¿½ï¿½ï¿½Äºï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ö£ï¿½
+    ChangeCostCrazy = 402  # ï¿½ï¿½ï¿½Äºï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½
 
-	PlotAddMoney = 500  # »ñµÃ½ð±Ò
+    Sadistic = 500  # ï¿½ï¿½Å°ï¿½ï¿½ï¿½ï¿½
+    ForceAddStatus = 600  # ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½×´Ì¬
 
 
 # ===================================================
-#  ÌØÑµÊ¹ÓÃÐ§¹û±í
+#  ï¿½ï¿½ÑµÊ¹ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProEffect(models.Model):
-	class Meta:
-		abstract = True
-		verbose_name = verbose_name_plural = "ÌØÑµÊ¹ÓÃÐ§¹û"
+    class Meta:
+        abstract = True
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ÑµÊ¹ï¿½ï¿½Ð§ï¿½ï¿½"
 
-	CODES = [
-		(ExerProEffectCode.Unset.value, '¿Õ'),
+    CODES = [
+        (ExerProEffectCode.Unset.value, 'ï¿½ï¿½'),
 
-		(ExerProEffectCode.Attack.value, 'Ôì³ÉÉËº¦'),
-		(ExerProEffectCode.AttackSlash.value, 'Ôì³ÉÉËº¦£¨ÍêÃÀÕ¶»÷£©'),
-		(ExerProEffectCode.AttackBlack.value, 'Ôì³ÉÉËº¦£¨ºÚÐý·ç£©'),
-		(ExerProEffectCode.AttackWave.value, 'Ôì³ÉÉËº¦£¨²¨¶¯È­£©'),
-		(ExerProEffectCode.AttackRite.value, 'Ôì³ÉÉËº¦£¨ÒÇÊ½Ø°Ê×£©'),
+        (ExerProEffectCode.Attack.value, 'ï¿½ï¿½ï¿½ï¿½Ëºï¿½'),
+        (ExerProEffectCode.AttackSlash.value, 'ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¶ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProEffectCode.AttackBlack.value, 'ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç£©'),
+        (ExerProEffectCode.AttackWave.value, 'ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È­ï¿½ï¿½'),
+        (ExerProEffectCode.AttackRite.value, 'ï¿½ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½Ê½Ø°ï¿½×£ï¿½'),
 
-		(ExerProEffectCode.Recover.value, '»Ø¸´ÌåÁ¦Öµ'),
+        (ExerProEffectCode.Recover.value, 'ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½Öµ'),
 
-		(ExerProEffectCode.AddParam.value, 'Ôö¼ÓÄÜÁ¦Öµ'),
-		(ExerProEffectCode.AddMHP.value, '»ñµÃMHP'),
-		(ExerProEffectCode.AddPower.value, '»ñµÃÁ¦Á¿'),
-		(ExerProEffectCode.AddDefense.value, '»ñµÃ¸ñµ²'),
-		(ExerProEffectCode.AddAgile.value, '»ñµÃÃô½Ý'),
-		(ExerProEffectCode.AddParamUrgent.value, 'Ôö¼ÓÄÜÁ¦Öµ£¨½ô¼±°´Å¥£©'),
+		(ExerProEffectCode.AddParam.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ'),
+		(ExerProEffectCode.AddMHP.value, 'ï¿½ï¿½ï¿½MHP'),
+		(ExerProEffectCode.AddPower.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
+		(ExerProEffectCode.AddDefense.value, 'ï¿½ï¿½Ã¸ï¿½'),
+		(ExerProEffectCode.AddAgile.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
+		(ExerProEffectCode.AddParamUrgent.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¥ï¿½ï¿½'),
 
-		(ExerProEffectCode.TempAddParam.value, 'ÁÙÊ±Ôö¼ÓÄÜÁ¦Öµ'),
-		(ExerProEffectCode.TempAddMHP.value, 'ÁÙÊ±»ñµÃMHP'),
-		(ExerProEffectCode.TempAddPower.value, 'ÁÙÊ±»ñµÃÁ¦Á¿'),
-		(ExerProEffectCode.TempAddDefense.value, 'ÁÙÊ±»ñµÃ¸ñµ²'),
-		(ExerProEffectCode.TempAddAgile.value, 'ÁÙÊ±»ñµÃÃô½Ý'),
+		(ExerProEffectCode.TempAddParam.value, 'ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ'),
+		(ExerProEffectCode.TempAddMHP.value, 'ï¿½ï¿½Ê±ï¿½ï¿½ï¿½MHP'),
+		(ExerProEffectCode.TempAddPower.value, 'ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
+		(ExerProEffectCode.TempAddDefense.value, 'ï¿½ï¿½Ê±ï¿½ï¿½Ã¸ï¿½'),
+		(ExerProEffectCode.TempAddAgile.value, 'ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
 
-		(ExerProEffectCode.AddState.value, 'Ôö¼Ó×´Ì¬'),
-		(ExerProEffectCode.RemoveState.value, 'ÒÆ³ý×´Ì¬'),
-		(ExerProEffectCode.RemoveNegaState.value, 'ÒÆ³ýÏû¼«×´Ì¬'),
+		(ExerProEffectCode.AddState.value, 'ï¿½ï¿½ï¿½ï¿½×´Ì¬'),
+		(ExerProEffectCode.RemoveState.value, 'ï¿½Æ³ï¿½×´Ì¬'),
+		(ExerProEffectCode.RemoveNegaState.value, 'ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬'),
 
-		(ExerProEffectCode.AddEnergy.value, '»Ø¸´ÄÜÁ¿'),
+		(ExerProEffectCode.AddEnergy.value, 'ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½'),
 
-		(ExerProEffectCode.DrawCards.value, '³éÈ¡¿¨ÅÆ'),
-		(ExerProEffectCode.ConsumeCards.value, 'ÏûºÄ¿¨ÅÆ'),
+		(ExerProEffectCode.DrawCards.value, 'ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½'),
+		(ExerProEffectCode.ConsumeCards.value, 'ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½'),
 
-		(ExerProEffectCode.ChangeCost.value, '¸ü¸ÄºÄÄÜ'),
-		(ExerProEffectCode.ChangeCostDisc.value, '¸ü¸ÄºÄÄÜ£¨·¢ÏÖ£©'),
-		(ExerProEffectCode.ChangeCostCrazy.value, '¸ü¸ÄºÄÄÜ£¨·è¿ñ£©'),
+        (ExerProEffectCode.ChangeCost.value, 'ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½'),
+        (ExerProEffectCode.ChangeCostDisc.value, 'ï¿½ï¿½ï¿½Äºï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ö£ï¿½'),
+        (ExerProEffectCode.ChangeCostCrazy.value, 'ï¿½ï¿½ï¿½Äºï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½'),
 
-		(ExerProEffectCode.PlotAddMoney.value, '»ñµÃ½ð±Ò'),
-	]
+		(ExerProEffectCode.PlotAddMoney.value, 'ï¿½ï¿½Ã½ï¿½ï¿½'),
+        (ExerProEffectCode.Sadistic.value, 'ï¿½ï¿½Å°ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProEffectCode.ForceAddStatus.value, 'ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½×´Ì¬'),
+    ]
 
-	# Ð§¹û±àºÅ
-	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="Ð§¹û±àºÅ")
+    # Ð§ï¿½ï¿½ï¿½ï¿½ï¿½
+    code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="Ð§ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# Ð§¹û²ÎÊý
-	params = jsonfield.JSONField(default=[], verbose_name="Ð§¹û²ÎÊý")
+    # Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    params = jsonfield.JSONField(default=[], verbose_name="Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ×ª»¯Îª×Öµä
-	def convertToDict(self):
-		return {
-			'code': self.code,
-			'params': self.params,
-		}
+    # ×ªï¿½ï¿½Îªï¿½Öµï¿½
+    def convertToDict(self):
+        return {
+            'code': self.code,
+            'params': self.params,
+        }
 
 
 # ===================================================
-#  ÌØÑµÎïÆ·ÐÇ¼¶±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Æ·ï¿½Ç¼ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProItemStar(GroupConfigure):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµÎïÆ·ÐÇ¼¶"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ·ï¿½Ç¼ï¿½"
 
-	# ÐÇ¼¶ÑÕÉ«£¨#ABCDEF£©
-	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="ÐÇ¼¶ÑÕÉ«")
+    # ï¿½Ç¼ï¿½ï¿½ï¿½É«ï¿½ï¿½#ABCDEFï¿½ï¿½
+    color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="ï¿½Ç¼ï¿½ï¿½ï¿½É«")
 
-	def __str__(self):
-		return self.name
+    def __str__(self):
+        return self.name
 
-	# ¹ÜÀí½çÃæÓÃ£ºÏÔÊ¾ÐÇ¼¶ÑÕÉ«
-	def adminColor(self):
-		from django.utils.html import format_html
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½Ê¾ï¿½Ç¼ï¿½ï¿½ï¿½É«
+    def adminColor(self):
+        from django.utils.html import format_html
 
-		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+        res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
 
-		return format_html(res)
+        return format_html(res)
 
-	adminColor.short_description = "ÐÇ¼¶ÑÕÉ«"
+    adminColor.short_description = "ï¿½Ç¼ï¿½ï¿½ï¿½É«"
 
-	def convertToDict(self):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-		}
+    def convertToDict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'color': self.color,
+        }
 
 
 # ===================================================
-#  »ù±¾ÌØÑµÎïÆ·±í
+#  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñµï¿½ï¿½Æ·ï¿½ï¿½
 # ===================================================
 class BaseExerProItem(BaseItem):
-	class Meta:
-		abstract = True
-		verbose_name = verbose_name_plural = "ÌØÑµÎïÆ·"
+    class Meta:
+        abstract = True
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ·"
 
-	# Í¼±êË÷Òý
-	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="Í¼±êË÷Òý")
+	# Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ÎïÆ·ÐÇ¼¶£¨Ï¡º±¶È£©
-	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="ÐÇ¼¶")
+	# ï¿½ï¿½Æ·ï¿½Ç¼ï¿½ï¿½ï¿½Ï¡ï¿½ï¿½ï¿½È£ï¿½
+	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="ï¿½Ç¼ï¿½")
 
-	# ½ð±Ò£¨0±íÊ¾²»¿É¹ºÂò£©
-	gold = models.PositiveSmallIntegerField(default=0, verbose_name="½ð±Ò")
+    # ï¿½ï¿½Ò£ï¿½0ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½
+    gold = models.PositiveSmallIntegerField(default=0, verbose_name="ï¿½ï¿½ï¿½")
 
-	def convertToDict(self, **kwargs):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		res = super().convertToDict(**kwargs)
+    def convertToDict(self, **kwargs):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        res = super().convertToDict(**kwargs)
 
-		effects = ModelUtils.objectsToDict(self.effects())
+        effects = ModelUtils.objectsToDict(self.effects())
 
-		res['star_id'] = self.star_id
-		res['gold'] = self.gold
-		res['effects'] = effects
+        res['star_id'] = self.star_id
+        res['gold'] = self.gold
+        res['effects'] = effects
 
-		return res
+        return res
 
-	def effects(self):
-		raise NotImplementedError
+    def effects(self):
+        raise NotImplementedError
 
 
 # ===================================================
-#  ÌØÑµÎïÆ·Ê¹ÓÃÐ§¹û±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Æ·Ê¹ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProItemEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµÎïÆ·Ê¹ÓÃÐ§¹û"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ·Ê¹ï¿½ï¿½Ð§ï¿½ï¿½"
 
-	# ÎïÆ·
-	item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
-							 verbose_name="ÎïÆ·")
+    # ï¿½ï¿½Æ·
+    item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
+                             verbose_name="ï¿½ï¿½Æ·")
 
 
 # ===================================================
-#  ÌØÑµÎïÆ·±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Æ·ï¿½ï¿½
 # ===================================================
 class ExerProItem(BaseExerProItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµÎïÆ·"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ·"
 
-	# µÀ¾ßÀàÐÍ
-	TYPE = ItemType.ExerProItem
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    TYPE = ItemType.ExerProItem
 
-	def effects(self):
-		return self.exerproitemeffect_set.all()
+    def effects(self):
+        return self.exerproitemeffect_set.all()
 
 
 # ===================================================
-#  ÌØÑµÒ©Ë®Ê¹ÓÃÐ§¹û±í
+#  ï¿½ï¿½ÑµÒ©Ë®Ê¹ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProPotionEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµÒ©Ë®Ê¹ÓÃÐ§¹û"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ÑµÒ©Ë®Ê¹ï¿½ï¿½Ð§ï¿½ï¿½"
 
-	# ÎïÆ·
-	item = models.ForeignKey('ExerProPotion', on_delete=models.CASCADE,
-							 verbose_name="ÎïÆ·")
+    # ï¿½ï¿½Æ·
+    item = models.ForeignKey('ExerProPotion', on_delete=models.CASCADE,
+                             verbose_name="ï¿½ï¿½Æ·")
 
 
 # ===================================================
-#  ÌØÑµÒ©Ë®±í
+#  ï¿½ï¿½ÑµÒ©Ë®ï¿½ï¿½
 # ===================================================
 class ExerProPotion(BaseExerProItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµÒ©Ë®"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ÑµÒ©Ë®"
 
-	# µÀ¾ßÀàÐÍ
-	TYPE = ItemType.ExerProPotion
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    TYPE = ItemType.ExerProPotion
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		res = super().convertToDict()
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        res = super().convertToDict()
 
-		return res
+        return res
 
-	def effects(self):
-		return self.exerpropotioneffect_set.all()
+    def effects(self):
+        return self.exerpropotioneffect_set.all()
 
 
 # ===================================================
-#  ÌØÑµ¿¨Æ¬Ê¹ÓÃÐ§¹û±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Æ¬Ê¹ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProCardEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµ¿¨Æ¬Ê¹ÓÃÐ§¹û"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ¬Ê¹ï¿½ï¿½Ð§ï¿½ï¿½"
 
-	# ÎïÆ·
-	item = models.ForeignKey('ExerProCard', on_delete=models.CASCADE,
-							 verbose_name="ÎïÆ·")
+    # ï¿½ï¿½Æ·
+    item = models.ForeignKey('ExerProCard', on_delete=models.CASCADE,
+                             verbose_name="ï¿½ï¿½Æ·")
 
 
 # ===================================================
-#  ·´Òå´Ê±í
+#  ï¿½ï¿½ï¿½ï¿½Ê±ï¿½
 # ===================================================
 class Antonym(GroupConfigure):
-	class Meta:
-		verbose_name = verbose_name_plural = "·´Òå´Ê"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½ï¿½"
 
-	# ¿¨ÅÆ´Ê
-	card_word = models.CharField(max_length=32, verbose_name="¿¨ÅÆ´Ê")
+    # ï¿½ï¿½ï¿½Æ´ï¿½
+    card_word = models.CharField(max_length=32, verbose_name="ï¿½ï¿½ï¿½Æ´ï¿½")
 
-	# µÐÈË´Ê
-	enemy_word = models.CharField(max_length=32, verbose_name="µÐÈË´Ê")
+    # ï¿½ï¿½ï¿½Ë´ï¿½
+    enemy_word = models.CharField(max_length=32, verbose_name="ï¿½ï¿½ï¿½Ë´ï¿½")
 
-	# ÉËº¦±ÈÂÊ£¨*100£©
-	hurt_rate = models.SmallIntegerField(default=100, verbose_name="ÉËº¦±ÈÂÊ")
+    # ï¿½Ëºï¿½ï¿½ï¿½ï¿½Ê£ï¿½*100ï¿½ï¿½
+    hurt_rate = models.SmallIntegerField(default=100, verbose_name="ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		return {
-			'card_word': self.card_word,
-			'enemy_word': self.enemy_word,
-			'hurt_rate': self.hurt_rate / 100,
-		}
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        return {
+            'card_word': self.card_word,
+            'enemy_word': self.enemy_word,
+            'hurt_rate': self.hurt_rate / 100,
+        }
 
 
 # ===================================================
-#  ¿¨Æ¬ÀàÐÍÃ¶¾Ù
+#  ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class ExerProCardType(Enum):
-	Attack = 1  # ¹¥»÷
-	Skill = 2  # ¼¼ÄÜ
-	Ability = 3  # ÄÜÁ¦
-	Evil = 4  # ×çÖä
+    Attack = 1  # ï¿½ï¿½ï¿½ï¿½
+    Skill = 2  # ï¿½ï¿½ï¿½ï¿½
+    Ability = 3  # ï¿½ï¿½ï¿½ï¿½
+    Evil = 4  # ï¿½ï¿½ï¿½ï¿½
 
 
 # ===================================================
-#  ¿¨Æ¬ÀàÄ¿±ê¾Ù
+#  ï¿½ï¿½Æ¬ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProCardTarget(Enum):
-	Default = 0  # Ä¬ÈÏ
-	One = 1  # µ¥Ìå
-	All = 2  # ÈºÌå
+    Default = 0  # Ä¬ï¿½ï¿½
+    One = 1  # ï¿½ï¿½ï¿½ï¿½
+    All = 2  # Èºï¿½ï¿½
 
 
 # ===================================================
-#  ÌØÑµ¿¨Æ¬±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Æ¬ï¿½ï¿½
 # ===================================================
 class ExerProCard(BaseExerProItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµ¿¨Æ¬"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Æ¬"
 
-	# µÀ¾ßÀàÐÍ
-	TYPE = ItemType.ExerProCard
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    TYPE = ItemType.ExerProCard
 
-	CARD_TYPES = [
-		(ExerProCardType.Attack.value, '¹¥»÷'),
-		(ExerProCardType.Skill.value, '¼¼ÄÜ'),
-		(ExerProCardType.Ability.value, 'ÄÜÁ¦'),
-		(ExerProCardType.Evil.value, '×çÖä'),
-	]
+    CARD_TYPES = [
+        (ExerProCardType.Attack.value, 'ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProCardType.Skill.value, 'ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProCardType.Ability.value, 'ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProCardType.Evil.value, 'ï¿½ï¿½ï¿½ï¿½'),
+    ]
 
-	TARGETS = [
-		(ExerProCardTarget.Default.value, 'Ä¬ÈÏ'),
-		(ExerProCardTarget.One.value, 'µ¥Ìå'),
-		(ExerProCardTarget.All.value, 'ÈºÌå'),
-	]
+    TARGETS = [
+        (ExerProCardTarget.Default.value, 'Ä¬ï¿½ï¿½'),
+        (ExerProCardTarget.One.value, 'ï¿½ï¿½ï¿½ï¿½'),
+        (ExerProCardTarget.All.value, 'Èºï¿½ï¿½'),
+    ]
 
-	# ÏûºÄÄÜÁ¿
-	cost = models.PositiveSmallIntegerField(default=1, verbose_name="ÏûºÄÄÜÁ¿")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    cost = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ¿¨Æ¬ÀàÐÍ
-	card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
-												 choices=CARD_TYPES, verbose_name="¿¨Æ¬ÀàÐÍ")
+    # ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½
+    card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
+                                                 choices=CARD_TYPES, verbose_name="ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½")
 
-	# ¹ÌÓÐ
-	inherent = models.BooleanField(default=False, verbose_name="¹ÌÓÐ")
+    # ï¿½ï¿½ï¿½ï¿½
+    inherent = models.BooleanField(default=False, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ÏûºÄ£¨Ò»´ÎÐÔµÄ£©
-	disposable = models.BooleanField(default=False, verbose_name="ÏûºÄ")
+    # ï¿½ï¿½ï¿½Ä£ï¿½Ò»ï¿½ï¿½ï¿½ÔµÄ£ï¿½
+    disposable = models.BooleanField(default=False, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ÐÔÖÊ
-	character = models.CharField(default="", blank=True, max_length=32, verbose_name="ÐÔÖÊ")
+    # ï¿½ï¿½ï¿½ï¿½
+    character = models.CharField(default="", blank=True, max_length=32, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# Ä¿±ê
-	target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
-											  choices=TARGETS, verbose_name="Ä¿±ê")
+    # Ä¿ï¿½ï¿½
+    target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
+                                              choices=TARGETS, verbose_name="Ä¿ï¿½ï¿½")
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		res = super().convertToDict()
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        res = super().convertToDict()
 
-		res['cost'] = self.cost
-		res['card_type'] = self.card_type
-		res['inherent'] = self.inherent
-		res['disposable'] = self.disposable
-		res['character'] = self.character
-		res['target'] = self.target
+        res['cost'] = self.cost
+        res['card_type'] = self.card_type
+        res['inherent'] = self.inherent
+        res['disposable'] = self.disposable
+        res['character'] = self.character
+        res['target'] = self.target
 
-		return res
+        return res
 
-	def effects(self):
-		return self.exerprocardeffect_set.all()
+    def effects(self):
+        return self.exerprocardeffect_set.all()
 
 
 # ===================================================
-#  ÌØÑµµÐÈË¹¥»÷Ð§¹û±í
+#  ï¿½ï¿½Ñµï¿½ï¿½ï¿½Ë¹ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
 # ===================================================
 class EnemyEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµµÐÈË¹¥»÷Ð§¹û"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½ï¿½Ë¹ï¿½ï¿½ï¿½Ð§ï¿½ï¿½"
 
-	# µÐÈË
-	enemy = models.ForeignKey('ExerProEnemy', on_delete=models.CASCADE,
-							  verbose_name="µÐÈË")
+    # ï¿½ï¿½ï¿½ï¿½
+    enemy = models.ForeignKey('ExerProEnemy', on_delete=models.CASCADE,
+                              verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
 
 # ===================================================
-#  µÐÈËÐÐ¶¯ÀàÐÍÃ¶¾Ù
+#  ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class EnemyActionType(Enum):
-	Attack = 1  # ¹¥»÷
-	PowerUp = 2  # ÊôÐÔÌáÉý
-	PosStates = 3  # ×´Ì¬ÌáÉý
-	PowerDown = 4  # ÊôÐÔÏ÷Èõ
-	NegStates = 5  # ×´Ì¬Ï÷Èõ
-	Escape = 6  # ÌÓÅÜ
-	Unset = 7  # Ê²Ã´¶¼²»×ö
+	Attack = 1  # ï¿½ï¿½ï¿½ï¿½
+	PowerUp = 2  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	PosStates = 3  # ×´Ì¬ï¿½ï¿½ï¿½ï¿½
+	PowerDown = 4  # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	NegStates = 5  # ×´Ì¬ï¿½ï¿½ï¿½ï¿½
+	Escape = 6  # ï¿½ï¿½ï¿½ï¿½
+	Unset = 7  # Ê²Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 # ===================================================
-#  µÐÈËÐÐ¶¯±í
+#  ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½
 # ===================================================
 class EnemyAction(models.Model):
 	class Meta:
-		verbose_name = verbose_name_plural = "µÐÈËÐÐ¶¯"
+		verbose_name = verbose_name_plural = "ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½"
 
 	TYPES = [
-		(EnemyActionType.Attack.value, '¹¥»÷'),
-		(EnemyActionType.PowerUp.value, 'ÊôÐÔÌáÉý'),
-		(EnemyActionType.PosStates.value, '×´Ì¬ÌáÉý'),
-		(EnemyActionType.PowerDown.value, 'ÊôÐÔÏ÷Èõ'),
-		(EnemyActionType.NegStates.value, '×´Ì¬Ï÷Èõ'),
-		(EnemyActionType.Escape.value, 'ÌÓÅÜ'),
-		(EnemyActionType.Unset.value, 'ÎÞ'),
+		(EnemyActionType.Attack.value, 'ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.PowerUp.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.PosStates.value, '×´Ì¬ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.PowerDown.value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.NegStates.value, '×´Ì¬ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.Escape.value, 'ï¿½ï¿½ï¿½ï¿½'),
+		(EnemyActionType.Unset.value, 'ï¿½ï¿½'),
 	]
 
-	# »ØºÏ
-	rounds = jsonfield.JSONField(default=[], verbose_name="»ØºÏ")
+	# ï¿½Øºï¿½
+	rounds = jsonfield.JSONField(default=[], verbose_name="ï¿½Øºï¿½")
 
-	# ÀàÐÍ
+	# ï¿½ï¿½ï¿½ï¿½
 	type = models.PositiveSmallIntegerField(default=EnemyActionType.Unset.value,
-											choices=TYPES, verbose_name="ÀàÐÍ")
+											choices=TYPES, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ²ÎÊý
-	params = jsonfield.JSONField(default=[], verbose_name="²ÎÊý")
+	# ï¿½ï¿½ï¿½ï¿½
+	params = jsonfield.JSONField(default=[], verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# È¨ÖØ
-	rate = models.PositiveSmallIntegerField(default=10, verbose_name="È¨ÖØ")
+	# È¨ï¿½ï¿½
+	rate = models.PositiveSmallIntegerField(default=10, verbose_name="È¨ï¿½ï¿½")
 
-	# µÐÈË
-	enemy = models.ForeignKey("ExerProEnemy", on_delete=models.CASCADE, verbose_name="µÐÈË")
+	# ï¿½ï¿½ï¿½ï¿½
+	enemy = models.ForeignKey("ExerProEnemy", on_delete=models.CASCADE, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
 	def convertToDict(self):
 		"""
-		×ª»¯Îª×Öµä
+		×ªï¿½ï¿½Îªï¿½Öµï¿½
 		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
+			ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
 		"""
 		return {
 			'rounds': self.rounds,
@@ -923,56 +927,56 @@ class EnemyAction(models.Model):
 
 
 # ===================================================
-#  µÐÈËµÈ¼¶Ã¶¾Ù
+#  ï¿½ï¿½ï¿½ËµÈ¼ï¿½Ã¶ï¿½ï¿½
 # ===================================================
 class ExerProEnemyType(Enum):
-	Normal = 1  # ÆÕÍ¨
-	Elite = 2  # ¾«Ó¢
-	Boss = 3  # BOSS
+    Normal = 1  # ï¿½ï¿½Í¨
+    Elite = 2  # ï¿½ï¿½Ó¢
+    Boss = 3  # BOSS
 
 
 # ===================================================
-#  ÌØÑµµÐÈË±í
+#  ï¿½ï¿½Ñµï¿½ï¿½ï¿½Ë±ï¿½
 # ===================================================
 class ExerProEnemy(BaseItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµµÐÈË"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½ï¿½ï¿½"
 
-	# µÀ¾ßÀàÐÍ
-	TYPE = ItemType.ExerProEnemy
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    TYPE = ItemType.ExerProEnemy
 
-	ENEMY_TYPES = [
-		(ExerProEnemyType.Normal.value, 'ÆÕÍ¨'),
-		(ExerProEnemyType.Elite.value, '¾«Ó¢'),
-		(ExerProEnemyType.Boss.value, 'BOSS'),
-	]
+    ENEMY_TYPES = [
+        (ExerProEnemyType.Normal.value, 'ï¿½ï¿½Í¨'),
+        (ExerProEnemyType.Elite.value, 'ï¿½ï¿½Ó¢'),
+        (ExerProEnemyType.Boss.value, 'BOSS'),
+    ]
 
-	# µÈ¼¶
-	type = models.PositiveSmallIntegerField(default=ExerProEnemyType.Normal.value,
-											choices=ENEMY_TYPES, verbose_name="µÈ¼¶")
+    # ï¿½È¼ï¿½
+    type = models.PositiveSmallIntegerField(default=ExerProEnemyType.Normal.value,
+                                            choices=ENEMY_TYPES, verbose_name="ï¿½È¼ï¿½")
 
-	# ×î´óÌåÁ¦Öµ
-	mhp = models.PositiveSmallIntegerField(default=100, verbose_name="×î´óÌåÁ¦Öµ")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+    mhp = models.PositiveSmallIntegerField(default=100, verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ")
 
-	# Á¦Á¿
-	power = models.PositiveSmallIntegerField(default=10, verbose_name="Á¦Á¿")
+    # ï¿½ï¿½ï¿½ï¿½
+    power = models.PositiveSmallIntegerField(default=10, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	# ¸ñµ²
-	defense = models.PositiveSmallIntegerField(default=10, verbose_name="¸ñµ²")
+    # ï¿½ï¿½
+    defense = models.PositiveSmallIntegerField(default=10, verbose_name="ï¿½ï¿½")
 
-	# ¸ñµ²
-	character = models.CharField(default="", blank=True, max_length=32, verbose_name="ÐÔ¸ñ")
+    # ï¿½ï¿½
+    character = models.CharField(default="", blank=True, max_length=32, verbose_name="ï¿½Ô¸ï¿½")
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		res = super().convertToDict()
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        res = super().convertToDict()
 
-		actions = ModelUtils.objectsToDict(self.actions())
-		effects = ModelUtils.objectsToDict(self.effects())
+        actions = ModelUtils.objectsToDict(self.actions())
+        effects = ModelUtils.objectsToDict(self.effects())
 
 		res['mhp'] = self.mhp
 		res['power'] = self.power
@@ -982,49 +986,49 @@ class ExerProEnemy(BaseItem):
 		res['character'] = self.character
 		res['type_'] = self.type
 
-		res['actions'] = actions
-		res['effects'] = effects
+        res['actions'] = actions
+        res['effects'] = effects
 
-		return res
+        return res
 
-	def actions(self):
-		"""
-		»ñÈ¡µÐÈËµÄÐÐ¶¯¼Æ»®
-		Returns:
-			·µ»ØµÐÈËÐÐ¶¯¼Æ»®
-		"""
-		return self.enemyaction_set.all()
+    def actions(self):
+        """
+        ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ð¶ï¿½ï¿½Æ»ï¿½
+        Returns:
+            ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Æ»ï¿½
+        """
+        return self.enemyaction_set.all()
 
-	def effects(self):
-		"""
-		»ñÈ¡µÐÈËµÄ¹¥»÷Ð§¹û
-		Returns:
-			·µ»ØµÐÈË¹¥»÷Ð§¹û
-		"""
-		return self.enemyeffect_set.all()
+    def effects(self):
+        """
+        ï¿½ï¿½È¡ï¿½ï¿½ï¿½ËµÄ¹ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
+        Returns:
+            ï¿½ï¿½ï¿½Øµï¿½ï¿½Ë¹ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
+        """
+        return self.enemyeffect_set.all()
 
 
 # ===================================================
-#  ÌØÑµ×´Ì¬±í
+#  ï¿½ï¿½Ñµ×´Ì¬ï¿½ï¿½
 # ===================================================
 class ExerProState(BaseItem):
 	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµ×´Ì¬"
+		verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµ×´Ì¬"
 
-	# µÀ¾ßÀàÐÍ
+	# ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	TYPE = ItemType.ExerProState
 
-	# ×î´ó×´Ì¬»ØºÏÊý
-	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="×î´ó×´Ì¬»ØºÏÊý")
+	# ï¿½ï¿½ï¿½×´Ì¬ï¿½Øºï¿½ï¿½ï¿½
+	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="ï¿½ï¿½ï¿½×´Ì¬ï¿½Øºï¿½ï¿½ï¿½")
 
-	# ÊÇ·ñ¸ºÃæ×´Ì¬
-	is_nega = models.BooleanField(default=False, verbose_name="ÊÇ·ñ¸ºÃæ×´Ì¬")
+	# ï¿½Ç·ï¿½ï¿½ï¿½×´Ì¬
+	is_nega = models.BooleanField(default=False, verbose_name="ï¿½Ç·ï¿½ï¿½ï¿½×´Ì¬")
 
 	def convertToDict(self):
 		"""
-		×ª»¯Îª×Öµä
+		×ªï¿½ï¿½Îªï¿½Öµï¿½
 		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
+			ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
 		"""
 		res = super().convertToDict()
 
@@ -1036,218 +1040,219 @@ class ExerProState(BaseItem):
 
 # endregion
 
-# region µØÍ¼
+# region ï¿½ï¿½Í¼
 
 
 # ===================================================
-#  ¾ÝµãÀàÐÍ±í
+#  ï¿½Ýµï¿½ï¿½ï¿½ï¿½Í±ï¿½
 # ===================================================
 class NodeType(GroupConfigure):
-	class Meta:
-		verbose_name = verbose_name_plural = "¾ÝµãÀàÐÍ"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½"
 
-	# ÌâÐÍ
-	ques_types = models.CharField(max_length=32, verbose_name="ÌâÐÍ")
+    # ï¿½ï¿½ï¿½ï¿½
+    ques_types = models.CharField(max_length=32, verbose_name="ï¿½ï¿½ï¿½ï¿½")
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		res = super().convertToDict()
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        res = super().convertToDict()
 
-		res['ques_types'] = self.ques_types
+        res['ques_types'] = self.ques_types
 
-		return res
+        return res
 
 
 # ===================================================
-#  µØÍ¼±í
+#  ï¿½ï¿½Í¼ï¿½ï¿½
 # ===================================================
 class ExerProMap(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "ÌØÑµµØÍ¼"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Í¼"
 
-	# µØÍ¼Ãû³Æ
-	name = models.CharField(max_length=24, verbose_name="µØÍ¼Ãû³Æ")
+    # ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+    name = models.CharField(max_length=24, verbose_name="ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½")
 
-	# ¹ÊÊÂÃèÊö
-	description = models.CharField(max_length=512, verbose_name="¹ÊÊÂÃèÊö")
+    # ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    description = models.CharField(max_length=512, verbose_name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# µØÍ¼ÄÑ¶È
-	level = models.PositiveSmallIntegerField(default=1, verbose_name="µØÍ¼ÄÑ¶È")
+    # ï¿½ï¿½Í¼ï¿½Ñ¶ï¿½
+    level = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½ï¿½Í¼ï¿½Ñ¶ï¿½")
 
-	# µÈ¼¶ÒªÇó
-	min_level = models.PositiveSmallIntegerField(default=1, verbose_name="µÈ¼¶ÒªÇó")
+    # ï¿½È¼ï¿½Òªï¿½ï¿½
+    min_level = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½È¼ï¿½Òªï¿½ï¿½")
 
-	def __str__(self):
-		return "%d. %s" % (self.id, self.name)
+    def __str__(self):
+        return "%d. %s" % (self.id, self.name)
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		stages = ModelUtils.objectsToDict(self.stages())
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        stages = ModelUtils.objectsToDict(self.stages())
 
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description,
-			'level': self.level,
-			'min_level': self.min_level,
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'level': self.level,
+            'min_level': self.min_level,
 
-			'stages': stages
-		}
+            'stages': stages
+        }
 
-	def stages(self):
-		"""
-		»ñÈ¡ËùÓÐ¹Ø¿¨
-		Returns:
-			·µ»Ø¹Ø¿¨ QuerySet
-		"""
-		return self.exerpromapstage_set.all()
+    def stages(self):
+        """
+        ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ð¹Ø¿ï¿½
+        Returns:
+            ï¿½ï¿½ï¿½Ø¹Ø¿ï¿½ QuerySet
+        """
+        return self.exerpromapstage_set.all()
 
-	def stage(self, order) -> 'ExerProMapStage':
-		"""
-		»ñÈ¡Ö¸¶¨ÐòºÅµÄ¹Ø¿¨
-		Args:
-			order (int): ¹Ø¿¨ÐòºÅ
-		Returns:
-			·µ»ØÖ¸¶¨ÐòºÅµÄ¹Ø¿¨¶ÔÏó
-		"""
-		stage = self.stages().filter(order=order)
-		
-		if stage.exists(): return stage.first()
+    def stage(self, order) -> 'ExerProMapStage':
+        """
+        ï¿½ï¿½È¡Ö¸ï¿½ï¿½ï¿½ï¿½ÅµÄ¹Ø¿ï¿½
+        Args:
+            order (int): ï¿½Ø¿ï¿½ï¿½ï¿½ï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ÅµÄ¹Ø¿ï¿½ï¿½ï¿½ï¿½ï¿½
+        """
+        stage = self.stages().filter(order=order)
 
-		return None
+        if stage.exists(): return stage.first()
+
+        return None
+
 
 # # ===================================================
-# #  ¾ÝµãÀàÐÍ±í
+# #  ï¿½Ýµï¿½ï¿½ï¿½ï¿½Í±ï¿½
 # # ===================================================
 # class NodeType(Enum):
-# 	Rest = 0  # ÐÝÏ¢¾Ýµã
-# 	Treasure = 1  # ²Ø±¦¾Ýµã
-# 	Shop = 2  # ÉÌÈË¾Ýµã
-# 	Enemy = 3  # µÐÈË¾Ýµã
-# 	Elite = 4  # ¾«Ó¢¾Ýµã
-# 	Unknown = 5  # Î´Öª¾Ýµã
-# 	Boss = 6  # ¾«Ó¢¾Ýµã
+# 	Rest = 0  # ï¿½ï¿½Ï¢ï¿½Ýµï¿½
+# 	Treasure = 1  # ï¿½Ø±ï¿½ï¿½Ýµï¿½
+# 	Shop = 2  # ï¿½ï¿½ï¿½Ë¾Ýµï¿½
+# 	Enemy = 3  # ï¿½ï¿½ï¿½Ë¾Ýµï¿½
+# 	Elite = 4  # ï¿½ï¿½Ó¢ï¿½Ýµï¿½
+# 	Unknown = 5  # Î´Öªï¿½Ýµï¿½
+# 	Boss = 6  # ï¿½ï¿½Ó¢ï¿½Ýµï¿½
 
 
 # ===================================================
-#  µØÍ¼¹Ø¿¨±í
+#  ï¿½ï¿½Í¼ï¿½Ø¿ï¿½ï¿½ï¿½
 # ===================================================
 class ExerProMapStage(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "µØÍ¼¹Ø¿¨"
+    class Meta:
+        verbose_name = verbose_name_plural = "ï¿½ï¿½Í¼ï¿½Ø¿ï¿½"
 
-	# ÐòºÅ
-	order = models.PositiveSmallIntegerField(default=1, verbose_name="ÐòºÅ")
+    # ï¿½ï¿½ï¿½
+    order = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½ï¿½ï¿½")
 
-	# µØÍ¼
-	map = models.ForeignKey("english_pro_module.ExerProMap", on_delete=models.CASCADE, verbose_name="µØÍ¼")
+    # ï¿½ï¿½Í¼
+    map = models.ForeignKey("english_pro_module.ExerProMap", on_delete=models.CASCADE, verbose_name="ï¿½ï¿½Í¼")
 
-	# µÐÈË¼¯ºÏ£¨±¾½×¶Î»áË¢µÄµÐÈË£©
-	enemies = models.ManyToManyField("ExerProEnemy", verbose_name="µÐÈË¼¯ºÏ")
+    # ï¿½ï¿½ï¿½Ë¼ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½×¶Î»ï¿½Ë¢ï¿½Äµï¿½ï¿½Ë£ï¿½
+    enemies = models.ManyToManyField("ExerProEnemy", verbose_name="ï¿½ï¿½ï¿½Ë¼ï¿½ï¿½ï¿½")
 
-	# Õ½¶·×î´óµÐÈËÊýÁ¿
-	max_battle_enemies = models.PositiveSmallIntegerField(default=1, verbose_name="Õ½¶·×î´óµÐÈËÊýÁ¿")
+    # Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    max_battle_enemies = models.PositiveSmallIntegerField(default=1, verbose_name="Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# Ã¿²½¾Ýµã¸öÊý£¨×îºóÒ»¸öÐèÎª1£©
-	steps = jsonfield.JSONField(default=[3, 4, 5, 2, 1], verbose_name="Ã¿²½¾Ýµã¸öÊý")
+    # Ã¿ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½
+    steps = jsonfield.JSONField(default=[3, 4, 5, 2, 1], verbose_name="Ã¿ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½")
 
-	# ×î´ó·Ö²æ¾ÝµãÊýÁ¿
-	max_fork_node = models.PositiveSmallIntegerField(default=5, verbose_name="×î´ó·Ö²æ¾ÝµãÊýÁ¿")
+    # ï¿½ï¿½ï¿½Ö²ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½
+    max_fork_node = models.PositiveSmallIntegerField(default=5, verbose_name="ï¿½ï¿½ï¿½Ö²ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ×î´ó·Ö²æÑ¡ÔñÊý
-	max_fork = models.PositiveSmallIntegerField(default=3, verbose_name="×î´ó·Ö²æÑ¡ÔñÊý")
+    # ï¿½ï¿½ï¿½Ö²ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½
+    max_fork = models.PositiveSmallIntegerField(default=3, verbose_name="ï¿½ï¿½ï¿½Ö²ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½")
 
-	# ¾Ýµã±ÈÀý£¨Ò»¹²6ÖÖ¾Ýµã£¬°´ÕÕ¸Ã±ÈÀýµÄ¼¸ÂÊ½øÐÐÉú³É£¬Êµ¼Ê²»Ò»¶¨Îª¸Ã±ÈÀý£©
-	node_rate = jsonfield.JSONField(default=[1, 1, 1, 1, 1, 1], verbose_name="¾Ýµã±ÈÀý")
+    # ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½6ï¿½Ö¾Ýµã£¬ï¿½ï¿½ï¿½Õ¸Ã±ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½Êµï¿½Ê²ï¿½Ò»ï¿½ï¿½Îªï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½
+    node_rate = jsonfield.JSONField(default=[1, 1, 1, 1, 1, 1], verbose_name="ï¿½Ýµï¿½ï¿½ï¿½ï¿½")
 
-	def __str__(self):
-		return "%s µÚ %s ¹Ø" % (self.map, self.order)
+    def __str__(self):
+        return "%s ï¿½ï¿½ %s ï¿½ï¿½" % (self.map, self.order)
 
-	def convertToDict(self):
-		"""
-		×ª»¯Îª×Öµä
-		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
-		"""
-		enemies = list(e.id for e in self.enemies.all())
+    def convertToDict(self):
+        """
+        ×ªï¿½ï¿½Îªï¿½Öµï¿½
+        Returns:
+            ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
+        """
+        enemies = list(e.id for e in self.enemies.all())
 
-		return {
-			'order': self.order,
-			'max_battle_enemies': self.max_battle_enemies,
-			'steps': self.steps,
-			'max_fork_node': self.max_fork_node,
-			'max_fork': self.max_fork,
-			'node_rate': self.node_rate,
+        return {
+            'order': self.order,
+            'max_battle_enemies': self.max_battle_enemies,
+            'steps': self.steps,
+            'max_fork_node': self.max_fork_node,
+            'max_fork': self.max_fork,
+            'node_rate': self.node_rate,
 
-			'enemies': enemies,
-		}
+            'enemies': enemies,
+        }
 
 
 # ===================================================
-#  ÌØÑµ¼ÇÂ¼±í
+#  ï¿½ï¿½Ñµï¿½ï¿½Â¼ï¿½ï¿½
 # ===================================================
 class ExerProRecord(CacheableModel):
 	class Meta:
 
-		verbose_name = verbose_name_plural = "ÌØÑµ¼ÇÂ¼"
+		verbose_name = verbose_name_plural = "ï¿½ï¿½Ñµï¿½ï¿½Â¼"
 
-	# µ±Ç°µ¥´Ê»º´æ¼ü
+	# ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ê»ï¿½ï¿½ï¿½ï¿½
 	CUR_WORDS_CACHE_KEY = 'cur_words'
 
-	# ¹Ø¿¨
+	# ï¿½Ø¿ï¿½
 	stage = models.ForeignKey('ExerProMapStage', null=True,
-							  on_delete=models.CASCADE, verbose_name="¹Ø¿¨")
+							  on_delete=models.CASCADE, verbose_name="ï¿½Ø¿ï¿½")
 
-	# ¿ªÊ¼±êÖ¾
-	started = models.BooleanField(default=False, verbose_name="¿ªÊ¼±êÖ¾")
+	# ï¿½ï¿½Ê¼ï¿½ï¿½Ö¾
+	started = models.BooleanField(default=False, verbose_name="ï¿½ï¿½Ê¼ï¿½ï¿½Ö¾")
 
-	# Éú³É±êÖ¾
-	generated = models.BooleanField(default=False, verbose_name="Éú³É±êÖ¾")
+	# ï¿½ï¿½ï¿½É±ï¿½Ö¾
+	generated = models.BooleanField(default=False, verbose_name="ï¿½ï¿½ï¿½É±ï¿½Ö¾")
 
-	# µ±Ç°¾ÝµãË÷Òý
-	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="µ±Ç°¾ÝµãË÷Òý")
+	# ï¿½ï¿½Ç°ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½
+	cur_index = models.PositiveSmallIntegerField(default=None, null=True, verbose_name="ï¿½ï¿½Ç°ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ÊÇ·ñÍê³É¾ÝµãÊÂ¼þ
-	node_flag = models.BooleanField(default=False, verbose_name="ÊÇ·ñÍê³É¾ÝµãÊÂ¼þ")
+	# ï¿½Ç·ï¿½ï¿½ï¿½É¾Ýµï¿½ï¿½Â¼ï¿½
+	node_flag = models.BooleanField(default=False, verbose_name="ï¿½Ç·ï¿½ï¿½ï¿½É¾Ýµï¿½ï¿½Â¼ï¿½")
 
-	# µ¥´ÊµÈ¼¶£¨Í¬Ê±Ò²ÊÇÍæ¼ÒÔÚÓ¢ÓïÄ£¿éµÄµÈ¼¶£©
-	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="µ¥´ÊµÈ¼¶")
+	# ï¿½ï¿½ï¿½ÊµÈ¼ï¿½ï¿½ï¿½Í¬Ê±Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¢ï¿½ï¿½Ä£ï¿½ï¿½ÄµÈ¼ï¿½ï¿½ï¿½
+	word_level = models.PositiveSmallIntegerField(default=1, verbose_name="ï¿½ï¿½ï¿½ÊµÈ¼ï¿½")
 
-	# # ÏÂÒ»µ¥´Ê
+	# # ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
 	# next = models.ForeignKey('Word', null=True, blank=True,
-	# 						 on_delete=models.CASCADE, verbose_name="ÏÂÒ»µ¥´Ê")
+	# 						 on_delete=models.CASCADE, verbose_name="ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½")
 
-	# ¾ÝµãÊý¾Ý
+	# ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½
 	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
-								verbose_name="¾ÝµãÊý¾Ý")
+								verbose_name="ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½")
 
-	# ½ÇÉ«Êý¾Ý
+	# ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½
 	actor = jsonfield.JSONField(default=None, null=True, blank=True,
-								verbose_name="½ÇÉ«Êý¾Ý")
+								verbose_name="ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½")
 
-	# Íæ¼Ò
+	# ï¿½ï¿½ï¿½
 	player = models.OneToOneField('player_module.Player', null=False,
-								  on_delete=models.CASCADE, verbose_name="Íæ¼Ò")
+								  on_delete=models.CASCADE, verbose_name="ï¿½ï¿½ï¿½")
 
 	def __str__(self):
-		return "%d. %s ÌØÑµ¼ÇÂ¼" % (self.id, self.player)
+		return "%d. %s ï¿½ï¿½Ñµï¿½ï¿½Â¼" % (self.id, self.player)
 
-	# ´´½¨ÐÂ¼ÇÂ¼
+	# ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½Â¼
 	@classmethod
 	def create(cls, player):
 		"""
-		´´½¨ÌØÑµ¼ÇÂ¼
+		ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñµï¿½ï¿½Â¼
 		Args:
-			player (Player): Íç¼²
-			wids (list): µ¥´ÊIDÊý×é
+			player (Player): ï¿½ç¼²
+			wids (list): ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½
 		"""
 		record = cls()
 		record.player = player
@@ -1259,12 +1264,12 @@ class ExerProRecord(CacheableModel):
 
 	def convertToDict(self, type: str = None, **kwargs):
 		"""
-		×ª»¯Îª×Öµä
+		×ªï¿½ï¿½Îªï¿½Öµï¿½
 		Args:
-			type (str): ÀàÐÍ
-			**kwargs (**dict): ÍØÕ¹²ÎÊý
+			type (str): ï¿½ï¿½ï¿½ï¿½
+			**kwargs (**dict): ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½
 		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
+			ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½
 		"""
 
 		if type == "records":
@@ -1321,9 +1326,9 @@ class ExerProRecord(CacheableModel):
 
 	def loadFromDict(self, data: dict):
 		"""
-		´Ó×ÖµäÖÐ¶ÁÈ¡
+		ï¿½ï¿½ï¿½Öµï¿½ï¿½Ð¶ï¿½È¡
 		Args:
-			data (dict): ×Öµä
+			data (dict): ï¿½Öµï¿½
 		"""
 		from .views import Common
 
@@ -1338,13 +1343,13 @@ class ExerProRecord(CacheableModel):
 		ModelUtils.loadKey(data, 'nodes', self)
 		ModelUtils.loadKey(data, 'actor', self)
 
-	# region Á÷³Ì¿ØÖÆ
+	# region ï¿½ï¿½ï¿½Ì¿ï¿½ï¿½ï¿½
 
 	def setupMap(self, map: 'ExerProMap'):
 		"""
-		ÉèÖÃµØÍ¼
+		ï¿½ï¿½ï¿½Ãµï¿½Í¼
 		Args:
-			map (ExerProMap): µØÍ¼
+			map (ExerProMap): ï¿½ï¿½Í¼
 		"""
 		self.reset()
 		self.stage = map.stage(1)
@@ -1352,16 +1357,16 @@ class ExerProRecord(CacheableModel):
 
 	def reset(self):
 		"""
-		ÖØÖÃ£¬ÖØÖÃÌØÑµ¼ÇÂ¼×´Ì¬
+		ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñµï¿½ï¿½Â¼×´Ì¬
 		"""
 		self.started = self.generated = False
 		self.cur_index = self.nodes = self.actor = None
 
 	def upgrade(self):
 		"""
-		Éý¼¶µ¥´Ê
+		ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		"""
-		# ³õÊ¼×´Ì¬£¬Îª None
+		# ï¿½ï¿½Ê¼×´Ì¬ï¿½ï¿½Îª None
 		if self.word_level is None:
 			self.word_level = 1
 		else:
@@ -1372,7 +1377,7 @@ class ExerProRecord(CacheableModel):
 
 	def _generateWordRecords(self):
 		"""
-		Éú³Éµ¥´ÊºÍ¼ÇÂ¼
+		ï¿½ï¿½ï¿½Éµï¿½ï¿½ÊºÍ¼ï¿½Â¼
 		"""
 		word_recs = self.wordRecords()
 
@@ -1385,13 +1390,13 @@ class ExerProRecord(CacheableModel):
 
 	def _generateWords(self) -> list:
 		"""
-		Éú³Éµ¥´Ê
+		ï¿½ï¿½ï¿½Éµï¿½ï¿½ï¿½
 		Returns:
-			·µ»ØÉú³Éµ¥´ÊIDÊý×é
+			ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éµï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½
 		"""
 		from utils.calc_utils import NewWordsGenerator
 
-		# »ñÈ¡¾Éµ¥´ÊµÄIDÊý×é
+		# ï¿½ï¿½È¡ï¿½Éµï¿½ï¿½Êµï¿½IDï¿½ï¿½ï¿½ï¿½
 		old_words = self.currentWordRecords()
 		old_words = [record.word_id for record in old_words]
 
@@ -1399,20 +1404,20 @@ class ExerProRecord(CacheableModel):
 
 	def terminate(self):
 		"""
-		½áÊøÌØÑµ
+		ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñµ
 		"""
 		self.started = self.generated = False
 		self.save()
 
 	# endregion
 
-	# region µ¥´Ê¼ÇÂ¼¹ÜÀí
+	# region ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½ï¿½ï¿½ï¿½
 
 	def isFinished(self):
 		"""
-		±¾ÂÖµ¥´ÊÊÇ·ñÍê³É
+		ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
 		Returns:
-			·µ»Ø±¾ÂÖµ¥´ÊÊÇ·ñÍê³É
+			ï¿½ï¿½ï¿½Ø±ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
 		"""
 		if self.word_level is None: return True
 
@@ -1425,9 +1430,9 @@ class ExerProRecord(CacheableModel):
 
 	def nextWord(self) -> WordRecord:
 		"""
-		Éú³ÉÏÂÒ»¸öµ¥´Ê
+		ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		Returns:
-			·µ»ØÏÂÒ»¸öµ¥´Ê¼ÇÂ¼
+			ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Â¼
 		"""
 		word_recs = self.currentWordRecords()
 		word_recs = [word_rec for word_rec in word_recs
@@ -1439,7 +1444,7 @@ class ExerProRecord(CacheableModel):
 
 	def clearCurrentWords(self):
 		"""
-		Çå³ýµ±Ç°µ¥´Ê
+		ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
 		"""
 		word_recs = self.currentWordRecords()
 
@@ -1449,37 +1454,37 @@ class ExerProRecord(CacheableModel):
 
 	def wordRecords(self):
 		"""
-		È«²¿µ¥´Ê¼ÇÂ¼£¨»º´æ£©
+		È«ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½æ£©
 		Returns:
-			·µ»Ø»º´æµÄÈ«²¿µ¥´Ê¼ÇÂ¼ÁÐ±í
+			ï¿½ï¿½ï¿½Ø»ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½Ð±ï¿½
 		"""
 		return self._getOrSetCache(self.CUR_WORDS_CACHE_KEY,
 								   lambda: list(self._wordRecords()))
 
 	def _wordRecords(self):
 		"""
-		È«²¿µ¥´Ê¼ÇÂ¼£¨Êý¾Ý¿â£©
+		È«ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿â£©
 		Returns:
-			·µ»ØÈ«²¿µ¥´Ê¼ÇÂ¼ÁÐ±í
+			ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½Ð±ï¿½
 		"""
 		return self.wordrecord_set.all()
 
 	def currentWordRecords(self):
 		"""
-		µ±Ç°µ¥´Ê¼ÇÂ¼
+		ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ê¼ï¿½Â¼
 		Returns:
-			·µ»Øµ±Ç°µ¥´Ê¼ÇÂ¼ÁÐ±í
+			ï¿½ï¿½ï¿½Øµï¿½Ç°ï¿½ï¿½ï¿½Ê¼ï¿½Â¼ï¿½Ð±ï¿½
 		"""
 		return ModelUtils.query(self.wordRecords(), current=True)
 
 	def wordRecord(self, word_id: int, **kwargs) -> 'WordRecord':
 		"""
-		Í¨¹ýµ¥´ÊID²éÕÒµ¥´Ê¼ÇÂ¼
+		Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½Òµï¿½ï¿½Ê¼ï¿½Â¼
 		Args:
-			word_id (int): µ¥´ÊID
-			**kwargs (**dict): ÆäËû²éÑ¯Ìõ¼þ
+			word_id (int): ï¿½ï¿½ï¿½ï¿½ID
+			**kwargs (**dict): ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½
 		Returns:
-			Èô´æÔÚµ¥´Ê¼ÇÂ¼£¬·µ»ØÖ®£¬·ñÔò·µ»Ø None
+			ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½Ê¼ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ò·µ»ï¿½ None
 		"""
 		return ModelUtils.get(self.wordRecords(), word_id=word_id, **kwargs)
 

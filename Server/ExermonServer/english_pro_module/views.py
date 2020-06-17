@@ -82,13 +82,6 @@ class Service:
 		questions = Common.getQuestions(ids=qids, type_=type)
 		questions = ModelUtils.objectsToDict(questions)
 
-		# if type == QuestionType.Listening.value:
-		# 	questions = Common.getQuestions(ids=qids, type_=ListeningQuestion)
-		# elif type == QuestionType.Phrase.value:
-		# 	questions = Common.getQuestions(ids=qids, type_=InfinitiveQuestion)
-		# elif type == QuestionType.Correction.value:
-		# 	questions = Common.getQuestions(ids=qids, type_=CorrectionQuestion)
-
 		return {'questions': questions}
 
 	# 生成当前轮单词
@@ -98,13 +91,6 @@ class Service:
 		# words: 单词数据（数组） => 单词数据集
 
 		pro_record = Common.getExerProRecord(player)
-
-		# # 没有玩过的记录
-		# if not pro_record:
-		# 	pro_record = ExerProRecord.create(player)
-		#
-		# # 有玩过的记录
-		# else:
 
 		Common.ensureFinishLastWords(pro_record)
 
