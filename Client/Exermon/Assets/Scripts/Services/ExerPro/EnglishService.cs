@@ -274,7 +274,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
 				// TODO: 保存奖励信息
-				record.load(res); onSuccess?.Invoke();
+				//danteding 测试用
+				//record.load(res); onSuccess?.Invoke();
 			};
 
 			saveExerPro(terminate, _onSuccess, onError);
@@ -673,6 +674,8 @@ namespace ExerPro.EnglishModule.Services {
 			Debug.Log("switchNode: " + type);
 			if (!record.nodeFlag)
 				switch (type) {
+					//danteding 测试用
+					/*
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
 					case ExerProMapNode.Type.Treasure: onTreasureNode(); break;
 					case ExerProMapNode.Type.Shop: onShopNode(); break;
@@ -681,6 +684,8 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Elite: onEliteNode(); break;
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
+					case ExerProMapNode.Type.Listen: onListenNode(); break;*/
+					default: onListenNode(); break;
 				} else exitNode(false);
 		}
 
@@ -749,10 +754,18 @@ namespace ExerPro.EnglishModule.Services {
             sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
         }
 
-        /// <summary>
-        /// 精英据点
-        /// </summary>
-        void onEliteNode() {
+		/// <summary>
+		/// 听力据点
+		/// </summary>
+		void onListenNode()
+		{
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
+		}
+
+		/// <summary>
+		/// 精英据点
+		/// </summary>
+		void onEliteNode() {
             sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
         }
 

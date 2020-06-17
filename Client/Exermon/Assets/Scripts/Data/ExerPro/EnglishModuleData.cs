@@ -39,8 +39,9 @@ namespace ExerPro.EnglishModule.Data {
 
     using EnglishModule.Services;
     using System.IO;
+    using UnityEditor.PackageManager.UI;
 
-	#region 题目
+    #region 题目
 
 
     /// <summary>
@@ -59,6 +60,40 @@ namespace ExerPro.EnglishModule.Data {
         public ListeningSubQuestion()
         {
             
+        }
+
+        public static ListeningSubQuestion sample()
+        {
+            long i = UnityEngine.Random.Range(0, 10000);
+			LitJson.JsonData jsonData = new LitJson.JsonData();
+			jsonData["id"] = 100;
+			jsonData["title"] = "你走进一间房间，看见地上有一个大洞。当你靠近洞时，一条巨大的蛇形生物从里面钻了出来。\n\n" +
+				"“~嚯嚯嚯！你好，你好啊！这是谁啊？”\n" +
+				"你同意吗？";
+			jsonData["event_name"] = "蛇";
+			//var loadPath = System.Environment.CurrentDirectory + "\\Assets\\Sprites\\ExerPro\\PlotScene\\Snake.png";
+			//jsonData["picture"] = DataLoader.convert(loadPictureHelp(loadPath));
+			const string loadPath = "ExerPro/Test/";
+			jsonData["picture"] = DataLoader.convert(AssetLoader.loadTexture2D(loadPath, "Snake"));
+
+			ListeningSubQuestion.Choice[] tempArray = new ListeningSubQuestion.Choice[5];
+			LitJson.JsonData choiceData = new LitJson.JsonData();
+			choiceData["text"] = "【同意】 得到 175 金币。被诅咒——疑虑。";
+            ListeningSubQuestion.Choice temp = DataLoader.load<ListeningSubQuestion.Choice>(choiceData);
+			tempArray[0] = temp;
+			choiceData["text"] = "【拒绝】";
+            ListeningSubQuestion.Choice temp1 = DataLoader.load<ListeningSubQuestion.Choice>(choiceData);
+			tempArray[1] = temp1;
+			choiceData["text"] = "【拒绝】";
+            ListeningSubQuestion.Choice temp2 = DataLoader.load<ListeningSubQuestion.Choice>(choiceData);
+			tempArray[2] = temp2;
+			tempArray[3] = temp2;
+			tempArray[4] = temp2;
+
+			jsonData["choices"] = DataLoader.convert(tempArray);
+
+            ListeningSubQuestion testQuestion = DataLoader.load<ListeningSubQuestion>(jsonData);
+			return testQuestion;
         }
 	}
 
@@ -80,15 +115,21 @@ namespace ExerPro.EnglishModule.Data {
 		public string eventName { get; protected set; }
 		[AutoConvert]
 		public Texture2D picture { get; protected set; }
+		[AutoConvert]
+		public int times { get; protected set; }
 
-        public ListeningQuestion() {
+		public ListeningQuestion() {
         }
         public static ListeningQuestion sample() {
             ListeningQuestion returnSample = new ListeningQuestion();
             returnSample.article = "海贼王";
             returnSample.audio = AssetLoader.loadListeningAudioClip(1);
-            ListeningSubQuestion testSubQuestion1 = new ListeningSubQuestion();
-            return returnSample;
+            returnSample.eventName = "海";
+            
+            ListeningSubQuestion testSubQuestion1 = ListeningSubQuestion.sample();
+            returnSample.subQuestions = new ListeningSubQuestion[1];
+            returnSample.subQuestions[0] = (testSubQuestion1);
+			return returnSample;
         }
 	}
 	/*
@@ -1789,6 +1830,7 @@ namespace ExerPro.EnglishModule.Data {
             Unknown = 6, //未知据点
             Boss = 7, // 最终BOSS
             Story = 8, // 剧情据点
+            Listen = 9, // 听力据点
         }
 
         /// <summary>

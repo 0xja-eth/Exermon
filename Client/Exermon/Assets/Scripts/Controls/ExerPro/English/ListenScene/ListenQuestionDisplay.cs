@@ -4,17 +4,24 @@ using UnityEngine.UI;
 using UI.Common.Controls.ItemDisplays;
 using ExerPro.EnglishModule.Data;
 using UI.Common.Controls.SystemExtend.QuestionText;
+using Assets.Scripts.Controls.ExerPro.English.ListenScene;
 
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
-    public class ListenQuestionDisplay : ItemDetailDisplay<ListeningQuestion> {
+	/// <summary>
+	/// 题目显示
+	/// 利大佬说的Class E
+	/// </summary>
+	public class ListenQuestionDisplay : ItemDisplay<ListeningQuestion> {
         /// <summary>
         /// 外部变量
         /// </summary>
         public Text tipName;
         public RawImage image;
-        public QuestionText title, description;
-        public ListenChoiceContainer choiceContainer; // 选项容器
         public RectTransform content;
+        public Button playButton;
+        public Slider slider;
+        public ListeningSubQuestionDisplay subDisplay;
+        public RectTransform textContent; //子题目的父亲
 
         /// <summary>
         /// 显示答案解析
@@ -34,7 +41,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            choiceContainer?.addClickedCallback(onChoiceSelected);
+            //choiceContainer?.addClickedCallback(onChoiceSelected);
+            
         }
 
         #endregion
@@ -52,11 +60,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         void onChoiceSelected(int index) {
             showAnswer = true;
 
-            var question = choiceContainer.getItem();
-            var resultChoice = question.choices[index];
+            //var resultChoice = question.choices[index];
             var resultText = "";
             //var resultEffect = resultChoice.effects;
-            description.text = resultText;
 
             requestRefresh(true);
         }
@@ -69,22 +75,18 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// </summary>
         /// <param name="question">题目</param>
         protected override void drawExactlyItem(ListeningQuestion question) {
-            ListeningSubQuestion[] questions = question.subQuestions;
             base.drawExactlyItem(question);
+            ListeningSubQuestion[] questions = question.subQuestions;
             drawBaseInfo(question);
             if (showAnswer) {
-                if (title) title.gameObject.SetActive(false);
-                if (choiceContainer) choiceContainer.gameObject.SetActive(false);
-                if (description) description.gameObject.SetActive(true);
             }
             else {
-                if (title) title.gameObject.SetActive(true);
-                if (choiceContainer) choiceContainer.gameObject.SetActive(true);
-                if (description) description.gameObject.SetActive(false);
-                foreach(ListeningSubQuestion q in questions)
+                if (audioSource) audioSource.clip = question.audio;
+                foreach (ListeningSubQuestion q in questions)
                 {
-                    drawTitle(q);
-                    drawChoices(q);
+                    ListeningSubQuestionDisplay ss = ListeningSubQuestionDisplay.Instantiate(subDisplay, textContent.transform);
+                    ss.content = content;
+                    ss.startView(q);
                 }
             }
         }
@@ -99,37 +101,45 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
                 image.texture = question.picture;
         }
 
-        /// <summary>
-        /// 绘制题干
-        /// </summary>
-        /// <param name="question">题目</param>
-        void drawTitle(ListeningSubQuestion question) {
-            if (title)
-                title.text = question.title;
-        }
 
-        /// <summary>
-        /// 绘制图片和选项
-        /// </summary>
-        /// <param name="question">题目</param>
-        void drawChoices(ListeningSubQuestion question) {
-            choiceContainer?.startView(question);
-        }
 
         /// <summary>
         /// 清除物品
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
-            title.text = description.text = "";
 
             if (tipName) tipName.text = "";
-            if (choiceContainer) choiceContainer.gameObject.SetActive(false);
-            if (description) description.text = "";
-            if (description.gameObject) description.gameObject.SetActive(false);
         }
 
-        #endregion
+		#endregion
 
-    }
+		#region 播放音频
+		/// <summary>
+		/// 播放源
+		/// </summary>
+		public AudioSource audioSource;
+
+		/// <summary>
+		/// 播放听力音频
+		/// </summary>
+		public void playAudio()
+		{
+            if (audioSource.isPlaying) {
+                audioSource.Pause();
+                playButton.image.sprite = Resources.Load<Sprite>("ExerPro/ListenScene/play");
+            }
+            else {
+                audioSource.Play();
+                playButton.image.sprite = Resources.Load<Sprite>("ExerPro/ListenScene/pause");
+            }
+		}
+		protected override void update()
+		{
+			base.update();
+            if(audioSource.isPlaying)
+                slider.value = audioSource.time / audioSource.clip.length;
+        }
+		#endregion
+	}
 }

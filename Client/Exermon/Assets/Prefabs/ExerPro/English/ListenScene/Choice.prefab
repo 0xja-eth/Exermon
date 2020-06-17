@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2710365085464301386}
   - component: {fileID: 2710365085464301385}
   - component: {fileID: 5855751895284202424}
-  - component: {fileID: 2271785710237967682}
+  - component: {fileID: 4224528453626705844}
   m_Layer: 5
   m_Name: Choice
   m_TagString: Untagged
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 0
+  m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -131,7 +131,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &2271785710237967682
+--- !u!114 &4224528453626705844
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,12 +140,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2710365085464301391}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fd57f313b7175b46acea186c89ce27e, type: 3}
+  m_Script: {fileID: 11500000, guid: 898eaae2fc2904e4e84540727fc6262a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   background: {fileID: 0}
   disabledFlag: {fileID: 0}
-  selectedFlag: {fileID: 0}
+  selectedFlag: {fileID: 5313261791085055846}
   checkedFlag: {fileID: 0}
   highlightFlag: {fileID: 2710365085509083710}
   actived: 1
@@ -153,6 +153,7 @@ MonoBehaviour:
   selectable: 1
   checkable: 0
   highlightable: 1
+  clickable: 1
   forceChecked: 0
   deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}
