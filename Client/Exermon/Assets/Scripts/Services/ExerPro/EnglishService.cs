@@ -794,7 +794,7 @@ namespace ExerPro.EnglishModule.Services {
 			if (pop) sceneSys.popScene();
 			changeState(State.Idle);
 			record.nodeFlag = true;
-			saveExerPro();
+			//saveExerPro();
 		}
 
 		#endregion
@@ -827,7 +827,7 @@ namespace ExerPro.EnglishModule.Services {
 			changeState(State.Moving);
 			record.moveNext(nid, force);
 			record.nodeFlag = false;
-			saveExerPro();
+			//saveExerPro();
 		}
 
 		/// <summary>
