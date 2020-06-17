@@ -1097,6 +1097,7 @@ MonoBehaviour:
   retrieveBtn: {fileID: 1559585777}
   finishBtn: {fileID: 1171176458}
   showPassword: {fileID: 2029580012}
+  system: {fileID: 337007245}
 --- !u!95 &281108940
 Animator:
   serializedVersion: 3
@@ -5459,7 +5460,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1986818589
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5631,7 +5632,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggle: {fileID: 2029580012}
   flagObject: {fileID: 409123937}
-  isOnFlag: 1
+  isOnFlag: 0
 --- !u!114 &2029580011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5646,7 +5647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggle: {fileID: 2029580012}
   flagObject: {fileID: 1895737027}
-  isOnFlag: 0
+  isOnFlag: 1
 --- !u!114 &2029580012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5693,8 +5694,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1640228753}
-        m_MethodName: activate
+      - m_Target: {fileID: 281108938}
+        m_MethodName: click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

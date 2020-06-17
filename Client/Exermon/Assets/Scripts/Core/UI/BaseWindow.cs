@@ -1,6 +1,8 @@
 ﻿
 using UnityEngine;
 
+using UI.Common.Controls.AnimationSystem;
+
 namespace Core.UI {
 
     /// <summary>
@@ -192,6 +194,14 @@ namespace Core.UI {
         protected virtual bool isBackgroundVisible() {
             return shown;
         }
+
+		/// <summary>
+		/// 忙碌中（Showing/Hiding)
+		/// </summary>
+		/// <returns></returns>
+		public bool isBusy() {
+			return isShowing || isHiding;
+		}
 
         #endregion
 

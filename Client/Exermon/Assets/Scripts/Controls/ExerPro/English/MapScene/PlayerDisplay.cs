@@ -22,7 +22,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
     /// <summary>
     /// 玩家显示组件
     /// </summary>
-    public class PlayerDisplay : ItemDisplay<ExerProActor> {
+    public class PlayerDisplay : ItemDisplay<RuntimeActor> {
 
         /// <summary>
         /// 外部组件定义
@@ -118,7 +118,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public override bool isNullItem(ExerProActor item) {
+        public override bool isNullItem(RuntimeActor item) {
             return base.isNullItem(item) || item.slotItem.isNullItem();
         }
 
@@ -126,7 +126,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 绘制物品
         /// </summary>
         /// <param name="item"></param>
-        protected override void drawExactlyItem(ExerProActor item) {
+        protected override void drawExactlyItem(RuntimeActor item) {
             base.drawExactlyItem(item);
             drawPlayerExer(item.slotItem.playerExer);
         }

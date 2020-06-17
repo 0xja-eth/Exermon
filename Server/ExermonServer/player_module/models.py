@@ -1062,7 +1062,9 @@ class Player(CacheableModel):
 		Returns:
 			返回战斗力点数
 		"""
-		return self.exerSlot().battlePoint()
+		exer_slot = self.exerSlot()
+		if exer_slot is None: return 0
+		return exer_slot.battlePoint()
 
 	def gainMoney(self, currency: Currency = None,
 				  gold=0, ticket=0, bound_ticket=0):

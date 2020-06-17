@@ -88,6 +88,8 @@ namespace Core.UI {
         /// 初始化
         /// </summary>
         void initialize() {
+            var name = gameObject.name;
+            var init = this.initialized;
             if (!initialized) {
                 initialized = true;
                 initializeSystems();

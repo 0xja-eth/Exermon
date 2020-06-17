@@ -61,7 +61,7 @@ namespace Core.UI {
             initializeSceneUtils();
             initializeSystems();
             initializeOthers();
-            checkFirstScene();
+            //checkFirstScene();
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Core.UI {
         /// </summary>
         /// <returns></returns>
         public void checkFirstScene() {
-            var first = SceneSystem.Scene.FirstScene;
+            var first = Config.FirstScene;
             if (gameSys.isConnectable() && sceneIndex() != first)
                 sceneSys.gotoScene(first);
         }

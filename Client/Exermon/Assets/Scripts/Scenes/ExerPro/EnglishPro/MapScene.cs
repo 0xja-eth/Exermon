@@ -31,8 +31,9 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// 外部组件设置
         /// </summary>
         public StageRecordDisplay stageRecordDisplay;
+		public RestNodeDisplay restNodeDisplay;
 
-        public BaseWindow nodeDetail;
+		public BaseWindow nodeDetail;
 
         /// <summary>
         /// 内部变量定义
@@ -80,7 +81,17 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         protected override void update() {
             base.update();
             engSer?.update();
+			updateRestNode();
         }
+
+		/// <summary>
+		/// 更新休息据点
+		/// </summary>
+		void updateRestNode() {
+			if (!engSer.isRestNode()) return;
+			restNodeDisplay.startView(engSer.randomTips());
+			stageRecordDisplay.requestRefresh();
+		}
 
         #endregion
 
