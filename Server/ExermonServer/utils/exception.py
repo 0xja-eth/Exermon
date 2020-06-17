@@ -200,6 +200,7 @@ class ErrorType(Enum):
 	MapNotFound = 810  # 地图不存在
 	StageNotFound = 811  # 关卡不存在
 	ExerProStarted = 812  # 特训正在进行
+	ShoppingTypeNotExist = 813  # 购买物品类型不存在
 
 
 class GameException(Exception):
@@ -393,7 +394,7 @@ class GameException(Exception):
 		ErrorType.MapNotFound: "地图不存在！",
 		ErrorType.StageNotFound: "关卡不存在！",
 		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
-
+		ErrorType.ShoppingTypeNotExist: "购买物品类型不存在！",
 	}
 
 	def __init__(self, error_type: ErrorType):

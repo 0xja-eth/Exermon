@@ -3,6 +3,7 @@ from typing import Any
 from .models import *
 from player_module.models import Player
 from item_module.views import Common as ItemCommon
+from item_module.models import ItemType
 from utils.view_utils import Common as ViewUtils
 from utils.calc_utils import NewWordsGenerator
 from utils.exception import ErrorType, GameException
@@ -136,23 +137,6 @@ class Service:
 
 		return pro_record.convertToDict("status")
 
-		# exer_pro_record = ViewUtils.getObject(ExerProRecord, ErrorType.NoFirstCurrentWords, player=player)
-		# wids = exer_pro_record.words
-		# level = exer_pro_record.WordLevel
-		# sum = len(exer_pro_record.words)
-		# word_records = Common.getWordRecords(player, word_id__in=wids)
-		# correct = 0
-		# for word_record in word_records:
-		# 	if word_record.current_correct:
-		# 		correct += 1
-		# wrong = sum - correct
-		# return {
-		# 	'level': level,
-		# 	'sum': sum,
-		# 	'correct': correct,
-		# 	'wrong': wrong
-		# }
-
 	# 查询单词
 	@classmethod
 	async def getWords(cls, consumer, player: Player, wids: list,):
@@ -189,6 +173,14 @@ class Check:
 	@classmethod
 	def ensureQuestionType(cls, type: int):
 		ViewUtils.ensureEnumData(type, QuestionType, ErrorType.InvalidQuestionType, True)
+
+	# 校验购买物品是否在ExerProItem, ExerProPotion, ExerProCard类型中
+	@classmethod
+	def ensureShoppingItemType(cls, type: int):
+		item_list = [ItemType.ExerProItem.value, ItemType.ExerProPotion.value, ItemType.ExerProCard.value]
+		if type not in item_list:
+			raise GameException(ErrorType.ShoppingTypeNotExist)
+
 
 
 # =======================
