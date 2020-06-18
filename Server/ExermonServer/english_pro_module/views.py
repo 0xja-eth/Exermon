@@ -99,6 +99,15 @@ class Service:
 
         return pro_record.convertToDict("words")
 
+    # 回答短语题目
+    @classmethod
+    async def answerPhrase(cls, consumer, player: Player, pids: list, options: list):
+        # 返回数据
+        # correct_num: int => 答对题目数
+        correct_num = Common.answerPhrase(pids=pids, options=options)
+
+        return {'correct_num': correct_num}
+
     # 回答当前轮单词
     @classmethod
     async def answerWord(cls, consumer, player: Player, wid: int, chinese: str):
@@ -163,7 +172,7 @@ class Service:
         # 不返回数据
         # 只需检查金钱不足就抛出异常即可，若一切正常就扣取对应的金钱
         Check.ensureShoppingItemType(type)
-        pass
+        Common.buyShoppingItem(type_=type, num=num)
 
 
 # ======================
@@ -439,12 +448,27 @@ class Common:
         if not pro_record.isFinished(): raise GameException(error)
 
     @classmethod
+    def ensureMapEnable(cls, pro_record: ExerProRecord, map: ExerProMap):
+        """
+        确保指定地图可用
+        Args:
+            pro_record (ExerProRecord): 特训记录
+            map (ExerProMap): 特训地图
+        """
+
+        if pro_record.started and pro_record.stage \
+                and pro_record.stage.map != map:
+            raise GameException(ErrorType.ExerProStarted)
+
+        # TODO: 增加等级判断代码
+
+    @classmethod
     def buyShoppingItem(cls, type_: int = None, cla: type = None, num: int = 0,
                         error: ErrorType = ErrorType.InvalidBuyNum, **kwargs):
         """
         购买物品数据校验
         Args:
-        	type_ (int): 物品类型（枚举值）
+            type_ (int): 物品类型（枚举值）
             cla (type): 物品类型
             num (int): 物品数量
             error (ErrorType): 异常
@@ -458,18 +482,20 @@ class Common:
         else:
             item.update(num)
 
+    @classmethod
+    def answerPhrase(cls, pids: list, options: list, **kwargs):
+        """
+        回答短语题目
+        Args:
+            pids (list): 短语题目ID集
+            options (list): 短语题目回答集
+            **kwargs (**dict): 查询参数
+        """
+        phrases = Common.getQuestions(ids=pids, type_=QuestionType.Plot.value)
+        correct_num = 0
+        for i in range(len(options)):
+            if phrases[i].phrase == options[i]:
+                correct_num += 1
 
-@classmethod
-def ensureMapEnable(cls, pro_record: ExerProRecord, map: ExerProMap):
-    """
-    确保指定地图可用
-    Args:
-        pro_record (ExerProRecord): 特训记录
-        map (ExerProMap): 特训地图
-    """
+        return correct_num
 
-    if pro_record.started and pro_record.stage \
-            and pro_record.stage.map != map:
-        raise GameException(ErrorType.ExerProStarted)
-
-# TODO: 增加等级判断代码

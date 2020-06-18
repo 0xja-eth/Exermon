@@ -664,5 +664,23 @@ WEBSOCKET_METHOD_ROUTER = {
     ],
         EnglishPro.checkShopping,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
-]
+    ],
+    # 回答短语题目
+    'engpro/phrase/answer': [[
+        ['uid', 'int'],
+        ['pids', 'int[]'],
+        ['options', 'str[]'],
+    ],
+        EnglishPro.answerPhrase,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 回答改错题目
+    'engpro/correct/answer': [[
+        ['uid', 'int'],
+        ['wid', 'int'],
+        ['chinese', 'str']
+    ],
+        EnglishPro.answerWord,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
 }
