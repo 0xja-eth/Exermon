@@ -656,4 +656,13 @@ WEBSOCKET_METHOD_ROUTER = {
         EnglishPro.queryWords,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
+    # 购买物品数据校验
+    'engpro/item/check': [[
+        ['uid', 'int'],
+        ['type', 'int'],
+        ['num', 'int']
+    ],
+        EnglishPro.checkShopping,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+]
 }

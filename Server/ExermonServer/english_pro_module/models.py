@@ -722,6 +722,15 @@ class BaseExerProItem(BaseItem):
     # 金币（0表示不可购买）
     gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
 
+    def update(self, num):
+        """
+        更新已有记录
+        Args:
+            num (int): 金币数量
+        """
+        self.gold -= num
+        self.save()
+
     def convertToDict(self, **kwargs):
         """
         转化为字典

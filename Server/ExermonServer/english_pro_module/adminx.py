@@ -102,7 +102,6 @@ class PlotQuestionAdmin(BaseQuestionAdmin):
 class PlotQuesChoiceAdmin(BaseQuestionAdmin):
 	inlines = [PlotQuesChoicesInline]
 
-
 # @xadmin.sites.register(ReadingSubQuestion)
 # class ReadingSubQuestionAdmin(BaseQuestionAdmin):
 # 	inlines = [ReadingQuesChoicesInline]
