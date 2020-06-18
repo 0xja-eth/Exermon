@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static ExerPro.EnglishModule.Data.PhraseQuestion;
+using UI.ExerPro.EnglishPro.Common.Windows;
 
 namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
     class PhraseScene : BaseScene {
@@ -17,6 +18,7 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         /// </summary>
         /// 
         public OptionAreaDisplay optionAreaDisplay;
+        public RewardWindow rewardWindow;
 
         /// <summary>
         /// 外部系统设置
@@ -53,7 +55,8 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
 
         public void onSubmit() {
             //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
-            engSer.exitNode(true);
+            engSer.startRewardWindow(rewardWindow, questionNumber: 10);
+            //engSer.exitNode(true);
         }
     }
 }

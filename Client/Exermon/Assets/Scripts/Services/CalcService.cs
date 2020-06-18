@@ -1656,6 +1656,103 @@ namespace GameModule.Services {
 			}
 
 		}
+
+        public class RewardGenerator {
+            /// <summary>
+            /// 奖励卡牌一次生成数量
+            /// </summary>
+            const int RewardCardNumber = 3;
+
+            /// <summary>
+            /// 获取奖励金币
+            /// 战斗据点：层数+敌人；精英：敌人；听力/藏宝：层数+题目
+            /// </summary>
+            /// <param name="type">据点类型</param>
+            /// <param name="layer">层数，即当前节点的xOrder</param>
+            /// <param name="enemy">杀死敌人数</param>
+            /// <param name="question">答对题目数量</param>
+            /// <returns>奖励金币</returns>
+            public static int getGoldReward(ExerProMapNode.Type type, int layer = 0, int enemy = 0, int question = 0) {
+                int randBase = Random.Range(0, 5);
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                        return layer * randBase + enemy * (randBase + 15);
+                    case ExerProMapNode.Type.Elite:
+                        return enemy * (randBase + 35);
+                    case ExerProMapNode.Type.Treasure:
+                        return layer * randBase + question * 15;
+                    case ExerProMapNode.Type.Story:
+                        return layer * randBase + question * 50;
+                }
+                return -1;
+            }
+
+            /// <summary>
+            /// 获取生成的奖励卡牌组（三挑一）
+            /// </summary>
+            /// <param name="type">据点类型</param>
+            /// <returns></returns>
+            public static List<ExerProCard> getCardRewards(ExerProMapNode.Type type) {
+                List<ExerProCard> exerProCards = new List<ExerProCard>();
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                    case ExerProMapNode.Type.Elite:
+                        for(int i = 0; i < RewardCardNumber; i++) {
+                            exerProCards.Add(rewardGenerator.generateRandomCard(0.75f, 0.2f));
+                        }
+                        break;
+                    case ExerProMapNode.Type.Treasure:
+                    case ExerProMapNode.Type.Story:
+                        for (int i = 0; i < RewardCardNumber; i++) {
+                            exerProCards.Add(rewardGenerator.generateRandomCard(0.35f, 0.4f));
+                        }
+                        break;
+                }
+                return exerProCards;
+            }
+
+            /// <summary>
+            /// 当前类对象
+            /// </summary>
+            static RewardGenerator _rewardGenerator = null;
+            static RewardGenerator rewardGenerator {
+                get {
+                    if (_rewardGenerator == null)
+                        _rewardGenerator = new RewardGenerator();
+                    return _rewardGenerator;
+                }
+            }
+
+            /// <summary>
+            /// 生成一张随机卡牌
+            /// </summary>
+            /// <param name="normalRatio"></param>
+            /// <param name="rareRatio"></param>
+            /// <returns></returns>
+            ExerProCard generateRandomCard(float normalRatio, float rareRatio) {
+                var dataSer = DataService.get();
+                List<ExerProCard> cards = new List<ExerProCard>(dataSer.staticData.data.exerProCards);
+                shuffleCards(cards);
+                float randomValue = Random.Range(0, 1);
+                if (randomValue < normalRatio)
+                    return cards.Find(e => e.star().name == "普通");
+                else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)
+                    return cards.Find(e => e.star().name == "稀有");
+                else
+                    return cards.Find(e => e.star().name == "史诗");
+            }
+
+            /// <summary>
+            /// 打乱卡组
+            /// </summary>
+            /// <param name="cards"></param>
+            /// <returns></returns>
+            void shuffleCards(List<ExerProCard> cards) {
+                List<ExerProCard> l = new List<ExerProCard>(cards);
+                l.Sort(delegate (ExerProCard a, ExerProCard b) { return Random.Range(-1, 1); });
+            }
+        }
+
     }
 
 }

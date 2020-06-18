@@ -17,6 +17,7 @@ using GameModule.Data;
 
 using ExerPro.EnglishModule.Data;
 using UI.Common.Controls.ParamDisplays;
+using UI.ExerPro.EnglishPro.Common.Windows;
 
 namespace ExerPro.EnglishModule.Services {
 
@@ -792,6 +793,19 @@ namespace ExerPro.EnglishModule.Services {
 
             var index = Random.Range(0, rateList.Count);
             return states[rateList[index]];
+        }
+
+        /// <summary>
+        /// 调用奖励结算界面
+        /// 调用该方法会自动调用exitNode
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="enemyNumber"></param>
+        /// <param name="questionNumber"></param>
+        public void startRewardWindow(RewardWindow window, int enemyNumber = 0, int questionNumber = 0) {
+            var node = record.currentNode();
+            window.configure(node, enemyNumber, questionNumber, exitNode);
+            window.startWindow();
         }
 
         /// <summary>
