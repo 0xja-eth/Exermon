@@ -98,6 +98,11 @@ class PlotQuestionAdmin(BaseQuestionAdmin):
 	inlines = [PlotQuestionsInline]
 
 
+@xadmin.sites.register(PlotQuesChoice)
+class PlotQuesChoiceAdmin(BaseQuestionAdmin):
+	inlines = [PlotQuesChoicesInline]
+
+
 # @xadmin.sites.register(ReadingSubQuestion)
 # class ReadingSubQuestionAdmin(BaseQuestionAdmin):
 # 	inlines = [ReadingQuesChoicesInline]
