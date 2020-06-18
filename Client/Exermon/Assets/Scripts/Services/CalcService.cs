@@ -975,6 +975,8 @@ namespace GameModule.Services {
                 var posVis = new bool[posCnt];
                 var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
 
+				Debug.Log("enemies.Count: " + enemies.Count + ", " + enemyCnt);
+
                 for (int i = 0; i < cnt; ++i) {
                     var enemy = enemies[Random.Range(0, enemyCnt)];
                     var pos = Random.Range(0, posCnt);

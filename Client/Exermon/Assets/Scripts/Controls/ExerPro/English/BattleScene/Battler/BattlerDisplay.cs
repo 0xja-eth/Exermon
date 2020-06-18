@@ -426,7 +426,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		protected override void drawEmptyItem() {
             battle.gameObject.SetActive(false);
-			hpBar.clearValue();
+			hpBar?.clearValue();
 		}
 
 		/// <summary>

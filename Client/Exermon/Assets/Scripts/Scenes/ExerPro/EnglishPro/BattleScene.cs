@@ -165,7 +165,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// <returns>返回目标数组</returns>
 		List<RuntimeBattler> makeSingleTarget(RuntimeBattler battler) {
 			var res = new List<RuntimeBattler>();
-			res.Add(battleSer.actor());
+			if (battler != null) res.Add(battler);
 			return res;
 		}
 
@@ -196,12 +196,39 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		}
 
 		/// <summary>
+		/// 能否使用卡牌
+		/// </summary>
+		/// <param name="packCard">卡牌</param>
+		/// <param name="enemy">敌人</param>
+		/// <returns></returns>
+		bool isCardUsable(ExerProPackCard packCard, RuntimeEnemy enemy) {
+			if (packCard == null || packCard.isNullItem()) return false;
+			var card = packCard.item();
+			switch ((ExerProCard.Target)card.target) {
+				case ExerProCard.Target.One:
+					return enemy != null; // 必须指定一名敌人
+				default:
+					return true;
+			}
+		}
+
+		/// <summary>
+		/// 能否使用药水
+		/// </summary>
+		/// <param name="packCard">卡牌</param>
+		/// <param name="enemy">敌人</param>
+		/// <returns></returns>
+		bool isPotionUsable(ExerProPackPotion packCard) {
+			if (packCard == null || packCard.isNullItem()) return false;
+			return true;
+		}
+
+		/// <summary>
 		/// 使用药水
 		/// </summary>
 		/// <param name="potion"></param>
 		public void usePotion(ExerProPackPotion packPotion) {
-			if (packPotion == null ||
-				packPotion.isNullItem()) return;
+			if (!isPotionUsable(packPotion)) return;
 
 			var targets = makePotionTargets(packPotion.item());
 
@@ -215,8 +242,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
 		public void useCard(ExerProPackCard packCard, RuntimeEnemy enemy) {
-			if (packCard == null ||
-				packCard.isNullItem()) return;
+			if (!isCardUsable(packCard, enemy)) return;
 
 			var targets = makeCardTargets(packCard.item(), enemy);
 

@@ -45,7 +45,8 @@ namespace Core.Data.Loaders {
 		public const string ExerProCardIconPath = "ExerPro/Card/";
 		public const string ExerProStateIconPath = "ExerPro/State/";
         public const string ExerProListeningAudioPath = "ExerPro/ListeningAudio/";
-        /// <summary>
+        
+		/// <summary>
         /// 文件主体名称定义
         /// </summary>
         public const string CharacterFileName = "Character";
@@ -59,14 +60,20 @@ namespace Core.Data.Loaders {
 
 		public const string NodeIconFileName = "ExerPro/Node/Type";
 		public const string ThinkIconFileName = "ExerPro/Enemy/Think";
-		public const string ExerProEnemyFileName = "Enemy";
-        public const string ExerProListeningAudioFileName = "ListeningAudio";
 
-        /// <summary>
-        /// 其他常量定义
-        /// </summary>
-        //public const int ItemIconCols = 10; // 物品图标列数
-        public const int ItemIconSize = 96; // 物品尺寸（正方形）
+		public const string ExerProEnemyFileName = "Enemy";
+
+		public const string ExerProCardSkinFileName = "Skin/Skin";
+		public const string ExerProCardCharFrameFileName = "Skin/Character";
+		public const string ExerProCardTypeIconFileName = "Skin/Type";
+
+		public const string ListeningAudioFileName = "ListeningAudio";
+
+		/// <summary>
+		/// 其他常量定义
+		/// </summary>
+		//public const int ItemIconCols = 10; // 物品图标列数
+		public const int ItemIconSize = 96; // 物品尺寸（正方形）
 		public const int RankIconCnt = 6; // 段位数量
         public const int MaxSubRank = 5; // 最大子段位数目
 
@@ -74,10 +81,11 @@ namespace Core.Data.Loaders {
 		public const int StateIconSize = 64; // 状态图标尺寸（正方形）
 
 		/// <summary>
-		/// 纹理缓存
+		/// 纹理/声音缓存
 		/// </summary>
 		static Dictionary<string, Texture2D> cache = new Dictionary<string, Texture2D>();
         static Dictionary<string, AudioClip> cacheAudio = new Dictionary<string, AudioClip>();
+
         #region 加载资源封装
 
         /// <summary>
@@ -99,16 +107,41 @@ namespace Core.Data.Loaders {
             return loadTexture2D(path, name + "_" + id);
         }
 
-        /// <summary>
-        /// 计算纹理截取区域 
-        /// </summary>
-        /// <param name="texture">纹理</param>
-        /// <param name="xSize">单个图标宽度</param>
-        /// <param name="ySize">单个图标高度</param>
-        /// <param name="xIndex">图标X索引</param>
-        /// <param name="yIndex">图标Y索引</param>
-        /// <returns>返回要截取的区域</returns>
-        public static Rect calcRect(Texture2D texture, 
+		/// <summary>
+		/// 读取音频
+		/// </summary>
+		/// <param name="path">路径</param>
+		/// <param name="fileName">文件名</param>
+		/// <returns>音频文件</returns>
+		public static AudioClip loadAudio(string path, string fileName) {
+			var key = path + fileName;
+			if (!cacheAudio.ContainsKey(key))
+				cacheAudio[key] = Resources.Load<AudioClip>(key);
+			Debug.Log("loadAudioClip: " + key + ": " + (cacheAudio[key] != null));
+			return cacheAudio[key];
+		}
+
+		/// <summary>
+		/// 读取音频
+		/// </summary>
+		/// <param name="path">路径</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="id">文件id</param>
+		/// <returns>音频文件</returns>
+		public static AudioClip loadAudio(string path, string fileName, int id) {
+			return loadAudio(ExerProListeningAudioPath, ListeningAudioFileName + "_" + id);
+		}
+
+		/// <summary>
+		/// 计算纹理截取区域 
+		/// </summary>
+		/// <param name="texture">纹理</param>
+		/// <param name="xSize">单个图标宽度</param>
+		/// <param name="ySize">单个图标高度</param>
+		/// <param name="xIndex">图标X索引</param>
+		/// <param name="yIndex">图标Y索引</param>
+		/// <returns>返回要截取的区域</returns>
+		public static Rect calcRect(Texture2D texture, 
             int xSize, int ySize, int xIndex, int yIndex) {
             int h = texture.height;
             int x = xIndex * xSize, y = h - (yIndex+1) * ySize;
@@ -290,30 +323,42 @@ namespace Core.Data.Loaders {
 		}
 
 		/// <summary>
-		/// 读取音频
+		/// 诅咒卡牌皮肤索引
 		/// </summary>
-		/// <param name="path">路径</param>
-		/// <param name="fileName">文件名</param>
-		/// <returns>音频文件</returns>
-		public static AudioClip loadAudio(string path, string fileName)
-		{
-			var key = path + fileName;
-			if (!cacheAudio.ContainsKey(key))
-				cacheAudio[key] = Resources.Load<AudioClip>(key);
-			Debug.Log("loadAudioClip: " + key + ": " + (cacheAudio[key] != null));
-			return cacheAudio[key];
+		static int EvilCardSkinIndex = 0;
+
+		/// <summary>
+		/// 读取特训敌人全身像
+		/// </summary>
+		/// <param name="star">星级</param>
+		/// <param name="type">类型</param>
+		/// <param name="skinIndex">皮肤索引</param>
+		/// <returns>2D纹理</returns>
+		public static Texture2D loadCardSkin(int star, int type, int skinIndex = 0) {
+			var index = skinIndex > 0 ? skinIndex : star;
+			if (type == (int)ExerPro.EnglishModule.Data.ExerProCard.Type.Evil)
+				index = EvilCardSkinIndex;
+
+			return loadTexture2D(ExerProCardIconPath, ExerProCardSkinFileName, index);
 		}
 
-        /// <summary>
-        /// 读取音频
-        /// </summary>
-        /// <param name="path">路径</param>
-        /// <param name="fileName">文件名</param>
-        /// <param name="id">文件id</param>
-        /// <returns>音频文件</returns>
-        public static AudioClip loadAudio(string path, string fileName, int id)
-		{
-            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName + "_" + id);
+		/// <summary>
+		/// 读取性质框
+		/// </summary>
+		/// <param name="star">星级</param>
+		/// <returns>2D纹理</returns>
+		public static Texture2D loadCardCharFrame(int star, int skinIndex = 0) {
+			var index = skinIndex > 0 ? skinIndex : star;
+			return loadTexture2D(ExerProCardIconPath, ExerProCardCharFrameFileName, index);
+		}
+
+		/// <summary>
+		/// 读取类型图标
+		/// </summary>
+		/// <param name="star">星级</param>
+		/// <returns>2D纹理</returns>
+		public static Texture2D loadCardTypeIcon(int type) {
+			return loadTexture2D(ExerProCardIconPath, ExerProCardTypeIconFileName, type);
 		}
 
 		/// <summary>
@@ -322,8 +367,9 @@ namespace Core.Data.Loaders {
 		/// <param name="id">音频ID</param>
 		/// <returns>音频</returns>
 		public static AudioClip loadListeningAudioClip(int id) {
-            return loadAudio(ExerProListeningAudioPath, ExerProListeningAudioFileName, id);
-        }
+			return loadAudio(ExerProListeningAudioPath, ListeningAudioFileName, id);
+		}
+
 		#endregion
 
 		#region 加载组合资源

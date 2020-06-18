@@ -48,6 +48,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		GameObject arrow;
 		Vector2 startPos;
 
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			arrowParent = arrowParent ?? (transform as RectTransform);
+		}
+
+		#endregion
+
 		#region 数据控制
 
 		/// <summary>
@@ -57,7 +69,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public ExerProPackCard getCard() {
 			return cardDisplay.getItem();
 		}
-
+		/*
 		/// <summary>
 		/// 能否进行拖拽操作（超出container范围后才可进行）
 		/// </summary>
@@ -65,12 +77,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public bool isDraggable() {
 			return cardDisplay.isDraggable();
 		}
-
+		*/
 		/// <summary>
 		/// 使用卡牌
 		/// </summary>
-		public void use(EnemyDisplay enemy) {
-			if (!isDraggable()) return;
+		public void use(EnemyDisplay enemy = null) {
 			cardDisplay.use(enemy);
 		}
 
@@ -85,6 +96,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void OnBeginDrag(PointerEventData data) {
 			isDragging = true;
 			startPos = data.position;
+			cardDisplay.setupDetail();
+			if (arrow == null) createArrow();
 		}
 
 		/// <summary>
@@ -92,9 +105,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="data">事件数据</param>
 		public void OnDrag(PointerEventData data) {
-			if (!isDraggable()) return;
-			if (arrow == null) createArrow();
-			updateArrowTransform(data.position);
+			var pos = arrowLocalPos(data.position);
+			updateArrowTransform(pos);
 		}
 
 		/// <summary>
@@ -103,7 +115,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <param name="data">事件数据</param>
 		public void OnEndDrag(PointerEventData data) {
 			isDragging = false;
+			cardDisplay.terminateDetail();
 			destroyArrow();
+		}
+
+		/// <summary>
+		/// 获取本地坐标
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		Vector2 arrowLocalPos(Vector2 pos) {
+			return SceneUtils.screen2Local(pos, arrowParent);
 		}
 
 		#endregion

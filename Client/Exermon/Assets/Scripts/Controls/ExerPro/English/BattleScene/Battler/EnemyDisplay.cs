@@ -195,9 +195,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 			var think = AssetLoader.loadEnemyThink(
 				enemy.currentActionType());
-			this.think.gameObject.SetActive(true);
-			this.think.overrideSprite = AssetLoader.
-				generateSprite(think);
+			if (think != null) {
+				this.think.gameObject.SetActive(true);
+				this.think.overrideSprite = AssetLoader.
+					generateSprite(think); 
+			} else this.think.gameObject.SetActive(false);
 		}
 
 		/// <summary>
@@ -218,8 +220,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 拖拽释放回调
 		/// </summary>
 		public void OnDrop(PointerEventData eventData){
-			var dragger = getCardDragger(eventData);
-			dragger.use(this);
+			getCardDragger(eventData)?.use(this);
 		}
 
 		/// <summary>

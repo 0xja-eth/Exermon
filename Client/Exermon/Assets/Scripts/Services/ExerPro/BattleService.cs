@@ -59,11 +59,12 @@ namespace ExerPro.EnglishModule.Services {
         /// 外部系统设置
         /// </summary>
         EnglishService engSer;
+		SceneSystem sceneSys;
 
-        /// <summary>
-        /// 内部变量定义
-        /// </summary>
-        ExerProRecord record;
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		ExerProRecord record;
         ExerProCardGroup cardGroup;
 
         List<RuntimeEnemy> _enemies; // 敌人
@@ -84,8 +85,7 @@ namespace ExerPro.EnglishModule.Services {
         protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
-            record = engSer.record;
-            cardGroup = actor().cardGroup;
+			sceneSys = SceneSystem.get();
         }
 
         /// <summary>
@@ -168,16 +168,19 @@ namespace ExerPro.EnglishModule.Services {
         /// <param name="node"></param>
         public void start(ExerProMapNode.Type type) {
             setup(type);
-            changeState(State.Drawing);
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProBattleScene);
+			changeState(State.Answering);
         }
 
         /// <summary>
         /// 开始配置
         /// </summary>
         void setup(ExerProMapNode.Type type) {
-            result = Result.None;
+			record = engSer.record;
+			result = Result.None;
             generateEnemies(type);
-            cardGroup.onBattleStart();
+			cardGroup = actor()?.cardGroup;
+			cardGroup.onBattleStart();
         }
 
         /// <summary>

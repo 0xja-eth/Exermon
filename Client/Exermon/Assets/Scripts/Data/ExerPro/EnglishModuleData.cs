@@ -594,6 +594,16 @@ namespace ExerPro.EnglishModule.Data {
             All = 2,  // 敌方全体
         }
 
+		/// <summary>
+		/// 卡牌类型
+		/// </summary>
+		public new enum Type {
+			Attack = 1, // 攻击
+			Skill = 2, // 技能
+			Ability = 3, // 能力
+			Evil = 4 // 诅咒
+		}
+
         /// <summary>
         /// 属性
         /// </summary>
@@ -601,7 +611,9 @@ namespace ExerPro.EnglishModule.Data {
         public int cost { get; protected set; }
         [AutoConvert]
         public int cardType { get; protected set; }
-        [AutoConvert]
+		[AutoConvert]
+		public int skinIndex { get; protected set; }
+		[AutoConvert]
         public bool inherent { get; protected set; }
         [AutoConvert]
         public bool disposable { get; protected set; }
@@ -611,21 +623,40 @@ namespace ExerPro.EnglishModule.Data {
         public int target { get; protected set; }
 
 		/// <summary>
-		/// 获取读取函数
+		/// 图片
 		/// </summary>
-		/// <returns>读取函数</returns>
-		protected override LoadFun loadFun() {
-			return AssetLoader.getExerProCardIconSprite;
-		}
+		public Texture2D skin { get; protected set; }
+		public Texture2D charFrame { get; protected set; }
+		public Texture2D typeIcon { get; protected set; }
 
 		/// <summary>
 		/// 类型文本
 		/// </summary>
 		/// <returns></returns>
 		public string typeText() {
-            return DataService.get().cardType(cardType).Item2;
-        }
-    }
+			return DataService.get().cardType(cardType).Item2;
+		}
+
+		/// <summary>
+		/// 获取读取函数
+		/// </summary>
+		/// <returns>读取函数</returns>if (name) 
+		protected override LoadFun loadFun() {
+			return AssetLoader.getExerProCardIconSprite;
+		}
+
+		/// <summary>
+		/// 读取自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+
+			skin = AssetLoader.loadCardSkin(starId, cardType, skinIndex);
+			charFrame = AssetLoader.loadCardCharFrame(starId, skinIndex);
+			typeIcon = AssetLoader.loadCardTypeIcon(cardType);
+		}
+	}
 
     /// <summary>
     /// 特训敌人数据
@@ -651,7 +682,7 @@ namespace ExerPro.EnglishModule.Data {
                 Attack = 1,
 				PowerUp = 2, PosStates = 3,
 				PowerDown = 4, NegStates = 5,
-				Escape = 6, Unset = 7
+				Escape = 6, Unset = 0
             }
 
             /// <summary>
@@ -1251,11 +1282,14 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns>返回敌人数组</returns>
         public List<ExerProEnemy> enemies() {
             if (tmpEnemies == null) {
-                if (_enemies == null) return null;
-                tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
-                foreach (var enemy in _enemies)
-                    tmpEnemies.Add(DataService.get().exerProEnemy(enemy));
-            }
+				if (_enemies == null) return null;
+				tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
+                foreach (var enemy in _enemies) {
+					var e = DataService.get().exerProEnemy(enemy);
+					Debug.Log("E: " + e.toJson().ToJson());
+					tmpEnemies.Add(e);
+				}
+			}
             return tmpEnemies;
         }
 
@@ -1264,7 +1298,11 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回BOSS敌人数组</returns>
         public List<ExerProEnemy> bosses() {
-            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
+			Debug.Log("_enemies: " + string.Join(",", _enemies));
+			Debug.Log("enemies.Count: " + enemies().Count);
+			Debug.Log("enemies: " + enemies());
+
+			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Boss);
         }
 
         /// <summary>
@@ -1272,7 +1310,11 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回普通敌人数组</returns>
         public List<ExerProEnemy> normalEnemies() {
-            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Normal);
+			Debug.Log("_enemies: " + string.Join(",", _enemies));
+			Debug.Log("enemies.Count: " + enemies().Count);
+			Debug.Log("enemies: " + enemies());
+
+			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Normal);
         }
 
         /// <summary>
@@ -1280,9 +1322,23 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回精英敌人数组</returns>
         public List<ExerProEnemy> eliteEnemies() {
-            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Elite);
+			Debug.Log("_enemies: " + string.Join(",", _enemies));
+			Debug.Log("enemies.Count: " + enemies().Count);
+			Debug.Log("enemies: " + enemies());
+
+			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Elite);
         }
-        /*
+
+		/// <summary>
+		/// 测试
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			Debug.Log("loadCustomAttributes: "+json.ToJson());
+		}
+
+		/*
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -1296,7 +1352,7 @@ namespace ExerPro.EnglishModule.Data {
             this.nodeRate = nodeRate;
         }
         */
-    }
+	}
 
     #endregion
 
@@ -2731,7 +2787,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 行动序列
 		/// </summary>
-		Queue<RuntimeAction> actions;
+		Queue<RuntimeAction> actions = new Queue<RuntimeAction>();
 
 		/// <summary>
 		/// 当前行动
@@ -2843,7 +2899,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 构造函数
 		/// </summary>
 		public RuntimeBattler() {
-			reset();
+			//reset();
 		}
 	}
 
@@ -2876,10 +2932,13 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert("agile")]
         public int _agile { get; protected set; }
 
-        [AutoConvert]
-        public int gold { get; protected set; }
+		[AutoConvert]
+		public int gold { get; protected set; }
 
-        [AutoConvert]
+		[AutoConvert]
+		public int energy { get; protected set; }
+
+		[AutoConvert]
         public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
         public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
@@ -3033,10 +3092,13 @@ namespace ExerPro.EnglishModule.Data {
 			potionSlot.actor = this;
 		}
 
-		/*
-		public ExerProActor(Player player) {
-			setupPlayer(player);
-		}*/
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		/// <param name="player"></param>
+		public RuntimeActor() {
+			reset();
+		}
 	}
 
 	/// <summary>
@@ -3158,6 +3220,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public int currentActionType() {
+			if (_currentEnemyAction == null) return 0;
 			return _currentEnemyAction.type;
 		}
 
@@ -3166,6 +3229,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public ExerProEnemy.Action.Type currentActionTypeEnum() {
+			if (_currentEnemyAction == null) return ExerProEnemy.Action.Type.Unset;
 			return _currentEnemyAction.typeEnum();
 		}
 

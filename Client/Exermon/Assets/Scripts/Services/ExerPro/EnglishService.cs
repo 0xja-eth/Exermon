@@ -172,6 +172,7 @@ namespace ExerPro.EnglishModule.Services {
 		SceneSystem sceneSys;
 
 		DataService dataSer;
+		BattleService battleSer;
 
 		bool restFlag = false; // 休息据点标志
 
@@ -186,6 +187,7 @@ namespace ExerPro.EnglishModule.Services {
 			sceneSys = SceneSystem.get();
 
 			dataSer = DataService.get();
+			battleSer = BattleService.get();
 		}
 
 		/// <summary>
@@ -746,21 +748,21 @@ namespace ExerPro.EnglishModule.Services {
         /// 敌人据点
         /// </summary>
         void onEnemyNode() {
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
+			battleSer.start(ExerProMapNode.Type.Enemy);
         }
 
         /// <summary>
         /// 精英据点
         /// </summary>
         void onEliteNode() {
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
-        }
+			battleSer.start(ExerProMapNode.Type.Elite);
+		}
 
 		/// <summary>
 		/// Boss据点
 		/// </summary>
 		void onBossNode() {
-			exitNode(false);
+			battleSer.start(ExerProMapNode.Type.Boss);
 		}
 
 		/// <summary>

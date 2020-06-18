@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 using Core.Data.Loaders;
 using Core.UI.Utils;
@@ -16,11 +17,13 @@ using UI.Common.Controls.ItemDisplays;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
+	using Menu;
+
 	/// <summary>
 	/// 战场控件
 	/// </summary
-	public class BattleGround : SelectableContainerDisplay<RuntimeBattler> {
-
+	public class BattleGround : SelectableContainerDisplay<RuntimeBattler>, IDropHandler {
+		
 		/// <summary>
 		/// 位置偏移量设置
 		/// </summary>
@@ -158,5 +161,28 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		#endregion
+
+
+		#region 事件控制
+
+		/// <summary>
+		/// 拖拽释放回调
+		/// </summary>
+		public void OnDrop(PointerEventData eventData) {
+			getCardDragger(eventData)?.use();
+		}
+
+		/// <summary>
+		/// 获取拖拽中的物品显示项
+		/// </summary>
+		/// <param name="data">事件数据</param>
+		/// <returns>物品显示项</returns>
+		CardDragger getCardDragger(PointerEventData data) {
+			var obj = data.pointerDrag; if (obj == null) return null;
+			return SceneUtils.get<CardDragger>(obj);
+		}
+
+		#endregion
+
 	}
 }

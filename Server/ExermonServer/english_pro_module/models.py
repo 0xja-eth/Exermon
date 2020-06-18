@@ -816,6 +816,9 @@ class ExerProCard(BaseExerProItem):
 	card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
 												 choices=CARD_TYPES, verbose_name="¿¨Æ¬ÀàÐÍ")
 
+	# ¿¨ÅÆÆ¤·ôË÷Òý
+	skin_index = models.PositiveSmallIntegerField(default=0, verbose_name="¿¨ÅÆÆ¤·ôË÷Òý")
+
 	# ¹ÌÓÐ
 	inherent = models.BooleanField(default=False, verbose_name="¹ÌÓÐ")
 
