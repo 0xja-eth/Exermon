@@ -233,6 +233,8 @@ class Common:
 			return PhraseQuestion
 		elif type_ == QuestionType.Correction.value:
 			return CorrectionQuestion
+		elif type_ == QuestionType.Plot.value:
+			return PlotQuestion
 
 		raise GameException(ErrorType.InvalidQuestionType)
 
@@ -380,50 +382,6 @@ class Common:
 
 		return record
 
-	# # 获取新单词集
-	# @classmethod
-	# def getNewWords(cls, old_words: list, player: Player, error: ErrorType = ErrorType.NoEnoughNewWord):
-	# 	"""
-	# 	Args:
-	# 		player (Player): 用户
-	# 		old_words (list): 旧单词 ID 列表
-	# 		error (ErrorType): 异常
-	# 	Returns:
-	# 		如果题库有足够的新单词就返回 单词ID集 和 单词集，否则报错
-	# 	"""
-	# 	words = ViewUtils.getObjects(Word, player=player).exclude(id__in=old_words)
-	# 	words_list = [word.id for word in words if cls.getNewWord(word, player) is not None]
-	# 	if len(words_list) < NewWordsGenerator.WordNum * NewWordsGenerator.WordNum:
-	# 		raise error
-	#
-	# 	random.seed(int(time.time()))
-	# 	new_wids = random.sample(words_list, NewWordsGenerator.WordNum * NewWordsGenerator.NewWordPercent)
-	# 	new_words = ViewUtils.getObjects(Word, player=player, id__in=new_wids)
-	#
-	# 	return new_wids, new_words
-
-	# # 获取新单词
-	# @classmethod
-	# def getNewWord(cls, word: Word, player: Player):
-	# 	"""
-	# 	Args:
-	# 		player (Player): 用户
-	# 		word (Word): 单词
-	# 	Returns:
-	# 		如果该单词是新单词，则返回，否则返回None
-	# 	"""
-	# 	word_record = WordRecord.objects.filter(word=word, player=player)
-	#
-	# 	# 先判断有无单词记录，无就是新单词
-	# 	if not word_record:
-	# 		return word
-	# 	else:
-	# 		# 再判断是否有答对过
-	# 		record = word_record.filter(correct=0)
-	# 		if not record:
-	# 			return word
-	# 		return None
-
 	# 检验答词ID是否在当前轮中
 	@classmethod
 	def ensureWordInCurrentWords(cls, wid: int, player: Player, words: list):
@@ -444,40 +402,6 @@ class Common:
 	@classmethod
 	def ensureWordNotCorrect(cls, word_rec: WordRecord):
 		if word_rec.current_correct: raise GameException()
-
-	# 判断单词是否回答正确
-	# @classmethod
-	# def isAnswerCorrect(cls, wid: int, player: Player, chinese: str, isUpdate: bool) -> bool:
-	# 	"""
-	# 	Args:
-	# 		player (Player): 用户
-	# 		wid (int): 单词
-	# 		chinese (str): 中文
-	# 		isUpdate  (bool): 是否更新单词记录
-	# 	Returns:
-	# 		isUpdate = True时，更新单词记录并返回该单词是否正确
-	# 		isUpdate = False时，返回值为False表明该单词回答错误或者未回答，返回值为True表明该单词已经回答正确了
-	# 	"""
-	# 	# 将回答结果记录到 WordRecord 表中
-	# 	record = player.wordRecord(wid)
-	# 	if record is not None:
-	# 		word = ViewUtils.getObject(Word, ErrorType.WordNotExit, player=player, id=wid)
-	# 		if isUpdate:
-	# 			if word.chinese == chinese:
-	# 				record.updateRecord(True)
-	# 				return True
-	# 			else:
-	# 				record.updateRecord(False)
-	# 				return False
-	# 		else:
-	# 			if not record.current:
-	# 				raise ErrorType.NoInCurrentWords
-	# 			elif record.current and record.correct == 0:
-	# 				return False
-	# 			else:
-	# 				return True
-	# 	else:
-	# 		raise ErrorType.NoInCurrentWords
 
 	@classmethod
 	def ensureFinishLastWords(cls, pro_record: ExerProRecord,

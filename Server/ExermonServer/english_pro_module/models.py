@@ -5,7 +5,7 @@ from django.conf import settings
 from game_module.models import GroupConfigure
 from item_module.models import *
 from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
-from utils.model_utils import QuestionAudioUpload, Common as ModelUtils
+from utils.model_utils import QuestionAudioUpload, PlotQuestionImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 import os, base64, datetime, jsonfield, random
 from enum import Enum
@@ -23,6 +23,7 @@ class QuestionType(Enum):
     Listening = 1  # 听力题
     Phrase = 2  # 不定式题
     Correction = 3  # 改错题
+    Plot = 4  # 剧情题
 
 
 # ===================================================
@@ -142,6 +143,82 @@ class ReadingQuestion(GroupQuestion):
             返回该听力题目的子题目
         """
         return self.readingsubquestion_set.all()
+
+
+# ===================================================
+#  剧情题目
+# ===================================================
+class PlotQuestion(BaseQuestion):
+    class Meta:
+        verbose_name = verbose_name_plural = "剧情题目"
+
+    # 剧情事件名称
+    event_name = models.CharField(max_length=64, verbose_name="剧情事件名称")
+
+    # 剧情图标
+    file = models.ImageField(upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
+
+    def __str__(self):
+        return self.file.url
+
+    # 获取剧情图片完整路径
+    def getExactlyPath(self):
+        base = settings.STATIC_URL
+        path = os.path.join(base, str(self.file))
+        if os.path.exists(path):
+            return path
+        else:
+            raise GameException(ErrorType.PictureFileNotFound)
+
+    # 获取base64编码
+    def convertToBase64(self):
+
+        with open(self.getExactlyPath(), 'rb') as f:
+            data = base64.b64encode(f.read())
+
+        return data.decode()
+
+    def choices(self):
+        return self.plotqueschoice_set.all()
+
+    def convertToDict(self):
+        plot_choices = ModelUtils.objectsToDict(self.choices())
+
+        return {
+            'id': self.id,
+            'title': self.title,
+            'event_name': self.event_name,
+            'picture': self.convertToBase64(),
+            'choices': plot_choices
+        }
+
+
+# ===================================================
+#  剧情题目选项表
+# ===================================================
+class PlotQuesChoice(BaseQuesChoice):
+    class Meta:
+        verbose_name = verbose_name_plural = "剧情题目选项"
+
+    # 选项对应的结果文本
+    result_text = models.TextField(verbose_name="选项对应的结果文本")
+
+    # 所属问题
+    question = models.ForeignKey('PlotQuestion', null=False, on_delete=models.CASCADE,
+                                 verbose_name="所属问题")
+
+    def effects(self):
+        return self.exerproploteffect_set.all()
+
+    def convertToDict(self):
+        plot_effects = ModelUtils.objectsToDict(self.effects())
+
+        return {
+            'id': self.id,
+            'text': self.text,
+            'result_text': self.result_text,
+            'effects': plot_effects
+        }
 
 
 # ===================================================
@@ -675,6 +752,18 @@ class ExerProItemEffect(ExerProEffect):
     # 物品
     item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
                              verbose_name="物品")
+
+
+# ===================================================
+#  剧情题目效果表
+# ===================================================
+class ExerProPlotEffect(ExerProEffect):
+    class Meta:
+        verbose_name = verbose_name_plural = "剧情题目效果"
+
+    # 效果
+    effects = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
+                             verbose_name="效果")
 
 
 # ===================================================

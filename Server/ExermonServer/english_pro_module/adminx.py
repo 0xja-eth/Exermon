@@ -25,12 +25,20 @@ class ListeningQuesChoicesInline(BaseQuesChoicesInline):
 	model = ListeningQuesChoice
 
 
+class PlotQuesChoicesInline(BaseQuesChoicesInline):
+	model = PlotQuesChoice
+
+
 # class ReadingQuesChoicesInline(BaseQuesChoicesInline):
 # 	model = ReadingQuesChoice
 
 
 class ListeningSubQuestionsInline(BaseQuestionsInline):
 	model = ListeningSubQuestion
+
+
+class PlotQuestionsInline(BaseQuestionsInline):
+	model = PlotQuestion
 
 
 # class ReadingSubQuestionsInline(BaseQuestionsInline):
@@ -83,6 +91,11 @@ class MapStagesInline(object):
 @xadmin.sites.register(ListeningSubQuestion)
 class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 	inlines = [ListeningQuesChoicesInline]
+
+
+@xadmin.sites.register(PlotQuestion)
+class PlotQuestionAdmin(BaseQuestionAdmin):
+	inlines = [PlotQuestionsInline]
 
 
 # @xadmin.sites.register(ReadingSubQuestion)
