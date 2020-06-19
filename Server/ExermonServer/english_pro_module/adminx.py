@@ -37,10 +37,6 @@ class ListeningSubQuestionsInline(BaseQuestionsInline):
 	model = ListeningSubQuestion
 
 
-class PlotQuestionsInline(BaseQuestionsInline):
-	model = PlotQuestion
-
-
 # class ReadingSubQuestionsInline(BaseQuestionsInline):
 # 	model = ReadingSubQuestion
 
@@ -48,6 +44,10 @@ class PlotQuestionsInline(BaseQuestionsInline):
 class WrongItemsInline(object):
 	model = WrongItem
 	style = "table"
+
+
+class ExerProPlotEffectsInline(BaseEffectsInline):
+	model = ExerProPlotEffect
 
 
 class ExerProItemEffectsInline(BaseEffectsInline):
@@ -95,12 +95,12 @@ class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 
 @xadmin.sites.register(PlotQuestion)
 class PlotQuestionAdmin(BaseQuestionAdmin):
-	inlines = [PlotQuestionsInline]
+	list_display = ['id', 'title', 'event_name', 'picture']
 
+	list_editable = ['title', 'event_name', 'picture']
 
-@xadmin.sites.register(PlotQuesChoice)
-class PlotQuesChoiceAdmin(BaseQuestionAdmin):
 	inlines = [PlotQuesChoicesInline]
+
 
 # @xadmin.sites.register(ReadingSubQuestion)
 # class ReadingSubQuestionAdmin(BaseQuestionAdmin):
@@ -191,6 +191,22 @@ class BaseExerProItemAdmin(BaseItemAdmin):
 	form_layout = BaseItemAdmin.form_layout + field_set
 
 	# form_layout = field_set
+
+
+@xadmin.sites.register(PlotQuesChoice)
+class PlotQuesChoiceAdmin(BaseExerProItemAdmin):
+
+	list_display = BaseExerProItemAdmin.list_display + \
+				   ['result_text']
+
+	list_editable = BaseExerProItemAdmin.list_editable + \
+				   ['result_text']
+
+	field_set = [Fieldset('特训物品属性')]
+
+	form_layout = BaseExerProItemAdmin.form_layout + field_set
+
+	inlines = [ExerProPlotEffectsInline]
 
 
 @xadmin.sites.register(ExerProItem)

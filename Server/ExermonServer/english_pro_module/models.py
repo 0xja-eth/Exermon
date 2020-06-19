@@ -152,19 +152,21 @@ class PlotQuestion(BaseQuestion):
     class Meta:
         verbose_name = verbose_name_plural = "剧情题目"
 
+    TYPE = QuestionType.Plot
+
     # 剧情事件名称
     event_name = models.CharField(max_length=64, verbose_name="剧情事件名称")
 
     # 剧情图标
-    file = models.ImageField(upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
+    picture = models.ImageField(upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
 
     def __str__(self):
-        return self.file.url
+        return self.picture.url
 
     # 获取剧情图片完整路径
     def getExactlyPath(self):
         base = settings.STATIC_URL
-        path = os.path.join(base, str(self.file))
+        path = os.path.join(base, str(self.picture))
         if os.path.exists(path):
             return path
         else:
