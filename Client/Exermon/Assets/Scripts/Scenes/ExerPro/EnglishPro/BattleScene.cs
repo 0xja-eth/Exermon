@@ -1,6 +1,8 @@
 ﻿
 using System.Collections.Generic;
 
+using UnityEngine;
+
 using Core.Systems;
 using Core.UI;
 
@@ -29,7 +31,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// </summary>
 		public BattleGround battleGround;
 
-		public MenuWindow menu;
+		public MenuWindow menuWindow;
 		public WordWindow wordWindow;
 		public DrawWindow drawWindow;
 
@@ -92,6 +94,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 状态改变回调
 		/// </summary>
 		void onStateChanged() {
+			Debug.Log((BattleService.State)battleSer.state);
 			switch ((BattleService.State)battleSer.state) {
 				case BattleService.State.Answering: onAnswer(); break;
 				case BattleService.State.Drawing: onDraw(); break;
@@ -113,6 +116,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 抽卡
 		/// </summary>
 		void onDraw() {
+			wordWindow.terminateWindow();
 			drawWindow.startWindow();
 		}
 
@@ -120,14 +124,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 开始出牌
 		/// </summary>
 		void onPlay() {
-			menu.startWindow();
+			menuWindow.startWindow();
 		}
 
 		/// <summary>
 		/// 弃牌
 		/// </summary>
 		void onDiscard() {
-			menu.terminateView();
+			menuWindow.terminateView();
 		}
 
 		/// <summary>
@@ -283,11 +287,19 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		#endregion
 
 		/// <summary>
+		/// 进入回合
+		/// </summary>
+		public void play() {
+			drawWindow.terminateWindow();
+			battleSer.play();
+		}
+
+		/// <summary>
 		/// 跳过
 		/// </summary>
 		public void jump() {
 			battleSer.jump();
-			menu.terminateWindow();
+			menuWindow.terminateWindow();
 		}
 
 		/// <summary>

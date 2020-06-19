@@ -33,7 +33,7 @@ namespace Core.UI.Utils {
         /// <summary>
         /// 临时动画对象
         /// </summary>
-        public struct TempAnimation {
+        public class TempAnimation {
 
             /// <summary>
             /// 动画片段
@@ -60,10 +60,12 @@ namespace Core.UI.Utils {
 				clip = new AnimationClip();
 				clip.legacy = legacy;
 				clip.name = name;
+				clip.wrapMode = WrapMode.Once;
 				beforeEvent = null;
 			}
 			public TempAnimation(AnimationClip clip) {
 				this.clip = clip; animation = null;
+				clip.wrapMode = WrapMode.Once;
 				beforeEvent = null;
 			}
 

@@ -148,7 +148,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 配置角色位置
 		/// </summary>
 		void setupActorPos(BattlerDisplay display) {
-			display.setupPosition(ActorPos);
+			var pos = container.rect.size * ActorPos;
+			display.setupPosition(pos);
 		}
 
 		/// <summary>
@@ -157,11 +158,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="display"></param>
 		/// <param name="index"></param>
 		void setupEnemyPos(BattlerDisplay display, RuntimeEnemy battler) {
-			display.setupPosition(EnemiesPos[battler.pos]);
+			var pos = container.rect.size * EnemiesPos[battler.pos];
+			display.setupPosition(pos);
 		}
 
 		#endregion
-
 
 		#region 事件控制
 

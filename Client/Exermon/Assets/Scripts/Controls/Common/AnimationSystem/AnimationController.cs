@@ -67,7 +67,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// </summary>
         /// <param name="ani"></param>
         void updateAnimationItem(AnimationView ani) {
-            if (!ani.isPlaying()) ani.play();
+            if (!ani.isPlaying() && !ani.isCurPlayed()) ani.play();
 			if (ani.isPlayed()) playingAnimations.Remove(ani);
        }
 

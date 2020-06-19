@@ -854,6 +854,40 @@ class ExerProCard(BaseExerProItem):
 
 
 # ===================================================
+#  初始卡组表
+# ===================================================
+class FirstCardGroup(GroupConfigure):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "初始卡组"
+
+	# 卡组ID集
+	cards = jsonfield.JSONField(default=[], verbose_name="卡组ID集")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res["cards"] = self.cards
+
+		return res
+
+	def adminCards(self):
+		res = ""
+		for id in self.cards:
+			res += ViewUtils.getObject(ExerProCard,
+		   		ErrorType.ExerProCardNotExist, id=id).name + " "
+
+		return res
+
+	adminCards.short_description = "包含卡牌"
+
+
+# ===================================================
 #  特训敌人攻击效果表
 # ===================================================
 class EnemyEffect(ExerProEffect):

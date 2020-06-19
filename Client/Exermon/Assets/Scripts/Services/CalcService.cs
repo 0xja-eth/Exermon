@@ -1432,31 +1432,35 @@ namespace GameModule.Services {
             /// </summary>
             EnemyNextCalc(int round, RuntimeEnemy enemy) {
                 this.round = round; this.enemy = enemy;
-                this.enemyData = enemy.enemy();
+                enemyData = enemy.enemy();
 
-                actions = filterActions(this.enemyData.actions);
+				actions = filterActions(enemyData.actions);
             }
 
-            /// <summary>
-            /// 过滤行动
-            /// </summary>
-            /// <returns>过滤后的行动列表</returns>
-            ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
+			/// <summary>
+			/// 过滤行动
+			/// </summary>
+			/// <returns>过滤后的行动列表</returns>
+			ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
                 var res = new List<ExerProEnemy.Action>();
-                foreach (var action in actions)
-                    if (action.testRound(round)) res.Add(action);
-                return res.ToArray();
+				foreach (var action in actions) {
+					Debug.Log(enemyData.name + ": ("+ action.testRound(round) + ") " + action.toJson().ToJson());
+					if (action.testRound(round)) res.Add(action);
+				}
+				return res.ToArray();
             }
 
             /// <summary>
             /// 生成行动
             /// </summary>
             ExerProEnemy.Action generateAction() {
-                var list = new List<int>();
+				var list = new List<int>();
                 for (var i = 0; i < actions.Length; ++i) {
                     var action = actions[i];
                     for (var j = 0; j < action.rate; ++j) list.Add(i);
                 }
+				Debug.Log(string.Join(",", list));
+				if (list.Count <= 0) return null; 
                 var index = Random.Range(0, list.Count);
                 return actions[list[index]];
             }
@@ -1627,8 +1631,11 @@ namespace GameModule.Services {
 					var val = calcDistance(word, word_, english);
 					if (val < minVal && word_ != word &&
 						!result.Contains(word_.chinese))
-						minWord = word_;
+						minWord = word_; minVal = val;
 				}
+				Debug.Log("generateWordChoice: word = " +
+					word.english + ": " + word.chinese + "minWord = " +
+					minWord.english + ": " + minWord.chinese + "(" + minVal + ")");
 				return minWord;
 			}
 			
@@ -1654,7 +1661,9 @@ namespace GameModule.Services {
 						sum++; j++;
 					}
 				}
-				return sum * 1.0 / len2;
+				var res = sum * 1.0 / len2;
+				Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
+				return res;
 			}
 
 		}

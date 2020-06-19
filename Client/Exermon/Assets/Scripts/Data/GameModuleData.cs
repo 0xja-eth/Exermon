@@ -291,18 +291,6 @@ namespace GameModule.Data {
     }
 
     /// <summary>
-    /// 特训物品星级数据
-    /// </summary>
-    public class ExerProItemStar : TypeData {
-
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
-        public Color color { get; protected set; }
-    }
-
-    /// <summary>
     /// 题目星级数据
     /// </summary>
     public class QuesStar : TypeData {
@@ -486,20 +474,23 @@ namespace GameModule.Data {
         [AutoConvert]
         public ResultJudge[] resultJudges { get; protected set; }
 
-        [AutoConvert]
+		[AutoConvert]
+		public GameTip[] gameTips { get; protected set; }
+
+		[AutoConvert]
         public Antonym[] antonyms { get; protected set; }
         [AutoConvert]
         public ExerProItemStar[] exerProItemStars { get; protected set; }
         [AutoConvert]
         public NodeType[] nodeTypes { get; protected set; }
 		[AutoConvert]
-		public GameTip[] gameTips { get; protected set; }
+		public FirstCardGroup[] firstCardGroups { get; protected set; }
 	}
 
-    /// <summary>
-    /// 游戏资料数据
-    /// </summary>
-    public class GameDatabase : BaseData {
+	/// <summary>
+	/// 游戏资料数据
+	/// </summary>
+	public class GameDatabase : BaseData {
 
         /// <summary>
         /// 数据库

@@ -25,7 +25,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 常量定义
 		/// </summary>
 		const string ShowAnimation = "CardShow";
-		const float ClosedAlpha = 0.5f;
+		static readonly Color NormalColor = new Color(1, 1, 1, 1);
+		static readonly Color LockedColor = new Color(1, 1, 1, 0.5f);
 
 		/// <summary>
 		/// 外部组件定义
@@ -40,8 +41,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public Image charFrame; // 性质框
 		public Image typeIcon; // 类型图标
 
+		public Image back;
+
 		public GameObject content;
-		public GameObject back;
 
 		public CanvasGroup canvasGroup;
 
@@ -51,6 +53,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 是否开启
 		/// </summary>
+		[SerializeField]
 		bool _isOpen = true;
 		public bool isOpen {
 			get { return _isOpen; }
@@ -60,7 +63,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 是否锁定
 		/// </summary>
-		bool _isLocked = false;
+		[SerializeField]
+		bool _isLocked = true;
 		public bool isLocked {
 			get { return _isLocked; }
 			set { _isLocked = value; requestRefresh(); }
@@ -81,6 +85,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 卡牌开启
+		/// </summary>
+		public void open() {
+			isOpen = true;
+		}
+
+		/// <summary>
+		/// 物品变化回调
+		/// </summary>
+		protected override void onItemChanged() {
+			base.onItemChanged();
+			isLocked = isNullItem(item);
+		}
 
 		/// <summary>
 		/// 获取容器
@@ -191,6 +210,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			drawCharacter(card);
 			drawType(card);
 
+			name.text = card.name;
 			cost.text = card.cost.ToString();
 			description.text = card.description;
 		}
@@ -201,7 +221,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <param name="card"></param>
 		void drawSkin(ExerProCard card) {
 
-			if (back) back.SetActive(false);
+			if (back) {
+				back.color = NormalColor;
+				back.gameObject.SetActive(false);
+			}
 			content.SetActive(true);
 			
 			var skin = AssetLoader.generateSprite(card.skin);
@@ -250,10 +273,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		protected override void drawEmptyItem() {
 			base.drawEmptyItem();
-			cost.text = type.text = description.text = "";
+			name.text = cost.text = type.text = description.text = "";
 
-			if (back) back.SetActive(true);
 			content.SetActive(false);
+
+			if (back) {
+				back.color = LockedColor;
+				back.gameObject.SetActive(true);
+			}
 
 			cardSkin.enabled = false;
 			if (typeIcon) typeIcon.gameObject.SetActive(false);

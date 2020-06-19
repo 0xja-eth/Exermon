@@ -150,6 +150,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 动画播放完毕回调
 		/// </summary>
 		void onAnimationPlayed(AnimationUtils.TempAnimation ani) {
+			Debug.Log(this.name + " onAnimationPlayed");
+
 			var name = ani.getName();
 			if (updateEvents.ContainsKey(""))
 				updateEvents[""]?.Invoke();
@@ -161,10 +163,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <summary>
 		/// 下一动画播放开始回调
 		/// </summary>
-		void onNextAnimationPlay(AnimationUtils.TempAnimation? ani_) {
-			if (ani_ == null) return;
+		void onNextAnimationPlay(AnimationUtils.TempAnimation ani) {
+			if (ani == null) return;
 
-			var ani = (AnimationUtils.TempAnimation)ani_;
 			var name = ani.getName();
 			if (updateEvents.ContainsKey(""))
 				updateEvents[""]?.Invoke();
@@ -181,10 +182,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		protected override void update() {
             base.update();
-			var ani_ = curAni();
-			if (ani_ == null) return;
-
-			var ani = (AnimationUtils.TempAnimation)ani_;
+			var ani = curAni();
 			updateCurrentEvent(ani);
             updateAnimation(ani);
         }
@@ -193,7 +191,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新当前动画事件
 		/// </summary>
 		void updateCurrentEvent(AnimationUtils.TempAnimation ani) {
-			if (ani.isPlaying()) {
+			if (ani != null && ani.isPlaying()) {
 				var name = ani.getName();
 				if (updateEvents.ContainsKey(name))
 					updateEvents[name]?.Invoke();
@@ -204,7 +202,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新动画
 		/// </summary>
 		void updateAnimation(AnimationUtils.TempAnimation ani) {
-			if (ani.isPlayed()) onAnimationPlayed(ani);
+			if (ani != null && ani.isPlayed()) onAnimationPlayed(ani);
 		}
 
 		#endregion
@@ -215,7 +213,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 当前动画
 		/// </summary>
 		/// <returns></returns>
-		public AnimationUtils.TempAnimation? curAni() {
+		public AnimationUtils.TempAnimation curAni() {
 			if (animations.Count <= 0) return null;
             return animations.Peek();
         }
@@ -226,15 +224,24 @@ namespace UI.Common.Controls.AnimationSystem {
         /// <returns></returns>
         public bool isPlaying() {
             return animation.isPlaying;
-        }
+		}
 
-        /// <summary>
-        /// 是否播放完毕（全部）
-        /// </summary>
-        /// <returns></returns>
-        public bool isPlayed() {
-            return animations.Count <= 0;
-        }
+		/// <summary>
+		/// 是否播放完毕（全部）
+		/// </summary>
+		/// <returns></returns>
+		public bool isPlayed() {
+			return animations.Count <= 0;
+		}
+
+		/// <summary>
+		/// 当前是否播放完毕
+		/// </summary>
+		/// <returns></returns>
+		public bool isCurPlayed() {
+			var ani = curAni(); 
+			return ani != null && ani.isPlayed();
+		}
 
 		#region 播放队列操作
 
@@ -258,7 +265,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 播放
 		/// </summary>
 		public void play() {
-			curAni()?.setupAnimation(animation);
+			var ani = curAni();
+			Debug.Log(name + " play: " + ani?.getName());
+			ani?.setupAnimation(animation);
         }
 
         /// <summary>
@@ -291,6 +300,10 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public AnimationUtils.TempAnimation addAnimation(string name) {
 			var clip = animation.GetClip(name);
+
+			Debug.Log(name + " addAnimation: " + clip.wrapMode);
+
+			clip.wrapMode = WrapMode.Once;
 			if (clip == null) return addAnimation(name, true);
 			return addAnimation(clip);
 		}
@@ -299,7 +312,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public AnimationUtils.TempAnimation addAnimation(
             AnimationUtils.TempAnimation ani) {
-            animations.Enqueue(ani); return ani;
+			Debug.Log(name + " addAnimation: " + ani.getName());
+			animations.Enqueue(ani); return ani;
         }
 		
 		#endregion

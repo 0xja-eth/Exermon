@@ -19,12 +19,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <summary>
 		/// 文本常量定义
 		/// </summary>
-		const string CountFOrmat = "获得 {0} 次抽牌机会！";
 
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text count;
+		public Text count, max;
 
 		public DrawCardGroupDisplay drawCardGroup;
 
@@ -38,6 +37,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		BattleService battleSer;
 		EnglishService engSer;
+
+		/// <summary>
+		/// 抽取卡牌
+		/// </summary>
+		ExerProPackCard[] _drawnCards = null;
 
 		#region 初始化
 
@@ -60,6 +64,30 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 
 		#endregion
 
+		#region 开启/关闭
+
+		/// <summary>
+		/// 关闭窗口
+		/// </summary>
+		public override void terminateWindow() {
+			base.terminateWindow();
+			_drawnCards = null;
+		}
+
+		#endregion
+
+		#region 数据控制
+
+		/// <summary>
+		/// 获取抽取的卡牌
+		/// </summary>
+		/// <returns></returns>
+		public ExerProPackCard[] drawnCards() {
+			return _drawnCards = _drawnCards ?? battleSer.drawnCards();
+		}
+
+		#endregion
+
 		#region 画面绘制
 
 		/// <summary>
@@ -67,9 +95,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		protected override void refresh() {
 			base.refresh();
-			var cards = battleSer.drawnCards();
+			var cards = drawnCards();
 
-			count.text = string.Format(CountFOrmat, cards.Length);
+			var handGroup = battleSer.handGroup();
+
+			count.text = handGroup.items.Count.ToString();
+			max.text = handGroup.capacity.ToString();
 
 			drawCardGroup.setItems(cards);
 		}

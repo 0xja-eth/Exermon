@@ -146,7 +146,7 @@ class WordAdmin(object):
 @xadmin.sites.register(WordRecord)
 class WordRecordAdmin(object):
 
-	list_display = ['id', 'word', 'player', 'count', 'correct',
+	list_display = ['id', 'word', 'record', 'count', 'correct',
 					'last_date', 'first_date', 'collected', 'wrong']
 
 	list_editable = ['count', 'correct',  'last_date',
@@ -225,6 +225,14 @@ class ExerProCardAdmin(BaseItemAdmin):
 	form_layout = BaseExerProItemAdmin.form_layout + field_set
 
 	inlines = [ExerProCardEffectsInline]
+
+
+@xadmin.sites.register(FirstCardGroup)
+class FirstCardGroupAdmin(object):
+
+	list_display = ['id', 'name', 'adminCards']
+
+	list_editable = ['name']
 
 
 @xadmin.sites.register(ExerProEnemy)

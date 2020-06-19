@@ -405,6 +405,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="pos"></param>
 		public virtual void setupPosition(Vector2 pos) {
+			Debug.Log(name + ": setupPosition: " + pos);
 			rectTransform.anchoredPosition = oriPosition = pos;
 		}
 

@@ -201,6 +201,10 @@ class ErrorType(Enum):
 	StageNotFound = 811  # 关卡不存在
 	ExerProStarted = 812  # 特训正在进行
 
+	ExerProItemNotExist = 820  # 特训道具不存在
+	ExerProPotionNotExist = 821  # 特训药水不存在
+	ExerProCardNotExist = 822  # 特训卡牌不存在
+
 
 class GameException(Exception):
 
@@ -394,7 +398,9 @@ class GameException(Exception):
 		ErrorType.StageNotFound: "关卡不存在！",
 		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
 
-	}
+		ErrorType.ExerProItemNotExist: "特训道具不存在！",
+		ErrorType.ExerProPotionNotExist: "特训药水不存在！",
+		ErrorType.ExerProCardNotExist: "特训卡牌不存在！",	}
 
 	def __init__(self, error_type: ErrorType):
 		"""

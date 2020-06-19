@@ -65,7 +65,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 内部变量定义
 		/// </summary>
 		ExerProRecord record;
-        ExerProCardGroup cardGroup;
+        ExerProCardGroup _cardGroup;
 
         List<RuntimeEnemy> _enemies; // 敌人
         int curEnemyIndex = 0; // 当前敌人索引
@@ -111,10 +111,10 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新抽牌
         /// </summary>
         void updateDrawing() {
-            // 抽牌答对次数 + 额外次数
-            for (int i = 0; i < corrCnt + bonusCnt; ++i)
-                cardGroup.drawCard();
-            changeState(State.Playing);
+			// 抽牌答对次数 + 额外次数
+			if (isStateChanged())
+				for (int i = 0; i < corrCnt + bonusCnt; ++i)
+	                _cardGroup.drawCard();
         }
 
         /// <summary>
@@ -179,8 +179,8 @@ namespace ExerPro.EnglishModule.Services {
 			record = engSer.record;
 			result = Result.None;
             generateEnemies(type);
-			cardGroup = actor()?.cardGroup;
-			cardGroup.onBattleStart();
+			_cardGroup = actor()?.cardGroup;
+			_cardGroup.onBattleStart();
         }
 
         /// <summary>
@@ -194,6 +194,13 @@ namespace ExerPro.EnglishModule.Services {
         }
 
 		/// <summary>
+		/// 进入回合
+		/// </summary>
+		public void play() {
+			changeState(State.Playing);
+		}
+
+		/// <summary>
 		/// 结束出牌阶段
 		/// </summary>
 		public void jump() {
@@ -204,7 +211,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 结束
         /// </summary>
         public void terminate() {
-            cardGroup.onBattleEnd();
+            _cardGroup.onBattleEnd();
         }
 
 		#region 数据获取
@@ -215,6 +222,38 @@ namespace ExerPro.EnglishModule.Services {
 		/// <returns></returns>
 		public RuntimeActor actor() {
 			return record.actor;
+		}
+
+		/// <summary>
+		/// 卡组
+		/// </summary>
+		/// <returns></returns>
+		public ExerProCardGroup cardGroup() {
+			return _cardGroup;
+		}
+
+		/// <summary>
+		/// 手牌
+		/// </summary>
+		/// <returns></returns>
+		public ExerProCardHandGroup handGroup() {
+			return _cardGroup.handGroup;
+		}
+
+		/// <summary>
+		/// 抽牌堆
+		/// </summary>
+		/// <returns></returns>
+		public ExerProCardDrawGroup drawGroup() {
+			return _cardGroup.drawGroup;
+		}
+
+		/// <summary>
+		/// 弃牌堆
+		/// </summary>
+		/// <returns></returns>
+		public ExerProCardDiscardGroup discardGroup() {
+			return _cardGroup.discardGroup;
 		}
 
 		/// <summary>
@@ -268,6 +307,24 @@ namespace ExerPro.EnglishModule.Services {
 		}
 
 		/// <summary>
+		/// 当前抽牌数量
+		/// </summary>
+		/// <returns></returns>
+		public int drawCount() {
+			return Math.Min(maxDrawCount(), 
+				corrCnt + bonusCnt / BonusWordCount * BonusWordCount);
+		}
+
+		/// <summary>
+		/// 最大抽牌数量
+		/// </summary>
+		/// <returns></returns>
+		public int maxDrawCount() {
+			var hand = _cardGroup.handGroup;
+			return hand.capacity - hand.items.Count;
+		}
+
+		/// <summary>
 		/// 当前题目
 		/// </summary>
 		/// <returns></returns>
@@ -280,17 +337,17 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <returns></returns>
 		public ExerProPackCard[] drawnCards() {
-            return cardGroup.handGroup.getDrawnCards();
+            return _cardGroup.handGroup.getDrawnCards();
         }
 
         /// <summary>
         /// 回答
         /// </summary>
         /// <param name="chinese"></param>
-        public void answer(string chinese, UnityAction<bool> callback) {
-            var word = currentWord();
-            engSer.answerWord(word, chinese, (res) => 
-                onAnswerSuccess(res, callback));
+        public void answer(string chinese, 
+			UnityAction<bool> onSuccess, UnityAction onError = null) {
+            engSer.answerWord(currentWord(), chinese, (res) => 
+                onAnswerSuccess(res, onSuccess), onError);
         }
 
         /// <summary>

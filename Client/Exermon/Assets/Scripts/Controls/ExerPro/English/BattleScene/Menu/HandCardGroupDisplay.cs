@@ -207,7 +207,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			var angles = rt.localEulerAngles;
 
 			rt.pivot = cardPivot;
-			angles.z = index * deltaAngle();
+			angles.z = -index * deltaAngle();
 			rt.localEulerAngles = angles;
 		}
 
@@ -215,9 +215,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 刷新旋转
 		/// </summary>
 		void refreshRotation() {
-			var angles = rectTransform.localEulerAngles;
+			var angles = container.localEulerAngles;
 			angles.z = angleRange() / 2;
-			rectTransform.localEulerAngles = angles;
+			container.localEulerAngles = angles;
 		}
 
 		/// <summary>

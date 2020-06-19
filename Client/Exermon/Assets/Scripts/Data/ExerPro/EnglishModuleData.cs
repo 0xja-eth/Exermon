@@ -420,14 +420,26 @@ namespace ExerPro.EnglishModule.Data {
     }
 
 
-    #endregion
+	#endregion
 
-    #region 物品
-    
-    /// <summary>
-    /// 特训效果数据
-    /// </summary>
-    public class ExerProEffectData : BaseData {
+	#region 物品
+
+	/// <summary>
+	/// 特训物品星级数据
+	/// </summary>
+	public class ExerProItemStar : TypeData {
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public Color color { get; protected set; }
+	}
+
+	/// <summary>
+	/// 特训效果数据
+	/// </summary>
+	public class ExerProEffectData : BaseData {
 
         /// <summary>
         /// 效果代码枚举
@@ -658,10 +670,34 @@ namespace ExerPro.EnglishModule.Data {
 		}
 	}
 
-    /// <summary>
-    /// 特训敌人数据
-    /// </summary>
-    public class ExerProEnemy : BaseItem {
+	/// <summary>
+	/// 初始卡组
+	/// </summary>
+	public class FirstCardGroup: TypeData {
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int[] cards { get; protected set; }
+
+		/// <summary>
+		/// 获取所有卡牌
+		/// </summary>
+		/// <returns></returns>
+		public ExerProCard[] getCards() {
+			var cnt = cards.Length;
+			var res = new ExerProCard[cnt];
+			for (int i = 0; i < cnt; ++i)
+				res[i] = DataService.get().exerProCard(cards[i]);
+			return res;
+		}
+	}
+
+	/// <summary>
+	/// 特训敌人数据
+	/// </summary>
+	public class ExerProEnemy : BaseItem {
 
         /// <summary>
         /// 类型
@@ -977,6 +1013,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public ExerProPackCard firstCard() {
+			if (items.Count <= 0) return null;
             return items[items.Count - 1];
         }
     }
@@ -1284,11 +1321,8 @@ namespace ExerPro.EnglishModule.Data {
             if (tmpEnemies == null) {
 				if (_enemies == null) return null;
 				tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
-                foreach (var enemy in _enemies) {
-					var e = DataService.get().exerProEnemy(enemy);
-					Debug.Log("E: " + e.toJson().ToJson());
-					tmpEnemies.Add(e);
-				}
+                foreach (var enemy in _enemies) 
+					tmpEnemies.Add(DataService.get().exerProEnemy(enemy));
 			}
             return tmpEnemies;
         }
@@ -1298,10 +1332,6 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回BOSS敌人数组</returns>
         public List<ExerProEnemy> bosses() {
-			Debug.Log("_enemies: " + string.Join(",", _enemies));
-			Debug.Log("enemies.Count: " + enemies().Count);
-			Debug.Log("enemies: " + enemies());
-
 			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Boss);
         }
 
@@ -1310,10 +1340,6 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回普通敌人数组</returns>
         public List<ExerProEnemy> normalEnemies() {
-			Debug.Log("_enemies: " + string.Join(",", _enemies));
-			Debug.Log("enemies.Count: " + enemies().Count);
-			Debug.Log("enemies: " + enemies());
-
 			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Normal);
         }
 
@@ -1322,10 +1348,6 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回精英敌人数组</returns>
         public List<ExerProEnemy> eliteEnemies() {
-			Debug.Log("_enemies: " + string.Join(",", _enemies));
-			Debug.Log("enemies.Count: " + enemies().Count);
-			Debug.Log("enemies: " + enemies());
-
 			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Elite);
         }
 
@@ -1633,8 +1655,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         void generate() {
             if (generated) return;
-            generated = CalcService.NodeGenerator.generate(this);
-            refreshNodeStatuses();
+			generated = CalcService.NodeGenerator.generate(this);
+			setupCards(); refreshNodeStatuses();
         }
 
         /// <summary>
@@ -1656,7 +1678,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 开始特训
         /// </summary>
         public void start() {
-            createActor(); generate();
+			createActor(); generate();
         }
         /*
         /// <summary>
@@ -1685,6 +1707,16 @@ namespace ExerPro.EnglishModule.Data {
             _enemies = null; generated = false; nodes.Clear();
         }
         */
+
+		/// <summary>
+		/// 配置初始卡牌
+		/// </summary>
+		public void setupCards() {
+			var group = DataService.get().firstCardGroup(1);
+			var cards = group.getCards();
+			foreach (var card in cards)
+				actor.cardGroup.addCard(card);
+		}
 
         /// <summary>
         /// 重置单词
@@ -3238,6 +3270,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public JsonData currentActionParams() {
+			if (_currentEnemyAction == null) return new JsonData();
 			return _currentEnemyAction.params_;
 		}
 
@@ -3281,7 +3314,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public void processEnemyAction() {
 			isActionStarted = true;
-			if (_currentEnemyAction.isUnset())
+			if (_currentEnemyAction == null || _currentEnemyAction.isUnset())
 				isActionEnd = true;
         }
 
