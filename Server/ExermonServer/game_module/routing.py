@@ -678,7 +678,7 @@ WEBSOCKET_METHOD_ROUTER = {
     'engpro/correct/answer': [[
         ['uid', 'int'],
         ['qid', 'int'],
-        ['wrongItems', 'int[]'],
+        ['wrongItems', 'list'],
     ],
         EnglishPro.answerCorrect,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应

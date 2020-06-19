@@ -520,7 +520,7 @@ class Common:
             options (list): 短语题目回答集
             **kwargs (**dict): 查询参数
         """
-        phrases = Common.getQuestions(ids=pids, type_=QuestionType.Plot.value)
+        phrases = Common.getQuestions(ids=pids, type_=QuestionType.Phrase.value)
         correct_num = 0
         for i in range(len(options)):
             if phrases[i].phrase == options[i]:

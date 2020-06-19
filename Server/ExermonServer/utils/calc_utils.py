@@ -2179,9 +2179,11 @@ class CorrectionCompute:
         elif answer_type == CorrectType.Add.value:
             # 判断是否只有一个正确答案
             if right_answer.indexOf('/') != -1:
+                # 判断增加单词前面的那个词是否来自原文
+                answer_font = answer.split(' ')[0]
+                cls.answer(answer_font, wid, sentence)
                 # 组合正确答案
                 answers = right_answer.split(' ')
-                cls.answer(answers[0], wid, sentence)
                 answers_back = answers[1].split('/')
                 right_answer_list = []
 
@@ -2204,7 +2206,7 @@ class CorrectionCompute:
             for wrong in wrong_items_frontend:
                 if wrong_item.sentence_index == wrong[0] \
                         and wrong_item.word_index == wrong[1] \
-                        and cls.answer(wrong[2], wrong_item.word, wrong_item[1], sentences[wrong_item[0]-1]):
+                        and cls.answer(wrong[2], wrong_item.word, wrong[1], sentences[wrong_item.sentence_index-1]):
                     num += 1
 
         return num
