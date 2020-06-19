@@ -677,10 +677,10 @@ WEBSOCKET_METHOD_ROUTER = {
     # 回答改错题目
     'engpro/correct/answer': [[
         ['uid', 'int'],
-        ['wid', 'int'],
-        ['chinese', 'str']
+        ['qid', 'int'],
+        ['wrongItems', 'int[]'],
     ],
-        EnglishPro.answerWord,  # 处理函数
+        EnglishPro.answerCorrect,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
 }

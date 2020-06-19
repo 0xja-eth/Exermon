@@ -202,6 +202,7 @@ class ErrorType(Enum):
 	ExerProStarted = 812  # 特训正在进行
 	ShoppingTypeNotExist = 813  # 购买物品类型不存在
 	InvalidBuyNum = 814  # 购买数量不合法
+	CorrectAnswerWrong = 815  # 改错回答不合法
 
 
 class GameException(Exception):
@@ -396,7 +397,8 @@ class GameException(Exception):
 		ErrorType.StageNotFound: "关卡不存在！",
 		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
 		ErrorType.ShoppingTypeNotExist: "购买物品类型不存在！",
-		ErrorType.InvalidBuyNum: "购买数量不合法！"
+		ErrorType.InvalidBuyNum: "购买数量不合法！",
+		ErrorType.CorrectAnswerWrong: "改错回答不合法！"
 	}
 
 	def __init__(self, error_type: ErrorType):

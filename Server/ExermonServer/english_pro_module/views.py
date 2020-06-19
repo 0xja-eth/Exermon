@@ -5,7 +5,7 @@ from player_module.models import Player
 from item_module.views import Common as ItemCommon
 from item_module.models import ItemType
 from utils.view_utils import Common as ViewUtils
-from utils.calc_utils import NewWordsGenerator
+from utils.calc_utils import NewWordsGenerator, CorrectionCompute
 from utils.exception import ErrorType, GameException
 
 import time
@@ -105,6 +105,14 @@ class Service:
         # 返回数据
         # correct_num: int => 答对题目数
         correct_num = Common.answerPhrase(pids=pids, options=options)
+
+        return {'correct_num': correct_num}
+
+    # 回答改错题目
+    async def answerCorrect(cls, consumer, player: Player, qid: int, wrongItems: list):
+        # 返回数据
+        # correct_num: int => 答对题目数
+        correct_num = Common.answerCorrect(qid=qid, wrongItems=wrongItems)
 
         return {'correct_num': correct_num}
 
@@ -324,6 +332,27 @@ class Common:
 
         return res
 
+    # 获取单个题目
+    @classmethod
+    def getQuestion(cls, id=None, error: ErrorType = ErrorType.QuestionNotExist,
+                     type_: int = None, cla: type = None, **kwargs):
+        """
+        获取单个题目
+        Args:
+            ids (list): 题目ID集
+            type_ (int): 题目类型（枚举值）
+            cla (type): 题目类型
+            error (ErrorType): 抛出异常
+            **kwargs (**dict): 查询参数
+        Returns:
+            否则指定类型的单个题目
+        """
+        if cla is None:
+            cla = cls.getQuestionClass(type_)
+        res = ViewUtils.getObject(cla, error=error, id=id)
+
+        return res
+
     # 获取指定列表的单词集
     @classmethod
     def getWords(cls, wids=None, error: ErrorType = ErrorType.WordNotExit, **kwargs) -> list:
@@ -499,3 +528,19 @@ class Common:
 
         return correct_num
 
+    @classmethod
+    def answerCorrect(cls, qid: int, wrongItems: list, **kwargs):
+        """
+        回答短语题目
+        Args:
+            pids (list): 短语题目ID集
+            options (list): 短语题目回答集
+            **kwargs (**dict): 查询参数
+        """
+        question = cls.getQuestion(id=qid, type_=QuestionType.Correction.value)
+        wrong_item_backend = question.wrongItems()
+        wrong_item_frontend = wrongItems
+
+        num = CorrectionCompute.compute_right_answer(question.article, wrong_item_frontend, wrong_item_backend)
+
+        return num
