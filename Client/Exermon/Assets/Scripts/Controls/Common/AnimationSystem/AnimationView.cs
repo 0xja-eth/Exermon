@@ -245,8 +245,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		/// <param name="force">是否直接添加到播放列表</param>
 		public void addToPlayQueue(bool force) {
-			if (controller == null) return;
-			controller.add(this, force);
+			controller?.add(this, force);
 		}
 		public void addToPlayQueue() {
 			addToPlayQueue(false);
@@ -256,6 +255,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 开始下一个动画视窗
 		/// </summary>
 		public void startNextAnimationView() {
+			Debug.Log("startNextAnimationView");
 			controller?.playNext();
 		}
 
@@ -416,6 +416,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="play">立即播放</param>
 		public void rotateTo(Vector3 target, string name = "Rotate",
 			float duration = AnimationUtils.AniDuration, bool play = false) {
+
+			Debug.Log(this.name + ": rotateTo " + target + ", rectTransform: " + rectTransform);
+
 			if (rectTransform == null) return;
 
 			var ani = addAnimation(name, true);

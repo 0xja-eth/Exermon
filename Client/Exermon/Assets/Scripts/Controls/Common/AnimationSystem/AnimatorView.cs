@@ -187,7 +187,7 @@ namespace UI.Common.Controls.AnimationSystem {
             if (animator == null) return;
 			foreach (var key in endEvents.Keys) {
 				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-				if (key != eventState && (key == "" || state.IsName(key)))
+				if (eventState != null && key != eventState && (key == "" || state.IsName(key)))
 					endEvents[eventState]?.Invoke();
 			}
 			foreach (var key in changeEvents.Keys) {

@@ -1028,8 +1028,9 @@ namespace GameModule.Services {
 
             RuntimeBattler subject, object_;
 
-            List<RuntimeActionResult.StateChange> stateChanges;
-            List<RuntimeBuff> addBuffs;
+            List<RuntimeActionResult.StateChange> stateChanges = 
+				new List<RuntimeActionResult.StateChange>();
+            List<RuntimeBuff> addBuffs = new List<RuntimeBuff>();
 
             /// <summary>
             /// 生成
@@ -1048,9 +1049,12 @@ namespace GameModule.Services {
             /// <param name="action">行动</param>
             ExerProActionResultGenerator(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
-                result = new RuntimeActionResult(action);
                 this.action = action;
-                _generate(); _setup();
+				subject = action.subject;
+				object_ = action.object_;
+				result = new RuntimeActionResult(action);
+
+				_generate(); _setup();
             }
 
             /// <summary>

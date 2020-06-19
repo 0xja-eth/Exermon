@@ -239,7 +239,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 拖拽释放回调
 		/// </summary>
 		public void OnDrop(PointerEventData eventData){
-			getCardDragger(eventData)?.use(this);
+			var dragger = getCardDragger(eventData);
+			Debug.Log("Dragger: " + dragger);
+			dragger?.use(this);
 		}
 
 		/// <summary>
@@ -248,6 +250,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="data">事件数据</param>
 		/// <returns>物品显示项</returns>
 		CardDragger getCardDragger(PointerEventData data) {
+			Debug.Log("data.pointerDrag: " + data.pointerDrag);
 			var obj = data.pointerDrag; if (obj == null) return null;
 			return SceneUtils.get<CardDragger>(obj);
 		}

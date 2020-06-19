@@ -113,29 +113,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		protected override void update() {
 			base.update();
-			updateAction();
 			updateResult();
 			updateHPDelta();
 		}
-
-		/// <summary>
-		/// 更新行动
-		/// </summary>
-		protected virtual void updateAction() {
-			currentAction = item?.currentAction();
-			// if (item.currentAction() != null) item.processAction();
-			// processAction(currentAction);
-		}
-
-		/*
-		/// <summary>
-		/// 处理行动
-		/// </summary>
-		/// <param name="action"></param>
-		protected virtual void processAction(RuntimeAction action) {
-			item.processAction();
-		}
-		*/
 
 		/// <summary>
 		/// 更新结果
@@ -377,7 +357,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 播放击中动画
 		/// </summary>
 		protected virtual void playHitAnimation() {
-			target().hurt();
+			if (target() != null && target() != this) target().hurt();
 			onAttackEnd();
 		}
 

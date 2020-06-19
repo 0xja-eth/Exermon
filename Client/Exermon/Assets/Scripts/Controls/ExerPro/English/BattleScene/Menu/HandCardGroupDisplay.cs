@@ -163,7 +163,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 角度范围
 		/// </summary>
 		/// <returns></returns>
-		float angleRange() { return deltaAngle() * itemsCount(); }
+		float angleRange() { return deltaAngle() * (itemsCount() - 1); }
 
 		/// <summary>
 		/// 卡牌角度增量
@@ -215,9 +215,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 刷新旋转
 		/// </summary>
 		void refreshRotation() {
-			var angles = container.localEulerAngles;
-			angles.z = angleRange() / 2;
-			container.localEulerAngles = angles;
+			//var angles = container.localEulerAngles;
+			//angles.z = ;
+			rotateTo(angleRange() / 2);
+			//container.localEulerAngles = angles;
 		}
 
 		/// <summary>

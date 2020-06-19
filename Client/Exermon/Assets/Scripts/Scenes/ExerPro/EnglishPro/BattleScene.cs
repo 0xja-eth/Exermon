@@ -246,7 +246,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
 		public void useCard(ExerProPackCard packCard, RuntimeEnemy enemy) {
+			Debug.Log("useCard: " + packCard + ", " + enemy);
+
 			if (!isCardUsable(packCard, enemy)) return;
+			Debug.Log("Use enable!");
 
 			var targets = makeCardTargets(packCard.item(), enemy);
 

@@ -79,6 +79,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 使用卡牌
 		/// </summary>
 		public void use(EnemyDisplay enemy = null) {
+			Debug.Log("use: " + enemy);
 			cardDisplay.use(enemy);
 		}
 

@@ -22,7 +22,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 	/// <summary>
 	/// 角色显示控件
 	/// </summary
-	public class ActorDisplay : BattlerDisplay, IDropHandler {
+	public class ActorDisplay : BattlerDisplay {
 		
 		#region 数据控制
 
@@ -37,10 +37,36 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 		#endregion
 
-		#region 动画控制
+		#region 更新控制
+
+		/// <summary>
+		/// 更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			updateAction();
+		}
+
+		/// <summary>
+		/// 更新行动
+		/// </summary>
+		protected virtual void updateAction() {
+			currentAction = item?.currentAction();
+			if (item.currentAction() != null) item.processAction();
+			processAction(currentAction);
+		}
+
+		/// <summary>
+		/// 处理行动
+		/// </summary>
+		/// <param name="action"></param>
+		protected virtual void processAction(RuntimeAction action) {
+			onHit();
+		}
 
 		#endregion
 
+		/*
 		#region 事件控制
 
 		/// <summary>
@@ -62,6 +88,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		#endregion
-
+		*/
 	}
 }

@@ -91,14 +91,17 @@ namespace UI.Common.Controls.AnimationSystem {
 		public void add(AnimationView ani, bool force = false) {
 			if (force) playingAnimations.Add(ani);
 			else animations.Enqueue(ani);
+			join(ani);
 		}
 
-        /// <summary>
-        /// 播放下一个动画
-        /// </summary>
-        public void playNext() {
-            if (animations.Count <= 0) return;
-            playingAnimations.Add(animations.Dequeue());
+		/// <summary>
+		/// 播放下一个动画
+		/// </summary>
+		public void playNext() {
+			Debug.Log("playNext: " + animations.Count);
+
+			if (animations.Count <= 0) return;
+			playingAnimations.Add(animations.Dequeue());
         }
 
         #endregion
