@@ -46,8 +46,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <summary>
 		/// 动画栈/缓冲队列
 		/// </summary>
-		Queue<AnimationUtils.TempAnimation> animations = 
-            new Queue<AnimationUtils.TempAnimation>();
+		LinkedList<AnimationUtils.TempAnimation> animations = 
+            new LinkedList<AnimationUtils.TempAnimation>();
 		//Queue<AnimationUtils.TempAnimation> tmpAnimations = 
 		//    new Queue<AnimationUtils.TempAnimation>();
 
@@ -215,7 +215,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <returns></returns>
 		public AnimationUtils.TempAnimation curAni() {
 			if (animations.Count <= 0) return null;
-            return animations.Peek();
+            return animations.First.Value;
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// 切换到下一个动画
         /// </summary>
         public void next() {
-            animations.Dequeue();
+            animations.RemoveFirst();
         }
 
         /// <summary>
@@ -300,10 +300,6 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public AnimationUtils.TempAnimation addAnimation(string name) {
 			var clip = animation.GetClip(name);
-
-			Debug.Log(name + " addAnimation: " + clip.wrapMode);
-
-			clip.wrapMode = WrapMode.Once;
 			if (clip == null) return addAnimation(name, true);
 			return addAnimation(clip);
 		}
@@ -313,8 +309,21 @@ namespace UI.Common.Controls.AnimationSystem {
 		public AnimationUtils.TempAnimation addAnimation(
             AnimationUtils.TempAnimation ani) {
 			Debug.Log(name + " addAnimation: " + ani.getName());
-			animations.Enqueue(ani); return ani;
+			return enqueueAnimation(ani);
         }
+
+		/// <summary>
+		/// 加入队列
+		/// </summary>
+		/// <param name="ani"></param>
+		AnimationUtils.TempAnimation enqueueAnimation(AnimationUtils.TempAnimation ani) {
+			foreach (var ani_ in animations)
+				if (ani_.isClipEquals(ani)) {
+					Debug.LogWarning("Adding animation: " + ani.getName() + " failed.");
+					return ani_;
+				}
+			animations.AddLast(ani); return ani;
+		}
 		
 		#endregion
 

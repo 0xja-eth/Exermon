@@ -22,6 +22,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 
 		public GameObject correctFlag, wrongFlag;
 
+		public Color normalFontColor = new Color(0, 0, 0);
+		public Color correctFontColor = new Color(0.2705882f, 0.6078432f, 0.372549f);
+		public Color wrongFontColor = new Color(0.9372549f, 0.2666667f, 0.1137255f);
+
+		public CanvasGroup canvasGroup;
+		public float noAnswerAlpha = 0.4f; // 非正确答案时的透明度
+
 		#region 数据控制
 
 		/// <summary>
@@ -70,21 +77,41 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 		/// <param name="item"></param>
 		protected override void drawExactlyItem(string item) {
 			base.drawExactlyItem(item);
-			chinese.text = item;
+			drawText(item);
 			drawAnswer();
+		}
+
+		/// <summary>
+		/// 绘制文本
+		/// </summary>
+		/// <param name="text"></param>
+		void drawText(string text) {
+			var color = normalFontColor;
+			if (showAnswer()) {
+				var correct = isCorrect();
+				if (correct) color = correctFontColor;
+				if (!isSelected() && !correct) color = wrongFontColor;
+			}
+
+			chinese.color = color;
+			chinese.text = item;
 		}
 
 		/// <summary>
 		/// 绘制答案
 		/// </summary>
 		void drawAnswer() {
-			if (!showAnswer()) {
-				correctFlag.SetActive(false);
-				wrongFlag.SetActive(false);
-			} else {
+			if (!showAnswer()) clearAnswer();
+			else {
 				var correct = isCorrect();
-				correctFlag.SetActive(correct);
-				wrongFlag.SetActive(!correct);
+
+				if (canvasGroup)
+					canvasGroup.alpha = correct ? 1 : noAnswerAlpha;
+
+				if (isSelected()) {
+					if (correctFlag) correctFlag.SetActive(correct);
+					if (wrongFlag) wrongFlag.SetActive(!correct);
+				}
 			}
 		}
 
@@ -95,6 +122,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 			base.drawEmptyItem();
 
 			chinese.text = "";
+			clearAnswer();
+		}
+
+		/// <summary>
+		/// 清除答案显示
+		/// </summary>
+		void clearAnswer() {
 			correctFlag.SetActive(false);
 			wrongFlag.SetActive(false);
 		}

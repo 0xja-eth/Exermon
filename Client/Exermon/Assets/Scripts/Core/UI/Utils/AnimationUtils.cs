@@ -43,12 +43,12 @@ namespace Core.UI.Utils {
             /// <summary>
             /// 动画组件
             /// </summary>
-            Animation animation;
+            Animation animation = null;
 
 			/// <summary>
 			/// 动画开始前事件
 			/// </summary>
-			UnityAction beforeEvent;
+			UnityAction beforeEvent = null;
 
 			/// <summary>
 			/// 构造函数
@@ -56,17 +56,14 @@ namespace Core.UI.Utils {
 			/// <param name="name">动画片段名称</param>
 			/// <param name="legacy">是否用在 Animation 组件中</param>
 			public TempAnimation(string name = AniClipName, bool legacy = true) {
-				animation = null;
 				clip = new AnimationClip();
 				clip.legacy = legacy;
 				clip.name = name;
 				clip.wrapMode = WrapMode.Once;
-				beforeEvent = null;
 			}
 			public TempAnimation(AnimationClip clip) {
-				this.clip = clip; animation = null;
+				this.clip = clip;
 				clip.wrapMode = WrapMode.Once;
-				beforeEvent = null;
 			}
 
 			/// <summary>
@@ -143,6 +140,15 @@ namespace Core.UI.Utils {
             public bool isPlayed() {
                 return animation && !animation.IsPlaying(clip.name);
             }
+
+			/// <summary>
+			/// 两个动画片段是否相等
+			/// </summary>
+			/// <param name="ani"></param>
+			/// <returns></returns>
+			public bool isClipEquals(TempAnimation ani) {
+				return ani.clip == clip;
+			}
 
             /// <summary>
             /// 播放
