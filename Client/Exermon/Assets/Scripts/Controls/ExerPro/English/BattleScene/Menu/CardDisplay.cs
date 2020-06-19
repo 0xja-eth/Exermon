@@ -70,19 +70,19 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			set { _isLocked = value; requestRefresh(); }
 		}
 
-		#region 启动控制
+		//#region 启动控制
 
-		/// <summary>
-		/// 显示视窗
-		/// </summary>
-		protected override void showView() {
-			if (animation && !isLocked) {
-				var ani = animation.addAnimation(ShowAnimation);
-				ani.setBeforeEvent(base.showView);
-			} else base.showView();
-		}
+		///// <summary>
+		///// 显示视窗
+		///// </summary>
+		//protected override void showView() {
+		//	if (animation && !isLocked) {
+		//		var ani = animation.addAnimation(ShowAnimation);
+		//		ani.setBeforeEvent(base.showView);
+		//	} else base.showView();
+		//}
 
-		#endregion
+		//#endregion
 
 		#region 数据控制
 
@@ -98,7 +98,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		protected override void onItemChanged() {
 			base.onItemChanged();
-			isLocked = isNullItem(item);
+			isLocked = base.isNullItem(item);
+			Debug.Log("onItemChanged: " + item?.item().name + ": " + isLocked);
+			if (animation && !isLocked)
+				animation.addAnimation(ShowAnimation);
 		}
 
 		/// <summary>
@@ -278,7 +281,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			content.SetActive(false);
 
 			if (back) {
-				back.color = LockedColor;
+				back.color = isLocked ? LockedColor : NormalColor;
 				back.gameObject.SetActive(true);
 			}
 

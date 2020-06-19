@@ -66,11 +66,6 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
-		/// <summary>
-		/// 开始标志
-		/// </summary>
-		bool isStarted = false;
-
         #region 初始化
 
         /// <summary>
@@ -255,6 +250,13 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public void addToPlayQueue() {
 			addToPlayQueue(false);
+		}
+
+		/// <summary>
+		/// 开始下一个动画视窗
+		/// </summary>
+		public void startNextAnimationView() {
+			controller?.playNext();
 		}
 
 		#endregion

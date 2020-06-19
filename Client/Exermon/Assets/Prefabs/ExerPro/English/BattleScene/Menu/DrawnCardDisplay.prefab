@@ -57,8 +57,8 @@ MonoBehaviour:
   cardSkin: {fileID: 2688432033876432892}
   charFrame: {fileID: 2635541293646651802}
   typeIcon: {fileID: 0}
+  back: {fileID: 2771709228412802477}
   content: {fileID: 7121383768948500451}
-  back: {fileID: 6875537340213628243}
   canvasGroup: {fileID: 0}
   animation: {fileID: 6065307175500884247}
   dragger: {fileID: 0}

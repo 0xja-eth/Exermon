@@ -960,6 +960,14 @@ namespace ExerPro.EnglishModule.Data {
 			get { return packPotion; }
 			protected set { packPotion = value; }
 		}
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProSlotPotion() { }
+		public ExerProSlotPotion(ExerProPotionSlot slot, int index) {
+			potionSlot = slot; this.index = index;
+		}
 	}
 
 	#endregion
@@ -1199,9 +1207,30 @@ namespace ExerPro.EnglishModule.Data {
 	public class ExerProPotionSlot : SlotContainer<ExerProSlotPotion> {
 
 		/// <summary>
+		/// 槽数
+		/// </summary>
+		public const int SlotItemCount = 3;
+
+		/// <summary>
 		/// 所属玩家
 		/// </summary>
 		public RuntimeActor actor { get; set; }
+		
+		/// <summary>
+		/// 默认容量
+		/// </summary>
+		/// <returns></returns>
+		public override int defaultCapacity() {
+			return SlotItemCount;
+		}
+
+		/// <summary>
+		/// 配置槽项（初始化）
+		/// </summary>
+		void setupSlotItems() {
+			for(int i = 0; i < SlotItemCount; ++i) 
+				items.Add(new ExerProSlotPotion(this, i));
+		}
 
 		/// <summary>
 		/// 通过装备物品获取槽ID
@@ -1224,6 +1253,13 @@ namespace ExerPro.EnglishModule.Data {
 			return slotItem;
 		}
 
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProPotionSlot() { }
+		public ExerProPotionSlot(RuntimeActor actor) {
+			this.actor = actor; setupSlotItems();
+		}
 	}
 
 	#endregion
@@ -1818,8 +1854,8 @@ namespace ExerPro.EnglishModule.Data {
             var player = PlayerService.get().player;
             if (player == null) return;
 
-            actor = actor ?? new RuntimeActor();
-            actor.setupPlayer(player);
+			if (actor == null) actor = new RuntimeActor(player);
+            else actor.setupPlayer(player);
         }
 
         /// <summary>
@@ -2978,7 +3014,7 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
 
 		[AutoConvert]
-		public ExerProPotionSlot potionSlot { get; protected set; } = new ExerProPotionSlot();
+		public ExerProPotionSlot potionSlot { get; protected set; }
 
 		/// <summary>
 		/// 对应的艾瑟萌槽项
@@ -3113,6 +3149,13 @@ namespace ExerPro.EnglishModule.Data {
 			slotItem = player.getExerSlotItem(EnglishSubjectId);
 		}
 
+		/// <summary>
+		/// 配置药水槽
+		/// </summary>
+		void createPotionSlot() {
+			potionSlot = new ExerProPotionSlot(this);
+		}
+		
 		#endregion
 
 		/// <summary>
@@ -3128,7 +3171,10 @@ namespace ExerPro.EnglishModule.Data {
 		/// 构造函数
 		/// </summary>
 		/// <param name="player"></param>
-		public RuntimeActor() {
+		public RuntimeActor() { }
+		public RuntimeActor(Player player) {
+			setupPlayer(player);
+			createPotionSlot();
 			reset();
 		}
 	}

@@ -188,7 +188,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 摧毁箭头
 		/// </summary>
 		void destroyArrow() {
-			if (arrow != null) return;
+			if (arrow == null) return;
 			Destroy(arrow); arrow = null;
 		}
 

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 using Core.UI;
 using Core.UI.Utils;
@@ -19,6 +20,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
+		public Text energy; 
 		public HandCardGroupDisplay handCards;
 		public PotionSlotDisplay potionSlot;
 
@@ -60,6 +62,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		protected override void refresh() {
 			base.refresh();
 			var actor = battleSer.actor();
+
+			energy.text = actor.energy.ToString();
 			setupHandCards(actor);
 			setupPotionSlot(actor);
 		}

@@ -155,7 +155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 20.999939, y: 8}
+  m_AnchoredPosition: {x: 21, y: 8}
   m_SizeDelta: {x: -42, y: 64}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &27372607
@@ -232,7 +232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 20.999939, y: -2}
+  m_AnchoredPosition: {x: 21, y: -2}
   m_SizeDelta: {x: -42, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &57703259
@@ -3934,7 +3934,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 15.9999695, y: 0}
+  m_AnchoredPosition: {x: 16, y: 0}
   m_SizeDelta: {x: -32, y: -32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1219523490
@@ -6805,6 +6805,7 @@ MonoBehaviour:
   shownState: Shown
   hiddenState: Hidden
   shownAttr: shown
+  energy: {fileID: 268713602}
   handCards: {fileID: 1933041197}
   potionSlot: {fileID: 1927358913}
 --- !u!95 &2087441263

@@ -221,7 +221,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <returns></returns>
 		public RuntimeActor actor() {
-			return record.actor;
+			return record?.actor;
 		}
 
 		/// <summary>
@@ -237,7 +237,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <returns></returns>
 		public ExerProCardHandGroup handGroup() {
-			return _cardGroup.handGroup;
+			return _cardGroup?.handGroup;
 		}
 
 		/// <summary>
@@ -245,7 +245,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <returns></returns>
 		public ExerProCardDrawGroup drawGroup() {
-			return _cardGroup.drawGroup;
+			return _cardGroup?.drawGroup;
 		}
 
 		/// <summary>
@@ -253,7 +253,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <returns></returns>
 		public ExerProCardDiscardGroup discardGroup() {
-			return _cardGroup.discardGroup;
+			return _cardGroup?.discardGroup;
 		}
 
 		/// <summary>

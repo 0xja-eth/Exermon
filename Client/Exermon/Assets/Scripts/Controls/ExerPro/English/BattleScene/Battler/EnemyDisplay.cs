@@ -32,6 +32,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 字符串常量定义
 		/// </summary>
 		const string NameFormat = "{0}[{1}]";
+		const string PureNameFormat = "{0}";
 
 		/// <summary>
 		/// 外部组件设置
@@ -190,15 +191,33 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var enemy = this.enemy(item);
 			var enemyData = enemy.enemy();
 
-			name.text = string.Format(NameFormat,
-				enemyData.name, enemyData.character);
+			drawName(enemyData);
+			drawThinking(enemy);
+		}
 
+		/// <summary>
+		/// 绘制名称
+		/// </summary>
+		/// <param name="enemy"></param>
+		void drawName(ExerProEnemy enemy) {
+			if (enemy.character != "")
+				name.text = string.Format(NameFormat,
+					enemy.name, enemy.character);
+			else name.text = string.Format(PureNameFormat,
+					enemy.name);
+		}
+
+		/// <summary>
+		/// 绘制敌人行动思考图标
+		/// </summary>
+		/// <param name="enemy"></param>
+		void drawThinking(RuntimeEnemy enemy) {
 			var think = AssetLoader.loadEnemyThink(
 				enemy.currentActionType());
 			if (think != null) {
 				this.think.gameObject.SetActive(true);
 				this.think.overrideSprite = AssetLoader.
-					generateSprite(think); 
+					generateSprite(think);
 			} else this.think.gameObject.SetActive(false);
 		}
 

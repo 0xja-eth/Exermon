@@ -106,7 +106,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 				var correct = isCorrect();
 
 				if (canvasGroup)
-					canvasGroup.alpha = correct ? 1 : noAnswerAlpha;
+					canvasGroup.alpha = isSelected() || correct ? 1 : noAnswerAlpha;
 
 				if (correctFlag) correctFlag.SetActive(correct);
 				if (isSelected() && wrongFlag) wrongFlag.SetActive(!correct);

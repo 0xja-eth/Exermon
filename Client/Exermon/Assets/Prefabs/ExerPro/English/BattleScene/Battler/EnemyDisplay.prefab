@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &154831357375675474
 RectTransform:
   m_ObjectHideFlags: 0
@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 713893129170059414}
   - component: {fileID: 713893129170059415}
   m_Layer: 5
-  m_Name: Enemy
+  m_Name: EnemyDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -667,14 +667,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   background: {fileID: 0}
   disabledFlag: {fileID: 0}
-  selectedFlag: {fileID: 154831357375675473}
+  selectedFlag: {fileID: 0}
   checkedFlag: {fileID: 0}
-  highlightFlag: {fileID: 154831357375675473}
+  highlightFlag: {fileID: 0}
   actived: 1
   _enabled: 1
   selectable: 1
   checkable: 0
   highlightable: 1
+  clickable: 1
   forceChecked: 0
   deselectable: 1
   normalColor: {r: 1, g: 1, b: 1, a: 0}

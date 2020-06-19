@@ -122,7 +122,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 更新行动
 		/// </summary>
 		protected virtual void updateAction() {
-			currentAction = item.currentAction();
+			currentAction = item?.currentAction();
 			// if (item.currentAction() != null) item.processAction();
 			// processAction(currentAction);
 		}
