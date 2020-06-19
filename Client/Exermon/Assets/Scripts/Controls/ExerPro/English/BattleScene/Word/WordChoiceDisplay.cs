@@ -108,11 +108,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 				if (canvasGroup)
 					canvasGroup.alpha = correct ? 1 : noAnswerAlpha;
 
-				if (isSelected()) {
-					if (correctFlag) correctFlag.SetActive(correct);
-					if (wrongFlag) wrongFlag.SetActive(!correct);
-				}
-			}
+				if (correctFlag) correctFlag.SetActive(correct);
+				if (isSelected() && wrongFlag) wrongFlag.SetActive(!correct);
+			} 
 		}
 
 		/// <summary>
@@ -129,6 +127,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 		/// 清除答案显示
 		/// </summary>
 		void clearAnswer() {
+			canvasGroup.alpha = 1;
 			correctFlag.SetActive(false);
 			wrongFlag.SetActive(false);
 		}

@@ -38,7 +38,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Image background;
+        public Graphic background;
         public GameObject disabledFlag; // 选择时显示的 GameObject
         public GameObject selectedFlag; // 选择时显示的 GameObject
         public GameObject checkedFlag; // 选中时显示的 GameObject
