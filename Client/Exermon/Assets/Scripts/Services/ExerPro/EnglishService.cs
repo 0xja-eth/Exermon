@@ -727,13 +727,14 @@ namespace ExerPro.EnglishModule.Services {
         /// 藏宝据点
         /// </summary>
         void onTreasureNode() {
-            long i = UnityEngine.Random.Range(0, 10000);
-            switch (i % 2) {
-                case 0:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-                case 1:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-            }
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+            //long i = UnityEngine.Random.Range(0, 10000);
+            //switch (i % 2) {
+            //    case 0:
+            //        sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+            //    case 1:
+            //        sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+            //}
         }
 
         /// <summary>

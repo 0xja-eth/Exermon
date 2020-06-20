@@ -99,8 +99,8 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// </summary>
         void configureCardDisplay() {
             var cards = CalcService.RewardGenerator.getCardRewards((ExerProMapNode.Type)node.typeId);
-            cardDisplay.setItems(cards);
             cardDisplay.startView();
+            cardDisplay.setItems(cards);
             cardDisplay.addClickedCallback(onCardSelected);
         }
 

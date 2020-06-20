@@ -27,8 +27,6 @@ namespace UI.ExerPro.EnglishPro.Common.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
-        public BaseItemDisplay itemDisplay;
-
         public StarsDisplay starsDisplay;
 
         public Image icon;
@@ -36,24 +34,6 @@ namespace UI.ExerPro.EnglishPro.Common.Controls {
         public Text cost;
         public Text description;
 
-        #region 初始化
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            initializeDrawFuncs();
-        }
-
-        /// <summary>
-        /// 初始化绘制函数
-        /// </summary>
-        protected void initializeDrawFuncs() {
-            itemDisplay.registerItemType<ExerProCard>(drawItem);
-        }
-
-        #endregion
 
         #region 界面控制
 
@@ -87,7 +67,7 @@ namespace UI.ExerPro.EnglishPro.Common.Controls {
         /// <param name="shopItem"></param>
         protected override void drawExactlyItem(ExerProCard shopItem) {
             base.drawExactlyItem(shopItem);
-            itemDisplay.setItem(shopItem);
+            drawItem(shopItem);
         }
 
         /// <summary>
@@ -95,7 +75,7 @@ namespace UI.ExerPro.EnglishPro.Common.Controls {
         /// </summary>
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
-            name.text = "";
+            cost.text = description.text = name.text = "";
             icon.gameObject.SetActive(false);
         }
 
