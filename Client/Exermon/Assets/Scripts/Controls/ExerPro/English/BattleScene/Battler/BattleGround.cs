@@ -41,6 +41,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		};
 
 		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public ActionManager actionManager;
+
+		/// <summary>
 		/// 预制件设置
 		/// </summary>
 		public GameObject actorPerfab, enemyPerfab;

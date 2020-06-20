@@ -32,6 +32,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public void onHit() {
 			battler.onHit();
 		}
+		
+		/// <summary>
+		/// 产生结果
+		/// </summary>
+		public void onResult() {
+			battler.onResult();
+		}
 
 	}
 }

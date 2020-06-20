@@ -47,7 +47,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		ExerProEnemy.Action currentEnemyAction = null;
 
 		#region 更新控制
-
+		/*
 		/// <summary>
 		/// 更新
 		/// </summary>
@@ -55,7 +55,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			base.update();
 			updateEnemyAction();
 		}
-
+		
 		/// <summary>
 		/// 更新敌人行动
 		/// </summary>
@@ -86,16 +86,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				//	processAddStates(action); break;
 				case ExerProEnemy.Action.Type.Escape:
 					processEscape(action); break;
-				default: skill(); break;
+				default: processSkill(action); break;
 			}
-		}
-
-		/// <summary>
-		/// 处理攻击
-		/// </summary>
-		void processAttack(ExerProEnemy.Action action) {
-			moveToTarget(); attack(); resetPosition();
-		}
+		}*/
 		/*
 		/// <summary>
 		/// 处理提升
@@ -148,7 +141,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 动画控制
-
+		/*
 		/// <summary>
 		/// 击中回调
 		/// </summary>
@@ -161,11 +154,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 					powerUp(); onSkillEnd(); break;
 				case ExerProEnemy.Action.Type.PowerDown:
 				case ExerProEnemy.Action.Type.NegStates:
-					target()?.powerDown();
+					targetDisplay()?.powerDown();
 					onSkillEnd(); break;
 			}
 		}
-
+		*/
 		#endregion
 
 		#region 界面控制

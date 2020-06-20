@@ -39,30 +39,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 		#region 更新控制
 
-		/// <summary>
-		/// 更新
-		/// </summary>
-		protected override void update() {
-			base.update();
-			updateAction();
-		}
-
-		/// <summary>
-		/// 更新行动
-		/// </summary>
-		protected virtual void updateAction() {
-			currentAction = item?.currentAction();
-			if (item.currentAction() != null) item.processAction();
-			processAction(currentAction);
-		}
-
-		/// <summary>
-		/// 处理行动
-		/// </summary>
-		/// <param name="action"></param>
-		protected virtual void processAction(RuntimeAction action) {
-			onHit();
-		}
+		///// <summary>
+		///// 更新
+		///// </summary>
+		//protected override void update() {
+		//	base.update();
+		//	updateAction();
+		//}
 
 		#endregion
 

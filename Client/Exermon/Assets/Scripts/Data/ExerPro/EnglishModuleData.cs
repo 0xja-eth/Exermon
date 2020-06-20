@@ -56,10 +56,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 构造函数
 		/// </summary>
-        public ListeningSubQuestion()
-        {
-            
-        }
+		public ListeningSubQuestion() {
+
+		}
 	}
 
 	/// <summary>
@@ -81,12 +80,14 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
 		public Texture2D picture { get; protected set; }
 
-        public ListeningQuestion() {
-        }
+		/// <summary>
+		/// 测试数据
+		/// </summary>
+		/// <returns></returns>
         public static ListeningQuestion sample() {
             ListeningQuestion returnSample = new ListeningQuestion();
             returnSample.article = "海贼王";
-            returnSample.audio = AssetLoader.loadListeningAudioClip(1);
+            //returnSample.audio = AssetLoader.loadListeningAudioClip(1);
             ListeningSubQuestion testSubQuestion1 = new ListeningSubQuestion();
             return returnSample;
         }
@@ -514,11 +515,21 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
 		public int iconIndex { get; protected set; }
 		[AutoConvert]
+		public int startAniIndex { get; protected set; }
+		[AutoConvert]
+		public int targetAniIndex { get; protected set; }
+		[AutoConvert]
         public int starId { get; protected set; }
         [AutoConvert]
         public int gold { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
+
+		/// <summary>
+		/// 起手动画/目标动画
+		/// </summary>
+		public AnimationClip startAni { get; protected set; } = null;
+		public AnimationClip targetAni { get; protected set; } = null;
 
 		/// <summary>
 		/// 物品图标
@@ -530,13 +541,21 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="index">索引</param>
 		/// <returns>返回裁剪后的精灵</returns>
-		public delegate Sprite LoadFun(int index);
+		public delegate Sprite IconLoadFun(int index);
+
+		/// <summary>
+		/// 读取函数
+		/// </summary>
+		/// <param name="index">索引</param>
+		/// <returns>返回裁剪后的精灵</returns>
+		public delegate AnimationClip AniLoadFun(int index, bool start);
 
 		/// <summary>
 		/// 获取读取函数
 		/// </summary>
 		/// <returns>读取函数</returns>
-		protected abstract LoadFun loadFun();
+		protected abstract IconLoadFun iconLoadFun();
+		protected virtual AniLoadFun aniLoadFun() { return null; }
 
 		/// <summary>
 		/// 物品星级
@@ -553,6 +572,8 @@ namespace ExerPro.EnglishModule.Data {
 		protected override void loadCustomAttributes(JsonData json) {
 			base.loadCustomAttributes(json);
 			//icon = loadFun()?.Invoke(iconIndex);
+			startAni = AssetLoader.loadAnimation(startAniIndex);
+			targetAni = AssetLoader.loadAnimation(targetAniIndex);
 		}
 	}
 
@@ -569,7 +590,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 获取读取函数
 		/// </summary>
 		/// <returns>读取函数</returns>
-		protected override LoadFun loadFun() {
+		protected override IconLoadFun iconLoadFun() {
 			return AssetLoader.getExerProItemIconSprite;
 		}
 	}
@@ -587,7 +608,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 获取读取函数
 		/// </summary>
 		/// <returns>读取函数</returns>
-		protected override LoadFun loadFun() {
+		protected override IconLoadFun iconLoadFun() {
 			return AssetLoader.getExerProItemIconSprite;
 		}
 	}
@@ -653,7 +674,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 获取读取函数
 		/// </summary>
 		/// <returns>读取函数</returns>if (name) 
-		protected override LoadFun loadFun() {
+		protected override IconLoadFun iconLoadFun() {
 			return AssetLoader.getExerProCardIconSprite;
 		}
 
@@ -2863,7 +2884,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public virtual RuntimeAction currentAction() {
 			if (actions.Count <= 0) return null;
-			return actions.Peek();
+			var action = actions.Dequeue();
+			if (!isMovableState()) return null;
+			return action;
 		}
 
 		/// <summary>
@@ -2877,23 +2900,19 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 处理当前行动（处理后移出队列）
 		/// </summary>
-		public void processAction() {
-			if (actions.Count <= 0) return;
-
-			var action = actions.Peek();
+		public virtual void processAction(RuntimeAction action) {
 			if (!isMovableState()) return;
-
 			action.generateResult();
 			action.object_.applyResult(action.result);
 		}
 
-		/// <summary>
-		/// 结束当前行动
-		/// </summary>
-		public virtual void endAction() {
-			if (actions.Count <= 0) return;
-			actions.Dequeue();
-		}
+		///// <summary>
+		///// 结束当前行动
+		///// </summary>
+		//public virtual void endAction() {
+		//	if (actions.Count <= 0) return;
+		//	actions.Dequeue();
+		//}
 
 		/// <summary>
 		/// 清除所有行动
@@ -3330,10 +3349,10 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		/// <summary>
-		/// 结束行动
+		/// 处理行动
 		/// </summary>
-		public override void endAction() {
-			base.endAction();
+		public override void processAction(RuntimeAction action) {
+			base.processAction(action);
 			isActionEnd = true;
 		}
 
@@ -3409,10 +3428,21 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public RuntimeActionResult result { get; protected set; } = null;
 
-        /// <summary>
-        /// 生成结果
-        /// </summary>
-        public void generateResult() {
+		/// <summary>
+		/// 起手动画/目标动画
+		/// </summary>
+		public AnimationClip startAni { get; protected set; } = null;
+		public AnimationClip targetAni { get; protected set; } = null;
+
+		/// <summary>
+		/// 是否需要移动到对方位置
+		/// </summary>
+		public bool moveToTarget { get; set; } = false;
+
+		/// <summary>
+		/// 生成结果
+		/// </summary>
+		public void generateResult() {
             // TODO: 结果生成
             result = CalcService.ExerProActionResultGenerator.generate(this);
         }
@@ -3421,14 +3451,17 @@ namespace ExerPro.EnglishModule.Data {
 		/// 构造函数
 		/// </summary>
 		public RuntimeAction() { }
-        public RuntimeAction(RuntimeBattler subject,
-            RuntimeBattler object_, ExerProEffectData[] effects = null) {
-            this.subject = subject; this.object_ = object_;
-            this.effects = effects ?? new ExerProEffectData[0];
-        }
-        public RuntimeAction(RuntimeBattler subject,
+		public RuntimeAction(RuntimeBattler subject,
+			RuntimeBattler object_, ExerProEffectData[] effects = null,
+			AnimationClip startAni = null, AnimationClip targetAni = null) {
+			this.subject = subject; this.object_ = object_;
+			this.startAni = startAni; this.targetAni = targetAni;
+			this.effects = effects ?? new ExerProEffectData[0];
+		}
+		public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler object_, BaseExerProItem item) :
-            this(subject, object_, item.effects) { }
+            this(subject, object_, item.effects,
+				item.startAni, item.targetAni) { }
     }
 
     /// <summary>

@@ -1408,10 +1408,19 @@ namespace GameModule.Services {
         /// </summary>
         public class EnemyNextCalc {
 
-            /// <summary>
-            /// 属性
-            /// </summary>
-            int round;
+			/// <summary>
+			/// 动画常量控制
+			/// </summary>
+			public const int AttackAniIndex = 1; // 开始攻击动画
+			public const int SkillAniIndex = 2; // 开始技能动画
+			public const int HurtAniIndex = 3; // 受伤动画
+			public const int PowerUpAniIndex = 4; // 提升动画
+			public const int PowerDownAniIndex = 5; // 削弱动画
+
+			/// <summary>
+			/// 属性
+			/// </summary>
+			int round;
             RuntimeEnemy enemy;
 
             ExerProEnemy enemyData;
@@ -1476,37 +1485,51 @@ namespace GameModule.Services {
                 generateRuntimeAction(RuntimeActor actor) {
 
                 RuntimeBattler object_;
+				int startAniIndex = 0, targetAniIndex = 0;
                 var params_ = enemy.currentActionParams();
                 var effects = new List<ExerProEffectData>();
 
                 switch (enemy.currentActionTypeEnum()) {
                     case ExerProEnemy.Action.Type.Attack:
                         _processAttack(effects, params_);
-                        object_ = actor; break;
+						startAniIndex = AttackAniIndex;
+						targetAniIndex = HurtAniIndex;
+						object_ = actor; break;
 
 					case ExerProEnemy.Action.Type.NegStates:
 						_processAddStates(effects, params_);
+						startAniIndex = SkillAniIndex;
+						targetAniIndex = PowerDownAniIndex;
 						object_ = actor; break;
 
 					case ExerProEnemy.Action.Type.PowerDown:
                         _processPowerDown(effects, params_);
-                        object_ = actor; break;
+						startAniIndex = SkillAniIndex;
+						targetAniIndex = PowerDownAniIndex;
+						object_ = actor; break;
 
                     case ExerProEnemy.Action.Type.PosStates:
                         _processAddStates(effects, params_);
-                        object_ = enemy; break;
+						startAniIndex = SkillAniIndex;
+						targetAniIndex = PowerUpAniIndex;
+						object_ = enemy; break;
 
                     case ExerProEnemy.Action.Type.PowerUp:
-                        _processPowerDown(effects, params_);
-                        object_ = enemy; break;
+                        _processPowerUp(effects, params_);
+						startAniIndex = SkillAniIndex;
+						targetAniIndex = PowerUpAniIndex;
+						object_ = enemy; break;
 
                     default: return null;
                 }
 
                 effects.AddRange(enemyData.effects);
 
-                return new ExerPro.EnglishModule.Data.RuntimeAction(
-                    enemy, object_, effects.ToArray());
+				var startAni = AssetLoader.loadAnimation(startAniIndex);
+				var targetAni = AssetLoader.loadAnimation(targetAniIndex);
+
+				return new ExerPro.EnglishModule.Data.RuntimeAction(
+                    enemy, object_, effects.ToArray(), startAni, targetAni);
             }
 
             /// <summary>

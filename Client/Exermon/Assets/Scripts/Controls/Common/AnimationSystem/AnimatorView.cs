@@ -240,6 +240,23 @@ namespace UI.Common.Controls.AnimationSystem {
             animator.SetTrigger(name);
         }
 
+		/// <summary>
+		/// 配置动画
+		/// </summary>
+		/// <param name="state">状态名</param>
+		/// <param name="clip">动画片段</param>
+		public void changeAni(string state, AnimationClip clip) {
+			var override_ = new AnimatorOverrideController();
+			var runtime = animator.runtimeAnimatorController;
+			override_.runtimeAnimatorController = runtime;
+			override_[state] = clip;
+
+			animator.runtimeAnimatorController = null;
+			animator.runtimeAnimatorController = override_;
+
+			Resources.UnloadUnusedAssets();
+		}
+
         #endregion
 
     }
