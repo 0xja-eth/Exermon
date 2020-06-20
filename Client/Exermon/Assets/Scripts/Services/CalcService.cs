@@ -1054,7 +1054,7 @@ namespace GameModule.Services {
 				object_ = action.object_;
 				result = new RuntimeActionResult(action);
 
-				Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
+				//Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
 
 				_generate(); _setup();
             }
@@ -1495,13 +1495,14 @@ namespace GameModule.Services {
 				int startAniIndex = 0, targetAniIndex = 0;
                 var params_ = enemy.currentActionParams();
                 var effects = new List<ExerProEffectData>();
+				bool move = false;
 
                 switch (enemy.currentActionTypeEnum()) {
                     case ExerProEnemy.Action.Type.Attack:
                         _processAttack(effects, params_);
 						startAniIndex = AttackAniIndex;
 						targetAniIndex = HurtAniIndex;
-						object_ = actor; break;
+						move = true; object_ = actor; break;
 
 					case ExerProEnemy.Action.Type.NegStates:
 						_processAddStates(effects, params_);
@@ -1536,7 +1537,7 @@ namespace GameModule.Services {
 				var targetAni = AssetLoader.loadAnimation(targetAniIndex);
 
 				return new ExerPro.EnglishModule.Data.RuntimeAction(
-                    enemy, object_, effects.ToArray(), startAni, targetAni, true);
+                    enemy, object_, effects.ToArray(), startAni, targetAni, move);
             }
 
             /// <summary>
@@ -1677,9 +1678,6 @@ namespace GameModule.Services {
 						!result.Contains(word_.chinese))
 						minWord = word_; minVal = val;
 				}
-				Debug.Log("generateWordChoice: word = " +
-					word.english + ": " + word.chinese + "minWord = " +
-					minWord.english + ": " + minWord.chinese + "(" + minVal + ")");
 				return minWord;
 			}
 			

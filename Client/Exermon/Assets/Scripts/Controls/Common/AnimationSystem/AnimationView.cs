@@ -28,16 +28,16 @@ namespace UI.Common.Controls { }
 /// </summary>
 namespace UI.Common.Controls.AnimationSystem {
 
-    /// <summary>
-    /// 动画项
-    /// </summary>
-    public class AnimationView : BaseView {
+	/// <summary>
+	/// 动画项
+	/// </summary>
+	public class AnimationView : BaseView {
 
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
-        public Animation animation;
-        public AnimationController controller;
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public Animation animation;
+		public AnimationController controller;
 
 		public RectTransform rectTransform;
 		public CanvasGroup canvasGroup;
@@ -46,8 +46,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <summary>
 		/// 动画栈/缓冲队列
 		/// </summary>
-		LinkedList<AnimationUtils.TempAnimation> animations = 
-            new LinkedList<AnimationUtils.TempAnimation>();
+		LinkedList<AnimationUtils.TempAnimation> animations =
+			new LinkedList<AnimationUtils.TempAnimation>();
 		//Queue<AnimationUtils.TempAnimation> tmpAnimations = 
 		//    new Queue<AnimationUtils.TempAnimation>();
 
@@ -66,21 +66,21 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
-        #region 初始化
+		#region 初始化
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
 			setupAnimationObjects();
 			animation = animation ?? SceneUtils.ani(gameObject);
-        }
+		}
 
 		/// <summary>
 		/// 配置动画物体
 		/// </summary>
-		void setupAnimationObjects(){
+		void setupAnimationObjects() {
 			rectTransform = rectTransform ?? transform as RectTransform;
 			canvasGroup = canvasGroup ?? SceneUtils.get<CanvasGroup>(gameObject);
 			graphic = graphic ?? SceneUtils.get<Graphic>(gameObject);
@@ -140,7 +140,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		public void removeUpdateEvent(string aniName) {
 			updateEvents.Remove(aniName);
 		}
-		
+
 		/// <summary>
 		/// 动画播放完毕回调
 		/// </summary>
@@ -176,11 +176,21 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新
 		/// </summary>
 		protected override void update() {
-            base.update();
+			base.update();
 			var ani = curAni();
+
+			updateAutoPlay();
 			updateCurrentEvent(ani);
-            updateAnimation(ani);
-        }
+			updateAnimation(ani);
+		}
+
+		/// <summary>
+		/// 更新自动播放
+		/// </summary>
+		void updateAutoPlay() {
+			// 如果没有控制器，自动播放当前动画
+			if (!controller && !isPlaying() && !isCurPlayed()) play();
+		}
 
 		/// <summary>
 		/// 更新当前动画事件
@@ -197,7 +207,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新动画
 		/// </summary>
 		void updateAnimation(AnimationUtils.TempAnimation ani) {
-			if (ani != null && ani.isPlayed()) onAnimationPlayed(ani);
+			if (ani != null && ani.isPlayed())
+				onAnimationPlayed(ani);
 		}
 
 		#endregion

@@ -104,7 +104,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void OnBeginDrag(PointerEventData data) {
 			Debug.Log(name + ": OnBeginDrag: " + data);
 			isDragging = true;
-			cardDisplay.setupDetail();
+			//cardDisplay.setupDetail();
 			startPos = arrowLocalPos(data);
 			if (arrow == null) createArrow();
 		}
@@ -126,7 +126,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void OnEndDrag(PointerEventData data) {
 			Debug.Log(name + ": OnEndDrag: " + data);
 			isDragging = false;
-			cardDisplay.terminateDetail();
+			//cardDisplay.terminateDetail();
 			destroyArrow();
 		}
 
@@ -134,8 +134,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 销毁回调
 		/// </summary>
 		public void OnDestroy() {
-
+			Debug.Log(name + ": OnDestroy");
+			isDragging = false;
+			destroyArrow();
 		}
+
+		#endregion
+
+		#region 拖拽控制
 
 		/// <summary>
 		/// 获取本地坐标
@@ -145,10 +151,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		Vector2 arrowLocalPos(PointerEventData data) {
 			return SceneUtils.screen2Local(data.position, arrowParent(), data.pressEventCamera);
 		}
-
-		#endregion
-
-		#region 拖拽控制
 
 		/// <summary>
 		/// 更新箭头变换

@@ -28,7 +28,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public const string IdleAnimation = "Idle";
 		public const string HurtAnimation = "Hurt";
 		public const string AttackAnimation = "Attack";
-		public const string MovingAnimation = "Move";
+		public const string ForwardAnimation = "Forward";
 		public const string BackAnimation = "Back";
 		public const string EscapeAnimation = "Escape";
 		//public const string PowerUpAnimation = "PowerUp";
@@ -90,8 +90,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 初始化动画事件
 		/// </summary>
 		void initializeAnimationEvents() {
+			animation.addEndEvent(ForwardAnimation, attack);
 			animation.addEndEvent(BackAnimation, onMoveEnd);
 			animation.addEndEvent(EscapeAnimation, onMoveEnd);
+
+			animator.addEndEvent(AttackAnimation, resetPosition);
 
 			//animator.addEndEvent(HurtAnimation, onActionEnd);
 			//animator.addEndEvent(AttackAnimation, onActionEnd);
@@ -165,8 +168,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void updateHPDelta() {
 			var delta = item.deltaHP;
 			if (delta != null) {
-				Debug.Log(name + ": updateHPDelta: " + delta);
+				Debug.Log(name + ": updateHPDelta: " + delta.value);
 				hpResults.addItem(delta);
+				requestRefresh();
 			}
 		}
 
@@ -345,6 +349,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		public void moveToTarget() {
 			var target = targetDisplay();
+
+			Debug.Log("moveToTarget: " + target);
+
 			if (target == null) return;
 
 			moveTo(target.beAttackedPosition());
@@ -360,16 +367,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 移动到指定位置
 		/// </summary>
-		public void moveTo(Vector2 target, string name = MovingAnimation) {
-			animation.moveTo(oriPosition, MovingAnimation);
+		public void moveTo(Vector2 target, string name = ForwardAnimation) {
+			animation.moveTo(target, ForwardAnimation);
 			animator.setVar(MovingAttr, true);
 		}
 
 		/// <summary>
 		/// 移动指定量
 		/// </summary>
-		public void moveDelta(Vector2 delta, string name = MovingAnimation) {
-			animation.moveDelta(oriPosition, MovingAnimation);
+		public void moveDelta(Vector2 delta, string name = ForwardAnimation) {
+			animation.moveDelta(delta, ForwardAnimation);
 			animator.setVar(MovingAttr, true);
 		}
 
@@ -396,7 +403,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 处理攻击
 		/// </summary>
 		void moveToAttack() {
-			moveToTarget(); attack(); resetPosition();
+			moveToTarget();
+			//attack();
+			//resetPosition();
 		}
 		
 		/// <summary>

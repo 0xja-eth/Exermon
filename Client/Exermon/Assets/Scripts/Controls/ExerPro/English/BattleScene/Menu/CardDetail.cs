@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Core.UI;
 using Core.Data.Loaders;
 
 using ExerPro.EnglishModule.Data;
@@ -24,6 +25,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 外部组件定义
 		/// </summary>
+		public Text name;
+		public Image icon;
+
 		public Text cost;
 		public Text description;
 
@@ -36,118 +40,34 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 
 		public BaseWindow window;
 
+		#region 开启/结束控制
+
+		/// <summary>
+		/// 开启视窗
+		/// </summary>
+		public override void startView() {
+			base.startView();
+			window?.startWindow();
+		}
+
+		/// <summary>
+		/// 结束视窗
+		/// </summary>
+		public override void terminateView() {
+			//base.terminateView();
+			window?.terminateWindow();
+		}
+
+		#endregion
+
 		#region 数据控制
 
 		/// <summary>
-		/// 卡牌开启
-		/// </summary>
-		public void open() {
-			isOpen = true;
-		}
-
-		/// <summary>
-		/// 物品变化回调
+		/// 物品改变回调
 		/// </summary>
 		protected override void onItemChanged() {
 			base.onItemChanged();
-			isLocked = base.isNullItem(item);
-			Debug.Log("onItemChanged: " + item?.item().name + ": " + isLocked);
-			if (animation && !isLocked)
-				animation.addAnimation(ShowAnimation);
-		}
-
-		/// <summary>
-		/// 获取容器
-		/// </summary>
-		/// <returns></returns>
-		public new HandCardGroupDisplay getContainer() {
-			return container as HandCardGroupDisplay;
-		}
-
-		/// <summary>
-		/// 获取卡牌详情控件
-		/// </summary>
-		/// <returns></returns>
-		public CardDisplay getDetail() {
-			var container = getContainer();
-			if (container == null) return null;
-			return container.cardDetail;
-		}
-
-		/// <summary>
-		/// 配置详情
-		/// </summary>
-		public void setupDetail() {
-			getDetail()?.startView(item);
-		}
-
-		/// <summary>
-		/// 关闭详情
-		/// </summary>
-		public void terminateDetail() {
-			getDetail()?.terminateView();
-		}
-
-		/// <summary>
-		/// 反转详情
-		/// </summary>
-		public void toggleDetail() {
-			var detail = getDetail();
-			if (detail == null) return;
-			if (detail.shown) terminateDetail();
-			else setupDetail();
-		}
-
-		/// <summary>
-		/// 是否处于拖拽状态
-		/// </summary>
-		public bool isDragging() {
-			return dragger && dragger.isDragging;
-		}
-
-		/*
-		/// <summary>
-		/// 能否进行拖拽操作
-		/// </summary>
-		public bool isDraggable() {
-			var container = getContainer();
-			if (container == null) return true;
-			return !container.isRotating();
-		}
-		*/
-		/// <summary>
-		/// 设置拖拽状态
-		/// </summary>
-		public void setDragging(bool value) {
-			var container = getContainer();
-			if (container == null) return;
-			container.isDragging = value;
-		}
-
-		/// <summary>
-		/// 使用卡牌
-		/// </summary>
-		public void use(EnemyDisplay enemy) {
-			var container = getContainer();
-			if (container == null) return;
-			container.use(this, enemy);
-		}
-
-		/// <summary>
-		/// 物品是否为空
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public override bool isNullItem(ExerProPackCard item) {
-			return !isOpen || base.isNullItem(item);
-		}
-
-		/// <summary>
-		/// 点击
-		/// </summary>
-		public override void onClick() {
-			base.onClick();
-			toggleDetail();
+			if (isNullItem(item)) terminateView();
 		}
 
 		#endregion
@@ -168,6 +88,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			name.text = card.name;
 			cost.text = card.cost.ToString();
 			description.text = card.description;
+
+			icon.gameObject.SetActive(true);
+			icon.overrideSprite = card.icon;
 		}
 
 		/// <summary>
@@ -175,13 +98,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="card"></param>
 		void drawSkin(ExerProCard card) {
-
-			if (back) {
-				back.color = NormalColor;
-				back.gameObject.SetActive(false);
-			}
-			content.SetActive(true);
-			
 			var skin = AssetLoader.generateSprite(card.skin);
 
 			cardSkin.enabled = true;
@@ -230,12 +146,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			base.drawEmptyItem();
 			name.text = cost.text = type.text = description.text = "";
 
-			content.SetActive(false);
-
-			if (back) {
-				back.color = isLocked ? LockedColor : NormalColor;
-				back.gameObject.SetActive(true);
-			}
+			icon.gameObject.SetActive(false);
 
 			cardSkin.enabled = false;
 			if (typeIcon) typeIcon.gameObject.SetActive(false);

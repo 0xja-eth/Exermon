@@ -2419,9 +2419,11 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="value"></param>
 		public void setHPChange(int value) {
 			_deltaHP = _deltaHP ?? new DeltaHP();
-			_deltaHP.value = value;
+			_deltaHP.value += value;
+
+			Debug.Log("setHPChange: " + value + ", sum: " + _deltaHP.value);
 		}
-		
+
 		#endregion
 
 		/// <summary>

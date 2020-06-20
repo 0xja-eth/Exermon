@@ -37,6 +37,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 			base.onSubViewCreated(sub, index);
 
+			Debug.Log("HPResult.onSubViewCreated: " + sub);
+
 			var rt = sub.transform as RectTransform;
 			if (rt == null) return;
 			var x = Random.Range(-MaxXOffset, MaxXOffset);

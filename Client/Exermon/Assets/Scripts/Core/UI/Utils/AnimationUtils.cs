@@ -28,7 +28,7 @@ namespace Core.UI.Utils {
         /// 常量定义
         /// </summary>
         const string AniClipName = "Animation";
-        public const float AniDuration = 0.75f;
+        public const float AniDuration = 0.5f;
 
         /// <summary>
         /// 临时动画对象
@@ -124,20 +124,20 @@ namespace Core.UI.Utils {
 				if (play) this.play();
                 return clip.name;
             }
+			
+			/// <summary>
+			/// 是否正在播放
+			/// </summary>
+			/// <returns></returns>
+			public bool isPlaying() {
+				return animation && animation.IsPlaying(clip.name);
+			}
 
-            /// <summary>
-            /// 是否正在播放
-            /// </summary>
-            /// <returns></returns>
-            public bool isPlaying() {
-                return animation && animation.IsPlaying(clip.name);
-            }
-
-            /// <summary>
-            /// 是否播放完毕
-            /// </summary>
-            /// <returns></returns>
-            public bool isPlayed() {
+			/// <summary>
+			/// 是否播放完毕
+			/// </summary>
+			/// <returns></returns>
+			public bool isPlayed() {
                 return animation && !animation.IsPlaying(clip.name);
             }
 

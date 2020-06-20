@@ -68,8 +68,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 更新动画
 		/// </summary>
 		void uodateAnimation() {
-			if (!animation.isPlaying)
-				drawEmptyItem();
+			if (!animation.isPlaying) requestDestroy = true;
 		}
 
 		#endregion
@@ -110,9 +109,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item">结果</param>
 		protected override void drawExactlyItem(RuntimeBattler.DeltaHP item) {
             base.drawExactlyItem(item);
+
 			if (isDamage()) drawDamage(item);
 			else if (isRecover()) drawRecover(item);
-			else drawEmptyItem();
+			else requestDestroy = true;
 		}
 
 		/// <summary>
@@ -120,6 +120,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>		
 		/// <param name="item">结果</param>
 		void drawDamage(RuntimeBattler.DeltaHP item) {
+			Debug.Log(name + ": drawDamage: " + item.value);
+
 			animation.Play(DamageAnimation);
 			drawValue(Mathf.Abs(item.value));
 		}
@@ -129,6 +131,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item">结果</param>
 		void drawRecover(RuntimeBattler.DeltaHP item) {
+			Debug.Log(name + ": drawRecover: " + item.value);
+
 			animation.Play(RecoverAnimation);
 			drawValue(Mathf.Abs(item.value));
 		}
@@ -148,7 +152,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void drawEmptyItem() {
 			animation.Stop();
 			value.text = "";
-			requestDestroy = true;
 		}
 
         #endregion

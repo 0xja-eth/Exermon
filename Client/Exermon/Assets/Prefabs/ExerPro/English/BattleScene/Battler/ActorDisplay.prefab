@@ -456,7 +456,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animation: {fileID: 3369629342021005463}
   controller: {fileID: 0}
-  rectTransform: {fileID: 0}
+  rectTransform: {fileID: 6789909901512949022}
   canvasGroup: {fileID: 0}
   graphic: {fileID: 0}
 --- !u!114 &8930337670809030736

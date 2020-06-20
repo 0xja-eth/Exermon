@@ -17,6 +17,7 @@ namespace UI.Common.Controls.AnimationSystem {
 	/// 一般挂载在带有 BaseView 的物体上
 	/// </remarks>
 	public class AnimatorView : BaseView {
+
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -190,19 +191,20 @@ namespace UI.Common.Controls.AnimationSystem {
         /// </summary>
         void updateAnimatorState() {
             if (animator == null) return;
-			foreach (var key in endEvents.Keys) {
-				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-				if (eventState != null && key != eventState && (key == "" || state.IsName(key)))
-					endEvents[eventState]?.Invoke();
+			var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
+			/*
+			if (eventState != null && !state.IsName(eventState) &&
+				endEvents.ContainsKey(eventState)) {
+				endEvents[eventState]?.Invoke();
+				eventState = null;
 			}
+			*/
 			foreach (var key in changeEvents.Keys) {
-				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
 				if (key != eventState && (key == "" || state.IsName(key))) 
 					changeEvents[eventState = key]?.Invoke();
 			}
 			foreach (var key in updateEvents.Keys) {
-                var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-                if (state.IsName(key)) updateEvents[key]?.Invoke();
+                if (state.IsName(key)) updateEvents[eventState = key]?.Invoke();
             }
         }
 

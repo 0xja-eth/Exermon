@@ -39,7 +39,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public MenuWindow menu; // 菜单窗口
 
-		public CardDisplay cardDetail; // 卡牌详情
+		public CardDetail detail; // 卡牌详情
 
 		public AnimationView animation; // 动画
 
@@ -153,12 +153,20 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public override void terminateView() {
 			base.terminateView();
-			cardDetail.terminateView();
+			detail.terminateView();
 		}
 
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 获取物品详情
+		/// </summary>
+		/// <returns></returns>
+		public override IItemDetailDisplay<ExerProPackCard> getItemDetail() {
+			return detail;
+		}
 
 		/// <summary>
 		/// 拖拽状态

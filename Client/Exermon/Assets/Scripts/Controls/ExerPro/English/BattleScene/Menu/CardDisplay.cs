@@ -111,15 +111,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public new HandCardGroupDisplay getContainer() {
 			return container as HandCardGroupDisplay;
 		}
-
+		/*
 		/// <summary>
 		/// 获取卡牌详情控件
 		/// </summary>
 		/// <returns></returns>
-		public CardDisplay getDetail() {
+		public CardDetail getDetail() {
 			var container = getContainer();
 			if (container == null) return null;
-			return container.cardDetail;
+			return container.detail;
 		}
 
 		/// <summary>
@@ -216,6 +216,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			name.text = card.name;
 			cost.text = card.cost.ToString();
 			description.text = card.description;
+
+			icon.gameObject.SetActive(true);
+			icon.overrideSprite = card.icon;
 		}
 
 		/// <summary>
@@ -277,6 +280,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		protected override void drawEmptyItem() {
 			base.drawEmptyItem();
 			name.text = cost.text = type.text = description.text = "";
+
+			icon.gameObject.SetActive(false);
 
 			content.SetActive(false);
 
