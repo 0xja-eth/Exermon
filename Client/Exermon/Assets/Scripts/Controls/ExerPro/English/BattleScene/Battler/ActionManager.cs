@@ -62,7 +62,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 行动项
 		/// </summary>
-		List<Item> actionItems;
+		List<Item> actionItems = new List<Item>();
 
 		#region 更新控制
 
@@ -88,6 +88,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void updateAction(Item item) {
+			Debug.Log("updateAction: " + item?.subject?.name);
+
 			var subject = item.subject;
 			var target = item.object_;
 
@@ -106,15 +108,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public void add(RuntimeAction action) {
 			var subject = battleGround.getBattlerDisplay(action.subject);
 			var object_ = battleGround.getBattlerDisplay(action.object_);
-			actionItems.Add(new Item(action, subject, object_));
-			setupAnimations(action, subject, object_);
-		}
-
-		/// <summary>
-		/// 配置行动动画
-		/// </summary>
-		void setupAnimations(RuntimeAction action, BattlerDisplay subject, BattlerDisplay object_) {
 			var startAni = action.startAni ?? defaultStartAni;
+
+			Debug.Log("add: " + subject + ", " + object_);
+
+			actionItems.Add(new Item(action, subject, object_));
 
 			subject.setupStartAni(startAni);
 		}
@@ -134,9 +132,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void hit(Item item) {
+			Debug.Log("Hit: " + item.subject.name);
 			var target = item.object_;
 			var ani = item.action.targetAni ?? defaultTargetAni;
-			target.setupTargetAni(ani); target.onHit();
+			target.setupTargetAni(ani); target.hurt();
 		}
 
 		/// <summary>
@@ -144,6 +143,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void end(Item item) {
+			Debug.Log("End: " + item.subject.name);
 			item.action.subject.processAction(item.action);
 			actionItems.Remove(item);
 		}

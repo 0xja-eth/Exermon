@@ -133,6 +133,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
+		/// 创建战斗者
+		/// </summary>
+		protected override void createSubViews() {
+			base.createSubViews();
+			resetBattlerSiblings();
+		}
+
+		/// <summary>
 		/// 子视图创建回调
 		/// </summary>
 		/// <param name="sub">子视图</param>

@@ -131,6 +131,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		}
 
 		/// <summary>
+		/// 销毁回调
+		/// </summary>
+		public void OnDestroy() {
+
+		}
+
+		/// <summary>
 		/// 获取本地坐标
 		/// </summary>
 		/// <param name="pos"></param>

@@ -186,6 +186,6 @@ if __name__ == '__main__':
 
 	from english_pro_module.raw_data.upload import upload
 
-	upload("ExerProCard")
+	# upload("ExerProCard")
 	upload("ExerProEnemy")
-	upload("ExerProPotion")
+	# upload("ExerProPotion")

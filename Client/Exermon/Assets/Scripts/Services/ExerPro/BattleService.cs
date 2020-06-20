@@ -73,7 +73,7 @@ namespace ExerPro.EnglishModule.Services {
 		int corrCnt = 0, bonusCnt = 0;
         bool bonus = false;
 		
-		int round = 0;
+		int round = 1;
 		
 		Result result = Result.None;
 
@@ -176,6 +176,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 开始配置
         /// </summary>
         void setup(ExerProMapNode.Type type) {
+			round = 1;
 			record = engSer.record;
 			result = Result.None;
             generateEnemies(type);
@@ -414,6 +415,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <returns>敌人是否全部行动完毕</returns>
         bool processEnemiesAction() {
+			Debug.Log("curEnemyIndex = " + curEnemyIndex);
             var enemy = _enemies[curEnemyIndex];
             if (enemy.updateAction()) curEnemyIndex++;
             return curEnemyIndex >= _enemies.Count;

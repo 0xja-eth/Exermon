@@ -1086,19 +1086,26 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         List<ExerProPackCard> drawnCards = new List<ExerProPackCard>();
 
-        /// <summary>
-        /// 获取并清除抽取的卡牌
-        /// </summary>
-        public ExerProPackCard[] getDrawnCards() {
-            var res = drawnCards.ToArray();
-            drawnCards.Clear(); return res;
-        }
+		/// <summary>
+		/// 获取并清除抽取的卡牌
+		/// </summary>
+		public ExerProPackCard[] getDrawnCards() {
+			var res = drawnCards.ToArray();
+			clearDrawnCards(); return res;
+		}
 
-        /// <summary>
-        /// 接收物品
-        /// </summary>
-        /// <param name="item"></param>
-        protected override bool acceptItem(ExerProPackCard item) {
+		/// <summary>
+		/// 获取并清除抽取的卡牌
+		/// </summary>
+		public void clearDrawnCards() {
+			drawnCards.Clear();
+		}
+
+		/// <summary>
+		/// 接收物品
+		/// </summary>
+		/// <param name="item"></param>
+		protected override bool acceptItem(ExerProPackCard item) {
             var res = base.acceptItem(item);
 			if (res) drawnCards.Add(item);
 			return res;
@@ -1143,7 +1150,8 @@ namespace ExerPro.EnglishModule.Data {
                     transferItem(handGroup, item);
                 else
                     transferItem(drawGroup, item);
-        }
+			handGroup.clearDrawnCards();
+		}
 
         /// <summary>
         /// 战斗结束，回收牌堆
@@ -3368,6 +3376,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 计算下一步
         /// </summary>
         public void calcNext(int round, RuntimeActor actor) {
+			Debug.Log("calcNext: " + round + ": " + enemy().name);
+
 			RuntimeAction action;
             CalcService.EnemyNextCalc.calc(round, this, actor,
                 out _currentEnemyAction, out action);
@@ -3379,7 +3389,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public void processEnemyAction() {
 			isActionStarted = true;
-			if (_currentEnemyAction == null || _currentEnemyAction.isUnset())
+			if (_currentEnemyAction == null || 
+				_currentEnemyAction.isUnset())
 				isActionEnd = true;
         }
 
@@ -3437,6 +3448,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 是否需要移动到对方位置
 		/// </summary>
+		[AutoConvert]
 		public bool moveToTarget { get; set; } = false;
 
 		/// <summary>
@@ -3453,10 +3465,13 @@ namespace ExerPro.EnglishModule.Data {
 		public RuntimeAction() { }
 		public RuntimeAction(RuntimeBattler subject,
 			RuntimeBattler object_, ExerProEffectData[] effects = null,
-			AnimationClip startAni = null, AnimationClip targetAni = null) {
+			AnimationClip startAni = null, AnimationClip targetAni = null,
+			bool moveToTarget = false) {
+
 			this.subject = subject; this.object_ = object_;
 			this.startAni = startAni; this.targetAni = targetAni;
 			this.effects = effects ?? new ExerProEffectData[0];
+			this.moveToTarget = moveToTarget;
 		}
 		public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler object_, BaseExerProItem item) :

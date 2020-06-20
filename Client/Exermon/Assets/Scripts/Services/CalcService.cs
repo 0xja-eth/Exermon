@@ -1054,6 +1054,8 @@ namespace GameModule.Services {
 				object_ = action.object_;
 				result = new RuntimeActionResult(action);
 
+				Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
+
 				_generate(); _setup();
             }
 
@@ -1077,7 +1079,10 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="effect">效果</param>
             void processEffect(ExerProEffectData effect) {
-                var params_ = effect.params_;
+
+				Debug.Log("processEffect: " + effect.toJson().ToJson());
+
+				var params_ = effect.params_;
                 var len = params_.Count;
                 int a, b, h, p, n, s, r;
                 bool select = false;
@@ -1108,25 +1113,25 @@ namespace GameModule.Services {
 
 					case ExerProEffectData.Code.AddMHP:
 						p = RuntimeBattler.MHPParamId;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddPower:
 						p = RuntimeBattler.PowerParamId;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddDefense:
 						p = RuntimeBattler.DefenseParamId;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddAgile:
 						p = RuntimeBattler.AgileParamId;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						processBuff(p, a, b, -1); break;
 
@@ -1146,21 +1151,21 @@ namespace GameModule.Services {
 
 					case ExerProEffectData.Code.TempAddPower:
 						p = RuntimeBattler.PowerParamId; n = 1;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						if (len == 3) n = DataLoader.load<int>(params_[2]);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddDefense:
 						p = RuntimeBattler.DefenseParamId; n = 1;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						if (len == 3) n = DataLoader.load<int>(params_[2]);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddAgile:
 						p = RuntimeBattler.AgileParamId; n = 1;
-						a = DataLoader.load<int>(params_[1]); b = 100;
+						a = DataLoader.load<int>(params_[0]); b = 100;
 						if (len == 2) b += DataLoader.load<int>(params_[1]);
 						if (len == 3) n = DataLoader.load<int>(params_[2]);
 						processBuff(p, a, b, n); break;
@@ -1447,6 +1452,8 @@ namespace GameModule.Services {
                 this.round = round; this.enemy = enemy;
                 enemyData = enemy.enemy();
 
+				Debug.Log("EnemyNextCalc: " + enemyData.name + ": " + enemyData.toJson().ToJson());
+
 				actions = filterActions(enemyData.actions);
             }
 
@@ -1457,7 +1464,7 @@ namespace GameModule.Services {
 			ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
                 var res = new List<ExerProEnemy.Action>();
 				foreach (var action in actions) {
-					Debug.Log(enemyData.name + ": ("+ action.testRound(round) + ") " + action.toJson().ToJson());
+					Debug.Log(enemyData.name + ": filterActions (" + action.testRound(round) + ") " + action.toJson().ToJson());
 					if (action.testRound(round)) res.Add(action);
 				}
 				return res.ToArray();
@@ -1472,7 +1479,7 @@ namespace GameModule.Services {
                     var action = actions[i];
                     for (var j = 0; j < action.rate; ++j) list.Add(i);
                 }
-				Debug.Log(string.Join(",", list));
+				Debug.Log(enemyData.name + ": generateAction: " + string.Join(",", list));
 				if (list.Count <= 0) return null; 
                 var index = Random.Range(0, list.Count);
                 return actions[list[index]];
@@ -1529,7 +1536,7 @@ namespace GameModule.Services {
 				var targetAni = AssetLoader.loadAnimation(targetAniIndex);
 
 				return new ExerPro.EnglishModule.Data.RuntimeAction(
-                    enemy, object_, effects.ToArray(), startAni, targetAni);
+                    enemy, object_, effects.ToArray(), startAni, targetAni, true);
             }
 
             /// <summary>
@@ -1538,7 +1545,11 @@ namespace GameModule.Services {
             void _processAttack(
                 List<ExerProEffectData> effects, JsonData actionParams) {
 
-                effects.Add(new ExerProEffectData(
+				int value = enemy.power();
+				if (actionParams.Count > 0) value += (int)actionParams[0];
+				actionParams.Add(value);
+
+				effects.Add(new ExerProEffectData(
                     ExerProEffectData.Code.Attack, actionParams));
             }
 
@@ -1552,12 +1563,15 @@ namespace GameModule.Services {
 
                 for (int i = 0; i < 4; ++i) {
                     var params_ = new JsonData();
-                    var p = DataLoader.load<int>(actionParams[i]);
-                    params_.SetJsonType(JsonType.Array);
-                    params_[0] = i; params_[1] = -p;
-                    params_[2] = 0; params_[3] = t;
+					var p = DataLoader.load<int>(actionParams[i]);
 
-                    effects.Add(new ExerProEffectData(
+					params_.SetJsonType(JsonType.Array);
+					params_.Add(i); params_.Add(-p);
+					params_.Add(0); params_.Add(t);
+
+					Debug.Log("_processPowerDown: " + params_.ToJson());
+
+					effects.Add(new ExerProEffectData(
                         ExerProEffectData.Code.AddParam, params_));
                 }
             }
@@ -1583,12 +1597,15 @@ namespace GameModule.Services {
 
                 for (int i = 0; i < 4; ++i) {
                     var params_ = new JsonData();
-                    params_.SetJsonType(JsonType.Array);
-                    params_[0] = i;
-                    params_[1] = actionParams[i];
-                    params_[2] = 0; params_[3] = t;
+					var p = DataLoader.load<int>(actionParams[i]);
 
-                    effects.Add(new ExerProEffectData(
+					params_.SetJsonType(JsonType.Array);
+                    params_.Add(i); params_.Add(p);
+                    params_.Add(0); params_.Add(t);
+
+					Debug.Log("_processPowerUp: " + params_.ToJson());
+
+					effects.Add(new ExerProEffectData(
                         ExerProEffectData.Code.AddParam, params_));
                 }
             }

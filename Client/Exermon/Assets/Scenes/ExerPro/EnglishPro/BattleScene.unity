@@ -2195,6 +2195,7 @@ GameObject:
   m_Component:
   - component: {fileID: 629167491}
   - component: {fileID: 629167492}
+  - component: {fileID: 629167493}
   m_Layer: 5
   m_Name: BattleGround
   m_TagString: Untagged
@@ -2246,10 +2247,26 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
+  actionManager: {fileID: 629167493}
   actorPerfab: {fileID: 6789909901512949023, guid: e974b604319a5a043b111b757f94f8d3,
     type: 3}
   enemyPerfab: {fileID: 713893129170059409, guid: 91ba07938cab3644b93686c34b0160de,
     type: 3}
+--- !u!114 &629167493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629167490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c1136e698e9184eaaa2f30c8af8bb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battleGround: {fileID: 629167492}
+  defaultStartAni: {fileID: 7400000, guid: ef0a76e808c00d14ab687461568692cd, type: 2}
+  defaultTargetAni: {fileID: 7400000, guid: cb48ae3b728c9ae40b494fe587489d74, type: 2}
 --- !u!1 &659780795
 GameObject:
   m_ObjectHideFlags: 0

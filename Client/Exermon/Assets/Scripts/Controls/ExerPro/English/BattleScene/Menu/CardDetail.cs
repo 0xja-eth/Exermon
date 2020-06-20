@@ -18,15 +18,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 	/// <summary>
 	/// 卡牌显示
 	/// </summary>
-	public class CardDisplay : PackContItemDisplay
+	public class CardDetail : PackContItemDetail
 		<ExerProPackCard, ExerProCard> {
-
-		/// <summary>
-		/// 常量定义
-		/// </summary>
-		const string ShowAnimation = "CardShow";
-		static readonly Color NormalColor = new Color(1, 1, 1, 1);
-		static readonly Color LockedColor = new Color(1, 1, 1, 0.5f);
 
 		/// <summary>
 		/// 外部组件定义
@@ -41,48 +34,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public Image charFrame; // 性质框
 		public Image typeIcon; // 类型图标
 
-		public Image back;
-
-		public GameObject content;
-
-		public CanvasGroup canvasGroup;
-
-		public AnimationView animation;
-		public CardDragger dragger;
-
-		/// <summary>
-		/// 是否开启
-		/// </summary>
-		[SerializeField]
-		bool _isOpen = true;
-		public bool isOpen {
-			get { return _isOpen; }
-			set { _isOpen = value; requestRefresh(); }
-		}
-
-		/// <summary>
-		/// 是否锁定
-		/// </summary>
-		[SerializeField]
-		bool _isLocked = true;
-		public bool isLocked {
-			get { return _isLocked; }
-			set { _isLocked = value; requestRefresh(); }
-		}
-
-		//#region 启动控制
-
-		///// <summary>
-		///// 显示视窗
-		///// </summary>
-		//protected override void showView() {
-		//	if (animation && !isLocked) {
-		//		var ani = animation.addAnimation(ShowAnimation);
-		//		ani.setBeforeEvent(base.showView);
-		//	} else base.showView();
-		//}
-
-		//#endregion
+		public BaseWindow window;
 
 		#region 数据控制
 
@@ -135,7 +87,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void terminateDetail() {
 			getDetail()?.terminateView();
 		}
-		/*
+
 		/// <summary>
 		/// 反转详情
 		/// </summary>
@@ -145,7 +97,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			if (detail.shown) terminateDetail();
 			else setupDetail();
 		}
-		*/
+
 		/// <summary>
 		/// 是否处于拖拽状态
 		/// </summary>
@@ -189,7 +141,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public override bool isNullItem(ExerProPackCard item) {
 			return !isOpen || base.isNullItem(item);
 		}
-		/*
+
 		/// <summary>
 		/// 点击
 		/// </summary>
@@ -197,7 +149,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			base.onClick();
 			toggleDetail();
 		}
-		*/
+
 		#endregion
 
 		#region 界面绘制

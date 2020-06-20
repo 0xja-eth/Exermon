@@ -146,6 +146,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		*/
 		#endregion
 
+		#region 关闭控制
+
+		/// <summary>
+		/// 关闭视窗
+		/// </summary>
+		public override void terminateView() {
+			base.terminateView();
+			cardDetail.terminateView();
+		}
+
+		#endregion
+
 		#region 数据控制
 
 		/// <summary>
@@ -215,10 +227,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 刷新旋转
 		/// </summary>
 		void refreshRotation() {
-			//var angles = container.localEulerAngles;
-			//angles.z = ;
-			rotateTo(angleRange() / 2);
-			//container.localEulerAngles = angles;
+			var angles = container.localEulerAngles;
+			angles.z = angleRange() / 2;
+			//rotateTo(angleRange() / 2);
+			container.localEulerAngles = angles;
 		}
 
 		/// <summary>

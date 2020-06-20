@@ -7,19 +7,12 @@ using UnityEngine.UI;
 using Core.Data.Loaders;
 using Core.UI;
 
-using ExerPro.EnglishModule.Data;
-using ExerPro.EnglishModule.Services;
-
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.ParamDisplays;
-using UI.Common.Controls.AnimationSystem;
-
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	/// <summary>
-	/// 战斗者显示控件
+	/// 动画事件接收控件
 	/// </summary
-	public class OnHitReceiver : BaseView {
+	public class BattlerAnimationReceiver : BaseView {
 
 		/// <summary>
 		/// 外部组件设置
@@ -30,6 +23,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 击中回调
 		/// </summary>
 		public void onHit() {
+			Debug.Log(name + ": onHit");
 			battler.onHit();
 		}
 		
@@ -37,6 +31,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 产生结果
 		/// </summary>
 		public void onResult() {
+			Debug.Log(name + ": onResult");
 			battler.onResult();
 		}
 

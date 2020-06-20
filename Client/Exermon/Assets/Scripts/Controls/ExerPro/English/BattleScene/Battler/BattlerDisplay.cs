@@ -29,6 +29,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public const string HurtAnimation = "Hurt";
 		public const string AttackAnimation = "Attack";
 		public const string MovingAnimation = "Move";
+		public const string BackAnimation = "Back";
 		public const string EscapeAnimation = "Escape";
 		//public const string PowerUpAnimation = "PowerUp";
 		//public const string PowerDownAnimation = "PowerDown";
@@ -72,7 +73,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 		protected RectTransform rectTransform;
 
-		protected bool hitFlag, resultFlag;
+		protected bool hitFlag = false, resultFlag = false;
 		
 		#region 初始化
 
@@ -89,7 +90,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 初始化动画事件
 		/// </summary>
 		void initializeAnimationEvents() {
-			animation.addEndEvent(MovingAnimation, onMoveEnd);
+			animation.addEndEvent(BackAnimation, onMoveEnd);
 			animation.addEndEvent(EscapeAnimation, onMoveEnd);
 
 			//animator.addEndEvent(HurtAnimation, onActionEnd);
@@ -136,7 +137,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="action"></param>
 		protected virtual void processAction(RuntimeAction action) {
+			//Debug.Log("processAction + " + action.toJson().ToJson());
+
 			actionManager()?.add(action);
+
 			if (action.moveToTarget) moveToAttack();
 			else attack();
 		}
@@ -160,7 +164,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		void updateHPDelta() {
 			var delta = item.deltaHP;
-			if (delta != null) hpResults.addItem(delta);
+			if (delta != null) {
+				Debug.Log(name + ": updateHPDelta: " + delta);
+				hpResults.addItem(delta);
+			}
 		}
 
 		/// <summary>
@@ -330,7 +337,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 重置位置
 		/// </summary>
 		public void resetPosition() {
-			moveTo(oriPosition);
+			moveTo(oriPosition, BackAnimation);
 		}
 
 		/// <summary>
@@ -503,6 +510,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var battle = item.getBattlePicture();
 			this.battle.gameObject.SetActive(true);
 			this.battle.overrideSprite = AssetLoader.generateSprite(battle);
+			this.battle.SetNativeSize();
 		}
 
 		/// <summary>

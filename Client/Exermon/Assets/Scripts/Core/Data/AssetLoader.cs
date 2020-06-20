@@ -89,7 +89,7 @@ namespace Core.Data.Loaders {
 		/// <summary>
 		/// 纹理/声音缓存
 		/// </summary>
-		static Dictionary<string, Texture2D> cache = new Dictionary<string, Texture2D>();
+		static Dictionary<string, Texture2D> cacheTexture = new Dictionary<string, Texture2D>();
 		static Dictionary<string, AudioClip> cacheAudio = new Dictionary<string, AudioClip>();
 		static Dictionary<string, AnimationClip> cacheAni = new Dictionary<string, AnimationClip>();
 
@@ -103,10 +103,10 @@ namespace Core.Data.Loaders {
 		/// <returns>2D纹理</returns>
 		public static Texture2D loadTexture2D(string path, string fileName) {
             var key = path + fileName;
-            if (!cache.ContainsKey(key))
-                cache[key] = Resources.Load<Texture2D>(key);
-            Debug.Log("loadTexture2D: " + key + ": " + (cache[key] != null));
-            return cache[key];
+            if (!cacheTexture.ContainsKey(key))
+                cacheTexture[key] = Resources.Load<Texture2D>(key);
+            Debug.Log("loadTexture2D: " + key + ": " + (cacheTexture[key] != null));
+            return cacheTexture[key];
         }
         /// <param name="name">文件主体名称</param>
         /// <param name="id">序号</param>
@@ -143,7 +143,7 @@ namespace Core.Data.Loaders {
 			var key = path + fileName;
 			if (!cacheAni.ContainsKey(key))
 				cacheAni[key] = Resources.Load<AnimationClip>(key);
-			Debug.Log("loadAnimationClip: " + key + ": " + (cacheAudio[key] != null));
+			Debug.Log("loadAnimationClip: " + key + ": " + (cacheAni[key] != null));
 			return cacheAni[key];
 		}
 		/// <param name="id">文件id</param>

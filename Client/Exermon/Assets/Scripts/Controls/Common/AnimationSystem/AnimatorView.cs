@@ -53,12 +53,17 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
-        #region 初始化
+		/// <summary>
+		/// 动画重载
+		/// </summary>
+		AnimatorOverrideController override_;
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
             base.initializeOnce();
             initAnimator();
         }
@@ -246,15 +251,18 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="state">状态名</param>
 		/// <param name="clip">动画片段</param>
 		public void changeAni(string state, AnimationClip clip) {
-			var override_ = new AnimatorOverrideController();
-			var runtime = animator.runtimeAnimatorController;
-			override_.runtimeAnimatorController = runtime;
+
+			if (override_ == null) {
+				override_ = new AnimatorOverrideController();
+				var runtime = animator.runtimeAnimatorController;
+				override_.runtimeAnimatorController = runtime;
+
+				animator.runtimeAnimatorController = null;
+				animator.runtimeAnimatorController = override_;
+
+				Resources.UnloadUnusedAssets();
+			}
 			override_[state] = clip;
-
-			animator.runtimeAnimatorController = null;
-			animator.runtimeAnimatorController = override_;
-
-			Resources.UnloadUnusedAssets();
 		}
 
         #endregion
