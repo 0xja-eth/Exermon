@@ -216,7 +216,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 下一题
 		/// </summary>
 		public void nextWord() {
-			requestRefresh();
+			if (terminated) scene.draw();
+			else requestRefresh();
 		}
 
 		#endregion

@@ -112,7 +112,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 			Debug.Log("BattleScene.onStateChanged: " + (BattleService.State)battleSer.state);
 			switch ((BattleService.State)battleSer.state) {
 				case BattleService.State.Answering: onAnswer(); break;
-				case BattleService.State.Drawing: onDraw(); break;
+				//case BattleService.State.Drawing: onDraw(); break;
 				case BattleService.State.Playing: onPlay(); break;
 				case BattleService.State.Discarding: onDiscard(); break;
 				case BattleService.State.Enemy: onEnemy(); break;
@@ -130,8 +130,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 抽卡
 		/// </summary>
 		void onDraw() {
-			wordWindow.terminateWindow();
-			drawWindow.startWindow();
+			//wordWindow.terminateWindow();
+			//drawWindow.startWindow();
 		}
 
 		/// <summary>
@@ -275,7 +275,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 
 			var targets = makePotionTargets(packPotion.item());
 
-			battleSer.use(packPotion.effects(), targets);
+			battleSer.use(packPotion.item(), targets);
 			battleSer.actor().usePotion(packPotion);
 
 			refreshStatus();
@@ -294,7 +294,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 
 			var targets = makeCardTargets(packCard.item(), enemy);
 
-			battleSer.use(packCard.effects(), targets);
+			battleSer.use(packCard.item(), targets);
 			battleSer.actor().useCard(packCard);
 
 			refreshStatus();
@@ -334,6 +334,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 抽牌
+		/// </summary>
+		public void draw() {
+			wordWindow.terminateWindow();
+			drawWindow.startWindow();
+		}
 
 		/// <summary>
 		/// 进入回合

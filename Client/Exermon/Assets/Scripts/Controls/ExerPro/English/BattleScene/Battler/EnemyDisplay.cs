@@ -150,19 +150,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 界面控制
-
-		/// <summary>
-		/// 配置位置
-		/// </summary>
-		/// <param name="pos"></param>
-		public override void setupPosition(Vector2 pos) {
-			var enemy = this.enemy();
-			if (enemy != null)
-				pos += new Vector2(enemy.xOffset, enemy.yOffset);
-
-			base.setupPosition(pos);
-		}
-
+			
 		/// <summary>
 		/// 绘制确切物品
 		/// </summary>

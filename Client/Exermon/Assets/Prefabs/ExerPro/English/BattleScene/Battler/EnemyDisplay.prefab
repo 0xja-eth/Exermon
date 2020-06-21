@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &154831357375675474
 RectTransform:
   m_ObjectHideFlags: 0
@@ -102,15 +102,15 @@ RectTransform:
   m_GameObject: {fileID: 154831358610301064}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7589600507706989098}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1, y: -0.5}
-  m_SizeDelta: {x: -2, y: -3}
+  m_AnchoredPosition: {x: 2, y: 0}
+  m_SizeDelta: {x: -4, y: -4}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &154831358610301067
 CanvasRenderer:
@@ -679,11 +679,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a9122e4a543e964da6e603b87c8cc36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  background: {fileID: 0}
+  background: {fileID: 713893128261799735}
   disabledFlag: {fileID: 0}
-  selectedFlag: {fileID: 0}
+  selectedFlag: {fileID: 154831357375675473}
   checkedFlag: {fileID: 0}
-  highlightFlag: {fileID: 0}
+  highlightFlag: {fileID: 154831357375675473}
   actived: 1
   _enabled: 1
   selectable: 1
@@ -692,11 +692,11 @@ MonoBehaviour:
   clickable: 1
   forceChecked: 0
   deselectable: 1
-  normalColor: {r: 1, g: 1, b: 1, a: 0}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
   emptyColor: {r: 1, g: 1, b: 1, a: 0}
-  selectedColor: {r: 1, g: 1, b: 0.75, a: 0}
+  selectedColor: {r: 1, g: 1, b: 1, a: 0}
   checkedColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
-  highlightColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
+  highlightColor: {r: 1, g: 1, b: 0.75, a: 0.5019608}
   disableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   battle: {fileID: 713893128261799735}
   states: {fileID: 3335488136089993869}
@@ -1111,10 +1111,10 @@ RectTransform:
   m_Father: {fileID: 154831357375675474}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00033187866}
-  m_SizeDelta: {x: 192, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7589600507706989092
 CanvasRenderer:
@@ -1137,12 +1137,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 77c6c91f997972c4ea8887f7c0e4f92b, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

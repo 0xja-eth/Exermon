@@ -1,4 +1,7 @@
 ﻿
+using System;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 using Core.UI;
@@ -6,6 +9,8 @@ using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
+
+using UI.Common.Controls.AnimationSystem;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 
@@ -23,8 +28,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text count, max;
-
 		public DrawCardGroupDisplay drawCardGroup;
 
 		/// <summary>
@@ -71,7 +74,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		public override void terminateWindow() {
 			base.terminateWindow();
-			_drawnCards = null;
+			_drawnCards = null; 
 		}
 
 		#endregion
@@ -95,19 +98,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		protected override void refresh() {
 			base.refresh();
-			var cards = drawnCards();
-
-			var handGroup = battleSer.handGroup();
-
-			count.text = handGroup.items.Count.ToString();
-			max.text = handGroup.capacity.ToString();
-
-			drawCardGroup.setItems(cards);
+			drawCardGroup.setItems(drawnCards());
 		}
-
-		#endregion
-
-		#region 流程控制
 
 		#endregion
 

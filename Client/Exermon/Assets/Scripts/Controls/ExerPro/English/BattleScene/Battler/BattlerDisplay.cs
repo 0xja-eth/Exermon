@@ -23,6 +23,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		SelectableItemDisplay<RuntimeBattler>, IComparable<BattlerDisplay> {
 
 		/// <summary>
+		/// 最大偏移量
+		/// </summary>
+		const int MaxXOffset = 24;
+		const int MaxYOffset = 16;
+
+		/// <summary>
 		/// 动画名称定义
 		/// </summary>
 		public const string IdleAnimation = "Idle";
@@ -76,6 +82,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected RectTransform rectTransform;
 
 		protected bool hitFlag = false, resultFlag = false;
+
+		float xOffset, yOffset;
 		
 		#region 初始化
 
@@ -529,8 +537,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 配置位置
 		/// </summary>
 		/// <param name="pos"></param>
-		public virtual void setupPosition(Vector2 pos) {
-			Debug.Log(name + ": setupPosition: " + pos);
+		public void setupPosition(Vector2 pos) {
+			var xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
+			var yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
+
+			pos += new Vector2(xOffset, yOffset);
 			rectTransform.anchoredPosition = oriPosition = pos;
 		}
 

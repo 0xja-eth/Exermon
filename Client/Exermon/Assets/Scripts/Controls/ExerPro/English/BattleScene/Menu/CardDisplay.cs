@@ -69,21 +69,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			get { return _isLocked; }
 			set { _isLocked = value; requestRefresh(); }
 		}
-
-		//#region 启动控制
-
-		///// <summary>
-		///// 显示视窗
-		///// </summary>
-		//protected override void showView() {
-		//	if (animation && !isLocked) {
-		//		var ani = animation.addAnimation(ShowAnimation);
-		//		ani.setBeforeEvent(base.showView);
-		//	} else base.showView();
-		//}
-
-		//#endregion
-
+		
 		#region 数据控制
 
 		/// <summary>
@@ -99,7 +85,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		protected override void onItemChanged() {
 			base.onItemChanged();
 			isLocked = base.isNullItem(item);
-			Debug.Log("onItemChanged: " + item?.item().name + ": " + isLocked);
 			if (animation && !isLocked)
 				animation.addAnimation(ShowAnimation);
 		}
@@ -111,58 +96,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public new HandCardGroupDisplay getContainer() {
 			return container as HandCardGroupDisplay;
 		}
-		/*
-		/// <summary>
-		/// 获取卡牌详情控件
-		/// </summary>
-		/// <returns></returns>
-		public CardDetail getDetail() {
-			var container = getContainer();
-			if (container == null) return null;
-			return container.detail;
-		}
 
-		/// <summary>
-		/// 配置详情
-		/// </summary>
-		public void setupDetail() {
-			getDetail()?.startView(item);
-		}
-
-		/// <summary>
-		/// 关闭详情
-		/// </summary>
-		public void terminateDetail() {
-			getDetail()?.terminateView();
-		}
-		/*
-		/// <summary>
-		/// 反转详情
-		/// </summary>
-		public void toggleDetail() {
-			var detail = getDetail();
-			if (detail == null) return;
-			if (detail.shown) terminateDetail();
-			else setupDetail();
-		}
-		*/
 		/// <summary>
 		/// 是否处于拖拽状态
 		/// </summary>
 		public bool isDragging() {
 			return dragger && dragger.isDragging;
 		}
-
-		/*
-		/// <summary>
-		/// 能否进行拖拽操作
-		/// </summary>
-		public bool isDraggable() {
-			var container = getContainer();
-			if (container == null) return true;
-			return !container.isRotating();
-		}
-		*/
+		
 		/// <summary>
 		/// 设置拖拽状态
 		/// </summary>
@@ -189,15 +130,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public override bool isNullItem(ExerProPackCard item) {
 			return !isOpen || base.isNullItem(item);
 		}
-		/*
-		/// <summary>
-		/// 点击
-		/// </summary>
-		public override void onClick() {
-			base.onClick();
-			toggleDetail();
-		}
-		*/
+	
 		#endregion
 
 		#region 界面绘制

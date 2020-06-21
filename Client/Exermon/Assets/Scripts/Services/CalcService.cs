@@ -1102,109 +1102,103 @@ namespace GameModule.Services {
                 switch ((ExerProEffectData.Code)effect.code) {
                     case ExerProEffectData.Code.Attack:
                     case ExerProEffectData.Code.AttackBlack:
-                        a = DataLoader.load<int>(params_[0]); h = HPDamageType;
-                        if (len >= 3) h = DataLoader.load<int>(params_[2]);
+						a = effect.get(0, 0); h = effect.get(2, HPDamageType);
                         processDamage(a, h); break;
 
                     case ExerProEffectData.Code.AttackSlash:
-                        a = DataLoader.load<int>(params_[0]); b = 2;
-                        if (len == 2) b = DataLoader.load<int>(params_[1]);
+						a = effect.get(0, 0); b = effect.get(1, 2);
                         _processSlashAttack(a, b); break;
 
                     case ExerProEffectData.Code.Recover:
-                        a = DataLoader.load<int>(params_[0]); b = 0;
-                        if (len == 2) b += DataLoader.load<int>(params_[1]);
-                        var val = Math.Round(a + object_.hp * b / 100.0);
-                        processDamage((int)val, HPRecoverType); break;
+						a = effect.get(0, 0); b = effect.get(1, 0);
+						var val = Math.Round(a + object_.hp * 1.0 * b / 100);
+						processDamage((int)val, HPRecoverType); break;
 
                     case ExerProEffectData.Code.AddParam:
-						p = DataLoader.load<int>(params_[0]);
-						a = DataLoader.load<int>(params_[1]); b = 100;
-						if (len == 3) b += DataLoader.load<int>(params_[2]);
+						p = effect.get(0, 0);
+						a = effect.get(1, 0);
+						b = 100 + effect.get(2, 0);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddMHP:
 						p = RuntimeBattler.MHPParamId;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddPower:
 						p = RuntimeBattler.PowerParamId;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddDefense:
 						p = RuntimeBattler.DefenseParamId;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.AddAgile:
 						p = RuntimeBattler.AgileParamId;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
 						processBuff(p, a, b, -1); break;
 
 					case ExerProEffectData.Code.TempAddParam:
-						p = DataLoader.load<int>(params_[0]); n = 1;
-						a = DataLoader.load<int>(params_[1]); b = 100;
-						if (len == 3) b += DataLoader.load<int>(params_[2]);
-						if (len == 4) n = DataLoader.load<int>(params_[3]);
+						p = effect.get(0, 0);
+						a = effect.get(1, 0);
+						b = 100 + effect.get(2, 0);
+						n = effect.get(3, 1);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddMHP:
-						p = RuntimeBattler.MHPParamId; n = 1;
-						a = DataLoader.load<int>(params_[1]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
-						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						p = RuntimeBattler.MHPParamId;
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
+						n = effect.get(2, 1);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddPower:
-						p = RuntimeBattler.PowerParamId; n = 1;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
-						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						p = RuntimeBattler.PowerParamId;
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
+						n = effect.get(2, 1);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddDefense:
-						p = RuntimeBattler.DefenseParamId; n = 1;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
-						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						p = RuntimeBattler.DefenseParamId;
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
+						n = effect.get(2, 1);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.TempAddAgile:
-						p = RuntimeBattler.AgileParamId; n = 1;
-						a = DataLoader.load<int>(params_[0]); b = 100;
-						if (len == 2) b += DataLoader.load<int>(params_[1]);
-						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						p = RuntimeBattler.AgileParamId;
+						a = effect.get(0, 0);
+						b = 100 + effect.get(1, 0);
+						n = effect.get(2, 1);
 						processBuff(p, a, b, n); break;
 
 					case ExerProEffectData.Code.AddState:
-                        s = DataLoader.load<int>(params_[0]);
-                        r = DataLoader.load<int>(params_[1]); p = 100;
-                        if (len == 3) p += DataLoader.load<int>(params_[2]);
+						s = effect.get(0, 0); r = effect.get(1, 0);
+						p = effect.get(2, 100);
                         processAddState(s, r, p); break;
 
                     case ExerProEffectData.Code.RemoveState:
-                        s = DataLoader.load<int>(params_[0]);
-                        r = DataLoader.load<int>(params_[1]); p = 100;
-                        if (len == 3) p += DataLoader.load<int>(params_[2]);
-                        processRemoveState(s, r, p); break;
+						s = effect.get(0, 0); r = effect.get(1, 0);
+						p = effect.get(2, 100);
+						processRemoveState(s, r, p); break;
 
                     case ExerProEffectData.Code.RemoveNegaState:
                         _processRemoveNegaStates(); break;
 
                     case ExerProEffectData.Code.DrawCards:
-                        n = DataLoader.load<int>(params_[0]);
-                        drawCards(n); break;
+						n = effect.get(0, 0); drawCards(n); break;
 
                     case ExerProEffectData.Code.ConsumeCards:
-                        n = DataLoader.load<int>(params_[0]); select = true;
-                        if (len == 2) select = DataLoader.load<bool>(params_[1]);
-                        consumeCards(n, select); break;
+						n = effect.get(0, 0);
+						select = effect.get(1, false);
+						consumeCards(n, select); break;
                 }
             }
 
@@ -1238,11 +1232,21 @@ namespace GameModule.Services {
             void processDamage(int a, int h = HPDamageType) {
                 if (h == HPRecoverType) result.hpRecover = a;
                 else {
-                    var val = a + subject.power() - object_.defense();
+                    var val = calcDamage(a);
                     if (h == HPDamageType) result.hpDamage = val;
                     if (h == HPDrainType) result.hpDrain = val;
                 }
             }
+
+			/// <summary>
+			/// 计算伤害
+			/// </summary>
+			/// <param name="a"></param>
+			/// <returns></returns>
+			int calcDamage(int a) {
+				var res = a + subject.power() - object_.defense();
+				return Math.Max(res, 1);
+			}
 
             /// <summary>
             /// 处理Buff

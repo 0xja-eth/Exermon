@@ -487,6 +487,19 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		/// <summary>
+		/// 效果范围
+		/// </summary>
+		static readonly int[] AttackEffectRange = new int[] { 1, 99 };
+		static readonly int[] RecoverEffectRange = new int[] { 100, 199 };
+		static readonly int[] BuffEffectRange = new int[] { 200, 219 };
+		static readonly int[] StateEffectRange = new int[] { 220, 229 };
+		static readonly int[] EnergyEffectRange = new int[] { 230, 239 };
+		static readonly int[] CardEffectRange = new int[] { 300, 399 };
+		static readonly int[] CostEffectRange = new int[] { 400, 499 };
+
+		static readonly int[] PlotEffectRange = new int[] { 500, 599 };
+
+		/// <summary>
 		/// 属性
 		/// </summary>
 		[AutoConvert]
@@ -494,10 +507,104 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert("params")]
         public JsonData params_ { get; protected set; } // 参数（数组）
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public ExerProEffectData() { }
+		#region 数据获取
+
+		/// <summary>
+		/// 获取指定下标下的数据
+		/// </summary>
+		/// <typeparam name="T">类型</typeparam>
+		/// <param name="index">下标</param>
+		/// <param name="default_">默认值</param>
+		/// <returns></returns>
+		public T get<T>(int index, T default_ = default) {
+			if (params_ == null || !params_.IsArray) return default_;
+			if (index < params_.Count) return DataLoader.load<T>(params_[index]);
+			return default_;
+		}
+
+		#endregion
+
+		#region 效果判断
+
+		/// <summary>
+		/// 效果代码是否属于某范围
+		/// </summary>
+		/// <param name="range">范围（最小值，最大值）</param>
+		/// <returns></returns>
+		public bool isCodeInsideRange(int[] range) {
+			return range[0] <= code && code <= range[1];
+		}
+
+		/// <summary>
+		/// 是否攻击效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isAttackEffect() {
+			return isCodeInsideRange(AttackEffectRange);
+		}
+
+		/// <summary>
+		/// 是否回复效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isRecoverEffect() {
+			return isCodeInsideRange(RecoverEffectRange);
+		}
+
+		/// <summary>
+		/// 是否BUFF效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isBuffEffect() {
+			return isCodeInsideRange(BuffEffectRange);
+		}
+
+		/// <summary>
+		/// 是否状态效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isStateEffect() {
+			return isCodeInsideRange(StateEffectRange);
+		}
+
+		/// <summary>
+		/// 是否能量效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isEnergyEffect() {
+			return isCodeInsideRange(EnergyEffectRange);
+		}
+
+		/// <summary>
+		/// 是否卡牌效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isCardEffect() {
+			return isCodeInsideRange(CardEffectRange);
+		}
+
+		/// <summary>
+		/// 是否耗能效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isCostEffect() {
+			return isCodeInsideRange(CostEffectRange);
+		}
+
+		/// <summary>
+		/// 是否剧情效果
+		/// </summary>
+		/// <returns></returns>
+		public bool isPlotEffect() {
+			return isCodeInsideRange(PlotEffectRange);
+		}
+
+		#endregion
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProEffectData() { }
         public ExerProEffectData(Code code, JsonData params_) {
             this.code = (int)code; this.params_ = params_;
         }
@@ -520,9 +627,9 @@ namespace ExerPro.EnglishModule.Data {
 		public int targetAniIndex { get; protected set; }
 		[AutoConvert]
         public int starId { get; protected set; }
-        [AutoConvert]
-        public int gold { get; protected set; }
-        [AutoConvert]
+		[AutoConvert]
+		public int gold { get; protected set; }
+		[AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
 
 		/// <summary>
@@ -563,6 +670,29 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns>返回物品星级对象</returns>
 		public ExerProItemStar star() {
 			return DataService.get().exerProItemStar(starId);
+		}
+
+		/// <summary>
+		/// 重复次数
+		/// </summary>
+		/// <returns></returns>
+		public int repeats() {
+			var res = 1;
+			var effects = attackEffects();
+			foreach (var effect in effects)
+				res = Math.Max(res, effect.get(1, 1));
+			return res;
+		}
+
+		/// <summary>
+		/// 攻击类效果
+		/// </summary>
+		/// <returns></returns>
+		public ExerProEffectData[] attackEffects() {
+			var res = new List<ExerProEffectData>();
+			foreach (var effect in effects)
+				if (effect.isAttackEffect()) res.Add(effect);
+			return res.ToArray();
 		}
 
 		/// <summary>
@@ -2954,7 +3084,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="action">行动</param>
 		public void addAction(RuntimeAction action) {
-			Debug.Log(this + " addAction " + action.toJson().ToJson());
+			Debug.Log(this + " addAction " + action?.toJson().ToJson());
 			actions.Enqueue(action);
 		}
 
@@ -3369,20 +3499,10 @@ namespace ExerPro.EnglishModule.Data {
 	public class RuntimeEnemy : RuntimeBattler {
 
         /// <summary>
-        /// 最大偏移量
-        /// </summary>
-        const int MaxXOffset = 24;
-        const int MaxYOffset = 16;
-
-        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
         public int pos { get; protected set; }
-        [AutoConvert]
-        public int xOffset { get; protected set; }
-        [AutoConvert]
-        public int yOffset { get; protected set; }
 
         [AutoConvert]
         public int enemyId { get; protected set; }
@@ -3450,14 +3570,6 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProEnemy enemy() {
             if (tempEnemy != null) return tempEnemy;
             return tempEnemy = DataService.get().exerProEnemy(enemyId);
-        }
-
-        /// <summary>
-        /// 生成位置
-        /// </summary>
-        public void generatePosition() {
-            xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
-            yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
         }
 
 		#endregion
@@ -3588,8 +3700,6 @@ namespace ExerPro.EnglishModule.Data {
         public RuntimeEnemy(int pos, ExerProEnemy enemy) {
             tempEnemy = enemy; enemyId = enemy.id;
             this.pos = pos;
-
-            generatePosition();
         }
 
     }

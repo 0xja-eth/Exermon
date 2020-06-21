@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-using Random = UnityEngine.Random;
-
-using LitJson;
-
-using Core.Data;
-using Core.Data.Loaders;
 using Core.Systems;
 using Core.Services;
 
 using GameModule.Services;
 
+using ItemModule.Data;
 using ExerPro.EnglishModule.Data;
 
 /// <summary>
@@ -448,9 +443,12 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		/// <param name="effect">效果</param>
 		/// <param name="targets">目标</param>
-		public void use(ExerProEffectData[] effects, List<RuntimeBattler> targets) {
+		public void use<T>(T item, List<RuntimeBattler> targets) where T: BaseExerProItem {
 			var actor = this.actor();
-			actor.addAction(new RuntimeAction(actor, targets.ToArray(), effects));
+			var repeats = item.repeats();
+
+			for (int i = 0; i < repeats; ++i)
+				actor.addAction(new RuntimeAction(actor, targets.ToArray(), item));
 			//foreach (var target in targets)
 			//	actor.addAction(new RuntimeAction(actor, target, effects));
 		}
