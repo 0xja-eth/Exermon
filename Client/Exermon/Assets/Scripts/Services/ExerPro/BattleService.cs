@@ -88,7 +88,7 @@ namespace ExerPro.EnglishModule.Services {
         protected override void initializeStateDict() {
             base.initializeStateDict();
             addStateDict(State.NotInBattle);
-            addStateDict(State.Answering, updateAnswering);
+			addStateDict(State.Answering); //, updateAnswering);
             addStateDict(State.Drawing, updateDrawing);
             addStateDict(State.Playing);
             addStateDict(State.Discarding, updateDiscarding);
@@ -103,20 +103,16 @@ namespace ExerPro.EnglishModule.Services {
 		/// <summary>
 		/// 更新回答（回合开始）
 		/// </summary>
-		void updateAnswering() {
-			if (isStateChanged()) onRoundStart();
-		}
+		//void updateAnswering() {
+		//	if (isStateChanged()) onRoundStart();
+		//}
 
 		/// <summary>
 		/// 更新抽牌
 		/// </summary>
 		void updateDrawing() {
 			// 抽牌答对次数 + 额外次数
-			if (isStateChanged()) {
-				var cnt = drawCount();
-				for (int i = 0; i < cnt; ++i)
-					_cardGroup.drawCard();
-			}
+			if (isStateChanged()) onDraw();
 		}
 		/*
         /// <summary>
@@ -212,17 +208,17 @@ namespace ExerPro.EnglishModule.Services {
 		/// 角色是否死亡
 		/// </summary>
 		/// <returns></returns>
-		bool isActorDeath() {
-			return actor().isDead();
+		bool isActorLost() {
+			return actor().isLost();
 		}
 
 		/// <summary>
 		/// 是否敌人死亡
 		/// </summary>
 		/// <returns></returns>
-		bool isEnemiesDeath() {
+		bool isEnemiesLost() {
 			foreach (var enemy in _enemies)
-				if (!enemy.isDead()) return false;
+				if (!enemy.isLost()) return false;
 			return true;
 		}
 
@@ -239,8 +235,8 @@ namespace ExerPro.EnglishModule.Services {
 		/// 判断结果
 		/// </summary>
 		void processRoundResult() {
-			if (isActorDeath()) result = Result.Lose;
-			else if (isEnemiesDeath()) result = Result.Win;
+			if (isActorLost()) result = Result.Lose;
+			else if (isEnemiesLost()) result = Result.Win;
 			if (result != Result.None) onBattleEnd();
 			else nextRound();
 		}
@@ -444,6 +440,8 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="effect">效果</param>
 		/// <param name="targets">目标</param>
 		public void use<T>(T item, List<RuntimeBattler> targets) where T: BaseExerProItem {
+			Debug.Log("use: " + item.toJson().ToJson() + " -> " + targets);
+
 			var actor = this.actor();
 			var repeats = item.repeats();
 
@@ -478,15 +476,27 @@ namespace ExerPro.EnglishModule.Services {
 		/// 战斗开始回调
 		/// </summary>
 		void onBattleStart() {
+			Debug.Log("onBattleStart: " + round);
 			actor().onBattleStart();
 			foreach (var enemy in _enemies)
 				enemy.onBattleStart();
 		}
 
 		/// <summary>
+		/// 抽牌回调
+		/// </summary>
+		void onDraw() {
+			onRoundStart();
+			var cnt = drawCount();
+			for (int i = 0; i < cnt; ++i)
+				_cardGroup.drawCard();
+		}
+
+		/// <summary>
 		/// 回合开始回调
 		/// </summary>
 		void onRoundStart() {
+			Debug.Log("onRoundStart: " + round);
 			actor().onRoundStart(round);
 			foreach (var enemy in _enemies)
 				enemy.onRoundStart(round);
@@ -496,6 +506,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 回合结束回调
 		/// </summary>
 		void onRoundEnd() {
+			Debug.Log("onRoundEnd: " + round);
 			resetRoundStates();
 			battlersRoundEnd();
 			processRoundResult();
@@ -505,6 +516,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 处理战斗者回合结束
 		/// </summary>
 		void battlersRoundEnd() {
+			Debug.Log("battlersRoundEnd: " + round);
 			actor().onRoundEnd(round);
 			foreach (var enemy in _enemies)
 				enemy.onRoundEnd(round);
@@ -514,6 +526,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 战斗结束回调
 		/// </summary>
 		void onBattleEnd() {
+			Debug.Log("onBattleEnd: " + round);
 			// TODO: 生成奖励
 			battlersBattleEnd();
 			changeState(State.Result);

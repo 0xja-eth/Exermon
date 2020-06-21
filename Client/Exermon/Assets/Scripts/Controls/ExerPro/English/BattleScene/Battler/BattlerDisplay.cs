@@ -61,6 +61,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public AnimatorView animator; // 控制静态动画
 
 		public MultParamsDisplay hpBar;
+		public GameObject hpBarObj;
 
 		/// <summary>
 		/// 外部变量定义
@@ -102,7 +103,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void initializeAnimationEvents() {
 			animation.addEndEvent(ForwardAnimation, attack);
 			animation.addEndEvent(BackAnimation, onMoveEnd);
-			animation.addEndEvent(EscapeAnimation, onMoveEnd);
+			animation.addEndEvent(EscapeAnimation, onEscapeEnd);
 
 			//animator.addEndEvent(AttackAnimation, resetPosition);
 
@@ -375,13 +376,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 重置位置
 		/// </summary>
 		public void moveToTarget() {
-			var target = targetDisplay();
-
-			Debug.Log("moveToTarget: " + target);
-
-			if (target == null) return;
-
-			moveTo(target.beAttackedPosition());
+			Debug.Log("moveToTarget");
+			moveTo(actionManager().getAttackPosition(this));
 		}
 
 		/// <summary>
@@ -418,7 +414,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 移动结束回调
 		/// </summary>
 		public void onEscapeEnd() {
-			item.isEscaped = true;
+			item.onEscape();
 			onMoveEnd();
 		}
 
@@ -559,7 +555,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 			if (hpBar) {
 				hpBar.setValue(item, "hp");
-				hpBar.gameObject.SetActive(!item.isDead());
+				hpBarObj.SetActive(!item.isDead());
 			}
 		}
 
@@ -569,8 +565,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void drawEmptyItem() {
             battle.gameObject.SetActive(false);
 			if (hpBar) {
-				hpBar.gameObject.SetActive(false);
 				hpBar.clearValue();
+				hpBarObj.SetActive(false);
 			}
 		}
 

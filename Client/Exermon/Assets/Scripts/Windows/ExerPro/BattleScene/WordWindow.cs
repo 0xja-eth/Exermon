@@ -94,12 +94,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 关闭窗口
 		/// </summary>
 		public override void terminateWindow() {
-			if (terminated) base.terminateWindow();
+			base.terminateWindow();
+			wordQuestionDisplay.terminateView();
+			//if (terminated) {
+
+			//}
 		}
-		public void terminateWindow(bool force) {
-			if (force) terminated = true;
-			terminateWindow();
-		}
+		//public void terminateWindow(bool force) {
+		//	if (force) terminated = true;
+		//	terminateWindow();
+		//}
 
 		#endregion
 
@@ -132,6 +136,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			resetQuestion();
 			drawWordQuestion();
 			drawCount();
+
+			scene.refreshStatus();
 		}
 
 		/// <summary>
@@ -150,6 +156,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		void drawWordQuestion() {
 			var word = battleSer.currentWord();
 			wordQuestionDisplay.setItem(word);
+			wordQuestionDisplay.startView();
 		}
 
 		/// <summary>

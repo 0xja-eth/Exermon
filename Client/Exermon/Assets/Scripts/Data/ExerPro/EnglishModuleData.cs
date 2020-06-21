@@ -2645,16 +2645,24 @@ namespace ExerPro.EnglishModule.Data {
             return hp <= 0;
         }
 
-        #endregion
+		/// <summary>
+		/// 是否失败
+		/// </summary>
+		/// <returns></returns>
+		public bool isLost() {
+			return isDead() || isEscaped;
+		}
 
-        #region 属性统一接口
+		#endregion
 
-        /// <summary>
-        /// 基本属性值
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <returns>属性值</returns>
-        public virtual int baseParam(int paramId) {
+		#region 属性统一接口
+
+		/// <summary>
+		/// 基本属性值
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <returns>属性值</returns>
+		public virtual int baseParam(int paramId) {
             switch (paramId) {
                 case MHPParamId: return baseMHP();
                 case PowerParamId: return basePower();
@@ -3113,6 +3121,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 战斗开始回调
 		/// </summary>
 		public virtual void onBattleStart() {
+			onRoundStart(0);
 			clearStates();
 			clearBuffs();
 		}
@@ -3162,6 +3171,13 @@ namespace ExerPro.EnglishModule.Data {
 		public virtual void onActionEnd(RuntimeAction action) { }
 
 		/// <summary>
+		/// 逃跑回调
+		/// </summary>
+		public virtual void onEscape() {
+			isEscaped = true; onActionEnd(null);
+		}
+
+		/// <summary>
 		/// 死亡回调
 		/// </summary>
 		protected virtual void onDie() { }
@@ -3207,7 +3223,9 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 战斗结束回调
         /// </summary>
-        public virtual void onBattleEnd() { }
+        public virtual void onBattleEnd() {
+			isEscaped = false;
+		}
 
         #endregion
 
@@ -3641,7 +3659,7 @@ namespace ExerPro.EnglishModule.Data {
 			var actor = BattleService.get().actor();
             CalcService.EnemyNextCalc.calc(round, this, actor,
                 out _currentEnemyAction, out action);
-			addAction(action);
+			if (action != null) addAction(action);
         }
 
         /// <summary>

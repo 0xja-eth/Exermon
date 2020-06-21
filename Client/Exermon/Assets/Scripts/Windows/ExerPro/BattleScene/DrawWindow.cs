@@ -74,6 +74,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		public override void terminateWindow() {
 			base.terminateWindow();
+			drawCardGroup.terminateView();
 			_drawnCards = null; 
 		}
 
@@ -99,6 +100,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		protected override void refresh() {
 			base.refresh();
 			drawCardGroup.setItems(drawnCards());
+			drawCardGroup.startView();
 		}
 
 		#endregion

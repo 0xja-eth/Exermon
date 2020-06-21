@@ -17,13 +17,28 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls { }
 /// </summary>
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
-	using Menu;
-
 	/// <summary>
 	/// 角色显示控件
 	/// </summary
 	public class ActorDisplay : BattlerDisplay {
-		
+
+		/// <summary>
+		/// 场景组件引用
+		/// </summary>
+		BattleScene scene;
+
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			scene = SceneUtils.getCurrentScene<BattleScene>();
+		}
+
+		#endregion
+
 		#region 数据控制
 
 		/// <summary>
@@ -33,6 +48,19 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <returns></returns>
 		public override bool isNullItem(RuntimeBattler item) {
 			return base.isNullItem(item) || !isActor();
+		}
+
+		#endregion
+
+		#region 画面绘制
+
+		/// <summary>
+		/// 绘制物品
+		/// </summary>
+		/// <param name="item"></param>
+		protected override void drawExactlyItem(RuntimeBattler item) {
+			base.drawExactlyItem(item);
+			scene.refreshStatus();
 		}
 
 		#endregion

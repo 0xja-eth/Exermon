@@ -41,7 +41,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		public WordWindow wordWindow;
 		public DrawWindow drawWindow;
 
-		public PlayerStatus playerStatue;
+		public PlayerStatus playerStatus;
 		public MultParamsDisplay wordProgress;
 
 		/// <summary>
@@ -270,8 +270,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 使用药水
 		/// </summary>
 		/// <param name="potion"></param>
-		public void usePotion(ExerProPackPotion packPotion) {
-			if (!isPotionUsable(packPotion)) return;
+		public bool usePotion(ExerProPackPotion packPotion) {
+			if (!isPotionUsable(packPotion)) return false;
 
 			var targets = makePotionTargets(packPotion.item());
 
@@ -279,6 +279,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 			battleSer.actor().usePotion(packPotion);
 
 			refreshStatus();
+
+			return true;
 		}
 
 		/// <summary>
@@ -286,10 +288,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// </summary>
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
-		public void useCard(ExerProPackCard packCard, RuntimeEnemy enemy) {
+		public bool useCard(ExerProPackCard packCard, RuntimeEnemy enemy) {
 			Debug.Log("useCard: " + packCard + ", " + enemy);
 
-			if (!isCardUsable(packCard, enemy)) return;
+			if (!isCardUsable(packCard, enemy)) return false;
 			Debug.Log("Use enable!");
 
 			var targets = makeCardTargets(packCard.item(), enemy);
@@ -298,6 +300,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 			battleSer.actor().useCard(packCard);
 
 			refreshStatus();
+
+			return true;
 		}
 
 		/// <summary>
@@ -315,7 +319,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 绘制玩家信息
 		/// </summary>
 		void drawPlayerDisplay() {
-			playerStatue.setItem(battleSer.actor());
+			playerStatus.setItem(battleSer.actor(), true);
 		}
 
 		/// <summary>

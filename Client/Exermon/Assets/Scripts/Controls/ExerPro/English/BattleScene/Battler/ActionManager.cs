@@ -39,6 +39,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			public RuntimeAction action;
 
 			/// <summary>
+			/// 是否结束
+			/// </summary>
+			public bool isEnd = false;
+
+			/// <summary>
 			/// 构造函数
 			/// </summary>
 			public Item(RuntimeAction action, 
@@ -63,7 +68,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 行动项
 		/// </summary>
-		List<Item> actionItems = new List<Item>();
+		Queue<Item> actionQueue = new Queue<Item>();
 
 		#region 更新控制
 
@@ -79,9 +84,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 更新行动
 		/// </summary>
 		void updateActions() {
-			var tmp = actionItems.ToArray();
-			foreach (var item in tmp)
-				updateAction(item);
+			//var tmp = actionItems.ToArray();
+			//foreach (var item in tmp)
+			if (actionQueue.Count <= 0) return;
+			updateAction(actionQueue.Peek());
 		}
 
 		/// <summary>
@@ -112,9 +118,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var objects = battleGround.getBattlerDisplays(action.objects);
 			var startAni = action.startAni ?? defaultStartAni;
 
-			Debug.Log("add: " + subject + ", " + objects);
+			Debug.Log("Enqueue: " + subject + ", " + objects);
 
-			actionItems.Add(new Item(action, subject, objects));
+			actionQueue.Enqueue(new Item(action, subject, objects));
 
 			subject.setupStartAni(startAni);
 		}
@@ -130,8 +136,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			return targets[0];
 		}
 		public BattlerDisplay[] getTargets(BattlerDisplay battler) {
-			var item = actionItems.Find(item_ => item_.subject == battler);
-			return item.objects;
+			var item = actionQueue.Peek();
+			if (item.subject == battler) return item.objects;
+			return new BattlerDisplay[0];
 		}
 
 		/// <summary>
@@ -171,10 +178,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void end(Item item) {
+			if (item.isEnd) return;
+
 			Debug.Log("End: " + item.subject.name);
 			item.action.subject.processAction(item.action);
 			item.action.subject.onActionEnd(item.action);
-			actionItems.Remove(item);
+			item.isEnd = true;
+
+			actionQueue.Dequeue();
 		}
 
 		#endregion

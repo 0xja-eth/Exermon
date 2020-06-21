@@ -4749,7 +4749,7 @@ MonoBehaviour:
   menuWindow: {fileID: 2087441262}
   wordWindow: {fileID: 1304475217}
   drawWindow: {fileID: 297630842}
-  playerStatue: {fileID: 120245332}
+  playerStatus: {fileID: 120245332}
   wordProgress: {fileID: 120245333}
 --- !u!1 &1445545930
 GameObject:

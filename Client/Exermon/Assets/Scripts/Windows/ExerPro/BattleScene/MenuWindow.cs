@@ -54,6 +54,19 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 
 		#endregion
 
+		#region 启动/关闭控制
+
+		/// <summary>
+		/// 关闭窗口
+		/// </summary>
+		public override void terminateWindow() {
+			base.terminateWindow();
+			handCards.terminateView();
+			potionSlot.terminateView();
+		}
+
+		#endregion
+
 		#region 画面绘制
 
 		/// <summary>
@@ -74,10 +87,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <param name="actor"></param>
 		void setupHandCards(RuntimeActor actor) {
 			handCards.setItems(actor.cardGroup.handGroup.items);
+			handCards.startView();
 		}
 
+		/// <summary>
+		/// 配置药品槽
+		/// </summary>
+		/// <param name="actor"></param>
 		void setupPotionSlot(RuntimeActor actor) {
 			potionSlot.setItems(actor.potionSlot.items);
+			potionSlot.startView();
 		}
 
 		#endregion
@@ -88,8 +107,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 使用药水
 		/// </summary>
 		/// <param name="potion"></param>
-		public void usePotion(PotionSlotItemDisplay slotDisplay) {
-			scene.usePotion(slotDisplay?.getItem()?.packPotion);
+		public bool usePotion(PotionSlotItemDisplay slotDisplay) {
+			return scene.usePotion(slotDisplay?.getItem()?.packPotion);
 		}
 
 		/// <summary>
@@ -97,8 +116,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
-		public void useCard(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
-			scene.useCard(cardDisplay?.getItem(), enemyDisplay?.enemy());
+		public bool useCard(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
+			return scene.useCard(cardDisplay?.getItem(), enemyDisplay?.enemy());
 		}
 
 		#endregion
