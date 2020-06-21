@@ -27,6 +27,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
     public class BattleScene : BaseScene {
 
 		/// <summary>
+		/// 文本常量定义
+		/// </summary>
+		const string InvalidTargetAlertText = "无效的使用目标！";
+		const string NotEngoughEnergyAlertText = "没有足够的能量！";
+
+		/// <summary>
 		/// 外部组件设置
 		/// </summary>
 		public BattleGround battleGround;
@@ -101,7 +107,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 				case BattleService.State.Playing: onPlay(); break;
 				case BattleService.State.Discarding: onDiscard(); break;
 				case BattleService.State.Enemy: onEnemy(); break;
-				case BattleService.State.RoundEnd: refreshStatus(); break;
 			}
 		}
 
@@ -162,6 +167,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		//	return res;
 		//}
 
+		#region 可用性判断
+
 		/// <summary>
 		/// 生成单个目标
 		/// </summary>
@@ -200,13 +207,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		}
 
 		/// <summary>
-		/// 能否使用卡牌
+		/// 目标判断
 		/// </summary>
-		/// <param name="packCard">卡牌</param>
-		/// <param name="enemy">敌人</param>
-		/// <returns></returns>
-		bool isCardUsable(ExerProPackCard packCard, RuntimeEnemy enemy) {
-			if (packCard == null || packCard.isNullItem()) return false;
+		bool judgeTarget(ExerProPackCard packCard, RuntimeEnemy enemy) {
 			var card = packCard.item();
 			switch ((ExerProCard.Target)card.target) {
 				case ExerProCard.Target.One:
@@ -214,6 +217,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 				default:
 					return true;
 			}
+		}
+
+		/// <summary>
+		/// 能否使用卡牌
+		/// </summary>
+		/// <param name="packCard">卡牌</param>
+		/// <param name="enemy">敌人</param>
+		/// <returns></returns>
+		bool isCardUsable(ExerProPackCard packCard, RuntimeEnemy enemy) {
+			if (packCard == null || packCard.isNullItem()) return false;
+			if (battleSer.actor().energy < packCard.cost())
+				return requestInvalidAlert(NotEngoughEnergyAlertText);
+			if (!judgeTarget(packCard, enemy))
+				return requestInvalidAlert(InvalidTargetAlertText);
+			return true;
 		}
 
 		/// <summary>
@@ -228,6 +246,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		}
 
 		/// <summary>
+		/// 请求无效提示
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
+		bool requestInvalidAlert(string text) {
+			if (text != "") gameSys.requestAlert(text);
+			return false; // 需要返回 false 表示无效
+		}
+
+		#endregion
+
+		/// <summary>
 		/// 使用药水
 		/// </summary>
 		/// <param name="potion"></param>
@@ -238,6 +268,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 
 			battleSer.use(packPotion.effects(), targets);
 			battleSer.actor().usePotion(packPotion);
+
+			refreshStatus();
 		}
 
 		/// <summary>
@@ -255,12 +287,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 
 			battleSer.use(packCard.effects(), targets);
 			battleSer.actor().useCard(packCard);
+
+			refreshStatus();
 		}
 
 		/// <summary>
 		/// 刷新状态
 		/// </summary>
 		public void refreshStatus() {
+			battleGround.requestRefresh();
+			menuWindow.requestRefresh();
+
 			drawPlayerDisplay();
 			drawProgresses();
 		}

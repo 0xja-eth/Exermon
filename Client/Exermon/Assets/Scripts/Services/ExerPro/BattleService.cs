@@ -43,8 +43,7 @@ namespace ExerPro.EnglishModule.Services {
             Playing = 3, // 出牌阶段
             Discarding = 4, // 弃牌阶段
             Enemy = 5, // 敌人行动阶段
-            RoundEnd = 6, // 回合结束阶段
-            Result = 7, // 战斗结算阶段
+            Result = 6, // 战斗结算阶段
 
         }
 
@@ -96,10 +95,9 @@ namespace ExerPro.EnglishModule.Services {
             addStateDict(State.NotInBattle);
             addStateDict(State.Answering);
             addStateDict(State.Drawing, updateDrawing);
-            addStateDict(State.Playing, updatePlaying);
+            addStateDict(State.Playing);
             addStateDict(State.Discarding, updateDiscarding);
             addStateDict(State.Enemy, updateEnemy);
-            addStateDict(State.RoundEnd, updateRoundEnd);
             addStateDict(State.Result);
         }
 
@@ -107,25 +105,31 @@ namespace ExerPro.EnglishModule.Services {
 
         #region 更新控制
 
-        /// <summary>
-        /// 更新抽牌
-        /// </summary>
-        void updateDrawing() {
-			// 抽牌答对次数 + 额外次数
-			if (isStateChanged())
-				for (int i = 0; i < corrCnt + bonusCnt; ++i)
-	                _cardGroup.drawCard();
-        }
+		/// <summary>
+		/// 更新回答（回合开始）
+		/// </summary>
+		void updateAnswering() {
+			if (isStateChanged()) onRoundStart();
+		}
 
+		/// <summary>
+		/// 更新抽牌
+		/// </summary>
+		void updateDrawing() {
+			// 抽牌答对次数 + 额外次数
+			if (isStateChanged()) {
+				var cnt = drawCount();
+				for (int i = 0; i < cnt; ++i)
+					_cardGroup.drawCard();
+			}
+		}
+		/*
         /// <summary>
         /// 更新出牌
         /// </summary>
         void updatePlaying() {
-            if (isStateChanged())
-                foreach (var enemy in _enemies)
-                    calcEnemyNext(enemy);
         }
-
+		*/
         /// <summary>
         /// 更新弃牌
         /// </summary>
@@ -138,26 +142,17 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新敌人
         /// </summary>
         void updateEnemy() {
-            if (processEnemiesAction())
-                changeState(State.RoundEnd);
-        }
+			if (processEnemiesAction()) onRoundEnd();
+		}
 
-        /// <summary>
-        /// 更新回合结束
-        /// </summary>
-        void updateRoundEnd() {
-            onRoundEnd();
-            changeState(State.Answering);
-        }
-        /*
+        
         /// <summary>
         /// 更新结果
         /// </summary>
         void updateResult() {
-            actor().onBattleEnd();
             changeState(State.NotInBattle);
         }
-        */
+        
         #endregion
 
         #region 流程控制
@@ -167,7 +162,7 @@ namespace ExerPro.EnglishModule.Services {
         /// </summary>
         /// <param name="node"></param>
         public void start(ExerProMapNode.Type type) {
-            setup(type);
+            setup(type); onBattleStart();
 			sceneSys.pushScene(SceneSystem.Scene.EnglishProBattleScene);
 			changeState(State.Answering);
         }
@@ -179,10 +174,8 @@ namespace ExerPro.EnglishModule.Services {
 			round = 1;
 			record = engSer.record;
 			result = Result.None;
-            generateEnemies(type);
-			_cardGroup = actor()?.cardGroup;
-			_cardGroup.onBattleStart();
-        }
+			generateEnemies(type);
+		}
 
         /// <summary>
         /// 生成敌人
@@ -208,12 +201,63 @@ namespace ExerPro.EnglishModule.Services {
 			changeState(State.Discarding);
 		}
 
-        /// <summary>
-        /// 结束
-        /// </summary>
-        public void terminate() {
-            _cardGroup.onBattleEnd();
+		#region 回合控制
+
+		/// <summary>
+		/// 当前回合
+		/// </summary>
+		/// <returns></returns>
+		public int currentRound() {
+			return round;
+		}
+
+		/// <summary>
+		/// 角色是否死亡
+		/// </summary>
+		/// <returns></returns>
+		bool isActorDeath() {
+			return actor().isDead();
+		}
+
+		/// <summary>
+		/// 是否敌人死亡
+		/// </summary>
+		/// <returns></returns>
+		bool isEnemiesDeath() {
+			foreach (var enemy in _enemies)
+				if (!enemy.isDead()) return false;
+			return true;
+		}
+
+		/// <summary>
+		/// 重置回合状态
+		/// </summary>
+		void resetRoundStates() {
+			bonus = false;
+			corrCnt = bonusCnt = 0;
+			curEnemyIndex = 0;
+		}
+
+		/// <summary>
+		/// 判断结果
+		/// </summary>
+		void judgeResult() {
+			if (isActorDeath()) result = Result.Lose;
+			else if (isEnemiesDeath()) result = Result.Win;
+			if (result != Result.None) onBattleEnd();
+		}
+
+		#endregion
+
+		/// <summary>
+		/// 结束
+		/// </summary>
+		public void terminate() {
+			engSer.exitNode();
+            //onBattleEnd();
         }
+
+		#endregion
 
 		#region 数据获取
 
@@ -381,11 +425,13 @@ namespace ExerPro.EnglishModule.Services {
             if (bonus) changeState(State.Drawing);
             else bonus = true;
         }
-		
+
 		#endregion
 
-		#region 出牌控制
+		#region 行动控制
 
+		#region 玩家行动
+		
 		/// <summary>
 		/// 使用
 		/// </summary>
@@ -393,112 +439,88 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="targets">目标</param>
 		public void use(ExerProEffectData[] effects, List<RuntimeBattler> targets) {
 			var actor = this.actor();
-			foreach (var target in targets) {
-				actor.addAction(new RuntimeAction(
-					actor, target, effects));
-			}
+			foreach (var target in targets)
+				actor.addAction(new RuntimeAction(actor, target, effects));
 		}
 
 		#endregion
 
-		#region 敌人控制
-
+		#region 敌人行动
+		
 		/// <summary>
-		/// 计算敌人下一步行动
+		/// 处理敌人行动
 		/// </summary>
-		void calcEnemyNext(RuntimeEnemy enemy) {
-            enemy.calcNext(round, actor());
-        }
-
-        /// <summary>
-        /// 处理敌人行动
-        /// </summary>
-        /// <returns>敌人是否全部行动完毕</returns>
-        bool processEnemiesAction() {
+		/// <returns>敌人是否全部行动完毕</returns>
+		bool processEnemiesAction() {
 			Debug.Log("curEnemyIndex = " + curEnemyIndex);
-            var enemy = _enemies[curEnemyIndex];
-            if (enemy.updateAction()) curEnemyIndex++;
-            return curEnemyIndex >= _enemies.Count;
-        }
+			var enemy = _enemies[curEnemyIndex];
+			if (enemy.updateAction()) curEnemyIndex++;
+			return curEnemyIndex >= _enemies.Count;
+		}
 
 		#endregion
 
-		#region 回合控制
+		#endregion
+
+		#region 回调控制
 
 		/// <summary>
-		/// 当前回合
+		/// 战斗开始回调
 		/// </summary>
-		/// <returns></returns>
-		public int currentRound() {
-			return round;
+		void onBattleStart() {
+			actor().onBattleStart();
+			foreach (var enemy in _enemies)
+				enemy.onBattleStart();
+		}
+
+		/// <summary>
+		/// 回合开始回调
+		/// </summary>
+		void onRoundStart() {
+			actor().onRoundStart(round);
+			foreach (var enemy in _enemies)
+				enemy.onRoundStart(round);
 		}
 
 		/// <summary>
 		/// 回合结束回调
 		/// </summary>
 		void onRoundEnd() {
-            resetStates();
-            battlersRoundEnd();
-            judgeResult();
-        }
+			resetRoundStates();
+			battlersRoundEnd();
+			judgeResult();
 
-        /// <summary>
-        /// 重置部分状态
-        /// </summary>
-        void resetStates() {
-            bonus = false;
-            corrCnt = bonusCnt = 0;
-            curEnemyIndex = 0;
-        }
+			changeState(State.Answering);
+		}
 
-        /// <summary>
-        /// 处理战斗者回合结束
-        /// </summary>
-        void battlersRoundEnd() {
-            actor().onRoundEnd();
-            foreach (var enemy in _enemies)
-                enemy.onRoundEnd();
-        }
+		/// <summary>
+		/// 处理战斗者回合结束
+		/// </summary>
+		void battlersRoundEnd() {
+			actor().onRoundEnd(round);
+			foreach (var enemy in _enemies)
+				enemy.onRoundEnd(round);
+		}
 
-        /// <summary>
-        /// 判断结果
-        /// </summary>
-        void judgeResult() {
-            if (isActorDeath()) result = Result.Lose;
-            else if (isEnemiesDeath()) result = Result.Win;
-            if (result != Result.None) onBattleEnd();
-        }
-
-        /// <summary>
-        /// 角色是否死亡
-        /// </summary>
-        /// <returns></returns>
-        bool isActorDeath() {
-            return actor().isDeath();
-        }
-
-        /// <summary>
-        /// 是否敌人死亡
-        /// </summary>
-        /// <returns></returns>
-        bool isEnemiesDeath() {
-            foreach (var enemy in _enemies)
-                if (!enemy.isDeath()) return false;
-            return true;
-        }
-
-        /// <summary>
-        /// 战斗结束回调
-        /// </summary>
-        void onBattleEnd() {
+		/// <summary>
+		/// 战斗结束回调
+		/// </summary>
+		void onBattleEnd() {
 			// TODO: 生成奖励
+			battlersBattleEnd();
+			changeState(State.Result);
+		}
+
+		/// <summary>
+		/// 战斗结束回调
+		/// </summary>
+		void battlersBattleEnd() {
 			actor().onBattleEnd();
-            changeState(State.Result);
-        }
+			foreach (var enemy in _enemies)
+				enemy.onBattleEnd();
+		}
 
-        #endregion
+		#endregion
 
-        #endregion
-
-    }
+	}
 }

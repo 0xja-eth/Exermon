@@ -104,7 +104,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void OnBeginDrag(PointerEventData data) {
 			Debug.Log(name + ": OnBeginDrag: " + data);
 			isDragging = true;
-			//cardDisplay.setupDetail();
+			cardDisplay.select();
 			startPos = arrowLocalPos(data);
 			if (arrow == null) createArrow();
 		}
@@ -126,7 +126,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public void OnEndDrag(PointerEventData data) {
 			Debug.Log(name + ": OnEndDrag: " + data);
 			isDragging = false;
-			//cardDisplay.terminateDetail();
+			cardDisplay.deselect();
 			destroyArrow();
 		}
 
@@ -135,6 +135,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public void OnDestroy() {
 			Debug.Log(name + ": OnDestroy");
+			cardDisplay.deselect();
 			isDragging = false;
 			destroyArrow();
 		}

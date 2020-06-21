@@ -31,12 +31,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public const string ForwardAnimation = "Forward";
 		public const string BackAnimation = "Back";
 		public const string EscapeAnimation = "Escape";
+		public const string DieAnimation = "Die";
 		//public const string PowerUpAnimation = "PowerUp";
 		//public const string PowerDownAnimation = "PowerDown";
 
 		public const string MovingAttr = "moving";
 		public const string AttackAttr = "attack";
 		public const string HurtAttr = "hurt";
+		public const string DieAttr = "die";
 		//public const string SkillAttr = "skill";
 		//public const string PowerUpAttr = "power_up";
 		//public const string PowerDownAttr = "power_down";
@@ -94,7 +96,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			animation.addEndEvent(BackAnimation, onMoveEnd);
 			animation.addEndEvent(EscapeAnimation, onMoveEnd);
 
-			animator.addEndEvent(AttackAnimation, resetPosition);
+			//animator.addEndEvent(AttackAnimation, resetPosition);
 
 			//animator.addEndEvent(HurtAnimation, onActionEnd);
 			//animator.addEndEvent(AttackAnimation, onActionEnd);
@@ -122,6 +124,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			updateAction();
 			updateResult();
 			updateHPDelta();
+			updateDead();
 		}
 
 		/// <summary>
@@ -180,6 +183,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void updateStates() {
 			if (!item.isStateChanged) return;
 			states.setItems(item.allRuntimeStates());
+		}
+
+		/// <summary>
+		/// 更新死亡
+		/// </summary>
+		void updateDead() {
+			if (item.isDead()) die();
 		}
 
 		#endregion
@@ -341,6 +351,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 重置位置
 		/// </summary>
 		public void resetPosition() {
+			Debug.Log("resetPosition: " + oriPosition);
 			moveTo(oriPosition, BackAnimation);
 		}
 
@@ -368,7 +379,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 移动到指定位置
 		/// </summary>
 		public void moveTo(Vector2 target, string name = ForwardAnimation) {
-			animation.moveTo(target, ForwardAnimation);
+			animation.moveTo(target, name);
 			animator.setVar(MovingAttr, true);
 		}
 
@@ -376,7 +387,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 移动指定量
 		/// </summary>
 		public void moveDelta(Vector2 delta, string name = ForwardAnimation) {
-			animation.moveDelta(delta, ForwardAnimation);
+			animation.moveDelta(delta, name);
 			animator.setVar(MovingAttr, true);
 		}
 
@@ -460,6 +471,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		public void hurt() {
 			animator.setVar(HurtAttr);
+		}
+
+		/// <summary>
+		/// 削弱
+		/// </summary>
+		public void die() {
+			animator.setVar(DieAttr, true);
 		}
 
 		#endregion

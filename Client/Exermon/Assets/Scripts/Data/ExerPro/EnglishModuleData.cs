@@ -933,6 +933,16 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProPackCard : ExerProPackItem<ExerProCard> {
 		
+		/// <summary>
+		/// 消耗能量
+		/// </summary>
+		/// <returns></returns>
+		public int cost() {
+			var item = this.item();
+			if (item == null) return 0;
+			return item.cost;
+		}
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -2457,15 +2467,10 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         /// <summary>
-        /// 死亡回调
-        /// </summary>
-        protected virtual void onDie() { }
-
-        /// <summary>
         /// 是否死亡
         /// </summary>
         /// <returns></returns>
-        public bool isDeath() {
+        public bool isDead() {
             return hp <= 0;
         }
 
@@ -2552,39 +2557,42 @@ namespace ExerPro.EnglishModule.Data {
             addBuff(paramId, 0, rate);
         }
 
-        #endregion
+		#endregion
 
-        #endregion
+		#endregion
 
-        #region Buff控制
+		#region Buff控制
 
-        /// <summary>
-        /// BUFF添加回调
-        /// </summary>
-        public virtual void onBuffAdded(RuntimeBuff buff) { }
+		/// <summary>
+		/// 状态是否改变
+		/// </summary>
+		List<RuntimeBuff> _addedBuffs = new List<RuntimeBuff>();
+		public List<RuntimeBuff> addedBuffs {
+			get {
+				var res = _addedBuffs;
+				_addedBuffs.Clear(); return res;
+			}
+		}
 
-        /// <summary>
-        /// BUFF移除回调
-        /// </summary>
-        public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
+		#region Buff变更
 
-        #region Buff变更
-
-        /// <summary>
-        /// 添加Buff
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <param name="value">变化值</param>
-        /// <param name="rate">变化率</param>
-        /// <param name="turns">持续回合</param>
-        /// <returns>返回添加的Buff</returns>
-        public RuntimeBuff addBuff(int paramId,
+		/// <summary>
+		/// 添加Buff
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <param name="value">变化值</param>
+		/// <param name="rate">变化率</param>
+		/// <param name="turns">持续回合</param>
+		/// <returns>返回添加的Buff</returns>
+		public RuntimeBuff addBuff(int paramId,
             int value = 0, double rate = 1, int turns = 0) {
             return addBuff(new RuntimeBuff(paramId, value, rate, turns));
         }
         public RuntimeBuff addBuff(RuntimeBuff buff) {
             buffs.Add(buff); onBuffAdded(buff);
-            return buff;
+			_addedBuffs.Add(buff);
+
+			return buff;
         }
 
         /// <summary>
@@ -2594,12 +2602,16 @@ namespace ExerPro.EnglishModule.Data {
         public void removeBuff(int index, bool force = false) {
             var buff = buffs[index];
             buffs.RemoveAt(index);
-            onBuffRemoved(buff, force);
+			_addedBuffs.Remove(buff);
+
+			onBuffRemoved(buff, force);
         }
         /// <param name="buff">Buff对象</param>
         public void removeBuff(RuntimeBuff buff, bool force = false) {
             buffs.Remove(buff);
-            onBuffRemoved(buff, force);
+			_addedBuffs.Remove(buff);
+
+			onBuffRemoved(buff, force);
         }
 
         /// <summary>
@@ -2688,16 +2700,6 @@ namespace ExerPro.EnglishModule.Data {
 			}
 		}
 		
-        /// <summary>
-        /// 状态添加回调
-        /// </summary>
-        public virtual void onStateAdded(RuntimeState state) { }
-
-        /// <summary>
-        /// 状态解除回调
-        /// </summary>
-        public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
-
 		/// <summary>
 		/// 获取所有状态
 		/// </summary>
@@ -2845,7 +2847,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public bool isMovableState() {
-			return !isEscaped && !isDeath();
+			return !isEscaped && !isDead();
 		}
 
 		#endregion
@@ -2875,9 +2877,16 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public RuntimeActionResult getResult() {
             var res = currentResult;
-            currentResult = null;
-            return res;
+			clearResult();
+			return res;
         }
+
+		/// <summary>
+		/// 清除当前结果
+		/// </summary>
+		public void clearResult() {
+			currentResult = null;
+		}
 
 		#endregion
 
@@ -2904,6 +2913,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="action">行动</param>
 		public void addAction(RuntimeAction action) {
+			Debug.Log(this + " addAction " + action.toJson().ToJson());
 			actions.Enqueue(action);
 		}
 
@@ -2935,20 +2945,73 @@ namespace ExerPro.EnglishModule.Data {
 
 		#region 回调控制
 
-        /// <summary>
-        /// 回合结束回调
-        /// </summary>
-        public virtual void onRoundEnd() {
+		/// <summary>
+		/// 战斗开始回调
+		/// </summary>
+		public virtual void onBattleStart() {
+			clearStates();
+			clearBuffs();
+		}
+		
+		/// <summary>
+		/// 回合开始回调
+		/// </summary>
+		/// <param name="round">回合数</param>
+		public virtual void onRoundStart(int round) {
+			_deltaHP = null;
+			_addedBuffs.Clear();
+			_isStateChanged = false;
+			clearActions();
+		}
+
+		#region BUFF回调
+
+		/// <summary>
+		/// BUFF添加回调
+		/// </summary>
+		public virtual void onBuffAdded(RuntimeBuff buff) { }
+
+		/// <summary>
+		/// BUFF移除回调
+		/// </summary>
+		public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
+
+		#endregion
+
+		#region 状态回调
+
+		/// <summary>
+		/// 状态添加回调
+		/// </summary>
+		public virtual void onStateAdded(RuntimeState state) { }
+
+		/// <summary>
+		/// 状态解除回调
+		/// </summary>
+		public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
+
+		#endregion
+
+		/// <summary>
+		/// 死亡回调
+		/// </summary>
+		protected virtual void onDie() { }
+
+		/// <summary>
+		/// 回合结束回调
+		/// </summary>
+		/// <param name="round">回合数</param>
+		public virtual void onRoundEnd(int round) {
 			clearActions();
 
 			processBuffsRoundEnd();
             processStatesRoundEnd();
         }
 
-        /// <summary>
-        /// 处理状态回合结束
-        /// </summary>
-        void processBuffsRoundEnd() {
+		/// <summary>
+		/// 处理状态回合结束
+		/// </summary>
+		void processBuffsRoundEnd() {
             var buffs = this.buffs.ToArray();
 
             for (int i = 0; i < buffs.Length; ++i) {
@@ -2975,9 +3038,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 战斗结束回调
         /// </summary>
-        public virtual void onBattleEnd() {
-
-        }
+        public virtual void onBattleEnd() { }
 
         #endregion
 
@@ -3014,6 +3075,8 @@ namespace ExerPro.EnglishModule.Data {
         public const int DefaultAgile = 5; // 初始敏捷
 
         public const int DefaultGold = 100; // 初始金币
+
+		public const int DefaultEnergy = 3; // 默认能量
 
         const int EnglishSubjectId = 3; // 英语科目ID
 
@@ -3071,9 +3134,17 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 读取金钱
 		/// </summary>
-		/// <param name="gold"></param>
-		public void gainGold(int gold) {
-			this.gold = Math.Max(0, this.gold + gold);
+		/// <param name="val"></param>
+		public void gainGold(int val) {
+			gold = Math.Max(gold + val, 0);
+		}
+
+		/// <summary>
+		/// 添加能量
+		/// </summary>
+		/// <param name="val"></param>
+		public void addEnergy(int val) {
+			energy = Math.Max(energy + val, 0);
 		}
 
 		/// <summary>
@@ -3108,6 +3179,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="card">卡牌</param>
 		public void useCard(ExerProPackCard card) {
 			cardGroup.useCard(card);
+			addEnergy(-card.cost());
 		}
 
 		#region 属性定义
@@ -3141,10 +3213,54 @@ namespace ExerPro.EnglishModule.Data {
 		#region 回调控制
 
 		/// <summary>
+		/// 战斗开始回调
+		/// </summary>
+		public override void onBattleStart() {
+			base.onBattleStart();
+			cardGroup.onBattleStart();
+		}
+
+		/// <summary>
+		/// 回合开始回调
+		/// </summary>
+		public override void onRoundStart(int round) {
+			base.onRoundStart(round);
+			energy = DefaultEnergy;
+		}
+
+		#region 卡牌事件
+
+		/// <summary>
+		/// 卡牌使用回调
+		/// </summary>
+		/// <param name="card">卡牌</param>
+		public virtual void onUseCard(ExerProPackCard card) {
+
+		}
+
+		/// <summary>
+		/// 卡牌丢弃回调
+		/// </summary>
+		/// <param name="card">卡牌</param>
+		public virtual void onDiscardCard(ExerProPackCard card) {
+
+		}
+
+		/// <summary>
+		/// 卡牌消耗回调
+		/// </summary>
+		/// <param name="card">卡牌</param>
+		public virtual void onConsumeCard(ExerProPackCard card) {
+
+		}
+
+		#endregion
+		
+		/// <summary>
 		/// 回合结束回调
 		/// </summary>
-		public override void onRoundEnd() {
-			base.onRoundEnd();
+		public override void onRoundEnd(int round) {
+			base.onRoundEnd(round);
 			cardGroup.onRoundEnd();
 		}
 
@@ -3377,10 +3493,9 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 计算下一步
         /// </summary>
-        public void calcNext(int round, RuntimeActor actor) {
-			Debug.Log("calcNext: " + round + ": " + enemy().name);
-
+        public void calcNext(int round) {
 			RuntimeAction action;
+			var actor = BattleService.get().actor();
             CalcService.EnemyNextCalc.calc(round, this, actor,
                 out _currentEnemyAction, out action);
 			addAction(action);
@@ -3396,11 +3511,32 @@ namespace ExerPro.EnglishModule.Data {
 				isActionEnd = true;
         }
 
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 战斗开始回调
+		/// </summary>
+		public override void onBattleStart() {
+			base.onBattleStart();
+			reset();
+		}
+
+		/// <summary>
+		/// 回合开始回调
+		/// </summary>
+		/// <param name="round"></param>
+		public override void onRoundStart(int round) {
+			base.onRoundStart(round);
+			calcNext(round);
+		}
+
 		/// <summary>
 		/// 回合结束回调
 		/// </summary>
-		public override void onRoundEnd() {
-			base.onRoundEnd();
+		public override void onRoundEnd(int round) {
+			base.onRoundEnd(round);
 			_currentEnemyAction = null;
 		}
 
@@ -3415,7 +3551,6 @@ namespace ExerPro.EnglishModule.Data {
             this.pos = pos;
 
             generatePosition();
-            reset();
         }
 
     }
@@ -3438,7 +3573,6 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 结果
         /// </summary>
-        [AutoConvert]
         public RuntimeActionResult result { get; protected set; } = null;
 
 		/// <summary>
@@ -3450,7 +3584,6 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 是否需要移动到对方位置
 		/// </summary>
-		[AutoConvert]
 		public bool moveToTarget { get; set; } = false;
 
 		/// <summary>
