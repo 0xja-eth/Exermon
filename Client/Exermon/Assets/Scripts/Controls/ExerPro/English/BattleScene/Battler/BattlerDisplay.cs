@@ -38,7 +38,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public const string MovingAttr = "moving";
 		public const string AttackAttr = "attack";
 		public const string HurtAttr = "hurt";
-		public const string DieAttr = "die";
+		public const string DieAttr = "died";
 		//public const string SkillAttr = "skill";
 		//public const string PowerUpAttr = "power_up";
 		//public const string PowerDownAttr = "power_down";

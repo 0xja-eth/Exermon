@@ -93,7 +93,7 @@ namespace ExerPro.EnglishModule.Services {
         protected override void initializeStateDict() {
             base.initializeStateDict();
             addStateDict(State.NotInBattle);
-            addStateDict(State.Answering);
+            addStateDict(State.Answering, updateAnswering);
             addStateDict(State.Drawing, updateDrawing);
             addStateDict(State.Playing);
             addStateDict(State.Discarding, updateDiscarding);
@@ -243,10 +243,19 @@ namespace ExerPro.EnglishModule.Services {
 		/// <summary>
 		/// 判断结果
 		/// </summary>
-		void judgeResult() {
+		void processRoundResult() {
 			if (isActorDeath()) result = Result.Lose;
 			else if (isEnemiesDeath()) result = Result.Win;
 			if (result != Result.None) onBattleEnd();
+			else nextRound();
+		}
+
+		/// <summary>
+		/// 切换到下一回合
+		/// </summary>
+		void nextRound() {
+			round++;
+			changeState(State.Answering);
 		}
 
 		#endregion
@@ -490,9 +499,7 @@ namespace ExerPro.EnglishModule.Services {
 		void onRoundEnd() {
 			resetRoundStates();
 			battlersRoundEnd();
-			judgeResult();
-
-			changeState(State.Answering);
+			processRoundResult();
 		}
 
 		/// <summary>
