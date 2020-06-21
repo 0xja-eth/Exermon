@@ -1657,11 +1657,16 @@ namespace GameModule.Services {
 
 		}
 
+        /// <summary>
+        /// 奖励生成器
+        /// </summary>
         public class RewardGenerator {
             /// <summary>
             /// 奖励卡牌一次生成数量
             /// </summary>
             const int RewardCardNumber = 3;
+
+            int _killEnemyAccmu = 0;
 
             /// <summary>
             /// 获取奖励金币
@@ -1674,6 +1679,7 @@ namespace GameModule.Services {
             /// <returns>奖励金币</returns>
             public static int getGoldReward(ExerProMapNode.Type type, int layer = 0, int enemy = 0, int question = 0) {
                 int randBase = Random.Range(0, 5);
+                rewardGenerator._killEnemyAccmu += enemy;
                 switch (type) {
                     case ExerProMapNode.Type.Enemy:
                         return layer * randBase + enemy * (randBase + 15);
@@ -1686,7 +1692,15 @@ namespace GameModule.Services {
                 }
                 return -1;
             }
-
+            /// <summary>
+            /// boss奖励
+            /// </summary>
+            /// <param name="stageOrder"></param>
+            /// <returns></returns>
+            public static int getBossGoldReward(int stageOrder) {
+                int randBase = Random.Range(35, 40);
+                return stageOrder * randBase;
+            }
             /// <summary>
             /// 获取生成的奖励卡牌组（三挑一）
             /// </summary>
@@ -1707,8 +1721,31 @@ namespace GameModule.Services {
                             exerProCards.Add(rewardGenerator.generateRandomCard(0.35f, 0.4f));
                         }
                         break;
+                    case ExerProMapNode.Type.Boss:
+                        for (int i = 0; i < RewardCardNumber; i++) {
+                            exerProCards.Add(rewardGenerator.generateRandomCard(0f, 0f));
+                        }
+                        break;
                 }
                 return exerProCards;
+            }
+
+            /// <summary>
+            /// 获取当前玩家的积分
+            /// 该函数使用内部杀死敌人记录进行计算，需在获取通关金币奖励后使用
+            /// </summary>
+            /// <param name="layer">层数，即当前节点的xOrder</param>
+            /// <param name="gold">玩家的金币数</param>
+            /// <param name="cards">玩家的卡牌数</param>
+            /// <param name="boss">杀死的boss数</param>
+            /// <returns>当前玩家总的积分</returns>
+            public static int generateScore(int layer = 0, int gold = 0, int cards = 0,
+                int boss = 0, bool isPerfect = false) {
+                var score = rewardGenerator._killEnemyAccmu * 2 + boss * 50;
+                score += layer * 5 + gold / 100 * 25 + (cards > 30 ? (cards - 30) / 5 * 10 : 0);
+                if (isPerfect)
+                    score += 50;
+                return score;
             }
 
             /// <summary>
@@ -1748,8 +1785,7 @@ namespace GameModule.Services {
             /// <param name="cards"></param>
             /// <returns></returns>
             void shuffleCards(List<ExerProCard> cards) {
-                List<ExerProCard> l = new List<ExerProCard>(cards);
-                l.Sort(delegate (ExerProCard a, ExerProCard b) { return Random.Range(-1, 1); });
+                cards.Sort(delegate (ExerProCard a, ExerProCard b) { return Random.Range(-1, 1); });
             }
         }
 

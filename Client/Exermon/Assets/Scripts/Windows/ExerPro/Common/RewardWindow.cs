@@ -18,6 +18,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
     /// </summary>
     public class RewardWindow : BaseWindow {
         const string addMaskFormat = "+{0}";
+        const string scoreFormat = "{0}";
 
         /// <summary>
         /// 外部变量
@@ -38,8 +39,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// </summary>
         bool isConfigured { get; set; } = false;
         ExerProMapNode node { get; set; } = null;
-        int enenyNumber { get; set; } = 0;
-        int questionNumber { get; set; } = 0;
+        EnglishService.RewardInfo rewardInfo { get; set; } = null;
         UnityAction<bool> terminateCallback = null;
         int selectIndex { get; set; } = -1;
 
@@ -58,42 +58,76 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
 
         #region 窗口控制
         /// <summary>
-        /// 开始窗口
+        /// 奖励系统请调用该接口
         /// </summary>
-        public override void startWindow() {
-            if (!isConfigured)
-                return;
+        /// <param name="rewardInfo">通过EnglishService的rewardInfo获取</param>
+        public void startWindow(EnglishService.RewardInfo rewardInfo) {
+            base.startWindow();
+            node = engServ.record.currentNode();
+            terminateCallback = engServ.exitNode;
+            this.rewardInfo = rewardInfo;
+
             configureMarks();
             configureCardDisplay();
             confirm.gameObject.SetActive(false);
-            base.startWindow();
+
+            if((ExerProMapNode.Type)node.typeId == ExerProMapNode.Type.Boss) {
+                configureBoss();
+            }
         }
         
+        /// <summary>
+        /// 用于剧情奖励，直接设定奖励情况
+        /// </summary>
+        /// <param name="gold"></param>
+        public void startWindow(int gold) {
+            base.startWindow();
+
+        }
         /// <summary>
         /// 配置分数
         /// </summary>
         void configureMarks() {
+            configureGold();
+            configureScore();
+        }
+        
+        /// <summary>
+        /// 配置金币奖励
+        /// </summary>
+        void configureGold() {
             int gold = 0;
             switch ((ExerProMapNode.Type)node.typeId) {
                 case ExerProMapNode.Type.Enemy:
-                    gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId, 
-                        node.xOrder, enemy: this.enenyNumber);
+                    gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
+                        node.xOrder + 1, enemy: rewardInfo.killEnemyNumber);
                     break;
                 case ExerProMapNode.Type.Elite:
                     gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
-                        enemy: this.enenyNumber);
+                        enemy: rewardInfo.killEnemyNumber);
                     break;
                 case ExerProMapNode.Type.Story:
                 case ExerProMapNode.Type.Treasure:
                     gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
-                        node.xOrder, question:this.questionNumber);
+                        node.xOrder + 1, question: rewardInfo.correctQuestionNumber);
+                    break;
+                case ExerProMapNode.Type.Boss:
+                    gold = CalcService.RewardGenerator.getBossGoldReward(engServ.record.stageOrder + 1);
                     break;
             }
             this.gold.text = string.Format(addMaskFormat, gold);
-
-            this.integral.text = string.Format(addMaskFormat, 100);
         }
-        
+
+        /// <summary>
+        /// 配置积分
+        /// </summary>
+        void configureScore() {
+            var actor = engServ.record.actor;
+            int score = CalcService.RewardGenerator.generateScore(node.xOrder + 1, actor.gold,
+                    actor.cardGroup.getCardNumber(), rewardInfo.killBossNumber, rewardInfo.isPerfect);
+            integral.text = string.Format(scoreFormat, score);
+        }
+
         /// <summary>
         /// 配置卡牌
         /// </summary>
@@ -105,19 +139,11 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         }
 
         /// <summary>
-        /// 启用该窗口必须先进行参数配置
+        /// 配置Boss点的情况
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="enenyNumber"></param>
-        /// <param name="questionNumber"></param>
-        /// <param name="terminateCallback"></param>
-        public void configure(ExerProMapNode node, int enenyNumber = 0,
-            int questionNumber = 0, UnityAction<bool> terminateCallback = null) {
-            this.node = node;
-            this.enenyNumber = enenyNumber;
-            this.questionNumber = questionNumber;
-            this.terminateCallback = terminateCallback;
-            this.isConfigured = true;
+        void configureBoss() {
+            var actor = engServ.record.actor;
+            actor.changeHP(actor.mhp());
         }
 
         /// <summary>

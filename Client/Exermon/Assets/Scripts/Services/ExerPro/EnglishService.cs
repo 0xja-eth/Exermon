@@ -130,7 +130,7 @@ namespace ExerPro.EnglishModule.Services {
             ExerProStart, ExerProSave,
             QuestionGenerate, QuestionGet,
             WordGenerate, WordAnswer, WordGet, WordQuery,
-            WordRecordGet, GetRank, 
+            WordRecordGet, GetRank,
         }
 
         /// <summary>
@@ -799,14 +799,24 @@ namespace ExerPro.EnglishModule.Services {
         /// <summary>
         /// 调用奖励结算界面
         /// 调用该方法会自动调用exitNode
+        /// 调用该方法前，首先把场景中结算的按钮setFalse，避免用户重复点击
+        /// 可参考PhraseScene中的onSubmit
         /// </summary>
-        /// <param name="window"></param>
-        /// <param name="enemyNumber"></param>
-        /// <param name="questionNumber"></param>
-        public void startRewardWindow(RewardWindow window, int enemyNumber = 0, int questionNumber = 0) {
-            var node = record.currentNode();
-            window.configure(node, enemyNumber, questionNumber, exitNode);
-            window.startWindow();
+        /// <param name="enemyNumber">杀死敌人数量</param>
+        /// <param name="questionNumber">答对题目数量</param>
+        public void processReward(int enemyNumber = 0, int questionNumber = 0, int bossNumber = 0) {
+            bool isPerfect = false;
+            if (bossNumber > 0) {
+                var actor = record.actor;
+                if (actor.hp == actor.mhp())
+                    isPerfect = true;
+            }
+            rewardInfo = new RewardInfo(enemyNumber, questionNumber, bossNumber, isPerfect);
+        }
+
+
+        public void processPlotReward() {
+
         }
 
         /// <summary>
@@ -1032,6 +1042,59 @@ namespace ExerPro.EnglishModule.Services {
         }
 
         #endregion
+
+        #endregion
+
+        #region 奖励系统
+
+        public class RewardInfo {
+
+            /// <summary>
+            /// 杀死敌人数量
+            /// </summary>
+            public int killEnemyNumber { get; set; } = 0;
+            /// <summary>
+            /// 答对题目数量
+            /// </summary>
+            public int correctQuestionNumber { get; set; } = 0;
+
+            /// <summary>
+            /// Boss数据
+            /// </summary>
+            public int killBossNumber { get; set; } = 0;
+            public bool isPerfect { get; set; } = false;
+
+            public RewardInfo(int enemyNumber = 0, int questionNumber = 0, int killBossNumber = 0, bool isPerfect = false) {
+                this.killEnemyNumber = enemyNumber;
+                this.correctQuestionNumber = questionNumber;
+                this.killBossNumber = killBossNumber;
+                this.isPerfect = isPerfect;
+            }
+
+            public RewardInfo() { }
+        }
+
+        /// <summary>
+        /// 奖励信息储存接口
+        /// 需要进行奖励结算的场景请在update中获取该变量判定是否为null来决定是否显示奖励窗口
+        /// 获取后该变量重置为null
+        /// 举例：
+        /// var rewardInfo = engServ.rewardInfo;
+        /// if(rewardInf0 != null)
+        /// {   rewardWindow.startWindow(rewardInfo);   }
+        /// 参考PhraseScene
+        /// </summary>
+        RewardInfo _rewardInfo = null;
+        public RewardInfo rewardInfo {
+            get {
+                var res = _rewardInfo;
+                _rewardInfo = null;
+                return res;
+            }
+            set {
+                _rewardInfo = value;
+            }
+        }
 
         #endregion
     }

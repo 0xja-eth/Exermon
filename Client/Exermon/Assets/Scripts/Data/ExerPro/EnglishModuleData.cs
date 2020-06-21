@@ -1123,6 +1123,13 @@ namespace ExerPro.EnglishModule.Data {
             drawGroup.cardGroup = discardGroup.cardGroup = handGroup.cardGroup = this;
         }
 
+        /// <summary>
+        /// 获取玩家卡组数目接口
+        /// </summary>
+        /// <returns></returns>
+        public int getCardNumber() {
+            return 35;
+        }
     }
 
 	/// <summary>
