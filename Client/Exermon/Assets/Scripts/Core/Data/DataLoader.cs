@@ -313,70 +313,76 @@ namespace Core.Data.Loaders {
         /// <param name="format">转化格式</param>
         /// <returns>JsonData</returns>
         public static JsonData convert<T>(T data, string format = "") {
-            return convert(typeof(T), data, format);
-        }
-        /// <param name="type">类型</param>
-        public static JsonData convert(Type type, object data, string format = "") {
-            if (data == null) return null;
+	        return convert(typeof(T), data, format);
+		}
+		/// <param name="type">类型</param>
+		public static JsonData convert(Type type, object data, string format = "") {
+			if (data == null) return null;
+			try {
 
-            format = format.ToLower();
-            bool isArray = false;
-            Type eleType = null;
+				format = format.ToLower();
+				bool isArray = false;
+				Type eleType = null;
 
-            // 处理数组情况
-            if (isArray = type.IsArray)
-                eleType = type.GetElementType();
-            //else if (isArray = (type.Name == typeof(List<>).Name))
-            //    eleType = type.GetGenericArguments()[0];
-            else {
-                // 处理列表情况
-                var interfaces = type.GetInterfaces();
-                foreach (var interf in interfaces)
-                    if (interf.Name == typeof(ICollection<>).Name) {
-                        eleType = type.GetGenericArguments()[0];
-                        isArray = true; break;
-                    }
-            }
+				// 处理数组情况
+				if (isArray = type.IsArray)
+					eleType = type.GetElementType();
+				//else if (isArray = (type.Name == typeof(List<>).Name))
+				//    eleType = type.GetGenericArguments()[0];
+				else {
+					// 处理列表情况
+					var interfaces = type.GetInterfaces();
+					foreach (var interf in interfaces)
+						if (interf.Name == typeof(ICollection<>).Name) {
+							eleType = type.GetGenericArguments()[0];
+							isArray = true; break;
+						}
+				}
 
-            if (isArray) {
-                var array = (IEnumerable)data;
-                var json = new JsonData();
-                json.SetJsonType(JsonType.Array);
-                foreach (var d in array)
-                    json.Add(convert(eleType, d, format));
-                return json;
-            }
+				if (isArray) {
+					var array = (IEnumerable)data;
+					var json = new JsonData();
+					json.SetJsonType(JsonType.Array);
+					foreach (var d in array)
+						json.Add(convert(eleType, d, format));
+					return json;
+				}
 
-            // 处理特殊类型
-            if (type == typeof(Color)) return convertColor((Color)data);
-            if (type == typeof(DateTime) && format == "date") return convertDate((DateTime)data);
-            if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
-            if (type == typeof(Tuple<int, string>)) return convertTuple((Tuple<int, string>)data);
-            if (type == typeof(Texture2D)) return convertTexture2D(data as Texture2D);
-            if (type == typeof(AudioClip)) return convertAudioClip(data as AudioClip);
+				// 处理特殊类型
+				if (type == typeof(Color)) return convertColor((Color)data);
+				if (type == typeof(DateTime) && format == "date") return convertDate((DateTime)data);
+				if (type == typeof(DateTime)) return convertDateTime((DateTime)data);
+				if (type == typeof(Tuple<int, string>)) return convertTuple((Tuple<int, string>)data);
+				if (type == typeof(Texture2D)) return convertTexture2D(data as Texture2D);
+				if (type == typeof(AudioClip)) return convertAudioClip(data as AudioClip);
 
-            if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData))
-                return convertData(data as BaseData);
+				if (type.IsSubclassOf(typeof(BaseData)) || type == typeof(BaseData))
+					return convertData(data as BaseData);
 
-            // 处理基本类型
-            if (type == typeof(int)) return (int)data;
-            if (type == typeof(double)) return (double)data;
-            if (type == typeof(float)) return (double)data;
-            if (type == typeof(string)) return (string)data;
-            if (type == typeof(bool)) return (bool)data;
+				// 处理基本类型
+				if (type == typeof(int)) return (int)data;
+				if (type == typeof(double)) return (double)data;
+				if (type == typeof(float)) return (double)data;
+				if (type == typeof(string)) return (string)data;
+				if (type == typeof(bool)) return (bool)data;
 
-            // 其他情况下，直接返回即可
-            return data as JsonData;
-        }
+				// 其他情况下，直接返回即可
+				return data as JsonData;
+			} catch (Exception e) {
+				Debug.LogError(e.StackTrace + "\n\nError (convert type: " 
+					+ type + ") in covnerting " + data);
+				throw new Exception();
+			}
+		}
 
-        #region 具体转化函数
+		#region 具体转化函数
 
-        /// <summary>
-        /// 加载颜色
-        /// </summary>
-        /// <param name="json">数据</param>
-        /// <returns>加载的颜色</returns>
-        static JsonData convertColor(Color c) {
+		/// <summary>
+		/// 加载颜色
+		/// </summary>
+		/// <param name="json">数据</param>
+		/// <returns>加载的颜色</returns>
+		static JsonData convertColor(Color c) {
             return SceneUtils.color2Str(c);
         }
 

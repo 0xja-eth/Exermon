@@ -1024,55 +1024,67 @@ namespace GameModule.Services {
             /// 行动
             /// </summary>
             ExerPro.EnglishModule.Data.RuntimeAction action;
-            RuntimeActionResult result;
+            RuntimeActionResult[] results;
 
-            RuntimeBattler subject, object_;
+			RuntimeBattler subject;
+			RuntimeBattler[] objects;
 
             List<RuntimeActionResult.StateChange> stateChanges = 
 				new List<RuntimeActionResult.StateChange>();
             List<RuntimeBuff> addBuffs = new List<RuntimeBuff>();
 
-            /// <summary>
-            /// 生成
-            /// </summary>
-            /// <param name="action">行动</param>
-            /// <returns>返回结果</returns>
-            public static RuntimeActionResult generate(
+			RuntimeBattler object_;
+			RuntimeActionResult result;
+
+			/// <summary>
+			/// 生成
+			/// </summary>
+			/// <param name="action">行动</param>
+			/// <returns>返回结果</returns>
+			public static RuntimeActionResult[] generate(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
                 var generator = new ExerProActionResultGenerator(action);
-                return generator.result;
+                return generator.results;
             }
 
             /// <summary>
             /// 构造函数
             /// </summary>
             /// <param name="action">行动</param>
-            ExerProActionResultGenerator(
-                ExerPro.EnglishModule.Data.RuntimeAction action) {
+            ExerProActionResultGenerator(ExerPro.EnglishModule.Data.RuntimeAction action) {
                 this.action = action;
 				subject = action.subject;
-				object_ = action.object_;
-				result = new RuntimeActionResult(action);
+				objects = action.objects;
+
+				var cnt = objects.Length;
+				results = new RuntimeActionResult[cnt];
 
 				//Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
 
-				_generate(); _setup();
-            }
+				for(int i=0;i< cnt; ++i) {
+					_generate(objects[i], out results[i]);
+					_setup(results[i]);
+				}
+			}
 
             /// <summary>
             /// 生成
             /// </summary>
-            void _generate() {
+            void _generate(RuntimeBattler object_, out RuntimeActionResult result) {
+				result = new RuntimeActionResult(object_, action);
+				this.object_ = object_; this.result = result;
                 foreach (var effect in action.effects) processEffect(effect);
             }
 
             /// <summary>
             /// 配置结果
             /// </summary>
-            void _setup() {
+            void _setup(RuntimeActionResult result) {
                 result.stateChanges = stateChanges.ToArray();
                 result.addBuffs = addBuffs.ToArray();
-            }
+				stateChanges.Clear();
+				addBuffs.Clear();
+			}
 
             /// <summary>
             /// 处理效果
@@ -1205,8 +1217,7 @@ namespace GameModule.Services {
                 if (actor == null) return;
 
                 var hand = actor.cardGroup.handGroup;
-                var cnt = hand.countItems(card =>
-                    card.item().name.Contains(SlashStr));
+                var cnt = hand.countItems(card => card.item().name.Contains(SlashStr));
 
                 processDamage(a + b * cnt);
             }
@@ -1300,7 +1311,7 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="count">数量</param>
             void drawCards(int count) {
-                result.drawCardCnt = count;
+				result.drawCardCnt = count;
             }
 
             /// <summary>
@@ -1310,7 +1321,7 @@ namespace GameModule.Services {
             /// <param name="show">是否显示并选择</param>
             void consumeCards(int count, bool select = true) {
                 result.consumeCardCnt = count;
-                result.consumeSelect = select;
+				result.consumeSelect = select;
             }
 
         }

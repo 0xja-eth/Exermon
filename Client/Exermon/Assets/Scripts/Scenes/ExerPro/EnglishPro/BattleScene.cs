@@ -59,6 +59,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
             base.initializeSystems();
             engSer = EnglishService.get();
 			battleSer = BattleService.get();
+			battleSer.onStateChanged = onStateChanged;
 		}
 
         /// <summary>
@@ -73,23 +74,31 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
         /// 开始
         /// </summary>
         protected override void start() {
-            base.start();
+			base.start();
 			battleGround.setItems(battleSer.battlers());
 			refreshStatus();
 		}
 
-        #endregion
+		/// <summary>
+		/// 销毁回调
+		/// </summary>
+		private void OnDestroy() {
+			battleSer.onStateChanged = null;
+		}
 
-        #region 更新控制
+		#endregion
 
-        /// <summary>
-        /// 更新
-        /// </summary>
-        protected override void update() {
+		#region 更新控制
+
+		/// <summary>
+		/// 更新
+		/// </summary>
+		protected override void update() {
             base.update();
-			if (battleSer.isStateChanged())
-				onStateChanged();
 			battleSer?.update();
+			/*
+			if (battleSer.isStateChanged())
+				onStateChanged();*/
 		}
 
 		#endregion
@@ -100,7 +109,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		/// 状态改变回调
 		/// </summary>
 		void onStateChanged() {
-			Debug.Log((BattleService.State)battleSer.state);
+			Debug.Log("BattleScene.onStateChanged: " + (BattleService.State)battleSer.state);
 			switch ((BattleService.State)battleSer.state) {
 				case BattleService.State.Answering: onAnswer(); break;
 				case BattleService.State.Drawing: onDraw(); break;

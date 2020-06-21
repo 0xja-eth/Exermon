@@ -230,7 +230,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// <param name="name">变量名</param>
         /// <param name="val">值</param>
         public void setVar<T>(string name, T val) {
-            Debug.Log("setVar: " + typeof(T) + ": " + val);
+            Debug.Log("setVar: " + name + "(" + typeof(T) + "): " + val);
             if (typeof(T) == typeof(bool))
                 animator.SetBool(name, (bool)(object)val);
             else if (typeof(T) == typeof(int))

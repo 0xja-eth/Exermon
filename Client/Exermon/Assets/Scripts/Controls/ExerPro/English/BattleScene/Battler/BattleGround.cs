@@ -33,7 +33,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 位置定义
 		/// </summary>
-		static readonly Vector2 ActorPos = new Vector2(-0.35f, 0);
+		static readonly Vector2 ActorPos = new Vector2(-0.3f, 0);
 		static readonly Vector2[] EnemiesPos = new Vector2[MaxEnemyCols * MaxEnemyRows] {
 			new Vector2(0.3f, 0.25f), new Vector2(0.2f, 0.25f), new Vector2(0.1f, 0.25f), // 4, 5, 6
 			new Vector2(0.35f, 0), new Vector2(0.25f, 0), new Vector2(0.15f, 0), // 1, 2, 3
@@ -95,6 +95,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <returns>返回对应的显示控件</returns>
 		public BattlerDisplay getBattlerDisplay(RuntimeBattler battler) {
 			return subViews.Find(display => display.getItem() == battler) as BattlerDisplay;
+		}
+		public BattlerDisplay[] getBattlerDisplays(RuntimeBattler[] battlers) {
+			var cnt = battlers.Length;
+			var res = new BattlerDisplay[cnt];
+			for (int i = 0; i < cnt; ++i)
+				res[i] = getBattlerDisplay(battlers[i]);
+			return res;
 		}
 
 		#endregion

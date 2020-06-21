@@ -143,7 +143,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="action"></param>
 		protected virtual void processAction(RuntimeAction action) {
-			//Debug.Log("processAction + " + action.toJson().ToJson());
+			Debug.Log(name + ": processAction + " + action.toJson().ToJson());
 
 			actionManager()?.add(action);
 
@@ -348,6 +348,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
+		/// 获取原始位置
+		/// </summary>
+		/// <returns></returns>
+		public Vector2 getOriPosition() {
+			return oriPosition;
+		}
+
+		/// <summary>
 		/// 重置位置
 		/// </summary>
 		public void resetPosition() {
@@ -532,12 +540,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item">题目</param>
 		protected override void drawExactlyItem(RuntimeBattler item) {
             base.drawExactlyItem(item);
-			hpBar?.setValue(item, "hp");
 
 			var battle = item.getBattlePicture();
 			this.battle.gameObject.SetActive(true);
 			this.battle.overrideSprite = AssetLoader.generateSprite(battle);
 			this.battle.SetNativeSize();
+
+			if (hpBar) {
+				hpBar.setValue(item, "hp");
+				hpBar.gameObject.SetActive(!item.isDead());
+			}
 		}
 
 		/// <summary>
@@ -545,7 +557,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		protected override void drawEmptyItem() {
             battle.gameObject.SetActive(false);
-			hpBar?.clearValue();
+			if (hpBar) {
+				hpBar.gameObject.SetActive(false);
+				hpBar.clearValue();
+			}
 		}
 
 		/// <summary>

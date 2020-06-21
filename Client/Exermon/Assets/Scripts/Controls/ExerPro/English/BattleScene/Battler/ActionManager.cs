@@ -30,7 +30,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			/// <summary>
 			/// 使用者，目标
 			/// </summary>
-			public BattlerDisplay subject, object_;
+			public BattlerDisplay subject;
+			public BattlerDisplay[] objects;
 
 			/// <summary>
 			/// 行动
@@ -41,10 +42,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			/// 构造函数
 			/// </summary>
 			public Item(RuntimeAction action, 
-				BattlerDisplay subject, BattlerDisplay object_) {
+				BattlerDisplay subject, BattlerDisplay[] objects) {
 				this.action = action;
 				this.subject = subject;
-				this.object_ = object_;
+				this.objects = objects;
 			}
 
 		}
@@ -91,10 +92,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			Debug.Log("updateAction: " + item?.subject?.name);
 
 			var subject = item.subject;
-			var target = item.object_;
+			var targets = item.objects;
 
 			if (subject.isHit()) hit(item);
-			if (target.isResult()) end(item);
+			foreach(var target in targets)
+				if (target.isResult()) end(item);
 		}
 
 		#endregion
@@ -107,12 +109,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="action">行动</param>
 		public void add(RuntimeAction action) {
 			var subject = battleGround.getBattlerDisplay(action.subject);
-			var object_ = battleGround.getBattlerDisplay(action.object_);
+			var objects = battleGround.getBattlerDisplays(action.objects);
 			var startAni = action.startAni ?? defaultStartAni;
 
-			Debug.Log("add: " + subject + ", " + object_);
+			Debug.Log("add: " + subject + ", " + objects);
 
-			actionItems.Add(new Item(action, subject, object_));
+			actionItems.Add(new Item(action, subject, objects));
 
 			subject.setupStartAni(startAni);
 		}
@@ -123,8 +125,31 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="battler"></param>
 		/// <returns></returns>
 		public BattlerDisplay getTarget(BattlerDisplay battler) {
+			var targets = getTargets(battler);
+			if (targets.Length <= 0) return null;
+			return targets[0];
+		}
+		public BattlerDisplay[] getTargets(BattlerDisplay battler) {
 			var item = actionItems.Find(item_ => item_.subject == battler);
-			return item.object_;
+			return item.objects;
+		}
+
+		/// <summary>
+		/// 获取攻击占位
+		/// </summary>
+		/// <param name="battler">战斗者</param>
+		/// <returns></returns>
+		public Vector2 getAttackPosition(BattlerDisplay battler) {
+			var targets = getTargets(battler);
+			var cnt = targets.Length;
+
+			if (cnt <= 0) return battler.getOriPosition();
+
+			var res = targets[0].beAttackedPosition();
+			for (int i = 1; i < cnt; ++i)
+				res += targets[i].beAttackedPosition();
+
+			return res / cnt;
 		}
 
 		/// <summary>
@@ -133,9 +158,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item"></param>
 		void hit(Item item) {
 			Debug.Log("Hit: " + item.subject.name);
-			var target = item.object_;
+			var targets = item.objects;
 			var ani = item.action.targetAni ?? defaultTargetAni;
-			target.setupTargetAni(ani); target.hurt();
+
+			foreach(var target in targets) {
+				target.setupTargetAni(ani); target.hurt();
+			}
 		}
 
 		/// <summary>
@@ -145,6 +173,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void end(Item item) {
 			Debug.Log("End: " + item.subject.name);
 			item.action.subject.processAction(item.action);
+			item.action.subject.onActionEnd(item.action);
 			actionItems.Remove(item);
 		}
 

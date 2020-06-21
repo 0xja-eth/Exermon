@@ -2252,7 +2252,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 状态和BUFF
         /// </summary>
-        [AutoConvert]
+        //[AutoConvert]
         public Dictionary<int, RuntimeState> states { get; protected set; } = new Dictionary<int, RuntimeState>();
         [AutoConvert]
         public List<RuntimeBuff> buffs { get; protected set; } = new List<RuntimeBuff>();
@@ -2288,6 +2288,47 @@ namespace ExerPro.EnglishModule.Data {
 
             return res;
         }
+
+		#endregion
+
+		#region 数据读取
+
+		/// <summary>
+		/// 读取自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+
+			this.states.Clear();
+
+			var states = DataLoader.load(json, "states");
+
+			if (states != null) {
+				Debug.Log("Load states: " + states.ToJson());
+				foreach (KeyValuePair<string, JsonData> pair in states) {
+					var key = int.Parse(pair.Key);
+					var data = DataLoader.load<RuntimeState>(pair.Value);
+					Debug.Log("Load states: " + key + ", " + data);
+					this.states.Add(key, data);
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// 转化自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void convertCustomAttributes(ref JsonData json) {
+			base.convertCustomAttributes(ref json);
+			var states = new JsonData();
+
+			foreach (var pair in this.states) 
+				states[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+
+			json["states"] = states;
+		}
 
 		#endregion
 
@@ -2922,17 +2963,10 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		public virtual void processAction(RuntimeAction action) {
 			if (!isMovableState()) return;
-			action.generateResult();
-			action.object_.applyResult(action.result);
+			action.generateResults();
+			foreach(var obj in action.objects)
+				obj.applyResult(action.result(obj));
 		}
-
-		///// <summary>
-		///// 结束当前行动
-		///// </summary>
-		//public virtual void endAction() {
-		//	if (actions.Count <= 0) return;
-		//	actions.Dequeue();
-		//}
 
 		/// <summary>
 		/// 清除所有行动
@@ -2991,6 +3025,11 @@ namespace ExerPro.EnglishModule.Data {
 		public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
 
 		#endregion
+
+		/// <summary>
+		/// 当前行动结束回调
+		/// </summary>
+		public virtual void onActionEnd(RuntimeAction action) { }
 
 		/// <summary>
 		/// 死亡回调
@@ -3475,14 +3514,6 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		/// <summary>
-		/// 处理行动
-		/// </summary>
-		public override void processAction(RuntimeAction action) {
-			base.processAction(action);
-			isActionEnd = true;
-		}
-
-		/// <summary>
 		/// 更新行动
 		/// </summary>
 		public bool updateAction() {
@@ -3505,11 +3536,10 @@ namespace ExerPro.EnglishModule.Data {
         /// 处理敌人行动
         /// </summary>
         public void processEnemyAction() {
+			if (!isActionStarted && (_currentEnemyAction == null || 
+				_currentEnemyAction.isUnset())) isActionEnd = true;
 			isActionStarted = true;
-			if (_currentEnemyAction == null || 
-				_currentEnemyAction.isUnset())
-				isActionEnd = true;
-        }
+		}
 
 		#endregion
 
@@ -3529,7 +3559,16 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="round"></param>
 		public override void onRoundStart(int round) {
 			base.onRoundStart(round);
+			isActionStarted = isActionEnd = false;
 			calcNext(round);
+		}
+
+		/// <summary>
+		/// 行动结束回调
+		/// </summary>
+		public override void onActionEnd(RuntimeAction action) {
+			base.onActionEnd(action);
+			isActionEnd = true;
 		}
 
 		/// <summary>
@@ -3566,14 +3605,14 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public RuntimeBattler subject { get; protected set; } // 主体
         [AutoConvert]
-        public RuntimeBattler object_ { get; protected set; } // 对象
+        public RuntimeBattler[] objects { get; protected set; } // 对象
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; } // 效果
 
         /// <summary>
         /// 结果
         /// </summary>
-        public RuntimeActionResult result { get; protected set; } = null;
+        public RuntimeActionResult[] results { get; protected set; } = null;
 
 		/// <summary>
 		/// 起手动画/目标动画
@@ -3587,11 +3626,22 @@ namespace ExerPro.EnglishModule.Data {
 		public bool moveToTarget { get; set; } = false;
 
 		/// <summary>
+		/// 获取对应战斗者的结果
+		/// </summary>
+		/// <param name="battler">战斗者</param>
+		/// <returns></returns>
+		public RuntimeActionResult result(RuntimeBattler battler) {
+			foreach (var result in results)
+				if (result.object_ == battler) return result;
+			return null;
+		}
+
+		/// <summary>
 		/// 生成结果
 		/// </summary>
-		public void generateResult() {
+		public void generateResults() {
             // TODO: 结果生成
-            result = CalcService.ExerProActionResultGenerator.generate(this);
+            results = CalcService.ExerProActionResultGenerator.generate(this);
         }
 
 		/// <summary>
@@ -3599,25 +3649,34 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		public RuntimeAction() { }
 		public RuntimeAction(RuntimeBattler subject,
-			RuntimeBattler object_, ExerProEffectData[] effects = null,
+			RuntimeBattler[] object_, ExerProEffectData[] effects = null,
 			AnimationClip startAni = null, AnimationClip targetAni = null,
 			bool moveToTarget = false) {
 
-			this.subject = subject; this.object_ = object_;
+			this.subject = subject; this.objects = object_;
 			this.startAni = startAni; this.targetAni = targetAni;
 			this.effects = effects ?? new ExerProEffectData[0];
 			this.moveToTarget = moveToTarget;
 		}
 		public RuntimeAction(RuntimeBattler subject,
-            RuntimeBattler object_, BaseExerProItem item) :
+			RuntimeBattler object_, ExerProEffectData[] effects = null,
+			AnimationClip startAni = null, AnimationClip targetAni = null,
+			bool moveToTarget = false) : this(subject, 
+				new RuntimeBattler[] { object_ }, effects, 
+				startAni, targetAni, moveToTarget) { }
+		public RuntimeAction(RuntimeBattler subject,
+            RuntimeBattler[] object_, BaseExerProItem item) :
             this(subject, object_, item.effects,
 				item.startAni, item.targetAni) { }
-    }
+		public RuntimeAction(RuntimeBattler subject,
+			RuntimeBattler object_, BaseExerProItem item) : 
+			this(subject, new RuntimeBattler[] { object_ }, item) { }
+	}
 
-    /// <summary>
-    /// 运行时行动结果
-    /// </summary>
-    public class RuntimeActionResult : BaseData {
+	/// <summary>
+	/// 运行时行动结果
+	/// </summary>
+	public class RuntimeActionResult : BaseData {
 
         /// <summary>
         /// 状态改变
@@ -3666,19 +3725,24 @@ namespace ExerPro.EnglishModule.Data {
         public int consumeCardCnt { get; set; } // 消耗牌数量
         [AutoConvert]
         public bool consumeSelect { get; set; } // 消耗是否可选
-        
-        /// <summary>
-        /// 行动
-        /// </summary>
-        public RuntimeAction action { get; protected set; }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public RuntimeActionResult() { }
-        public RuntimeActionResult(RuntimeAction action) {
-            this.action = action;
-        }
+		/// <summary>
+		/// 行动
+		/// </summary>
+		public RuntimeAction action { get; protected set; }
+
+		/// <summary>
+		/// 所属目标
+		/// </summary>
+		public RuntimeBattler object_ { get; protected set; }
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public RuntimeActionResult() { }
+        public RuntimeActionResult(RuntimeBattler object_, RuntimeAction action) {
+			this.object_ = object_; this.action = action;
+		}
     }
 
     #endregion

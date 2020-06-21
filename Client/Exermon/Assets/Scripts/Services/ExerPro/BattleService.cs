@@ -450,8 +450,9 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="targets">目标</param>
 		public void use(ExerProEffectData[] effects, List<RuntimeBattler> targets) {
 			var actor = this.actor();
-			foreach (var target in targets)
-				actor.addAction(new RuntimeAction(actor, target, effects));
+			actor.addAction(new RuntimeAction(actor, targets.ToArray(), effects));
+			//foreach (var target in targets)
+			//	actor.addAction(new RuntimeAction(actor, target, effects));
 		}
 
 		#endregion
