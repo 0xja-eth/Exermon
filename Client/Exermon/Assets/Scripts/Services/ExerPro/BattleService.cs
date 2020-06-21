@@ -171,17 +171,19 @@ namespace ExerPro.EnglishModule.Services {
         /// 开始配置
         /// </summary>
         void setup(ExerProMapNode.Type type) {
-			round = 1;
+			round = 1; result = Result.None;
 			record = engSer.record;
-			result = Result.None;
+
+			_cardGroup = actor().cardGroup;
+
 			generateEnemies(type);
 		}
 
-        /// <summary>
-        /// 生成敌人
-        /// </summary>
-        /// <param name="type"></param>
-        void generateEnemies(ExerProMapNode.Type type) {
+		/// <summary>
+		/// 生成敌人
+		/// </summary>
+		/// <param name="type"></param>
+		void generateEnemies(ExerProMapNode.Type type) {
             var stage = record.stage();
             _enemies = CalcService.BattleEnemiesGenerator.
                 generate(actor(), stage, type);
