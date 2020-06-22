@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using GameModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
     /// <summary>
@@ -24,5 +25,19 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
             description.text = item.description;
         }
 
+        protected override void drawPrice(ExerProCard item) {
+            if (price == 0) {
+                price = CalcService.ExerProItemGenerator.generateCardPrice(item);
+                item.gold = price;
+            }
+            if (price > 0) {
+                priceText.text = price.ToString();
+                setPriceTag(goldTag);
+            }
+            else {
+                priceText.text = "";
+                setPriceTag(null);
+            }
+        }
     }
 }

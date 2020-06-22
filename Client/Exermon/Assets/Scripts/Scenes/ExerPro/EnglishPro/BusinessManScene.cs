@@ -65,6 +65,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene {
 
         public override void popScene() {
             engSer.exitNode();
+            shopWindow.terminateWindow();
         }
         #endregion
 

@@ -504,14 +504,17 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
         public int starId { get; protected set; }
         [AutoConvert]
-        public int gold { get; protected set; }
-        [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
+        
+        /// <summary>
+        /// 物品价格，仅用于商店处的临时储存
+        /// </summary>
+        public int gold { get; set; }
 
-		/// <summary>
-		/// 物品图标
-		/// </summary>
-		public Sprite icon { get; protected set; }
+        /// <summary>
+        /// 物品图标
+        /// </summary>
+        public Sprite icon { get; protected set; }
 
 		/// <summary>
 		/// 读取函数

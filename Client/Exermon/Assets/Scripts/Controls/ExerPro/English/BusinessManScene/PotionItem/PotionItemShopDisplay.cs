@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ExerPro.EnglishModule.Data;
-using Core.Data.Loaders;
 using UI.Common.Controls.ItemDisplays;
+using GameModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
     public class PotionItemShopDisplay : ShopDisplay<ExerProPotion> {
@@ -10,6 +10,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
         /// 外部组件设置
         /// </summary>
         public PotionItemDetail potionItemDetail;
+
+        /// <summary>
+        /// 内部变量
+        /// </summary>
+        const int PotionNumberOnce = 3;
 
         /// <summary>
         /// 物品详情控件
@@ -36,13 +41,14 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
             base.startView();
             itemDetail.startView();
             if (shopItems == null || shopItems.Length == 0) {
-                var d = dataSer.staticData.data.exerProPotions;
-
-                //LitJson.JsonData data = new LitJson.JsonData();
-                //data["gold"] = 1;
-                //data["starId"] = 1;
-                //d = DataLoader.load(d, data);
-                setItems(d);
+                var stageOrder = engSer.record.stageOrder;
+                var items = CalcService.ExerProItemGenerator.generateBusinessItem(
+                    PotionNumberOnce, stageOrder, CalcService.ExerProItemGenerator.Type.Potion);
+                ExerProPotion[] exerProPotions = new ExerProPotion[items.Count];
+                for (int i = 0; i < items.Count; i++) {
+                    exerProPotions[i] = items[i] as ExerProPotion;
+                }
+                setItems(exerProPotions);
             }
             else
                 setItems(shopItems);

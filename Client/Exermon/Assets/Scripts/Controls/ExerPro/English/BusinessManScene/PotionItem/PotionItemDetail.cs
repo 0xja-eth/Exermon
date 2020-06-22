@@ -4,16 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Core.Data.Loaders;
-
-using ItemModule.Data;
-using ItemModule.Services;
-
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
-using UI.ShopScene.Windows;
 using ExerPro.EnglishModule.Data;
+using GameModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
@@ -96,11 +91,10 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// <param name="obj"></param>
         string generatePriceText() {
             var price = shopItem.gold;
-            var res = new List<string>();
             if (price > 0)
-                res.Add(string.Format(GoldPriceFormat, price));
-
-            return string.Join("\n", res);
+                return (string.Format(GoldPriceFormat, price));
+            else
+                return "";
         }
 
         /// <summary>
