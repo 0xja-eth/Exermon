@@ -773,7 +773,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 精英据点
         /// </summary>
         void onEliteNode() {
-            sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+            onListenNode();
         }
 
         /// <summary>

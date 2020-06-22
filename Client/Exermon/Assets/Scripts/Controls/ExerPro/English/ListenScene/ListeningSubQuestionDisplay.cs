@@ -24,88 +24,85 @@ namespace Assets.Scripts.Controls.ExerPro.English.ListenScene
 		public QuestionText title, description;
 		public ListenChoiceContainer choiceContainer; // 选项容器
 		public RectTransform content;
+
+        /// <summary>
+        /// 内部变量
+        /// </summary>
 		ListenSubQuestionContainer container;
-		#region 初始化
-		/// <summary>
-		/// 初始化
-		/// </summary>
-		protected override void initializeOnce()
-		{
-			base.initializeOnce();
-			choiceContainer?.addClickedCallback(onChoiceSelected);
+        ListenQuestionDisplay fatherContainer = null;
 
-		}
-		/// <summary>
-		/// 显示答案解析
-		/// </summary>
-		bool _showAnswer = false;
-		public bool showAnswer
-		{
-			get { return _showAnswer; }
-			set
-			{
-				_showAnswer = value;
-				requestRefresh();
-			}
-		}
-		#endregion
+        /// <summary>
+        /// 显示答案解析
+        /// </summary>
+        bool _showAnswer = false;
+        public bool showAnswer {
+            get { return _showAnswer; }
+            set {
+                _showAnswer = value;
+                if (choiceContainer)
+                    choiceContainer.showAnswer = true;
+            }
+        }
+
+        /// <summary>
+        /// 是否已选择
+        /// </summary>
+        public bool isSelected { get; protected set; }
 
 
-		// 		protected override void drawExactlyItem(ListeningSubQuestion ques)
-		// 		{
-		// 			base.drawExactlyItem(ques);
-		// 			container?.startView(ques);
-		// 		}
+        #region 初始化
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            choiceContainer?.addClickedCallback(onChoiceSelected);
+
+        }
+
+        #endregion
+
+        #region 回调函数
+
+        /// <summary>
+        /// 选择回调
+        /// </summary>
+        /// <param name="index"></param>
+        void onChoiceSelected(int index) {
+            isSelected = true;
+            fatherContainer.onSubDisplaySelected();
+
+            //requestRefresh();
+        }
 
 
-		#region 回调函数
-		/// <summary>
-		/// 物品变更回调
-		/// </summary>
-		protected override void onItemChanged()
-		{
-			base.onItemChanged();
-			//content.anchoredPosition = new Vector2(0, 0);
-			// result = null; showAnswer = false;
-		}
+        #endregion
 
-		void onChoiceSelected(int index)
-		{
-			showAnswer = true;
+        #region 界面控制
 
-			var question = choiceContainer.getItem();
-			//var resultChoice = question.choices[index];
-			var resultText = "";
-			//var resultEffect = resultChoice.effects;
-			description.text = resultText;
+        /// <summary>
+        /// 启动页面，传入父控件以应用观察者模式
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="container"></param>
+        public void startView(ListeningSubQuestion item, ListenQuestionDisplay container) {
+            base.startView(item);
+            this.fatherContainer = container;
+        }
 
-			requestRefresh(true);
-		}
-		#endregion
-		#region 界面控制
-
-		/// <summary>
-		/// 绘制确切物品
-		/// </summary>
-		/// <param name="question">题目</param>
-		protected override void drawExactlyItem(ListeningSubQuestion question)
+        /// <summary>
+        /// 绘制确切物品
+        /// </summary>
+        /// <param name="question">题目</param>
+        protected override void drawExactlyItem(ListeningSubQuestion question)
 		{
 			base.drawExactlyItem(question);
-			if (showAnswer)
-			{
-				if (title) title.gameObject.SetActive(false);
-				if (choiceContainer) choiceContainer.gameObject.SetActive(false);
-				if (description) description.gameObject.SetActive(true);
-			}
-			else
-			{
-				if (title) title.gameObject.SetActive(true);
-				if (choiceContainer) choiceContainer.gameObject.SetActive(true);
-				if (description) description.gameObject.SetActive(false);
-				drawTitle(question);
-				drawChoices(question);
-			}
+            if (title) title.gameObject.SetActive(true);
+            if (choiceContainer) choiceContainer.gameObject.SetActive(true);
+            if (description) description.gameObject.SetActive(false);
 
+            drawTitle(question);
+            drawChoices(question);
 		}
 
 		/// <summary>
