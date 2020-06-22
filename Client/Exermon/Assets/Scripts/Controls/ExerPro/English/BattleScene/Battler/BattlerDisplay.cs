@@ -155,9 +155,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			Debug.Log(name + ": processAction + " + action.toJson().ToJson());
 
 			actionManager()?.add(action);
-
-			if (action.moveToTarget) moveToAttack();
-			else attack();
 		}
 
 		/// <summary>
@@ -425,24 +422,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 处理攻击
 		/// </summary>
-		void moveToAttack() {
+		public void moveToAttack() {
 			moveToTarget();
 			//attack();
 			//resetPosition();
 		}
-		
+
 		/// <summary>
 		/// 攻击
 		/// </summary>
-		void attack() {
+		public void attack() {
 			animator.setVar(AttackAttr);
-		}
-		
-		/// <summary>
-		/// 攻击结束回调
-		/// </summary>
-		void onAttackEnd() {
-			//animator.setVar(AttackAttr, false);
 		}
 
 		/*

@@ -253,7 +253,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="state">状态名</param>
 		/// <param name="clip">动画片段</param>
 		public void changeAni(string state, AnimationClip clip) {
-
+			Debug.Log("changeAni: " + state + ": " + clip);
 			if (override_ == null) {
 				override_ = new AnimatorOverrideController();
 				var runtime = animator.runtimeAnimatorController;

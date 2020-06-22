@@ -39,8 +39,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			public RuntimeAction action;
 
 			/// <summary>
-			/// 是否结束
+			/// 状态变量
 			/// </summary>
+			public bool isStarted = false;
+			public bool isHit = false;
 			public bool isEnd = false;
 
 			/// <summary>
@@ -100,6 +102,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var subject = item.subject;
 			var targets = item.objects;
 
+			if (!item.isStarted) start(item);
 			if (subject.isHit()) hit(item);
 			foreach(var target in targets)
 				if (target.isResult()) end(item);
@@ -160,15 +163,33 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
+		/// 开始行动
+		/// </summary>
+		/// <param name="item"></param>
+		void start(Item item) {
+			var subject = item.subject;
+
+			if (item.action.moveToTarget)
+				subject.moveToAttack();
+			else subject.attack();
+
+			item.isStarted = true;
+		}
+
+		/// <summary>
 		/// 击中
 		/// </summary>
 		/// <param name="item"></param>
 		void hit(Item item) {
+			if (item.isHit) return;
+
 			Debug.Log("Hit: " + item.subject.name);
 			var targets = item.objects;
 			var ani = item.action.targetAni ?? defaultTargetAni;
 
-			foreach(var target in targets) {
+			item.isHit = true;
+
+			foreach (var target in targets) {
 				target.setupTargetAni(ani); target.hurt();
 			}
 		}
