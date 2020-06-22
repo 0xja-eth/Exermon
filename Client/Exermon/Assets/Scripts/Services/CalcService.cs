@@ -1094,9 +1094,7 @@ namespace GameModule.Services {
 
 				Debug.Log("processEffect: " + effect.toJson().ToJson());
 
-				var params_ = effect.params_;
-                var len = params_.Count;
-                int a, b, h, p, n, s, r;
+				int a, b, h, p, n, s, r;
                 bool select = false;
 
                 switch ((ExerProEffectData.Code)effect.code) {
@@ -1179,6 +1177,10 @@ namespace GameModule.Services {
 						n = effect.get(2, 1);
 						processBuff(p, a, b, n); break;
 
+					case ExerProEffectData.Code.AddEnergy:
+						a = effect.get(0, 0);
+						processEnergy(a); break;
+
 					case ExerProEffectData.Code.AddState:
 						s = effect.get(0, 0); r = effect.get(1, 0);
 						p = effect.get(2, 100);
@@ -1248,6 +1250,14 @@ namespace GameModule.Services {
 				return Math.Max(res, 1);
 			}
 
+			/// <summary>
+			/// 处理能量获得
+			/// </summary>
+			/// <param name="a"></param>
+			void processEnergy(int a) {
+				result.energyGain = a;
+			}
+
             /// <summary>
             /// 处理Buff
             /// </summary>
@@ -1315,6 +1325,7 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="count">数量</param>
             void drawCards(int count) {
+				Debug.Log("drawCards");
 				result.drawCardCnt = count;
             }
 
@@ -1421,7 +1432,16 @@ namespace GameModule.Services {
                     actor.cardGroup.consumeCard();
             }
 
-        }
+			/// <summary>
+			/// 处理能量变化
+			/// </summary>
+			void processEnergy() {
+				var actor = battler as RuntimeActor;
+				if (actor == null) return;
+
+				actor.addEnergy(result.energyGain);
+			}
+		}
 
         /// <summary>
         /// 敌人下一步行动计算类

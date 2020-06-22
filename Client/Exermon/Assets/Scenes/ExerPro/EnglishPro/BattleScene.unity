@@ -2093,6 +2093,7 @@ MonoBehaviour:
   _checkable: 1
   _highlightable: 1
   actionManager: {fileID: 629167493}
+  drawWindow: {fileID: 297630842}
   actorPerfab: {fileID: 6789909901512949023, guid: e974b604319a5a043b111b757f94f8d3,
     type: 3}
   enemyPerfab: {fileID: 713893129170059409, guid: 91ba07938cab3644b93686c34b0160de,

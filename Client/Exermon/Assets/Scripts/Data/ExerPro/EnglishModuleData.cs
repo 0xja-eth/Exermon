@@ -3836,6 +3836,12 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int hpDrain { get; set; }
 
+		/// <summary>
+		/// 能量获得
+		/// </summary>
+		[AutoConvert]
+		public int energyGain { get; set; }
+
         /// <summary>
         /// 状态/Buff变更
         /// </summary>

@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-using UnityEngine.EventSystems;
+using UnityEngine;
 
 using Core.UI.Utils;
 
@@ -27,6 +27,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		BattleScene scene;
 
+		/// <summary>
+		/// 是否抽卡
+		/// </summary>
+		bool _isDrawCards = false;
+		public bool isDrawCards {
+			get {
+				var res = _isDrawCards;
+				_isDrawCards = false; return res;
+			}
+		}
+
 		#region 初始化
 
 		/// <summary>
@@ -35,6 +46,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void initializeOnce() {
 			base.initializeOnce();
 			scene = SceneUtils.getCurrentScene<BattleScene>();
+		}
+
+		#endregion
+
+		#region 更新控制
+
+		/// <summary>
+		/// 处理结果
+		/// </summary>
+		/// <param name="result"></param>
+		protected override void processResult(RuntimeActionResult result) {
+			if (result.drawCardCnt > 0) processDrawCards();
 		}
 
 		#endregion
@@ -65,40 +88,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 		#endregion
 
-		#region 更新控制
-
-		///// <summary>
-		///// 更新
-		///// </summary>
-		//protected override void update() {
-		//	base.update();
-		//	updateAction();
-		//}
-
-		#endregion
-
-		/*
-		#region 事件控制
+		#region 结果控制
 
 		/// <summary>
-		/// 拖拽释放回调
+		/// 处理抽卡显示
 		/// </summary>
-		public void OnDrop(PointerEventData eventData) {
-			var dragger = getSlotItemDisplay(eventData);
-			dragger.use();
-		}
-
-		/// <summary>
-		/// 获取拖拽中的物品显示项
-		/// </summary>
-		/// <param name="data">事件数据</param>
-		/// <returns>物品显示项</returns>
-		PotionSlotItemDisplay getSlotItemDisplay(PointerEventData data) {
-			var obj = data.pointerDrag; if (obj == null) return null;
-			return SceneUtils.get<PotionSlotItemDisplay>(obj);
+		void processDrawCards() {
+			Debug.Log("processDrawCards");
+			_isDrawCards = true;
 		}
 
 		#endregion
-		*/
 	}
 }

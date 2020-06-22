@@ -12,12 +12,15 @@ using Core.UI.Utils;
 using GameModule.Services;
 
 using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
 
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	using Menu;
+
+	using Windows;
 
 	/// <summary>
 	/// 战场控件
@@ -44,6 +47,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 外部组件设置
 		/// </summary>
 		public ActionManager actionManager;
+		public DrawWindow drawWindow;
 
 		/// <summary>
 		/// 预制件设置
@@ -51,9 +55,27 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public GameObject actorPerfab, enemyPerfab;
 
 		/// <summary>
+		/// 外部系统设置
+		/// </summary>
+		BattleService battleSer;
+
+		/// <summary>
 		/// 内部变量定义
 		/// </summary>
 		List<BattlerDisplay> sortedDisplays = new List<BattlerDisplay>();
+		ActorDisplay actorDisplay = null;
+
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			battleSer = BattleService.get();
+		}
+
+		#endregion
 
 		#region 更新控制
 
@@ -63,6 +85,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void update() {
 			base.update();
 			updateBattlerLayers();
+			updateDrawCards();
 		}
 
 		/// <summary>
@@ -73,6 +96,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				if (display.isAnimationPlaying()) {
 					resetBattlerSiblings(); break;
 				}
+		}
+
+		/// <summary>
+		/// 更新抽卡
+		/// </summary>
+		void updateDrawCards() {
+			var actor = getActorDisplay();
+			if (actor != null && actor.isDrawCards)
+				drawWindow.startWindow();
 		}
 
 		/// <summary>
@@ -102,6 +134,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			for (int i = 0; i < cnt; ++i)
 				res[i] = getBattlerDisplay(battlers[i]);
 			return res;
+		}
+
+		/// <summary>
+		/// 获取角色显示控件
+		/// </summary>
+		/// <returns></returns>
+		public ActorDisplay getActorDisplay() {
+			if (actorDisplay == null)
+				actorDisplay = getBattlerDisplay(battleSer.actor()) as ActorDisplay;
+			return actorDisplay;
 		}
 
 		#endregion

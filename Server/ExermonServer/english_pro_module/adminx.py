@@ -163,13 +163,16 @@ class AntonymAdmin(object):
 class BaseExerProItemAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['icon_index', 'star', 'gold']
+				   ['icon_index', 'start_ani_index',
+					'target_ani_index', 'star']
 
 	list_editable = BaseItemAdmin.list_editable + \
-					['icon_index', 'star', 'gold']
+					['icon_index', 'start_ani_index',
+					'target_ani_index', 'star']
 
 	field_set = [Fieldset('基本特训物品属性',
-						  'icon_index', 'star', 'gold')]
+						  'icon_index', 'start_ani_index',
+						  'target_ani_index', 'star')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 

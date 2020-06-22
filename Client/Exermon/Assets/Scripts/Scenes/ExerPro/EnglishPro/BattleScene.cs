@@ -211,7 +211,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 				case ExerProCard.Target.All:
 					return battleSer.enemies();
 				default:
-					return new List<RuntimeBattler>();
+					return makeSingleTarget(battleSer.actor());
+					//return new List<RuntimeBattler>();
 			}
 		}
 

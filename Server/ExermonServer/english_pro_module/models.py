@@ -638,11 +638,17 @@ class BaseExerProItem(BaseItem):
 	# 图标索引
 	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
+	# 起手动画索引
+	start_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="起手动画索引")
+
+	# 目标动画索引
+	target_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="目标动画索引")
+
 	# 物品星级（稀罕度）
 	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
 
 	# 金币（0表示不可购买）
-	gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
 
 	def convertToDict(self, **kwargs):
 		"""
@@ -654,8 +660,13 @@ class BaseExerProItem(BaseItem):
 
 		effects = ModelUtils.objectsToDict(self.effects())
 
+		res['icon_index'] = self.icon_index
+		res['start_ani_index'] = self.start_ani_index
+		res['target_ani_index'] = self.target_ani_index
+
 		res['star_id'] = self.star_id
-		res['gold'] = self.gold
+
+		# res['gold'] = self.gold
 		res['effects'] = effects
 
 		return res
