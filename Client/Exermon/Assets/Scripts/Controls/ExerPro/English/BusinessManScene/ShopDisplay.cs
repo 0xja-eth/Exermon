@@ -138,6 +138,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// </summary>
         public override void terminateView() {
             base.terminateView();
+            Debug.Log("Shop Display Terminate!");
             if (shopItems != null) {
                 foreach (var item in shopItems) {
                     item.gold = 0;

@@ -7,20 +7,5 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
     /// </summary>
     public class PotionItemDisplay : ShopItemDisplay<ExerProPotion> {
 
-        protected override void drawPrice(ExerProPotion item) {
-            if (price == 0) {
-                price = CalcService.ExerProItemGenerator.generatePotionPrice(item);
-                item.gold = price;
-            }
-            if (price > 0) {
-                priceText.text = price.ToString();
-                setPriceTag(goldTag);
-            }
-            else {
-                priceText.text = "";
-                setPriceTag(null);
-            }
-        }
-
     }
 }

@@ -81,7 +81,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// 绘制物品价格
         /// </summary>
         /// <param name="item">商品</param>
-        virtual protected void drawPrice(T item) {
+        void drawPrice(T item) {
             var price = item.gold;
             if (price > 0) {
                 priceText.text = price.ToString();
@@ -97,7 +97,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// 设置物品价格标签
         /// </summary>
         /// <param name="obj"></param>
-        protected void setPriceTag(Texture2D texture) {
+        void setPriceTag(Texture2D texture) {
             if (texture == null)
                 priceTag.gameObject.SetActive(false);
             else {

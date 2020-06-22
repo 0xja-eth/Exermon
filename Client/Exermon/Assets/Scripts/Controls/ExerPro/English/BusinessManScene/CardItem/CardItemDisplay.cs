@@ -24,20 +24,5 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
             cost.text = item.cost.ToString();
             description.text = item.description;
         }
-
-        protected override void drawPrice(ExerProCard item) {
-            if (price == 0) {
-                price = CalcService.ExerProItemGenerator.generateCardPrice(item);
-                item.gold = price;
-            }
-            if (price > 0) {
-                priceText.text = price.ToString();
-                setPriceTag(goldTag);
-            }
-            else {
-                priceText.text = "";
-                setPriceTag(null);
-            }
-        }
     }
 }

@@ -335,15 +335,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
 
         #endregion
 
-        /// <summary>
-        /// 结束窗口
-        /// </summary>
-        public override void terminateWindow() {
-            base.terminateWindow();
-            cardItemShop.terminateView();
-            potionItemShop.terminateView();
-        }
-
         #endregion
 
     }
