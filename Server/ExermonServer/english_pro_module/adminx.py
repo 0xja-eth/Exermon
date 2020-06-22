@@ -42,8 +42,12 @@ class WrongItemsInline(object):
 	style = "table"
 
 
-class ExerProItemEffectsInline(BaseEffectsInline):
-	model = ExerProItemEffect
+class ExerProItemTraitsInline(BaseTraitsInline):
+	model = ExerProItemTrait
+
+
+class ExerProStateTraitsInline(BaseTraitsInline):
+	model = ExerProStateTrait
 
 
 class ExerProPotionEffectsInline(BaseEffectsInline):
@@ -192,7 +196,7 @@ class ExerProItemAdmin(BaseExerProItemAdmin):
 
 	form_layout = BaseExerProItemAdmin.form_layout + field_set
 
-	inlines = [ExerProItemEffectsInline]
+	inlines = [ExerProItemTraitsInline]
 
 
 @xadmin.sites.register(ExerProPotion)
@@ -256,7 +260,7 @@ class ExerProEnemyAdmin(BaseItemAdmin):
 
 
 @xadmin.sites.register(ExerProState)
-class ExerProStatusAdmin(BaseItemAdmin):
+class ExerProStateAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
 				   []
@@ -268,7 +272,7 @@ class ExerProStatusAdmin(BaseItemAdmin):
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [ExerProStateTraitsInline]
 
 
 @xadmin.sites.register(ExerProMap)

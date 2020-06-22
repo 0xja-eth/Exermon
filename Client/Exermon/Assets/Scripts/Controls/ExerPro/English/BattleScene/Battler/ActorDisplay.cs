@@ -27,17 +27,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		BattleScene scene;
 
-		/// <summary>
-		/// 是否抽卡
-		/// </summary>
-		bool _isDrawCards = false;
-		public bool isDrawCards {
-			get {
-				var res = _isDrawCards;
-				_isDrawCards = false; return res;
-			}
-		}
-
 		#region 初始化
 
 		/// <summary>
@@ -46,18 +35,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void initializeOnce() {
 			base.initializeOnce();
 			scene = SceneUtils.getCurrentScene<BattleScene>();
-		}
-
-		#endregion
-
-		#region 更新控制
-
-		/// <summary>
-		/// 处理结果
-		/// </summary>
-		/// <param name="result"></param>
-		protected override void processResult(RuntimeActionResult result) {
-			if (result.drawCardCnt > 0) processDrawCards();
 		}
 
 		#endregion
@@ -84,18 +61,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void drawExactlyItem(RuntimeBattler item) {
 			base.drawExactlyItem(item);
 			scene.refreshStatus();
-		}
-
-		#endregion
-
-		#region 结果控制
-
-		/// <summary>
-		/// 处理抽卡显示
-		/// </summary>
-		void processDrawCards() {
-			Debug.Log("processDrawCards");
-			_isDrawCards = true;
 		}
 
 		#endregion

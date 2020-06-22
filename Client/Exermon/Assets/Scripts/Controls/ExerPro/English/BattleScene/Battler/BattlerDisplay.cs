@@ -169,7 +169,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 处理结果
 		/// </summary>
 		/// <param name="result"></param>
-		protected virtual void processResult(RuntimeActionResult result) { }
+		protected virtual void processResult(RuntimeActionResult result) {
+			if (result.drawCardCnt > 0) processDrawCards();
+		}
 
 		/// <summary>
 		/// 更新HP变化
@@ -229,7 +231,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="ani"></param>
 		public void setupStartAni(AnimationClip ani) {
-			animator.changeAni(AttackAnimation, ani);
+			animator.changeAni("Animation_1", ani);
+			// AttackAnimation
 		}
 
 		/// <summary>
@@ -237,7 +240,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="ani"></param>
 		public void setupTargetAni(AnimationClip ani) {
-			animator.changeAni(HurtAnimation, ani);
+			animator.changeAni("Animation_3", ani);
+			// HurtAnimation
 		}
 
 		/*
@@ -568,6 +572,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public int CompareTo(BattlerDisplay other) {
 			return rectTransform.anchoredPosition.y.CompareTo(
 				other.rectTransform.anchoredPosition.y);
+		}
+
+		#endregion
+
+		#region 结果控制
+
+		/// <summary>
+		/// 处理抽卡显示
+		/// </summary>
+		void processDrawCards() {
+			battleGround()?.processDrawCards();
 		}
 
 		#endregion

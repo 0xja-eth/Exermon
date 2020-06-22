@@ -258,11 +258,12 @@ namespace UI.Common.Controls.AnimationSystem {
 				var runtime = animator.runtimeAnimatorController;
 				override_ = new AnimatorOverrideController(runtime);
 
-				animator.runtimeAnimatorController = null;
+				//animator.runtimeAnimatorController = null;
 				animator.runtimeAnimatorController = override_;
 
 				Resources.UnloadUnusedAssets();
 			}
+
 			clip.legacy = false;
 			override_[state] = clip;
 		}

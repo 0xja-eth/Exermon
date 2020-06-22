@@ -85,7 +85,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void update() {
 			base.update();
 			updateBattlerLayers();
-			updateDrawCards();
 		}
 
 		/// <summary>
@@ -96,15 +95,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				if (display.isAnimationPlaying()) {
 					resetBattlerSiblings(); break;
 				}
-		}
-
-		/// <summary>
-		/// 更新抽卡
-		/// </summary>
-		void updateDrawCards() {
-			var actor = getActorDisplay();
-			if (actor != null && actor.isDrawCards)
-				drawWindow.startWindow();
 		}
 
 		/// <summary>
@@ -247,5 +237,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 		#endregion
 
+		#region 结果控制
+
+		/// <summary>
+		/// 更新抽卡
+		/// </summary>
+		public void processDrawCards() {
+			drawWindow.startWindow();
+		}
+
+		#endregion
 	}
 }

@@ -597,6 +597,75 @@ class ExerProEffect(models.Model):
 
 
 # ===================================================
+#  使用效果编号枚举
+# ===================================================
+class ExerProTraitCode(Enum):
+	Unset = 0  # 空
+
+	DamagePlus = 1  # 攻击伤害加成
+	HurtPlus = 2  # 受到伤害加成
+	RecoverPlus = 3  # 回复加成
+
+	RestRecoverPlus = 4  # 回复加成（休息据点）
+
+	RoundEndRecover = 5  # 回合结束HP回复
+	RoundStartRecover = 6  # 回合开始HP回复
+	BattleEndRecover = 7  # 战斗结束HP回复
+	BattleStartRecover = 8  # 战斗开始HP回复
+
+	ParamAdd = 9  # 属性加成值
+	ParamRoundAdd = 10  # 回合属性加成值
+	ParamBattleAdd = 11  # 战斗属性加成值
+
+	RoundDrawCards = 12  # 回合开始抽牌数加成
+	BattleDrawCards = 13  # 战斗开始抽牌数加成
+
+
+# ===================================================
+#  特训特性表
+# ===================================================
+class ExerProTraits(models.Model):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训使用效果"
+
+	CODES = [
+		(ExerProTraitCode.Unset.value, '空'),
+
+		(ExerProTraitCode.DamagePlus.value, '攻击伤害加成'),
+		(ExerProTraitCode.HurtPlus.value, '受到伤害加成'),
+		(ExerProTraitCode.RecoverPlus.value, '回复加成'),
+
+		(ExerProTraitCode.RestRecoverPlus.value, '回复加成（休息据点）'),
+
+		(ExerProTraitCode.RoundEndRecover.value, '回合结束HP回复'),
+		(ExerProTraitCode.RoundStartRecover.value, '回合开始HP回复'),
+		(ExerProTraitCode.BattleEndRecover.value, '战斗结束HP回复'),
+		(ExerProTraitCode.BattleStartRecover.value, '战斗开始HP回复'),
+
+		(ExerProTraitCode.ParamAdd.value, '属性加成值'),
+		(ExerProTraitCode.ParamRoundAdd.value, '回合属性加成值'),
+		(ExerProTraitCode.ParamBattleAdd.value, '战斗属性加成值'),
+
+		(ExerProTraitCode.RoundDrawCards.value, '回合开始抽牌数加成'),
+		(ExerProTraitCode.BattleDrawCards.value, '战斗开始抽牌数加成'),
+	]
+
+	# 效果编号
+	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
+
+	# 效果参数
+	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	# 转化为字典
+	def convertToDict(self):
+		return {
+			'code': self.code,
+			'params': self.params,
+		}
+
+
+# ===================================================
 #  特训物品星级表
 # ===================================================
 class ExerProItemStar(GroupConfigure):
@@ -658,8 +727,6 @@ class BaseExerProItem(BaseItem):
 		"""
 		res = super().convertToDict(**kwargs)
 
-		effects = ModelUtils.objectsToDict(self.effects())
-
 		res['icon_index'] = self.icon_index
 		res['start_ani_index'] = self.start_ani_index
 		res['target_ani_index'] = self.target_ani_index
@@ -667,7 +734,10 @@ class BaseExerProItem(BaseItem):
 		res['star_id'] = self.star_id
 
 		# res['gold'] = self.gold
-		res['effects'] = effects
+
+		effects = self.effects()
+		if effects is not None:
+			res['effects'] = ModelUtils.objectsToDict(effects)
 
 		return res
 
@@ -676,11 +746,11 @@ class BaseExerProItem(BaseItem):
 
 
 # ===================================================
-#  特训物品使用效果表
+#  特训物品特性表
 # ===================================================
-class ExerProItemEffect(ExerProEffect):
+class ExerProItemTrait(ExerProEffect):
 	class Meta:
-		verbose_name = verbose_name_plural = "特训物品使用效果"
+		verbose_name = verbose_name_plural = "特训物品特性"
 
 	# 物品
 	item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
@@ -697,8 +767,25 @@ class ExerProItem(BaseExerProItem):
 	# 道具类型
 	TYPE = ItemType.ExerProItem
 
+	def convertToDict(self, type: str = None, **kwargs):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		traits = ModelUtils.objectsToDict(self.traits())
+
+		res['traits'] = traits
+
+		return res
+
 	def effects(self):
-		return self.exerproitemeffect_set.all()
+		return None
+
+	def traits(self):
+		return self.exerproitemtrait_set.all()
 
 
 # ===================================================
@@ -723,15 +810,15 @@ class ExerProPotion(BaseExerProItem):
 	# 道具类型
 	TYPE = ItemType.ExerProPotion
 
-	def convertToDict(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convertToDict()
-
-		return res
+	# def convertToDict(self):
+	# 	"""
+	# 	转化为字典
+	# 	Returns:
+	# 		返回转化后的字典
+	# 	"""
+	# 	res = super().convertToDict()
+	#
+	# 	return res
 
 	def effects(self):
 		return self.exerpropotioneffect_set.all()
@@ -1053,6 +1140,18 @@ class ExerProEnemy(BaseItem):
 
 
 # ===================================================
+#  特训状态特性表
+# ===================================================
+class ExerProStateTrait(ExerProEffect):
+	class Meta:
+		verbose_name = verbose_name_plural = "特训状态特性"
+
+	# 状态
+	item = models.ForeignKey('ExerProState', on_delete=models.CASCADE,
+							 verbose_name="状态")
+
+
+# ===================================================
 #  特训状态表
 # ===================================================
 class ExerProState(BaseItem):
@@ -1076,10 +1175,16 @@ class ExerProState(BaseItem):
 		"""
 		res = super().convertToDict()
 
+		traits = ModelUtils.objectsToDict(self.traits())
+
 		res['max_turns'] = self.max_turns
 		res['is_nega'] = self.is_nega
+		res['traits'] = traits
 
 		return res
+
+	def traits(self):
+		return self.exerprostatetrait_set.all()
 
 
 # endregion
