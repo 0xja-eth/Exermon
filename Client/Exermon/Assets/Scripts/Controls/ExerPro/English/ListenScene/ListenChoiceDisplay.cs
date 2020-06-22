@@ -11,7 +11,8 @@ using ExerPro.EnglishModule.Data;
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
     /// <summary>
     /// 题目选项显示
-    /// </summary
+    /// 利大佬说的Class A
+    /// </summary>
     public class ListenChoiceDisplay :
         SelectableItemDisplay<ListeningSubQuestion.Choice> {
 
@@ -74,7 +75,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// <param name="eventData">事件数据</param>
         public override void OnPointerClick(PointerEventData eventData) {
             base.OnPointerClick(eventData);
-            Debug.Log("Plot Choice Clicked!");
+            Debug.Log("Listen Choice Clicked!");
 
         }
         #endregion
