@@ -171,6 +171,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="result"></param>
 		protected virtual void processResult(RuntimeActionResult result) {
 			if (result.drawCardCnt > 0) processDrawCards();
+			requestRefresh();
 		}
 
 		/// <summary>
@@ -541,16 +542,33 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item">题目</param>
 		protected override void drawExactlyItem(RuntimeBattler item) {
             base.drawExactlyItem(item);
+			drawBattle(item); drawHP(item); drawStates(item);
+		}
 
+		/// <summary>
+		/// 绘制战斗图
+		/// </summary>
+		/// <param name="item"></param>
+		void drawBattle(RuntimeBattler item) {
 			var battle = item.getBattlePicture();
 			this.battle.gameObject.SetActive(true);
 			this.battle.overrideSprite = AssetLoader.generateSprite(battle);
 			this.battle.SetNativeSize();
+		}
 
+		void drawHP(RuntimeBattler item) {
 			if (hpBar) {
 				hpBar.setValue(item, "hp");
 				hpBarObj.SetActive(!item.isDead());
 			}
+		}
+
+		/// <summary>
+		/// 绘制状态
+		/// </summary>
+		/// <param name="item"></param>
+		void drawStates(RuntimeBattler item) {
+			states.setItems(item.allRuntimeStates());
 		}
 
 		/// <summary>

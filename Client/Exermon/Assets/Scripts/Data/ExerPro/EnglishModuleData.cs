@@ -442,10 +442,10 @@ namespace ExerPro.EnglishModule.Data {
 	/// </summary>
 	public class ExerProEffectData : BaseData {
 
-        /// <summary>
-        /// 效果代码枚举
-        /// </summary>
-        public enum Code {
+		/// <summary>
+		/// 效果代码枚举
+		/// </summary>
+		public enum Code {
 			Unset = 0, // 空
 
 			Attack = 1, // 造成伤害
@@ -503,9 +503,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// 属性
 		/// </summary>
 		[AutoConvert]
-        public int code { get; protected set; }
-        [AutoConvert("params")]
-        public JsonData params_ { get; protected set; } // 参数（数组）
+		public int code { get; protected set; }
+		[AutoConvert("params")]
+		public JsonData params_ { get; protected set; } // 参数（数组）
 
 		#region 数据获取
 
@@ -520,6 +520,14 @@ namespace ExerPro.EnglishModule.Data {
 			if (params_ == null || !params_.IsArray) return default_;
 			if (index < params_.Count) return DataLoader.load<T>(params_[index]);
 			return default_;
+		}
+
+		/// <summary>
+		/// 效果代码枚举
+		/// </summary>
+		/// <returns></returns>
+		public Code codeEnum() {
+			return (Code)code;
 		}
 
 		#endregion
@@ -605,16 +613,89 @@ namespace ExerPro.EnglishModule.Data {
 		/// 构造函数
 		/// </summary>
 		public ExerProEffectData() { }
-        public ExerProEffectData(Code code, JsonData params_) {
-            this.code = (int)code; this.params_ = params_;
-        }
+		public ExerProEffectData(Code code, JsonData params_) {
+			this.code = (int)code; this.params_ = params_;
+		}
 
-    }
+	}
 
-    /// <summary>
-    /// 特训物品数据
-    /// </summary>
-    public abstract class BaseExerProItem : BaseItem {
+	/// <summary>
+	/// 特训效果数据
+	/// </summary>
+	public class ExerProTraitData : BaseData {
+
+		/// <summary>
+		/// 效果代码枚举
+		/// </summary>
+		public enum Code {
+			Unset = 0, // 空
+
+			DamagePlus = 1, // 攻击伤害加成
+			HurtPlus = 2, // 受到伤害加成
+			RecoverPlus = 3, // 回复加成
+
+			RestRecoverPlus = 4, // 回复加成（休息据点）
+
+			RoundEndRecover = 5, // 回合结束HP回复
+			RoundStartRecover = 6, // 回合开始HP回复
+			BattleEndRecover = 7, // 战斗结束HP回复
+			BattleStartRecover = 8, // 战斗开始HP回复
+
+			ParamAdd = 9, // 属性加成值
+			ParamRoundAdd = 10, // 回合属性加成值
+			ParamBattleAdd = 11, // 战斗属性加成值
+
+			RoundDrawCards = 12, // 回合开始抽牌数加成
+			BattleDrawCards = 13, // 战斗开始抽牌数加成
+		}
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public int code { get; protected set; }
+		[AutoConvert("params")]
+		public JsonData params_ { get; protected set; } // 参数（数组）
+
+		#region 数据获取
+
+		/// <summary>
+		/// 获取指定下标下的数据
+		/// </summary>
+		/// <typeparam name="T">类型</typeparam>
+		/// <param name="index">下标</param>
+		/// <param name="default_">默认值</param>
+		/// <returns></returns>
+		public T get<T>(int index, T default_ = default) {
+			if (params_ == null || !params_.IsArray) return default_;
+			if (index < params_.Count) return DataLoader.load<T>(params_[index]);
+			return default_;
+		}
+
+		/// <summary>
+		/// 特性代码枚举
+		/// </summary>
+		/// <returns></returns>
+		public Code codeEnum() {
+			return (Code)code;
+		}
+
+		#endregion
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public ExerProTraitData() { }
+		public ExerProTraitData(Code code, JsonData params_) {
+			this.code = (int)code; this.params_ = params_;
+		}
+
+	}
+
+	/// <summary>
+	/// 特训物品数据
+	/// </summary>
+	public abstract class BaseExerProItem : BaseItem {
 
 		/// <summary>
 		/// 属性
@@ -715,6 +796,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 属性
 		/// </summary>
+		[AutoConvert]
+		public ExerProTraitData[] traits { get; protected set; }
 
 		/// <summary>
 		/// 获取读取函数
@@ -959,26 +1042,29 @@ namespace ExerPro.EnglishModule.Data {
 		}
 	}
 
-    /// <summary>
-    /// 特训状态数据
-    /// </summary>
-    public class ExerProState : BaseItem {
+	/// <summary>
+	/// 特训状态数据
+	/// </summary>
+	public class ExerProState : BaseItem {
 
 		/// <summary>
 		/// 属性
 		/// </summary>
 		[AutoConvert]
-		public int iconIndex { get; protected set; } 
+		public int iconIndex { get; protected set; }
 		[AutoConvert]
 		public int maxTurns { get; protected set; } // 最大状态叠加回合数
 		[AutoConvert]
-        public bool isNega { get; protected set; } // 是否负面
-		
+		public bool isNega { get; protected set; } // 是否负面
+
+		[AutoConvert]
+		public ExerProTraitData[] traits { get; protected set; }
+
 		/// <summary>
 		/// 物品图标
 		/// </summary>
 		public Sprite icon { get; protected set; }
-		
+
 		/// <summary>
 		/// 加载自定义属性
 		/// </summary>
@@ -1038,6 +1124,14 @@ namespace ExerPro.EnglishModule.Data {
 	/// 特训背包道具
 	/// </summary>
 	public class ExerProPackItem : ExerProPackItem<ExerProItem> {
+
+		/// <summary>
+		/// 特性
+		/// </summary>
+		/// <returns></returns>
+		public ExerProTraitData[] traits() {
+			return item().traits;
+		}
 
 		/// <summary>
 		/// 构造函数
@@ -1138,12 +1232,25 @@ namespace ExerPro.EnglishModule.Data {
 	/// <summary>
 	/// 特训物品背包
 	/// </summary>
-	public class ExerProItemPack : PackContainer<ExerProPackItem> { }
+	public class ExerProItemPack : PackContainer<ExerProPackItem> {
 
-    /// <summary>
-    /// 特训药水背包
-    /// </summary>
-    public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
+		/// <summary>
+		/// 特性
+		/// </summary>
+		/// <returns></returns>
+		public List<ExerProTraitData> traits() {
+			var res = new List<ExerProTraitData>();
+			foreach (var item in items)
+				res.AddRange(item.traits());
+			return res;
+		}
+
+	}
+
+	/// <summary>
+	/// 特训药水背包
+	/// </summary>
+	public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
 
     /// <summary>
     /// 特训抽牌堆
@@ -2300,12 +2407,17 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int turns { get; protected set; } // 状态回合
 
-        /// <summary>
-        /// 获取状态
-        /// </summary>
-        /// <returns></returns>
-        public ExerProState state() {
-            return DataService.get().exerProState(stateId);
+		/// <summary>
+		/// 状态对象
+		/// </summary>
+		ExerProState _state = null;
+
+		/// <summary>
+		/// 获取状态
+		/// </summary>
+		/// <returns></returns>
+		public ExerProState state() {
+            return _state = _state ?? DataService.get().exerProState(stateId);
         }
 
         /// <summary>
@@ -2350,10 +2462,18 @@ namespace ExerPro.EnglishModule.Data {
                 this.turns = max; 
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public RuntimeState() { }
+		/// <summary>
+		/// 特性
+		/// </summary>
+		/// <returns></returns>
+		public ExerProTraitData[] traits() {
+			return state().traits;
+		}
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		public RuntimeState() { }
         public RuntimeState(int stateId, int turns = 0) {
             this.stateId = stateId; this.turns = turns;
         }
@@ -2371,12 +2491,14 @@ namespace ExerPro.EnglishModule.Data {
         public const int MHPParamId = 1;
         public const int PowerParamId = 2;
         public const int DefenseParamId = 3;
-        public const int AgileParamId = 4;
+		public const int AgileParamId = 4;
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+		public const int MaxParamCount = 4;
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public int hp { get; protected set; }
 
         /// <summary>
@@ -2634,14 +2756,27 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="rate">增加率</param>
 		/// <param name="show">是否显示</param>
 		public void addHP(double rate, bool show = true) {
-            changeHP((int)Math.Round(hp * rate), show);
-        }
+			changeHP((int)Math.Round(hp + mhp() * rate), show);
+		}
 
-        /// <summary>
-        /// 是否死亡
-        /// </summary>
-        /// <returns></returns>
-        public bool isDead() {
+		/// <summary>
+		/// 增加HP
+		/// </summary>
+		/// <param name="rate">增加率</param>
+		/// <param name="show">是否显示</param>
+		public void addHPInRestNode(double rate, bool show = true) {
+			var traits = filterTraits(ExerProTraitData.Code.RestRecoverPlus);
+
+			int val = sumTraits(traits);
+			rate += sumTraits(traits, 1) / 100.0;
+			addHP((int)Math.Round(mhp() * rate + val));
+		}
+
+		/// <summary>
+		/// 是否死亡
+		/// </summary>
+		/// <returns></returns>
+		public bool isDead() {
             return hp <= 0;
         }
 
@@ -2694,49 +2829,180 @@ namespace ExerPro.EnglishModule.Data {
             foreach (var buff in buffs)
                 if (buff.paramId == paramId && !buff.isOutOfDate()) rate *= buff.rate;
             return rate;
-        }
+		}
 
-        /// <summary>
-        /// 额外属性
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <returns></returns>
-        public virtual int extraParam(int paramId) {
-            return 0;
-        }
+		/// <summary>
+		/// 特性属性
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <returns></returns>
+		public virtual int traitParamVal(int paramId) {
+			return sumTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
+		}
 
-        /// <summary>
-        /// 属性值
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <returns>属性值</returns>
-        public int param(int paramId) {
-            var base_ = baseParam(paramId);
-            var rate = buffRate(paramId);
-            var value = buffValue(paramId);
-            var extra = extraParam(paramId);
-            return (int)Math.Round((base_ + value) * rate + extra);
-        }
-        
-        /// <summary>
-        /// 属性相加
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <param name="value">增加值</param>
-        public void addParam(int paramId, int value) {
-            addBuff(paramId, value);
-        }
+		/// <summary>
+		/// 特性属性
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <returns></returns>
+		public virtual double traitParamRate(int paramId) {
+			return multTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
+		}
 
-        /// <summary>
-        /// 属性相乘
-        /// </summary>
-        /// <param name="paramId">属性ID</param>
-        /// <param name="rate">比率</param>
-        public void multParam(int paramId, double rate) {
+		/// <summary>
+		/// 额外属性
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <returns></returns>
+		public virtual int extraParam(int paramId) {
+			return 0;
+		}
+
+		/// <summary>
+		/// 属性值
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <returns>属性值</returns>
+		public int param(int paramId) {
+			var base_ = baseParam(paramId) + traitParamVal(paramId) + buffValue(paramId);
+			var rate = buffRate(paramId) * traitParamRate(paramId);
+			var extra = extraParam(paramId);
+			return (int)Math.Round((base_) * rate + extra);
+		}
+
+		/// <summary>
+		/// 属性相加
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <param name="value">增加值</param>
+		public void addParam(int paramId, int value) {
+			addBuff(paramId, value);
+		}
+		public void addParam(int paramId, int value, double rate) {
+			addBuff(paramId, value, rate);
+		}
+
+		/// <summary>
+		/// 属性相乘
+		/// </summary>
+		/// <param name="paramId">属性ID</param>
+		/// <param name="rate">比率</param>
+		public void multParam(int paramId, double rate) {
             addBuff(paramId, 0, rate);
-        }
+		}
+
+		/// <summary>
+		/// 伤害加成
+		/// </summary>
+		public int damagePlusVal() {
+			return sumTraits(ExerProTraitData.Code.DamagePlus);
+		}
+		public double damagePlusRate() {
+			return multTraits(ExerProTraitData.Code.DamagePlus);
+		}
+
+		/// <summary>
+		/// 受伤加成
+		/// </summary>
+		public int hurtPlusVal() {
+			return sumTraits(ExerProTraitData.Code.HurtPlus);
+		}
+		public double hurtPlusRate() {
+			return multTraits(ExerProTraitData.Code.HurtPlus);
+		}
+
+		/// <summary>
+		/// 回复加成
+		/// </summary>
+		public int recoverPlusVal() {
+			return sumTraits(ExerProTraitData.Code.RecoverPlus);
+		}
+		public double recoverPlusRate() {
+			return multTraits(ExerProTraitData.Code.RecoverPlus);
+		}
 
 		#endregion
+
+		#endregion
+
+		#region 特性控制
+
+		/// <summary>
+		/// 获取所有特性
+		/// </summary>
+		/// <returns></returns>
+		public virtual List<ExerProTraitData> traits() {
+			return statesTraits();
+		}
+
+		/// <summary>
+		/// 所有状态特性
+		/// </summary>
+		List<ExerProTraitData> statesTraits() {
+			var res = new List<ExerProTraitData>();
+			foreach (var state in states)
+				res.AddRange(state.Value.traits());
+			return res;
+		}
+
+		/// <summary>
+		/// 获取特定特性
+		/// </summary>
+		/// <param name="code">特性枚举</param>
+		/// <returns>返回符合条件的特性</returns>
+		public List<ExerProTraitData> filterTraits(ExerProTraitData.Code code) {
+			return traits().FindAll(trait => trait.code == (int)code);
+		}
+		/// <param name="param">参数取值</param>
+		/// <param name="id">参数下标</param>
+		public List<ExerProTraitData> filterTraits<T>(ExerProTraitData.Code code, T param, int id = 0) {
+			return traits().FindAll(trait => trait.code == (int)code 
+				&& Equals(trait.get<T>(id), param));
+		}
+
+		/// <summary>
+		/// 特性值求和
+		/// </summary>
+		/// <param name="code">特性枚举</param>
+		/// <param name="index">特性参数索引</param>
+		/// <param name="base_">求和基础值</param>
+		/// <returns></returns>
+		public int sumTraits(ExerProTraitData.Code code, int index = 0, int base_ = 0) {
+			return sumTraits(filterTraits(code), index, base_);
+		}
+		/// <param name="param">参数取值</param>
+		/// <param name="id">参数下标</param>
+		public int sumTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 1, int base_ = 0) {
+			return sumTraits(filterTraits(code, param, id), index, base_);
+		}
+		public int sumTraits(List<ExerProTraitData> traits, int index = 0, int base_ = 0) {
+			var res = base_;
+			foreach (var trait in traits)
+				res += trait.get(index, 0);
+			return res;
+		}
+
+		/// <summary>
+		/// 特性值求积
+		/// </summary>
+		/// <param name="code">特性枚举</param>
+		/// <param name="index">特性参数索引</param>
+		/// <param name="base_">概率基础值</param>
+		/// <returns></returns>
+		public double multTraits(ExerProTraitData.Code code, int index = 1, int base_ = 100) {
+			return multTraits(filterTraits(code), index, base_);
+		}
+		/// <param name="param">参数取值</param>
+		/// <param name="id">参数下标</param>
+		public double multTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 2, int base_ = 100) {
+			return multTraits(filterTraits(code, param, id), index, base_);
+		}
+		public double multTraits(List<ExerProTraitData> traits, int index = 1, int base_ = 100) {
+			var res = 1.0;
+			foreach (var trait in traits)
+				res *= (base_ + trait.get(index, 0)) / 100.0;
+			return res;
+		}
 
 		#endregion
 
@@ -3365,6 +3631,16 @@ namespace ExerPro.EnglishModule.Data {
 		public void useCard(ExerProPackCard card) {
 			cardGroup.useCard(card);
 			addEnergy(-card.cost());
+		}
+
+		/// <summary>
+		/// 获取所有特性
+		/// </summary>
+		/// <returns></returns>
+		public override List<ExerProTraitData> traits() {
+			var res = base.traits();
+			res.AddRange(itemPack.traits());
+			return res;
 		}
 
 		#region 属性定义

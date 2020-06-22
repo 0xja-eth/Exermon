@@ -1097,7 +1097,7 @@ namespace GameModule.Services {
 				int a, b, h, p, n, s, r;
                 bool select = false;
 
-                switch ((ExerProEffectData.Code)effect.code) {
+                switch (effect.codeEnum()) {
                     case ExerProEffectData.Code.Attack:
                     case ExerProEffectData.Code.AttackBlack:
 						a = effect.get(0, 0); h = effect.get(2, HPDamageType);
@@ -1232,7 +1232,8 @@ namespace GameModule.Services {
             /// <param name="a">伤害点数</param>
             /// <param name="h">伤害类型</param>
             void processDamage(int a, int h = HPDamageType) {
-                if (h == HPRecoverType) result.hpRecover = a;
+                if (h == HPRecoverType)
+					result.hpRecover = calcRecover(a);
                 else {
                     var val = calcDamage(a);
                     if (h == HPDamageType) result.hpDamage = val;
@@ -1246,8 +1247,29 @@ namespace GameModule.Services {
 			/// <param name="a"></param>
 			/// <returns></returns>
 			int calcDamage(int a) {
-				var res = a + subject.power() - object_.defense();
-				return Math.Max(res, 1);
+				double res = a + subject.power() - object_.defense();
+
+				res += subject.damagePlusVal();
+				res += object_.hurtPlusVal();
+
+				res *= subject.damagePlusRate();
+				res *= object_.hurtPlusRate();
+
+				return (int)Math.Round(Math.Max(res, 1));
+			}
+
+			/// <summary>
+			/// 计算回复
+			/// </summary>
+			/// <param name="a"></param>
+			/// <returns></returns>
+			int calcRecover(int a) {
+				double res = a;
+
+				res += object_.recoverPlusVal();
+				res *= object_.recoverPlusRate();
+
+				return (int)Math.Round(Math.Max(res, 1));
 			}
 
 			/// <summary>
@@ -1743,6 +1765,118 @@ namespace GameModule.Services {
 			}
 
 		}
-    }
+
+		/// <summary>
+		/// 特训特性计算类
+		/// </summary>
+		public class ExerProTraitsCalc {
+
+			/// <summary>
+			/// 计算战斗开始时的特性效果
+			/// </summary>
+			/// <param name="battler"></param>
+			public static void calcOnBattleStart(RuntimeBattler battler) {
+				processBattleStartRecover(battler);
+				processParamBattleAdd(battler);
+				processBattleDrawCards(battler);
+			}
+			static void processBattleStartRecover(RuntimeBattler battler) {
+				var traits = battler.filterTraits(ExerProTraitData.Code.BattleStartRecover);
+
+				int val = battler.sumTraits(traits);
+				double rate = battler.sumTraits(traits, 1) / 100.0;
+
+				battler.addHP(val); battler.addHP(rate);
+			}
+			static void processParamBattleAdd(RuntimeBattler battler) {
+				for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
+					var traits = battler.filterTraits(ExerProTraitData.Code.ParamBattleAdd, i);
+
+					var val = battler.sumTraits(traits, 1);
+					var rate = battler.multTraits(traits, 2);
+
+					battler.addParam(i, val, rate);
+				}
+			}
+			static void processBattleDrawCards(RuntimeBattler battler) {
+				var actor = battler as RuntimeActor;
+				if (actor == null) return;
+
+				var val = actor.sumTraits(ExerProTraitData.Code.BattleDrawCards);
+
+				for (int i = 0; i < val; ++i)
+					actor.cardGroup.drawCard();
+			}
+
+			/// <summary>
+			/// 计算回合开始时的特性效果
+			/// </summary>
+			/// <param name="battler"></param>
+			public static void calcOnRoundStart(RuntimeBattler battler, int rest = 0) {
+				processRoundStartRecover(battler);
+				if (rest > 0) processParamRoundAdd(battler, rest);
+				processRoundDrawCards(battler);
+			}
+			static void processRoundStartRecover(RuntimeBattler battler) {
+				var traits = battler.filterTraits(ExerProTraitData.Code.RoundStartRecover);
+
+				int val = battler.sumTraits(traits);
+				double rate = battler.sumTraits(traits, 1) / 100.0;
+
+				battler.addHP(val); battler.addHP(rate);
+			}
+			static void processParamRoundAdd(RuntimeBattler battler, int rest) {
+				for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
+					var traits = battler.filterTraits(ExerProTraitData.Code.ParamRoundAdd, i);
+
+					var val = battler.sumTraits(traits, 1);
+					var rate = battler.multTraits(traits, 2);
+
+					battler.addBuff(i, val, rate, rest);
+				}
+			}
+			static void processRoundDrawCards(RuntimeBattler battler) {
+				var actor = battler as RuntimeActor;
+				if (actor == null) return;
+
+				var val = actor.sumTraits(ExerProTraitData.Code.RoundDrawCards);
+
+				for (int i = 0; i < val; ++i)
+					actor.cardGroup.drawCard();
+			}
+
+			/// <summary>
+			/// 计算回合开始时的特性效果
+			/// </summary>
+			/// <param name="battler"></param>
+			public static void calcOnRoundEnd(RuntimeBattler battler, int rest = 0) {
+				processRoundEndRecover(battler);
+			}
+			static void processRoundEndRecover(RuntimeBattler battler) {
+				var traits = battler.filterTraits(ExerProTraitData.Code.RoundEndRecover);
+
+				int val = battler.sumTraits(traits);
+				double rate = battler.sumTraits(traits, 1) / 100.0;
+
+				battler.addHP(val); battler.addHP(rate);
+			}
+
+			/// <summary>
+			/// 计算回合开始时的特性效果
+			/// </summary>
+			/// <param name="battler"></param>
+			public static void calcOnBattleEnd(RuntimeBattler battler, int rest = 0) {
+				processBattleEndRecover(battler);
+			}
+			static void processBattleEndRecover(RuntimeBattler battler) {
+				var traits = battler.filterTraits(ExerProTraitData.Code.BattleEndRecover);
+
+				int val = battler.sumTraits(traits);
+				double rate = battler.sumTraits(traits, 1) / 100.0;
+
+				battler.addHP(val); battler.addHP(rate);
+			}
+		}
+	}
 
 }
