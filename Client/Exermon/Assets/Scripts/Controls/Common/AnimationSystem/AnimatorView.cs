@@ -255,15 +255,15 @@ namespace UI.Common.Controls.AnimationSystem {
 		public void changeAni(string state, AnimationClip clip) {
 			Debug.Log("changeAni: " + state + ": " + clip);
 			if (override_ == null) {
-				override_ = new AnimatorOverrideController();
 				var runtime = animator.runtimeAnimatorController;
-				override_.runtimeAnimatorController = runtime;
+				override_ = new AnimatorOverrideController(runtime);
 
 				animator.runtimeAnimatorController = null;
 				animator.runtimeAnimatorController = override_;
 
 				Resources.UnloadUnusedAssets();
 			}
+			clip.legacy = false;
 			override_[state] = clip;
 		}
 

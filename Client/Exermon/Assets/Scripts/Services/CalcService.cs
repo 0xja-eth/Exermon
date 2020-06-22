@@ -1352,14 +1352,15 @@ namespace GameModule.Services {
             RuntimeBattler battler;
             RuntimeActionResult result;
 
-            RuntimeBattler subject;
+            RuntimeBattler subject; // 发起者
+			RuntimeActor actor; // 关联的角色
 
-            /// <summary>
-            /// 应用
-            /// </summary>
-            /// <param name="battler">对战者</param>
-            /// <param name="result">结果</param>
-            public static void apply(RuntimeBattler battler, RuntimeActionResult result) {
+			/// <summary>
+			/// 应用
+			/// </summary>
+			/// <param name="battler">对战者</param>
+			/// <param name="result">结果</param>
+			public static void apply(RuntimeBattler battler, RuntimeActionResult result) {
                 var calc = new ResultApplyCalc(battler, result);
                 calc.processHP();
                 calc.processAddBuffs();
@@ -1376,7 +1377,9 @@ namespace GameModule.Services {
             ResultApplyCalc(RuntimeBattler battler, RuntimeActionResult result) {
                 this.battler = battler; this.result = result;
                 subject = result.action.subject;
-            }
+				actor = (battler as RuntimeActor) 
+					?? (subject as RuntimeActor);
+			}
 
             /// <summary>
             /// 处理HP
@@ -1412,7 +1415,6 @@ namespace GameModule.Services {
             /// 处理抽牌
             /// </summary>
             void processDraw() {
-                var actor = battler as RuntimeActor;
                 if (actor == null) return;
 
                 for (int i = 0; i < result.drawCardCnt; ++i)
@@ -1424,8 +1426,6 @@ namespace GameModule.Services {
             /// </summary>
             void processConsume() {
                 if (result.consumeSelect) return;
-
-                var actor = battler as RuntimeActor;
                 if (actor == null) return;
 
                 for (int i = 0; i < result.drawCardCnt; ++i)
@@ -1436,7 +1436,6 @@ namespace GameModule.Services {
 			/// 处理能量变化
 			/// </summary>
 			void processEnergy() {
-				var actor = battler as RuntimeActor;
 				if (actor == null) return;
 
 				actor.addEnergy(result.energyGain);

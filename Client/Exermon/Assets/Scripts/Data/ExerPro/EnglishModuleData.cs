@@ -2680,7 +2680,7 @@ namespace ExerPro.EnglishModule.Data {
         public int buffValue(int paramId) {
             int value = 0;
             foreach (var buff in buffs)
-                if (!buff.isOutOfDate()) value += buff.value;
+                if (buff.paramId == paramId && !buff.isOutOfDate()) value += buff.value;
             return value;
         }
 
@@ -2692,7 +2692,7 @@ namespace ExerPro.EnglishModule.Data {
         public double buffRate(int paramId) {
             double rate = 1;
             foreach (var buff in buffs)
-                if (!buff.isOutOfDate()) rate *= buff.rate;
+                if (buff.paramId == paramId && !buff.isOutOfDate()) rate *= buff.rate;
             return rate;
         }
 
@@ -2715,7 +2715,7 @@ namespace ExerPro.EnglishModule.Data {
             var rate = buffRate(paramId);
             var value = buffValue(paramId);
             var extra = extraParam(paramId);
-            return (int)Math.Round(base_ * rate + value + extra);
+            return (int)Math.Round((base_ + value) * rate + extra);
         }
         
         /// <summary>
@@ -3197,9 +3197,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 处理状态回合结束
 		/// </summary>
 		void processBuffsRoundEnd() {
-            var buffs = this.buffs.ToArray();
-
-            for (int i = 0; i < buffs.Length; ++i) {
+            for (int i = buffs.Count - 1; i >= 0; --i) {
                 var buff = buffs[i]; buff.onRoundEnd();
                 if (buff.isOutOfDate()) removeBuff(i);
             }
