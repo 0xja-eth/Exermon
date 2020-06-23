@@ -38,7 +38,6 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// <summary>
         /// 内部变量
         /// </summary>
-        bool isConfigured { get; set; } = false;
         ExerProMapNode node { get; set; } = null;
         EnglishService.RewardInfo rewardInfo { get; set; } = null;
         UnityAction<bool> terminateCallback = null;
