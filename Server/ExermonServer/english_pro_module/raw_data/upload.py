@@ -565,7 +565,7 @@ def _saveExerProState(d: dict):
 	item.name = load(d, 'name', "")
 	item.description = load(d, 'description', "")
 	item.icon_index = load(d, 'icon_index', 0)
-	item.is_nega = load(d, 'is_nega', False)
+	item.is_nega = load(d, 'is_nega', 0) == 1
 	item.max_turns = load(d, 'max_turns', 0)
 	item.star_id = load(d, 'star', 1, ExerProItemStar)
 

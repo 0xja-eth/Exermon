@@ -1161,6 +1161,9 @@ class ExerProState(BaseItem):
 	# 道具类型
 	TYPE = ItemType.ExerProState
 
+	# 图标索引
+	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
+
 	# 最大状态回合数
 	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
 
@@ -1177,6 +1180,7 @@ class ExerProState(BaseItem):
 
 		traits = ModelUtils.objectsToDict(self.traits())
 
+		res['icon_index'] = self.icon_index
 		res['max_turns'] = self.max_turns
 		res['is_nega'] = self.is_nega
 		res['traits'] = traits

@@ -263,12 +263,12 @@ class ExerProEnemyAdmin(BaseItemAdmin):
 class ExerProStateAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   []
+				   ['icon_index', 'max_turns', 'is_nega']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   []
+				   ['icon_index', 'max_turns', 'is_nega']
 
-	field_set = [Fieldset('ÌØÑµ×´Ì¬ÊôĞÔ')]
+	field_set = [Fieldset('ÌØÑµ×´Ì¬ÊôĞÔ', 'icon_index', 'max_turns', 'is_nega')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 

@@ -556,6 +556,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			this.battle.SetNativeSize();
 		}
 
+		/// <summary>
+		/// 绘制体力值
+		/// </summary>
+		/// <param name="item"></param>
 		void drawHP(RuntimeBattler item) {
 			if (hpBar) {
 				hpBar.setValue(item, "hp");
@@ -568,6 +572,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void drawStates(RuntimeBattler item) {
+			states.gameObject.SetActive(!item.isDead());
 			states.setItems(item.allRuntimeStates());
 		}
 

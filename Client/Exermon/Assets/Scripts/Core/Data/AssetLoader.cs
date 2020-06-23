@@ -84,7 +84,7 @@ namespace Core.Data.Loaders {
         public const int MaxSubRank = 5; // 最大子段位数目
 
 		public static readonly Vector2 CardIconSize = new Vector2(96, 144); // 卡牌尺寸
-		public const int StateIconSize = 64; // 状态图标尺寸（正方形）
+		public const int StateIconSize = 32; // 状态图标尺寸（正方形）
 
 		/// <summary>
 		/// 纹理/声音缓存
