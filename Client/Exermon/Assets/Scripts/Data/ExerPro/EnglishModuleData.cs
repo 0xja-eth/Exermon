@@ -1454,12 +1454,29 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProCardHandGroup handGroup { get; protected set; } = new ExerProCardHandGroup();
 
-        #region 卡牌获取
+		/// <summary>
+		/// 出牌记录
+		/// </summary>
+		[AutoConvert]
+		public List<int> _cardRecord { get; protected set; } = new List<int>();
 
-        /// <summary>
-        /// 获取卡牌
-        /// </summary>
-        public void addCard(ExerProCard card) {
+		/// <summary>
+		/// 获取出牌记录的卡牌实例
+		/// </summary>
+		/// <returns></returns>
+		public List<ExerProCard> cardRecord() {
+			var res = new List<ExerProCard>(_cardRecord.Count);
+			foreach (var cid in _cardRecord)
+				res.Add(DataService.get().exerProCard(cid));
+			return res;
+		}
+
+		#region 加入卡组
+
+		/// <summary>
+		/// 加入卡组
+		/// </summary>
+		public void addCard(ExerProCard card) {
             pushItem(new ExerProPackCard(card));
         }
 
@@ -1526,7 +1543,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// 使用牌
 		/// </summary>
 		public void useCard(ExerProPackCard card) {
-            if (card.item().disposable) consumeCard(card);
+			_cardRecord.Add(card.itemId);
+			if (card.item().disposable) consumeCard(card);
             else discardCard(card);
         }
 
