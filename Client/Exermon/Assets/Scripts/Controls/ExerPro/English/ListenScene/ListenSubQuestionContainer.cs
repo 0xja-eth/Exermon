@@ -23,9 +23,12 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// <summary>
 		/// 显示答案解析
 		/// </summary>
+		bool _showAnswer = false;
 		public bool showAnswer {
+			get { return _showAnswer; }
 			set {
-				foreach(var sub in subViews) {
+				_showAnswer = value;
+				foreach (var sub in subViews) {
 					var display = sub as ListeningSubQuestionDisplay;
 					if (display) display.showAnswer = value;
 				}
@@ -53,6 +56,20 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 保存选项
+		/// </summary>
+		public int[] saveSelections() {
+			var cnt = subViews.Count;
+			var res = new int[cnt];
+			for(int i = 0; i < cnt; ++i) {
+				var display = subViews[i] as ListeningSubQuestionDisplay;
+				if (display) res[i] = display.choiceContainer.saveSelection();
+				else res[i] = -1;
+			}
+			return res;
+		}
 
 		/// <summary>
 		/// 物品变更回调

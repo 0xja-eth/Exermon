@@ -84,8 +84,10 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
                 if (canvasGroup)
                     canvasGroup.alpha = choice.answer ? 1 : noAnswerAlpha;
 
-                var isInSelected = getContainer().getItemDisplay(getContainer().getSelectedIndex()) == this;
-                correct = choice.answer;
+				var isInSelected = index == getContainer().selectedChoiceIndex;
+				// getContainer().getItemDisplay(getContainer().getSelectedIndex()) == this;
+
+				correct = choice.answer;
                 wrong = !choice.answer && isInSelected;
 
                 if (correctFlag) correctFlag.SetActive(correct);
@@ -113,7 +115,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// </summary>
         /// <param name="choice">选项</param>
         /// <returns></returns>
-        string generateChoiceText(ListeningSubQuestion.Choice choice) {
+        string generateChoiceText(BaseQuestion.Choice choice) {
             var alph = ((char)('A' + index)).ToString();
             return string.Format(TextFormat, alph, choice.text);
         }

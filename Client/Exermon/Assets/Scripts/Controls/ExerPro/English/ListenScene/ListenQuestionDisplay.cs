@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using Core.UI;
+using Core.UI.Utils;
+
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
+using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
@@ -18,12 +23,22 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 	public class ListenQuestionDisplay : ItemDisplay<ListeningQuestion> {
 
 		/// <summary>
+		/// 常量定义
+		/// </summary>
+		const string CountFormat = "播放次数：{0}/{1}";
+		const string TimeFormat = "{0}/{1}";
+
+		const string ArticleDisableTipText = "作答中不可查看听力材料";
+
+		const int ArticleViewIndex = 2;
+
+		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text tipName;
+		public Text tipName, article, count, time;
 		public ListenSubQuestionContainer subQuestions;
 
-		// 左部分组件
+		// 左部组件
 		public RawImage image;
 
 		public Button playButton;
@@ -36,10 +51,16 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 
 		public Texture2D play, pause;
 
+		public DropdownField showTypeSelect;
+		public GameObject[] leftViews; // 左侧视图
+
 		/// <summary>
 		/// 内部变量定义
 		/// </summary>
 		int selectNumber = 0;
+		int playCnt = 0; // 播放次数
+
+		bool isLastPlaying = false;
 
 		Sprite playSprite, pauseSprite;
 
@@ -57,6 +78,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			base.initializeOnce();
 			playSprite = AssetLoader.generateSprite(play);
 			pauseSprite = AssetLoader.generateSprite(pause);
+
+			if (showTypeSelect) showTypeSelect.onChanged = onShowTypeChanged;
 		}
 
 		/// <summary>
@@ -84,7 +107,12 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		void updateAudio() {
 			playButton.interactable = !audioSource.isPlaying || isPauseable();
-			if (audioSource.isPlaying) slider.value = audioSource.time / audioSource.clip.length;
+
+			if (audioSource.isPlaying)
+				drawTimer(audioSource.time, audioSource.clip.length);
+			else if (isLastPlaying) onAudioStop();
+
+			isLastPlaying = audioSource.isPlaying;
 		}
 
 		#endregion
@@ -98,21 +126,45 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		public bool isPauseable() {
 			return false;
 		}
+		
+		/// <summary>
+		/// 能否暂停
+		/// </summary>
+		/// <returns></returns>
+		public bool isPlayable() {
+			if (audioSource.isPlaying) return false;
+			if (isNullItem(item)) return false;
+			if (item.times <= 0) return true;
+
+			return playCnt < item.times || subQuestions.showAnswer;
+		}
 
 		#endregion
 
 		#region 回调控制
 
 		/// <summary>
+		/// 音频停止回调
+		/// </summary>
+		public void onAudioStop() {
+			refreshAudioInfo();
+		}
+
+		/// <summary>
 		/// 提交答案
 		/// </summary>
 		public void onConfirmClicked() {
 			subQuestions.showAnswer = true;
+			var selections = subQuestions.saveSelections();
+
+			showTypeSelect.setIndex(ArticleViewIndex);
 
 			if (confirmButton) confirmButton.SetActive(false);
 			if (submitButton) submitButton.SetActive(true);
 
-			// TODO: 加入判断
+			refreshAudioInfo();
+			// TODO: 加入判断接口
+
 		}
 
 		/// <summary>
@@ -122,10 +174,37 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			if (submitButton) submitButton.SetActive(false);
 			engSer.processReward(questionNumber: 10);
 		}
-
+		
+		/// <summary>
+		/// 显示类型改变回调
+		/// </summary>
+		public void onShowTypeChanged(Tuple<int, string> obj) {
+			if (!showTypeSelect) return;
+			var index = showTypeSelect.getIndex();
+			for (int i = 0; i < leftViews.Length; ++i) {
+				var go = leftViews[i];
+				var view = SceneUtils.get<BaseView>(go);
+				if (view != null)
+					if (i == index) view.startView();
+					else view.terminateView();
+				else go.SetActive(i == index);
+			}
+		}
+		
 		#endregion
 
 		#region 界面控制
+
+		/// <summary>
+		/// 刷新音频信息
+		/// </summary>
+		void refreshAudioInfo() {
+			if (isNullItem(item)) drawEmptyItem();
+			else {
+				drawAudioInfo(item);
+				drawBaseInfo(item);
+			}
+		}
 
 		/// <summary>
 		/// 绘制确切物品
@@ -137,6 +216,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 
 			setupAudio(question);
 
+			drawAudioInfo(question);
 			drawBaseInfo(question);
 			drawSubQuestions(question);
 			/*
@@ -151,11 +231,37 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		}
 
 		/// <summary>
+		/// 配置音频
+		/// </summary>
+		/// <param name="question"></param>
+		void setupAudio(ListeningQuestion question) {
+			audioSource.clip = question.audio;
+		}
+
+		/// <summary>
+		/// 配置音频
+		/// </summary>
+		/// <param name="question"></param>
+		void drawAudioInfo(ListeningQuestion question) {
+			if (question.times <= 0) return;
+			if (count) {
+				if (!subQuestions.showAnswer)
+					count.text = string.Format(CountFormat, playCnt, question.times);
+				else count.text = "";
+			}
+			var sprite = audioSource.isPlaying ? pauseSprite : playSprite;
+			playButton.image.overrideSprite = sprite;
+		}
+
+		/// <summary>
 		/// 绘制基本信息
 		/// </summary>
 		void drawBaseInfo(ListeningQuestion question) {
 			if (tipName) tipName.text = question.eventName;
 			if (image) image.texture = question.picture;
+
+			if (subQuestions.showAnswer) article.text = question.article;
+			else article.text = ArticleDisableTipText;
 		}
 
 		/// <summary>
@@ -166,11 +272,17 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		}
 
 		/// <summary>
-		/// 配置音频
+		/// 绘制时间
 		/// </summary>
-		/// <param name="question"></param>
-		void setupAudio(ListeningQuestion question) {
-			if (audioSource) audioSource.clip = question.audio;
+		void drawTimer(double cur, double max) {
+			slider.value = (float)(cur / max);
+
+			if (time) {
+				var curTxt = SceneUtils.time2Str(cur);
+				var maxTxt = SceneUtils.time2Str(max);
+
+				time.text = string.Format(TimeFormat, curTxt, maxTxt);
+			}
 		}
 
 		/// <summary>
@@ -180,6 +292,11 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			base.drawEmptyItem();
 
 			if (tipName) tipName.text = "";
+			if (count) count.text = "";
+			if (time) time.text = "";
+
+			article.text = "";
+
 			subQuestions.clearItems();
 
 			audioSource.Stop();
@@ -195,15 +312,26 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// <summary>
 		/// 播放听力音频
 		/// </summary>
-		public void playAudio() {
+		public void toggleAudio() {
 			if (audioSource.clip == null) return;
-			if (audioSource.isPlaying && isPauseable()) {
-				audioSource.Pause();
-				playButton.image.overrideSprite = AssetLoader.generateSprite(play);
-			} else {
-				audioSource.Play();
-				playButton.image.overrideSprite = AssetLoader.generateSprite(pause);
-			}
+			if (isPauseable()) pauseAudio();
+			else if (isPlayable()) playAudio();
+		}
+
+		/// <summary>
+		/// 暂停
+		/// </summary>
+		void pauseAudio() {
+			audioSource.Pause();
+			refreshAudioInfo();
+		}
+
+		/// <summary>
+		/// 播放
+		/// </summary>
+		void playAudio() {
+			audioSource.Play(); playCnt++;
+			refreshAudioInfo();
 		}
 
 		#endregion
