@@ -1886,10 +1886,6 @@ namespace GameModule.Services {
             /// 奖励卡牌选择数量
             /// </summary>
             const int RewardCardNumber = 3;
-            /// <summary>
-            /// 杀死敌人数量累计
-            /// </summary>
-            int _killEnemyAccmu = 0;
 
             /// <summary>
             /// 获取奖励金币
@@ -1900,9 +1896,12 @@ namespace GameModule.Services {
             /// <param name="enemy">杀死敌人数</param>
             /// <param name="question">答对题目数量</param>
             /// <returns>奖励金币</returns>
-            public static int getGoldReward(ExerProMapNode.Type type, int layer = 0, int enemy = 0, int question = 0) {
+            public static int getGoldReward(ExerProRecord record, int enemy = 0, int question = 0) {
+                record.scoreRecord.killEnemyAccmu += enemy;
+                var type = (ExerProMapNode.Type)record.currentNode().typeId;
+                var layer = record.currentNode().xOrder + 1;
+
                 int randBase = Random.Range(0, 5);
-                rewardGenerator._killEnemyAccmu += enemy;
                 switch (type) {
                     case ExerProMapNode.Type.Enemy:
                         return layer * randBase + enemy * (randBase + 15);
@@ -1920,9 +1919,9 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="stageOrder"></param>
             /// <returns></returns>
-            public static int getBossGoldReward(int stageOrder) {
+            public static int getBossGoldReward(ExerProRecord record) {
                 int randBase = Random.Range(35, 40);
-                return stageOrder * randBase;
+                return record.stageOrder * randBase;
             }
             /// <summary>
             /// 获取生成的奖励卡牌组（三挑一）
@@ -1956,26 +1955,25 @@ namespace GameModule.Services {
             /// <param name="cards">玩家的卡牌数</param>
             /// <param name="boss">杀死的boss数</param>
             /// <returns>当前玩家总的积分</returns>
-            public static int generateScore(int layer = 0, int gold = 0, int cards = 0,
-                int boss = 0, bool isPerfect = false) {
-                var score = rewardGenerator._killEnemyAccmu * 2 + boss * 50;
-                score += layer * 5 + gold / 100 * 25 + (cards > 30 ? (cards - 30) / 5 * 10 : 0);
+            public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
+                record.scoreRecord.killBossAccmu += boss;
+                var gold = record.actor.gold;
+                var cards = record.actor.cardGroup.getCardNumber();
+
+                var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
+                score += gold / 100 * 25 + (cards > 30 ? (cards - 30) / 5 * 10 : 0);
                 if (isPerfect)
-                    score += 50;
+                    record.scoreRecord.perfectNumber += 1;
+                score += record.scoreRecord.perfectNumber * 50;
+
+                var layer = record.currentNode().xOrder + 1;
+                score += (layer + record.scoreRecord.stageOrderAccumu) * 5;
+                if(boss > 0) {
+                    record.scoreRecord.stageOrderAccumu += layer;
+                }
                 return score;
             }
 
-            /// <summary>
-            /// 当前类对象
-            /// </summary>
-            static RewardGenerator _rewardGenerator = null;
-            static RewardGenerator rewardGenerator {
-                get {
-                    if (_rewardGenerator == null)
-                        _rewardGenerator = new RewardGenerator();
-                    return _rewardGenerator;
-                }
-            }
         }
 
         /// <summary>
@@ -1992,6 +1990,8 @@ namespace GameModule.Services {
             /// <summary>
             /// 内部变量
             /// </summary>
+            const int NormalStarID = 1;
+            const int RareStarID = 2;
             double DefaultNoramlRatio = 0.8;
             double DefaultRareRatio = 0.15;
             int[] cardTypePrice = new int[3]{ 20, 50, 100 };
@@ -2034,10 +2034,10 @@ namespace GameModule.Services {
             /// <param name="potion"></param>
             /// <returns></returns>
             public static int generatePotionPrice(ExerProPotion potion) {
-                switch (potion.star().name) {
-                    case "普通":
+                switch (potion.starId) {
+                    case NormalStarID:
                         return Random.Range(30, 45);
-                    case "稀有":
+                    case RareStarID:
                         return Random.Range(55, 75);
                 }
                 return 0;

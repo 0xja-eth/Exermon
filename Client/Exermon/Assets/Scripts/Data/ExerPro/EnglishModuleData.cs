@@ -1876,6 +1876,12 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         List<ExerProEnemy> _enemies = null;
 
+        /// <summary>
+        /// 积分记录
+        /// </summary>
+        [AutoConvert]
+        public ScoreRecord scoreRecord { get; protected set; } = new ScoreRecord();
+
         #region 数据转化
 
         /// <summary>
@@ -2263,6 +2269,21 @@ namespace ExerPro.EnglishModule.Data {
 
         #endregion
     }
+
+    public class ScoreRecord : BaseData {
+        /// <summary>
+        /// 积分计算的相关数据
+        /// </summary>
+        [AutoConvert]
+        public int killEnemyAccmu { get; set; } = 0;
+        [AutoConvert]
+        public int killBossAccmu { get; set; } = 0;
+        [AutoConvert]
+        public int perfectNumber { get; set; } = 0;
+        [AutoConvert]
+        public int stageOrderAccumu { get; set; } = 0;
+    }
+
 
     /// <summary>
     /// 据点类型

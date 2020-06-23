@@ -33,11 +33,11 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// </summary>
         CalcService calServ;
         EnglishService engServ;
+        ExerProRecord record;
 
         /// <summary>
         /// 内部变量
         /// </summary>
-        bool isConfigured { get; set; } = false;
         ExerProMapNode node { get; set; } = null;
         EnglishService.RewardInfo rewardInfo { get; set; } = null;
         UnityAction<bool> terminateCallback = null;
@@ -51,6 +51,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
             base.initializeSystems();
             calServ = CalcService.get();
             engServ = EnglishService.get();
+            record = engServ.record;
         }
 
         #endregion
@@ -99,20 +100,15 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
             int gold = 0;
             switch ((ExerProMapNode.Type)node.typeId) {
                 case ExerProMapNode.Type.Enemy:
-                    gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
-                        node.xOrder + 1, enemy: rewardInfo.killEnemyNumber);
-                    break;
                 case ExerProMapNode.Type.Elite:
-                    gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
-                        enemy: rewardInfo.killEnemyNumber);
+                    gold = CalcService.RewardGenerator.getGoldReward(record, enemy: rewardInfo.killEnemyNumber);
                     break;
                 case ExerProMapNode.Type.Story:
                 case ExerProMapNode.Type.Treasure:
-                    gold = CalcService.RewardGenerator.getGoldReward((ExerProMapNode.Type)node.typeId,
-                        node.xOrder + 1, question: rewardInfo.correctQuestionNumber);
+                    gold = CalcService.RewardGenerator.getGoldReward(record, question: rewardInfo.correctQuestionNumber);
                     break;
                 case ExerProMapNode.Type.Boss:
-                    gold = CalcService.RewardGenerator.getBossGoldReward(engServ.record.stageOrder + 1);
+                    gold = CalcService.RewardGenerator.getBossGoldReward(record);
                     break;
             }
             this.gold.text = string.Format(addMaskFormat, gold);
@@ -123,8 +119,8 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// </summary>
         void configureScore() {
             var actor = engServ.record.actor;
-            int score = CalcService.RewardGenerator.generateScore(node.xOrder + 1, actor.gold,
-                    actor.cardGroup.getCardNumber(), rewardInfo.killBossNumber, rewardInfo.isPerfect);
+            int score = CalcService.RewardGenerator.generateScore(record, 
+                rewardInfo.killBossNumber, rewardInfo.isPerfect);
             integral.text = string.Format(scoreFormat, score);
         }
 
