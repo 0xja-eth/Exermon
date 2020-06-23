@@ -28,16 +28,16 @@ namespace UI.Common.Controls { }
 /// </summary>
 namespace UI.Common.Controls.AnimationSystem {
 
-    /// <summary>
-    /// 动画项
-    /// </summary>
-    public class AnimationView : BaseView {
+	/// <summary>
+	/// 动画项
+	/// </summary>
+	public class AnimationView : BaseView {
 
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
-        public Animation animation;
-        public AnimationController controller;
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public Animation animation;
+		public AnimationController controller;
 
 		public RectTransform rectTransform;
 		public CanvasGroup canvasGroup;
@@ -46,8 +46,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <summary>
 		/// 动画栈/缓冲队列
 		/// </summary>
-		Queue<AnimationUtils.TempAnimation> animations = 
-            new Queue<AnimationUtils.TempAnimation>();
+		LinkedList<AnimationUtils.TempAnimation> animations =
+			new LinkedList<AnimationUtils.TempAnimation>();
 		//Queue<AnimationUtils.TempAnimation> tmpAnimations = 
 		//    new Queue<AnimationUtils.TempAnimation>();
 
@@ -66,26 +66,21 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
+		#region 初始化
+
 		/// <summary>
-		/// 开始标志
+		/// 初始化
 		/// </summary>
-		bool isStarted = false;
-
-        #region 初始化
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
+		protected override void initializeOnce() {
+			base.initializeOnce();
 			setupAnimationObjects();
 			animation = animation ?? SceneUtils.ani(gameObject);
-        }
+		}
 
 		/// <summary>
 		/// 配置动画物体
 		/// </summary>
-		void setupAnimationObjects(){
+		void setupAnimationObjects() {
 			rectTransform = rectTransform ?? transform as RectTransform;
 			canvasGroup = canvasGroup ?? SceneUtils.get<CanvasGroup>(gameObject);
 			graphic = graphic ?? SceneUtils.get<Graphic>(gameObject);
@@ -145,11 +140,13 @@ namespace UI.Common.Controls.AnimationSystem {
 		public void removeUpdateEvent(string aniName) {
 			updateEvents.Remove(aniName);
 		}
-		
+
 		/// <summary>
 		/// 动画播放完毕回调
 		/// </summary>
 		void onAnimationPlayed(AnimationUtils.TempAnimation ani) {
+			Debug.Log(this.name + " onAnimationPlayed");
+
 			var name = ani.getName();
 			if (updateEvents.ContainsKey(""))
 				updateEvents[""]?.Invoke();
@@ -161,10 +158,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <summary>
 		/// 下一动画播放开始回调
 		/// </summary>
-		void onNextAnimationPlay(AnimationUtils.TempAnimation? ani_) {
-			if (ani_ == null) return;
+		void onNextAnimationPlay(AnimationUtils.TempAnimation ani) {
+			if (ani == null) return;
 
-			var ani = (AnimationUtils.TempAnimation)ani_;
 			var name = ani.getName();
 			if (updateEvents.ContainsKey(""))
 				updateEvents[""]?.Invoke();
@@ -180,20 +176,27 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新
 		/// </summary>
 		protected override void update() {
-            base.update();
-			var ani_ = curAni();
-			if (ani_ == null) return;
+			base.update();
+			var ani = curAni();
 
-			var ani = (AnimationUtils.TempAnimation)ani_;
+			updateAutoPlay();
 			updateCurrentEvent(ani);
-            updateAnimation(ani);
-        }
+			updateAnimation(ani);
+		}
+
+		/// <summary>
+		/// 更新自动播放
+		/// </summary>
+		void updateAutoPlay() {
+			// 如果没有控制器，自动播放当前动画
+			if (!controller && !isPlaying() && !isCurPlayed()) play();
+		}
 
 		/// <summary>
 		/// 更新当前动画事件
 		/// </summary>
 		void updateCurrentEvent(AnimationUtils.TempAnimation ani) {
-			if (ani.isPlaying()) {
+			if (ani != null && ani.isPlaying()) {
 				var name = ani.getName();
 				if (updateEvents.ContainsKey(name))
 					updateEvents[name]?.Invoke();
@@ -204,7 +207,8 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 更新动画
 		/// </summary>
 		void updateAnimation(AnimationUtils.TempAnimation ani) {
-			if (ani.isPlayed()) onAnimationPlayed(ani);
+			if (ani != null && ani.isPlayed())
+				onAnimationPlayed(ani);
 		}
 
 		#endregion
@@ -215,9 +219,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 当前动画
 		/// </summary>
 		/// <returns></returns>
-		public AnimationUtils.TempAnimation? curAni() {
+		public AnimationUtils.TempAnimation curAni() {
 			if (animations.Count <= 0) return null;
-            return animations.Peek();
+            return animations.First.Value;
         }
 
         /// <summary>
@@ -226,15 +230,24 @@ namespace UI.Common.Controls.AnimationSystem {
         /// <returns></returns>
         public bool isPlaying() {
             return animation.isPlaying;
-        }
+		}
 
-        /// <summary>
-        /// 是否播放完毕（全部）
-        /// </summary>
-        /// <returns></returns>
-        public bool isPlayed() {
-            return animations.Count <= 0;
-        }
+		/// <summary>
+		/// 是否播放完毕（全部）
+		/// </summary>
+		/// <returns></returns>
+		public bool isPlayed() {
+			return animations.Count <= 0;
+		}
+
+		/// <summary>
+		/// 当前是否播放完毕
+		/// </summary>
+		/// <returns></returns>
+		public bool isCurPlayed() {
+			var ani = curAni(); 
+			return ani != null && ani.isPlayed();
+		}
 
 		#region 播放队列操作
 
@@ -243,11 +256,18 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		/// <param name="force">是否直接添加到播放列表</param>
 		public void addToPlayQueue(bool force) {
-			if (controller == null) return;
-			controller.add(this, force);
+			controller?.add(this, force);
 		}
 		public void addToPlayQueue() {
 			addToPlayQueue(false);
+		}
+
+		/// <summary>
+		/// 开始下一个动画视窗
+		/// </summary>
+		public void startNextAnimationView() {
+			Debug.Log("startNextAnimationView");
+			controller?.playNext();
 		}
 
 		#endregion
@@ -258,7 +278,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 播放
 		/// </summary>
 		public void play() {
-			curAni()?.setupAnimation(animation);
+			var ani = curAni();
+			Debug.Log(name + " play: " + ani?.getName());
+			ani?.setupAnimation(animation);
         }
 
         /// <summary>
@@ -272,7 +294,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// 切换到下一个动画
         /// </summary>
         public void next() {
-            animations.Dequeue();
+            animations.RemoveFirst();
         }
 
         /// <summary>
@@ -299,8 +321,22 @@ namespace UI.Common.Controls.AnimationSystem {
 		}
 		public AnimationUtils.TempAnimation addAnimation(
             AnimationUtils.TempAnimation ani) {
-            animations.Enqueue(ani); return ani;
+			Debug.Log(name + " addAnimation: " + ani.getName());
+			return enqueueAnimation(ani);
         }
+
+		/// <summary>
+		/// 加入队列
+		/// </summary>
+		/// <param name="ani"></param>
+		AnimationUtils.TempAnimation enqueueAnimation(AnimationUtils.TempAnimation ani) {
+			foreach (var ani_ in animations)
+				if (ani_.isClipEquals(ani)) {
+					Debug.LogWarning("Adding animation: " + ani.getName() + " failed.");
+					return ani_;
+				}
+			animations.AddLast(ani); return ani;
+		}
 		
 		#endregion
 
@@ -391,6 +427,9 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// <param name="play">立即播放</param>
 		public void rotateTo(Vector3 target, string name = "Rotate",
 			float duration = AnimationUtils.AniDuration, bool play = false) {
+
+			Debug.Log(this.name + ": rotateTo " + target + ", rectTransform: " + rectTransform);
+
 			if (rectTransform == null) return;
 
 			var ani = addAnimation(name, true);

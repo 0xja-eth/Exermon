@@ -40,13 +40,20 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 关闭视窗
 		/// </summary>
 		public override void terminateView() {
-			base.terminateView();
 			window.terminateWindow();
 		}
 
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 物品改变回调
+		/// </summary>
+		protected override void onItemChanged() {
+			base.onItemChanged();
+			if (isNullItem(item)) terminateView();
+		}
 
 		/// <summary>
 		/// 是否为空物品

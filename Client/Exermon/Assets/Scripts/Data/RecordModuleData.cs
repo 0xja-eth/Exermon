@@ -535,9 +535,7 @@ namespace RecordModule.Data {
         /// <param name="json"></param>
         protected override void loadCustomAttributes(JsonData json) {
             base.loadCustomAttributes(json);
-
-            Debug.Log("loadCustomAttributes: " + json.ToJson());
-
+			
             this.exerExpIncrs.Clear();
             this.slotExpIncrs.Clear();
 

@@ -36,7 +36,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item"></param>
 		/// <returns></returns>
 		public override bool isNullItem(RuntimeState item) {
-			return base.isNullItem(item) && item.state() != null;
+			return base.isNullItem(item) || item.state() == null;
 		}
 
 		#endregion

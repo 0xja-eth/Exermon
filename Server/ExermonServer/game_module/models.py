@@ -1010,6 +1010,7 @@ class GameConfigure(models.Model):
 
 		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
 
+		first_card_groups = ModelUtils.objectsToDict(self.firstcardgroup_set.all())
 		exer_pro_item_stars = ModelUtils.objectsToDict(self.exerproitemstar_set.all())
 		antonyms = ModelUtils.objectsToDict(self.antonym_set.all())
 		node_types = ModelUtils.objectsToDict(self.nodetype_set.all())
@@ -1076,10 +1077,10 @@ class GameConfigure(models.Model):
 			'result_judges': result_judges,
 			'game_tips': game_tips,
 
+			'first_card_groups': first_card_groups,
+			'exer_pro_item_stars': exer_pro_item_stars,
 			'antonyms': antonyms,
 			'node_types': node_types,
-
-			'exer_pro_item_stars': exer_pro_item_stars,
 		}
 
 	def _convertDynamicDataToDict(self):

@@ -50,7 +50,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 结束视窗
         /// </summary>
         public override void terminateView() {
-            base.terminateView();
+            //base.terminateView();
             window?.terminateWindow();
         }
 

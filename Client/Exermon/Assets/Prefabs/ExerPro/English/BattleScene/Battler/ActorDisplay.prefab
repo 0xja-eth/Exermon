@@ -109,11 +109,11 @@ RectTransform:
   m_Father: {fileID: 7136423212889565012}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.1}
+  m_SizeDelta: {x: 256, y: 256}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5049548059275741552
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e114688c3e1918049967bfae5c0cb6f8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6026dbd422ea12148bbacb8c4d1ffeda, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -321,6 +321,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7136423212889565012}
   - component: {fileID: 689451423857683196}
+  - component: {fileID: 3667156874189374205}
   m_Layer: 5
   m_Name: Animator
   m_TagString: Untagged
@@ -370,6 +371,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &3667156874189374205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6504738831977965397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38689aaf408c17b4f8943eb772209a88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battler: {fileID: 1136187708889307476}
 --- !u!1 &6789909901512949023
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,7 +436,8 @@ Animation:
   m_Enabled: 1
   serializedVersion: 3
   m_Animation: {fileID: 0}
-  m_Animations: []
+  m_Animations:
+  - {fileID: 7400000, guid: 0b35ba65989d6b64faaeafb3a1aee467, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
@@ -441,7 +456,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animation: {fileID: 3369629342021005463}
   controller: {fileID: 0}
-  rectTransform: {fileID: 0}
+  rectTransform: {fileID: 6789909901512949022}
   canvasGroup: {fileID: 0}
   graphic: {fileID: 0}
 --- !u!114 &8930337670809030736
@@ -479,6 +494,7 @@ MonoBehaviour:
   selectable: 0
   checkable: 0
   highlightable: 0
+  clickable: 1
   forceChecked: 0
   deselectable: 0
   normalColor: {r: 1, g: 1, b: 1, a: 0}

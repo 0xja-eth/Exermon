@@ -33,7 +33,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Word {
 		public bool showAnswer {
 			get { return _showAnswer; }
 			set {
-				_showAnswer = true;
+				_showAnswer = value;
 				requestRefresh();
 			}
 		}

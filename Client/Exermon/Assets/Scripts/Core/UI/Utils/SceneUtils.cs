@@ -667,7 +667,8 @@ namespace Core.UI.Utils {
 		public static Vector2 screen2Local(
 			Vector2 pos, RectTransform rt, Camera camera = null) {
 			Vector2 res; if (camera == null) camera = Camera.main;
-			
+			Debug.Log("camera: " + camera + ", Camera.main: " + Camera.main + ", Camera.current: " + Camera.current);
+
 			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
 				rt, pos, camera, out res)) return res;
 			return pos;

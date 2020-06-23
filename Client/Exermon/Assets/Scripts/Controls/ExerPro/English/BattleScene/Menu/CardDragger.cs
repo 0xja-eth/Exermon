@@ -26,8 +26,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public CardDisplay cardDisplay;
 
-		public RectTransform arrowParent;
-
 		/// <summary>
 		/// 预制件设定
 		/// </summary>
@@ -48,6 +46,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		GameObject arrow;
 		Vector2 startPos;
 
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+		}
+
+		#endregion
+
 		#region 数据控制
 
 		/// <summary>
@@ -57,7 +66,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public ExerProPackCard getCard() {
 			return cardDisplay.getItem();
 		}
-
+		/*
 		/// <summary>
 		/// 能否进行拖拽操作（超出container范围后才可进行）
 		/// </summary>
@@ -65,13 +74,23 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public bool isDraggable() {
 			return cardDisplay.isDraggable();
 		}
-
+		*/
 		/// <summary>
 		/// 使用卡牌
 		/// </summary>
-		public void use(EnemyDisplay enemy) {
-			if (!isDraggable()) return;
+		public void use(EnemyDisplay enemy = null) {
+			Debug.Log("use: " + enemy);
 			cardDisplay.use(enemy);
+		}
+
+		/// <summary>
+		/// 箭头父变换
+		/// </summary>
+		/// <returns></returns>
+		RectTransform arrowParent() {
+			var container = cardDisplay.getContainer();
+			if (container == null) return transform as RectTransform;
+			return container.transform as RectTransform;
 		}
 
 		#endregion
@@ -83,8 +102,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="data">事件数据</param>
 		public void OnBeginDrag(PointerEventData data) {
+			Debug.Log(name + ": OnBeginDrag: " + data);
 			isDragging = true;
-			startPos = data.position;
+			cardDisplay.select();
+			startPos = arrowLocalPos(data);
+			if (arrow == null) createArrow();
 		}
 
 		/// <summary>
@@ -92,9 +114,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="data">事件数据</param>
 		public void OnDrag(PointerEventData data) {
-			if (!isDraggable()) return;
-			if (arrow == null) createArrow();
-			updateArrowTransform(data.position);
+			var pos = arrowLocalPos(data);
+			Debug.Log(name + ": OnDrag: " + data.position + ", pos: " + pos);
+			updateArrowTransform(pos);
 		}
 
 		/// <summary>
@@ -102,6 +124,18 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="data">事件数据</param>
 		public void OnEndDrag(PointerEventData data) {
+			Debug.Log(name + ": OnEndDrag: " + data);
+			isDragging = false;
+			cardDisplay.deselect();
+			destroyArrow();
+		}
+
+		/// <summary>
+		/// 销毁回调
+		/// </summary>
+		public void OnDestroy() {
+			Debug.Log(name + ": OnDestroy");
+			cardDisplay.deselect();
 			isDragging = false;
 			destroyArrow();
 		}
@@ -111,6 +145,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		#region 拖拽控制
 
 		/// <summary>
+		/// 获取本地坐标
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		Vector2 arrowLocalPos(PointerEventData data) {
+			return SceneUtils.screen2Local(data.position, arrowParent(), data.pressEventCamera);
+		}
+
+		/// <summary>
 		/// 更新箭头变换
 		/// </summary>
 		/// <param name="pos"></param>
@@ -118,7 +161,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			var delta = pos - startPos;
 			var rt = arrow.transform as RectTransform;
 
-			var angle = Mathf.Atan(delta.y / delta.x) / Mathf.PI * 180;
+			float angle = 0;
+			if (delta.x != 0) angle = Mathf.Atan(delta.y / delta.x) / Mathf.PI * 180;
+			if (delta.x < 0) angle = angle + 180;
+
 			var dist = delta.magnitude;
 
 			var size = rt.sizeDelta; size.x = dist;
@@ -133,7 +179,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 创建箭头
 		/// </summary>
 		void createArrow() {
-			var arrow = Instantiate(arrowPerfab, arrowParent);
+			var arrow = Instantiate(arrowPerfab, arrowParent());
 			var rt = arrow.transform as RectTransform;
 			if (rt == null) return;
 
@@ -146,14 +192,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="rt"></param>
 		void setupArrowRectTransform(RectTransform rt) {
-			rt.pivot = new Vector2(0.5f, 0);
+			rt.pivot = new Vector2(0, 0.5f);
 		}
 
 		/// <summary>
 		/// 摧毁箭头
 		/// </summary>
 		void destroyArrow() {
-			if (arrow != null) return;
+			if (arrow == null) return;
 			Destroy(arrow); arrow = null;
 		}
 
