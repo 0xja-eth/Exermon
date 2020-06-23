@@ -53,9 +53,11 @@ namespace Core.Data.Loaders {
 		/// <summary>
 		/// 文件主体名称定义
 		/// </summary>
+		public const string IconsFileName = "Icons";
+		public const string IconFileName = "Icon";
+
 		public const string CharacterFileName = "Character";
-        public const string IconsFileName = "Icons";
-        public const string ExermonFileName = "Exermon";
+		public const string ExermonFileName = "Exermon";
         public const string ExerGiftFileName = "BigExerGift";
         public const string BigExerGiftFileName = "BigExerGift";
         public const string ExerSkillFileName = "Skill";
@@ -352,6 +354,17 @@ namespace Core.Data.Loaders {
 		}
 
 		/// <summary>
+		/// 获取卡牌图标所占的区域
+		/// </summary>
+		/// <param name="index">图标索引</param>
+		/// <returns>返回对应图标索引的精灵</returns>
+		public static Sprite getExerProCardIconSprite(int index) {
+			var texture = loadTexture2D(ExerProCardPath, IconFileName, index);
+			if (texture != null) return generateSprite(texture);
+			return null;
+		}
+
+		/// <summary>
 		/// 诅咒卡牌皮肤索引
 		/// </summary>
 		static int EvilCardSkinIndex = 0;
@@ -455,17 +468,6 @@ namespace Core.Data.Loaders {
 			return getGroupAssetsSprite(index,
 				ExerProItemPath, IconsFileName, 
 				ItemIconSize, ItemIconSize);
-		}
-
-		/// <summary>
-		/// 获取卡牌图标所占的区域
-		/// </summary>
-		/// <param name="index">图标索引</param>
-		/// <returns>返回对应图标索引的精灵</returns>
-		public static Sprite getExerProCardIconSprite(int index) {
-			return getGroupAssetsSprite(index,
-				ExerProCardPath, IconsFileName,
-				(int)CardIconSize.x, (int)CardIconSize.y);
 		}
 
 		/// <summary>

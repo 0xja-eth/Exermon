@@ -845,7 +845,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="json"></param>
 		protected override void loadCustomAttributes(JsonData json) {
 			base.loadCustomAttributes(json);
-			//icon = loadFun()?.Invoke(iconIndex);
+
+			icon = iconLoadFun()?.Invoke(iconIndex);
 			startAni = AssetLoader.loadAnimation(startAniIndex);
 			targetAni = AssetLoader.loadAnimation(targetAniIndex);
 		}

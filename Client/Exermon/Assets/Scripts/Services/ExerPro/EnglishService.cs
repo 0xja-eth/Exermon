@@ -190,6 +190,7 @@ namespace ExerPro.EnglishModule.Services {
 			sceneSys = SceneSystem.get();
 
 			dataSer = DataService.get();
+			battleSer = BattleService.get();
 		}
 
 		/// <summary>

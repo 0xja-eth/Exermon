@@ -45,6 +45,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public const string AttackAttr = "attack";
 		public const string HurtAttr = "hurt";
 		public const string DieAttr = "died";
+
+		public const string DefaultAttackAnimation = "Animation_1";
+		public const string DefaultHurtAnimation = "Animation_3";
+
 		//public const string SkillAttr = "skill";
 		//public const string PowerUpAttr = "power_up";
 		//public const string PowerDownAttr = "power_down";
@@ -232,7 +236,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="ani"></param>
 		public void setupStartAni(AnimationClip ani) {
-			animator.changeAni("Animation_1", ani);
+			animator.changeAni(DefaultAttackAnimation, ani);
 			// AttackAnimation
 		}
 
@@ -241,7 +245,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="ani"></param>
 		public void setupTargetAni(AnimationClip ani) {
-			animator.changeAni("Animation_3", ani);
+			animator.changeAni(DefaultHurtAnimation, ani);
 			// HurtAnimation
 		}
 
