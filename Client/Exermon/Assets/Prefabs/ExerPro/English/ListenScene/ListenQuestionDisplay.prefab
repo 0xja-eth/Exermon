@@ -608,12 +608,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 639b65c8d00fdbb45b6e59b900e9efa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  left: {fileID: 582089810251145187}
-  right: {fileID: 582089809597167465}
+  left: {fileID: 582089809597167465}
+  right: {fileID: 582089810251145187}
   container: {fileID: 582089809773105445}
   defaultRate: 0.5
-  minRate: 0.5
-  maxRate: 1
+  minRate: 0
+  maxRate: 0.5
 --- !u!114 &582089810152254830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1263,7 +1263,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.53
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

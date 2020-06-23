@@ -749,7 +749,8 @@ namespace ExerPro.EnglishModule.Services {
 		/// 剧情据点
 		/// </summary>
 		void onStoryNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
 		}
 
 		/// <summary>
@@ -762,9 +763,9 @@ namespace ExerPro.EnglishModule.Services {
 		/// <summary>
 		/// 听力据点
 		/// </summary>
-		void onListenNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
-		}
+		//void onListenNode() {
+		//	sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
+		//}
 
 		/// <summary>
 		/// 精英据点
