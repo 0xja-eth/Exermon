@@ -1429,13 +1429,23 @@ namespace ExerPro.EnglishModule.Data {
         /// 抽牌
         /// </summary>
         public void drawCard() {
-            drawGroup.transferItem(handGroup, drawGroup.firstCard());
+			if (drawGroup.items.Count <= 0) recycleDiscard();
+			drawGroup.transferItem(handGroup, drawGroup.firstCard());
         }
 
-        /// <summary>
-        /// 使用牌
-        /// </summary>
-        public void useCard(ExerProPackCard card) {
+		/// <summary>
+		/// 回收弃牌
+		/// </summary>
+		public void recycleDiscard() {
+			var tmpItems = discardGroup.items.ToArray();
+			foreach (var item in tmpItems)
+				discardGroup.transferItem(drawGroup, item);
+		}
+
+		/// <summary>
+		/// 使用牌
+		/// </summary>
+		public void useCard(ExerProPackCard card) {
             if (card.item().disposable) consumeCard(card);
             else discardCard(card);
         }
