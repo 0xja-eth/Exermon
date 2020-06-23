@@ -1,9 +1,12 @@
 ﻿
 using Core.Systems;
 using Core.UI;
-
+using UnityEngine;
 using UI.ExerPro.EnglishPro.ListenScene.Windows;
 using ExerPro.EnglishModule.Services;
+using PlayerModule.Services;
+using System.Diagnostics;
+using UI.ExerPro.EnglishPro.Common.Windows;
 
 /// <summary>
 /// 背包场景
@@ -18,6 +21,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         /// 外部变量
         /// </summary>
         public ListenWindow listenWindow;
+        public RewardWindow rewardWindow;
 
         /// <summary>
         /// 外部系统
@@ -45,11 +49,31 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         protected override void start() {
             base.start();
             refresh();
-        }
+            //测试用函数
+			//GameSystem.get().start();
+			//PlayerService.get().login("804173948", "123456789", configureQuestion);
+		}
 
+        //测试用
+        void configureQuestion()
+        {
+            if (GameSystem.get().isLoaded() == true)
+                UnityEngine.Debug.Log("danteding 登陆成功");
+        }
         #endregion
 
         #region 场景控制
+
+        /// <summary>
+        /// 场景更新
+        /// </summary>
+        protected override void update() {
+            base.update();
+            var rewardInfo = engSer.rewardInfo;
+            if (rewardInfo != null) {
+                rewardWindow.startWindow(rewardInfo);
+            }
+        }
 
         /// <summary>
         /// 刷新场景

@@ -13,6 +13,7 @@ using UI.Common.Controls.InputFields;
 using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
@@ -43,7 +44,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// 外部系统设置
         /// </summary>
         protected DataService dataSer;
-        protected ItemService itemSer;
+        protected EnglishService engSer;
 
         #region 初始化
 
@@ -87,7 +88,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         protected override void initializeSystems() {
             base.initializeSystems();
             dataSer = DataService.get();
-            itemSer = ItemService.get();
+            engSer = EnglishService.get();
         }
 
         #endregion
@@ -131,5 +132,18 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         }
 
         #endregion
+
+        /// <summary>
+        /// 结束视图，重置价格
+        /// </summary>
+        public override void terminateView() {
+            base.terminateView();
+            Debug.Log("Shop Display Terminate!");
+            if (shopItems != null) {
+                foreach (var item in shopItems) {
+                    item.gold = 0;
+                }
+            }
+        }
     }
 }

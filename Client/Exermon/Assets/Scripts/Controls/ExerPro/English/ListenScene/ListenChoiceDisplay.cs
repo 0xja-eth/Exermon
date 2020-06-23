@@ -11,10 +11,10 @@ using ExerPro.EnglishModule.Data;
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
     /// <summary>
     /// 题目选项显示
-    /// </summary
+    /// 利大佬说的Class A
+    /// </summary>
     public class ListenChoiceDisplay :
         SelectableItemDisplay<ListeningSubQuestion.Choice> {
-
         /// <summary>
         /// 常量定义
         /// </summary>
@@ -23,12 +23,46 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Color normalFontColor = new Color(0, 0, 0);
+        public Color normalFontColor = new Color(255, 255, 255);
+        public Color correctFontColor = new Color(0.2705882f, 0.6078432f, 0.372549f);
+        public Color wrongFontColor = new Color(0.9372549f, 0.2666667f, 0.1137255f);
 
         public CanvasGroup canvasGroup;
         public float noAnswerAlpha = 0.4f; // 非正确答案时的透明度
 
+        public GameObject correctFlag; // 正确答案标志
+        public GameObject wrongFlag; // 错误答案标志
+
         public QuestionText text;
+
+
+        #region 数据控制
+
+        /// <summary>
+        /// 获取容器
+        /// </summary>
+        /// <returns></returns>
+        public new ListenChoiceContainer getContainer() {
+            return (ListenChoiceContainer)container;
+        }
+
+        /// <summary>
+        /// 是否显示答案
+        /// </summary>
+        /// <returns></returns>
+        public bool showAnswer() {
+            return getContainer().showAnswer;
+        }
+
+        #endregion
+
+        #region 数据控制
+
+        public override bool isActived() {
+            return base.isActived() && !showAnswer();
+        }
+
+        #endregion
 
         #region 界面控制
 
@@ -38,10 +72,32 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// <param name="choice">选项</param>
         protected override void drawExactlyItem(ListeningSubQuestion.Choice choice) {
             base.drawExactlyItem(choice);
-            //if (canvasGroup)
-            //    canvasGroup.alpha = isHighlighting() ? 1 : noAnswerAlpha;
+            bool correct = false, wrong = false;
+
+            if (showAnswer()) {
+                if (canvasGroup)
+                    canvasGroup.alpha = choice.answer ? 1 : noAnswerAlpha;
+
+                var isInSelected = getContainer().getItemDisplay(getContainer().getSelectedIndex()) == this;
+                correct = choice.answer;
+                wrong = !choice.answer && isInSelected;
+
+                if (correctFlag) correctFlag.SetActive(correct);
+                if (wrongFlag) wrongFlag.SetActive(wrong);
+
+            }
+            else {
+                if (canvasGroup) canvasGroup.alpha = 1;
+                if (correctFlag) correctFlag.SetActive(false);
+                if (wrongFlag) wrongFlag.SetActive(false);
+            }
 
             if (text) {
+                var color = normalFontColor;
+                if (correct) color = correctFontColor;
+                if (wrong) color = wrongFontColor;
+
+                text.color = color;
                 text.text = generateChoiceText(choice);
             }
         }
@@ -52,31 +108,20 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// <param name="choice">选项</param>
         /// <returns></returns>
         string generateChoiceText(ListeningSubQuestion.Choice choice) {
-            return choice.text;
-            //var alph = ((char)('A' + index)).ToString();
-            //return string.Format(TextFormat, alph, choice.text);
+            var alph = ((char)('A' + index)).ToString();
+            return string.Format(TextFormat, alph, choice.text);
         }
 
         /// <summary>
         /// 清除物品
         /// </summary>
         protected override void drawEmptyItem() {
-            //if (canvasGroup) canvasGroup.alpha = 1;
+            if (canvasGroup) canvasGroup.alpha = 1;
+            if (correctFlag) correctFlag.SetActive(false);
+            if (wrongFlag) wrongFlag.SetActive(false);
             if (text) text.text = "";
         }
 
-        #endregion
-
-        #region 事件处理
-        /// <summary>
-        /// 处理点击事件回调
-        /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public override void OnPointerClick(PointerEventData eventData) {
-            base.OnPointerClick(eventData);
-            Debug.Log("Plot Choice Clicked!");
-
-        }
         #endregion
     }
 }

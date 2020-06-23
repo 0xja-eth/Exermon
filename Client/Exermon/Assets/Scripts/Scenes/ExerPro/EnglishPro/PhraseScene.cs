@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static ExerPro.EnglishModule.Data.PhraseQuestion;
+using UI.ExerPro.EnglishPro.Common.Windows;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
     class PhraseScene : BaseScene {
@@ -17,6 +19,8 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         /// </summary>
         /// 
         public OptionAreaDisplay optionAreaDisplay;
+        public RewardWindow rewardWindow;
+        public Button settlementButton;
 
         /// <summary>
         /// 外部系统设置
@@ -51,9 +55,19 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
             optionAreaDisplay.startView(sample());
         }
 
+        protected override void update() {
+            base.update();
+            var rewardInfo = engSer.rewardInfo;
+            if(rewardInfo != null) {
+                rewardWindow.startWindow(rewardInfo);
+            }
+        }
+
         public void onSubmit() {
             //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
-            engSer.exitNode(true);
+            settlementButton?.gameObject.SetActive(false);
+            engSer.processReward(questionNumber: 10);
+            //engSer.exitNode(true);
         }
     }
 }

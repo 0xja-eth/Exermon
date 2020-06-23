@@ -299,6 +299,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 2928637308878084877, guid: 0d3a09e17165a184ab6077cc917bf6c3,
+        type: 3}
+      propertyPath: exitButton
+      value: 
+      objectReference: {fileID: 1336756871}
     - target: {fileID: 3613023877216743536, guid: 0d3a09e17165a184ab6077cc917bf6c3,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -992,7 +997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1336756870
 RectTransform:
   m_ObjectHideFlags: 0

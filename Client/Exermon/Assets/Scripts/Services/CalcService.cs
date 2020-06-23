@@ -1877,6 +1877,261 @@ namespace GameModule.Services {
 				battler.addHP(val); battler.addHP(rate);
 			}
 		}
-	}
 
+        /// <summary>
+        /// 奖励生成器
+        /// </summary>
+        public class RewardGenerator {
+            /// <summary>
+            /// 奖励卡牌选择数量
+            /// </summary>
+            const int RewardCardNumber = 3;
+            /// <summary>
+            /// 杀死敌人数量累计
+            /// </summary>
+            int _killEnemyAccmu = 0;
+
+            /// <summary>
+            /// 获取奖励金币
+            /// 战斗据点：层数+敌人；精英：敌人；听力/藏宝：层数+题目
+            /// </summary>
+            /// <param name="type">据点类型</param>
+            /// <param name="layer">层数，即当前节点的xOrder</param>
+            /// <param name="enemy">杀死敌人数</param>
+            /// <param name="question">答对题目数量</param>
+            /// <returns>奖励金币</returns>
+            public static int getGoldReward(ExerProMapNode.Type type, int layer = 0, int enemy = 0, int question = 0) {
+                int randBase = Random.Range(0, 5);
+                rewardGenerator._killEnemyAccmu += enemy;
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                        return layer * randBase + enemy * (randBase + 15);
+                    case ExerProMapNode.Type.Elite:
+                        return enemy * (randBase + 35);
+                    case ExerProMapNode.Type.Treasure:
+                        return layer * randBase + question * 15;
+                    case ExerProMapNode.Type.Story:
+                        return layer * randBase + question * 50;
+                }
+                return -1;
+            }
+            /// <summary>
+            /// boss奖励
+            /// </summary>
+            /// <param name="stageOrder"></param>
+            /// <returns></returns>
+            public static int getBossGoldReward(int stageOrder) {
+                int randBase = Random.Range(35, 40);
+                return stageOrder * randBase;
+            }
+            /// <summary>
+            /// 获取生成的奖励卡牌组（三挑一）
+            /// </summary>
+            /// <param name="type">据点类型</param>
+            /// <returns></returns>
+            public static List<ExerProCard> getCardRewards(ExerProMapNode.Type type) {
+                List<ExerProCard> exerProCards = new List<ExerProCard>();
+                switch (type) {
+                    case ExerProMapNode.Type.Enemy:
+                    case ExerProMapNode.Type.Elite:
+                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.75, 0.2);
+                        break;
+                    case ExerProMapNode.Type.Treasure:
+                    case ExerProMapNode.Type.Story:
+                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.35, 0.4);
+                        break;
+                    case ExerProMapNode.Type.Boss:
+                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0, 0);
+                        break;
+                }
+                return exerProCards;
+            }
+
+            /// <summary>
+            /// 获取当前玩家的积分
+            /// 该函数使用内部杀死敌人记录进行计算，需在获取通关金币奖励后使用
+            /// </summary>
+            /// <param name="layer">层数，即当前节点的xOrder</param>
+            /// <param name="gold">玩家的金币数</param>
+            /// <param name="cards">玩家的卡牌数</param>
+            /// <param name="boss">杀死的boss数</param>
+            /// <returns>当前玩家总的积分</returns>
+            public static int generateScore(int layer = 0, int gold = 0, int cards = 0,
+                int boss = 0, bool isPerfect = false) {
+                var score = rewardGenerator._killEnemyAccmu * 2 + boss * 50;
+                score += layer * 5 + gold / 100 * 25 + (cards > 30 ? (cards - 30) / 5 * 10 : 0);
+                if (isPerfect)
+                    score += 50;
+                return score;
+            }
+
+            /// <summary>
+            /// 当前类对象
+            /// </summary>
+            static RewardGenerator _rewardGenerator = null;
+            static RewardGenerator rewardGenerator {
+                get {
+                    if (_rewardGenerator == null)
+                        _rewardGenerator = new RewardGenerator();
+                    return _rewardGenerator;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 随机生成特训物品，如卡牌、药水等
+        /// </summary>
+        public class ExerProItemGenerator {
+            /// <summary>
+            /// 指定生成物品类型
+            /// </summary>
+            public enum Type {
+                Card, Potion,
+            }
+
+            /// <summary>
+            /// 内部变量
+            /// </summary>
+            double DefaultNoramlRatio = 0.8;
+            double DefaultRareRatio = 0.15;
+            int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+
+            /// <summary>
+            /// 用于生成商店刷新的物品
+            /// </summary>
+            /// <param name="count">数量</param>
+            /// <param name="stageOrder">大层数</param>
+            /// <param name="type">物品类型</param>
+            /// <returns></returns>
+            public static List<BaseExerProItem> generateBusinessItem(int count, int stageOrder, Type type = Type.Card) {
+                List<BaseExerProItem> items = new List<BaseExerProItem>();
+                var normalRatio = itemGenerator.DefaultNoramlRatio - 0.15 * stageOrder;
+                var rareRatio = itemGenerator.DefaultRareRatio + 0.1 * stageOrder;
+                while (items.Count != count) {
+                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio, type);
+                    if (result == null)
+                        continue;
+                    items.Add(result);
+                }
+                return items;
+            }
+
+            /// <summary>
+            /// 商店出售卡牌定价
+            /// </summary>
+            /// <param name="card"></param>
+            /// <returns></returns>
+            public static int generateCardPrice(ExerProCard card) {
+                var price = card.cost * Random.Range(5, 10) +
+                    itemGenerator.cardTypePrice[card.starId - 1] * Random.Range(0.7f, 1) +
+                    ((card.target == (int)ExerProCard.Target.All) ? 10 : 0);   
+                return (int)price;
+            }
+
+            /// <summary>
+            /// 商店出售药水定价
+            /// </summary>
+            /// <param name="potion"></param>
+            /// <returns></returns>
+            public static int generatePotionPrice(ExerProPotion potion) {
+                switch (potion.star().name) {
+                    case "普通":
+                        return Random.Range(30, 45);
+                    case "稀有":
+                        return Random.Range(55, 75);
+                }
+                return 0;
+            }
+
+
+            /// <summary>
+            /// 随机生成指定数量的卡牌，需提供生成概率
+            /// </summary>
+            /// <param name="count">数量</param>
+            /// <param name="normalRatio">普通概率</param>
+            /// <param name="rareRatio">稀有概率</param>
+            /// <returns></returns>
+            public static List<ExerProCard> generateCards(int count, double normalRatio, double rareRatio){
+                List<ExerProCard> exerProCards = new List<ExerProCard>();
+                while(exerProCards.Count != count) {
+                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
+                    if (result == null)
+                        continue;
+                    exerProCards.Add(result);
+                }
+                return exerProCards;
+            }
+
+            /// <summary>
+            /// 随机生成指定数量的药水，需提供生成概率
+            /// </summary>
+            /// <param name="count">数量</param>
+            /// <param name="normalRatio">普通概率</param>
+            /// <param name="rareRatio">稀有概率</param>
+            /// <returns></returns>
+            public static List<ExerProPotion> generatePotions(int count, double normalRatio, double rareRatio) {
+                List<ExerProPotion> exerProPotions = new List<ExerProPotion>();
+                while (exerProPotions.Count != count) {
+                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio, Type.Potion) as ExerProPotion;
+                    if (result == null)
+                        continue;
+                    exerProPotions.Add(result);
+                }
+                return exerProPotions;
+            }
+
+            /// <summary>
+            /// 当前类对象
+            /// </summary>
+            static ExerProItemGenerator _itemGenerator = null;
+            static ExerProItemGenerator itemGenerator {
+                get {
+                    if (_itemGenerator == null)
+                        _itemGenerator = new ExerProItemGenerator();
+                    return _itemGenerator;
+                }
+            }
+
+            /// <summary>
+            /// 生成一个指定物品
+            /// </summary>
+            /// <param name="normalRatio"></param>
+            /// <param name="rareRatio"></param>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            BaseExerProItem generateRandomItem(double normalRatio, double rareRatio, Type type = Type.Card) {
+                var dataSer = DataService.get();
+                List<BaseExerProItem> items;
+                switch (type) {
+                    case Type.Card:
+                        items = new List<BaseExerProItem>(dataSer.staticData.data.exerProCards);
+                        break;
+                    case Type.Potion:
+                        items = new List<BaseExerProItem>(dataSer.staticData.data.exerProPotions);
+                        break;
+                    default:
+                        return null;
+                }
+
+                shuffleItems(items);
+                float randomValue = Random.Range(0, 1);
+                if (randomValue < normalRatio)
+                    return items.Find(e => e.star().name == "普通");
+                else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)
+                    return items.Find(e => e.star().name == "稀有");
+                else
+                    return items.Find(e => e.star().name == "史诗");
+            }
+
+            /// <summary>
+            /// 打乱数组
+            /// </summary>
+            /// <param name="cards"></param>
+            /// <returns></returns>
+            void shuffleItems(List<BaseExerProItem> items) {
+                items.Sort(delegate (BaseExerProItem a, BaseExerProItem b) { return Random.Range(-1, 1); });
+            }
+        }
+
+	}
 }

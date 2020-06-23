@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using QuestionModule.Data;
 using Core.Data;
 using System.Linq;
+using PlayerModule.Services;
 
 namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
     /// <summary>
@@ -58,7 +59,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
         /// </summary>
         void configureQuestion() {
             engServ.generateQuestion<ListeningQuestion>(onGetQuestionSuccess, onGetQuestionFailed);
-            onGetQuestionFailed();
+            //onGetQuestionFailed();
         }
 
         #endregion
@@ -81,14 +82,17 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
         /// </summary>
         /// <param name="questions"></param>
         void onGetQuestionSuccess(ListeningQuestion remoteQuestion) {
+            Debug.Log("onGetQuestionSuccess: " + remoteQuestion.toJson().ToJson());
             question = remoteQuestion;
             questions = question.subQuestions;
             questionDisplay.startView(question);
         }
 
         void onGetQuestionFailed() {
-            //test
-            ListeningQuestion testQuestion = generateTestData();
+			Debug.Log("onGetQuestionFailed: ");
+
+			//test
+			ListeningQuestion testQuestion = generateTestData();
             question = testQuestion;
             questionDisplay.startView(question);
         }

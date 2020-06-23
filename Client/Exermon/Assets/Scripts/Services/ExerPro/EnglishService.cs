@@ -16,6 +16,7 @@ using GameModule.Services;
 using GameModule.Data;
 
 using ExerPro.EnglishModule.Data;
+using UI.Common.Controls.ParamDisplays;
 
 namespace ExerPro.EnglishModule.Services {
 
@@ -62,6 +63,8 @@ namespace ExerPro.EnglishModule.Services {
 		const string WordQuery = "查询状态";
 
 		const string WordRecordGet = "查询单词记录";
+
+		const string GetRank = "查询排行记录";
 
 		/// <summary>
 		/// 题目缓存
@@ -126,7 +129,7 @@ namespace ExerPro.EnglishModule.Services {
 			ExerProStart, ExerProSave,
 			QuestionGenerate, QuestionGet,
 			WordGenerate, WordAnswer, WordGet, WordQuery,
-			WordRecordGet,
+			WordRecordGet, GetRank,
 		}
 
 		/// <summary>
@@ -187,7 +190,6 @@ namespace ExerPro.EnglishModule.Services {
 			sceneSys = SceneSystem.get();
 
 			dataSer = DataService.get();
-			battleSer = BattleService.get();
 		}
 
 		/// <summary>
@@ -231,6 +233,10 @@ namespace ExerPro.EnglishModule.Services {
 				NetworkSystem.Interfaces.EngProWordQuery);
 
 			addOperDict(Oper.WordRecordGet, WordRecordGet,
+				NetworkSystem.Interfaces.EngProWordRecordGet);
+
+			// 该处路由还未设定
+			addOperDict(Oper.GetRank, GetRank,
 				NetworkSystem.Interfaces.EngProWordRecordGet);
 		}
 
@@ -276,7 +282,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
 				// TODO: 保存奖励信息
-				record.load(res); onSuccess?.Invoke();
+				//danteding 测试用
+				//record.load(res); onSuccess?.Invoke();
 			};
 
 			saveExerPro(terminate, _onSuccess, onError);
@@ -342,8 +349,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="onSuccess">成功回调</param>
 		/// <param name="onError">失败回调</param>
 		public void generateQuestion<T>(UnityAction<T> onSuccess,
-			UnityAction onError = null) where T : BaseData, new()
-		{
+			UnityAction onError = null) where T : BaseData, new() {
 			UnityAction<T[]> _onSuccess = (res) => onSuccess.Invoke(res[0]);
 			generateQuestions(1, _onSuccess, onError);
 		}
@@ -721,13 +727,14 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-			long i = UnityEngine.Random.Range(0, 10000);
-			switch (i % 2) {
-				case 0:
-					sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-				case 1:
-					sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-			}
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+			//long i = UnityEngine.Random.Range(0, 10000);
+			//switch (i % 2) {
+			//    case 0:
+			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+			//    case 1:
+			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+			//}
 		}
 
 		/// <summary>
@@ -744,25 +751,25 @@ namespace ExerPro.EnglishModule.Services {
 			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
 		}
 
-        /// <summary>
-        /// 敌人据点
-        /// </summary>
-        void onEnemyNode() {
+		/// <summary>
+		/// 敌人据点
+		/// </summary>
+		void onEnemyNode() {
 			battleSer.start(ExerProMapNode.Type.Enemy);
-        }
-
-        /// <summary>
-        /// 精英据点
-        /// </summary>
-        void onEliteNode() {
-			battleSer.start(ExerProMapNode.Type.Elite);
 		}
 
 		/// <summary>
-		/// Boss据点
+		/// 听力据点
 		/// </summary>
-		void onBossNode() {
-			battleSer.start(ExerProMapNode.Type.Boss);
+		void onListenNode() {
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
+		}
+
+		/// <summary>
+		/// 精英据点
+		/// </summary>
+		void onEliteNode() {
+			battleSer.start(ExerProMapNode.Type.Elite);
 		}
 
 		/// <summary>
@@ -770,6 +777,13 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		void onUnknownNode() {
 			switchNode(randomNode());
+		}
+
+		/// <summary>
+		/// Boss据点
+		/// </summary>
+		void onBossNode() {
+			battleSer.start(ExerProMapNode.Type.Boss);
 		}
 
 		/// <summary>
@@ -787,6 +801,31 @@ namespace ExerPro.EnglishModule.Services {
 
 			var index = Random.Range(0, rateList.Count);
 			return states[rateList[index]];
+		}
+
+		/// <summary>
+		/// 调用奖励结算界面
+		/// 调用该方法会自动调用exitNode
+		/// 调用该方法前，首先把场景中结算的按钮setFalse，避免用户重复点击
+		/// 可参考PhraseScene中的onSubmit
+		/// </summary>
+		/// <param name="enemyNumber">杀死敌人数量</param>
+		/// <param name="questionNumber">答对题目数量</param>
+		public void processReward(int enemyNumber = 0, int questionNumber = 0, int bossNumber = 0) {
+			bool isPerfect = false;
+			if (bossNumber > 0) {
+				var actor = record.actor;
+				if (actor.hp == actor.mhp())
+					isPerfect = true;
+			}
+			rewardInfo = new RewardInfo(enemyNumber, questionNumber, bossNumber, isPerfect);
+		}
+
+		/// <summary>
+		/// 处理剧情奖励
+		/// </summary>
+		public void processPlotReward() {
+
 		}
 
 		/// <summary>
@@ -865,6 +904,206 @@ namespace ExerPro.EnglishModule.Services {
 		}
 
 		#endregion
+
+		#endregion
+
+		#region 排行系统
+
+		#region 排行数据定义
+
+		/// <summary>
+		/// 默认排行榜数量
+		/// </summary>
+		public const int DefaultRankCount = 10;
+
+		/// <summary>
+		/// 排行信息
+		/// </summary>
+		public class ExerProRank : BaseData,
+			ParamDisplay.IDisplayDataConvertable,
+			ParamDisplay.IDisplayDataArrayConvertable {
+
+			/// <summary>
+			/// 排行颜色
+			/// </summary>
+			static readonly Color[] RankColors = new Color[] {
+				new Color(0.8392f, 0.6431f, 0.2156f),
+				new Color(0.8392f, 0.7254f, 0.2392f),
+				new Color(0.8392f, 0.8039f, 0.3882f),
+				new Color(1, 1, 1),
+			};
+			static readonly Color[] FontColors = new Color[] {
+				new Color(1, 1, 1),
+				new Color(1, 1, 1),
+				new Color(1, 1, 1),
+				new Color(0.3f, 0.3f, 0.3f),
+			};
+			/// <summary>
+			/// 最大排行
+			/// </summary>
+			public const int MaxRank = 9999;
+
+			/// <summary>
+			/// 排行项
+			/// </summary>
+			public class RankItem : BaseData,
+				ParamDisplay.IDisplayDataConvertable {
+
+				/// <summary>
+				/// 属性
+				/// </summary>
+				[AutoConvert]
+				public int order { get; protected set; }
+				[AutoConvert]
+				public string name { get; protected set; }
+				[AutoConvert]
+				public int battlePoint { get; protected set; }
+
+				/// <summary>
+				/// 转化为显示数据
+				/// </summary>
+				/// <param name="type">类型</param>
+				/// <returns>返回显示数据</returns>
+				public JsonData convertToDisplayData(string type = "") {
+					var res = toJson();
+					var cIndex = Mathf.Clamp(
+						order - 1, 0, RankColors.Length - 1);
+					var color = RankColors[cIndex];
+					var fontColor = FontColors[cIndex];
+
+					if (order == 0)
+						res["order"] = MaxRank + "+";
+
+					res["color"] = DataLoader.convert(color);
+					res["font_color"] = DataLoader.convert(fontColor);
+
+					return res;
+				}
+			}
+
+			/// <summary>
+			/// 属性
+			/// </summary>
+			[AutoConvert]
+			public RankItem[] ranks { get; protected set; }
+			[AutoConvert]
+			public RankItem rank { get; protected set; }
+			[AutoConvert]
+			public DateTime updateTime { get; protected set; }
+
+			/// <summary>
+			/// 转化为显示数据
+			/// </summary>
+			/// <param name="type">类型</param>
+			/// <returns>返回显示数据</returns>
+			public JsonData convertToDisplayData(string type = "") {
+				var res = new JsonData();
+				res["update_time"] = DataLoader.convert(updateTime);
+				return res;
+			}
+
+			/// <summary>
+			/// 转化为显示数据数组
+			/// </summary>
+			/// <param name="type">类型</param>
+			/// <returns>返回显示数据</returns>
+			public JsonData[] convertToDisplayDataArray(string type = "") {
+				var count = ranks.Length;
+				var res = new JsonData[count];
+				for (int i = 0; i < count; ++i)
+					res[i] = ranks[i].convertToDisplayData(type);
+				return res;
+			}
+
+
+		}
+
+		/// <summary>
+		/// 赛季排行榜
+		/// </summary>
+		public ExerProRank exerProRank { get; protected set; }
+
+		#endregion
+
+		#region 操作控制
+
+		/// <summary>
+		/// 获取排行数据
+		/// </summary>
+		/// <param name="sid">赛季ID</param>
+		/// <param name="count">排行数量</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void getExerProRank(int count = DefaultRankCount,
+			UnityAction onSuccess = null, UnityAction onError = null) {
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				exerProRank = DataLoader.load(exerProRank, res, "ranks");
+				onSuccess?.Invoke();
+			};
+			getExerProRank(count, _onSuccess, onError);
+		}
+		public void getExerProRank(int count,
+			NetworkSystem.RequestObject.SuccessAction onSuccess,
+			UnityAction onError = null) {
+			JsonData data = new JsonData();
+			data["count"] = count;
+			sendRequest(Oper.GetRank, data, onSuccess, onError, uid: true);
+		}
+
+		#endregion
+
+		#endregion
+
+		#region 奖励系统
+
+		public class RewardInfo {
+
+			/// <summary>
+			/// 杀死敌人数量
+			/// </summary>
+			public int killEnemyNumber { get; set; } = 0;
+			/// <summary>
+			/// 答对题目数量
+			/// </summary>
+			public int correctQuestionNumber { get; set; } = 0;
+
+			/// <summary>
+			/// Boss数据
+			/// </summary>
+			public int killBossNumber { get; set; } = 0;
+			public bool isPerfect { get; set; } = false;
+
+			public RewardInfo(int enemyNumber = 0, int questionNumber = 0, int killBossNumber = 0, bool isPerfect = false) {
+				this.killEnemyNumber = enemyNumber;
+				this.correctQuestionNumber = questionNumber;
+				this.killBossNumber = killBossNumber;
+				this.isPerfect = isPerfect;
+			}
+
+			public RewardInfo() { }
+		}
+
+		/// <summary>
+		/// 奖励信息储存接口
+		/// 需要进行奖励结算的场景请在update中获取该变量判定是否为null来决定是否显示奖励窗口
+		/// 获取后该变量重置为null
+		/// 举例：
+		/// var rewardInfo = engServ.rewardInfo;
+		/// if(rewardInf0 != null)
+		/// {   rewardWindow.startWindow(rewardInfo);   }
+		/// 参考PhraseScene
+		/// </summary>
+		RewardInfo _rewardInfo = null;
+		public RewardInfo rewardInfo {
+			get {
+				var res = _rewardInfo;
+				_rewardInfo = null;
+				return res;
+			}
+			set {
+				_rewardInfo = value;
+			}
+		}
 
 		#endregion
 	}
