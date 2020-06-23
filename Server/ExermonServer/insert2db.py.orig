@@ -18,13 +18,13 @@ if __name__ == '__main__':
 
     base_path = 'english_pro_module/raw_data/'
 
-    # 英语单词的路�?
+    # 英语单词的路径
     words_path = base_path + 'words.txt'
-    # 短语的路�?
+    # 短语的路径
     phrase_path = base_path + 'phrase.txt'
     # 听力题的路径
     learning_question_path = base_path + 'listening.json'
-    # 判断短语的分�?
+    # 判断短语的分类
     todo = ['to do sth.', 'doing sth.']
     sb = ['sb. to do sth.', 'sb. doing sth.', 'sb. do sth.', 'sth. for sb.', 'sb. of sth.', 'sb. for doing sth.',
           'sb. into doing sth.']
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print("%d. %s saved" % (word.id, word.english))
 
 
-    # 插入不定式题�?
+    # 插入不定式题目
     def insert_phrase_questions():
         f = open(phrase_path, encoding='utf-8')
 
@@ -82,6 +82,13 @@ if __name__ == '__main__':
         center_print('Done inserting PhraseQuestion')
 
 
+<<<<<<< HEAD
+	upload("ExerProItem")
+	# upload("ExerProPotion")
+	# upload("ExerProCard")
+	# upload("ExerProEnemy")
+	upload("ExerProState")
+=======
     # 保存短语题目
     def save_phrase_question(str_list):
         word = str_list[0]
@@ -174,6 +181,7 @@ if __name__ == '__main__':
 
         print("%d. %s saved" % (ques.id, ques.audio))
 
+
     def select_answer(option, answers, question: ListeningSubQuestion):
 
         choices = question.listeningqueschoice_set.all()
@@ -198,8 +206,7 @@ if __name__ == '__main__':
 
     from english_pro_module.raw_data.upload import upload
 
-	upload("ExerProItem")
-	# upload("ExerProPotion")
-	# upload("ExerProCard")
-	# upload("ExerProEnemy")
-	upload("ExerProState")
+    upload("ExerProCard")
+    upload("ExerProEnemy")
+    upload("ExerProPotion")
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d

@@ -787,27 +787,34 @@ class BaseExerProItem(BaseItem):
     # 图标索引
     icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
+    # 物品星级（稀罕度）
+    star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
+
+<<<<<<< HEAD
 	# 起手动画索引
 	start_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="起手动画索引")
 
 	# 目标动画索引
 	target_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="目标动画索引")
 
-    # 物品星级（稀罕度）
-    star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
+	# 物品星级（稀罕度）
+	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
 
+	# 金币（0表示不可购买）
+	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+=======
     # 金币（0表示不可购买）
-    # gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+    gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
 
     def update(self, num):
         """
         更新已有记录
-		TODO: 什么鬼
         Args:
             num (int): 金币数量
         """
-        # self.gold -= num
-        # self.save()
+        self.gold -= num
+        self.save()
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
     def convertToDict(self, **kwargs):
         """
@@ -817,6 +824,7 @@ class BaseExerProItem(BaseItem):
         """
         res = super().convertToDict(**kwargs)
 
+<<<<<<< HEAD
 		res['icon_index'] = self.icon_index
 		res['start_ani_index'] = self.start_ani_index
 		res['target_ani_index'] = self.target_ani_index
@@ -828,6 +836,13 @@ class BaseExerProItem(BaseItem):
 		effects = self.effects()
 		if effects is not None:
 			res['effects'] = ModelUtils.objectsToDict(effects)
+=======
+        effects = ModelUtils.objectsToDict(self.effects())
+
+        res['star_id'] = self.star_id
+        res['gold'] = self.gold
+        res['effects'] = effects
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
         return res
 
@@ -838,12 +853,15 @@ class BaseExerProItem(BaseItem):
 # ===================================================
 #  特训物品特性表
 # ===================================================
+<<<<<<< HEAD
 class ExerProItemTrait(ExerProEffect):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训物品特性"
+=======
+class ExerProItemEffect(ExerProEffect):
+    class Meta:
+        verbose_name = verbose_name_plural = "特训物品使用效果"
 
-    # 物品
-    it
     # 物品
     item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
                              verbose_name="物品")
@@ -855,6 +873,7 @@ class ExerProItemTrait(ExerProEffect):
 class ExerProPlotEffect(ExerProEffect):
     class Meta:
         verbose_name = verbose_name_plural = "剧情题目效果"
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
     # 效果
     effects = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
@@ -868,7 +887,10 @@ class ExerProItem(BaseExerProItem):
     class Meta:
         verbose_name = verbose_name_plural = "特训物品"
 
-    # 道具类型 self.exerproitemeffect_set.all()
+    # 道具类型
+    TYPE = ItemType.ExerProItem
+
+<<<<<<< HEAD
 	def convertToDict(self, type: str = None, **kwargs):
 		"""
 		转化为字典
@@ -888,6 +910,10 @@ class ExerProItem(BaseExerProItem):
 
 	def traits(self):
 		return self.exerproitemtrait_set.all()
+=======
+    def effects(self):
+        return self.exerproitemeffect_set.all()
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
 
 # ===================================================
@@ -909,11 +935,10 @@ class ExerProPotion(BaseExerProItem):
     class Meta:
         verbose_name = verbose_name_plural = "特训药水"
 
-    # 道具类型convertToDict()
+    # 道具类型
+    TYPE = ItemType.ExerProPotion
 
-        return res
-
-        return res
+<<<<<<< HEAD
 	# def convertToDict(self):
 	# 	"""
 	# 	转化为字典
@@ -923,6 +948,17 @@ class ExerProPotion(BaseExerProItem):
 	# 	res = super().convertToDict()
 	#
 	# 	return res
+=======
+    def convertToDict(self):
+        """
+        转化为字典
+        Returns:
+            返回转化后的字典
+        """
+        res = super().convertToDict()
+
+        return res
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
     def effects(self):
         return self.exerpropotioneffect_set.all()
@@ -1015,14 +1051,19 @@ class ExerProCard(BaseExerProItem):
     cost = models.PositiveSmallIntegerField(default=1, verbose_name="消耗能量")
 
     # 卡片类型
-    card_type = models.PositiveSmallIntegerField(defau
-	# 卡牌皮肤索引
-	skin_index = models.PositiveSmallIntegerField(default=0, verbose_name="卡牌皮肤索引")
-lt=ExerProCardType.Attack.value,
+    card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
                                                  choices=CARD_TYPES, verbose_name="卡片类型")
 
+<<<<<<< HEAD
+	# 卡牌皮肤索引
+	skin_index = models.PositiveSmallIntegerField(default=0, verbose_name="卡牌皮肤索引")
+
 	# 固有
-	inherent = models.	inherent = models.BooleanField(default=False, verbose_name="固有")
+	inherent = models.BooleanField(default=False, verbose_name="固有")
+=======
+    # 固有
+    inherent = models.BooleanField(default=False, verbose_name="固有")
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
     # 消耗（一次性的）
     disposable = models.BooleanField(default=False, verbose_name="消耗")
@@ -1258,14 +1299,23 @@ class ExerProStateTrait(ExerProEffect):
 # ===================================================
 #  特训状态表
 # ===================================================
-class ExerProState(BaseItem):_name="最大状态回合数")
-    # 最大状态回合数
-    max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
+class ExerProState(BaseItem):
+    class Meta:
+        verbose_name = verbose_name_plural = "特训状态"
+
+    # 道具类型
+    TYPE = ItemType.ExerProState
+
+<<<<<<< HEAD
 	# 图标索引
 	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
 	# 最大状态回合数
 	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
+=======
+    # 最大状态回合数
+    max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
     # 是否负面状态
     is_nega = models.BooleanField(default=False, verbose_name="是否负面状态")
@@ -1273,15 +1323,22 @@ class ExerProState(BaseItem):_name="最大状态回合数")
     def convertToDict(self):
         """
         转化为字典
-    nega
-        res['max_turns'] = self.max_turns
-        res['is_nega'] = self.is_nega
+        Returns:
+            返回转化后的字典
+        """
+        res = super().convertToDict()
+
+<<<<<<< HEAD
 		traits = ModelUtils.objectsToDict(self.traits())
 
 		res['icon_index'] = self.icon_index
 		res['max_turns'] = self.max_turns
 		res['is_nega'] = self.is_nega
 		res['traits'] = traits
+=======
+        res['max_turns'] = self.max_turns
+        res['is_nega'] = self.is_nega
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
         return res
 

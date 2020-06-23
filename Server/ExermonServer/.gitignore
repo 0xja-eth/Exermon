@@ -1,7 +1,9 @@
 .idea
 .sql
+.DS_Store
 settings.py
 db.sqlite3
 __pycache__/
 subject_*
 static
+english_pro_module/migrations

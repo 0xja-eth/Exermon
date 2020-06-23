@@ -46,16 +46,21 @@ class WrongItemsInline(object):
 	style = "table"
 
 
-class ExerProPlotEffectsInline(BaseEffectsInline):
-	model = ExerProPlotEffect
-
-
+<<<<<<< HEAD
 class ExerProItemTraitsInline(BaseTraitsInline):
 	model = ExerProItemTrait
 
 
 class ExerProStateTraitsInline(BaseTraitsInline):
 	model = ExerProStateTrait
+=======
+class ExerProPlotEffectsInline(BaseEffectsInline):
+	model = ExerProPlotEffect
+
+
+class ExerProItemEffectsInline(BaseEffectsInline):
+	model = ExerProItemEffect
+>>>>>>> 42dc2bcd9f7b3335ee317de6c0dab86b131d5e8d
 
 
 class ExerProPotionEffectsInline(BaseEffectsInline):
