@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 using UI.Common.Controls.ItemDisplays;
 
 using UI.Common.Controls.SystemExtend.QuestionText;
+
+using QuestionModule.Data;
 using ExerPro.EnglishModule.Data;
 
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
@@ -14,7 +16,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
     /// 利大佬说的Class A
     /// </summary>
     public class ListenChoiceDisplay :
-        SelectableItemDisplay<ListeningSubQuestion.Choice> {
+        SelectableItemDisplay<BaseQuestion.Choice> {
         /// <summary>
         /// 常量定义
         /// </summary>
@@ -33,7 +35,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         public GameObject correctFlag; // 正确答案标志
         public GameObject wrongFlag; // 错误答案标志
 
-        public QuestionText text;
+        public Text text;
 
 
         #region 数据控制
@@ -51,13 +53,17 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// </summary>
         /// <returns></returns>
         public bool showAnswer() {
-            return getContainer().showAnswer;
+            return getContainer().showAnswer();
         }
 
         #endregion
 
         #region 数据控制
 
+		/// <summary>
+		/// 是否有效
+		/// </summary>
+		/// <returns></returns>
         public override bool isActived() {
             return base.isActived() && !showAnswer();
         }
@@ -70,7 +76,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
         /// 绘制确切物品
         /// </summary>
         /// <param name="choice">选项</param>
-        protected override void drawExactlyItem(ListeningSubQuestion.Choice choice) {
+        protected override void drawExactlyItem(BaseQuestion.Choice choice) {
             base.drawExactlyItem(choice);
             bool correct = false, wrong = false;
 

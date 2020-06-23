@@ -1,42 +1,30 @@
 ﻿using UnityEngine;
 
-using RecordModule.Data;
-
 using UI.Common.Controls.ItemDisplays;
+
 using ExerPro.EnglishModule.Data;
 using QuestionModule.Data;
 
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
+
     /// <summary>
     /// 题目选项容器
     /// Class B
     /// </summary>
     public class ListenChoiceContainer :
-        SelectableContainerDisplay<ListeningSubQuestion.Choice> {
+        SelectableContainerDisplay<BaseQuestion.Choice> {
 
-        /// <summary>
-        /// 显示答案解析
-        /// </summary>
-        bool _showAnswer = false;
-        public bool showAnswer {
-            get { return _showAnswer; }
-            set {
-                _showAnswer = value;
-                requestRefresh();
-            }
-        }
+		/// <summary>
+		///外部组件设置
+		/// </summary>
+		public ListeningSubQuestionDisplay questionDisplay;
 
-        ListeningSubQuestion question;
-        public void setItem(ListeningSubQuestion ques) {
-            question = ques;
-            setItems(ques.choices);
-            maxCheck = 1;
-        }
-        public ListeningSubQuestion getItem() { return question; }
-		public void startView(ListeningSubQuestion item)
-		{
-			base.startView();
-			setItem(item);
+		/// <summary>
+		/// 显示答案解析
+		/// </summary>
+		public bool showAnswer() {
+			return questionDisplay.showAnswer;
 		}
+		
 	}
 }

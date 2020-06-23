@@ -1,11 +1,11 @@
 ﻿
 using Core.Systems;
 using Core.UI;
-using UnityEngine;
-using UI.ExerPro.EnglishPro.ListenScene.Windows;
+
 using ExerPro.EnglishModule.Services;
-using PlayerModule.Services;
-using System.Diagnostics;
+
+using UI.ExerPro.EnglishPro.ListenScene.Windows;
+
 using UI.ExerPro.EnglishPro.Common.Windows;
 
 /// <summary>
@@ -48,26 +48,27 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         /// </summary>
         protected override void start() {
             base.start();
-            refresh();
-            //测试用函数
+			listenWindow.startWindow();
+
+			//测试用函数
 			//GameSystem.get().start();
 			//PlayerService.get().login("804173948", "123456789", configureQuestion);
 		}
 
-        //测试用
-        void configureQuestion()
-        {
-            if (GameSystem.get().isLoaded() == true)
-                UnityEngine.Debug.Log("danteding 登陆成功");
-        }
-        #endregion
+		////测试用
+		//void configureQuestion()
+		//{
+		//    if (GameSystem.get().isLoaded() == true)
+		//        UnityEngine.Debug.Log("danteding 登陆成功");
+		//}
+		#endregion
 
-        #region 场景控制
+		#region 场景控制
 
-        /// <summary>
-        /// 场景更新
-        /// </summary>
-        protected override void update() {
+		/// <summary>
+		/// 场景更新
+		/// </summary>
+		protected override void update() {
             base.update();
             var rewardInfo = engSer.rewardInfo;
             if (rewardInfo != null) {
@@ -75,13 +76,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
             }
         }
 
-        /// <summary>
-        /// 刷新场景
-        /// </summary>
-        public void refresh() {
-            listenWindow.startWindow();
-        }
-
+		/// <summary>
+		/// 退出场景
+		/// </summary>
         public override void popScene() {
             engSer.exitNode();
         }

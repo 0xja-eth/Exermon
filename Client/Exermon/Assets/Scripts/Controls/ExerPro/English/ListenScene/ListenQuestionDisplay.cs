@@ -1,108 +1,145 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.UI;
 
-using UI.Common.Controls.ItemDisplays;
+using Core.Data.Loaders;
+
 using ExerPro.EnglishModule.Data;
-using UI.Common.Controls.SystemExtend.QuestionText;
-using Assets.Scripts.Controls.ExerPro.English.ListenScene;
-using System.Collections.Generic;
 using ExerPro.EnglishModule.Services;
 
+using UI.Common.Controls.ItemDisplays;
+
 namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
-    /// <summary>
-    /// 题目显示
-    /// 利大佬说的Class E
-    /// </summary>
-    public class ListenQuestionDisplay : ItemDisplay<ListeningQuestion> {
-        /// <summary>
-        /// 外部变量
-        /// </summary>
-        public Text tipName;
-        public RawImage image;
-        public RectTransform content;
-        public Button playButton;
-        public Slider slider;
-        public ListeningSubQuestionDisplay subDisplay;
-        public Button confirmButton;
-        public Button submitButton;
+	/// <summary>
+	/// 题目显示
+	/// 利大佬说的Class E
+	/// </summary>
+	public class ListenQuestionDisplay : ItemDisplay<ListeningQuestion> {
 
-        int selectNumber = 0;
-        public RectTransform textContent; //子题目的父亲
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public Text tipName;
+		public ListenSubQuestionContainer subQuestions;
 
-        /// <summary>
-        /// 外部系统
-        /// </summary>
-        EnglishService engSer;
+		// 左部分组件
+		public RawImage image;
 
-        /// <summary>
-        /// 内部变量
-        /// </summary>
-        List<ListeningSubQuestionDisplay> subDisplays;
+		public Button playButton;
+		public Slider slider;
 
-        #region 初始化
-        protected override void initializeSystems() {
-            base.initializeSystems();
-            engSer = EnglishService.get();
-        }
-        #endregion
+		// 播放源
+		public AudioSource audioSource;
 
+		public GameObject confirmButton, submitButton;
 
-        #region 回调函数
-        /// <summary>
-        /// 物品变更回调
-        /// </summary>
-        protected override void onItemChanged() {
-            base.onItemChanged();
-            content.anchoredPosition = new Vector2(0, 0);
-            // result = null; showAnswer = false;
-        }
+		public Texture2D play, pause;
 
-        /// <summary>
-        /// 观察子题目的选择情况
-        /// </summary>
-        public void onSubDisplaySelected() {
-            bool isFinished = true;
-            foreach (var subDisplay in subDisplays)
-                if (!subDisplay.isSelected)
-                    isFinished = false;
-            if (isFinished)
-                confirmButton?.gameObject.SetActive(true);
-        }
-        
-        /// <summary>
-        /// 提交答案
-        /// </summary>
-        public void onConfirmClicked() {
-            foreach(var subDisplay in subDisplays) {
-                subDisplay.showAnswer = true;
-            }
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		int selectNumber = 0;
 
-            confirmButton?.gameObject.SetActive(false);
-            submitButton?.gameObject.SetActive(true);
-        }
+		Sprite playSprite, pauseSprite;
 
-        /// <summary>
-        /// 提交进行结算
-        /// </summary>
-        public void onSubmitClicked() {
-            submitButton?.gameObject.SetActive(false);
-            engSer.processReward(questionNumber: 10);
-        }
-        #endregion
+		/// <summary>
+		/// 外部系统
+		/// </summary>
+		EnglishService engSer;
 
-        #region 界面控制
+		#region 初始化
 
-        /// <summary>
-        /// 绘制确切物品
-        /// </summary>
-        /// <param name="question">题目</param>
-        protected override void drawExactlyItem(ListeningQuestion question) {
-            base.drawExactlyItem(question);
-            ListeningSubQuestion[] questions = question.subQuestions;
-            drawBaseInfo(question);
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			playSprite = AssetLoader.generateSprite(play);
+			pauseSprite = AssetLoader.generateSprite(pause);
+		}
 
-            if (audioSource) audioSource.clip = question.audio;
+		/// <summary>
+		/// /初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
+			base.initializeSystems();
+			engSer = EnglishService.get();
+		}
 
+		#endregion
+
+		#region 更新控制
+
+		/// <summary>
+		/// 更新进度
+		/// </summary>
+		protected override void update() {
+			base.update();
+			updateAudio();
+		}
+
+		/// <summary>
+		/// 更新音频
+		/// </summary>
+		void updateAudio() {
+			playButton.interactable = !audioSource.isPlaying || isPauseable();
+			if (audioSource.isPlaying) slider.value = audioSource.time / audioSource.clip.length;
+		}
+
+		#endregion
+
+		#region 数据控制
+
+		/// <summary>
+		/// 能否暂停
+		/// </summary>
+		/// <returns></returns>
+		public bool isPauseable() {
+			return false;
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 提交答案
+		/// </summary>
+		public void onConfirmClicked() {
+			subQuestions.showAnswer = true;
+
+			if (confirmButton) confirmButton.SetActive(false);
+			if (submitButton) submitButton.SetActive(true);
+
+			// TODO: 加入判断
+		}
+
+		/// <summary>
+		/// 提交进行结算
+		/// </summary>
+		public void onSubmitClicked() {
+			if (submitButton) submitButton.SetActive(false);
+			engSer.processReward(questionNumber: 10);
+		}
+
+		#endregion
+
+		#region 界面控制
+
+		/// <summary>
+		/// 绘制确切物品
+		/// </summary>
+		/// <param name="question">题目</param>
+		protected override void drawExactlyItem(ListeningQuestion question) {
+			base.drawExactlyItem(question);
+			ListeningSubQuestion[] questions = question.subQuestions;
+
+			setupAudio(question);
+
+			drawBaseInfo(question);
+			drawSubQuestions(question);
+			/*
             subDisplays = new List<ListeningSubQuestionDisplay>();
             foreach (ListeningSubQuestion q in questions) {
                 ListeningSubQuestionDisplay ss = ListeningSubQuestionDisplay.Instantiate(subDisplay, textContent.transform);
@@ -110,56 +147,65 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
                 ss.startView(q, this);
                 subDisplays.Add(ss);
             }
+			*/
+		}
 
-        }
+		/// <summary>
+		/// 绘制基本信息
+		/// </summary>
+		void drawBaseInfo(ListeningQuestion question) {
+			if (tipName) tipName.text = question.eventName;
+			if (image) image.texture = question.picture;
+		}
 
-        /// <summary>
-        /// 绘制基本信息
-        /// </summary>
-        void drawBaseInfo(ListeningQuestion question) {
-            if (tipName)
-                tipName.text = question.eventName;
-            if (image)
-                image.texture = question.picture;
-        }
+		/// <summary>
+		/// 绘制子题目
+		/// </summary>
+		void drawSubQuestions(ListeningQuestion question) {
+			subQuestions.setItems(question.subQuestions);
+		}
 
+		/// <summary>
+		/// 配置音频
+		/// </summary>
+		/// <param name="question"></param>
+		void setupAudio(ListeningQuestion question) {
+			if (audioSource) audioSource.clip = question.audio;
+		}
 
+		/// <summary>
+		/// 清除物品
+		/// </summary>
+		protected override void drawEmptyItem() {
+			base.drawEmptyItem();
 
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        protected override void drawEmptyItem() {
-            base.drawEmptyItem();
+			if (tipName) tipName.text = "";
+			subQuestions.clearItems();
 
-            if (tipName) tipName.text = "";
-        }
+			audioSource.Stop();
+			audioSource.clip = null;
 
-        #endregion
+			playButton.interactable = false;
+		}
 
-        #region 播放音频
-        /// <summary>
-        /// 播放源
-        /// </summary>
-        public AudioSource audioSource;
+		#endregion
 
-        /// <summary>
-        /// 播放听力音频
-        /// </summary>
-        public void playAudio() {
-            if (audioSource.isPlaying) {
-                audioSource.Pause();
-                playButton.image.sprite = Resources.Load<Sprite>("ExerPro/ListenScene/play");
-            }
-            else {
-                audioSource.Play();
-                playButton.image.sprite = Resources.Load<Sprite>("ExerPro/ListenScene/pause");
-            }
-        }
-        protected override void update() {
-            base.update();
-            if (audioSource.isPlaying)
-                slider.value = audioSource.time / audioSource.clip.length;
-        }
-        #endregion
-    }
+		#region 播放音频
+
+		/// <summary>
+		/// 播放听力音频
+		/// </summary>
+		public void playAudio() {
+			if (audioSource.clip == null) return;
+			if (audioSource.isPlaying && isPauseable()) {
+				audioSource.Pause();
+				playButton.image.overrideSprite = AssetLoader.generateSprite(play);
+			} else {
+				audioSource.Play();
+				playButton.image.overrideSprite = AssetLoader.generateSprite(pause);
+			}
+		}
+
+		#endregion
+	}
 }
