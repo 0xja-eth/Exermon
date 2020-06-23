@@ -38,9 +38,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		static readonly Vector2 ActorPos = new Vector2(-0.3f, 0);
 		static readonly Vector2[] EnemiesPos = new Vector2[MaxEnemyCols * MaxEnemyRows] {
-			new Vector2(0.3f, 0.25f), new Vector2(0.2f, 0.25f), new Vector2(0.1f, 0.25f), // 4, 5, 6
-			new Vector2(0.35f, 0), new Vector2(0.25f, 0), new Vector2(0.15f, 0), // 1, 2, 3
-			new Vector2(0.4f, -0.25f), new Vector2(0.3f, -0.25f), new Vector2(0.2f, -0.25f), // 7, 8, 9
+			new Vector2(0.3f, 0.25f), new Vector2(0.2f, 0.25f), new Vector2(0.1f, 0.25f), // 0, 1, 2,
+			new Vector2(0.35f, 0), new Vector2(0.25f, 0), new Vector2(0.15f, 0), // 3, 4, 5
+			new Vector2(0.4f, -0.25f), new Vector2(0.3f, -0.25f), new Vector2(0.2f, -0.25f), // 6, 7, 8
 		};
 
 		/// <summary>
