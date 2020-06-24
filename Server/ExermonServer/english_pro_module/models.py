@@ -60,6 +60,9 @@ class ListeningQuestion(GroupQuestion):
 
 	TYPE = QuestionType.Listening
 
+	# 重复次数
+	times = models.PositiveSmallIntegerField(default=2, verbose_name="重复次数")
+
 	# 音频文件
 	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
 
@@ -83,6 +86,7 @@ class ListeningQuestion(GroupQuestion):
 	def convertToDict(self):
 		res = super().convertToDict()
 
+		res['times'] = self.times
 		res['audio'] = self.convertToBase64()
 
 		return res
@@ -502,13 +506,23 @@ class ExerProEffectCode(Enum):
 	Recover = 100  # 回复体力值
 
 	AddParam = 200  # 增加能力值
-	AddParamUrgent = 201  # 增加能力值（紧急按钮）
+	AddMHP = 201  # 获得MHP
+	AddPower = 202  # 获得力量
+	AddDefense = 203  # 获得格挡
+	AddAgile = 204  # 获得敏捷
+	AddParamUrgent = 205  # 增加能力值（紧急按钮）
 
 	TempAddParam = 210  # 临时增加能力值
+	TempAddMHP = 211  # 临时获得MHP
+	TempAddPower = 212  # 临时获得力量
+	TempAddDefense = 213  # 临时获得格挡
+	TempAddAgile = 214  # 临时获得敏捷
 
 	AddState = 220  # 增加状态
 	RemoveState = 221  # 移除状态
 	RemoveNegaState = 222  # 移除消极状态
+
+	AddEnergy = 230  # 回复能量
 
 	DrawCards = 300  # 抽取卡牌
 	ConsumeCards = 310  # 消耗卡牌
@@ -517,8 +531,7 @@ class ExerProEffectCode(Enum):
 	ChangeCostDisc = 401  # 更改耗能（发现）
 	ChangeCostCrazy = 402  # 更改耗能（疯狂）
 
-	Sadistic = 500  # 残虐天性
-	ForceAddStatus = 600  # 增加己方状态
+	PlotAddMoney = 500  # 获得金币
 
 
 # ===================================================
@@ -541,13 +554,23 @@ class ExerProEffect(models.Model):
 		(ExerProEffectCode.Recover.value, '回复体力值'),
 
 		(ExerProEffectCode.AddParam.value, '增加能力值'),
+		(ExerProEffectCode.AddMHP.value, '获得MHP'),
+		(ExerProEffectCode.AddPower.value, '获得力量'),
+		(ExerProEffectCode.AddDefense.value, '获得格挡'),
+		(ExerProEffectCode.AddAgile.value, '获得敏捷'),
 		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
 
 		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
+		(ExerProEffectCode.TempAddMHP.value, '临时获得MHP'),
+		(ExerProEffectCode.TempAddPower.value, '临时获得力量'),
+		(ExerProEffectCode.TempAddDefense.value, '临时获得格挡'),
+		(ExerProEffectCode.TempAddAgile.value, '临时获得敏捷'),
 
 		(ExerProEffectCode.AddState.value, '增加状态'),
 		(ExerProEffectCode.RemoveState.value, '移除状态'),
 		(ExerProEffectCode.RemoveNegaState.value, '移除消极状态'),
+
+		(ExerProEffectCode.AddEnergy.value, '回复能量'),
 
 		(ExerProEffectCode.DrawCards.value, '抽取卡牌'),
 		(ExerProEffectCode.ConsumeCards.value, '消耗卡牌'),
@@ -556,8 +579,7 @@ class ExerProEffect(models.Model):
 		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
 		(ExerProEffectCode.ChangeCostCrazy.value, '更改耗能（疯狂）'),
 
-		(ExerProEffectCode.Sadistic.value, '残虐天性'),
-		(ExerProEffectCode.ForceAddStatus.value, '增加己方状态'),
+		(ExerProEffectCode.PlotAddMoney.value, '获得金币'),
 	]
 
 	# 效果编号
@@ -612,6 +634,9 @@ class BaseExerProItem(BaseItem):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特训物品"
+
+	# 图标索引
+	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
 	# 物品星级（稀罕度）
 	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
@@ -842,11 +867,12 @@ class EnemyEffect(ExerProEffect):
 # ===================================================
 class EnemyActionType(Enum):
 	Attack = 1  # 攻击
-	PowerUp = 2  # 提升
-	PowerDown = 3  # 削弱
-	AddStates = 4  # 状态
-	Escape = 5  # 逃跑
-	Unset = 6  # 什么都不做
+	PowerUp = 2  # 属性提升
+	PosStates = 3  # 状态提升
+	PowerDown = 4  # 属性削弱
+	NegStates = 5  # 状态削弱
+	Escape = 6  # 逃跑
+	Unset = 7  # 什么都不做
 
 
 # ===================================================
@@ -857,16 +883,11 @@ class EnemyAction(models.Model):
 		verbose_name = verbose_name_plural = "敌人行动"
 
 	TYPES = [
-		# (1, '攻击'),
-		# (2, '提升'),
-		# (3, '削弱'),
-		# (4, '状态'),
-		# (5, '逃跑'),
-		# (6, '无'),
 		(EnemyActionType.Attack.value, '攻击'),
-		(EnemyActionType.PowerUp.value, '提升'),
-		(EnemyActionType.PowerDown.value, '削弱'),
-		(EnemyActionType.AddStates.value, '状态'),
+		(EnemyActionType.PowerUp.value, '属性提升'),
+		(EnemyActionType.PosStates.value, '状态提升'),
+		(EnemyActionType.PowerDown.value, '属性削弱'),
+		(EnemyActionType.NegStates.value, '状态削弱'),
 		(EnemyActionType.Escape.value, '逃跑'),
 		(EnemyActionType.Unset.value, '无'),
 	]

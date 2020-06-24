@@ -75,14 +75,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			switch (action.typeEnum()) {
 				case ExerProEnemy.Action.Type.Attack:
 					processAttack(action); break;
-				case ExerProEnemy.Action.Type.PowerUp:
-					processPowerUp(action); break;
-				case ExerProEnemy.Action.Type.PowerDown:
-					processPowerDown(action); break;
-				case ExerProEnemy.Action.Type.AddStates:
-					processAddStates(action); break;
+				//case ExerProEnemy.Action.Type.PowerUp:
+				//	processPowerUp(action); break;
+				//case ExerProEnemy.Action.Type.PosStates:
+				//	processAddStates(action); break;
+				//case ExerProEnemy.Action.Type.PowerDown:
+				//	processPowerDown(action); break;
+				//case ExerProEnemy.Action.Type.NegStates:
+				//	processAddStates(action); break;
 				case ExerProEnemy.Action.Type.Escape:
 					processEscape(action); break;
+				default: skill(); break;
 			}
 		}
 
@@ -92,7 +95,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void processAttack(ExerProEnemy.Action action) {
 			moveToTarget(); attack(); resetPosition();
 		}
-
+		/*
 		/// <summary>
 		/// 处理提升
 		/// </summary>
@@ -114,6 +117,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			skill();
 		}
 
+		/// <summary>
+		/// 处理附加状态
+		/// </summary>
+		void processAddStates(ExerProEnemy.Action action) {
+			skill();
+		}
+		*/
 		/// <summary>
 		/// 处理逃走
 		/// </summary>
@@ -146,9 +156,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				case ExerProEnemy.Action.Type.Attack:
 					base.playHitAnimation(); break;
 				case ExerProEnemy.Action.Type.PowerUp:
+				case ExerProEnemy.Action.Type.PosStates:
 					powerUp(); onSkillEnd(); break;
 				case ExerProEnemy.Action.Type.PowerDown:
-				case ExerProEnemy.Action.Type.AddStates:
+				case ExerProEnemy.Action.Type.NegStates:
 					target()?.powerDown();
 					onSkillEnd(); break;
 			}

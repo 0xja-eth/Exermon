@@ -92,6 +92,13 @@ class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 
 @xadmin.sites.register(ListeningQuestion)
 class ListeningQuestionAdmin(GroupQuestionAdmin):
+
+	list_display = GroupQuestionAdmin.list_display + \
+				   ['times']
+
+	list_editable = GroupQuestionAdmin.list_editable + \
+				   ['times']
+
 	inlines = [ListeningSubQuestionsInline]
 
 
@@ -103,9 +110,9 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 @xadmin.sites.register(PhraseQuestion)
 class InfinitiveQuestionAdmin(object):
 
-	list_display = ['id', 'word', 'chinese', 'infinitive']
+	list_display = ['id', 'word', 'chinese', 'phrase']
 
-	list_editable = ['word', 'chinese', 'infinitive']
+	list_editable = ['word', 'chinese', 'phrase']
 
 
 @xadmin.sites.register(CorrectionQuestion)
@@ -153,29 +160,45 @@ class AntonymAdmin(object):
 	list_editable = ['card_word', 'enemy_word', 'hurt_rate']
 
 
-@xadmin.sites.register(ExerProItem)
-class ExerProItemAdmin(BaseItemAdmin):
+class BaseExerProItemAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   []
+				   ['icon_index', 'star', 'gold']
 
 	list_editable = BaseItemAdmin.list_editable + \
+					['icon_index', 'star', 'gold']
+
+	field_set = [Fieldset('基本特训物品属性',
+						  'icon_index', 'star', 'gold')]
+
+	form_layout = BaseItemAdmin.form_layout + field_set
+
+	# form_layout = field_set
+
+
+@xadmin.sites.register(ExerProItem)
+class ExerProItemAdmin(BaseExerProItemAdmin):
+
+	list_display = BaseExerProItemAdmin.list_display + \
+				   []
+
+	list_editable = BaseExerProItemAdmin.list_editable + \
 				   []
 
 	field_set = [Fieldset('特训物品属性')]
 
-	form_layout = BaseItemAdmin.form_layout + field_set
+	form_layout = BaseExerProItemAdmin.form_layout + field_set
 
 	inlines = [ExerProItemEffectsInline]
 
 
 @xadmin.sites.register(ExerProPotion)
-class ExerProPotionAdmin(BaseItemAdmin):
+class ExerProPotionAdmin(BaseExerProItemAdmin):
 
-	list_display = BaseItemAdmin.list_display + \
+	list_display = BaseExerProItemAdmin.list_display + \
 				   []
 
-	list_editable = BaseItemAdmin.list_editable + \
+	list_editable = BaseExerProItemAdmin.list_editable + \
 				   []
 
 	field_set = [Fieldset('特训物品属性')]
@@ -188,18 +211,18 @@ class ExerProPotionAdmin(BaseItemAdmin):
 @xadmin.sites.register(ExerProCard)
 class ExerProCardAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin.list_display + \
+	list_display = BaseExerProItemAdmin.list_display + \
 				   ['cost', 'card_type', 'inherent', 'disposable',
 					'character', 'target']
 
-	list_editable = BaseItemAdmin.list_editable + \
+	list_editable = BaseExerProItemAdmin.list_editable + \
 				   ['cost', 'card_type', 'inherent', 'disposable',
 					'character', 'target']
 
 	field_set = [Fieldset('特训卡片属性', 'cost', 'card_type',
 						  'inherent', 'disposable', 'character', 'target')]
 
-	form_layout = BaseItemAdmin.form_layout + field_set
+	form_layout = BaseExerProItemAdmin.form_layout + field_set
 
 	inlines = [ExerProCardEffectsInline]
 

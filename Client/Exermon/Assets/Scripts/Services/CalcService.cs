@@ -1095,14 +1095,71 @@ namespace GameModule.Services {
                         processDamage((int)val, HPRecoverType); break;
 
                     case ExerProEffectData.Code.AddParam:
-                    case ExerProEffectData.Code.TempAddParam:
-                        p = DataLoader.load<int>(params_[0]); n = -1;
-                        a = DataLoader.load<int>(params_[1]); b = 100;
-                        if (len == 3) b += DataLoader.load<int>(params_[2]);
-                        if (len == 4) n = DataLoader.load<int>(params_[3]);
-                        processBuff(p, a, b, n); break;
+						p = DataLoader.load<int>(params_[0]);
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 3) b += DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, -1); break;
 
-                    case ExerProEffectData.Code.AddState:
+					case ExerProEffectData.Code.AddMHP:
+						p = RuntimeBattler.MHPParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddPower:
+						p = RuntimeBattler.PowerParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddDefense:
+						p = RuntimeBattler.DefenseParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.AddAgile:
+						p = RuntimeBattler.AgileParamId;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						processBuff(p, a, b, -1); break;
+
+					case ExerProEffectData.Code.TempAddParam:
+						p = DataLoader.load<int>(params_[0]); n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 3) b += DataLoader.load<int>(params_[2]);
+						if (len == 4) n = DataLoader.load<int>(params_[3]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddMHP:
+						p = RuntimeBattler.MHPParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddPower:
+						p = RuntimeBattler.PowerParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddDefense:
+						p = RuntimeBattler.DefenseParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.TempAddAgile:
+						p = RuntimeBattler.AgileParamId; n = 1;
+						a = DataLoader.load<int>(params_[1]); b = 100;
+						if (len == 2) b += DataLoader.load<int>(params_[1]);
+						if (len == 3) n = DataLoader.load<int>(params_[2]);
+						processBuff(p, a, b, n); break;
+
+					case ExerProEffectData.Code.AddState:
                         s = DataLoader.load<int>(params_[0]);
                         r = DataLoader.load<int>(params_[1]); p = 100;
                         if (len == 3) p += DataLoader.load<int>(params_[2]);
@@ -1417,13 +1474,17 @@ namespace GameModule.Services {
                         _processAttack(effects, params_);
                         object_ = actor; break;
 
-                    case ExerProEnemy.Action.Type.PowerDown:
+					case ExerProEnemy.Action.Type.NegStates:
+						_processAddStates(effects, params_);
+						object_ = actor; break;
+
+					case ExerProEnemy.Action.Type.PowerDown:
                         _processPowerDown(effects, params_);
                         object_ = actor; break;
 
-                    case ExerProEnemy.Action.Type.AddStates:
+                    case ExerProEnemy.Action.Type.PosStates:
                         _processAddStates(effects, params_);
-                        object_ = actor; break;
+                        object_ = enemy; break;
 
                     case ExerProEnemy.Action.Type.PowerUp:
                         _processPowerDown(effects, params_);
