@@ -213,7 +213,7 @@ class ErrorType(Enum):
 	# EnglishProShop
 	ShopNotGenerated = 840  # 商品尚未生成
 	ShopItemNotExist = 841  # 商品不存在
-	InvalidBuyNum = 842  # 购买数量不合法
+	InvalidBuyNum = 842  # 金钱不足
 
 	# EnglishProAnswer
 	InvalidAnswer = 843  # 题目答案不合法
@@ -423,7 +423,7 @@ class GameException(Exception):
 		# EnglishProShop
 		ErrorType.ShopNotGenerated: "商品尚未生成！",
 		ErrorType.ShopItemNotExist: "商品不存在或已售出！",
-		ErrorType.InvalidBuyNum: "购买数量不合法！",
+		ErrorType.InvalidBuyNum: "金钱不足！",
 
 		# EnglishProAnswer
 		ErrorType.InvalidAnswer: "题目答案不合法！",
