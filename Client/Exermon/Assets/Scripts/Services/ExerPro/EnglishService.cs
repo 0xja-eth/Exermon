@@ -478,12 +478,104 @@ namespace ExerPro.EnglishModule.Services {
 			answerWord(word.id, chinese, _onSuccess, onError);
 		}
 		/// <param name="wid">题目ID</param>
-		public void answerWord(int wid, string chinese, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+		public void answerWord(int wid, string chinese, 
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 
 			JsonData data = new JsonData();
 			data["wid"] = wid; data["chinese"] = chinese;
 
 			sendRequest(Oper.WordAnswer, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 回答短语题
+		/// </summary>
+		/// <param name="answers">作答集</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void answerPhrase(PhraseQuestion[] questions, string[] answers,
+			UnityAction<int> onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var corrCnt = DataLoader.load<int>(res, "correct_num");
+				onSuccess?.Invoke(corrCnt);
+			};
+
+			var cnt = questions.Length;
+			var qids = new int[cnt];
+
+			for (int i = 0; i < cnt; ++i) qids[i] = questions[i].id;
+
+			answerPhrase(qids, answers, _onSuccess, onError);
+		}
+		/// <param name="qids">短语题集</param>
+		public void answerPhrase(int[] qids, string[] answers,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			data["qids"] = DataLoader.convert(qids);
+			data["answers"] = DataLoader.convert(answers);
+
+			sendRequest(Oper.AnswerPhrase, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 回答听力题
+		/// </summary>
+		/// <param name="answers">作答集</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void answerListening(ListeningQuestion question, int[] answers,
+			UnityAction<int> onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var corrCnt = DataLoader.load<int>(res, "correct_num");
+				onSuccess?.Invoke(corrCnt);
+			};
+
+			answerListening(question.id, answers, _onSuccess, onError);
+		}
+		/// <param name="qid">听力题</param>
+		public void answerListening(int qid, int[] answers,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			data["qid"] = qid; data["answers"] = DataLoader.convert(answers);
+
+			sendRequest(Oper.AnswerListening, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 回答改错题
+		/// </summary>
+		/// <param name="answers">作答集</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void answerCorrection(CorrectionQuestion question, 
+			CorrectionQuestion.FrontendWrongItem[] answers, 
+			UnityAction<int> onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var corrCnt = DataLoader.load<int>(res, "correct_num");
+				onSuccess?.Invoke(corrCnt);
+			};
+
+			var answers_ = new JsonData();
+			answers_.SetJsonType(JsonType.Array);
+
+			foreach (var answer in answers)
+				answers_.Add(DataLoader.convert(answer));
+
+			answerCorrection(question.id, answers_, _onSuccess, onError);
+		}
+		/// <param name="qid">听力题</param>
+		public void answerCorrection(int qid, JsonData answers,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			data["qid"] = qid; data["answers"] = answers;
+
+			sendRequest(Oper.AnswerCorrection, data, onSuccess, onError, uid: true);
 		}
 
 		///// <summary>

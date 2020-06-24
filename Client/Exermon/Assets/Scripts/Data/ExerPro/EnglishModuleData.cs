@@ -217,11 +217,28 @@ namespace ExerPro.EnglishModule.Data {
     /// 改错题
     /// </summary>
     public class CorrectionQuestion : BaseData {
+		
+		/// <summary>
+		/// 错误项
+		/// </summary>
+		public class FrontendWrongItem : BaseData {
 
-        /// <summary>
-        /// 错误项
-        /// </summary>
-        public class WrongItem : BaseData {
+			/// <summary>
+			/// 属性
+			/// </summary>
+			[AutoConvert]
+			public int sid { get; protected set; }
+			[AutoConvert]
+			public int wid { get; protected set; }
+			[AutoConvert]
+			public string word { get; protected set; }
+
+		}
+
+		/// <summary>
+		/// 错误项
+		/// </summary>
+		public class WrongItem : BaseData {
 
             /// <summary>
             /// 属性

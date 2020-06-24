@@ -2100,7 +2100,7 @@ class CorrectionCompute:
 
     # 格式化字符串
     @classmethod
-    def format_str(cls, rep, str):
+    def formatStr(cls, rep, str):
         rep = dict((re.escape(k), v) for k, v in rep.items())
         pattern = re.compile("|".join(rep.keys()))
         str_format = pattern.sub(lambda m: rep[re.escape(m.group(0))], str)
@@ -2119,7 +2119,7 @@ class CorrectionCompute:
         """
         # 将文章中的'"'等符号去掉
         rep = {'"': '', '“': '', '”': ''}
-        article = cls.format_str(rep, origin_article)
+        article = cls.formatStr(rep, origin_article)
 
         # 将文章按 ！？.划分句子
         sentences_list = re.split('[.!?]', article)
@@ -2129,7 +2129,7 @@ class CorrectionCompute:
 
     # 格式化句子
     @classmethod
-    def format_sentence(cls, origin_article):
+    def formatSentence(cls, origin_article):
         sentences = cls.splitArticle(origin_article)
         rep = {',': '', '，': '', '；': '', ';': '', ' ': ''}
         sentence_list = []
@@ -2138,20 +2138,20 @@ class CorrectionCompute:
             words = sentence.split(' ')
             new_sentence = []
             for word in words:
-                new_sentence.append(cls.format_str(rep, word))
+                new_sentence.append(cls.formatStr(rep, word))
             sentence_list.append(new_sentence)
 
         return sentence_list
 
     # 判断增加类型改错前一个单词是否是原文里的单词
     @classmethod
-    def is_add_valid(cls, answer_font, wid, sentence):
+    def isAddValid(cls, answer_font, wid, sentence):
         if answer_font != sentence[wid-1]:
             raise GameException(ErrorType.InvalidAnswer)
 
     # 判断改错类型
     @classmethod
-    def correct_type(cls, answer):
+    def correctType(cls, answer):
         answer = answer.split(' ')
         if len(answer) > 1:
             return CorrectType.Add.value
@@ -2163,10 +2163,14 @@ class CorrectionCompute:
     # 单词是否改对
     @classmethod
     def answer(cls, answer, right_answer, wid, sentence):
-        answer_type = cls.correct_type(answer)
+
+        answer_type = cls.correctType(answer)
+
         if answer_type == CorrectType.Delete.value:
             return answer == right_answer
+
         elif answer_type == CorrectType.Edit.value:
+
             # 判断是否只有一个正确答案
             if right_answer.indexOf('/') != -1:
                 answers = right_answer.split('/')
@@ -2176,12 +2180,16 @@ class CorrectionCompute:
                     return False
             else:
                 return answer == right_answer
+
         elif answer_type == CorrectType.Add.value:
+
             # 判断是否只有一个正确答案
             if right_answer.indexOf('/') != -1:
+
                 # 判断增加单词前面的那个词是否来自原文
                 answer_font = answer.split(' ')[0]
                 cls.answer(answer_font, wid, sentence)
+
                 # 组合正确答案
                 answers = right_answer.split(' ')
                 answers_back = answers[1].split('/')
@@ -2199,14 +2207,15 @@ class CorrectionCompute:
 
     # 计算改错题答对几个
     @classmethod
-    def compute_right_answer(cls, origin_article, wrong_items_frontend, wrong_items_backend):
-        sentences = cls.format_sentence(origin_article)
+    def computeRightAnswer(cls, origin_article, wrong_items_frontend, wrong_items_backend):
+        sentences = cls.formatSentence(origin_article)
         num = 0
         for wrong_item in wrong_items_backend:
             for wrong in wrong_items_frontend:
-                if wrong_item.sentence_index == wrong[0] \
-                        and wrong_item.word_index == wrong[1] \
-                        and cls.answer(wrong[2], wrong_item.word, wrong[1], sentences[wrong_item.sentence_index-1]):
+                if wrong_item.sentence_index == wrong['sid'] \
+                        and wrong_item.word_index == wrong['wid'] \
+                        and cls.answer(wrong['word'], wrong_item.word,
+                                       wrong['wid'], sentences[wrong_item.sentence_index-1]):
                     num += 1
 
         return num

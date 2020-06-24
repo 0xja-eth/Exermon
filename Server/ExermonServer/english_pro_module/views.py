@@ -161,7 +161,7 @@ class Service:
     async def answerCorrection(cls, consumer, player: Player, qid: int, answers: dict):
         # 返回数据
         # correct_num: int => 答对题目数
-        correct_num = Common.answerCorrect(qid=qid, wrongItems=answers)
+        correct_num = Common.answerCorrection(qid=qid, answers=answers)
 
         return {'correct_num': correct_num}
 
@@ -170,7 +170,7 @@ class Service:
     async def answerListening(cls, consumer, player: Player, qid: int, answers: list):
         # 返回数据
         # correct_num: int => 答对题目数
-        correct_num = Common.answerCorrect(qid=qid, wrongItems=answers)
+        correct_num = Common.answerListening(qid=qid, options=answers)
 
         return {'correct_num': correct_num}
 
@@ -565,15 +565,18 @@ class Common:
         return shop
 
     @classmethod
-    def answerPhrase(cls, pids: list, options: list, **kwargs):
+    def answerPhrase(cls, pids: list, options: list):
         """
         回答短语题目
         Args:
             pids (list): 短语题目ID集
             options (list): 短语题目回答集
-            **kwargs (**dict): 查询参数
         """
-        phrases = Common.getQuestions(ids=pids, type_=QuestionType.Phrase.value)
+        phrases = cls.getQuestions(ids=pids, cla=PhraseQuestion)
+
+        if len(options) != len(phrases):
+            raise GameException(ErrorType.InvalidAnswer)
+
         correct_num = 0
         for i in range(len(options)):
             if phrases[i].phrase == options[i]:
@@ -582,18 +585,41 @@ class Common:
         return correct_num
 
     @classmethod
-    def answerCorrect(cls, qid: int, wrongItems: list, **kwargs):
+    def answerCorrection(cls, qid: int, answers: list):
         """
         回答短语题目
         Args:
-            pids (list): 短语题目ID集
-            options (list): 短语题目回答集
-            **kwargs (**dict): 查询参数
+            qid (int): 改错题目ID
+            answers (list): 回答集
         """
-        question = cls.getQuestion(id=qid, type_=QuestionType.Correction.value)
-        wrong_item_backend = question.wrongItems()
-        wrong_item_frontend = wrongItems
+        question = cls.getQuestion(id=qid, cla=CorrectionQuestion)
 
-        num = CorrectionCompute.compute_right_answer(question.article, wrong_item_frontend, wrong_item_backend)
+        wrong_item_frontend = answers
+        wrong_item_backend = question.wrongItems()
+
+        num = CorrectionCompute.computeRightAnswer(
+            question.article, wrong_item_frontend, wrong_item_backend)
 
         return num
+
+    @classmethod
+    def answerListening(cls, qid: int, options: list):
+        """
+        回答短语题目
+        Args:
+            qid (list): 听力题目ID
+            options (list): 短语题目回答集
+        """
+        question: ListeningQuestion = cls.getQuestion(id=qid, cla=ListeningQuestion)
+        sub_questions = question.subQuestions()
+
+        if len(options) != len(sub_questions):
+            raise GameException(ErrorType.InvalidAnswer)
+
+        correct_num = 0
+        for i in range(len(options)):
+            sub_ques: ListeningSubQuestion = sub_questions[i]
+            if sub_ques.calcCorrect([options[i]]):
+                correct_num += 1
+
+        return correct_num
