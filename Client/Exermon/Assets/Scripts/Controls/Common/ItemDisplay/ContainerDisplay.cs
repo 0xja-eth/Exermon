@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 
 using Core.UI;
+using ExerPro.EnglishModule.Data;
 
 namespace UI.Common.Controls.ItemDisplays {
     /*
@@ -392,7 +393,12 @@ namespace UI.Common.Controls.ItemDisplays {
             clearItems();
         }
 
-        #endregion
+		internal void setItem(ListeningSubQuestion ques, int v, bool _)
+		{
+			throw new NotImplementedException();
+		}
 
-    }
+		#endregion
+
+	}
 }

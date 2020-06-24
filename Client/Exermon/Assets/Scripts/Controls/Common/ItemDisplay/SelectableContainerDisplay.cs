@@ -542,6 +542,14 @@ namespace UI.Common.Controls.ItemDisplays {
             return selectedIndex;
         }
 
+		/// <summary>
+		/// 是否有选择
+		/// </summary>
+		/// <returns></returns>
+		public bool isSelected() {
+			return selectedIndex >= 0;
+		}
+
         /// <summary>
         /// 获取选择项
         /// </summary>
@@ -936,8 +944,6 @@ namespace UI.Common.Controls.ItemDisplays {
             base.onSubViewCreated(sub, index);
         }
 
-        #endregion
-
         #region 物品帮助绘制
 
         /// <summary>
@@ -975,6 +981,8 @@ namespace UI.Common.Controls.ItemDisplays {
         }
 
         #endregion
+        #endregion
+
 
         /// <summary>
         /// 刷新视窗

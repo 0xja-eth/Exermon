@@ -27,6 +27,12 @@ class BaseEffectsInline(object):
 	style = "table"
 
 
+class BaseTraitsInline(object):
+
+	extra = 1
+	style = "table"
+
+
 class CurrencyAdmin(object):
 
 	list_display = ['id', 'gold', 'ticket', 'bound_ticket', 'item']

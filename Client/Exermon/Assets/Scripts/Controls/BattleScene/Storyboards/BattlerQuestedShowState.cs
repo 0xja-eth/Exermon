@@ -9,7 +9,7 @@ using Core.UI.Utils;
 namespace UI.BattleScene.Controls.Storyboards {
 
     /// <summary>
-    /// 基本状态行为
+    /// 战斗答题显示状态
     /// </summary>
     public class BattlerQuestedShowState : BaseStateBehaviour {
 

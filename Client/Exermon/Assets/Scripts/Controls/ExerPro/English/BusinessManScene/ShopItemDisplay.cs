@@ -36,6 +36,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
         public Texture2D goldTag;
 
+        /// <summary>
+        /// 内部变量
+        /// </summary>
+        protected int price = 0;
+
         #region 初始化
 
         /// <summary>
@@ -76,7 +81,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// 绘制物品价格
         /// </summary>
         /// <param name="item">商品</param>
-        void drawPrice(BaseExerProItem item) {
+        void drawPrice(T item) {
             var price = item.gold;
             if (price > 0) {
                 priceText.text = price.ToString();

@@ -3,12 +3,12 @@ from enum import Enum
 
 class WebscoketCloseCode(Enum):
 
-	ServerClose = 1000  # 服务器切断连接
-	ClientClose = 1001  # 客户端切断连接
-	AbnormalClose = 1006  # 非正常断开连接
+	ServerClose = 1000  # 鏈嶅姟鍣ㄥ垏鏂繛鎺?
+	ClientClose = 1001  # 瀹㈡埛绔垏鏂繛鎺?
+	AbnormalClose = 1006  # 闈炴甯告柇寮�杩炴帴
 
-	Logout = 3000  # 用户登出
-	Kickout = 3001  # 用户踢出
+	Logout = 3000  # 鐢ㄦ埛鐧诲嚭
+	Kickout = 3001  # 鐢ㄦ埛韪㈠嚭
 
 
 class ErrorType(Enum):
@@ -200,6 +200,12 @@ class ErrorType(Enum):
 	MapNotFound = 810  # 地图不存在
 	StageNotFound = 811  # 关卡不存在
 	ExerProStarted = 812  # 特训正在进行
+	InvalidBuyNum = 814  # 购买数量不合法
+	CorrectAnswerWrong = 815  # 改错回答不合法
+
+	ExerProItemNotExist = 820  # 特训道具不存在
+	ExerProPotionNotExist = 821  # 特训药水不存在
+	ExerProCardNotExist = 822  # 特训卡牌不存在
 
 
 class GameException(Exception):
@@ -393,14 +399,19 @@ class GameException(Exception):
 		ErrorType.MapNotFound: "地图不存在！",
 		ErrorType.StageNotFound: "关卡不存在！",
 		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
+		ErrorType.InvalidBuyNum: "购买数量不合法！",
+		ErrorType.CorrectAnswerWrong: "改错回答不合法！",
 
+		ErrorType.ExerProItemNotExist: "特训道具不存在！",
+		ErrorType.ExerProPotionNotExist: "特训药水不存在！",
+		ErrorType.ExerProCardNotExist: "特训卡牌不存在！",
 	}
 
 	def __init__(self, error_type: ErrorType):
 		"""
 
 		Args:
-			error_type (ErrorType): 错误类型
+			error_type (ErrorType): 閿欒绫诲瀷
 		"""
 		self.error_type = error_type
 		self.msg = GameException.ERROR_DICT[error_type]

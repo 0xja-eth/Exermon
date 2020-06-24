@@ -74,7 +74,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
             icon.gameObject.SetActive(true);
             icon.overrideSprite = potion.icon;
 
-            name.text = potion.name;
+			if (name) name.text = potion.name;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
         /// </summary>
         protected override void drawEmptyItem() {
             icon.gameObject.SetActive(false);
-            name.text = "";
+            if (name) name.text = "";
         }
 
         #endregion

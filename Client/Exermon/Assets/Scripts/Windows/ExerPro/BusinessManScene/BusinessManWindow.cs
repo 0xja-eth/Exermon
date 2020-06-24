@@ -25,6 +25,7 @@ using UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem;
 using UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays;
 
 using ExerPro.EnglishModule.Services;
+using System.Collections.Generic;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
 
@@ -287,18 +288,28 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
             }
         }
 
+        /// <summary>
+        /// 购买卡牌
+        /// </summary>
         public void buyCardItem() {
             var container = (ExerProCardGroup)operContainer<ExerProPackCard>();
             var item = (ExerProCard)operShopItem();
             if (container == null || item == null)
                 return;
-            //var price = item.gold;
-            var price = 1;
+            
+            var price = item.gold;
             player?.gainGold(-price);
+            var oldItems = cardItemShop.getItems();
+            List<ExerProCard> cardList = new List<ExerProCard>(oldItems);
+            cardList.RemoveAt(cardItemShop.getSelectedIndex());
+            cardItemShop.setItems(cardList.ToArray());
             container.addCard(item);
             onBuySuccess();
         }
 
+        /// <summary>
+        /// 购买药水
+        /// </summary>
         public void buyPotionItem() {
             var container = (ExerProPotionPack)operContainer<ExerProPackPotion>();
             var item = (ExerProPotion)operShopItem();
@@ -306,9 +317,14 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
                 return;
             var price = item.gold;
             player?.gainGold(-price);
+            var oldItems = potionItemShop.getItems();
+            List<ExerProPotion> potionList = new List<ExerProPotion>(oldItems);
+            potionList.RemoveAt(potionItemShop.getSelectedIndex());
+            potionItemShop.setItems(potionList.ToArray());
             container.pushItem(new ExerProPackPotion(item));
             onBuySuccess();
         }
+        
         /// <summary>
         /// 操作成功回调
         /// </summary>
@@ -320,5 +336,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         #endregion
 
         #endregion
+
     }
 }

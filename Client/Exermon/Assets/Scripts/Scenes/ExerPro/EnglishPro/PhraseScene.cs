@@ -70,8 +70,10 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         /// 下一道
         /// </summary>
         public void nextQuestion() {
-            if (currentQuesIndex >= questionNum)
+            if (currentQuesIndex >= questionNum) {
                 onSubmit();
+                return;
+            }
             PhraseQuestion question = questions[currentQuesIndex++];
             while (question.options().Length == 0)
                 question = questions[currentQuesIndex++];

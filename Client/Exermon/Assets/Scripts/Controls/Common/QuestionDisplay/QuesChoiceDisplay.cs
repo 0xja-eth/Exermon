@@ -110,7 +110,7 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// 绘制确切物品
         /// </summary>
         /// <param name="choice">选项</param>
-        protected override void drawExactlyItem(Question.Choice choice) {
+        protected override void drawExactlyItem(BaseQuestion.Choice choice) {
             base.drawExactlyItem(choice);
             var result = getResult();
             bool correct = false, wrong = false;

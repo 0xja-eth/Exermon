@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 if __name__ == '__main__':
-
 	import os
 	import uuid
 	import json
@@ -19,15 +18,16 @@ if __name__ == '__main__':
 
 	base_path = 'english_pro_module/raw_data/'
 
-	# 英语单词的路径
+	# 英语单词的路�?
 	words_path = base_path + 'words.txt'
-	# 短语的路径
+	# 短语的路�?
 	phrase_path = base_path + 'phrase.txt'
 	# 听力题的路径
 	learning_question_path = base_path + 'listening.json'
-	# 判断短语的分类
+	# 判断短语的分�?
 	todo = ['to do sth.', 'doing sth.']
-	sb = ['sb. to do sth.', 'sb. doing sth.', 'sb. do sth.', 'sth. for sb.', 'sb. of sth.', 'sb. for doing sth.', 'sb. into doing sth.']
+	sb = ['sb. to do sth.', 'sb. doing sth.', 'sb. do sth.', 'sth. for sb.', 'sb. of sth.', 'sb. for doing sth.',
+		  'sb. into doing sth.']
 	of = ['about', 'at', 'for', 'from', 'in', 'of', 'to', 'with', 'of', 'to']
 	# 听力题辅助词判断
 	learning_list = ['groupQuestion', 'audioPath', 'article', 'question', 'Answer1', 'Answer2', 'Answer3', 'option']
@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
 		print("%d. %s saved" % (word.id, word.english))
 
-	# 插入不定式题目
+	# 插入不定式题�?
 	def insert_phrase_questions():
 		f = open(phrase_path, encoding='utf-8')
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
 		if not flag:
 			ques = PhraseQuestion.objects.create(word=word, chinese=chinese,
-										  phrase=phrase, type=type)
+												 phrase=phrase, type=type)
 		else:
 			ques = ques.first()
 			ques.phrase = phrase
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 		f.close()
 		center_print('Done inserting ListeningQuestion')
 
-	# 保存短语题目
+	# 保存听力题目
 	def save_listening_question(id, group_question):
 		article = group_question['article']
 		audio = base_path + group_question['audio']
@@ -153,8 +153,10 @@ if __name__ == '__main__':
 				answers = question['answers']
 				option = question['option']
 
-				if index < sub_cnt: sub_ques = sub_queses[index]
-				else: sub_ques = ListeningSubQuestion()
+				if index < sub_cnt:
+					sub_ques = sub_queses[index]
+				else:
+					sub_ques = ListeningSubQuestion()
 
 				sub_ques.question_id = id
 				sub_ques.title = title
@@ -171,14 +173,17 @@ if __name__ == '__main__':
 		cho_cnt = choices.count()
 
 		for i in range(len(answers)):
-			if i < cho_cnt: choice = choices[i]
-			else: choice = ListeningQuesChoice()
+			if i < cho_cnt:
+				choice = choices[i]
+			else:
+				choice = ListeningQuesChoice()
 
 			choice.order = i + 1
 			choice.text = answers[i]
-			choice.answer = (option == i+1)
+			choice.answer = (option == i + 1)
 			choice.question = question
 			choice.save()
+
 
 	# insert_words()
 	# insert_phrase_questions()
@@ -186,6 +191,8 @@ if __name__ == '__main__':
 
 	from english_pro_module.raw_data.upload import upload
 
-	upload("ExerProCard")
-	upload("ExerProEnemy")
-	upload("ExerProPotion")
+	# upload("ExerProItem")
+	# upload("ExerProPotion")
+	# upload("ExerProCard")
+	# upload("ExerProEnemy")
+	# upload("ExerProState")

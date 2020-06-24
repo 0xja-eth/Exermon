@@ -415,7 +415,7 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
-  detail: {fileID: 0}
+  detail: {fileID: 6079261625548984598}
 --- !u!1 &5980498175695636446
 GameObject:
   m_ObjectHideFlags: 0

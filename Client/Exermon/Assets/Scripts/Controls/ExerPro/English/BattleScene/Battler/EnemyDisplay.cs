@@ -32,6 +32,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 字符串常量定义
 		/// </summary>
 		const string NameFormat = "{0}[{1}]";
+		const string PureNameFormat = "{0}";
 
 		/// <summary>
 		/// 外部组件设置
@@ -46,7 +47,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		ExerProEnemy.Action currentEnemyAction = null;
 
 		#region 更新控制
-
+		
 		/// <summary>
 		/// 更新
 		/// </summary>
@@ -54,14 +55,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			base.update();
 			updateEnemyAction();
 		}
-
+		
 		/// <summary>
 		/// 更新敌人行动
 		/// </summary>
 		void updateEnemyAction() {
-			currentEnemyAction = enemy().currentEnemyAction;
-			if (currentEnemyAction != null)
-				processEnemyAction(currentEnemyAction);
+			var action = enemy().currentEnemyAction;
+			if (action != null) processEnemyAction(action);
 		}
 
 		#endregion
@@ -73,27 +73,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		void processEnemyAction(ExerProEnemy.Action action) {
 			switch (action.typeEnum()) {
-				case ExerProEnemy.Action.Type.Attack:
-					processAttack(action); break;
-				//case ExerProEnemy.Action.Type.PowerUp:
-				//	processPowerUp(action); break;
-				//case ExerProEnemy.Action.Type.PosStates:
-				//	processAddStates(action); break;
-				//case ExerProEnemy.Action.Type.PowerDown:
-				//	processPowerDown(action); break;
-				//case ExerProEnemy.Action.Type.NegStates:
-				//	processAddStates(action); break;
 				case ExerProEnemy.Action.Type.Escape:
 					processEscape(action); break;
-				default: skill(); break;
 			}
-		}
-
-		/// <summary>
-		/// 处理攻击
-		/// </summary>
-		void processAttack(ExerProEnemy.Action action) {
-			moveToTarget(); attack(); resetPosition();
 		}
 		/*
 		/// <summary>
@@ -147,7 +129,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 动画控制
-
+		/*
 		/// <summary>
 		/// 击中回调
 		/// </summary>
@@ -160,27 +142,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 					powerUp(); onSkillEnd(); break;
 				case ExerProEnemy.Action.Type.PowerDown:
 				case ExerProEnemy.Action.Type.NegStates:
-					target()?.powerDown();
+					targetDisplay()?.powerDown();
 					onSkillEnd(); break;
 			}
 		}
-
+		*/
 		#endregion
 
 		#region 界面控制
-
-		/// <summary>
-		/// 配置位置
-		/// </summary>
-		/// <param name="pos"></param>
-		public override void setupPosition(Vector2 pos) {
-			var enemy = this.enemy();
-			if (enemy != null)
-				pos += new Vector2(enemy.xOffset, enemy.yOffset);
-
-			base.setupPosition(pos);
-		}
-
+			
 		/// <summary>
 		/// 绘制确切物品
 		/// </summary>
@@ -190,14 +160,34 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var enemy = this.enemy(item);
 			var enemyData = enemy.enemy();
 
-			name.text = string.Format(NameFormat,
-				enemyData.name, enemyData.character);
+			drawName(enemyData);
+			drawThinking(enemy);
+		}
 
+		/// <summary>
+		/// 绘制名称
+		/// </summary>
+		/// <param name="enemy"></param>
+		void drawName(ExerProEnemy enemy) {
+			if (enemy.character != "")
+				name.text = string.Format(NameFormat,
+					enemy.name, enemy.character);
+			else name.text = string.Format(PureNameFormat,
+					enemy.name);
+		}
+
+		/// <summary>
+		/// 绘制敌人行动思考图标
+		/// </summary>
+		/// <param name="enemy"></param>
+		void drawThinking(RuntimeEnemy enemy) {
 			var think = AssetLoader.loadEnemyThink(
 				enemy.currentActionType());
-			this.think.gameObject.SetActive(true);
-			this.think.overrideSprite = AssetLoader.
-				generateSprite(think);
+			if (think != null) {
+				this.think.gameObject.SetActive(true);
+				this.think.overrideSprite = AssetLoader.
+					generateSprite(think);
+			} else this.think.gameObject.SetActive(false);
 		}
 
 		/// <summary>
@@ -219,7 +209,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		public void OnDrop(PointerEventData eventData){
 			var dragger = getCardDragger(eventData);
-			dragger.use(this);
+			Debug.Log("Dragger: " + dragger);
+			dragger?.use(this);
 		}
 
 		/// <summary>
@@ -228,6 +219,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="data">事件数据</param>
 		/// <returns>物品显示项</returns>
 		CardDragger getCardDragger(PointerEventData data) {
+			Debug.Log("data.pointerDrag: " + data.pointerDrag);
 			var obj = data.pointerDrag; if (obj == null) return null;
 			return SceneUtils.get<CardDragger>(obj);
 		}
