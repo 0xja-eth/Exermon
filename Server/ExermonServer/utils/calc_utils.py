@@ -2147,7 +2147,7 @@ class CorrectionCompute:
     @classmethod
     def is_add_valid(cls, answer_font, wid, sentence):
         if answer_font != sentence[wid-1]:
-            raise GameException(ErrorType.CorrectAnswerWrong)
+            raise GameException(ErrorType.InvalidAnswer)
 
     # 判断改错类型
     @classmethod
@@ -2210,3 +2210,109 @@ class CorrectionCompute:
                     num += 1
 
         return num
+
+
+# ===================================================
+# 商品生成
+# ===================================================
+class ShopItemGenerator:
+
+    # 计算常量
+    RATIOS = [0.8, 0.15, 0.05]  # 每个星级的概率
+
+    CARD_COUNT = 10
+    POTION_COUNT = 3
+    ITEM_COUNT = 3
+
+    def __init__(self, shop):
+        from english_pro_module.runtimes import RuntimeShop
+        from english_pro_module.models import \
+            ExerProItem, ExerProPotion, ExerProCard
+        from item_module.models import ItemType
+
+        self.shop: RuntimeShop = shop
+
+        if self.shop.type_ == ItemType.ExerProItem:
+            self._generate(ExerProItem, self.ITEM_COUNT)
+        if self.shop.type_ == ItemType.ExerProPotion:
+            self._generate(ExerProPotion, self.POTION_COUNT)
+        if self.shop.type_ == ItemType.ExerProCard:
+            self._generate(ExerProCard, self.CARD_COUNT,
+                           self._generateCardRates())
+
+    def _generateCardRates(self):
+        stage_order = self.shop.pro_record.stage.order - 1
+        rates = self.RATIOS.copy()
+
+        rates[0] -= stage_order * 0.15
+        rates[1] += stage_order * 0.1
+        rates[2] += stage_order * 0.05
+
+        return rates
+
+    def _generate(self, cla, cnt, rates=None):
+
+        if rates is None: rates = self.RATIOS
+
+        items = ViewUtils.getObjects(cla)
+        item_dict = {}
+
+        # 生成 星级 - 物品集 字典
+        for i in range(len(rates)):
+            item_dict[i+1] = list(items.filter(star_id=i+1))
+
+        for i in range(cnt):
+            index = 1  # 星级ID
+            rand = random.random()
+
+            for rate in rates:
+                rand -= rate
+                if rand <= 0:
+                    item = self.__generateRandomShopItem(item_dict[index])
+                    self.shop.addShopItem(item)
+                else: index += 1
+
+    def __generateRandomShopItem(self, items):
+
+        cnt = 0
+        item = random.choice(items)
+        # 如果商店已经包含该物品，同时循环次数 <= 10000，则重新选择
+        while self.shop.contains(item) and cnt <= 10000:
+            item = random.choice(items)
+            cnt += 1
+
+        return item
+
+    # 价格计算
+    CARD_PRICES = [20, 50, 100]  # 卡牌星级价格数组
+    POTION_PRICES = [[30, 45], [55, 75], [0, 0]]
+    ITEM_PRICES = [[30, 45], [55, 75], [0, 0]]
+
+    @classmethod
+    def generatePrice(cls, item):
+        from item_module.models import ItemType
+
+        if item.TYPE == ItemType.ExerProItem:
+            return cls.generateExerProItemPrice(item)
+        if item.TYPE == ItemType.ExerProPotion:
+            return cls.generateExerProPotionPrice(item)
+        if item.TYPE == ItemType.ExerProCard:
+            return cls.generateExerProCardPrice(item)
+
+    @classmethod
+    def generateExerProItemPrice(cls, item):
+        return random.randint(*cls.ITEM_PRICES[item.star_id - 1])
+
+    @classmethod
+    def generateExerProPotionPrice(cls, potion):
+        return random.randint(*cls.POTION_PRICES[potion.star_id - 1])
+
+    @classmethod
+    def generateExerProCardPrice(cls, card):
+        from english_pro_module.models import ExerProCardTarget
+
+        res = card.cost * random.randint(5, 10)
+        res += cls.CARD_PRICES[card.star_id - 1] * random.randint(7, 10) / 10
+        if card.target == ExerProCardTarget.All.value: res += 10
+
+        return res

@@ -1,21 +1,38 @@
 ﻿using UnityEngine;
-using ExerPro.EnglishModule.Data;
+
 using GameModule.Services;
 
+using ExerPro.EnglishModule.Data;
+
+using UI.ShopScene.Controls;
+
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
-    public class CardItemShopDisplay : ShopDisplay<ExerProCard> {
+
+	/// <summary>
+	/// 卡牌商店显示
+	/// </summary>
+	public class CardItemShopDisplay : ExerProShopDisplay<ExerProCard> {
 
         /// <summary>
         /// 内部变量
         /// </summary>
-        const int CardNumberOnce = 10;
+        //const int CardNumberOnce = 10;
 
-        #region 启动/结束视图
-        /// <summary>
-        /// 启动视窗
-        /// </summary>
-        /// <param name="items"></param>
-        public override void startView() {
+		/// <summary>
+		/// 物品详情控件
+		/// </summary>
+		public override ShopItemDetail<ExerProCard> itemDetail {
+			get { return null; }
+			set { }
+		}
+
+		#region 启动/结束视图
+		/*
+		/// <summary>
+		/// 启动视窗
+		/// </summary>
+		/// <param name="items"></param>
+		public override void startView() {
             if (shopItems == null)
                 Debug.Log("startView: " + name + ": null");
             else
@@ -34,6 +51,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
             else
                 setItems(shopItems);
         }
+		*/
         #endregion
 
     }

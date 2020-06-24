@@ -1811,6 +1811,11 @@ namespace ExerPro.EnglishModule.Data {
     /// 特训记录
     /// </summary>
     public class ExerProRecord : BaseData, ParamDisplay.IDisplayDataConvertable {
+		
+		/// <summary>
+		/// 常量定义 
+		/// </summary>
+        public const int DefaultGold = 100; // 初始金币
 
         /// <summary>
         /// 属性
@@ -1843,7 +1848,9 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         [AutoConvert]
         public int curIndex { get; protected set; } = -1; // 当前节点索引
-        [AutoConvert]
+		[AutoConvert]
+		public int gold { get; protected set; } = DefaultGold; // 金币
+		[AutoConvert]
         public bool nodeFlag { get; set; } = false; // 是否完成据点事件
         [AutoConvert]
         public RuntimeActor actor { get; protected set; } = null;
@@ -1857,10 +1864,16 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert(autoConvert = false)]
         public List<WordRecord> wordRecords { get; protected set; }
 
-        /// <summary>
-        /// 下一单词ID
-        /// </summary>
-        public int next { get; set; } = 0;
+		/// <summary>
+		/// 积分记录
+		/// </summary>
+		[AutoConvert]
+		public ScoreRecord scoreRecord { get; protected set; } = new ScoreRecord();
+
+		/// <summary>
+		/// 下一单词ID
+		/// </summary>
+		public int next { get; set; } = 0;
 
         /*
         [AutoConvert]
@@ -1875,12 +1888,6 @@ namespace ExerPro.EnglishModule.Data {
         /// 敌人（缓存用）
         /// </summary>
         List<ExerProEnemy> _enemies = null;
-
-        /// <summary>
-        /// 积分记录
-        /// </summary>
-        [AutoConvert]
-        public ScoreRecord scoreRecord { get; protected set; } = new ScoreRecord();
 
         #region 数据转化
 
@@ -1959,107 +1966,116 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProMapStage stage() {
             return map()?.stage(stageOrder);
         }
-        /*
-        /// <summary>
-        /// 敌人数组
-        /// </summary>
-        /// <returns>返回敌人数组</returns>
-        public List<ExerProEnemy> enemies() {
-            if (_enemies == null) {
-                var enemies = stage()?.enemies;
-                if (enemies == null) return null;
-                _enemies = new List<ExerProEnemy>(enemies.Length);
-                foreach (var enemy in enemies)
-                    _enemies.Add(DataService.get().exerProEnemy(enemy));
-            }
-            return _enemies;
-        }
 
-        /// <summary>
-        /// BOSS数组
-        /// </summary>
-        /// <returns>返回敌人数组</returns>
-        public List<ExerProEnemy> bosses() {
-            return enemies().FindAll(e => e.type == (int)ExerProEnemy.EnemyType.Boss);
-        }
-        */
-        /// <summary>
-        /// 获取据点对象
-        /// </summary>
-        /// <param name="id">据点ID</param>
-        /// <returns>返回据点对象</returns>
-        public ExerProMapNode getNode(int id) {
-            if (id < 0 || id >= nodes.Count) return null;
-            return nodes[id]; // nodes.Find(node => node.id == id);
-        }
-        /// <param name="xOrder">X顺序</param>
-        /// <param name="yOrder">Y顺序</param>
-        public ExerProMapNode getNode(int xOrder, int yOrder) {
-            return nodes.Find(node => node.xOrder == xOrder &&
-                node.yOrder == yOrder);
-        }
+		/// <summary>
+		/// 得到金钱
+		/// </summary>
+		/// <param name="val"></param>
+		public void gainGold(int val) {
+			gold = Math.Max(gold + val, 0);
+		}
 
-        /// <summary>
-        /// 初始据点
-        /// </summary>
-        /// <returns></returns>
-        public List<ExerProMapNode> firstNodes() {
-            return nodes.FindAll(node => node.xOrder == 0);
-        }
+		#region 据点控制
 
-        /// <summary>
-        /// 最后据点
-        /// </summary>
-        /// <returns></returns>
-        public ExerProMapNode lastNode() {
-            if (nodes.Count <= 0) return null;
-            return nodes[nodes.Count - 1];
-        }
+		/// <summary>
+		/// 生成地图
+		/// </summary>
+		void generate() {
+			if (generated) return;
+			generated = CalcService.NodeGenerator.generate(this);
+			setupCards(); refreshNodeStatuses();
+		}
 
-        /// <summary>
-        /// 获取当前据点
-        /// </summary>
-        /// <returns>返回当前据点对象</returns>
-        public ExerProMapNode currentNode() {
-            return getNode(curIndex);
-        }
+		/// <summary>
+		/// 创建据点
+		/// </summary>
+		/// <param name="xOrder">X序号</param>
+		/// <param name="yOrder">Y序号</param>
+		/// <param name="type">据点类型</param>
+		public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type) {
+			var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
+			nodes.Add(node); return node;
+		}
 
-        /// <summary>
-        /// 是否已选择起点
-        /// </summary>
-        /// <returns></returns>
-        public bool isFirstSelected() {
-            return curIndex >= 0;
-        }
+		/// <summary>
+		/// 获取据点对象
+		/// </summary>
+		/// <param name="id">据点ID</param>
+		/// <returns>返回据点对象</returns>
+		public ExerProMapNode getNode(int id) {
+			if (id < 0 || id >= nodes.Count) return null;
+			return nodes[id]; // nodes.Find(node => node.id == id);
+		}
+		/// <param name="xOrder">X顺序</param>
+		/// <param name="yOrder">Y顺序</param>
+		public ExerProMapNode getNode(int xOrder, int yOrder) {
+			return nodes.Find(node => node.xOrder == xOrder &&
+				node.yOrder == yOrder);
+		}
 
-        /// <summary>
-        /// 下一个单词
-        /// </summary>
-        /// <returns></returns>
-        public Word nextWord() {
-            if (next <= 0) return wordRecords[0].word();
-            return EnglishService.get().getQuestion<Word>(next);
-        }
+		/// <summary>
+		/// 初始据点
+		/// </summary>
+		/// <returns></returns>
+		public List<ExerProMapNode> firstNodes() {
+			return nodes.FindAll(node => node.xOrder == 0);
+		}
 
-        /// <summary>
-        /// 下一个单词
-        /// </summary>
-        /// <returns></returns>
-        public int[] recordWordIds() {
-            var cnt = wordRecords.Count;
-            var res = new int[cnt];
-            for (int i = 0; i < cnt; ++i)
-                res[i] = wordRecords[i].wordId;
-            return res;
-        }
+		/// <summary>
+		/// 最后据点
+		/// </summary>
+		/// <returns></returns>
+		public ExerProMapNode lastNode() {
+			if (nodes.Count <= 0) return null;
+			return nodes[nodes.Count - 1];
+		}
 
-        #region 记录控制
+		/// <summary>
+		/// 获取当前据点
+		/// </summary>
+		/// <returns>返回当前据点对象</returns>
+		public ExerProMapNode currentNode() {
+			return getNode(curIndex);
+		}
 
-        /// <summary>
-        /// 获取本轮单词正确数量
-        /// </summary>
-        /// <returns></returns>
-        public int getCorrCnt() {
+		/// <summary>
+		/// 是否已选择起点
+		/// </summary>
+		/// <returns></returns>
+		public bool isFirstSelected() {
+			return curIndex >= 0;
+		}
+
+		#endregion
+
+		#region 记录控制
+
+		/// <summary>
+		/// 下一个单词
+		/// </summary>
+		/// <returns></returns>
+		public Word nextWord() {
+			if (next <= 0) return wordRecords[0].word();
+			return EnglishService.get().getQuestion<Word>(next);
+		}
+
+		/// <summary>
+		/// 已有记录的单词ID
+		/// </summary>
+		/// <returns></returns>
+		public int[] recordWordIds() {
+			var cnt = wordRecords.Count;
+			var res = new int[cnt];
+			for (int i = 0; i < cnt; ++i)
+				res[i] = wordRecords[i].wordId;
+			return res;
+		}
+
+		/// <summary>
+		/// 获取本轮单词正确数量
+		/// </summary>
+		/// <returns></returns>
+		public int getCorrCnt() {
             int cnt = 0;
             foreach (var record in wordRecords)
                 if (record.isCurrentCorrect()) cnt++;
@@ -2081,36 +2097,12 @@ namespace ExerPro.EnglishModule.Data {
 
         #endregion
 
-        #region 据点控制
+		#region 游戏控制
 
-        /// <summary>
-        /// 生成地图
-        /// </summary>
-        void generate() {
-            if (generated) return;
-			generated = CalcService.NodeGenerator.generate(this);
-			setupCards(); refreshNodeStatuses();
-        }
-
-        /// <summary>
-        /// 创建据点
-        /// </summary>
-        /// <param name="xOrder">X序号</param>
-        /// <param name="yOrder">Y序号</param>
-        /// <param name="type">据点类型</param>
-        public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type) {
-            var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
-            nodes.Add(node); return node;
-        }
-
-        #endregion
-
-        #region 游戏控制
-
-        /// <summary>
-        /// 开始特训
-        /// </summary>
-        public void start() {
+		/// <summary>
+		/// 开始特训
+		/// </summary>
+		public void start() {
 			createActor(); generate();
         }
         /*
@@ -2251,7 +2243,8 @@ namespace ExerPro.EnglishModule.Data {
             var player = PlayerService.get().player;
             if (player == null) return;
 
-			if (actor == null) actor = new RuntimeActor(player);
+			if (actor == null)
+				actor = new RuntimeActor(this, player);
             else actor.setupPlayer(player);
         }
 
@@ -2267,28 +2260,31 @@ namespace ExerPro.EnglishModule.Data {
             generate();
         }
 
-        #endregion
-    }
+		#endregion
+	}
 
-    public class ScoreRecord : BaseData {
-        /// <summary>
-        /// 积分计算的相关数据
-        /// </summary>
-        [AutoConvert]
-        public int killEnemyAccmu { get; set; } = 0;
-        [AutoConvert]
-        public int killBossAccmu { get; set; } = 0;
-        [AutoConvert]
-        public int perfectNumber { get; set; } = 0;
-        [AutoConvert]
-        public int stageOrderAccumu { get; set; } = 0;
-    }
+	/// <summary>
+	/// 积分记录
+	/// </summary>
+	public class ScoreRecord : BaseData {
 
+		/// <summary>
+		/// 积分计算的相关数据
+		/// </summary>
+		[AutoConvert]
+		public int killEnemyAccmu { get; set; } = 0;
+		[AutoConvert]
+		public int killBossAccmu { get; set; } = 0;
+		[AutoConvert]
+		public int perfectNumber { get; set; } = 0;
+		[AutoConvert]
+		public int stageOrderAccumu { get; set; } = 0;
+	}
 
-    /// <summary>
-    /// 据点类型
-    /// </summary>
-    public class NodeType : TypeData {
+	/// <summary>
+	/// 据点类型
+	/// </summary>
+	public class NodeType : TypeData {
 
         /// <summary>
         /// 属性
@@ -3526,6 +3522,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// 战斗开始回调
 		/// </summary>
 		public virtual void onBattleStart() {
+			CalcService.ExerProTraitsCalc.calcOnBattleStart(this);
+
 			onRoundStart(0);
 			clearStates();
 			clearBuffs();
@@ -3536,6 +3534,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="round">回合数</param>
 		public virtual void onRoundStart(int round) {
+			if (round > 0)
+				CalcService.ExerProTraitsCalc.calcOnRoundStart(this);
+
 			_deltaHP = null;
 			_addedBuffs.Clear();
 			_isStateChanged = false;
@@ -3592,7 +3593,10 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="round">回合数</param>
 		public virtual void onRoundEnd(int round) {
-            clearActions();
+			if (round > 0)
+				CalcService.ExerProTraitsCalc.calcOnRoundEnd(this);
+
+			clearActions();
 
             processBuffsRoundEnd();
             processStatesRoundEnd();
@@ -3627,6 +3631,7 @@ namespace ExerPro.EnglishModule.Data {
         /// 战斗结束回调
         /// </summary>
         public virtual void onBattleEnd() {
+			CalcService.ExerProTraitsCalc.calcOnBattleEnd(this);
 			isEscaped = false;
 		}
 
@@ -3664,8 +3669,6 @@ namespace ExerPro.EnglishModule.Data {
         public const int DefaultDefense = 5; // 初始格挡
         public const int DefaultAgile = 5; // 初始敏捷
 
-        public const int DefaultGold = 100; // 初始金币
-
 		public const int DefaultEnergy = 3; // 默认能量
 
         const int EnglishSubjectId = 3; // 英语科目ID
@@ -3683,9 +3686,6 @@ namespace ExerPro.EnglishModule.Data {
         public int _agile { get; protected set; }
 
 		[AutoConvert]
-		public int gold { get; protected set; }
-
-		[AutoConvert]
 		public int energy { get; protected set; }
 
 		[AutoConvert]
@@ -3698,10 +3698,22 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
 		public ExerProPotionSlot potionSlot { get; protected set; }
 
-        /// <summary>
-        /// 对应的艾瑟萌槽项
-        /// </summary>
-        public ExerSlotItem slotItem { get; protected set; } = null;
+		/// <summary>
+		/// 金钱
+		/// </summary>
+		public int gold {
+			get { return racord == null ? 0 : racord.gold; }
+		}
+
+		/// <summary>
+		/// 对应的记录
+		/// </summary>
+		public ExerProRecord racord { get; protected set; } = null;
+
+		/// <summary>
+		/// 对应的艾瑟萌槽项
+		/// </summary>
+		public ExerSlotItem slotItem { get; protected set; } = null;
 
         #region 数据转化
 
@@ -3722,11 +3734,11 @@ namespace ExerPro.EnglishModule.Data {
         #region 数据控制
 
 		/// <summary>
-		/// 读取金钱
+		/// 得到金钱
 		/// </summary>
 		/// <param name="val"></param>
 		public void gainGold(int val) {
-			gold = Math.Max(gold + val, 0);
+			racord?.gainGold(val);
 		}
 
 		/// <summary>
@@ -3882,7 +3894,7 @@ namespace ExerPro.EnglishModule.Data {
             _power = DefaultPower;
             _defense = DefaultDefense;
             _agile = DefaultAgile;
-            gold = DefaultGold;
+
             base.reset();
         }
 
@@ -3917,7 +3929,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="player"></param>
 		public RuntimeActor() { }
-		public RuntimeActor(Player player) {
+		public RuntimeActor(ExerProRecord racord, Player player) {
+			this.racord = racord;
+
 			setupPlayer(player);
 			createPotionSlot();
 			reset();

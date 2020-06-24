@@ -4,18 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using UI.ShopScene.Controls;
+
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
 using ExerPro.EnglishModule.Data;
-using GameModule.Services;
+
+using ItemModule.Services;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
     /// <summary>
     /// 物品详情
     /// </summary>
-    public class PotionItemDetail : BaseItemDetail,IItemDetailDisplay<ExerProPotion>  {
+    public class PotionItemDetail : ShopItemDetail<ExerProPotion> {//BaseItemDetail, IItemDetailDisplay<ExerProPotion>  {
 
         /// <summary>
         /// 常量定义
@@ -25,29 +28,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
-        public Text description, priceText;
-
-        public StarsDisplay starsDisplay;
-
-        public MultParamsDisplay detail;
-
-        #region 初始化
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
-            base.initializeOnce();
-        }
-
-        /// <summary>
-        /// 初始化绘制函数
-        /// </summary>
-        protected override void initializeDrawFuncs() {
-            registerItemType<ExerProPotion>(drawItem);
-        }
-
-        #endregion
 
         #region 画面绘制
 
@@ -55,41 +35,31 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
         /// 绘制基本信息
         /// </summary>
         /// <param name="item">物品1</param>
-        protected virtual void drawBaseInfo(ExerProPotion item) {
+        protected override void drawBaseInfo(ExerProPotion item) {
             name.text = item.name;
             description.text = item.description;
 
             // 处理物品星级和图标情况
-            if (item != null) {
-                starsDisplay?.setValue(item.starId);
+            starsDisplay?.setValue(item.starId);
 
-                icon.gameObject.SetActive(true);
-                //icon.overrideSprite = item.icon;
-            }
+            icon.gameObject.SetActive(true);
+            icon.overrideSprite = item.icon;
         }
-
+		/*
         /// <summary>
         /// 绘制物品详情
         /// </summary>
         /// <param name="obj"></param>
-        protected virtual void drawItemDetail(ParamDisplay.IDisplayDataConvertable obj) {
-            ////detail?.setValue(obj, "detail");
+        protected override void drawItemDetail(
+			ParamDisplay.IDisplayDataConvertable obj) {
+            detail?.setValue(obj, "detail");
         }
-
-        /// <summary>
-        /// 绘制物品价格
-        /// </summary>
-        /// <param name="obj"></param>
-        void drawPrice() {
-            if (shopItem == null) return;
-            priceText.text = generatePriceText();
-        }
-
-        /// <summary>
-        /// 生成价格文本
-        /// </summary>
-        /// <param name="obj"></param>
-        string generatePriceText() {
+		*/
+		/// <summary>
+		/// 生成价格文本
+		/// </summary>
+		/// <param name="obj"></param>
+		protected override string generatePriceText() {
             var price = shopItem.gold;
             if (price > 0)
                 return (string.Format(GoldPriceFormat, price));
@@ -97,27 +67,8 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
                 return "";
         }
 
-        /// <summary>
-        /// 绘制物品
-        /// </summary>
-        /// <param name="item">物品</param>
-        void drawItem(ExerProPotion item) {
-            drawPrice();
-            drawBaseInfo(item);
-            drawItemDetail(item);
-        }
-
-        /// <summary>
-        /// 清除物品
-        /// </summary>
-        protected override void drawEmptyItem() {
-            base.drawEmptyItem();
-            priceText.text = description.text = "";
-            detail.clearValue();
-        }
-
         #endregion
-
+		/*
         #region 接口实现
 
         /// <summary>
@@ -162,11 +113,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
             base.setItem(item, force);
         }
 
-        ExerProPotion IItemDisplay<ExerProPotion>.getItem() {
+        ExerProPotion IItemDisplay<ItemService.ShopItem<ExerProPotion>>.getItem() {
             return shopItem;
         }
 
         #endregion
-
+		*/
     }
 }

@@ -1849,7 +1849,7 @@ namespace GameModule.Services {
 			/// 计算回合开始时的特性效果
 			/// </summary>
 			/// <param name="battler"></param>
-			public static void calcOnRoundEnd(RuntimeBattler battler, int rest = 0) {
+			public static void calcOnRoundEnd(RuntimeBattler battler) {
 				processRoundEndRecover(battler);
 			}
 			static void processRoundEndRecover(RuntimeBattler battler) {
@@ -1882,6 +1882,7 @@ namespace GameModule.Services {
         /// 奖励生成器
         /// </summary>
         public class RewardGenerator {
+
             /// <summary>
             /// 奖励卡牌选择数量
             /// </summary>
@@ -1914,6 +1915,7 @@ namespace GameModule.Services {
                 }
                 return -1;
             }
+
             /// <summary>
             /// boss奖励
             /// </summary>
@@ -1923,6 +1925,7 @@ namespace GameModule.Services {
                 int randBase = Random.Range(35, 40);
                 return record.stageOrder * randBase;
             }
+
             /// <summary>
             /// 获取生成的奖励卡牌组（三挑一）
             /// </summary>
@@ -1980,6 +1983,7 @@ namespace GameModule.Services {
         /// 随机生成特训物品，如卡牌、药水等
         /// </summary>
         public class ExerProItemGenerator {
+
             /// <summary>
             /// 指定生成物品类型
             /// </summary>
@@ -2042,8 +2046,7 @@ namespace GameModule.Services {
                 }
                 return 0;
             }
-
-
+			
             /// <summary>
             /// 随机生成指定数量的卡牌，需提供生成概率
             /// </summary>

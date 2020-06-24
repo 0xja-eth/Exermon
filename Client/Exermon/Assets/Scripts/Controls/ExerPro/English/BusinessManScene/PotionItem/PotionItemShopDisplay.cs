@@ -1,10 +1,19 @@
-﻿using UnityEngine;
-using ExerPro.EnglishModule.Data;
-using UI.Common.Controls.ItemDisplays;
+﻿using Core.Data;
+using UnityEngine;
+
 using GameModule.Services;
 
+using ExerPro.EnglishModule.Data;
+
+using UI.Common.Controls.ItemDisplays;
+using UI.ShopScene.Controls;
+
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
-    public class PotionItemShopDisplay : ShopDisplay<ExerProPotion> {
+
+	/// <summary>
+	/// 药水商店显示
+	/// </summary>
+	public class PotionItemShopDisplay : ExerProShopDisplay<ExerProPotion> {
 
         /// <summary>
         /// 外部组件设置
@@ -14,21 +23,22 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
         /// <summary>
         /// 内部变量
         /// </summary>
-        const int PotionNumberOnce = 3;
+        //const int PotionNumberOnce = 3;
 
-        /// <summary>
-        /// 物品详情控件
-        /// </summary>
-        public PotionItemDetail itemDetail {
+		/// <summary>
+		/// 物品详情控件
+		/// </summary>
+		public override ShopItemDetail<ExerProPotion> itemDetail {
             get {
                 return potionItemDetail;
             }
             set {
-                potionItemDetail = value;
+                potionItemDetail = value as PotionItemDetail;
             }
         }
 
-        #region 启动视图
+		#region 启动视图
+		/*
         /// <summary>
         /// 启动视窗
         /// </summary>
@@ -53,27 +63,18 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
             else
                 setItems(shopItems);
         }
-
-        /// <summary>
-        /// 结束视窗
-        /// </summary>
-        public override void terminateView() {
+		*/
+		/*
+		/// <summary>
+		/// 结束视窗
+		/// </summary>
+		public override void terminateView() {
             base.terminateView();
             itemDetail.terminateView();
         }
-
+		*/
         #endregion
-
-
-        #region 数据操控
-        /// <summary>
-        /// 获取物品帮助组件
-        /// </summary>
-        /// <returns>帮助组件</returns>
-        public override IItemDetailDisplay<ExerProPotion>
-           getItemDetail() { return itemDetail; }
-
-        #endregion
-    }
+		
+	}
 
 }

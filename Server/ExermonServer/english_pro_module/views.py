@@ -1,12 +1,15 @@
 from typing import Any
 
 from .models import *
+from .runtimes import RuntimeShop
+
 from player_module.models import Player
 from item_module.views import Common as ItemCommon
 from item_module.models import ItemType
 from utils.view_utils import Common as ViewUtils
 from utils.calc_utils import NewWordsGenerator, CorrectionCompute
 from utils.exception import ErrorType, GameException
+from utils.runtime_manager import RuntimeManager
 
 import time
 import random
@@ -99,22 +102,25 @@ class Service:
 
         return pro_record.convertToDict("words")
 
-    # 回答短语题目
+    # 查询单词
     @classmethod
-    async def answerPhrase(cls, consumer, player: Player, pids: list, options: list):
-        # 返回数据
-        # correct_num: int => 答对题目数
-        correct_num = Common.answerPhrase(pids=pids, options=options)
+    async def getWords(cls, consumer, player: Player, wids: list, ):
+        # 返回数据：
+        # words: 单词数据（数组） => 单词数据集
+        words = Common.getWords(wids)
+        words = ModelUtils.objectsToDict(words)
 
-        return {'correct_num': correct_num}
+        return {'words': words}
 
-    # 回答改错题目
-    async def answerCorrect(cls, consumer, player: Player, qid: int, wrongItems: list):
-        # 返回数据
-        # correct_num: int => 答对题目数
-        correct_num = Common.answerCorrect(qid=qid, wrongItems=wrongItems)
+    # 查询单词记录
+    @classmethod
+    async def getRecords(cls, consumer, player: Player, ):
+        # 返回数据：
+        # records: 单词记录数据（数组） => 单词记录数据集
 
-        return {'correct_num': correct_num}
+        pro_record = Common.getExerProRecord(player)
+
+        return {'word_records': pro_record.convertToDict("records")}
 
     # 回答当前轮单词
     @classmethod
@@ -141,46 +147,70 @@ class Service:
                 'correct': correct
             }
 
-    # 查询当前轮单词
+    # 回答短语题目
     @classmethod
-    async def queryWords(cls, consumer, player: Player, ):
-        # 返回数据：
-        # level: int => 当前轮单词等级
-        # sum: int => 当前轮总单词数
-        # correct: int => 当前轮正确单词数
-        # wrong: int => 当前轮错误单词数
+    async def answerPhrase(cls, consumer, player: Player, qids: list, answers: list):
+        # 返回数据
+        # correct_num: int => 答对题目数
+        correct_num = Common.answerPhrase(pids=qids, options=answers)
+
+        return {'correct_num': correct_num}
+
+    # 回答改错题目
+    @classmethod
+    async def answerCorrection(cls, consumer, player: Player, qid: int, answers: dict):
+        # 返回数据
+        # correct_num: int => 答对题目数
+        correct_num = Common.answerCorrect(qid=qid, wrongItems=answers)
+
+        return {'correct_num': correct_num}
+
+    # 回答听力题目
+    @classmethod
+    async def answerListening(cls, consumer, player: Player, qid: int, answers: list):
+        # 返回数据
+        # correct_num: int => 答对题目数
+        correct_num = Common.answerCorrect(qid=qid, wrongItems=answers)
+
+        return {'correct_num': correct_num}
+
+    # # 查询当前轮单词
+    # @classmethod
+    # async def queryWords(cls, consumer, player: Player, ):
+    #     # 返回数据：
+    #     # level: int => 当前轮单词等级
+    #     # sum: int => 当前轮总单词数
+    #     # correct: int => 当前轮正确单词数
+    #     # wrong: int => 当前轮错误单词数
+    #
+    #     pro_record = Common.getExerProRecord(player)
+    #
+    #     return pro_record.convertToDict("status")
+
+    # 商品生成
+    @classmethod
+    async def shopGenerate(cls, consumer, player: Player, type: int):
+        # 不返回数据
+        # 只需检查金钱不足就抛出异常即可，若一切正常就扣取对应的金钱
+        Check.ensureExerProItemType(type)
 
         pro_record = Common.getExerProRecord(player)
 
-        return pro_record.convertToDict("status")
+        shop = Common.generateShop(pro_record, type)
 
-    # 查询单词
-    @classmethod
-    async def getWords(cls, consumer, player: Player, wids: list, ):
-        # 返回数据：
-        # words: 单词数据（数组） => 单词数据集
-        words = Common.getWords(wids)
-        words = ModelUtils.objectsToDict(words)
-
-        return {'words': words}
-
-    # 查询单词记录
-    @classmethod
-    async def getRecords(cls, consumer, player: Player, ):
-        # 返回数据：
-        # records: 单词记录数据（数组） => 单词记录数据集
-
-        pro_record = Common.getExerProRecord(player)
-
-        return {'word_records': pro_record.convertToDict("records")}
+        return shop.convertToDict()
 
     # 购买物品校验
     @classmethod
-    async def checkShopping(cls, consumer, player: Player, type: int, num: int):
+    async def shopBuy(cls, consumer, player: Player, type: int, order: int, num: int):
         # 不返回数据
-        # 只需检查金钱不足就抛出异常即可，若一切正常就扣取对应的金钱
-        Check.ensureShoppingItemType(type)
-        Common.buyShoppingItem(type_=type, num=num)
+        # 只需检查金钱不足就抛出异常即可
+        Check.ensureExerProItemType(type)
+
+        pro_record = Common.getExerProRecord(player)
+
+        shop = Common.getShop(pro_record, type)
+        shop.buy(order, num)
 
 
 # ======================
@@ -201,10 +231,12 @@ class Check:
 
     # 校验购买物品是否在ExerProItem, ExerProPotion, ExerProCard类型中
     @classmethod
-    def ensureShoppingItemType(cls, type: int):
+    def ensureExerProItemType(cls, type: int):
+
         item_list = [ItemType.ExerProItem.value, ItemType.ExerProPotion.value, ItemType.ExerProCard.value]
+
         if type not in item_list:
-            raise GameException(ErrorType.ShoppingTypeNotExist)
+            raise GameException(ErrorType.IncorrectItemType)
 
 
 # =======================
@@ -256,6 +288,8 @@ class Common:
             return ExerProPotion
         elif type_ == ItemType.ExerProCard.value:
             return ExerProCard
+
+        raise GameException(ErrorType.IncorrectItemType)
 
     @classmethod
     def getQuestionClass(cls, type_: int):
@@ -492,24 +526,41 @@ class Common:
         # TODO: 增加等级判断代码
 
     @classmethod
-    def buyShoppingItem(cls, type_: int = None, cla: type = None, num: int = 0,
-                        error: ErrorType = ErrorType.InvalidBuyNum, **kwargs):
+    def generateShop(cls, pro_record: ExerProRecord, type_: int) -> RuntimeShop:
         """
-        购买物品数据校验
+        生成商品校验
         Args:
-            type_ (int): 物品类型（枚举值）
-            cla (type): 物品类型
-            num (int): 物品数量
-            error (ErrorType): 异常
-            **kwargs (**dict): 查询参数
+            pro_record (): 特训记录
+            type_ (int): 物品枚举
+        Returns:
+            返回生成的商品对象
         """
-        if cla is None: cla = cls.getItemClass(type_)
+        shop = RuntimeShop(pro_record, type_)
 
-        item = ViewUtils.getObject(cla, **kwargs)
-        if item.gold < num:
-            raise error
-        else:
-            item.update(num)
+        RuntimeManager.add(RuntimeShop, shop)
+
+        return shop
+
+    @classmethod
+    def getShop(cls, pro_record: ExerProRecord, type_: int,
+                error: ErrorType = ErrorType.ShopNotGenerated) -> RuntimeShop:
+        """
+        获取商店
+        Args:
+            pro_record (ExerProRecord): 特训记录
+            type_ (int): 物品类型（枚举值）
+            error (ErrorType): 异常
+        Returns:
+            返回对应的商店
+        """
+        key = "%d-%d" % (pro_record.id, type_)
+
+        shop = RuntimeManager.get(RuntimeShop, key)
+
+        if shop is None and error is not None:
+            raise GameException(error)
+
+        return shop
 
     @classmethod
     def answerPhrase(cls, pids: list, options: list, **kwargs):

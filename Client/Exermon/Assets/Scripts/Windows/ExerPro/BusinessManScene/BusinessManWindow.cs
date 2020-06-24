@@ -146,11 +146,11 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 当前商店显示容器
         /// </summary>
         /// <returns></returns>
-        public ShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new() {
+        public ExerProShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new() {
             if (typeof(T) == typeof(ExerProCard))
-                return (ShopDisplay<T>)(object)cardItemShop;
+                return (ExerProShopDisplay<T>)(object)cardItemShop;
             if (typeof(T) == typeof(ExerProPotion))
-                return (ShopDisplay<T>)(object)potionItemShop;
+                return (ExerProShopDisplay<T>)(object)potionItemShop;
             return null;
         }
 

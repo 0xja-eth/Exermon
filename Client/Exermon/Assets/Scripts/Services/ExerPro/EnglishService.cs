@@ -15,6 +15,9 @@ using Core.Services;
 using GameModule.Services;
 using GameModule.Data;
 
+using ItemModule.Services;
+using ItemModule.Data;
+
 using ExerPro.EnglishModule.Data;
 using UI.Common.Controls.ParamDisplays;
 
@@ -60,9 +63,14 @@ namespace ExerPro.EnglishModule.Services {
 		const string WordGenerate = "生成单词";
 		const string WordAnswer = "提交答案";
 		const string WordGet = "获取单词";
-		const string WordQuery = "查询状态";
+		//const string WordQuery = "查询状态";
 
 		const string WordRecordGet = "查询单词记录";
+
+		const string ShopGenerate = "生成商品";
+		const string ShopBuy= "购买商品";
+
+		const string AnswerQuestion = "答案提交";
 
 		const string GetRank = "查询排行记录";
 
@@ -128,8 +136,14 @@ namespace ExerPro.EnglishModule.Services {
 		public enum Oper {
 			ExerProStart, ExerProSave,
 			QuestionGenerate, QuestionGet,
-			WordGenerate, WordAnswer, WordGet, WordQuery,
-			WordRecordGet, GetRank,
+			WordGenerate, WordAnswer, WordGet, //WordQuery,
+			WordRecordGet,
+
+			ShopGenerate, ShopBuy,
+
+			AnswerPhrase, AnswerCorrection, AnswerListening,
+
+			GetRank,
 		}
 
 		/// <summary>
@@ -230,11 +244,23 @@ namespace ExerPro.EnglishModule.Services {
 				NetworkSystem.Interfaces.EngProWordAnswer);
 			addOperDict(Oper.WordGet, WordGet,
 				NetworkSystem.Interfaces.EngProWordGet);
-			addOperDict(Oper.WordQuery, WordQuery,
-				NetworkSystem.Interfaces.EngProWordQuery);
+			//addOperDict(Oper.WordQuery, WordQuery,
+			//	NetworkSystem.Interfaces.EngProWordQuery);
 
 			addOperDict(Oper.WordRecordGet, WordRecordGet,
 				NetworkSystem.Interfaces.EngProWordRecordGet);
+
+			addOperDict(Oper.ShopGenerate, ShopGenerate,
+				NetworkSystem.Interfaces.EngProShopGnerate);
+			addOperDict(Oper.ShopBuy, ShopBuy,
+				NetworkSystem.Interfaces.EngProShopBuy);
+
+			addOperDict(Oper.AnswerPhrase, AnswerQuestion,
+				NetworkSystem.Interfaces.EngProAnswerPhrase);
+			addOperDict(Oper.AnswerCorrection, AnswerQuestion,
+				NetworkSystem.Interfaces.EngProAnswerCorrection);
+			addOperDict(Oper.AnswerListening, AnswerQuestion,
+				NetworkSystem.Interfaces.EngProAnswerListening);
 
 			// 该处路由还未设定
 			addOperDict(Oper.GetRank, GetRank,
@@ -299,7 +325,7 @@ namespace ExerPro.EnglishModule.Services {
 
 		#endregion
 
-		#region 题目记录操作
+		#region 题目操作
 
 		/// <summary>
 		/// 获取题目类型
@@ -506,7 +532,67 @@ namespace ExerPro.EnglishModule.Services {
 
 		#endregion
 
-		#region 题目操作
+		#region 商店操作
+
+		/// <summary>
+		/// 获取商品
+		/// </summary>
+		/// <param name="container">容器</param>
+		/// <param name="item">物品</param>
+		/// <param name="count">丢弃数量</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void shopGenerate<T>(UnityAction<ItemService.ShopItem<T>[]> onSuccess,
+			UnityAction onError = null) where T : BaseExerProItem, new() {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var items = DataLoader.load<ItemService.ShopItem<T>[]>(res, "items");
+				onSuccess?.Invoke(items);
+			};
+
+			var typeName = typeof(T).Name;
+			var type = (int)Enum.Parse(typeof(BaseItem.Type), typeName);
+
+			shopGenerate(type, _onSuccess, onError);
+		}
+		/// <param name="type">物品类型</param>
+		/// <param name="itemId">物品ID</param>
+		public void shopGenerate(int type,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+			JsonData data = new JsonData(); data["type"] = type;
+			sendRequest(Oper.ShopGenerate, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 购买物品
+		/// </summary>
+		/// <param name="container">容器</param>
+		/// <param name="shopItem">物品</param>
+		/// <param name="num">购买数量</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void shopBuy<T>(ItemService.ShopItem<T> shopItem, int num,
+			UnityAction onSuccess, UnityAction onError = null) 
+			where T : BaseExerProItem, new() {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				onSuccess?.Invoke();
+			};
+
+			shopBuy(shopItem.type, shopItem.order, num, _onSuccess, onError);
+		}
+		/// <param name="type">物品类型</param>
+		/// <param name="itemId">物品ID</param>
+		public void shopBuy(int type, int order, int num,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+			JsonData data = new JsonData();
+			data["type"] = type; data["order"] = order; data["num"] = num; 
+			sendRequest(Oper.ShopBuy, data, onSuccess, onError, uid: true);
+		}
+
+		#endregion
+
+		#region 题目读取操作（自动判断缓存）
 
 		/// <summary>
 		/// 读取题目（先判断缓存）
