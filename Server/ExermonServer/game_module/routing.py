@@ -670,7 +670,6 @@ WEBSOCKET_METHOD_ROUTER = {
         ['uid', 'int'],
         ['type', 'int'],
         ['order', 'int'],
-        ['num', 'int'],
     ],
         EnglishPro.shopBuy,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应

@@ -571,22 +571,24 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="num">购买数量</param>
 		/// <param name="onSuccess">成功回调</param>
 		/// <param name="onError">失败回调</param>
-		public void shopBuy<T>(ItemService.ShopItem<T> shopItem, int num,
+		public void shopBuy<T>(ItemService.ShopItem<T> shopItem,
 			UnityAction onSuccess, UnityAction onError = null) 
 			where T : BaseExerProItem, new() {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				record.gainGold(-shopItem.gold);
+				record.actor.gainItem(shopItem.item());
 				onSuccess?.Invoke();
 			};
 
-			shopBuy(shopItem.type, shopItem.order, num, _onSuccess, onError);
+			shopBuy(shopItem.type, shopItem.order, _onSuccess, onError);
 		}
 		/// <param name="type">物品类型</param>
 		/// <param name="itemId">物品ID</param>
-		public void shopBuy(int type, int order, int num,
+		public void shopBuy(int type, int order,
 			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
 			JsonData data = new JsonData();
-			data["type"] = type; data["order"] = order; data["num"] = num; 
+			data["type"] = type; data["order"] = order; 
 			sendRequest(Oper.ShopBuy, data, onSuccess, onError, uid: true);
 		}
 

@@ -1163,7 +1163,8 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训背包物品
     /// </summary>
-    public abstract class ExerProPackItem<T> : PackContItem<T> where T : BaseExerProItem {
+    public class ExerProPackItem<T> : PackContItem<T> 
+		where T : BaseExerProItem {
 
         /// <summary>
         /// 使用对象池
@@ -1588,7 +1589,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public int getCardNumber() {
-            return 35;
+            return items.Count + handGroup.items.Count + 
+				drawGroup.items.Count + discardGroup.items.Count;
         }
     }
 
@@ -3782,6 +3784,52 @@ namespace ExerPro.EnglishModule.Data {
 		public void useCard(ExerProPackCard card) {
 			cardGroup.useCard(card);
 			addEnergy(-card.cost());
+		}
+
+		/// <summary>
+		/// 获得物品
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="item">物品</param>
+		public void gainItem<T>(T item) where T: BaseExerProItem {
+			var contItem = getContItem(item);
+			getContainer<T>()?.pushItem(contItem);
+		}
+
+		/// <summary>
+		/// 获取容器
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public ExerProPackItem<T> getContItem<T>(T item)
+			where T : BaseExerProItem {
+
+			if (typeof(T) == typeof(ExerProItem))
+				return new ExerProPackItem(item as ExerProItem) as ExerProPackItem<T>; 
+			if (typeof(T) == typeof(ExerProPotion))
+				return new ExerProPackPotion(item as ExerProPotion) as ExerProPackItem<T>;
+			if (typeof(T) == typeof(ExerProCard))
+				return new ExerProPackCard(item as ExerProCard) as ExerProPackItem<T>;
+
+			return null;
+		}
+
+		/// <summary>
+		/// 获取容器
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public PackContainer<ExerProPackItem<T>> getContainer<T>()
+			where T : BaseExerProItem {
+
+			if (typeof(T) == typeof(ExerProItem))
+				return itemPack as PackContainer<ExerProPackItem<T>>;
+			if (typeof(T) == typeof(ExerProPotion))
+				return potionPack as PackContainer<ExerProPackItem<T>>;
+			if (typeof(T) == typeof(ExerProCard))
+				return cardGroup as PackContainer<ExerProPackItem<T>>;
+
+			return null;
 		}
 
 		/// <summary>

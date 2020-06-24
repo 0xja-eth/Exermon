@@ -4,7 +4,7 @@ from .models import *
 
 
 # ===================================================
-#  ÔËÐÐÊ±ÉÌÆ·
+#  è¿è¡Œæ—¶å•†å“
 # ===================================================
 class RuntimeShopItem:
 
@@ -23,22 +23,22 @@ class RuntimeShopItem:
 
 	def convertToDict(self):
 		"""
-		×ª»¯Îª×Öµä
+		è½¬åŒ–ä¸ºå­—å…¸
 		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
+			è¿”å›žè½¬åŒ–åŽçš„å­—å…¸
 		"""
 		return {
 			'order': self.order,
 			'id': self.item.id,
 			'type': self.item.TYPE,
-			'price': {'gold': self.gold}  # ÎªÁË±£Ö¤½Ó¿ÚÒ»ÖÂ
+			'price': {'gold': self.gold}  # ä¸ºäº†ä¿è¯æŽ¥å£ä¸€è‡´
 		}
 
 	def generatePrice(self):
 		"""
-		Éú³É¼Û¸ñ
+		ç”Ÿæˆä»·æ ¼
 		Returns:
-			·µ»Ø¼Û¸ñ
+			è¿”å›žä»·æ ¼
 		"""
 		from utils.calc_utils import ShopItemGenerator
 
@@ -46,7 +46,7 @@ class RuntimeShopItem:
 
 
 # ===================================================
-#  ÔËÐÐÊ±ÉÌµê
+#  è¿è¡Œæ—¶å•†åº—
 # ===================================================
 class RuntimeShop(RuntimeData):
 
@@ -62,51 +62,47 @@ class RuntimeShop(RuntimeData):
 
 	def convertToDict(self):
 		"""
-		×ª»¯Îª×Öµä
-		Args:
-			type (str): ÀàÐÍ
-			**kwargs (**dict): ÍØÕ¹²ÎÊý
+		è½¬åŒ–ä¸ºå­—å…¸
 		Returns:
-			·µ»Ø×ª»¯ºóµÄ×Öµä
+			è¿”å›žè½¬åŒ–åŽçš„å­—å…¸
 		"""
 		return {'items': ModelUtils.objectsToDict(self.items)}
 
 	def generate(self):
 		"""
-		Éú³ÉÉÌÆ·
+		ç”Ÿæˆå•†å“
 		"""
 		from utils.calc_utils import ShopItemGenerator
 		ShopItemGenerator(self)
 
 	def addShopItem(self, item: BaseExerProItem):
 		"""
-		Ìí¼ÓÉÌÆ·
+		æ·»åŠ å•†å“
 		Args:
-			order (int): ÐòºÅ
-			item (BaseExerProItem): ÉÌÆ·
+			order (int): åºå·
+			item (BaseExerProItem): å•†å“
 		"""
 		order = len(self.items)
 		self.items.append(RuntimeShopItem(order, item))
 
 	def contains(self, item: BaseExerProItem):
 		"""
-		ÊÇ·ñ°üº¬Ä³ÎïÆ·µÄÉÌÆ·
+		æ˜¯å¦åŒ…å«æŸç‰©å“çš„å•†å“
 		Args:
-			item (BaseExerProItem): ÎïÆ·
+			item (BaseExerProItem): ç‰©å“
 		Returns:
-			ÊÇ·ñ°üº¬Ä³ÎïÆ·µÄÉÌÆ·
+			æ˜¯å¦åŒ…å«æŸç‰©å“çš„å•†å“
 		"""
 		for item_ in self.items:
 			if item_.item == item: return True
 
 		return False
 
-	def buy(self, order, num):
+	def buy(self, order):
 		"""
-		¹ºÂòÉÌÆ·
+		è´­ä¹°å•†å“
 		Args:
-			id (int): ÎïÆ·ID
-			num (int): ÊýÁ¿
+			order (int): åºå·
 		"""
 		if order >= len(self.items):
 			raise GameException(ErrorType.ShopItemNotExist)
@@ -115,7 +111,7 @@ class RuntimeShop(RuntimeData):
 		if item.is_bought:
 			raise GameException(ErrorType.ShopItemNotExist)
 
-		price = num * item.gold
+		price = item.gold
 
 		if price > self.pro_record.gold:
 			raise GameException(ErrorType.InvalidBuyNum)

@@ -202,7 +202,7 @@ class Service:
 
     # 购买物品校验
     @classmethod
-    async def shopBuy(cls, consumer, player: Player, type: int, order: int, num: int):
+    async def shopBuy(cls, consumer, player: Player, type: int, order: int):
         # 不返回数据
         # 只需检查金钱不足就抛出异常即可
         Check.ensureExerProItemType(type)
@@ -210,7 +210,7 @@ class Service:
         pro_record = Common.getExerProRecord(player)
 
         shop = Common.getShop(pro_record, type)
-        shop.buy(order, num)
+        shop.buy(order)
 
 
 # ======================
@@ -538,6 +538,8 @@ class Common:
         shop = RuntimeShop(pro_record, type_)
 
         RuntimeManager.add(RuntimeShop, shop)
+
+        shop.generate()
 
         return shop
 
