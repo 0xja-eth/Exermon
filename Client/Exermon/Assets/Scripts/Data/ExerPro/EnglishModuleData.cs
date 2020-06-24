@@ -234,7 +234,10 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
 
-
+		/// <summary>
+		/// 测试？
+		/// </summary>
+		/// <returns></returns>
         public string[] sentences() {
             //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
             article = "Dear Diary, " +
@@ -719,6 +722,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
 
+		/*
         /// <summary>
         /// 物品价格，用于商店
         /// </summary>
@@ -738,8 +742,9 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         protected virtual int generatePrice() { return 0; }
-
-        /// <summary>
+		*/
+        
+		/// <summary>
         /// 起手动画/目标动画
         /// </summary>
         public AnimationClip startAni { get; protected set; } = null;
@@ -860,7 +865,7 @@ namespace ExerPro.EnglishModule.Data {
             ExerProPotion item = new ExerProPotion();
             return item;
         }
-
+		/*
         /// <summary>
         /// 药水定价策略
         /// </summary>
@@ -868,6 +873,7 @@ namespace ExerPro.EnglishModule.Data {
         protected override int generatePrice() {
             return CalcService.ExerProItemGenerator.generatePotionPrice(this);
         }
+		*/
     }
 
     /// <summary>
@@ -926,7 +932,7 @@ namespace ExerPro.EnglishModule.Data {
         public string typeText() {
             return DataService.get().cardType(cardType).Item2;
         }
-
+		/*
         /// <summary>
         /// 卡牌定价策略
         /// </summary>
@@ -934,7 +940,7 @@ namespace ExerPro.EnglishModule.Data {
         protected override int generatePrice() {
             return CalcService.ExerProItemGenerator.generateCardPrice(this);
         }
-
+		*/
         /// <summary>
         /// 获取读取函数
         /// </summary>
@@ -2341,7 +2347,6 @@ namespace ExerPro.EnglishModule.Data {
             Unknown = 6, //未知据点
             Boss = 7, // 最终BOSS
             Story = 8, // 剧情据点
-            Listen = 9, // 听力据点
         }
 
         /// <summary>
@@ -2366,13 +2371,18 @@ namespace ExerPro.EnglishModule.Data {
         public double xOffset { get; protected set; }
         [AutoConvert]
         public double yOffset { get; protected set; }
-        [AutoConvert]
-        public int typeId { get; protected set; }
+		[AutoConvert]
+		public int typeId { get; protected set; }
 
-        /// <summary>
-        /// 下一个Y序号（数组）
-        /// </summary>
-        [AutoConvert]
+		/// <summary>
+		/// 实际类型ID
+		/// </summary>
+		public int realTypeId { get; set; } = 0;
+
+		/// <summary>
+		/// 下一个Y序号（数组）
+		/// </summary>
+		[AutoConvert]
         public HashSet<int> nexts { get; protected set; } = new HashSet<int>();
         [AutoConvert]
         public int status { get; protected set; }
@@ -2426,20 +2436,23 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public NodeType type() {
             return DataService.get().nodeType(typeId);
-        }
-        /// <summary>
-        /// 获取类型枚举
-        /// </summary>
-        /// <returns></returns>
-        public Type typeEnum() {
-            return (Type)typeId;
-        }
+		}
 
-        /// <summary>
-        /// 获取下一节点
-        /// </summary>
-        /// <returns></returns>
-        public List<ExerProMapNode> getNexts() {
+		/// <summary>
+		/// 获取类型枚举
+		/// </summary>
+		/// <returns></returns>
+		public Type typeEnum(bool real = true) {
+			if (realTypeId > 0 && real)
+				return (Type)realTypeId;
+			return (Type)typeId;
+		}
+		
+		/// <summary>
+		/// 获取下一节点
+		/// </summary>
+		/// <returns></returns>
+		public List<ExerProMapNode> getNexts() {
             if (stage == null) return null;
             var nodes = new List<ExerProMapNode>();
             foreach (var next in nexts)
@@ -2464,6 +2477,14 @@ namespace ExerPro.EnglishModule.Data {
         public bool isCurrent() {
             return status == (int)Status.Current;
         }
+
+		/// <summary>
+		/// 是否BOSS据点
+		/// </summary>
+		/// <returns></returns>
+		public bool isBoss() {
+			return typeId == (int)Type.Boss;
+		}
 
         #endregion
 
@@ -2913,13 +2934,21 @@ namespace ExerPro.EnglishModule.Data {
             int val = sumTraits(traits);
             rate += sumTraits(traits, 1) / 100.0;
             addHP((int)Math.Round(mhp() * rate + val));
-        }
+		}
 
-        /// <summary>
-        /// 是否死亡
-        /// </summary>
-        /// <returns></returns>
-        public bool isDead() {
+		/// <summary>
+		/// 回复所有HP
+		/// </summary>
+		/// <param name="show">是否显示</param>
+		public void recoverAll(bool show = true) {
+			changeHP(mhp(), show);
+		}
+
+		/// <summary>
+		/// 是否死亡
+		/// </summary>
+		/// <returns></returns>
+		public bool isDead() {
             return hp <= 0;
         }
 

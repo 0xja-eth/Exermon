@@ -49,18 +49,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         protected override void start() {
             base.start();
 			listenWindow.startWindow();
-
-			//测试用函数
-			//GameSystem.get().start();
-			//PlayerService.get().login("804173948", "123456789", configureQuestion);
 		}
-
-		////测试用
-		//void configureQuestion()
-		//{
-		//    if (GameSystem.get().isLoaded() == true)
-		//        UnityEngine.Debug.Log("danteding 登陆成功");
-		//}
+		
 		#endregion
 
 		#region 场景控制
@@ -71,9 +61,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
 		protected override void update() {
             base.update();
             var rewardInfo = engSer.rewardInfo;
-            if (rewardInfo != null) {
+            if (rewardInfo != null) 
                 rewardWindow.startWindow(rewardInfo);
-            }
         }
 
 		/// <summary>

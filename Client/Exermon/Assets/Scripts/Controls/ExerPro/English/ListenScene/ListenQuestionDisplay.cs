@@ -126,7 +126,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		public bool isPauseable() {
-			return false;
+			return subQuestions.showAnswer;
 		}
 		
 		/// <summary>
@@ -156,6 +156,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 提交答案
 		/// </summary>
 		public void onConfirmClicked() {
+
 			subQuestions.showAnswer = true;
 			selections = subQuestions.saveSelections();
 
@@ -164,7 +165,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			if (confirmButton) confirmButton.SetActive(false);
 			if (submitButton) submitButton.SetActive(true);
 
-			refreshAudioInfo();
+			stopAudio();
 		}
 
 		/// <summary>
@@ -172,10 +173,11 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		public void onSubmitClicked() {
 			if (submitButton) submitButton.SetActive(false);
-			// TODO: 加入判断接口
+
+			stopAudio();
 			engSer.answerListening(item, selections, processReward);
 		}
-		
+
 		/// <summary>
 		/// 处理奖励
 		/// </summary>
@@ -341,6 +343,14 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		void playAudio() {
 			audioSource.Play(); playCnt++;
+			refreshAudioInfo();
+		}
+
+		/// <summary>
+		/// 停止
+		/// </summary>
+		void stopAudio() {
+			audioSource.Stop();
 			refreshAudioInfo();
 		}
 

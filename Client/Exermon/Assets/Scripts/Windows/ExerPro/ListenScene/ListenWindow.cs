@@ -17,6 +17,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
 	/// 剧情窗口
 	/// </summary>
 	public class ListenWindow : BaseWindow {
+
         /// <summary>
         /// 外部变量
         /// </summary>

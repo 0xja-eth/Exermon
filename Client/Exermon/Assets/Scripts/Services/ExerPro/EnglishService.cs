@@ -58,7 +58,7 @@ namespace ExerPro.EnglishModule.Services {
 		const string ExerProSave = "保存进度";
 
 		const string QuestionGenerate = "生成题目";
-		const string QuestionGet = "获取题目";
+		const string QuestionGet = "下载题目";
 
 		const string WordGenerate = "生成单词";
 		const string WordAnswer = "提交答案";
@@ -860,6 +860,9 @@ namespace ExerPro.EnglishModule.Services {
 		}
 		void switchNode(ExerProMapNode.Type type) {
 			Debug.Log("switchNode: " + type);
+
+			record.currentNode().realTypeId = (int)type;
+
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -908,9 +911,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-            long i = UnityEngine.Random.Range(0, 10000);
-            i = 1;
-            switch (i % 2) {
+            switch (Random.Range(0, 10000) % 2) {
                 case 0:
                     sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
                 case 1:
@@ -929,8 +930,12 @@ namespace ExerPro.EnglishModule.Services {
 		/// 剧情据点
 		/// </summary>
 		void onStoryNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+			switch (Random.Range(0, 10000) % 2) {
+				case 0:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene); break;
+				case 1:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
+			}
 		}
 
 		/// <summary>
@@ -939,13 +944,6 @@ namespace ExerPro.EnglishModule.Services {
 		void onEnemyNode() {
 			battleSer.start(ExerProMapNode.Type.Enemy);
 		}
-
-		/// <summary>
-		/// 听力据点
-		/// </summary>
-		//void onListenNode() {
-		//	sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
-		//}
 
 		/// <summary>
 		/// 精英据点
@@ -1248,6 +1246,13 @@ namespace ExerPro.EnglishModule.Services {
 			public int killBossNumber { get; set; } = 0;
 			public bool isPerfect { get; set; } = false;
 
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			/// <param name="enemyNumber"></param>
+			/// <param name="questionNumber"></param>
+			/// <param name="killBossNumber"></param>
+			/// <param name="isPerfect"></param>
 			public RewardInfo(int enemyNumber = 0, int questionNumber = 0, int killBossNumber = 0, bool isPerfect = false) {
 				this.killEnemyNumber = enemyNumber;
 				this.correctQuestionNumber = questionNumber;
@@ -1255,7 +1260,7 @@ namespace ExerPro.EnglishModule.Services {
 				this.isPerfect = isPerfect;
 			}
 
-			public RewardInfo() { }
+			// public RewardInfo() { }
 		}
 
 		/// <summary>

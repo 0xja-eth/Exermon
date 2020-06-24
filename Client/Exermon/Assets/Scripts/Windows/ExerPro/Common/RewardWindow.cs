@@ -1,27 +1,35 @@
 ﻿using UnityEngine;
-using Core.UI;
-using Core.UI.Utils;
-using UI.ExerPro.EnglishPro.PlotScene.Controls;
-using ExerPro.EnglishModule.Data;
-using ExerPro.EnglishModule.Services;
-using Core.Data.Loaders;
-using System.IO;
-using Core.Systems;
-using GameModule.Services;
-using UI.ExerPro.EnglishPro.Common.Controls;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+using Core.UI;
+using Core.UI.Utils;
+
+using GameModule.Services;
+
+using ExerPro.EnglishModule.Data;
+using ExerPro.EnglishModule.Services;
+
+using UI.ExerPro.EnglishPro.Common.Controls;
+
+/// <summary>
+/// 特训通用窗口
+/// </summary>
 namespace UI.ExerPro.EnglishPro.Common.Windows {
+
     /// <summary>
     /// 剧情窗口
     /// </summary>
     public class RewardWindow : BaseWindow {
+
+		/// <summary>
+		/// 常量定义
+		/// </summary>
         const string addMaskFormat = "+{0}";
         const string scoreFormat = "{0}";
 
         /// <summary>
-        /// 外部变量
+        /// 外部组件设置
         /// </summary>
         public CardDisplay cardDisplay;
         public Text integral;
@@ -29,30 +37,46 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         public Button confirm;
 
         /// <summary>
-        /// 外部系统
+        /// 外部系统设置
         /// </summary>
         CalcService calServ;
         EnglishService engServ;
-        ExerProRecord record;
 
-        /// <summary>
-        /// 内部变量
-        /// </summary>
-        ExerProMapNode node { get; set; } = null;
-        EnglishService.RewardInfo rewardInfo { get; set; } = null;
-        UnityAction<bool> terminateCallback = null;
-        int selectIndex { get; set; } = -1;
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		BaseScene scene;
 
-        #region 初始化
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
+		ExerProRecord record;
+		ExerProMapNode node;
+
+		EnglishService.RewardInfo rewardInfo;
+
+		UnityAction<bool> terminateCallback;
+
+		int selectedIndex = -1;
+
+		#region 初始化
+
+		/// <summary>
+		/// 初始化场景
+		/// </summary>
+		protected override void initializeScene() {
+			base.initializeScene();
+			scene = SceneUtils.getCurrentScene();
+		}
+
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
             base.initializeSystems();
             calServ = CalcService.get();
             engServ = EnglishService.get();
+
             record = engServ.record;
-        }
+			terminateCallback = engServ.exitNode;
+		}
 
         #endregion
 		
@@ -63,18 +87,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// </summary>
         /// <param name="rewardInfo">通过EnglishService的rewardInfo获取</param>
         public void startWindow(EnglishService.RewardInfo rewardInfo) {
-            base.startWindow();
-            node = engServ.record.currentNode();
-            terminateCallback = engServ.exitNode;
-            this.rewardInfo = rewardInfo;
-
-            configureMarks();
-            configureCardDisplay();
-            confirm.gameObject.SetActive(false);
-
-            if((ExerProMapNode.Type)node.typeId == ExerProMapNode.Type.Boss) {
-                configureBoss();
-            }
+            base.startWindow(); setupInfo(rewardInfo);
         }
         
         /// <summary>
@@ -83,83 +96,137 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// <param name="gold"></param>
         public void startWindow(int gold) {
             base.startWindow();
+			// TODO: 剧情效果
+		}
 
-        }
-        /// <summary>
-        /// 配置分数
-        /// </summary>
-        void configureMarks() {
-            configureGold();
-            configureScore();
-        }
-        
-        /// <summary>
-        /// 配置金币奖励
-        /// </summary>
-        void configureGold() {
-            int gold = 0;
-            switch ((ExerProMapNode.Type)node.typeId) {
-                case ExerProMapNode.Type.Enemy:
-                case ExerProMapNode.Type.Elite:
-                    gold = CalcService.RewardGenerator.getGoldReward(record, enemy: rewardInfo.killEnemyNumber);
-                    break;
-                case ExerProMapNode.Type.Story:
-                case ExerProMapNode.Type.Treasure:
-                    gold = CalcService.RewardGenerator.getGoldReward(record, question: rewardInfo.correctQuestionNumber);
-                    break;
-                case ExerProMapNode.Type.Boss:
-                    gold = CalcService.RewardGenerator.getBossGoldReward(record);
-                    break;
-            }
-            this.gold.text = string.Format(addMaskFormat, gold);
-        }
+		/// <summary>
+		/// 结束窗口
+		/// 结束前用户必须选择了一个卡牌
+		/// </summary>
+		public override void terminateWindow() {
+			base.terminateWindow();
 
-        /// <summary>
-        /// 配置积分
-        /// </summary>
-        void configureScore() {
-            var actor = engServ.record.actor;
-            int score = CalcService.RewardGenerator.generateScore(record, 
-                rewardInfo.killBossNumber, rewardInfo.isPerfect);
-            integral.text = string.Format(scoreFormat, score);
-        }
+			if (selectedIndex == -1) return;
+			record.actor.cardGroup.addCard(
+				cardDisplay.getItem(selectedIndex));
+		}
 
-        /// <summary>
-        /// 配置卡牌
-        /// </summary>
-        void configureCardDisplay() {
-            var cards = CalcService.RewardGenerator.getCardRewards((ExerProMapNode.Type)node.typeId);
-            cardDisplay.startView();
-            cardDisplay.setItems(cards);
-            cardDisplay.addClickedCallback(onCardSelected);
-        }
+		/// <summary>
+		/// 窗口关闭回调
+		/// </summary>
+		protected override void onWindowHidden() {
+			base.onWindowHidden();
 
-        /// <summary>
-        /// 配置Boss点的情况
-        /// </summary>
-        void configureBoss() {
-            var actor = engServ.record.actor;
-            actor.changeHP(actor.mhp());
-        }
+			if (terminateCallback != null)
+				terminateCallback.Invoke(true);
+			else scene?.popScene();
+		}
 
-        /// <summary>
-        /// 结束窗口
-        /// 结束前用户必须选择了一个卡牌
-        /// </summary>
-        public override void terminateWindow() {
-            if (selectIndex == -1)
-                return;
-            engServ.record.actor.cardGroup.addCard(cardDisplay.getItem(selectIndex));
-            base.terminateWindow();
-            terminateCallback?.Invoke(true);
-        }
+		#endregion
 
-        #endregion
+		#region 数据控制
 
-        void onCardSelected(int index) {
-            selectIndex = index;
+		/// <summary>
+		/// 配置奖励信息
+		/// </summary>
+		/// <param name="rewardInfo"></param>
+		void setupInfo(EnglishService.RewardInfo rewardInfo) {
+			this.rewardInfo = rewardInfo;
+			//confirm.gameObject.SetActive(false);
+			setupNodeReward();
+		}
+
+		/// <summary>
+		/// 配置据点奖励
+		/// </summary>
+		void setupNodeReward() {
+			node = record.currentNode();
+			setupMarks(); setupCardsDisplay();
+			if (node.isBoss()) setupBoss();
+		}
+
+		/// <summary>
+		/// 配置分数
+		/// </summary>
+		void setupMarks() {
+			setupGold(); setupScore();
+		}
+
+		/// <summary>
+		/// 配置金币奖励
+		/// </summary>
+		void setupGold() {
+			int gold = 0;
+			Debug.Log("setupGold: " + node.typeEnum());
+
+			switch (node.typeEnum()) {
+				case ExerProMapNode.Type.Enemy:
+				case ExerProMapNode.Type.Elite:
+					gold = CalcService.RewardGenerator.getGoldReward(
+						node, record, enemy: rewardInfo.killEnemyNumber);
+					break;
+
+				case ExerProMapNode.Type.Story:
+				case ExerProMapNode.Type.Treasure:
+					gold = CalcService.RewardGenerator.getGoldReward(
+						node, record, question: rewardInfo.correctQuestionNumber);
+					break;
+
+				case ExerProMapNode.Type.Boss:
+					gold = CalcService.RewardGenerator.getBossGoldReward(record);
+					break;
+			}
+
+			record.gainGold(gold);
+
+			this.gold.text = string.Format(addMaskFormat, gold);
+		}
+
+		/// <summary>
+		/// 配置积分
+		/// </summary>
+		void setupScore() {
+			int score = CalcService.RewardGenerator.generateScore(record,
+				rewardInfo.killBossNumber, rewardInfo.isPerfect);
+
+			integral.text = string.Format(scoreFormat, score);
+		}
+
+		/// <summary>
+		/// 配置卡牌
+		/// </summary>
+		void setupCardsDisplay() {
+			Debug.Log("setupCardsDisplay: " + node.typeEnum());
+
+			var cards = CalcService.RewardGenerator.
+				getCardRewards(node.typeEnum());
+
+			cardDisplay.startView();
+			cardDisplay.setItems(cards);
+			cardDisplay.addClickedCallback(onCardSelected);
+		}
+
+		/// <summary>
+		/// 配置Boss点的情况
+		/// </summary>
+		void setupBoss() {
+			record.actor.recoverAll();
+		}
+
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 卡牌选中回调
+		/// </summary>
+		/// <param name="index"></param>
+		void onCardSelected(int index) {
+            selectedIndex = index;
             confirm.gameObject.SetActive(true);
         }
 
-    }
+		#endregion
+
+	}
 }

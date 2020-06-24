@@ -1898,10 +1898,11 @@ namespace GameModule.Services {
             /// <param name="enemy">杀死敌人数</param>
             /// <param name="question">答对题目数量</param>
             /// <returns>奖励金币</returns>
-            public static int getGoldReward(ExerProRecord record, int enemy = 0, int question = 0) {
+            public static int getGoldReward(ExerProMapNode node, 
+				ExerProRecord record, int enemy = 0, int question = 0) {
                 record.scoreRecord.killEnemyAccmu += enemy;
-                var type = (ExerProMapNode.Type)record.currentNode().typeId;
-                var layer = record.currentNode().xOrder + 1;
+
+                var type = node.typeEnum(); var layer = node.xOrder + 1;
 
                 int randBase = Random.Range(0, 5);
                 switch (type) {
@@ -1934,19 +1935,26 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProCard> getCardRewards(ExerProMapNode.Type type) {
                 List<ExerProCard> exerProCards = new List<ExerProCard>();
+
                 switch (type) {
                     case ExerProMapNode.Type.Enemy:
                     case ExerProMapNode.Type.Elite:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.75, 0.2);
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0.75, 0.2);
                         break;
+
                     case ExerProMapNode.Type.Treasure:
                     case ExerProMapNode.Type.Story:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.35, 0.4);
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0.35, 0.4);
                         break;
-                    case ExerProMapNode.Type.Boss:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0, 0);
+
+					case ExerProMapNode.Type.Boss:
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0, 0);
                         break;
                 }
+
                 return exerProCards;
             }
 
@@ -1961,7 +1969,8 @@ namespace GameModule.Services {
             /// <returns>当前玩家总的积分</returns>
             public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
                 record.scoreRecord.killBossAccmu += boss;
-                var gold = record.actor.gold;
+
+				var gold = record.actor.gold;
                 var cards = record.actor.cardGroup.getCardNumber();
 
                 var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
@@ -1972,9 +1981,10 @@ namespace GameModule.Services {
 
                 var layer = record.currentNode().xOrder + 1;
                 score += (layer + record.scoreRecord.stageOrderAccumu) * 5;
-                if(boss > 0) {
+
+				if (boss > 0) 
                     record.scoreRecord.stageOrderAccumu += layer;
-                }
+
                 return score;
             }
 
@@ -1997,10 +2007,14 @@ namespace GameModule.Services {
             /// </summary>
             const int NormalStarID = 1;
             const int RareStarID = 2;
-            double DefaultNoramlRatio = 0.8;
-            double DefaultRareRatio = 0.15;
-            int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+			const int EpicStarID = 3;
 
+			double DefaultNoramlRatio = 0.8;
+            double DefaultRareRatio = 0.15;
+
+			int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+
+			/*
             /// <summary>
             /// 用于生成商店刷新的物品
             /// </summary>
@@ -2047,7 +2061,8 @@ namespace GameModule.Services {
                 }
                 return 0;
             }
-			
+			*/
+
             /// <summary>
             /// 随机生成指定数量的卡牌，需提供生成概率
             /// </summary>
@@ -2057,13 +2072,20 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProCard> generateCards(int count, double normalRatio, double rareRatio){
                 List<ExerProCard> exerProCards = new List<ExerProCard>();
-                while(exerProCards.Count != count) {
-                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
-                    if (result == null)
-                        continue;
-                    exerProCards.Add(result);
+
+				Debug.Log("generateCards: " + count + ", " + normalRatio + ", " + rareRatio);
+
+				int cnt = 0;
+				while (exerProCards.Count != count && cnt++ <= 100000) {
+					var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
+					if (result == null || exerProCards.Contains(result)) continue;
+
+					Debug.Log("exerProCards.Add(" + result.name + ")");
+
+					exerProCards.Add(result);
                 }
-                return exerProCards;
+
+				return exerProCards;
             }
 
             /// <summary>
@@ -2075,12 +2097,17 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProPotion> generatePotions(int count, double normalRatio, double rareRatio) {
                 List<ExerProPotion> exerProPotions = new List<ExerProPotion>();
-                while (exerProPotions.Count != count) {
+
+				int cnt = 0;
+                while (exerProPotions.Count != count && cnt++ <= 100000) {
                     var result = itemGenerator.generateRandomItem(normalRatio, rareRatio, Type.Potion) as ExerProPotion;
-                    if (result == null)
-                        continue;
-                    exerProPotions.Add(result);
+                    if (result == null || exerProPotions.Contains(result)) continue;
+
+					Debug.Log("exerProCards.Add(" + result.name + ")");
+
+					exerProPotions.Add(result);
                 }
+
                 return exerProPotions;
             }
 
@@ -2118,13 +2145,14 @@ namespace GameModule.Services {
                 }
 
                 shuffleItems(items);
+
                 float randomValue = Random.Range(0, 1);
                 if (randomValue < normalRatio)
-                    return items.Find(e => e.star().name == "普通");
+                    return items.Find(e => e.starId == NormalStarID);
                 else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)
-                    return items.Find(e => e.star().name == "稀有");
+                    return items.Find(e => e.starId == RareStarID);
                 else
-                    return items.Find(e => e.star().name == "史诗");
+                    return items.Find(e => e.starId == EpicStarID);
             }
 
             /// <summary>

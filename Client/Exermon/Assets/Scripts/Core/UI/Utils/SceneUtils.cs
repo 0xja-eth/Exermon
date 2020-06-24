@@ -64,13 +64,16 @@ namespace Core.UI.Utils {
             }
         }
 
-        /// <summary>
-        /// 获取/设置当前场景（脚本）
-        /// </summary>
-        public static T getCurrentScene<T>() where T : BaseScene {
-            return getSceneObject(CurrentSceneKey) as T;
-        }
-        public static void setCurrentScene(BaseScene scene) {
+		/// <summary>
+		/// 获取/设置当前场景（脚本）
+		/// </summary>
+		public static T getCurrentScene<T>() where T : BaseScene {
+			return getSceneObject(CurrentSceneKey) as T;
+		}
+		public static BaseScene getCurrentScene() {
+			return getSceneObject(CurrentSceneKey) as BaseScene;
+		}
+		public static void setCurrentScene(BaseScene scene) {
             depositSceneObject(CurrentSceneKey, scene);
         }
 
