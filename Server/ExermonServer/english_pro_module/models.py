@@ -1458,6 +1458,9 @@ class ExerProRecord(CacheableModel):
 	# 当前单词缓存键
 	CUR_WORDS_CACHE_KEY = 'cur_words'
 
+	# 默认金币
+	DEFAULT_GOLD = 100
+
 	# 关卡
 	stage = models.ForeignKey('ExerProMapStage', null=True,
 							  on_delete=models.CASCADE, verbose_name="关卡")
@@ -1482,7 +1485,7 @@ class ExerProRecord(CacheableModel):
 	# 						 on_delete=models.CASCADE, verbose_name="下一单词")
 
 	# 金币
-	gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+	gold = models.PositiveSmallIntegerField(default=DEFAULT_GOLD, verbose_name="金币")
 
 	# 据点数据
 	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
@@ -1618,7 +1621,7 @@ class ExerProRecord(CacheableModel):
 		Args:
 			val (int): 金币
 		"""
-		self.gold = max(0, gold + val)
+		self.gold = max(0, self.gold + val)
 
 	def reset(self):
 		"""

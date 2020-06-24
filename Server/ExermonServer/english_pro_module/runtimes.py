@@ -30,7 +30,7 @@ class RuntimeShopItem:
 		return {
 			'order': self.order,
 			'id': self.item.id,
-			'type': self.item.TYPE,
+			'type': self.item.TYPE.value,
 			'price': {'gold': self.gold}  # 为了保证接口一致
 		}
 

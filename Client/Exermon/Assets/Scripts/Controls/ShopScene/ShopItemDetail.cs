@@ -32,9 +32,9 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
-        public RectTransform layoutContent;
+        //public RectTransform layoutContent;
 
-        public ShopWindow shopWindow;
+        //public ShopWindow shopWindow;
 
         public Text description, priceText;
 
@@ -130,7 +130,7 @@ namespace UI.ShopScene.Controls {
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
             priceText.text = description.text = "";
-            detail.clearValue();
+            detail?.clearValue();
         }
 
         #endregion

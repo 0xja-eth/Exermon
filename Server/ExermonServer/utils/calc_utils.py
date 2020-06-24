@@ -2232,11 +2232,11 @@ class ShopItemGenerator:
 
         self.shop: RuntimeShop = shop
 
-        if self.shop.type_ == ItemType.ExerProItem:
+        if self.shop.type_ == ItemType.ExerProItem.value:
             self._generate(ExerProItem, self.ITEM_COUNT)
-        if self.shop.type_ == ItemType.ExerProPotion:
+        if self.shop.type_ == ItemType.ExerProPotion.value:
             self._generate(ExerProPotion, self.POTION_COUNT)
-        if self.shop.type_ == ItemType.ExerProCard:
+        if self.shop.type_ == ItemType.ExerProCard.value:
             self._generate(ExerProCard, self.CARD_COUNT,
                            self._generateCardRates())
 
@@ -2269,10 +2269,18 @@ class ShopItemGenerator:
                 rand -= rate
                 if rand <= 0:
                     item = self.__generateRandomShopItem(item_dict[index])
-                    self.shop.addShopItem(item)
+
+                    # 如果物品无法生成，尝试降低星级
+                    while item is None and index > 0:
+                        index -= 1
+                        item = self.__generateRandomShopItem(item_dict[index])
+
+                    if item is not None: self.shop.addShopItem(item)
+                    break
                 else: index += 1
 
     def __generateRandomShopItem(self, items):
+        if len(items) <= 0: return None
 
         cnt = 0
         item = random.choice(items)
@@ -2292,12 +2300,16 @@ class ShopItemGenerator:
     def generatePrice(cls, item):
         from item_module.models import ItemType
 
+        val = 0
+
         if item.TYPE == ItemType.ExerProItem:
-            return cls.generateExerProItemPrice(item)
+            val = cls.generateExerProItemPrice(item)
         if item.TYPE == ItemType.ExerProPotion:
-            return cls.generateExerProPotionPrice(item)
+            val = cls.generateExerProPotionPrice(item)
         if item.TYPE == ItemType.ExerProCard:
-            return cls.generateExerProCardPrice(item)
+            val = cls.generateExerProCardPrice(item)
+
+        return int(max(0, round(val)))
 
     @classmethod
     def generateExerProItemPrice(cls, item):

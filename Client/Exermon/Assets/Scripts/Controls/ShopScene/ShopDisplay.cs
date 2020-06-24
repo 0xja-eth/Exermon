@@ -167,7 +167,7 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <param name="items"></param>
         void startView(ItemService.ShopItem<T>[] items) {
-            base.startView(); itemDetail.startView();
+            base.startView(); itemDetail?.startView();
             setItems(shopItems = items);
         }
 

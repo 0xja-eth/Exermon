@@ -816,7 +816,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
 			//long i = UnityEngine.Random.Range(0, 10000);
 			//switch (i % 2) {
 			//    case 0:
@@ -837,7 +837,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// 剧情据点
 		/// </summary>
 		void onStoryNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
 			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
 		}
 
