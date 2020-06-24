@@ -350,6 +350,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 停止
 		/// </summary>
 		void stopAudio() {
+			isLastPlaying = false;
+			playButton.interactable = true;
+
 			audioSource.Stop();
 			refreshAudioInfo();
 		}

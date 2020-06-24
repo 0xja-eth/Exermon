@@ -18,7 +18,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 	/// <summary>
 	/// 卡牌显示
 	/// </summary>
-	public class CardDisplay : PackContItemDisplay
+	public class PackCardDisplay : PackContItemDisplay
 		<ExerProPackCard, ExerProCard> {
 
 		/// <summary>

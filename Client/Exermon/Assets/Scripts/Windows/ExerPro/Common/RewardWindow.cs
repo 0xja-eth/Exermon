@@ -31,7 +31,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public CardDisplay cardDisplay;
+        public CardRewardDisplay cardDisplay;
         public Text integral;
         public Text gold;
         public Button confirm;

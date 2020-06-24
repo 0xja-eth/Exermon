@@ -22,8 +22,8 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Pack {
         }
         protected override void onSubViewCreated(SelectableItemDisplay<ExerProPackCard> sub, int index) {
             base.onSubViewCreated(sub, index);
-            ((CardDisplay)sub).setItem(items[index]);
-            ((CardDisplay)sub).description = description;
+            ((PackCardDisplay)sub).setItem(items[index]);
+            ((PackCardDisplay)sub).description = description;
         }
         protected override void onSelectChanged() {
             base.onSelectChanged();

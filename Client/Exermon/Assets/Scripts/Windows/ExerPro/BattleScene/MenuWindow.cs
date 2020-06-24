@@ -116,7 +116,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		/// <param name="packCard">卡牌</param>
 		/// <param name="enemy">敌人</param>
-		public bool useCard(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
+		public bool useCard(PackCardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
 			return scene.useCard(cardDisplay?.getItem(), enemyDisplay?.enemy());
 		}
 
