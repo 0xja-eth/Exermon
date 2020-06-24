@@ -720,6 +720,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		void onTreasureNode() {
 			long i = UnityEngine.Random.Range(0, 10000);
+
 			switch (i % 2) {
 				case 0:
 					sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;

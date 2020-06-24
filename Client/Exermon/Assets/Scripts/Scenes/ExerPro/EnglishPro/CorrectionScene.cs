@@ -24,9 +24,10 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// </summary>
         public ArticleDisplay articleDisplay;
         public Text changedBeforeValue;
-        public GameObject windowObj;
         public CorrectionWindow correctionWindow;
-        int index = 0;
+
+        List<int> doneIds = new List<int>();
+
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -40,8 +41,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
-            correctionWindow = SceneUtils.get<CorrectionWindow>(windowObj);
-
         }
 
         /// <summary>
@@ -65,6 +64,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 
         #endregion
 
+
+        #region 控制
+
+        /// <summary>
+        /// 单词选择回调
+        /// </summary>
+        /// <param name="container">句子容器</param>
+        /// <param name="word">单词</param>
         public void onWordSelected(SentenceContainer container, string word) {
             //清除其他句子选择
             foreach (ItemDisplay<string> item in articleDisplay.getSubViews()) {
@@ -73,18 +80,40 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
                     continue;
                 each.deselect();
             }
-            correctionWindow.startView();
             changedBeforeValue.text = word;
             correctionWindow.currentSenContainer = container;
+            correctionWindow.startWindow();
         }
 
-        public void onWordDeselected() {
-            correctionWindow.terminateView();
-        }
 
+        /// <summary>
+        /// 提交回调
+        /// </summary>
         public void onSubmit() {
+            int sentenceIndex = 1;
+            int wordIndex = 1;
+            List<Answer> answers = new List<Answer>();
+            foreach (var sentenceDisplay in articleDisplay.getSubViews()) {
+                SentenceContainer sentenceContainer = SceneUtils.get<SentenceContainer>(sentenceDisplay.gameObject);
+                wordIndex = 1;
+                foreach (WordDisplay wordDisplay in sentenceContainer.getSubViews()) {
+                    Debug.Log(wordDisplay.state);
+                    if (wordDisplay.state != WordDisplay.State.Original) {
+                        Answer answer = new Answer();
+                        answer.sid = sentenceIndex; answer.wid = wordIndex;
+                        answer.word = wordDisplay.getItem();
+                        Debug.Log(sentenceIndex + wordIndex + wordDisplay.getItem());
+                        answers.Add(answer);
+                    }
+                    wordIndex++;
+                }
+                sentenceIndex++;
+            }
+            Debug.Log("AAA" + answers.ToArray().Length);
+
             engSer.exitNode(true);
         }
+        #endregion
     }
 
 

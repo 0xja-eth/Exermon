@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UI.Common.Controls.ItemDisplays;
-using UnityEngine;
+﻿using UI.Common.Controls.ItemDisplays;
+using UnityEngine.UI;
 
-namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene {
+namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
     class OptionDisplay :
-        SelectableItemDisplay<string> {
+        DraggableItemDisplay<string> {
+
+        public Text option;
+        public Text drag;
 
         #region 界面绘制
 
@@ -18,6 +16,7 @@ namespace Assets.Scripts.Controls.ExerPro.English.PhraseScene {
         /// <param name="item"></param>
         protected override void drawExactlyItem(string item) {
             base.drawExactlyItem(item);
+            option.text = item; drag.text = item;
         }
         #endregion
     }

@@ -16,6 +16,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
         public SentenceContainer container;
 
+        #region 初始化
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            container = SceneUtils.get<SentenceContainer>(gameObject);
+        }
+        #endregion
+
         /// <summary>
         /// 开启视图
         /// </summary>
@@ -24,10 +34,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
             base.startView(item);
         }
 
-        protected override void initializeOnce() {
-            base.initializeOnce();
-            container = SceneUtils.get<SentenceContainer>(gameObject);
-        }
 
         /// <summary>
         /// 绘制物品

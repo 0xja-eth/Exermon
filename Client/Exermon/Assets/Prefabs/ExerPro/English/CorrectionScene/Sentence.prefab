@@ -225,12 +225,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 5
     m_Right: 0
     m_Top: 10
     m_Bottom: 10
   m_ChildAlignment: 3
-  m_Spacing: 0
+  m_Spacing: 15
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
@@ -359,6 +359,7 @@ MonoBehaviour:
   _deselectable: 1
   _checkable: 1
   _highlightable: 1
+  correctionScene: {fileID: 0}
 --- !u!114 &8765131141154292353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,3 +372,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9223608f3eda24c8bac2a0d441fd7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  container: {fileID: 0}

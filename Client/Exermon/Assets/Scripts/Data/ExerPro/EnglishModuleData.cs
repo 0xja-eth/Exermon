@@ -118,37 +118,38 @@ namespace ExerPro.EnglishModule.Data {
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
-        public string[] option1 = { "sb. to do sth.", "sb. doing sth.", "sb. to do sth.", "sb. into doing sth.", "sb. of sth" };
-        public string[] option2 = { "doing sth.", "to do sth." };
+        public string[] option1 = { "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. of sth." , "sth. for sb." };
+        public string[] option2 = { "doing sth.", "to do sth." ,"to doing sth."};
         public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
-        public string[] option4 = { "for", "in", "of", "to" };
+        public string[] option = { "about", "at", "for", "from", "in", "of", "with", "to" ,
+            "doing sth.", "to do sth." ,"to doing sth.", "sb. to do sth.", "sb. doing sth.",
+            "sb. into doing sth.", "sb. of sth", "sth. for sb." };
+        
         public string[] options() {
             if (option1.ToList<string>().IndexOf(phrase) != -1)
                 return option1;
             else if (option2.ToList<string>().IndexOf(phrase) != -1)
                 return option2;
-            else if (option4.ToList<string>().IndexOf(phrase) != -1)
-                return option4;
             else if (option3.ToList<string>().IndexOf(phrase) != -1)
                 return option3;
-            return new string[] { };
+            return option;
         }
         public static PhraseQuestion sample() {
             long i = UnityEngine.Random.Range(0, 10000);
 
             PhraseQuestion question = new PhraseQuestion();
-            switch (i % 4) {
+            switch (i % 2) {
                 case 0:
                     question.word = "persuade";
                     question.chinese = "说服某人做某事";
                     question.phrase = "sb. into doing sth.";
                     return question;
-                case 1:
+                case 2:
                     question.word = "hesitate";
                     question.chinese = "犹豫做某事";
                     question.phrase = "to do sth.";
                     return question;
-                case 2:
+                case 1:
                     question.word = "be certain";
                     question.chinese = "确信……";
                     question.phrase = "about";
@@ -199,6 +200,18 @@ namespace ExerPro.EnglishModule.Data {
             
         }
 
+        public class Answer : BaseData {
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public int sid { get; set; }
+            [AutoConvert]
+            public int wid { get; set; }
+            [AutoConvert]
+            public string word { get; set; }
+        }
+
         /// <summary>
         /// 属性
         /// </summary>
@@ -212,6 +225,9 @@ namespace ExerPro.EnglishModule.Data {
 
         public string[] sentences() {
             //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
+            article = "Dear Diary, " +
+      "Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
+       "Good night and remember, you, dear diary, is my only souvenir from my past life and my only friend.";
             string temp = article.Replace("\n", "");
             temp = temp.Replace("\t", "");
             temp = temp.Replace("\r", "");
@@ -227,8 +243,6 @@ namespace ExerPro.EnglishModule.Data {
 
             foreach(string word in wordList) {
                 Regex regex = new Regex(word);
-                Debug.Log("aaa" + word);
-                Debug.Log("aaa" + regex.IsMatch(temp));
                 if (regex.IsMatch(temp)) {
                     string match = Regex.Match(temp, word).Value;
                     string hashCode = match.GetHashCode().ToString();
@@ -247,9 +261,12 @@ namespace ExerPro.EnglishModule.Data {
             temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
             temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
 
+            temp = temp.Replace(",  \"", ",\"&");
+            temp = temp.Replace(".  \"", ".\"&");
             temp = temp.Replace(" ? ", " ?&");
             temp = temp.Replace(" . ", " .&");
             temp = temp.Replace(" ! ", " !&");
+            Debug.Log("aaa" + temp);
 
             temp = temp.Replace("#", ".");
             
