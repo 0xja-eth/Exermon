@@ -20,6 +20,7 @@ using SeasonModule.Services;
 using System.Collections.Generic;
 
 using LitJson;
+using static ExerPro.EnglishModule.Data.FirstCardGroup;
 
 /// <summary>
 /// 游戏模块服务

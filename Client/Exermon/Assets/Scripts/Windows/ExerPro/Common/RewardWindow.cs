@@ -55,9 +55,9 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         }
 
         #endregion
-
-
+		
         #region 窗口控制
+
         /// <summary>
         /// 奖励系统请调用该接口
         /// </summary>

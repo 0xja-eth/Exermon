@@ -908,20 +908,20 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
-			//long i = UnityEngine.Random.Range(0, 10000);
-			//switch (i % 2) {
-			//    case 0:
-			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-			//    case 1:
-			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-			//}
-		}
+            long i = UnityEngine.Random.Range(0, 10000);
+            i = 1;
+            switch (i % 2) {
+                case 0:
+                    sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+                case 1:
+                    sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+            }
+        }
 
-		/// <summary>
-		/// 商人据点
-		/// </summary>
-		void onShopNode() {
+        /// <summary>
+        /// 商人据点
+        /// </summary>
+        void onShopNode() {
 			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
 		}
 
@@ -1001,13 +1001,6 @@ namespace ExerPro.EnglishModule.Services {
 					isPerfect = true;
 			}
 			rewardInfo = new RewardInfo(enemyNumber, questionNumber, bossNumber, isPerfect);
-		}
-
-		/// <summary>
-		/// 处理剧情奖励
-		/// </summary>
-		public void processPlotReward() {
-
 		}
 
 		/// <summary>

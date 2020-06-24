@@ -1,27 +1,21 @@
-﻿using Assets.Scripts.Controls.ExerPro.English.PhraseScene;
-using Core.Systems;
+﻿using Core.Systems;
 using Core.UI;
+using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UI.ExerPro.EnglishPro.PhraseScene.Controls;
 using UnityEngine;
-using static ExerPro.EnglishModule.Data.PhraseQuestion;
-using UI.ExerPro.EnglishPro.Common.Windows;
-using UnityEngine.UI;
-
+using UI.Common.Windows;
 namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
-    class PhraseScene : BaseScene {
+    public class PhraseScene : BaseScene {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        /// 
         public OptionAreaDisplay optionAreaDisplay;
-        public RewardWindow rewardWindow;
-        public Button settlementButton;
-
+        int correctNum = 0;
+        int wrongNum = 0;
+        PhraseQuestion[] questions;
+        int currentQuesIndex = 0;
+        int questionNum = 10;
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -35,7 +29,17 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
+            gameSys = GameSystem.get();
         }
+
+        /// <summary>
+        /// 初始化其他
+        /// </summary>
+        protected override void initializeOthers() {
+            base.initializeOthers();
+            correctNum = wrongNum = 0;
+        }
+
         #endregion
 
         /// <summary>
@@ -50,24 +54,49 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
         /// 开始
         /// </summary>
         protected override void start() {
+            engSer.generateQuestions<PhraseQuestion>(questionNum, (res) =>
+            {
+                questions = res;
+                PhraseQuestion question = questions[currentQuesIndex++];
+                while (question.options().Length == 0)
+                    question = res[currentQuesIndex++];
+                optionAreaDisplay.startView(question);
+
+            });
             base.start();
-            Debug.Log(sample().word);
-            optionAreaDisplay.startView(sample());
         }
 
-        protected override void update() {
-            base.update();
-            var rewardInfo = engSer.rewardInfo;
-            if(rewardInfo != null) {
-                rewardWindow.startWindow(rewardInfo);
+        /// <summary>
+        /// 下一道
+        /// </summary>
+        public void nextQuestion() {
+            if (currentQuesIndex >= questionNum) {
+                onSubmit();
+                return;
             }
+            PhraseQuestion question = questions[currentQuesIndex++];
+            while (question.options().Length == 0)
+                question = questions[currentQuesIndex++];
+            optionAreaDisplay.startView(question);
         }
 
+        /// <summary>
+        /// 提交
+        /// </summary>
         public void onSubmit() {
-            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
-            settlementButton?.gameObject.SetActive(false);
-            engSer.processReward(questionNumber: 10);
-            //engSer.exitNode(true);
+            Debug.Log("答对：" + correctNum + "题,答错：" + wrongNum + "题。");
+            gameSys.requestAlert("答对：" + correctNum + "题,答错：" + wrongNum + "题。",
+                AlertWindow.Type.Notice);
+
+            engSer.exitNode(true);
+        }
+
+        /// <summary>
+        /// 记录正确和错误数量
+        /// </summary>
+        public void record(bool isCorrect) {
+            if (isCorrect) correctNum++;
+            else wrongNum++;
         }
     }
 }

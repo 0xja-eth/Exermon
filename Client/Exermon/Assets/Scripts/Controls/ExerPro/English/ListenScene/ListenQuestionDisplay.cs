@@ -60,6 +60,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		int selectNumber = 0;
 		int playCnt = 0; // 播放次数
 
+		int[] selections = null;
+
 		bool isLastPlaying = false;
 
 		Sprite playSprite, pauseSprite;
@@ -155,7 +157,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		public void onConfirmClicked() {
 			subQuestions.showAnswer = true;
-			var selections = subQuestions.saveSelections();
+			selections = subQuestions.saveSelections();
 
 			showTypeSelect.setIndex(ArticleViewIndex);
 
@@ -163,8 +165,6 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			if (submitButton) submitButton.SetActive(true);
 
 			refreshAudioInfo();
-			// TODO: 加入判断接口
-
 		}
 
 		/// <summary>
@@ -172,9 +172,19 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		public void onSubmitClicked() {
 			if (submitButton) submitButton.SetActive(false);
-			engSer.processReward(questionNumber: 10);
+			// TODO: 加入判断接口
+			engSer.answerListening(item, selections, processReward);
 		}
 		
+		/// <summary>
+		/// 处理奖励
+		/// </summary>
+		/// <param name="corrCnt">正确题目数</param>
+		void processReward(int corrCnt) {
+			Debug.Log("Correct Count = " + corrCnt);
+			engSer.processReward(questionNumber: corrCnt);
+		}
+
 		/// <summary>
 		/// 显示类型改变回调
 		/// </summary>

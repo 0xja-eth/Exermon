@@ -100,44 +100,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
             questions = question.subQuestions;
             questionDisplay.startView(question);
         }
-		/*
-        void onGetQuestionFailed() {
-			Debug.Log("onGetQuestionFailed: ");
 
-			//test
-			ListeningQuestion testQuestion = generateTestData();
-            question = testQuestion;
-            questionDisplay.startView(question);
-        }
-		*/
         #endregion
-
-		/*
-        ListeningQuestion generateTestData() {
-            ListeningQuestion ListeningSample = ListeningQuestion.sample();
-            return ListeningSample;
-        }
-		*/
-		/*
-        Texture2D loadPictureHelp(string fileName) {
-            //创建文件读取流
-            FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            fileStream.Seek(0, SeekOrigin.Begin);
-            //创建文件长度缓冲区
-            byte[] bytes = new byte[fileStream.Length];
-            //读取文件
-            fileStream.Read(bytes, 0, (int)fileStream.Length);
-            //释放文件读取流
-            fileStream.Close();
-            fileStream.Dispose();
-            fileStream = null;
-
-            //创建Texture
-            int width = 300;
-            int height = 372;
-            Texture2D texture = new Texture2D(width, height);
-            texture.LoadImage(bytes);
-            return texture;
-        }*/
     }
 }
