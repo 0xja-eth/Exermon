@@ -542,6 +542,14 @@ namespace UI.Common.Controls.ItemDisplays {
             return selectedIndex;
         }
 
+		/// <summary>
+		/// 是否有选择
+		/// </summary>
+		/// <returns></returns>
+		public bool isSelected() {
+			return selectedIndex >= 0;
+		}
+
         /// <summary>
         /// 获取选择项
         /// </summary>

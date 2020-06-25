@@ -2,6 +2,7 @@
 using Core.UI;
 
 using UI.PackScene.Windows;
+using UnityEngine;
 
 namespace UI.PackScene.Controls {
 
@@ -17,6 +18,7 @@ namespace UI.PackScene.Controls {
         /// </summary>
         /// <param name="content"></param>
         protected override void showContent(PackWindow content, int index) {
+            Debug.Log("showContent" + index);
             content.switchView(index);
         }
 
@@ -25,6 +27,7 @@ namespace UI.PackScene.Controls {
         /// </summary>
         /// <param name="content"></param>
         protected override void hideContent(PackWindow content, int index) {
+            Debug.Log("hideContent" + index);
             content.clearView();
         }
 

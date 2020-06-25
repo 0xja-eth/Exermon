@@ -649,38 +649,56 @@ WEBSOCKET_METHOD_ROUTER = {
         EnglishPro.getRecords,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
-    # 查询当前轮单词
-    'engpro/word/query': [[
-        ['uid', 'int'],
-    ],
-        EnglishPro.queryWords,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-    # 购买物品数据校验
-    'engpro/item/check': [[
+    # # 查询当前轮单词
+    # 'engpro/word/query': [[
+    #     ['uid', 'int'],
+    # ],
+    #     EnglishPro.queryWords,  # 处理函数
+    #     ChannelLayerTag.Self  # 是否需要响应
+    # ],
+
+    # 商品生成
+    'engpro/shop/generate': [[
         ['uid', 'int'],
         ['type', 'int'],
-        ['num', 'int']
     ],
-        EnglishPro.checkShopping,  # 处理函数
+        EnglishPro.shopGenerate,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 商品购买校验
+    'engpro/shop/buy': [[
+        ['uid', 'int'],
+        ['type', 'int'],
+        ['order', 'int'],
+    ],
+        EnglishPro.shopBuy,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 回答短语题目
-    'engpro/phrase/answer': [[
+    'engpro/answer/phrase': [[
         ['uid', 'int'],
-        ['pids', 'int[]'],
-        ['options', 'str[]'],
+        ['qids', 'int[]'],
+        ['answers', 'str[]'],
     ],
         EnglishPro.answerPhrase,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 回答改错题目
-    'engpro/correct/answer': [[
+    'engpro/answer/correction': [[
         ['uid', 'int'],
         ['qid', 'int'],
-        ['wrongItems', 'list'],
+        ['answers', 'dict'],
     ],
-        EnglishPro.answerCorrect,  # 处理函数
+        EnglishPro.answerCorrection,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 回答听力题目
+    'engpro/answer/listening': [[
+        ['uid', 'int'],
+        ['qid', 'int'],
+        ['answers', 'int[]'],
+    ],
+        EnglishPro.answerListening,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
 }

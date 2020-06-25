@@ -33,13 +33,22 @@ namespace ItemModule.Services {
         /// </summary>
         public class ShopItem : BaseData {
 
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int type { get; protected set; }
-            [AutoConvert]
+			/// <summary>
+			/// 属性
+			/// </summary>
+			[AutoConvert]
+			public int order { get; protected set; }
+			[AutoConvert]
+			public int type { get; protected set; }
+			[AutoConvert]
             public ItemPrice price { get; protected set; }
+
+			/// <summary>
+			/// 金币
+			/// </summary>
+			public int gold {
+				get { return price.gold; }
+			}
 
         }
         public class ShopItem<T> : ShopItem where T : BaseItem, new() {
@@ -654,7 +663,7 @@ namespace ItemModule.Services {
         /// </summary>
         /// <param name="container">容器</param>
         /// <param name="item">物品</param>
-        /// <param name="count">丢弃数量</param>
+        /// <param name="count">购买数量</param>
         /// <param name="onSuccess">成功回调</param>
         /// <param name="onError">失败回调</param>
         public void buyItem<T>(PackContainer<PackContItem> container, T item, int count, int buyType,

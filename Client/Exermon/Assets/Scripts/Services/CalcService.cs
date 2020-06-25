@@ -20,6 +20,7 @@ using SeasonModule.Services;
 using System.Collections.Generic;
 
 using LitJson;
+using static ExerPro.EnglishModule.Data.FirstCardGroup;
 
 /// <summary>
 /// 游戏模块服务
@@ -1849,7 +1850,7 @@ namespace GameModule.Services {
 			/// 计算回合开始时的特性效果
 			/// </summary>
 			/// <param name="battler"></param>
-			public static void calcOnRoundEnd(RuntimeBattler battler, int rest = 0) {
+			public static void calcOnRoundEnd(RuntimeBattler battler) {
 				processRoundEndRecover(battler);
 			}
 			static void processRoundEndRecover(RuntimeBattler battler) {
@@ -1882,6 +1883,7 @@ namespace GameModule.Services {
         /// 奖励生成器
         /// </summary>
         public class RewardGenerator {
+
             /// <summary>
             /// 奖励卡牌选择数量
             /// </summary>
@@ -1896,10 +1898,11 @@ namespace GameModule.Services {
             /// <param name="enemy">杀死敌人数</param>
             /// <param name="question">答对题目数量</param>
             /// <returns>奖励金币</returns>
-            public static int getGoldReward(ExerProRecord record, int enemy = 0, int question = 0) {
+            public static int getGoldReward(ExerProMapNode node, 
+				ExerProRecord record, int enemy = 0, int question = 0) {
                 record.scoreRecord.killEnemyAccmu += enemy;
-                var type = (ExerProMapNode.Type)record.currentNode().typeId;
-                var layer = record.currentNode().xOrder + 1;
+
+                var type = node.typeEnum(); var layer = node.xOrder + 1;
 
                 int randBase = Random.Range(0, 5);
                 switch (type) {
@@ -1914,6 +1917,7 @@ namespace GameModule.Services {
                 }
                 return -1;
             }
+
             /// <summary>
             /// boss奖励
             /// </summary>
@@ -1923,6 +1927,7 @@ namespace GameModule.Services {
                 int randBase = Random.Range(35, 40);
                 return record.stageOrder * randBase;
             }
+
             /// <summary>
             /// 获取生成的奖励卡牌组（三挑一）
             /// </summary>
@@ -1930,19 +1935,26 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProCard> getCardRewards(ExerProMapNode.Type type) {
                 List<ExerProCard> exerProCards = new List<ExerProCard>();
+
                 switch (type) {
                     case ExerProMapNode.Type.Enemy:
                     case ExerProMapNode.Type.Elite:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.75, 0.2);
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0.75, 0.2);
                         break;
+
                     case ExerProMapNode.Type.Treasure:
                     case ExerProMapNode.Type.Story:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0.35, 0.4);
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0.35, 0.4);
                         break;
+
                     case ExerProMapNode.Type.Boss:
-                        exerProCards = ExerProItemGenerator.generateCards(RewardCardNumber, 0, 0);
+                        exerProCards = ExerProItemGenerator.
+							generateCards(RewardCardNumber, 0, 0);
                         break;
                 }
+
                 return exerProCards;
             }
 
@@ -1957,6 +1969,7 @@ namespace GameModule.Services {
             /// <returns>当前玩家总的积分</returns>
             public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
                 record.scoreRecord.killBossAccmu += boss;
+
                 var gold = record.actor.gold;
                 var cards = record.actor.cardGroup.getCardNumber();
 
@@ -1968,9 +1981,10 @@ namespace GameModule.Services {
 
                 var layer = record.currentNode().xOrder + 1;
                 score += (layer + record.scoreRecord.stageOrderAccumu) * 5;
-                if(boss > 0) {
+
+				if (boss > 0) 
                     record.scoreRecord.stageOrderAccumu += layer;
-                }
+
                 return score;
             }
 
@@ -1980,6 +1994,7 @@ namespace GameModule.Services {
         /// 随机生成特训物品，如卡牌、药水等
         /// </summary>
         public class ExerProItemGenerator {
+
             /// <summary>
             /// 指定生成物品类型
             /// </summary>
@@ -1992,11 +2007,13 @@ namespace GameModule.Services {
             /// </summary>
             const int NormalStarID = 1;
             const int RareStarID = 2;
-            const int EpicStarID = 3;
+			const int EpicStarID = 3;
             double DefaultNoramlRatio = 0.8;
             double DefaultRareRatio = 0.15;
+
             int[] cardTypePrice = new int[3]{ 20, 50, 100 };
 
+			/*
             /// <summary>
             /// 用于生成商店刷新的物品
             /// </summary>
@@ -2043,7 +2060,7 @@ namespace GameModule.Services {
                 }
                 return 0;
             }
-
+			*/
 
             /// <summary>
             /// 随机生成指定数量的卡牌，需提供生成概率
@@ -2054,12 +2071,19 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProCard> generateCards(int count, double normalRatio, double rareRatio){
                 List<ExerProCard> exerProCards = new List<ExerProCard>();
-                while(exerProCards.Count != count) {
+
+				Debug.Log("generateCards: " + count + ", " + normalRatio + ", " + rareRatio);
+
+				int cnt = 0;
+				while (exerProCards.Count != count && cnt++ <= 100000) {
                     var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
-                    if (result == null)
-                        continue;
+					if (result == null || exerProCards.Contains(result)) continue;
+
+					Debug.Log("exerProCards.Add(" + result.name + ")");
+
                     exerProCards.Add(result);
                 }
+
                 return exerProCards;
             }
 
@@ -2072,12 +2096,17 @@ namespace GameModule.Services {
             /// <returns></returns>
             public static List<ExerProPotion> generatePotions(int count, double normalRatio, double rareRatio) {
                 List<ExerProPotion> exerProPotions = new List<ExerProPotion>();
-                while (exerProPotions.Count != count) {
+
+				int cnt = 0;
+                while (exerProPotions.Count != count && cnt++ <= 100000) {
                     var result = itemGenerator.generateRandomItem(normalRatio, rareRatio, Type.Potion) as ExerProPotion;
-                    if (result == null)
-                        continue;
+                    if (result == null || exerProPotions.Contains(result)) continue;
+
+					Debug.Log("exerProCards.Add(" + result.name + ")");
+
                     exerProPotions.Add(result);
                 }
+
                 return exerProPotions;
             }
 
@@ -2115,7 +2144,7 @@ namespace GameModule.Services {
                 }
 
                 shuffleItems(items);
-                float randomValue = Random.Range(0.0f, 1.0f);
+				float randomValue = Random.Range(0.0f, 1.0f);
                 if (randomValue < normalRatio)
                     return items.Find(e => e.starId == NormalStarID);
                 else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)

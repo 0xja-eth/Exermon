@@ -116,6 +116,7 @@ MonoBehaviour:
   selectable: 1
   checkable: 0
   highlightable: 1
+  clickable: 1
   forceChecked: 0
   deselectable: 0
   normalColor: {r: 1, g: 1, b: 1, a: 0}
@@ -130,7 +131,9 @@ MonoBehaviour:
   priceTag: {fileID: 535476165807808762}
   name: {fileID: 535476166371507240}
   priceText: {fileID: 535476165340864949}
-  goldTag: {fileID: 2800000, guid: 4d6a7f8696dd15249b5c311e4a87e3cf, type: 3}
+  goldTag: {fileID: 2800000, guid: 160a450c96cc0a34793372a2a939fda2, type: 3}
+  ticketTag: {fileID: 2800000, guid: 160a450c96cc0a34793372a2a939fda2, type: 3}
+  boundTicketTag: {fileID: 2800000, guid: 160a450c96cc0a34793372a2a939fda2, type: 3}
 --- !u!1 &535476165212180020
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,7 +350,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4d6a7f8696dd15249b5c311e4a87e3cf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 160a450c96cc0a34793372a2a939fda2, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

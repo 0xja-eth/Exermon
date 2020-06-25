@@ -2100,7 +2100,7 @@ class CorrectionCompute:
 
     # 格式化字符串
     @classmethod
-    def format_str(cls, rep, str):
+    def formatStr(cls, rep, str):
         rep = dict((re.escape(k), v) for k, v in rep.items())
         pattern = re.compile("|".join(rep.keys()))
         str_format = pattern.sub(lambda m: rep[re.escape(m.group(0))], str)
@@ -2119,7 +2119,7 @@ class CorrectionCompute:
         """
         # 将文章中的'"'等符号去掉
         rep = {'"': '', '“': '', '”': ''}
-        article = cls.format_str(rep, origin_article)
+        article = cls.formatStr(rep, origin_article)
 
         # 将文章按 ！？.划分句子
         sentences_list = re.split('[.!?]', article)
@@ -2129,7 +2129,7 @@ class CorrectionCompute:
 
     # 格式化句子
     @classmethod
-    def format_sentence(cls, origin_article):
+    def formatSentence(cls, origin_article):
         sentences = cls.splitArticle(origin_article)
         rep = {',': '', '，': '', '；': '', ';': '', ' ': ''}
         sentence_list = []
@@ -2138,20 +2138,20 @@ class CorrectionCompute:
             words = sentence.split(' ')
             new_sentence = []
             for word in words:
-                new_sentence.append(cls.format_str(rep, word))
+                new_sentence.append(cls.formatStr(rep, word))
             sentence_list.append(new_sentence)
 
         return sentence_list
 
     # 判断增加类型改错前一个单词是否是原文里的单词
     @classmethod
-    def is_add_valid(cls, answer_font, wid, sentence):
+    def isAddValid(cls, answer_font, wid, sentence):
         if answer_font != sentence[wid-1]:
-            raise GameException(ErrorType.CorrectAnswerWrong)
+            raise GameException(ErrorType.InvalidAnswer)
 
     # 判断改错类型
     @classmethod
-    def correct_type(cls, answer):
+    def correctType(cls, answer):
         answer = answer.split(' ')
         if len(answer) > 1:
             return CorrectType.Add.value
@@ -2163,10 +2163,14 @@ class CorrectionCompute:
     # 单词是否改对
     @classmethod
     def answer(cls, answer, right_answer, wid, sentence):
-        answer_type = cls.correct_type(answer)
+
+        answer_type = cls.correctType(answer)
+
         if answer_type == CorrectType.Delete.value:
             return answer == right_answer
+
         elif answer_type == CorrectType.Edit.value:
+
             # 判断是否只有一个正确答案
             if right_answer.indexOf('/') != -1:
                 answers = right_answer.split('/')
@@ -2176,12 +2180,16 @@ class CorrectionCompute:
                     return False
             else:
                 return answer == right_answer
+
         elif answer_type == CorrectType.Add.value:
+
             # 判断是否只有一个正确答案
             if right_answer.indexOf('/') != -1:
+
                 # 判断增加单词前面的那个词是否来自原文
                 answer_font = answer.split(' ')[0]
                 cls.answer(answer_font, wid, sentence)
+
                 # 组合正确答案
                 answers = right_answer.split(' ')
                 answers_back = answers[1].split('/')
@@ -2199,14 +2207,133 @@ class CorrectionCompute:
 
     # 计算改错题答对几个
     @classmethod
-    def compute_right_answer(cls, origin_article, wrong_items_frontend, wrong_items_backend):
-        sentences = cls.format_sentence(origin_article)
+    def computeRightAnswer(cls, origin_article, wrong_items_frontend, wrong_items_backend):
+        sentences = cls.formatSentence(origin_article)
         num = 0
         for wrong_item in wrong_items_backend:
             for wrong in wrong_items_frontend:
-                if wrong_item.sentence_index == wrong[0] \
-                        and wrong_item.word_index == wrong[1] \
-                        and cls.answer(wrong[2], wrong_item.word, wrong[1], sentences[wrong_item.sentence_index-1]):
+                if wrong_item.sentence_index == wrong['sid'] \
+                        and wrong_item.word_index == wrong['wid'] \
+                        and cls.answer(wrong['word'], wrong_item.word,
+                                       wrong['wid'], sentences[wrong_item.sentence_index-1]):
                     num += 1
 
         return num
+
+
+# ===================================================
+# 商品生成
+# ===================================================
+class ShopItemGenerator:
+
+    # 计算常量
+    RATIOS = [0.8, 0.15, 0.05]  # 每个星级的概率
+
+    CARD_COUNT = 10
+    POTION_COUNT = 3
+    ITEM_COUNT = 3
+
+    def __init__(self, shop):
+        from english_pro_module.runtimes import RuntimeShop
+        from english_pro_module.models import \
+            ExerProItem, ExerProPotion, ExerProCard
+        from item_module.models import ItemType
+
+        self.shop: RuntimeShop = shop
+
+        if self.shop.type_ == ItemType.ExerProItem.value:
+            self._generate(ExerProItem, self.ITEM_COUNT)
+        if self.shop.type_ == ItemType.ExerProPotion.value:
+            self._generate(ExerProPotion, self.POTION_COUNT)
+        if self.shop.type_ == ItemType.ExerProCard.value:
+            self._generate(ExerProCard, self.CARD_COUNT,
+                           self._generateCardRates())
+
+    def _generateCardRates(self):
+        stage_order = self.shop.pro_record.stage.order - 1
+        rates = self.RATIOS.copy()
+
+        rates[0] -= stage_order * 0.15
+        rates[1] += stage_order * 0.1
+        rates[2] += stage_order * 0.05
+
+        return rates
+
+    def _generate(self, cla, cnt, rates=None):
+
+        if rates is None: rates = self.RATIOS
+
+        items = ViewUtils.getObjects(cla)
+        item_dict = {}
+
+        # 生成 星级 - 物品集 字典
+        for i in range(len(rates)):
+            item_dict[i+1] = list(items.filter(star_id=i+1))
+
+        for i in range(cnt):
+            index = 1  # 星级ID
+            rand = random.random()
+
+            for rate in rates:
+                rand -= rate
+                if rand <= 0:
+                    item = self.__generateRandomShopItem(item_dict[index])
+
+                    # 如果物品无法生成，尝试降低星级
+                    while item is None and index > 0:
+                        index -= 1
+                        item = self.__generateRandomShopItem(item_dict[index])
+
+                    if item is not None: self.shop.addShopItem(item)
+                    break
+                else: index += 1
+
+    def __generateRandomShopItem(self, items):
+        if len(items) <= 0: return None
+
+        cnt = 0
+        item = random.choice(items)
+        # 如果商店已经包含该物品，同时循环次数 <= 10000，则重新选择
+        while self.shop.contains(item) and cnt <= 10000:
+            item = random.choice(items)
+            cnt += 1
+
+        return item
+
+    # 价格计算
+    CARD_PRICES = [20, 50, 100]  # 卡牌星级价格数组
+    POTION_PRICES = [[30, 45], [55, 75], [0, 0]]
+    ITEM_PRICES = [[30, 45], [55, 75], [0, 0]]
+
+    @classmethod
+    def generatePrice(cls, item):
+        from item_module.models import ItemType
+
+        val = 0
+
+        if item.TYPE == ItemType.ExerProItem:
+            val = cls.generateExerProItemPrice(item)
+        if item.TYPE == ItemType.ExerProPotion:
+            val = cls.generateExerProPotionPrice(item)
+        if item.TYPE == ItemType.ExerProCard:
+            val = cls.generateExerProCardPrice(item)
+
+        return int(max(0, round(val)))
+
+    @classmethod
+    def generateExerProItemPrice(cls, item):
+        return random.randint(*cls.ITEM_PRICES[item.star_id - 1])
+
+    @classmethod
+    def generateExerProPotionPrice(cls, potion):
+        return random.randint(*cls.POTION_PRICES[potion.star_id - 1])
+
+    @classmethod
+    def generateExerProCardPrice(cls, card):
+        from english_pro_module.models import ExerProCardTarget
+
+        res = card.cost * random.randint(5, 10)
+        res += cls.CARD_PRICES[card.star_id - 1] * random.randint(7, 10) / 10
+        if card.target == ExerProCardTarget.All.value: res += 10
+
+        return res

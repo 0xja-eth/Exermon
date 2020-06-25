@@ -43,32 +43,32 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         GameObject dragObj; // 拖拽对象（可以是新创建的，也可以是自己）
 
-		bool dragging; // 是否拖拽中
+        bool dragging; // 是否拖拽中
 
-		Transform oriParent; // 原有父变换
-		Vector2 oriPosition;
+        Transform oriParent; // 原有父变换
+        Vector2 oriPosition;
 
-		RectTransform rectTransform;
+        RectTransform rectTransform;
 
-		#region 初始化
+        #region 初始化
 
-		/// <summary>
-		/// 初始化
-		/// </summary>
-		protected override void initializeOnce() {
-			base.initializeOnce();
-			rectTransform = transform as RectTransform;
-		}
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        protected override void initializeOnce() {
+            base.initializeOnce();
+            rectTransform = transform as RectTransform;
+        }
 
-		#endregion
+        #endregion
 
-		#region 数据控制
+        #region 数据控制
 
-		/// <summary>
-		/// 是否可以拖拽
-		/// </summary>
-		/// <returns>可否拖拽</returns>
-		public virtual bool isDraggable() {
+        /// <summary>
+        /// 是否可以拖拽
+        /// </summary>
+        /// <returns>可否拖拽</returns>
+        public virtual bool isDraggable() {
             return isActived() && draggable;
         }
 
@@ -114,10 +114,10 @@ namespace UI.Common.Controls.ItemDisplays {
             dragging = true;
             onBeforeDrag();
 
-			if (createDragObj) dragObj = createDraggingObject();
+            if (createDragObj) dragObj = createDraggingObject();
             else dragObj = convertToDraggingObject();
 
-			updateDraggingObjectPosition(data);
+            updateDraggingObjectPosition(data);
             refreshStatus();
         }
 
@@ -137,16 +137,16 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="data">事件数据</param>
         public void OnEndDrag(PointerEventData data) {
-            Debug.Log("OnEndDrag: "+ data.pointerDrag);
+            Debug.Log("OnEndDrag: " + data.pointerDrag);
             if (!isDragging()) return;
             dragging = false;
-			onAfterDrag();
+            onAfterDrag();
 
-			if (createDragObj) Destroy(dragObj);
+            if (createDragObj) Destroy(dragObj);
             else resetFromDraggingObject();
             dragObj = null;
 
-			refreshStatus();
+            refreshStatus();
         }
 
         #endregion
@@ -156,17 +156,17 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 开始拖拽
         /// </summary>
-        protected virtual void onBeforeDrag() {}
+        protected virtual void onBeforeDrag() { }
 
-		/// <summary>
-		/// 拖拽结束
-		/// </summary>
-		protected virtual void onAfterDrag() {}
+        /// <summary>
+        /// 拖拽结束
+        /// </summary>
+        protected virtual void onAfterDrag() { }
 
-		/// <summary>
-		/// 生成拖拽对象
-		/// </summary>
-		GameObject createDraggingObject() {
+        /// <summary>
+        /// 生成拖拽对象
+        /// </summary>
+        GameObject createDraggingObject() {
             var go = Instantiate(gameObject, transform.parent);
             var cp = SceneUtils.get<DraggableItemDisplay<T>>(go);
             cp.setItem(item, true); Destroy(cp);
@@ -180,8 +180,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         GameObject convertToDraggingObject() {
             oriParent = transform.parent;
-			oriPosition = rectTransform.anchoredPosition;
-			adjustDraggingObjectTransform(gameObject);
+            oriPosition = rectTransform.anchoredPosition;
+            adjustDraggingObjectTransform(gameObject);
             createDraggingObjectComponents(gameObject);
             return gameObject;
         }
@@ -191,29 +191,29 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         void resetFromDraggingObject() {
             transform.SetParent(oriParent);
-			rectTransform.anchoredPosition = oriPosition;
+            rectTransform.anchoredPosition = oriPosition;
 
-			Destroy(SceneUtils.get<CanvasGroup>(transform));
+            Destroy(SceneUtils.get<CanvasGroup>(transform));
         }
 
-		/// <summary>
-		/// 调整拖拽对象的变换
-		/// </summary>
-		/// <param name="go">对象</param>
-		protected virtual void adjustDraggingObjectTransform(GameObject go) {
-			var rt = go.transform as RectTransform;
+        /// <summary>
+        /// 调整拖拽对象的变换
+        /// </summary>
+        /// <param name="go">对象</param>
+        protected virtual void adjustDraggingObjectTransform(GameObject go) {
+            var rt = go.transform as RectTransform;
 
-			rt.SetParent(draggingParent);
-			rt.SetAsLastSibling();
+            rt.SetParent(draggingParent);
+            rt.SetAsLastSibling();
 
-			preventDraggingObjectSizeChange(rt);
-		}
+            preventDraggingObjectSizeChange(rt);
+        }
 
-		/// <summary>
-		/// 防止推拽对象的尺寸改变
-		/// </summary>
-		/// <param name="go">变换</param>
-		void preventDraggingObjectSizeChange(RectTransform rt) {
+        /// <summary>
+        /// 防止推拽对象的尺寸改变
+        /// </summary>
+        /// <param name="go">变换</param>
+        void preventDraggingObjectSizeChange(RectTransform rt) {
             var srt = transform as RectTransform;
             //rt.anchorMin = draggingParent.anchorMin;
             //rt.anchorMax = draggingParent.anchorMax;
@@ -237,10 +237,11 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="eventData">事件数据</param>
         void updateDraggingObjectPosition(PointerEventData eventData) {
             var rt = dragObj.transform as RectTransform;
-
-			rt.localPosition = SceneUtils.screen2Local(
-				eventData.position, draggingParent, 
-				eventData.pressEventCamera);
+            Debug.Log("screen:" + eventData.position);
+            rt.localPosition = SceneUtils.screen2Local(
+                eventData.position, draggingParent,
+                eventData.pressEventCamera);
+            Debug.Log("local" + rt.localPosition);
         }
 
         #endregion

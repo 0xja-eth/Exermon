@@ -1458,6 +1458,9 @@ class ExerProRecord(CacheableModel):
 	# 当前单词缓存键
 	CUR_WORDS_CACHE_KEY = 'cur_words'
 
+	# 默认金币
+	DEFAULT_GOLD = 100
+
 	# 关卡
 	stage = models.ForeignKey('ExerProMapStage', null=True,
 							  on_delete=models.CASCADE, verbose_name="关卡")
@@ -1480,6 +1483,9 @@ class ExerProRecord(CacheableModel):
 	# # 下一单词
 	# next = models.ForeignKey('Word', null=True, blank=True,
 	# 						 on_delete=models.CASCADE, verbose_name="下一单词")
+
+	# 金币
+	gold = models.PositiveSmallIntegerField(default=DEFAULT_GOLD, verbose_name="金币")
 
 	# 据点数据
 	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
@@ -1567,6 +1573,7 @@ class ExerProRecord(CacheableModel):
 			'cur_index': cur_index,
 			'word_level': self.word_level,
 
+			'gold': self.gold,
 			'nodes': self.nodes,
 			'actor': self.actor,
 
@@ -1590,6 +1597,9 @@ class ExerProRecord(CacheableModel):
 		ModelUtils.loadKey(data, 'started', self)
 		ModelUtils.loadKey(data, 'generated', self)
 		ModelUtils.loadKey(data, 'cur_index', self)
+		ModelUtils.loadKey(data, 'node_flag', self)
+		ModelUtils.loadKey(data, 'word_level', self)
+		ModelUtils.loadKey(data, 'gold', self)
 		ModelUtils.loadKey(data, 'nodes', self)
 		ModelUtils.loadKey(data, 'actor', self)
 
@@ -1604,6 +1614,14 @@ class ExerProRecord(CacheableModel):
 		self.reset()
 		self.stage = map.stage(1)
 		self.started = True
+
+	def gainGold(self, val):
+		"""
+		获得金币
+		Args:
+			val (int): 金币
+		"""
+		self.gold = max(0, self.gold + val)
 
 	def reset(self):
 		"""
@@ -1737,5 +1755,27 @@ class ExerProRecord(CacheableModel):
 			若存在单词记录，返回之，否则返回 None
 		"""
 		return ModelUtils.get(self.wordRecords(), word_id=word_id, **kwargs)
+
+
+# TODO: 排行榜
+# # ===================================================
+# #  特训积分表
+# # ===================================================
+# class ExerProScore(models.Model):
+# 	class Meta:
+#
+# 		verbose_name = verbose_name_plural = "特训积分"
+#
+# 	# 关卡
+# 	stage = models.ForeignKey('ExerProMapStage', null=True,
+# 							  on_delete=models.CASCADE, verbose_name="关卡")
+#
+# 	# 开始标志
+# 	started = models.BooleanField(default=False, verbose_name="开始标志")
+#
+# 	# 生成标志
+# 	generated = models.BooleanField(default=False, verbose_name="生成标志")
+
+
 
 # endregion
