@@ -1787,7 +1787,7 @@ namespace ExerPro.EnglishModule.Data {
 			Debug.Log("loadCustomAttributes: "+json.ToJson());
 		}
 
-		/*
+        /*
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -1801,7 +1801,48 @@ namespace ExerPro.EnglishModule.Data {
             this.nodeRate = nodeRate;
         }
         */
-	}
+
+        #region Unit Test
+        /// <summary>
+        /// 测试变量
+        /// 其中index = 0为默认情况（数据库定义）；
+        /// index = 1对应小规模地图，分布较均匀，参数约束较严格
+        /// index = 2对应小规模地图，分布波动非常大，参数约束中等
+        /// index = 3对应大规模地图，
+        /// index = 4对应大规模地图，
+        /// index = 5对应大规模地图，
+        /// </summary>
+        List<int[]> testSteps = new List<int[]> { new int[] { 3, 4, 5, 2, 3, 5, 4, 3, 4, 3, 2, 4, 4, 2, 5, 1 },
+            new int[] { 4, 3, 2, 3, 4, 1 }, new int[] { 2, 5, 1, 4, 3, 6, 1 },
+            new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
+            new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
+            new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },};
+        List<int> testMaxForkNodes = new List<int> { 10, 2, 5, 5, 8, 10};
+        List<int> testMaxForks = new List<int> { 3, 2, 3, 3, 3, 3};
+
+        List<int[]> testNodeRates = new List<int[]> { new int[] { 2, 1, 1, 1, 1, 4 },
+            new int[] { 2, 0, 0, 0, 0, 0 }, new int[]{ 0, 1} , new int[]{ 0, 0,1}  };
+
+        static int index = 0;
+        /// <summary>
+        /// 改变内置参数进行测试
+        /// </summary>
+        /// <param name="steps"></param>
+        /// <param name="maxForkNode"></param>
+        /// <param name="maxFork"></param>
+        public void changeStageParam() {
+            this.steps = testSteps[index];
+            this.maxForkNode = testMaxForkNodes[index];
+            this.maxFork = testMaxForks[index];
+            index++;
+        }
+
+        public void changeNodeRate() {
+            this.nodeRate = testNodeRates[index];
+            index++;
+        }
+        #endregion
+    }
 
     #endregion
 
@@ -2088,6 +2129,9 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         void generate() {
             if (generated) return;
+
+            //Unit Test
+            //this.stage().changeStageParam();
 			generated = CalcService.NodeGenerator.generate(this);
 			setupCards(); refreshNodeStatuses();
         }
@@ -2692,10 +2736,10 @@ namespace ExerPro.EnglishModule.Data {
 			this.states.Clear();
 
 			var states = DataLoader.load(json, "states");
-
 			if (states != null) {
 				Debug.Log("Load states: " + states.ToJson());
-				foreach (KeyValuePair<string, JsonData> pair in states) {
+                states.SetJsonType(JsonType.Object);
+                foreach (KeyValuePair<string, JsonData> pair in states) {
 					var key = int.Parse(pair.Key);
 					var data = DataLoader.load<RuntimeState>(pair.Value);
 					Debug.Log("Load states: " + key + ", " + data);

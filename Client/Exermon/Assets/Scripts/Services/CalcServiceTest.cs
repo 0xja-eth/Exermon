@@ -24,12 +24,12 @@ using LitJson;
 /// <summary>
 /// 游戏模块服务
 /// </summary>
-namespace GameModule.Services {
+namespace GameModule.Services.Test {
 
     /// <summary>
     /// 计算服务
     /// </summary>
-    public class CalcService : BaseService<CalcService> {
+    public class CalcServiceTest : BaseService<CalcService> {
 
         /// <summary>
         /// 公用计算函数
@@ -155,7 +155,7 @@ namespace GameModule.Services {
             /// <param name="plusVal">附加值</param>
             /// <param name="plusRate">附加率</param>
             /// <returns>属性实际值</returns>
-            public static double calc(double base_, double rate, 
+            public static double calc(double base_, double rate,
                 int level, double plusVal = 0, double plusRate = 1) {
                 var value = base_ * Math.Pow((rate / R + 1) * S, level - 1);
                 return value * plusRate + plusVal;
@@ -274,7 +274,7 @@ namespace GameModule.Services {
                 var plusVal = playerExer.plusParamValue(paramId).value;
                 var plusRate = playerExer.plusParamRate(paramId).value;
 
-                return ExermonParamCalc.calc(epb, rpr, 
+                return ExermonParamCalc.calc(epb, rpr,
                     playerExer.level, plusVal, plusRate);
             }
             /// <summary>
@@ -453,7 +453,7 @@ namespace GameModule.Services {
                 if (exerSlotItem == null) return null;
 
                 var lastStar = stars[0];
-                foreach(var star in stars) {
+                foreach (var star in stars) {
                     if (exerSlotItem.level < star.level)
                         return lastStar;
                     lastStar = star;
@@ -506,7 +506,7 @@ namespace GameModule.Services {
                     // 最后一个段位，直接返回（out 变量已经赋值）
                     if (starCnt == 0) return starNum;
 
-                    if (starNum > starCnt) 
+                    if (starNum > starCnt)
                         // 还没找到段位，继续找下一个
                         starNum -= starCnt;
                     else { // 找到所属的段位了
@@ -756,8 +756,8 @@ namespace GameModule.Services {
             /// <param name="stage">关卡</param>
             public static bool generate(ExerProRecord stage) {
                 var generator = new NodeGenerator(stage);
-                return generator.generateNodes() && 
-                    generator.generateForkNodes() && 
+                return generator.generateNodes() &&
+                    generator.generateForkNodes() &&
                     generator.generateLinks();
             }
 
@@ -819,7 +819,7 @@ namespace GameModule.Services {
                 int maxCnt = stage.maxForkNode;
                 int maxX = nodes.Length;
 
-                while(cnt < maxCnt && counter <= 10000) {
+                while (cnt < maxCnt && counter <= 10000) {
                     if (maxX <= 2) break; counter++;
 
                     // 随机生成一个点
@@ -833,7 +833,7 @@ namespace GameModule.Services {
                     var node = colNodes[y];
                     if (node.fork) continue;
 
-                    // 若该步的分支据点数目 > 下一步总数 - 1，则跳过
+                    // 若该步的分支据点数目 >= 下一步总数 - 1，则跳过
                     int nextCnt = nodes[x + 1].Count;
                     var forkCnt = _calcForkCount(colNodes);
                     if (forkCnt >= nextCnt - 1) continue;
@@ -851,7 +851,7 @@ namespace GameModule.Services {
             int _calcForkCount(List<ExerProMapNode> nodes) {
                 int cnt = 0;
                 foreach (var node in nodes) if (node.fork) cnt++;
-                return cnt; 
+                return cnt;
             }
 
             /// <summary>
@@ -875,11 +875,11 @@ namespace GameModule.Services {
 
                         // 因为 random 为 true，所以这里直接进行 stage.maxFork 次循环
                         else for (int n = 0; n < stage.maxFork; ++n)
-                            _addNext(node, ref ny, true);
+                                _addNext(node, ref ny, true);
                     }
 
                     // 剩余未分配的下一个据点则全部作为本步最后一个据点的下一步
-                    for(; ny < nodes[x + 1].Count; ++ny)
+                    for (; ny < nodes[x + 1].Count; ++ny)
                         _addNext(node, ref ny, incr: false);
                 }
                 return true;
@@ -894,7 +894,7 @@ namespace GameModule.Services {
             /// <param name="random">是否随机增加下一步Y坐标</param>
             /// <param name="incr">是否增加下一步Y坐标</param>
             /// <returns>返回新的 ny 值</returns>
-            void _addNext(ExerProMapNode node, ref int ny, 
+            void _addNext(ExerProMapNode node, ref int ny,
                 bool random = false, bool incr = true) {
 
                 var x = node.xOrder;
@@ -913,15 +913,109 @@ namespace GameModule.Services {
             /// 常量定义
             /// </summary>
             public const int MaxEnemyCols = 3; // 最大敌人列数
-			public const int MaxEnemyRows = 3; // 最大敌人行数
+            public const int MaxEnemyRows = 3; // 最大敌人行数
 
             /// <summary>
             /// 内部变量定义
             /// </summary>
-            ExerProMapStage stage;
+            ExerProMapStage stage = new ExerProMapStage();
             RuntimeActor actor;
 
-            List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
+            /// <summary>
+            /// 测试
+            /// </summary>
+            /// <summary>
+            /// 地图关卡
+            /// </summary>
+            public class ExerProMapStage : BaseData {
+
+                /// <summary>
+                /// 属性
+                /// </summary>
+                [AutoConvert]
+                public int order { get; protected set; }
+                [AutoConvert("enemies")]
+                public int[] _enemies { get; protected set; }
+                [AutoConvert]
+                public int maxBattleEnemies { get;  set; }
+                [AutoConvert]
+                public int[] steps { get; protected set; }
+                [AutoConvert]
+                public int maxForkNode { get; protected set; }
+                [AutoConvert]
+                public int maxFork { get; protected set; }
+                [AutoConvert]
+                public int[] nodeRate { get; protected set; }
+
+                /// <summary>
+                /// 地图
+                /// </summary>
+                public ExerProMap map { get; set; }
+
+                /// <summary>
+                /// 缓存敌人集合
+                /// </summary>
+                List<ExerProEnemy> tmpEnemies;
+
+                /// <summary>
+                /// 敌人数组
+                /// </summary>
+                /// <returns>返回敌人数组</returns>
+                public List<ExerProEnemy> enemies() {
+                    if (tmpEnemies == null) {
+                        tmpEnemies = new List<ExerProEnemy>();
+                        for(int i = 0; i < 100; i++) {
+                            var enemy = new ExerProEnemy();
+                            var data = new JsonData();
+                            var type = Random.Range(1, 4);
+                            data["type_"] = type;
+                            enemy.load(data);
+                            var eType = enemy.type_;
+                            tmpEnemies.Add(enemy);
+                        }
+                    }
+                    return tmpEnemies;
+                }
+
+                /// <summary>
+                /// BOSS数组
+                /// </summary>
+                /// <returns>返回BOSS敌人数组</returns>
+                public List<ExerProEnemy> bosses() {
+                    return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Boss);
+                }
+
+                /// <summary>
+                /// 普通敌人数组
+                /// </summary>
+                /// <returns>返回普通敌人数组</returns>
+                public List<ExerProEnemy> normalEnemies() {
+                    return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Normal);
+                }
+
+                /// <summary>
+                /// 精英数组
+                /// </summary>
+                /// <returns>返回精英敌人数组</returns>
+                public List<ExerProEnemy> eliteEnemies() {
+                    return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Elite);
+                }
+
+                /// <summary>
+                /// 测试
+                /// </summary>
+                /// <param name="json"></param>
+                protected override void loadCustomAttributes(JsonData json) {
+                    base.loadCustomAttributes(json);
+                    Debug.Log("loadCustomAttributes: " + json.ToJson());
+                }
+
+            }
+
+
+            List<ExerProEnemy> enemies = new List<ExerProEnemy>();
+
+            public static List<int> posList = new List<int>();
 
             /// <summary>
             /// 生成
@@ -929,19 +1023,18 @@ namespace GameModule.Services {
             /// <param name="actor">角色对象</param>
             /// <param name="stage">关卡对象</param>
             /// <param name="type">类型</param>
-            public static List<RuntimeEnemy> generate(RuntimeActor actor, 
-                ExerProMapStage stage, ExerProMapNode.Type type) {
-                var generator = new BattleEnemiesGenerator(actor, stage, type);
-
+            public static List<ExerProEnemy> generate(ExerProMapNode.Type type = ExerProMapNode.Type.Boss,
+                int maxEnemy = 10) {
+                posList.Clear();
+                var generator = new BattleEnemiesGenerator(type, maxEnemy);
                 return generator.enemies;
             }
 
             /// <summary>
             /// 构造函数
             /// </summary>
-            BattleEnemiesGenerator(RuntimeActor actor,
-                ExerProMapStage stage, ExerProMapNode.Type type) {
-                this.actor = actor; this.stage = stage;
+            BattleEnemiesGenerator(ExerProMapNode.Type type, int maxEnemy = 10) {
+                stage.maxBattleEnemies = maxEnemy;
                 switch (type) {
                     case ExerProMapNode.Type.Enemy:
                         generateEnemies(); break;
@@ -975,7 +1068,7 @@ namespace GameModule.Services {
                 var posVis = new bool[posCnt];
                 var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
 
-				Debug.Log("enemies.Count: " + enemies.Count + ", " + enemyCnt);
+                Debug.Log("enemies.Count: " + enemies.Count + ", " + enemyCnt);
 
                 for (int i = 0; i < cnt; ++i) {
                     var enemy = enemies[Random.Range(0, enemyCnt)];
@@ -983,7 +1076,8 @@ namespace GameModule.Services {
                     while (posVis[pos]) pos = Random.Range(0, posCnt);
                     posVis[pos] = true;
 
-                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                    this.enemies.Add(enemy);
+                    posList.Add(pos);
                 }
             }
 
@@ -997,12 +1091,13 @@ namespace GameModule.Services {
 
                 var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
 
-                foreach(var enemy in enemies) {
+                foreach (var enemy in enemies) {
                     var pos = Random.Range(0, posCnt);
                     while (posVis[pos]) pos = Random.Range(0, posCnt);
                     posVis[pos] = true;
 
-                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                    this.enemies.Add(enemy);
+                    posList.Add(pos);
                 }
             }
 
@@ -1026,22 +1121,22 @@ namespace GameModule.Services {
             ExerPro.EnglishModule.Data.RuntimeAction action;
             RuntimeActionResult[] results;
 
-			RuntimeBattler subject;
-			RuntimeBattler[] objects;
+            RuntimeBattler subject;
+            RuntimeBattler[] objects;
 
-            List<RuntimeActionResult.StateChange> stateChanges = 
-				new List<RuntimeActionResult.StateChange>();
+            List<RuntimeActionResult.StateChange> stateChanges =
+                new List<RuntimeActionResult.StateChange>();
             List<RuntimeBuff> addBuffs = new List<RuntimeBuff>();
 
-			RuntimeBattler object_;
-			RuntimeActionResult result;
+            RuntimeBattler object_;
+            RuntimeActionResult result;
 
-			/// <summary>
-			/// 生成
-			/// </summary>
-			/// <param name="action">行动</param>
-			/// <returns>返回结果</returns>
-			public static RuntimeActionResult[] generate(
+            /// <summary>
+            /// 生成
+            /// </summary>
+            /// <param name="action">行动</param>
+            /// <returns>返回结果</returns>
+            public static RuntimeActionResult[] generate(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
                 var generator = new ExerProActionResultGenerator(action);
                 return generator.results;
@@ -1053,26 +1148,26 @@ namespace GameModule.Services {
             /// <param name="action">行动</param>
             ExerProActionResultGenerator(ExerPro.EnglishModule.Data.RuntimeAction action) {
                 this.action = action;
-				subject = action.subject;
-				objects = action.objects;
+                subject = action.subject;
+                objects = action.objects;
 
-				var cnt = objects.Length;
-				results = new RuntimeActionResult[cnt];
+                var cnt = objects.Length;
+                results = new RuntimeActionResult[cnt];
 
-				//Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
+                //Debug.Log("ExerProActionResultGenerator: " + action.toJson().ToJson());
 
-				for(int i=0;i< cnt; ++i) {
-					_generate(objects[i], out results[i]);
-					_setup(results[i]);
-				}
-			}
+                for (int i = 0; i < cnt; ++i) {
+                    _generate(objects[i], out results[i]);
+                    _setup(results[i]);
+                }
+            }
 
             /// <summary>
             /// 生成
             /// </summary>
             void _generate(RuntimeBattler object_, out RuntimeActionResult result) {
-				result = new RuntimeActionResult(object_, action);
-				this.object_ = object_; this.result = result;
+                result = new RuntimeActionResult(object_, action);
+                this.object_ = object_; this.result = result;
                 foreach (var effect in action.effects) processEffect(effect);
             }
 
@@ -1082,9 +1177,9 @@ namespace GameModule.Services {
             void _setup(RuntimeActionResult result) {
                 result.stateChanges = stateChanges.ToArray();
                 result.addBuffs = addBuffs.ToArray();
-				stateChanges.Clear();
-				addBuffs.Clear();
-			}
+                stateChanges.Clear();
+                addBuffs.Clear();
+            }
 
             /// <summary>
             /// 处理效果
@@ -1092,115 +1187,115 @@ namespace GameModule.Services {
             /// <param name="effect">效果</param>
             void processEffect(ExerProEffectData effect) {
 
-				Debug.Log("processEffect: " + effect.toJson().ToJson());
+                Debug.Log("processEffect: " + effect.toJson().ToJson());
 
-				int a, b, h, p, n, s, r;
+                int a, b, h, p, n, s, r;
                 bool select = false;
 
                 switch (effect.codeEnum()) {
                     case ExerProEffectData.Code.Attack:
                     case ExerProEffectData.Code.AttackBlack:
-						a = effect.get(0, 0); h = effect.get(2, HPDamageType);
+                        a = effect.get(0, 0); h = effect.get(2, HPDamageType);
                         processDamage(a, h); break;
 
                     case ExerProEffectData.Code.AttackSlash:
-						a = effect.get(0, 0); b = effect.get(1, 2);
+                        a = effect.get(0, 0); b = effect.get(1, 2);
                         _processSlashAttack(a, b); break;
 
                     case ExerProEffectData.Code.Recover:
-						a = effect.get(0, 0); b = effect.get(1, 0);
-						var val = Math.Round(a + object_.hp * 1.0 * b / 100);
-						processDamage((int)val, HPRecoverType); break;
+                        a = effect.get(0, 0); b = effect.get(1, 0);
+                        var val = Math.Round(a + object_.hp * 1.0 * b / 100);
+                        processDamage((int)val, HPRecoverType); break;
 
                     case ExerProEffectData.Code.AddParam:
-						p = effect.get(0, 0);
-						a = effect.get(1, 0);
-						b = 100 + effect.get(2, 0);
-						processBuff(p, a, b, -1); break;
+                        p = effect.get(0, 0);
+                        a = effect.get(1, 0);
+                        b = 100 + effect.get(2, 0);
+                        processBuff(p, a, b, -1); break;
 
-					case ExerProEffectData.Code.AddMHP:
-						p = RuntimeBattler.MHPParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						processBuff(p, a, b, -1); break;
+                    case ExerProEffectData.Code.AddMHP:
+                        p = RuntimeBattler.MHPParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        processBuff(p, a, b, -1); break;
 
-					case ExerProEffectData.Code.AddPower:
-						p = RuntimeBattler.PowerParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						processBuff(p, a, b, -1); break;
+                    case ExerProEffectData.Code.AddPower:
+                        p = RuntimeBattler.PowerParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        processBuff(p, a, b, -1); break;
 
-					case ExerProEffectData.Code.AddDefense:
-						p = RuntimeBattler.DefenseParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						processBuff(p, a, b, -1); break;
+                    case ExerProEffectData.Code.AddDefense:
+                        p = RuntimeBattler.DefenseParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        processBuff(p, a, b, -1); break;
 
-					case ExerProEffectData.Code.AddAgile:
-						p = RuntimeBattler.AgileParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						processBuff(p, a, b, -1); break;
+                    case ExerProEffectData.Code.AddAgile:
+                        p = RuntimeBattler.AgileParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        processBuff(p, a, b, -1); break;
 
-					case ExerProEffectData.Code.TempAddParam:
-						p = effect.get(0, 0);
-						a = effect.get(1, 0);
-						b = 100 + effect.get(2, 0);
-						n = effect.get(3, 1);
-						processBuff(p, a, b, n); break;
+                    case ExerProEffectData.Code.TempAddParam:
+                        p = effect.get(0, 0);
+                        a = effect.get(1, 0);
+                        b = 100 + effect.get(2, 0);
+                        n = effect.get(3, 1);
+                        processBuff(p, a, b, n); break;
 
-					case ExerProEffectData.Code.TempAddMHP:
-						p = RuntimeBattler.MHPParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						n = effect.get(2, 1);
-						processBuff(p, a, b, n); break;
+                    case ExerProEffectData.Code.TempAddMHP:
+                        p = RuntimeBattler.MHPParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        n = effect.get(2, 1);
+                        processBuff(p, a, b, n); break;
 
-					case ExerProEffectData.Code.TempAddPower:
-						p = RuntimeBattler.PowerParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						n = effect.get(2, 1);
-						processBuff(p, a, b, n); break;
+                    case ExerProEffectData.Code.TempAddPower:
+                        p = RuntimeBattler.PowerParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        n = effect.get(2, 1);
+                        processBuff(p, a, b, n); break;
 
-					case ExerProEffectData.Code.TempAddDefense:
-						p = RuntimeBattler.DefenseParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						n = effect.get(2, 1);
-						processBuff(p, a, b, n); break;
+                    case ExerProEffectData.Code.TempAddDefense:
+                        p = RuntimeBattler.DefenseParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        n = effect.get(2, 1);
+                        processBuff(p, a, b, n); break;
 
-					case ExerProEffectData.Code.TempAddAgile:
-						p = RuntimeBattler.AgileParamId;
-						a = effect.get(0, 0);
-						b = 100 + effect.get(1, 0);
-						n = effect.get(2, 1);
-						processBuff(p, a, b, n); break;
+                    case ExerProEffectData.Code.TempAddAgile:
+                        p = RuntimeBattler.AgileParamId;
+                        a = effect.get(0, 0);
+                        b = 100 + effect.get(1, 0);
+                        n = effect.get(2, 1);
+                        processBuff(p, a, b, n); break;
 
-					case ExerProEffectData.Code.AddEnergy:
-						a = effect.get(0, 0);
-						processEnergy(a); break;
+                    case ExerProEffectData.Code.AddEnergy:
+                        a = effect.get(0, 0);
+                        processEnergy(a); break;
 
-					case ExerProEffectData.Code.AddState:
-						s = effect.get(0, 0); r = effect.get(1, 0);
-						p = effect.get(2, 100);
+                    case ExerProEffectData.Code.AddState:
+                        s = effect.get(0, 0); r = effect.get(1, 0);
+                        p = effect.get(2, 100);
                         processAddState(s, r, p); break;
 
                     case ExerProEffectData.Code.RemoveState:
-						s = effect.get(0, 0); r = effect.get(1, 0);
-						p = effect.get(2, 100);
-						processRemoveState(s, r, p); break;
+                        s = effect.get(0, 0); r = effect.get(1, 0);
+                        p = effect.get(2, 100);
+                        processRemoveState(s, r, p); break;
 
                     case ExerProEffectData.Code.RemoveNegaState:
                         _processRemoveNegaStates(); break;
 
                     case ExerProEffectData.Code.DrawCards:
-						n = effect.get(0, 0); drawCards(n); break;
+                        n = effect.get(0, 0); drawCards(n); break;
 
                     case ExerProEffectData.Code.ConsumeCards:
-						n = effect.get(0, 0);
-						select = effect.get(1, false);
-						consumeCards(n, select); break;
+                        n = effect.get(0, 0);
+                        select = effect.get(1, false);
+                        consumeCards(n, select); break;
                 }
             }
 
@@ -1233,7 +1328,7 @@ namespace GameModule.Services {
             /// <param name="h">伤害类型</param>
             void processDamage(int a, int h = HPDamageType) {
                 if (h == HPRecoverType)
-					result.hpRecover = calcRecover(a);
+                    result.hpRecover = calcRecover(a);
                 else {
                     var val = calcDamage(a);
                     if (h == HPDamageType) result.hpDamage = val;
@@ -1241,44 +1336,44 @@ namespace GameModule.Services {
                 }
             }
 
-			/// <summary>
-			/// 计算伤害
-			/// </summary>
-			/// <param name="a"></param>
-			/// <returns></returns>
-			int calcDamage(int a) {
-				double res = a + subject.power() - object_.defense();
+            /// <summary>
+            /// 计算伤害
+            /// </summary>
+            /// <param name="a"></param>
+            /// <returns></returns>
+            int calcDamage(int a) {
+                double res = a + subject.power() - object_.defense();
 
-				res += subject.damagePlusVal();
-				res += object_.hurtPlusVal();
+                res += subject.damagePlusVal();
+                res += object_.hurtPlusVal();
 
-				res *= subject.damagePlusRate();
-				res *= object_.hurtPlusRate();
+                res *= subject.damagePlusRate();
+                res *= object_.hurtPlusRate();
 
-				return (int)Math.Round(Math.Max(res, 1));
-			}
+                return (int)Math.Round(Math.Max(res, 1));
+            }
 
-			/// <summary>
-			/// 计算回复
-			/// </summary>
-			/// <param name="a"></param>
-			/// <returns></returns>
-			int calcRecover(int a) {
-				double res = a;
+            /// <summary>
+            /// 计算回复
+            /// </summary>
+            /// <param name="a"></param>
+            /// <returns></returns>
+            int calcRecover(int a) {
+                double res = a;
 
-				res += object_.recoverPlusVal();
-				res *= object_.recoverPlusRate();
+                res += object_.recoverPlusVal();
+                res *= object_.recoverPlusRate();
 
-				return (int)Math.Round(Math.Max(res, 1));
-			}
+                return (int)Math.Round(Math.Max(res, 1));
+            }
 
-			/// <summary>
-			/// 处理能量获得
-			/// </summary>
-			/// <param name="a"></param>
-			void processEnergy(int a) {
-				result.energyGain = a;
-			}
+            /// <summary>
+            /// 处理能量获得
+            /// </summary>
+            /// <param name="a"></param>
+            void processEnergy(int a) {
+                result.energyGain = a;
+            }
 
             /// <summary>
             /// 处理Buff
@@ -1347,8 +1442,8 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="count">数量</param>
             void drawCards(int count) {
-				Debug.Log("drawCards");
-				result.drawCardCnt = count;
+                Debug.Log("drawCards");
+                result.drawCardCnt = count;
             }
 
             /// <summary>
@@ -1358,7 +1453,7 @@ namespace GameModule.Services {
             /// <param name="show">是否显示并选择</param>
             void consumeCards(int count, bool select = true) {
                 result.consumeCardCnt = count;
-				result.consumeSelect = select;
+                result.consumeSelect = select;
             }
 
         }
@@ -1375,14 +1470,14 @@ namespace GameModule.Services {
             RuntimeActionResult result;
 
             RuntimeBattler subject; // 发起者
-			RuntimeActor actor; // 关联的角色
+            RuntimeActor actor; // 关联的角色
 
-			/// <summary>
-			/// 应用
-			/// </summary>
-			/// <param name="battler">对战者</param>
-			/// <param name="result">结果</param>
-			public static void apply(RuntimeBattler battler, RuntimeActionResult result) {
+            /// <summary>
+            /// 应用
+            /// </summary>
+            /// <param name="battler">对战者</param>
+            /// <param name="result">结果</param>
+            public static void apply(RuntimeBattler battler, RuntimeActionResult result) {
                 var calc = new ResultApplyCalc(battler, result);
                 calc.processHP();
                 calc.processAddBuffs();
@@ -1399,19 +1494,29 @@ namespace GameModule.Services {
             ResultApplyCalc(RuntimeBattler battler, RuntimeActionResult result) {
                 this.battler = battler; this.result = result;
                 subject = result.action.subject;
-				actor = (battler as RuntimeActor) 
-					?? (subject as RuntimeActor);
-			}
+                actor = (battler as RuntimeActor)
+                    ?? (subject as RuntimeActor);
+            }
 
             /// <summary>
             /// 处理HP
             /// </summary>
             void processHP() {
-                battler.addHP(result.hpRecover);
-                battler.addHP(-result.hpDamage);
-                battler.addHP(-result.hpDrain);
+                var data = battler.toJson();
+                var hp = battler.hp;
+                hp += (result.hpRecover - result.hpDamage - result.hpDrain);
+                data["hp"] = hp;
+                battler.load(data);
 
-                subject.addHP(result.hpDrain);
+                //battler.addHP(result.hpRecover);
+                //battler.addHP(-result.hpDamage);
+                //battler.addHP(-result.hpDrain);
+
+                data = subject.toJson();
+                hp = subject.hp;
+                hp += result.hpDrain;
+                data["hp"] = hp;
+                subject.load(data);
             }
 
             /// <summary>
@@ -1426,7 +1531,7 @@ namespace GameModule.Services {
             /// 处理状态增加
             /// </summary>
             void processAddStates() {
-                foreach (var state in result.stateChanges) 
+                foreach (var state in result.stateChanges)
                     if (state.remove)
                         battler.removeState(state.stateId, state.turns);
                     else
@@ -1454,429 +1559,300 @@ namespace GameModule.Services {
                     actor.cardGroup.consumeCard();
             }
 
-			/// <summary>
-			/// 处理能量变化
-			/// </summary>
-			void processEnergy() {
-				if (actor == null) return;
+            /// <summary>
+            /// 处理能量变化
+            /// </summary>
+            void processEnergy() {
+                if (actor == null) return;
 
-				actor.addEnergy(result.energyGain);
-			}
-		}
+                actor.addEnergy(result.energyGain);
+            }
+        }
 
         /// <summary>
         /// 敌人下一步行动计算类
         /// </summary>
         public class EnemyNextCalc {
 
-			/// <summary>
-			/// 动画常量控制
-			/// </summary>
-			public const int AttackAniIndex = 1; // 开始攻击动画
-			public const int SkillAniIndex = 2; // 开始技能动画
-			public const int HurtAniIndex = 3; // 受伤动画
-			public const int PowerUpAniIndex = 4; // 提升动画
-			public const int PowerDownAniIndex = 5; // 削弱动画
+            /// <summary>
+            /// 动画常量控制
+            /// </summary>
+            public const int AttackAniIndex = 1; // 开始攻击动画
+            public const int SkillAniIndex = 2; // 开始技能动画
+            public const int HurtAniIndex = 3; // 受伤动画
+            public const int PowerUpAniIndex = 4; // 提升动画
+            public const int PowerDownAniIndex = 5; // 削弱动画
 
-			/// <summary>
-			/// 属性
-			/// </summary>
-			int round;
-            RuntimeEnemy enemy;
+            /// <summary>
+            /// 属性
+            /// </summary>
+            int round;
 
             ExerProEnemy enemyData;
+            ExerProEnemy.Action currentAction;
             ExerProEnemy.Action[] actions;
 
             /// <summary>
             /// 计算
             /// </summary>
             public static void calc(int round,
-                RuntimeEnemy enemy, RuntimeActor actor,
-                out ExerProEnemy.Action action, 
-                out ExerPro.EnglishModule.Data.RuntimeAction runtimeAction) {
+                ExerProEnemy enemy, out ExerProEnemy.Action action) {
 
                 var calc = new EnemyNextCalc(round, enemy);
-
                 action = calc.generateAction();
-                runtimeAction = calc.generateRuntimeAction(actor);
             }
 
             /// <summary>
             /// 构造函数
             /// </summary>
-            EnemyNextCalc(int round, RuntimeEnemy enemy) {
-                this.round = round; this.enemy = enemy;
-                enemyData = enemy.enemy();
+            EnemyNextCalc(int round, ExerProEnemy enemy) {
+                this.round = round; 
+                enemyData = enemy;
 
-				Debug.Log("EnemyNextCalc: " + enemyData.name + ": " + enemyData.toJson().ToJson());
+                Debug.Log("EnemyNextCalc: " + enemyData.name + ": " + enemyData.toJson().ToJson());
 
-				actions = filterActions(enemyData.actions);
+                actions = filterActions(enemyData.actions);
             }
 
-			/// <summary>
-			/// 过滤行动
-			/// </summary>
-			/// <returns>过滤后的行动列表</returns>
-			ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
+            /// <summary>
+            /// 过滤行动
+            /// </summary>
+            /// <returns>过滤后的行动列表</returns>
+            ExerProEnemy.Action[] filterActions(ExerProEnemy.Action[] actions) {
                 var res = new List<ExerProEnemy.Action>();
-				foreach (var action in actions) {
-					Debug.Log(enemyData.name + ": filterActions (" + action.testRound(round) + ") " + action.toJson().ToJson());
-					if (action.testRound(round)) res.Add(action);
-				}
-				return res.ToArray();
+                foreach (var action in actions) {
+                    Debug.Log(enemyData.name + ": filterActions (" + action.testRound(round) + ") " + action.toJson().ToJson());
+                    if (action.testRound(round)) res.Add(action);
+                }
+                return res.ToArray();
             }
 
             /// <summary>
             /// 生成行动
             /// </summary>
             ExerProEnemy.Action generateAction() {
-				var list = new List<int>();
+                var list = new List<int>();
                 for (var i = 0; i < actions.Length; ++i) {
                     var action = actions[i];
                     for (var j = 0; j < action.rate; ++j) list.Add(i);
                 }
-				Debug.Log(enemyData.name + ": generateAction: " + string.Join(",", list));
-				if (list.Count <= 0) return null; 
+                Debug.Log(enemyData.name + ": generateAction: " + string.Join(",", list));
+                if (list.Count <= 0) return null;
                 var index = Random.Range(0, list.Count);
                 return actions[list[index]];
             }
-
-            /// <summary>
-            /// 生成运行时行动
-            /// </summary>
-            ExerPro.EnglishModule.Data.RuntimeAction 
-                generateRuntimeAction(RuntimeActor actor) {
-
-                RuntimeBattler object_;
-				int startAniIndex = 0, targetAniIndex = 0;
-                var params_ = enemy.currentActionParams();
-                var effects = new List<ExerProEffectData>();
-				bool move = false;
-
-                switch (enemy.currentActionTypeEnum()) {
-                    case ExerProEnemy.Action.Type.Attack:
-                        _processAttack(effects, params_);
-						startAniIndex = AttackAniIndex;
-						targetAniIndex = HurtAniIndex;
-						move = true; object_ = actor; break;
-
-					case ExerProEnemy.Action.Type.NegStates:
-						_processAddStates(effects, params_);
-						startAniIndex = SkillAniIndex;
-						targetAniIndex = PowerDownAniIndex;
-						object_ = actor; break;
-
-					case ExerProEnemy.Action.Type.PowerDown:
-                        _processPowerDown(effects, params_);
-						startAniIndex = SkillAniIndex;
-						targetAniIndex = PowerDownAniIndex;
-						object_ = actor; break;
-
-                    case ExerProEnemy.Action.Type.PosStates:
-                        _processAddStates(effects, params_);
-						startAniIndex = SkillAniIndex;
-						targetAniIndex = PowerUpAniIndex;
-						object_ = enemy; break;
-
-                    case ExerProEnemy.Action.Type.PowerUp:
-                        _processPowerUp(effects, params_);
-						startAniIndex = SkillAniIndex;
-						targetAniIndex = PowerUpAniIndex;
-						object_ = enemy; break;
-
-                    default: return null;
-                }
-
-                effects.AddRange(enemyData.effects);
-
-				var startAni = AssetLoader.loadAnimation(startAniIndex);
-				var targetAni = AssetLoader.loadAnimation(targetAniIndex);
-
-				return new ExerPro.EnglishModule.Data.RuntimeAction(
-                    enemy, object_, effects.ToArray(), startAni, targetAni, move);
-            }
-
-            /// <summary>
-            /// 处理攻击行动
-            /// </summary>
-            void _processAttack(
-                List<ExerProEffectData> effects, JsonData actionParams) {
-
-				int value = enemy.power();
-				if (actionParams.Count > 0) value += (int)actionParams[0];
-				actionParams.Add(value);
-
-				effects.Add(new ExerProEffectData(
-                    ExerProEffectData.Code.Attack, actionParams));
-            }
-
-            /// <summary>
-            /// 处理削弱
-            /// </summary>
-            void _processPowerDown(
-                List<ExerProEffectData> effects, JsonData actionParams) {
-                var t = actionParams.Count == 5 ?
-                    actionParams[4] : 1;
-
-                for (int i = 0; i < 4; ++i) {
-                    var params_ = new JsonData();
-					var p = DataLoader.load<int>(actionParams[i]);
-
-					params_.SetJsonType(JsonType.Array);
-					params_.Add(i); params_.Add(-p);
-					params_.Add(0); params_.Add(t);
-
-					Debug.Log("_processPowerDown: " + params_.ToJson());
-
-					effects.Add(new ExerProEffectData(
-                        ExerProEffectData.Code.AddParam, params_));
-                }
-            }
-
-            /// <summary>
-            /// 处理状态
-            /// </summary>
-            void _processAddStates(
-                List<ExerProEffectData> effects, JsonData actionParams) {
-                for (int i = 0; i < actionParams.Count; ++i) 
-                    effects.Add(new ExerProEffectData(
-                        ExerProEffectData.Code.AddParam,
-                        actionParams[i]));
-            }
-
-            /// <summary>
-            /// 处理削弱
-            /// </summary>
-            void _processPowerUp(
-                List<ExerProEffectData> effects, JsonData actionParams) {
-                var t = actionParams.Count == 5 ?
-                    actionParams[4] : 1;
-
-                for (int i = 0; i < 4; ++i) {
-                    var params_ = new JsonData();
-					var p = DataLoader.load<int>(actionParams[i]);
-
-					params_.SetJsonType(JsonType.Array);
-                    params_.Add(i); params_.Add(p);
-                    params_.Add(0); params_.Add(t);
-
-					Debug.Log("_processPowerUp: " + params_.ToJson());
-
-					effects.Add(new ExerProEffectData(
-                        ExerProEffectData.Code.AddParam, params_));
-                }
-            }
+   
         }
 
-		/// <summary>
-		/// 单词选项生成器
-		/// </summary>
-		public class WordChoicesGenerator {
+        /// <summary>
+        /// 单词选项生成器
+        /// </summary>
+        public class WordChoicesGenerator {
 
-			/// <summary>
-			/// 最大选项数
-			/// </summary>
-			public const int MaxChoices = 4;
-			
-			/// <summary>
-			/// 属性
-			/// </summary>
-			Word word;
-			List<Word> words;
+            /// <summary>
+            /// 最大选项数
+            /// </summary>
+            public const int MaxChoices = 4;
 
-			List<string> result;
+            /// <summary>
+            /// 属性
+            /// </summary>
+            Word word;
+            List<Word> words;
 
-			/// <summary>
-			/// 距离字典
-			/// </summary>
-			Dictionary<Word, double> chi, eng;
+            List<string> result;
 
-			/// <summary>
-			/// 生成
-			/// </summary>
-			/// <param name="word">单词</param>
-			/// <param name="words">单词集</param>
-			/// <returns></returns>
-			public static List<string> generate(Word word, List<Word> words) {
-				var generator = new WordChoicesGenerator(word, words);
-				return generator.result;
-			}
+            /// <summary>
+            /// 距离字典
+            /// </summary>
+            Dictionary<Word, double> chi, eng;
 
-			/// <summary>
-			/// 构造函数
-			/// </summary>
-			WordChoicesGenerator(Word word, List<Word> words) {
-				this.word = word; this.words = words;
-				result = new List<string>(MaxChoices);
+            /// <summary>
+            /// 生成
+            /// </summary>
+            /// <param name="word">单词</param>
+            /// <param name="words">单词集</param>
+            /// <returns></returns>
+            public static List<string> generate(Word word, List<Word> words) {
+                var generator = new WordChoicesGenerator(word, words);
+                return generator.result;
+            }
 
-				// 正确答案位置
-				var corrIndex = Random.Range(0, MaxChoices);
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            WordChoicesGenerator(Word word, List<Word> words) {
+                this.word = word; this.words = words;
+                result = new List<string>(MaxChoices);
 
-				for (var i = 0; i < MaxChoices; ++i)
-					if (corrIndex == i)
-						result.Add(word.chinese);
-					else 
-						result.Add(generateWordChoice(
-							Random.Range(0, 2) == 1).chinese);
-			}
+                // 正确答案位置
+                var corrIndex = Random.Range(0, MaxChoices);
 
-			/// <summary>
-			/// 生成距离字典
-			/// </summary>
-			/// <param name="chi">中文距离</param>
-			/// <param name="eng">英文距离</param>
-			Word generateWordChoice(bool english) {
-				var minVal = 999.0;
-				var minWord = words[0];
-				foreach (var word_ in words) {
-					var val = calcDistance(word, word_, english);
-					if (val < minVal && word_ != word &&
-						!result.Contains(word_.chinese))
-						minWord = word_; minVal = val;
-				}
-				return minWord;
-			}
-			
-			/// <summary>
-			/// 以s1为基准，计算s2到s1的距离
-			/// </summary>
-			/// <returns>返回距离</returns>
-			static double calcDistance(Word w1, Word w2, bool english = false) {
-				if (english) return calcDistance(w1.english, w2.english);
-				return calcDistance(w1.chinese, w2.chinese);
-			}
-			static double calcDistance(string s1, string s2) {
-				int sum = 0, j = 0, k = 0;
-				int len1 = s1.Length, len2 = s2.Length;
-				for (var i = 0; i < len1; ++i) {
-					j = k; k = 0;
-					while (j < len2) {
-						if (s2[j] == s1[i]) {
-							if (k == 0) k = j;
-							j++; break;
-						}
-						if (k == 0) k = j;
-						sum++; j++;
-					}
-				}
-				var res = sum * 1.0 / len2;
-				Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
-				return res;
-			}
+                for (var i = 0; i < MaxChoices; ++i)
+                    if (corrIndex == i)
+                        result.Add(word.chinese);
+                    else
+                        result.Add(generateWordChoice(
+                            Random.Range(0, 2) == 1).chinese);
+            }
 
-		}
+            /// <summary>
+            /// 生成距离字典
+            /// </summary>
+            /// <param name="chi">中文距离</param>
+            /// <param name="eng">英文距离</param>
+            Word generateWordChoice(bool english) {
+                var minVal = 999.0;
+                var minWord = words[0];
+                foreach (var word_ in words) {
+                    var val = calcDistance(word, word_, english);
+                    if (val < minVal && word_ != word &&
+                        !result.Contains(word_.chinese))
+                        minWord = word_; minVal = val;
+                }
+                return minWord;
+            }
 
-		/// <summary>
-		/// 特训特性计算类
-		/// </summary>
-		public class ExerProTraitsCalc {
+            /// <summary>
+            /// 以s1为基准，计算s2到s1的距离
+            /// </summary>
+            /// <returns>返回距离</returns>
+            static double calcDistance(Word w1, Word w2, bool english = false) {
+                if (english) return calcDistance(w1.english, w2.english);
+                return calcDistance(w1.chinese, w2.chinese);
+            }
+            public static double calcDistance(string s1, string s2) {
+                int sum = 0, j = 0, k = 0;
+                int len1 = s1.Length, len2 = s2.Length;
+                for (var i = 0; i < len1; ++i) {
+                    j = k; k = 0;
+                    while (j < len2) {
+                        if (s2[j] == s1[i]) {
+                            if (k == 0) k = j;
+                            j++; break;
+                        }
+                        if (k == 0) k = j;
+                        sum++; j++;
+                    }
+                }
+                var res = sum * 1.0 / len2;
+                Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
+                return res;
+            }
 
-			/// <summary>
-			/// 计算战斗开始时的特性效果
-			/// </summary>
-			/// <param name="battler"></param>
-			public static void calcOnBattleStart(RuntimeBattler battler) {
-				processBattleStartRecover(battler);
-				processParamBattleAdd(battler);
-				processBattleDrawCards(battler);
-			}
-			static void processBattleStartRecover(RuntimeBattler battler) {
-				var traits = battler.filterTraits(ExerProTraitData.Code.BattleStartRecover);
+        }
 
-				int val = battler.sumTraits(traits);
-				double rate = battler.sumTraits(traits, 1) / 100.0;
+        /// <summary>
+        /// 特训特性计算类
+        /// </summary>
+        public class ExerProTraitsCalc {
 
-				battler.addHP(val); battler.addHP(rate);
-			}
-			static void processParamBattleAdd(RuntimeBattler battler) {
-				for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
-					var traits = battler.filterTraits(ExerProTraitData.Code.ParamBattleAdd, i);
+            /// <summary>
+            /// 计算战斗开始时的特性效果
+            /// </summary>
+            /// <param name="battler"></param>
+            public static void calcOnBattleStart(RuntimeBattler battler) {
+                processBattleStartRecover(battler);
+                processParamBattleAdd(battler);
+                processBattleDrawCards(battler);
+            }
+            static void processBattleStartRecover(RuntimeBattler battler) {
+                var traits = battler.filterTraits(ExerProTraitData.Code.BattleStartRecover);
 
-					var val = battler.sumTraits(traits, 1);
-					var rate = battler.multTraits(traits, 2);
+                int val = battler.sumTraits(traits);
+                double rate = battler.sumTraits(traits, 1) / 100.0;
 
-					battler.addParam(i, val, rate);
-				}
-			}
-			static void processBattleDrawCards(RuntimeBattler battler) {
-				var actor = battler as RuntimeActor;
-				if (actor == null) return;
+                battler.addHP(val); battler.addHP(rate);
+            }
+            static void processParamBattleAdd(RuntimeBattler battler) {
+                for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
+                    var traits = battler.filterTraits(ExerProTraitData.Code.ParamBattleAdd, i);
 
-				var val = actor.sumTraits(ExerProTraitData.Code.BattleDrawCards);
+                    var val = battler.sumTraits(traits, 1);
+                    var rate = battler.multTraits(traits, 2);
 
-				for (int i = 0; i < val; ++i)
-					actor.cardGroup.drawCard();
-			}
+                    battler.addParam(i, val, rate);
+                }
+            }
+            static void processBattleDrawCards(RuntimeBattler battler) {
+                var actor = battler as RuntimeActor;
+                if (actor == null) return;
 
-			/// <summary>
-			/// 计算回合开始时的特性效果
-			/// </summary>
-			/// <param name="battler"></param>
-			public static void calcOnRoundStart(RuntimeBattler battler, int rest = 0) {
-				processRoundStartRecover(battler);
-				if (rest > 0) processParamRoundAdd(battler, rest);
-				processRoundDrawCards(battler);
-			}
-			static void processRoundStartRecover(RuntimeBattler battler) {
-				var traits = battler.filterTraits(ExerProTraitData.Code.RoundStartRecover);
+                var val = actor.sumTraits(ExerProTraitData.Code.BattleDrawCards);
 
-				int val = battler.sumTraits(traits);
-				double rate = battler.sumTraits(traits, 1) / 100.0;
+                for (int i = 0; i < val; ++i)
+                    actor.cardGroup.drawCard();
+            }
 
-				battler.addHP(val); battler.addHP(rate);
-			}
-			static void processParamRoundAdd(RuntimeBattler battler, int rest) {
-				for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
-					var traits = battler.filterTraits(ExerProTraitData.Code.ParamRoundAdd, i);
+            /// <summary>
+            /// 计算回合开始时的特性效果
+            /// </summary>
+            /// <param name="battler"></param>
+            public static void calcOnRoundStart(RuntimeBattler battler, int rest = 0) {
+                processRoundStartRecover(battler);
+                if (rest > 0) processParamRoundAdd(battler, rest);
+                processRoundDrawCards(battler);
+            }
+            static void processRoundStartRecover(RuntimeBattler battler) {
+                var traits = battler.filterTraits(ExerProTraitData.Code.RoundStartRecover);
 
-					var val = battler.sumTraits(traits, 1);
-					var rate = battler.multTraits(traits, 2);
+                int val = battler.sumTraits(traits);
+                double rate = battler.sumTraits(traits, 1) / 100.0;
 
-					battler.addBuff(i, val, rate, rest);
-				}
-			}
-			static void processRoundDrawCards(RuntimeBattler battler) {
-				var actor = battler as RuntimeActor;
-				if (actor == null) return;
+                battler.addHP(val); battler.addHP(rate);
+            }
+            static void processParamRoundAdd(RuntimeBattler battler, int rest) {
+                for (var i = 0; i < RuntimeBattler.MaxParamCount; ++i) {
+                    var traits = battler.filterTraits(ExerProTraitData.Code.ParamRoundAdd, i);
 
-				var val = actor.sumTraits(ExerProTraitData.Code.RoundDrawCards);
+                    var val = battler.sumTraits(traits, 1);
+                    var rate = battler.multTraits(traits, 2);
 
-				for (int i = 0; i < val; ++i)
-					actor.cardGroup.drawCard();
-			}
+                    battler.addBuff(i, val, rate, rest);
+                }
+            }
+            static void processRoundDrawCards(RuntimeBattler battler) {
+                var actor = battler as RuntimeActor;
+                if (actor == null) return;
 
-			/// <summary>
-			/// 计算回合开始时的特性效果
-			/// </summary>
-			/// <param name="battler"></param>
-			public static void calcOnRoundEnd(RuntimeBattler battler, int rest = 0) {
-				processRoundEndRecover(battler);
-			}
-			static void processRoundEndRecover(RuntimeBattler battler) {
-				var traits = battler.filterTraits(ExerProTraitData.Code.RoundEndRecover);
+                var val = actor.sumTraits(ExerProTraitData.Code.RoundDrawCards);
 
-				int val = battler.sumTraits(traits);
-				double rate = battler.sumTraits(traits, 1) / 100.0;
+                for (int i = 0; i < val; ++i)
+                    actor.cardGroup.drawCard();
+            }
 
-				battler.addHP(val); battler.addHP(rate);
-			}
+            /// <summary>
+            /// 计算回合开始时的特性效果
+            /// </summary>
+            /// <param name="battler"></param>
+            public static void calcOnRoundEnd(RuntimeBattler battler, int rest = 0) {
+                processRoundEndRecover(battler);
+            }
+            static void processRoundEndRecover(RuntimeBattler battler) {
+                var traits = battler.filterTraits(ExerProTraitData.Code.RoundEndRecover);
 
-			/// <summary>
-			/// 计算回合开始时的特性效果
-			/// </summary>
-			/// <param name="battler"></param>
-			public static void calcOnBattleEnd(RuntimeBattler battler, int rest = 0) {
-				processBattleEndRecover(battler);
-			}
-			static void processBattleEndRecover(RuntimeBattler battler) {
-				var traits = battler.filterTraits(ExerProTraitData.Code.BattleEndRecover);
+                int val = battler.sumTraits(traits);
+                double rate = battler.sumTraits(traits, 1) / 100.0;
 
-				int val = battler.sumTraits(traits);
-				double rate = battler.sumTraits(traits, 1) / 100.0;
+                battler.addHP(val); battler.addHP(rate);
+            }
 
-				battler.addHP(val); battler.addHP(rate);
-			}
-		}
+            /// <summary>
+            /// 计算回合开始时的特性效果
+            /// </summary>
+            /// <param name="battler"></param>
+            public static void calcOnBattleEnd(RuntimeBattler battler, int rest = 0) {
+                processBattleEndRecover(battler);
+            }
+            static void processBattleEndRecover(RuntimeBattler battler) {
+                var traits = battler.filterTraits(ExerProTraitData.Code.BattleEndRecover);
+
+                int val = battler.sumTraits(traits);
+                double rate = battler.sumTraits(traits, 1) / 100.0;
+
+                battler.addHP(val); battler.addHP(rate);
+            }
+        }
 
         /// <summary>
         /// 奖励生成器
@@ -1896,10 +1872,9 @@ namespace GameModule.Services {
             /// <param name="enemy">杀死敌人数</param>
             /// <param name="question">答对题目数量</param>
             /// <returns>奖励金币</returns>
-            public static int getGoldReward(ExerProRecord record, int enemy = 0, int question = 0) {
-                record.scoreRecord.killEnemyAccmu += enemy;
-                var type = (ExerProMapNode.Type)record.currentNode().typeId;
-                var layer = record.currentNode().xOrder + 1;
+            public static int getGoldReward(ExerProMapNode.Type type = ExerProMapNode.Type.Enemy,
+                int layer = 0, int enemy = 0, int question = 0) {
+                //record.scoreRecord.killEnemyAccmu += enemy;
 
                 int randBase = Random.Range(0, 5);
                 switch (type) {
@@ -1919,9 +1894,9 @@ namespace GameModule.Services {
             /// </summary>
             /// <param name="stageOrder"></param>
             /// <returns></returns>
-            public static int getBossGoldReward(ExerProRecord record) {
+            public static int getBossGoldReward(int stageOrder) {
                 int randBase = Random.Range(35, 40);
-                return record.stageOrder * randBase;
+                return stageOrder * randBase;
             }
             /// <summary>
             /// 获取生成的奖励卡牌组（三挑一）
@@ -1955,21 +1930,19 @@ namespace GameModule.Services {
             /// <param name="cards">玩家的卡牌数</param>
             /// <param name="boss">杀死的boss数</param>
             /// <returns>当前玩家总的积分</returns>
-            public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
-                record.scoreRecord.killBossAccmu += boss;
-                var gold = record.actor.gold;
-                var cards = record.actor.cardGroup.getCardNumber();
-
-                var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
+            public static int generateScore(int accEnemy = 0, int accBoss = 0, int boss = 0, 
+                int accPerfect = 0, bool isPerfect = false, int gold = 0, int cards = 0, 
+                int accLayer = 0, int layer = 0) {
+                accBoss += boss;
+                var score = accEnemy * 2 + accBoss * 50;
                 score += gold / 100 * 25 + (cards > 30 ? (cards - 30) / 5 * 10 : 0);
                 if (isPerfect)
-                    record.scoreRecord.perfectNumber += 1;
-                score += record.scoreRecord.perfectNumber * 50;
+                    accPerfect += 1;
+                score += accPerfect * 50;
 
-                var layer = record.currentNode().xOrder + 1;
-                score += (layer + record.scoreRecord.stageOrderAccumu) * 5;
-                if(boss > 0) {
-                    record.scoreRecord.stageOrderAccumu += layer;
+                score += (layer +accLayer) * 5;
+                if (boss > 0) {
+                    accLayer += layer;
                 }
                 return score;
             }
@@ -1995,7 +1968,10 @@ namespace GameModule.Services {
             const int EpicStarID = 3;
             double DefaultNoramlRatio = 0.8;
             double DefaultRareRatio = 0.15;
-            int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+            int[] cardTypePrice = new int[3] { 20, 50, 100 };
+
+            public static ExerProCard[] cards = null;
+            public static ExerProPotion[] potions = null;
 
             /// <summary>
             /// 用于生成商店刷新的物品
@@ -2025,7 +2001,7 @@ namespace GameModule.Services {
             public static int generateCardPrice(ExerProCard card) {
                 var price = card.cost * Random.Range(5, 10) +
                     itemGenerator.cardTypePrice[card.starId - 1] * Random.Range(0.7f, 1) +
-                    ((card.target == (int)ExerProCard.Target.All) ? 10 : 0);   
+                    ((card.target == (int)ExerProCard.Target.All) ? 10 : 0);
                 return (int)price;
             }
 
@@ -2052,9 +2028,9 @@ namespace GameModule.Services {
             /// <param name="normalRatio">普通概率</param>
             /// <param name="rareRatio">稀有概率</param>
             /// <returns></returns>
-            public static List<ExerProCard> generateCards(int count, double normalRatio, double rareRatio){
+            public static List<ExerProCard> generateCards(int count, double normalRatio, double rareRatio) {
                 List<ExerProCard> exerProCards = new List<ExerProCard>();
-                while(exerProCards.Count != count) {
+                while (exerProCards.Count != count) {
                     var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
                     if (result == null)
                         continue;
@@ -2085,7 +2061,7 @@ namespace GameModule.Services {
             /// 当前类对象
             /// </summary>
             static ExerProItemGenerator _itemGenerator = null;
-            static ExerProItemGenerator itemGenerator {
+            public static ExerProItemGenerator itemGenerator {
                 get {
                     if (_itemGenerator == null)
                         _itemGenerator = new ExerProItemGenerator();
@@ -2100,15 +2076,17 @@ namespace GameModule.Services {
             /// <param name="rareRatio"></param>
             /// <param name="type"></param>
             /// <returns></returns>
-            BaseExerProItem generateRandomItem(double normalRatio, double rareRatio, Type type = Type.Card) {
-                var dataSer = DataService.get();
+            public BaseExerProItem generateRandomItem(double normalRatio, double rareRatio, 
+                Type type = Type.Card) {
+                if (cards == null || potions == null)
+                    return null;
                 List<BaseExerProItem> items;
                 switch (type) {
                     case Type.Card:
-                        items = new List<BaseExerProItem>(dataSer.staticData.data.exerProCards);
+                        items = new List<BaseExerProItem>(cards);
                         break;
                     case Type.Potion:
-                        items = new List<BaseExerProItem>(dataSer.staticData.data.exerProPotions);
+                        items = new List<BaseExerProItem>(potions);
                         break;
                     default:
                         return null;
@@ -2134,5 +2112,5 @@ namespace GameModule.Services {
             }
         }
 
-	}
+    }
 }
