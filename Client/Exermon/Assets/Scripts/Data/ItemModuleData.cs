@@ -605,9 +605,11 @@ namespace ItemModule.Data {
 			BattleItemSlotItem = 301,  // 对战物资槽
 
 			//ExerProPackItem 401+
-			ExerProPackItem = 401, //特训背包物品
-			ExerProPackCard = 402, //特训背包卡片
-			ExerProPackPotion = 403, //特训背包药水
+			ExerProPackItem = 401, // 特训背包物品
+			ExerProPackCard = 402, // 特训背包卡片
+			ExerProPackPotion = 403, // 特训背包药水
+
+			ExerProSlotPotion = 404, // 特训槽药水
 		}
 
 		/// <summary>

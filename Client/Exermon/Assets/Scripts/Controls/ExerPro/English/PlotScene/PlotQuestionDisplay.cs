@@ -15,6 +15,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         public QuestionText title, description;
         public PlotChoiceContainer choiceContainer; // 选项容器
         public RectTransform content;
+        public Button exitButton;
 
         /// <summary>
         /// 显示答案解析
@@ -58,6 +59,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
             var resultEffect = resultChoice.effects;
             description.text = resultText;
 
+            exitButton?.gameObject.SetActive(true);
             requestRefresh(true);
         }
         #endregion

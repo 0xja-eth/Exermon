@@ -3,12 +3,12 @@ from enum import Enum
 
 class WebscoketCloseCode(Enum):
 
-	ServerClose = 1000  # 服务器切断连接
-	ClientClose = 1001  # 客户端切断连接
-	AbnormalClose = 1006  # 非正常断开连接
+	ServerClose = 1000  # 鏈嶅姟鍣ㄥ垏鏂繛鎺?
+	ClientClose = 1001  # 瀹㈡埛绔垏鏂繛鎺?
+	AbnormalClose = 1006  # 闈炴甯告柇寮�杩炴帴
 
-	Logout = 3000  # 用户登出
-	Kickout = 3001  # 用户踢出
+	Logout = 3000  # 鐢ㄦ埛鐧诲嚭
+	Kickout = 3001  # 鐢ㄦ埛韪㈠嚭
 
 
 class ErrorType(Enum):
@@ -186,20 +186,37 @@ class ErrorType(Enum):
 	CompRankNotExist = 702  # 赛季排位不存在
 	ResultJudgeNotExist = 703  # 结果判断类型不存在
 
-	# EnglishPro
-	InvalidQuestionCount = 800  # 非法的题目数量
-	InvalidQuestionType = 801  # 非法的题目类型
-	InvalidQuestionDatabaseCount = 802  # 超过题库数量
+	# EnglishProCommon
+	MapNotFound = 800  # 地图不存在
+	StageNotFound = 801  # 关卡不存在
+	ExerProStarted = 802  # 特训正在进行
 	ExerProRecordNotExist = 803  # 特训记录不存在
-	WordNotExit = 804  # 单词不存在
-	WordRecordNotExit = 805  # 单词记录不存在
-	AnswerNotFinish = 806  # 当前轮单词没有问答完毕
-	NoEnoughNewWord = 807  # 单词库中没有足够的新单词
-	NoInCurrentWords = 808  # 该单词不在当前轮中
-	WordAlreadyCorrect = 809  # 本轮该单词已答对
-	MapNotFound = 810  # 地图不存在
-	StageNotFound = 811  # 关卡不存在
-	ExerProStarted = 812  # 特训正在进行
+
+	# EnglishProItem
+	ExerProItemNotExist = 810  # 特训道具不存在
+	ExerProPotionNotExist = 811  # 特训药水不存在
+	ExerProCardNotExist = 812  # 特训卡牌不存在
+
+	# EnglishProQuestion
+	InvalidQuestionCount = 820  # 非法的题目数量
+	InvalidQuestionType = 821  # 非法的题目类型
+	InvalidQuestionDatabaseCount = 822  # 超过题库数量
+
+	# EnglishProWord
+	WordNotExit = 830  # 单词不存在
+	WordRecordNotExit = 831  # 单词记录不存在
+	AnswerNotFinish = 832  # 当前轮单词没有问答完毕
+	NoEnoughNewWord = 833  # 单词库中没有足够的新单词
+	NoInCurrentWords = 834  # 该单词不在当前轮中
+	WordAlreadyCorrect = 835  # 本轮该单词已答对
+
+	# EnglishProShop
+	ShopNotGenerated = 840  # 商品尚未生成
+	ShopItemNotExist = 841  # 商品不存在
+	InvalidBuyNum = 842  # 金钱不足
+
+	# EnglishProAnswer
+	InvalidAnswer = 843  # 题目答案不合法
 
 
 class GameException(Exception):
@@ -379,20 +396,37 @@ class GameException(Exception):
 		ErrorType.CompRankNotExist: "赛季排位不存在！",
 		ErrorType.ResultJudgeNotExist: "结果判断类型不存在！",
 
-		# EnglishPro
+		# EnglishProCommon
+		ErrorType.MapNotFound: "地图不存在！",
+		ErrorType.StageNotFound: "关卡不存在！",
+		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
+		ErrorType.ExerProRecordNotExist: "特训记录不存在！",
+
+		# EnglishProItem
+		ErrorType.ExerProItemNotExist: "特训道具不存在！",
+		ErrorType.ExerProPotionNotExist: "特训药水不存在！",
+		ErrorType.ExerProCardNotExist: "特训卡牌不存在！",
+
+		# EnglishProQuestion
 		ErrorType.InvalidQuestionCount: "非法的题目数量！",
 		ErrorType.InvalidQuestionType: "非法的题目类型！",
 		ErrorType.InvalidQuestionDatabaseCount: "超过题库数量！",
-		ErrorType.ExerProRecordNotExist: "特训记录不存在！",
+
+		# EnglishProWord
 		ErrorType.WordNotExit: "单词不存在！",
 		ErrorType.WordRecordNotExit: "单词记录不存在！",
 		ErrorType.AnswerNotFinish: "当前轮单词没有问答完毕！",
 		ErrorType.NoEnoughNewWord: "单词库中没有足够的新单词！",
 		ErrorType.NoInCurrentWords: "该单词不在当前轮中！",
 		ErrorType.WordAlreadyCorrect: "本轮该单词已答对！",
-		ErrorType.MapNotFound: "地图不存在！",
-		ErrorType.StageNotFound: "关卡不存在！",
-		ErrorType.ExerProStarted: "特训进行中！请结束当前特训再开启新的特训！",
+
+		# EnglishProShop
+		ErrorType.ShopNotGenerated: "商品尚未生成！",
+		ErrorType.ShopItemNotExist: "商品不存在或已售出！",
+		ErrorType.InvalidBuyNum: "金钱不足！",
+
+		# EnglishProAnswer
+		ErrorType.InvalidAnswer: "题目答案不合法！",
 
 	}
 
@@ -400,7 +434,7 @@ class GameException(Exception):
 		"""
 
 		Args:
-			error_type (ErrorType): 错误类型
+			error_type (ErrorType): 閿欒绫诲瀷
 		"""
 		self.error_type = error_type
 		self.msg = GameException.ERROR_DICT[error_type]

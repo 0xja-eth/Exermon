@@ -23,22 +23,35 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		SelectableItemDisplay<RuntimeBattler>, IComparable<BattlerDisplay> {
 
 		/// <summary>
+		/// 最大偏移量
+		/// </summary>
+		const int MaxXOffset = 24;
+		const int MaxYOffset = 16;
+
+		/// <summary>
 		/// 动画名称定义
 		/// </summary>
 		public const string IdleAnimation = "Idle";
 		public const string HurtAnimation = "Hurt";
 		public const string AttackAnimation = "Attack";
-		public const string MovingAnimation = "Move";
+		public const string ForwardAnimation = "Forward";
+		public const string BackAnimation = "Back";
 		public const string EscapeAnimation = "Escape";
-		public const string PowerUpAnimation = "PowerUp";
-		public const string PowerDownAnimation = "PowerDown";
+		public const string DieAnimation = "Die";
+		//public const string PowerUpAnimation = "PowerUp";
+		//public const string PowerDownAnimation = "PowerDown";
 
 		public const string MovingAttr = "moving";
 		public const string AttackAttr = "attack";
 		public const string HurtAttr = "hurt";
-		public const string SkillAttr = "skill";
-		public const string PowerUpAttr = "power_up";
-		public const string PowerDownAttr = "power_down";
+		public const string DieAttr = "died";
+
+		public const string DefaultAttackAnimation = "Animation_1";
+		public const string DefaultHurtAnimation = "Animation_3";
+
+		//public const string SkillAttr = "skill";
+		//public const string PowerUpAttr = "power_up";
+		//public const string PowerDownAttr = "power_down";
 
 		/// <summary>
 		/// 外部组件设置
@@ -52,6 +65,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public AnimatorView animator; // 控制静态动画
 
 		public MultParamsDisplay hpBar;
+		public GameObject hpBarObj;
 
 		/// <summary>
 		/// 外部变量定义
@@ -68,9 +82,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 内部变量定义
 		/// </summary>
 		protected Vector2 oriPosition;
-		protected RuntimeAction currentAction;
+		//protected RuntimeAction currentAction;
 
 		protected RectTransform rectTransform;
+
+		protected bool hitFlag = false, resultFlag = false;
+
+		float xOffset, yOffset;
 		
 		#region 初始化
 
@@ -87,13 +105,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 初始化动画事件
 		/// </summary>
 		void initializeAnimationEvents() {
-			animation.addEndEvent(MovingAnimation, onMoveEnd);
-			animation.addEndEvent(EscapeAnimation, onMoveEnd);
+			animation.addEndEvent(ForwardAnimation, attack);
+			animation.addEndEvent(BackAnimation, onMoveEnd);
+			animation.addEndEvent(EscapeAnimation, onEscapeEnd);
 
-			animator.addEndEvent(HurtAnimation, onActionEnd);
-			animator.addEndEvent(AttackAnimation, onActionEnd);
-			animator.addEndEvent(PowerUpAnimation, onActionEnd);
-			animator.addEndEvent(PowerDownAnimation, onActionEnd);
+			//animator.addEndEvent(AttackAnimation, resetPosition);
+
+			//animator.addEndEvent(HurtAnimation, onActionEnd);
+			//animator.addEndEvent(AttackAnimation, onActionEnd);
+			//animator.addEndEvent(PowerUpAnimation, onActionEnd);
+			//animator.addEndEvent(PowerDownAnimation, onActionEnd);
 		}
 
 		/// <summary>
@@ -116,26 +137,29 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			updateAction();
 			updateResult();
 			updateHPDelta();
+			updateDead();
 		}
 
 		/// <summary>
 		/// 更新行动
 		/// </summary>
 		protected virtual void updateAction() {
-			currentAction = item.currentAction();
-			// if (item.currentAction() != null) item.processAction();
-			// processAction(currentAction);
+			var action = item?.currentAction();
+			if (action == null) return;
+			processAction(action);
+			//if (currentAction != null)
+			//	item.processAction();
 		}
 
-		/*
 		/// <summary>
 		/// 处理行动
 		/// </summary>
 		/// <param name="action"></param>
 		protected virtual void processAction(RuntimeAction action) {
-			item.processAction();
+			Debug.Log(name + ": processAction + " + action.toJson().ToJson());
+
+			actionManager()?.add(action);
 		}
-		*/
 
 		/// <summary>
 		/// 更新结果
@@ -149,14 +173,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 处理结果
 		/// </summary>
 		/// <param name="result"></param>
-		protected virtual void processResult(RuntimeActionResult result) { }
+		protected virtual void processResult(RuntimeActionResult result) {
+			if (result.drawCardCnt > 0) processDrawCards();
+			requestRefresh();
+		}
 
 		/// <summary>
 		/// 更新HP变化
 		/// </summary>
 		void updateHPDelta() {
 			var delta = item.deltaHP;
-			if (delta != null) hpResults.addItem(delta);
+			if (delta != null) {
+				Debug.Log(name + ": updateHPDelta: " + delta.value);
+				hpResults.addItem(delta);
+				requestRefresh();
+			}
 		}
 
 		/// <summary>
@@ -167,9 +198,103 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			states.setItems(item.allRuntimeStates());
 		}
 
+		/// <summary>
+		/// 更新死亡
+		/// </summary>
+		void updateDead() {
+			if (item.isDead()) die();
+		}
+
 		#endregion
 
 		#region 数据控制
+
+		#region 行动数据
+
+		/// <summary>
+		/// 是否击中
+		/// </summary>
+		/// <returns></returns>
+		public bool isHit() {
+			var res = hitFlag;
+			hitFlag = false;
+			return res;
+		}
+		
+		/// <summary>
+		/// 是否结果
+		/// </summary>
+		/// <returns></returns>
+		public bool isResult() {
+			var res = resultFlag;
+			resultFlag = false;
+			return res;
+		}
+
+		/// <summary>
+		/// 配置起手动画
+		/// </summary>
+		/// <param name="ani"></param>
+		public void setupStartAni(AnimationClip ani) {
+			animator.changeAni(DefaultAttackAnimation, ani);
+			// AttackAnimation
+		}
+
+		/// <summary>
+		/// 配置目标动画
+		/// </summary>
+		/// <param name="ani"></param>
+		public void setupTargetAni(AnimationClip ani) {
+			animator.changeAni(DefaultHurtAnimation, ani);
+			// HurtAnimation
+		}
+
+		/*
+		/// <summary>
+		/// 获取起手动画
+		/// </summary>
+		/// <returns></returns>
+		AnimationClip startAni() {
+			return currentAction?.startAni ??
+				actionManager()?.defaultStartAni;
+		}
+
+		/// <summary>
+		/// 获取起手动画
+		/// </summary>
+		/// <returns></returns>
+		AnimationClip targetAni() {
+			return currentAction?.targetAni ??
+				actionManager()?.defaultTargetAni;
+		}
+		*/
+		/// <summary>
+		/// 获取行动目标
+		/// </summary>
+		/// <returns></returns>
+		BattlerDisplay targetDisplay() {
+			return actionManager()?.getTarget(this);
+		}
+
+		#endregion
+
+		#region 控件数据
+
+		/// <summary>
+		/// 获取战场现实控件
+		/// </summary>
+		/// <returns></returns>
+		public BattleGround battleGround() {
+			return container as BattleGround;
+		}
+
+		/// <summary>
+		/// 获取行动管理控件
+		/// </summary>
+		/// <returns></returns>
+		public ActionManager actionManager() {
+			return battleGround()?.actionManager;
+		}
 
 		/// <summary>
 		/// 是否为敌人
@@ -220,19 +345,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			if (battler == null) battler = item;
 			return battler as RuntimeEnemy;
 		}
-
-		/// <summary>
-		/// 行动目标显示控件
-		/// </summary>
-		/// <returns></returns>
-		public BattlerDisplay target() {
-			if (currentAction == null) return null;
-
-			var battleGround = container as BattleGround;
-			if (battleGround == null) return null;
-
-			return battleGround.getBattlerDisplay(currentAction.object_);
-		}
+		
+		#endregion
 
 		#endregion
 
@@ -249,20 +363,27 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
+		/// 获取原始位置
+		/// </summary>
+		/// <returns></returns>
+		public Vector2 getOriPosition() {
+			return oriPosition;
+		}
+
+		/// <summary>
 		/// 重置位置
 		/// </summary>
 		public void resetPosition() {
-			moveTo(oriPosition);
+			Debug.Log("resetPosition: " + oriPosition);
+			moveTo(oriPosition, BackAnimation);
 		}
 
 		/// <summary>
 		/// 重置位置
 		/// </summary>
 		public void moveToTarget() {
-			var target = this.target();
-			if (target == null) return;
-
-			moveTo(target.beAttackedPosition());
+			Debug.Log("moveToTarget");
+			moveTo(actionManager().getAttackPosition(this));
 		}
 
 		/// <summary>
@@ -275,16 +396,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <summary>
 		/// 移动到指定位置
 		/// </summary>
-		public void moveTo(Vector2 target, string name = MovingAnimation) {
-			animation.moveTo(oriPosition, MovingAnimation);
+		public void moveTo(Vector2 target, string name = ForwardAnimation) {
+			animation.moveTo(target, name);
 			animator.setVar(MovingAttr, true);
 		}
 
 		/// <summary>
 		/// 移动指定量
 		/// </summary>
-		public void moveDelta(Vector2 delta, string name = MovingAnimation) {
-			animation.moveDelta(oriPosition, MovingAnimation);
+		public void moveDelta(Vector2 delta, string name = ForwardAnimation) {
+			animation.moveDelta(delta, name);
 			animator.setVar(MovingAttr, true);
 		}
 
@@ -299,65 +420,75 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 移动结束回调
 		/// </summary>
 		public void onEscapeEnd() {
-			item.isEscaped = true;
+			item.onEscape();
 			onMoveEnd();
 		}
 
 		#endregion
 
-		#region 攻击动画
+		#region 技能动画
+
+		/// <summary>
+		/// 处理攻击
+		/// </summary>
+		public void moveToAttack() {
+			moveToTarget();
+			//attack();
+			//resetPosition();
+		}
 
 		/// <summary>
 		/// 攻击
 		/// </summary>
 		public void attack() {
-			animator.setVar(AttackAttr, true);
+			animator.setVar(AttackAttr);
 		}
 
-		/// <summary>
-		/// 攻击结束回调
-		/// </summary>
-		public void onAttackEnd() {
-			animator.setVar(AttackAttr, false);
-		}
-
+		/*
 		/// <summary>
 		/// 发动技能
 		/// </summary>
 		public void skill() {
-			animator.setVar(SkillAttr, true);
+			animator.setVar(SkillAttr);
 		}
-
+		
 		/// <summary>
 		/// 技能结束回调
 		/// </summary>
 		public void onSkillEnd() {
-			animator.setVar(SkillAttr, false);
+			//animator.setVar(SkillAttr, false);
 		}
-
+		*/
 		#endregion
 
 		#region 目标动画
 
-		/// <summary>
-		/// 提升
-		/// </summary>
-		public void powerUp() {
-			animator.setVar(PowerUpAttr, true);
-		}
+		///// <summary>
+		///// 提升
+		///// </summary>
+		//public void powerUp() {
+		//	animator.setVar(PowerUpAttr);
+		//}
 
-		/// <summary>
-		/// 削弱
-		/// </summary>
-		public void powerDown() {
-			animator.setVar(PowerDownAttr, true);
-		}
+		///// <summary>
+		///// 削弱
+		///// </summary>
+		//public void powerDown() {
+		//	animator.setVar(PowerDownAttr);
+		//}
 
 		/// <summary>
 		/// 削弱
 		/// </summary>
 		public void hurt() {
-			animator.setVar(HurtAttr, true);
+			animator.setVar(HurtAttr);
+		}
+
+		/// <summary>
+		/// 削弱
+		/// </summary>
+		public void die() {
+			animator.setVar(DieAttr, true);
 		}
 
 		#endregion
@@ -368,27 +499,24 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 击中回调
 		/// </summary>
 		public void onHit() {
-			item.processAction();
-			playHitAnimation();
-			item.endAction();
+			hitFlag = true;
 		}
 
 		/// <summary>
-		/// 播放击中动画
+		/// 产生结果
 		/// </summary>
-		protected virtual void playHitAnimation() {
-			target().hurt();
-			onAttackEnd();
+		public void onResult() {
+			resultFlag = true;
 		}
 
-		/// <summary>
-		/// 结束行动 
-		/// </summary>
-		public void onActionEnd() {
-			animator.setVar(HurtAttr, false);
-			animator.setVar(PowerUpAttr, false);
-			animator.setVar(PowerDownAttr, false);
-		}
+		///// <summary>
+		///// 结束行动 
+		///// </summary>
+		//public void onActionEnd() {
+		//	animator.setVar(HurtAttr, false);
+		//	animator.setVar(PowerUpAttr, false);
+		//	animator.setVar(PowerDownAttr, false);
+		//}
 
 		#endregion
 
@@ -404,7 +532,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 配置位置
 		/// </summary>
 		/// <param name="pos"></param>
-		public virtual void setupPosition(Vector2 pos) {
+		public void setupPosition(Vector2 pos) {
+			var xOffset = UnityEngine.Random.Range(-MaxXOffset, MaxXOffset);
+			var yOffset = UnityEngine.Random.Range(-MaxYOffset, MaxYOffset);
+
+			pos += new Vector2(xOffset, yOffset);
 			rectTransform.anchoredPosition = oriPosition = pos;
 		}
 
@@ -414,11 +546,38 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item">题目</param>
 		protected override void drawExactlyItem(RuntimeBattler item) {
             base.drawExactlyItem(item);
-			hpBar?.setValue(item, "hp");
+			drawBattle(item); drawHP(item); drawStates(item);
+		}
 
+		/// <summary>
+		/// 绘制战斗图
+		/// </summary>
+		/// <param name="item"></param>
+		void drawBattle(RuntimeBattler item) {
 			var battle = item.getBattlePicture();
 			this.battle.gameObject.SetActive(true);
 			this.battle.overrideSprite = AssetLoader.generateSprite(battle);
+			this.battle.SetNativeSize();
+		}
+
+		/// <summary>
+		/// 绘制体力值
+		/// </summary>
+		/// <param name="item"></param>
+		void drawHP(RuntimeBattler item) {
+			if (hpBar) {
+				hpBar.setValue(item, "hp");
+				hpBarObj.SetActive(!item.isDead());
+			}
+		}
+
+		/// <summary>
+		/// 绘制状态
+		/// </summary>
+		/// <param name="item"></param>
+		void drawStates(RuntimeBattler item) {
+			states.gameObject.SetActive(!item.isDead());
+			states.setItems(item.allRuntimeStates());
 		}
 
 		/// <summary>
@@ -426,7 +585,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		protected override void drawEmptyItem() {
             battle.gameObject.SetActive(false);
-			hpBar.clearValue();
+			if (hpBar) {
+				hpBar.clearValue();
+				hpBarObj.SetActive(false);
+			}
 		}
 
 		/// <summary>
@@ -437,6 +599,17 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		public int CompareTo(BattlerDisplay other) {
 			return rectTransform.anchoredPosition.y.CompareTo(
 				other.rectTransform.anchoredPosition.y);
+		}
+
+		#endregion
+
+		#region 结果控制
+
+		/// <summary>
+		/// 处理抽卡显示
+		/// </summary>
+		void processDrawCards() {
+			battleGround()?.processDrawCards();
 		}
 
 		#endregion

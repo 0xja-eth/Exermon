@@ -649,11 +649,56 @@ WEBSOCKET_METHOD_ROUTER = {
         EnglishPro.getRecords,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
-    # 查询当前轮单词
-    'engpro/word/query': [[
+    # # 查询当前轮单词
+    # 'engpro/word/query': [[
+    #     ['uid', 'int'],
+    # ],
+    #     EnglishPro.queryWords,  # 处理函数
+    #     ChannelLayerTag.Self  # 是否需要响应
+    # ],
+
+    # 商品生成
+    'engpro/shop/generate': [[
         ['uid', 'int'],
+        ['type', 'int'],
     ],
-        EnglishPro.queryWords,  # 处理函数
+        EnglishPro.shopGenerate,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 商品购买校验
+    'engpro/shop/buy': [[
+        ['uid', 'int'],
+        ['type', 'int'],
+        ['order', 'int'],
+    ],
+        EnglishPro.shopBuy,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 回答短语题目
+    'engpro/answer/phrase': [[
+        ['uid', 'int'],
+        ['qids', 'int[]'],
+        ['answers', 'str[]'],
+    ],
+        EnglishPro.answerPhrase,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 回答改错题目
+    'engpro/answer/correction': [[
+        ['uid', 'int'],
+        ['qid', 'int'],
+        ['answers', 'dict'],
+    ],
+        EnglishPro.answerCorrection,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 回答听力题目
+    'engpro/answer/listening': [[
+        ['uid', 'int'],
+        ['qid', 'int'],
+        ['answers', 'int[]'],
+    ],
+        EnglishPro.answerListening,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
 }

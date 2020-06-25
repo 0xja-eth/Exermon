@@ -129,14 +129,21 @@ namespace Core.Systems {
             public const string EngProWordGet = "engpro/word/get";
 
             public const string EngProWordRecordGet = "engpro/record/get";
-            public const string EngProWordQuery = "engpro/word/query";
+            //public const string EngProWordQuery = "engpro/word/query";
 
-        }
+			public const string EngProShopGnerate = "engpro/shop/generate";
+			public const string EngProShopBuy = "engpro/shop/buy";
 
-        /// <summary>
-        /// 请求对象
-        /// </summary>
-        public class RequestObject {
+			public const string EngProAnswerPhrase = "engpro/answer/phrase";
+			public const string EngProAnswerCorrection = "engpro/answer/correction";
+			public const string EngProAnswerListening = "engpro/answer/listening";
+
+		}
+
+		/// <summary>
+		/// 请求对象
+		/// </summary>
+		public class RequestObject {
             /// <summary>
             /// 回调函数类型
             /// </summary>

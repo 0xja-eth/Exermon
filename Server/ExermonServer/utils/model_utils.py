@@ -299,6 +299,26 @@ class QuestionImageUpload(SystemImageUpload):
 
 
 # ===================================================
+#  剧情题目图标
+# ===================================================
+@deconstructible
+class PlotQuestionImageUpload(SystemImageUpload):
+
+	IMAGE_DIR = 'plotQuestion/picture'
+
+	def generateFileName(self, instance, filename):
+
+		# 文件拓展名
+		ext = os.path.splitext(filename)[1]
+
+		# 定义文件名
+		rand_str = random.sample(self.CHARSET, self.RANDOM_LEN)
+		filename = "plotQuestion_%s" % rand_str
+
+		return filename+ext
+
+
+# ===================================================
 #  题目音频
 # ===================================================
 @deconstructible

@@ -124,6 +124,13 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             engSer.terminate();
         }
 
+
+        /// <summary>
+        /// 打开背包
+        /// </summary>
+        public void openPack() {
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProPackScene);
+        }
         #endregion
 
     }

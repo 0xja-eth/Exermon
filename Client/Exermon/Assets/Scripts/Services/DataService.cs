@@ -435,10 +435,13 @@ namespace GameModule.Services {
         }
         public ExerProItemStar exerProItemStar(int id) {
             return get(staticData.configure.exerProItemStars, id);
-        }
-        public NodeType nodeType(int id) {
-            return get(staticData.configure.nodeTypes, id);
-        }
+		}
+		public NodeType nodeType(int id) {
+			return get(staticData.configure.nodeTypes, id);
+		}
+		public FirstCardGroup firstCardGroup(int id) {
+			return get(staticData.configure.firstCardGroups, id);
+		}
 
 		/// <summary>
 		/// 数据库

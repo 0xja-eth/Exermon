@@ -17,12 +17,6 @@ namespace UI.Common.Controls.QuestionDisplay {
         /// <summary>
         /// 常量定义
         /// </summary>
-        const int CriticalSecond = 15;
-
-        static readonly Color NormalColor =
-            new Color(0.3921569f, 0.8156863f, 0.8470588f);
-        static readonly Color CriticalColor =
-            new Color(0.9294118f, 0.3098039f, 0.1411765f);
 
         /// <summary>
         /// 外部组件设置
@@ -30,12 +24,22 @@ namespace UI.Common.Controls.QuestionDisplay {
         public Text time;
         public Image bar;
 
+		/// <summary>
+		/// 外部变量定义
+		/// </summary>
         public bool countdown = true; // 倒计时模式
 
-        /// <summary>
-        /// 内部变量定义
-        /// </summary>
-        bool timing = false;
+		public int criticalSecond = 15;
+
+		public Color normalColor =
+			new Color(0.3921569f, 0.8156863f, 0.8470588f);
+		public Color criticalColor =
+			new Color(0.9294118f, 0.3098039f, 0.1411765f);
+
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		bool timing = false;
         bool timeUp = false;
 
         DateTime endTime;
@@ -187,8 +191,8 @@ namespace UI.Common.Controls.QuestionDisplay {
 
             if (reverse) delta = duration - delta;
 
-            time.color = (seconds < CriticalSecond) ?
-                CriticalColor : NormalColor;
+            time.color = (seconds < criticalSecond) ?
+                criticalColor : normalColor;
             time.text = SceneUtils.time2Str(delta);
 
             rate = Mathf.Clamp01(rate);

@@ -31,9 +31,6 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 常量定义
 		/// </summary>
-		const int MaxDeltaAngle = 12; // 最大相差角度
-		const int MaxRotateAngle = 90; // 最大旋转角度
-
 		const float RotateSpeed = 0.5f; // 旋转速度
 		const float RotateThreshold = 2.5f; // 旋转阈值
 
@@ -42,12 +39,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		public MenuWindow menu; // 菜单窗口
 
+		public CardDetail detail; // 卡牌详情
+
+		public AnimationView animation; // 动画
+
 		/// <summary>
 		/// 外部变量定义
 		/// </summary>
 		public Vector2 cardPivot = new Vector2(0.5f, -2);
-
-		public AnimationView animation; // 动画
+		public float maxDeltaAngle = 20;
+		public float maxRotateAngle = 90;
 
 		/// <summary>
 		/// 内部变量定义
@@ -75,15 +76,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		#endregion
 
 		#region 更新控制
-
+		/*
 		/// <summary>
 		/// 更新
 		/// </summary>
 		protected override void update() {
 			base.update();
-			updatePointerMove();
+			//updatePointerMove();
 		}
-
+		
 		/// <summary>
 		/// 更新指针移动
 		/// </summary>
@@ -103,7 +104,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 				else onPointerMove(delta);
 			}
 		}
-
+		
 		/// <summary>
 		/// 指针是否按下
 		/// </summary>
@@ -131,7 +132,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		Vector2 getPointerLocalPosition(Vector2 pos) {
 			return SceneUtils.screen2Local(pos, rectTransform);
 		}
-
+		
 		/// <summary>
 		/// 是否处于旋转状态
 		/// </summary>
@@ -142,10 +143,30 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		public bool isRotating(Vector2 pos) {
 			return pos.y <= rectTransform.rect.height / 2;
 		}
+		*/
+		#endregion
+
+		#region 关闭控制
+
+		/// <summary>
+		/// 关闭视窗
+		/// </summary>
+		public override void terminateView() {
+			base.terminateView();
+			detail.terminateView();
+		}
 
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 获取物品详情
+		/// </summary>
+		/// <returns></returns>
+		public override IItemDetailDisplay<ExerProPackCard> getItemDetail() {
+			return detail;
+		}
 
 		/// <summary>
 		/// 拖拽状态
@@ -156,41 +177,33 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 最大角度范围
 		/// </summary>
 		/// <returns></returns>
-		float maxAngleRange() { return MaxRotateAngle*2; }
+		float maxAngleRange() { return maxRotateAngle*2; }
 
 		/// <summary>
 		/// 角度范围
 		/// </summary>
 		/// <returns></returns>
-		float angleRange() { return deltaAngle() * itemsCount(); }
+		float angleRange() { return deltaAngle() * (itemsCount() - 1); }
 
 		/// <summary>
 		/// 卡牌角度增量
 		/// </summary>
 		/// <returns></returns>
 		float deltaAngle() {
-			return Mathf.Min(maxAngleRange() / itemsCount(), MaxDeltaAngle);
+			return Mathf.Min(maxAngleRange() / itemsCount(), maxDeltaAngle);
 		}
 		
 		/// <summary>
 		/// 使用卡牌
 		/// </summary>
-		public void use(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
-			menu.useCard(cardDisplay, enemyDisplay);
-			removeItem(cardDisplay.getItem());
+		public void use(PackCardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
+			if (menu.useCard(cardDisplay, enemyDisplay))
+				removeItem(cardDisplay.getItem());
 		}
 
 		#endregion
 
 		#region 界面控制
-
-		/// <summary>
-		/// 创建子视图组
-		/// </summary>
-		protected override void createSubViews() {
-			base.createSubViews();
-			rotateTo(deltaAngle() / 2);
-		}
 
 		/// <summary>
 		/// 子视图创建回调
@@ -211,8 +224,29 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <param name="rt"></param>
 		/// <param name="index"></param>
 		void setupSubViewPosition(RectTransform rt, int index) {
-			var angle = index * deltaAngle();
+			var angles = rt.localEulerAngles;
+
 			rt.pivot = cardPivot;
+			angles.z = -index * deltaAngle();
+			rt.localEulerAngles = angles;
+		}
+
+		/// <summary>
+		/// 刷新旋转
+		/// </summary>
+		void refreshRotation() {
+			var angles = container.localEulerAngles;
+			angles.z = angleRange() / 2;
+			//rotateTo(angleRange() / 2);
+			container.localEulerAngles = angles;
+		}
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		protected override void refresh() {
+			base.refresh();
+			refreshRotation();
 		}
 
 		#endregion
@@ -228,7 +262,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			angle = Mathf.Clamp(angle, -range, range);
 			animation.rotateTo(new Vector3(0, 0, angle), play: true);
 		}
-
+		
 		/// <summary>
 		/// 旋转到指定角度增量
 		/// </summary>
@@ -237,7 +271,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			var angle = container.localEulerAngles.z;
 			rotateTo(angle + delta);
 		}
-
+		
 		#endregion
 
 		#region 事件控制
@@ -258,7 +292,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			isDown = _isRotating = false;
 			lastPos = default;
 		}
-		*/
+		
 		/// <summary>
 		/// 指针移动回调
 		/// </summary>
@@ -270,7 +304,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 			if (delta.x >= RotateThreshold)
 				rotateDelta(delta.x * RotateSpeed);
 		}
-
+		*/
 		#endregion
 	}
 }

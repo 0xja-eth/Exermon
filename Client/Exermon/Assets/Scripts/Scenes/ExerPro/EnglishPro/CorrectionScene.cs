@@ -24,8 +24,10 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// </summary>
         public ArticleDisplay articleDisplay;
         public Text changedBeforeValue;
-        public GameObject correctionWindow;
-        int index = 0;
+        public CorrectionWindow correctionWindow;
+
+        List<int> doneIds = new List<int>();
+
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -53,38 +55,65 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// 开始
         /// </summary>
         protected override void start() {
+            engSer.generateQuestions<CorrectionQuestion>(1, (res) =>
+            {
+                articleDisplay.startView(res[0]);
+            });
             base.start();
-            if (engSer.questionCache.getCacheList<CorrectionQuestion>().ToArray().Length == 0)
-                engSer.generateQuestions<CorrectionQuestion>(10, (res) => {
-                    articleDisplay.startView(res[0]);
-                    index = 1;
-                });
-            else {
-                articleDisplay.startView(engSer.questionCache.correctionQuestions[index++]);
-            }
         }
+
         #endregion
 
+
+        #region 控制
+
+        /// <summary>
+        /// 单词选择回调
+        /// </summary>
+        /// <param name="container">句子容器</param>
+        /// <param name="word">单词</param>
         public void onWordSelected(SentenceContainer container, string word) {
             //清除其他句子选择
             foreach (ItemDisplay<string> item in articleDisplay.getSubViews()) {
-                if (SceneUtils.get<SentenceContainer>(item.gameObject) == container)
+                SentenceContainer each = SceneUtils.get<SentenceContainer>(item.gameObject);
+                if (each == container || each.getSelectedIndex() == -1)
                     continue;
-                SceneUtils.get<SentenceContainer>(item.gameObject).deselect();
+                each.deselect();
             }
-            SceneUtils.get<CorrectionWindow>(correctionWindow).startView();
             changedBeforeValue.text = word;
-            SceneUtils.get<CorrectionWindow>(correctionWindow).currentSenContainer = container;
+            correctionWindow.currentSenContainer = container;
+            correctionWindow.startWindow();
         }
 
-        public void onWordDeselected() {
-            SceneUtils.get<CorrectionWindow>(correctionWindow).terminateView();
-        }
 
+        /// <summary>
+        /// 提交回调
+        /// </summary>
         public void onSubmit() {
-            //sceneSys.gotoScene(SceneSystem.Scene.EnglishProMapScene);
+            int sentenceIndex = 1;
+            int wordIndex = 1;
+            List<Answer> answers = new List<Answer>();
+            foreach (var sentenceDisplay in articleDisplay.getSubViews()) {
+                SentenceContainer sentenceContainer = SceneUtils.get<SentenceContainer>(sentenceDisplay.gameObject);
+                wordIndex = 1;
+                foreach (WordDisplay wordDisplay in sentenceContainer.getSubViews()) {
+                    Debug.Log(wordDisplay.state);
+                    if (wordDisplay.state != WordDisplay.State.Original) {
+                        Answer answer = new Answer();
+                        answer.sid = sentenceIndex; answer.wid = wordIndex;
+                        answer.word = wordDisplay.getItem();
+                        Debug.Log(sentenceIndex + wordIndex + wordDisplay.getItem());
+                        answers.Add(answer);
+                    }
+                    wordIndex++;
+                }
+                sentenceIndex++;
+            }
+            Debug.Log("AAA" + answers.ToArray().Length);
+
             engSer.exitNode(true);
         }
+        #endregion
     }
 
 

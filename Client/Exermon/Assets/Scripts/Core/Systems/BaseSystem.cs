@@ -58,6 +58,11 @@ namespace Core.Systems {
             if (_self != null) throw new MultCaseException();
         }
 
+		/// <summary>
+		/// 状态改变回调
+		/// </summary>
+		public UnityAction onStateChanged { get; set; } = null;
+
         /// <summary>
         /// 初始化（只执行一次）
         /// </summary>
@@ -95,7 +100,8 @@ namespace Core.Systems {
         void updateState() {
             if (hasState(state) && stateDict[state] != null)
                 stateDict[state].Invoke();
-            lastState = state;
+			if (isStateChanged()) onStateChanged?.Invoke();
+			lastState = state;
         }
 
         /// <summary>
@@ -158,7 +164,7 @@ namespace Core.Systems {
         protected void changeState(int state, bool force = false) {
             Debug.Log("changeState: " + GetType() + ": " + this.state + " -> " + state);
             if ((force || hasState(state)) && this.state != state) 
-                this.state = state;
+				this.state = state; 
         }
         protected void changeState(Enum state, bool force = false) {
             changeState(state.GetHashCode(), force);

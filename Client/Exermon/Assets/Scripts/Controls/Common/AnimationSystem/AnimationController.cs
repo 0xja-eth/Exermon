@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 using Core.UI;
 
@@ -41,6 +41,11 @@ namespace UI.Common.Controls.AnimationSystem {
         /// </summary>
         public List<AnimationView> playingAnimations = new List<AnimationView>();
 
+		/// <summary>
+		/// 播放完毕回调函数
+		/// </summary>
+		public UnityAction<AnimationView> onPlayed { get; set; }
+
         #region 更新控制
 
         /// <summary>
@@ -67,13 +72,30 @@ namespace UI.Common.Controls.AnimationSystem {
         /// </summary>
         /// <param name="ani"></param>
         void updateAnimationItem(AnimationView ani) {
-            if (!ani.isPlaying()) ani.play();
-			if (ani.isPlayed()) playingAnimations.Remove(ani);
-       }
+            if (!ani.isPlaying() && !ani.isCurPlayed()) ani.play();
+			if (ani.isPlayed()) onAnimationPlayed(ani);
+		}
+
+		/// <summary>
+		/// 动画播放完毕回调
+		/// </summary>
+		/// <param name="ani"></param>
+		void onAnimationPlayed(AnimationView ani) {
+			playingAnimations.Remove(ani);
+			onPlayed?.Invoke(ani);
+		}
 
 		#endregion
 
 		#region 动画控制
+
+		/// <summary>
+		/// 是否在播放中
+		/// </summary>
+		/// <returns></returns>
+		public bool isPlaying() {
+			return animations.Count > 0 || playingAnimations.Count > 0;
+		}
 
 		/// <summary>
 		/// 加入动画项
@@ -91,17 +113,38 @@ namespace UI.Common.Controls.AnimationSystem {
 		public void add(AnimationView ani, bool force = false) {
 			if (force) playingAnimations.Add(ani);
 			else animations.Enqueue(ani);
+			join(ani);
 		}
 
-        /// <summary>
-        /// 播放下一个动画
-        /// </summary>
-        public void playNext() {
-            if (animations.Count <= 0) return;
-            playingAnimations.Add(animations.Dequeue());
+		/// <summary>
+		/// 播放下一个动画
+		/// </summary>
+		public void playNext() {
+			Debug.Log("playNext: " + animations.Count);
+
+			if (animations.Count <= 0) return;
+			playingAnimations.Add(animations.Dequeue());
         }
 
-        #endregion
+		/// <summary>
+		/// 停止
+		/// </summary>
+		public void stop() {
+			foreach (var ani in playingAnimations) ani.stop();
+			foreach (var ani in animations) ani.stop();
+			playingAnimations.Clear();
+			animations.Clear();
+		}
 
-    }
+		/// <summary>
+		/// 停止当前播放动画
+		/// </summary>
+		public void stopCurrent() {
+			foreach (var ani in playingAnimations) ani.stop();
+			playingAnimations.Clear();
+		}
+
+		#endregion
+
+	}
 }

@@ -207,7 +207,8 @@ namespace Core.Services {
                 var text = string.Format(format, errmsg);
                 var type = AlertWindow.Type.Notice;
                 gameSys.requestAlert(text, type);//, retry, onError);
-            };
+				onError?.Invoke();
+			};
         }
 
         #endregion

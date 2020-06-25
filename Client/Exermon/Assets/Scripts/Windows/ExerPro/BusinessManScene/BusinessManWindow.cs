@@ -25,6 +25,7 @@ using UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem;
 using UI.ExerPro.EnglishPro.BusinessManScene.ParamDisplays;
 
 using ExerPro.EnglishModule.Services;
+using System.Collections.Generic;
 
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
 
@@ -38,10 +39,13 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// </summary>
         const string BuySuccessText = "购买成功！";
 
-        /// <summary>
-        /// 视图枚举
-        /// </summary>
-        public enum View {
+		static readonly Vector2 CardShopAnchorMax = new Vector2(1, 1);
+		static readonly Vector2 PotionShopAnchorMax = new Vector2(0.67f, 1);
+
+		/// <summary>
+		/// 视图枚举
+		/// </summary>
+		public enum View {
             CardItem, PotionItem,
         }
 
@@ -87,18 +91,18 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// </summary>
         protected override void initializeOnce() {
             base.initializeOnce();
-            var name = gameObject.name;
-            var init = this.initialized;
-
             player = englishSer.record.actor;
         }
-
+		/*
+		/// <summary>
+		/// 初始化
+		/// </summary>
         protected override void initializeEvery() {
             base.initializeEvery();
             if (player == null)
                 player = englishSer.record.actor;
         }
-
+		*/
         /// <summary>
         /// 初始化场景
         /// </summary>
@@ -137,31 +141,31 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
             tabController.startView((int)view);
         }
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
 
-        /// <summary>
-        /// 当前商店显示容器
-        /// </summary>
-        /// <returns></returns>
-        public ShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new() {
-            if (typeof(T) == typeof(ExerProCard))
-                return (ShopDisplay<T>)(object)cardItemShop;
-            if (typeof(T) == typeof(ExerProPotion))
-                return (ShopDisplay<T>)(object)potionItemShop;
-            return null;
-        }
+		/// <summary>
+		/// 当前商店显示容器
+		/// </summary>
+		/// <returns></returns>
+		public ExerProShopDisplay<T> currentPackContainer<T>() where T : BaseExerProItem, new() {
+			if (typeof(T) == typeof(ExerProCard))
+				return cardItemShop as ExerProShopDisplay<T>;
+			if (typeof(T) == typeof(ExerProPotion))
+				return potionItemShop as ExerProShopDisplay<T>;
+			return null;
+		}
 
-        /// <summary>
-        /// 当前操作背包容器
-        /// </summary>
-        /// <returns></returns>
-        public PackContainer<T> operContainer<T>() where T : PackContItem, new() {
+		/// <summary>
+		/// 当前操作背包容器
+		/// </summary>
+		/// <returns></returns>
+		public PackContainer<T> operContainer<T>() where T : PackContItem, new() {
             if (typeof(T) == typeof(ExerProPackCard))
-                return (PackContainer<T>)(object)player?.cardGroup;
+                return player?.cardGroup as PackContainer<T>;
             else if (typeof(T) == typeof(ExerProPackPotion))
-                return (PackContainer<T>)(object)player?.potionPack;
+                return player?.potionPack as PackContainer<T>;
             return null;
         }
 
@@ -169,18 +173,14 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 操作商品
         /// </summary>
         /// <returns></returns>
-        public BaseExerProItem operShopItem() {
+        public ItemService.ShopItem operShopItem() {
             switch (view) {
-                case View.CardItem:
-                    return cardItemShop.selectedItem();
-
-                case View.PotionItem:
-                    return potionItemShop.selectedItem();
+                case View.CardItem: return cardItemShop.selectedItem();
+                case View.PotionItem: return potionItemShop.selectedItem();
             }
             return null;
         }
-
-        public
+		
         #endregion
 
         #region 界面绘制
@@ -200,7 +200,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 卡牌物品商店
         /// </summary>
         void onCardItemShop() {
-            leftView.anchorMax = new Vector2(1, 1);
+            leftView.anchorMax = CardShopAnchorMax;
             rightView.gameObject.SetActive(false);
             cardItemShop.startView();
         }
@@ -209,7 +209,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 药水物品商店
         /// </summary>
         void onPotionItemShop() {
-            leftView.anchorMax = new Vector2(0.67f, 1);
+            leftView.anchorMax = PotionShopAnchorMax;
             rightView.gameObject.SetActive(true);
             potionItemShop.startView();
         }
@@ -275,30 +275,68 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// <summary>
         /// 购买道具
         /// </summary>
-        /// <param name="count"></param>
         public void buyItem() {
-            switch (view) {
-                case View.CardItem:
-                    buyCardItem();
-                    break;
-                case View.PotionItem:
-                    buyPotionItem();
-                    break;
-            }
+			switch (view) {
+				case View.CardItem:
+					var card = cardItemShop.selectedItem();
+					englishSer.shopBuy(card, onBuyCardSuccess);
+					break;
+				case View.PotionItem:
+					var potion = potionItemShop.selectedItem();
+					englishSer.shopBuy(potion, onBuyPotionSuccess);
+					break;
+			}
         }
+		
+		/// <summary>
+		/// 实际处理购买
+		/// </summary>
+		void onBuyCardSuccess() {
+			var card = cardItemShop.selectedItem();
+			cardItemShop.removeItem(card);
+			onBuySuccess();
+		}
 
-        public void buyCardItem() {
+		/// <summary>
+		/// 实际处理购买
+		/// </summary>
+		void onBuyPotionSuccess() {
+			var potion = potionItemShop.selectedItem();
+			potionItemShop.removeItem(potion);
+			onBuySuccess();
+		}
+
+		/// <summary>
+		/// 操作成功回调
+		/// </summary>
+		void onBuySuccess() {
+			refreshMoney();
+			gameSys.requestAlert(BuySuccessText);
+		}
+
+		/*
+		/// <summary>
+		/// 购买卡牌
+		/// </summary>
+		public void buyCardItem() {
             var container = (ExerProCardGroup)operContainer<ExerProPackCard>();
-            var item = (ExerProCard)operShopItem();
+            var item = operShopItem();
             if (container == null || item == null)
                 return;
-            //var price = item.gold;
-            var price = 1;
+            
+            var price = item.gold;
             player?.gainGold(-price);
+            var oldItems = cardItemShop.getItems();
+            List<ExerProCard> cardList = new List<ExerProCard>(oldItems);
+            cardList.RemoveAt(cardItemShop.getSelectedIndex());
+            cardItemShop.setItems(cardList.ToArray());
             container.addCard(item);
             onBuySuccess();
         }
 
+        /// <summary>
+        /// 购买药水
+        /// </summary>
         public void buyPotionItem() {
             var container = (ExerProPotionPack)operContainer<ExerProPackPotion>();
             var item = (ExerProPotion)operShopItem();
@@ -306,19 +344,18 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
                 return;
             var price = item.gold;
             player?.gainGold(-price);
+            var oldItems = potionItemShop.getItems();
+            List<ExerProPotion> potionList = new List<ExerProPotion>(oldItems);
+            potionList.RemoveAt(potionItemShop.getSelectedIndex());
+            potionItemShop.setItems(potionList.ToArray());
             container.pushItem(new ExerProPackPotion(item));
             onBuySuccess();
         }
-        /// <summary>
-        /// 操作成功回调
-        /// </summary>
-        protected virtual void onBuySuccess() {
-            gameSys.requestAlert(BuySuccessText);
-            refreshMoney();
-        }
+        */
 
-        #endregion
+		#endregion
 
-        #endregion
-    }
+		#endregion
+
+	}
 }

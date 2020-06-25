@@ -32,9 +32,9 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 外部组件定义
         /// </summary>
-        public RectTransform layoutContent;
+        //public RectTransform layoutContent;
 
-        public ShopWindow shopWindow;
+        //public ShopWindow shopWindow;
 
         public Text description, priceText;
 
@@ -101,7 +101,7 @@ namespace UI.ShopScene.Controls {
         /// 生成价格文本
         /// </summary>
         /// <param name="obj"></param>
-        string generatePriceText() {
+        protected virtual string generatePriceText() {
             var price = shopItem.price;
             var res = new List<string>();
             if (price.gold > 0)
@@ -130,7 +130,7 @@ namespace UI.ShopScene.Controls {
         protected override void drawEmptyItem() {
             base.drawEmptyItem();
             priceText.text = description.text = "";
-            detail.clearValue();
+            detail?.clearValue();
         }
 
         #endregion
@@ -145,7 +145,7 @@ namespace UI.ShopScene.Controls {
         /// <summary>
         /// 商品
         /// </summary>
-        ItemService.ShopItem<T> shopItem;
+        protected ItemService.ShopItem<T> shopItem;
 
         /// <summary>
         /// 配置容器

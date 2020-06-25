@@ -17,6 +17,7 @@ namespace UI.Common.Controls.AnimationSystem {
 	/// 一般挂载在带有 BaseView 的物体上
 	/// </remarks>
 	public class AnimatorView : BaseView {
+
         /// <summary>
         /// 外部组件设置
         /// </summary>
@@ -53,12 +54,17 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
 
-        #region 初始化
+		/// <summary>
+		/// 动画重载
+		/// </summary>
+		AnimatorOverrideController override_;
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeOnce() {
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
             base.initializeOnce();
             initAnimator();
         }
@@ -185,19 +191,20 @@ namespace UI.Common.Controls.AnimationSystem {
         /// </summary>
         void updateAnimatorState() {
             if (animator == null) return;
-			foreach (var key in endEvents.Keys) {
-				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-				if (key != eventState && (key == "" || state.IsName(key)))
-					endEvents[eventState]?.Invoke();
+			var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
+			/*
+			if (eventState != null && !state.IsName(eventState) &&
+				endEvents.ContainsKey(eventState)) {
+				endEvents[eventState]?.Invoke();
+				eventState = null;
 			}
+			*/
 			foreach (var key in changeEvents.Keys) {
-				var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
 				if (key != eventState && (key == "" || state.IsName(key))) 
 					changeEvents[eventState = key]?.Invoke();
 			}
 			foreach (var key in updateEvents.Keys) {
-                var state = animator.GetCurrentAnimatorStateInfo(layerIndex);
-                if (state.IsName(key)) updateEvents[key]?.Invoke();
+                if (state.IsName(key)) updateEvents[eventState = key]?.Invoke();
             }
         }
 
@@ -223,7 +230,7 @@ namespace UI.Common.Controls.AnimationSystem {
         /// <param name="name">变量名</param>
         /// <param name="val">值</param>
         public void setVar<T>(string name, T val) {
-            Debug.Log("setVar: " + typeof(T) + ": " + val);
+            Debug.Log("setVar: " + name + "(" + typeof(T) + "): " + val);
             if (typeof(T) == typeof(bool))
                 animator.SetBool(name, (bool)(object)val);
             else if (typeof(T) == typeof(int))
@@ -239,6 +246,27 @@ namespace UI.Common.Controls.AnimationSystem {
         public void setVar(string name) {
             animator.SetTrigger(name);
         }
+
+		/// <summary>
+		/// 配置动画
+		/// </summary>
+		/// <param name="state">状态名</param>
+		/// <param name="clip">动画片段</param>
+		public void changeAni(string state, AnimationClip clip) {
+			Debug.Log("changeAni: " + state + ": " + clip);
+			if (override_ == null) {
+				var runtime = animator.runtimeAnimatorController;
+				override_ = new AnimatorOverrideController(runtime);
+
+				//animator.runtimeAnimatorController = null;
+				animator.runtimeAnimatorController = override_;
+
+				Resources.UnloadUnusedAssets();
+			}
+
+			clip.legacy = false;
+			override_[state] = clip;
+		}
 
         #endregion
 

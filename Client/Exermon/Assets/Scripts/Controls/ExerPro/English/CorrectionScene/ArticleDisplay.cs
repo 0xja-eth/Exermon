@@ -18,6 +18,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
     /// </summary
     public class ArticleDisplay : ContainerDisplay<string>,
         IItemDisplay<CorrectionQuestion> {
+
         CorrectionQuestion question;
         public GameObject correctionWindow;
         public Text changedBeforeValue;
@@ -26,6 +27,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
             return question;
         }
 
+        /// <summary>
+        /// 设置物品
+        /// </summary>
+        /// <param name="item">改错题项</param>
+        /// <param name="force">强制</param>
+        /// <returns>null</returns>
         public void setItem(CorrectionQuestion item, bool force = false) {
             question = item; base.setItems(item.sentences());
         }
@@ -38,15 +45,6 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
         public void startView(CorrectionQuestion item) {
             base.startView();
             setItem(item, true);
-        }
-
-        public void revert() {
-            int index = 0;
-            foreach (ItemDisplay<string> item in getSubViews()) {
-                SceneUtils.get<SentenceContainer>(item.gameObject).clearItems();
-                SceneUtils.get<SentenceContainer>(item.gameObject).setItem(items[index++]);
-            }
-            startView(question);
         }
 
     }

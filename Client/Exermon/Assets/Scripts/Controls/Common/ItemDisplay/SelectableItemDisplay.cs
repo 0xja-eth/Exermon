@@ -38,7 +38,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public Image background;
+        public Graphic background;
         public GameObject disabledFlag; // 选择时显示的 GameObject
         public GameObject selectedFlag; // 选择时显示的 GameObject
         public GameObject checkedFlag; // 选中时显示的 GameObject
@@ -352,6 +352,7 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerEnter(PointerEventData eventData) {
+			Debug.Log(name + ": OnPointerEnter: " + eventData);
             if (isHighlightable()) highlighting = true;
             refreshStatus();
         }
@@ -361,7 +362,8 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerExit(PointerEventData eventData) {
-            highlighting = false;
+			Debug.Log(name + ": OnPointerExit: " + eventData);
+			highlighting = false;
             refreshStatus();
         }
 
@@ -370,8 +372,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// </summary>
         /// <param name="eventData">事件数据</param>
         public virtual void OnPointerClick(PointerEventData eventData) {
-            // 取消选择：当已经选择，同时没有选中的时候，可取消选择
-            if (isDeselectable() && isSelected() && !isChecked()) deselect();
+			Debug.Log(name + ": OnPointerClick: " + eventData);
+			// 取消选择：当已经选择，同时没有选中的时候，可取消选择
+			if (isDeselectable() && isSelected() && !isChecked()) deselect();
             else {
                 // 如果已选择或者不可选择时单击，执行反转操作
                 // else if (isSelected() || !isSelectable()) toggle();

@@ -5,10 +5,11 @@ from django.conf import settings
 from game_module.models import GroupConfigure
 from item_module.models import *
 from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
-from utils.model_utils import QuestionAudioUpload, Common as ModelUtils
+from utils.model_utils import QuestionAudioUpload, PlotQuestionImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 import os, base64, datetime, jsonfield, random
 from enum import Enum
+
 
 # Create your models here.
 
@@ -22,6 +23,7 @@ class QuestionType(Enum):
 	Listening = 1  # 听力题
 	Phrase = 2  # 不定式题
 	Correction = 3  # 改错题
+	Plot = 4  # 剧情题
 
 
 # ===================================================
@@ -141,6 +143,84 @@ class ReadingQuestion(GroupQuestion):
 			返回该听力题目的子题目
 		"""
 		return self.readingsubquestion_set.all()
+
+
+# ===================================================
+#  剧情题目
+# ===================================================
+class PlotQuestion(BaseQuestion):
+	class Meta:
+		verbose_name = verbose_name_plural = "剧情题目"
+
+	TYPE = QuestionType.Plot
+
+	# 剧情事件名称
+	event_name = models.CharField(max_length=64, verbose_name="剧情事件名称")
+
+	# 剧情图标
+	picture = models.ImageField(upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
+
+	def __str__(self):
+		return self.picture.url
+
+	# 获取剧情图片完整路径
+	def getExactlyPath(self):
+		base = settings.STATIC_URL
+		path = os.path.join(base, str(self.picture))
+		if os.path.exists(path):
+			return path
+		else:
+			raise GameException(ErrorType.PictureFileNotFound)
+
+	# 获取base64编码
+	def convertToBase64(self):
+
+		with open(self.getExactlyPath(), 'rb') as f:
+			data = base64.b64encode(f.read())
+
+		return data.decode()
+
+	def choices(self):
+		return self.plotqueschoice_set.all()
+
+	def convertToDict(self):
+		plot_choices = ModelUtils.objectsToDict(self.choices())
+
+		return {
+			'id': self.id,
+			'title': self.title,
+			'event_name': self.event_name,
+			'picture': self.convertToBase64(),
+			'choices': plot_choices
+		}
+
+
+# ===================================================
+#  剧情题目选项表
+# ===================================================
+class PlotQuesChoice(BaseQuesChoice):
+	class Meta:
+		verbose_name = verbose_name_plural = "剧情题目选项"
+
+	# 选项对应的结果文本
+	result_text = models.TextField(verbose_name="选项对应的结果文本")
+
+	# 所属问题
+	question = models.ForeignKey('PlotQuestion', null=False, on_delete=models.CASCADE,
+								 verbose_name="所属问题")
+
+	def effects(self):
+		return self.exerproploteffect_set.all()
+
+	def convertToDict(self):
+		plot_effects = ModelUtils.objectsToDict(self.effects())
+
+		return {
+			'id': self.id,
+			'text': self.text,
+			'result_text': self.result_text,
+			'effects': plot_effects
+		}
 
 
 # ===================================================
@@ -597,6 +677,75 @@ class ExerProEffect(models.Model):
 
 
 # ===================================================
+#  使用效果编号枚举
+# ===================================================
+class ExerProTraitCode(Enum):
+	Unset = 0  # 空
+
+	DamagePlus = 1  # 攻击伤害加成
+	HurtPlus = 2  # 受到伤害加成
+	RecoverPlus = 3  # 回复加成
+
+	RestRecoverPlus = 4  # 回复加成（休息据点）
+
+	RoundEndRecover = 5  # 回合结束HP回复
+	RoundStartRecover = 6  # 回合开始HP回复
+	BattleEndRecover = 7  # 战斗结束HP回复
+	BattleStartRecover = 8  # 战斗开始HP回复
+
+	ParamAdd = 9  # 属性加成值
+	ParamRoundAdd = 10  # 回合属性加成值
+	ParamBattleAdd = 11  # 战斗属性加成值
+
+	RoundDrawCards = 12  # 回合开始抽牌数加成
+	BattleDrawCards = 13  # 战斗开始抽牌数加成
+
+
+# ===================================================
+#  特训特性表
+# ===================================================
+class ExerProTraits(models.Model):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训使用效果"
+
+	CODES = [
+		(ExerProTraitCode.Unset.value, '空'),
+
+		(ExerProTraitCode.DamagePlus.value, '攻击伤害加成'),
+		(ExerProTraitCode.HurtPlus.value, '受到伤害加成'),
+		(ExerProTraitCode.RecoverPlus.value, '回复加成'),
+
+		(ExerProTraitCode.RestRecoverPlus.value, '回复加成（休息据点）'),
+
+		(ExerProTraitCode.RoundEndRecover.value, '回合结束HP回复'),
+		(ExerProTraitCode.RoundStartRecover.value, '回合开始HP回复'),
+		(ExerProTraitCode.BattleEndRecover.value, '战斗结束HP回复'),
+		(ExerProTraitCode.BattleStartRecover.value, '战斗开始HP回复'),
+
+		(ExerProTraitCode.ParamAdd.value, '属性加成值'),
+		(ExerProTraitCode.ParamRoundAdd.value, '回合属性加成值'),
+		(ExerProTraitCode.ParamBattleAdd.value, '战斗属性加成值'),
+
+		(ExerProTraitCode.RoundDrawCards.value, '回合开始抽牌数加成'),
+		(ExerProTraitCode.BattleDrawCards.value, '战斗开始抽牌数加成'),
+	]
+
+	# 效果编号
+	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
+
+	# 效果参数
+	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	# 转化为字典
+	def convertToDict(self):
+		return {
+			'code': self.code,
+			'params': self.params,
+		}
+
+
+# ===================================================
 #  特训物品星级表
 # ===================================================
 class ExerProItemStar(GroupConfigure):
@@ -638,11 +787,27 @@ class BaseExerProItem(BaseItem):
 	# 图标索引
 	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
+	# 起手动画索引
+	start_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="起手动画索引")
+
+	# 目标动画索引
+	target_ani_index = models.PositiveSmallIntegerField(default=0, verbose_name="目标动画索引")
+
 	# 物品星级（稀罕度）
 	star = models.ForeignKey("ExerProItemStar", on_delete=models.CASCADE, verbose_name="星级")
 
 	# 金币（0表示不可购买）
-	gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
+
+	def update(self, num):
+		"""
+		更新已有记录
+		TODO: 什么鬼
+		Args:
+			num (int): 金币数量
+		"""
+		# self.gold -= num
+		# self.save()
 
 	def convertToDict(self, **kwargs):
 		"""
@@ -652,11 +817,17 @@ class BaseExerProItem(BaseItem):
 		"""
 		res = super().convertToDict(**kwargs)
 
-		effects = ModelUtils.objectsToDict(self.effects())
+		res['icon_index'] = self.icon_index
+		res['start_ani_index'] = self.start_ani_index
+		res['target_ani_index'] = self.target_ani_index
 
 		res['star_id'] = self.star_id
-		res['gold'] = self.gold
-		res['effects'] = effects
+
+		# res['gold'] = self.gold
+
+		effects = self.effects()
+		if effects is not None:
+			res['effects'] = ModelUtils.objectsToDict(effects)
 
 		return res
 
@@ -665,15 +836,27 @@ class BaseExerProItem(BaseItem):
 
 
 # ===================================================
-#  特训物品使用效果表
+#  特训物品特性表
 # ===================================================
-class ExerProItemEffect(ExerProEffect):
+class ExerProItemTrait(ExerProEffect):
 	class Meta:
-		verbose_name = verbose_name_plural = "特训物品使用效果"
+		verbose_name = verbose_name_plural = "特训物品特性"
 
 	# 物品
 	item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
 							 verbose_name="物品")
+
+
+# ===================================================
+#  剧情题目效果表
+# ===================================================
+class ExerProPlotEffect(ExerProEffect):
+	class Meta:
+		verbose_name = verbose_name_plural = "剧情题目效果"
+
+	# 效果
+	effects = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
+							 verbose_name="效果")
 
 
 # ===================================================
@@ -683,11 +866,26 @@ class ExerProItem(BaseExerProItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训物品"
 
-	# 道具类型
-	TYPE = ItemType.ExerProItem
+	# 道具类型 self.exerproitemeffect_set.all()
+	def convertToDict(self, type: str = None, **kwargs):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		traits = ModelUtils.objectsToDict(self.traits())
+
+		res['traits'] = traits
+
+		return res
 
 	def effects(self):
-		return self.exerproitemeffect_set.all()
+		return None
+
+	def traits(self):
+		return self.exerproitemtrait_set.all()
 
 
 # ===================================================
@@ -712,15 +910,15 @@ class ExerProPotion(BaseExerProItem):
 	# 道具类型
 	TYPE = ItemType.ExerProPotion
 
-	def convertToDict(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convertToDict()
-
-		return res
+	# def convertToDict(self):
+	# 	"""
+	# 	转化为字典
+	# 	Returns:
+	# 		返回转化后的字典
+	# 	"""
+	# 	res = super().convertToDict()
+	#
+	# 	return res
 
 	def effects(self):
 		return self.exerpropotioneffect_set.all()
@@ -816,6 +1014,9 @@ class ExerProCard(BaseExerProItem):
 	card_type = models.PositiveSmallIntegerField(default=ExerProCardType.Attack.value,
 												 choices=CARD_TYPES, verbose_name="卡片类型")
 
+	# 卡牌皮肤索引
+	skin_index = models.PositiveSmallIntegerField(default=0, verbose_name="卡牌皮肤索引")
+
 	# 固有
 	inherent = models.BooleanField(default=False, verbose_name="固有")
 
@@ -848,6 +1049,40 @@ class ExerProCard(BaseExerProItem):
 
 	def effects(self):
 		return self.exerprocardeffect_set.all()
+
+
+# ===================================================
+#  初始卡组表
+# ===================================================
+class FirstCardGroup(GroupConfigure):
+
+	class Meta:
+		verbose_name = verbose_name_plural = "初始卡组"
+
+	# 卡组ID集
+	cards = jsonfield.JSONField(default=[], verbose_name="卡组ID集")
+
+	def convertToDict(self):
+		"""
+		转化为字典
+		Returns:
+			返回转化后的字典
+		"""
+		res = super().convertToDict()
+
+		res["cards"] = self.cards
+
+		return res
+
+	def adminCards(self):
+		res = ""
+		for id in self.cards:
+			res += ViewUtils.getObject(ExerProCard,
+		   		ErrorType.ExerProCardNotExist, id=id).name + " "
+
+		return res
+
+	adminCards.short_description = "包含卡牌"
 
 
 # ===================================================
@@ -1005,14 +1240,26 @@ class ExerProEnemy(BaseItem):
 
 
 # ===================================================
+#  特训状态特性表
+# ===================================================
+class ExerProStateTrait(ExerProEffect):
+	class Meta:
+		verbose_name = verbose_name_plural = "特训状态特性"
+
+	# 状态
+	item = models.ForeignKey('ExerProState', on_delete=models.CASCADE,
+							 verbose_name="状态")
+
+
+# ===================================================
 #  特训状态表
 # ===================================================
 class ExerProState(BaseItem):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训状态"
 
-	# 道具类型
-	TYPE = ItemType.ExerProState
+	# 图标索引
+	icon_index = models.PositiveSmallIntegerField(default=0, verbose_name="图标索引")
 
 	# 最大状态回合数
 	max_turns = models.PositiveSmallIntegerField(default=0, verbose_name="最大状态回合数")
@@ -1023,15 +1270,23 @@ class ExerProState(BaseItem):
 	def convertToDict(self):
 		"""
 		转化为字典
-		Returns:
-			返回转化后的字典
 		"""
 		res = super().convertToDict()
 
 		res['max_turns'] = self.max_turns
 		res['is_nega'] = self.is_nega
 
+		traits = ModelUtils.objectsToDict(self.traits())
+
+		res['icon_index'] = self.icon_index
+		res['max_turns'] = self.max_turns
+		res['is_nega'] = self.is_nega
+		res['traits'] = traits
+
 		return res
+
+	def traits(self):
+		return self.exerprostatetrait_set.all()
 
 
 # endregion
@@ -1119,10 +1374,11 @@ class ExerProMap(models.Model):
 			返回指定序号的关卡对象
 		"""
 		stage = self.stages().filter(order=order)
-		
+
 		if stage.exists(): return stage.first()
 
 		return None
+
 
 # # ===================================================
 # #  据点类型表
@@ -1202,6 +1458,9 @@ class ExerProRecord(CacheableModel):
 	# 当前单词缓存键
 	CUR_WORDS_CACHE_KEY = 'cur_words'
 
+	# 默认金币
+	DEFAULT_GOLD = 100
+
 	# 关卡
 	stage = models.ForeignKey('ExerProMapStage', null=True,
 							  on_delete=models.CASCADE, verbose_name="关卡")
@@ -1224,6 +1483,9 @@ class ExerProRecord(CacheableModel):
 	# # 下一单词
 	# next = models.ForeignKey('Word', null=True, blank=True,
 	# 						 on_delete=models.CASCADE, verbose_name="下一单词")
+
+	# 金币
+	gold = models.PositiveSmallIntegerField(default=DEFAULT_GOLD, verbose_name="金币")
 
 	# 据点数据
 	nodes = jsonfield.JSONField(default=None, null=True, blank=True,
@@ -1274,7 +1536,6 @@ class ExerProRecord(CacheableModel):
 		words = [record.word for record in word_records]
 
 		if type == "words":
-
 			return {
 				'word_level': self.word_level,
 				'words': ModelUtils.objectsToDict(words),
@@ -1312,6 +1573,7 @@ class ExerProRecord(CacheableModel):
 			'cur_index': cur_index,
 			'word_level': self.word_level,
 
+			'gold': self.gold,
 			'nodes': self.nodes,
 			'actor': self.actor,
 
@@ -1335,6 +1597,9 @@ class ExerProRecord(CacheableModel):
 		ModelUtils.loadKey(data, 'started', self)
 		ModelUtils.loadKey(data, 'generated', self)
 		ModelUtils.loadKey(data, 'cur_index', self)
+		ModelUtils.loadKey(data, 'node_flag', self)
+		ModelUtils.loadKey(data, 'word_level', self)
+		ModelUtils.loadKey(data, 'gold', self)
 		ModelUtils.loadKey(data, 'nodes', self)
 		ModelUtils.loadKey(data, 'actor', self)
 
@@ -1349,6 +1614,14 @@ class ExerProRecord(CacheableModel):
 		self.reset()
 		self.stage = map.stage(1)
 		self.started = True
+
+	def gainGold(self, val):
+		"""
+		获得金币
+		Args:
+			val (int): 金币
+		"""
+		self.gold = max(0, self.gold + val)
 
 	def reset(self):
 		"""
@@ -1482,5 +1755,27 @@ class ExerProRecord(CacheableModel):
 			若存在单词记录，返回之，否则返回 None
 		"""
 		return ModelUtils.get(self.wordRecords(), word_id=word_id, **kwargs)
+
+
+# TODO: 排行榜
+# # ===================================================
+# #  特训积分表
+# # ===================================================
+# class ExerProScore(models.Model):
+# 	class Meta:
+#
+# 		verbose_name = verbose_name_plural = "特训积分"
+#
+# 	# 关卡
+# 	stage = models.ForeignKey('ExerProMapStage', null=True,
+# 							  on_delete=models.CASCADE, verbose_name="关卡")
+#
+# 	# 开始标志
+# 	started = models.BooleanField(default=False, verbose_name="开始标志")
+#
+# 	# 生成标志
+# 	generated = models.BooleanField(default=False, verbose_name="生成标志")
+
+
 
 # endregion

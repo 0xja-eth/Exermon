@@ -64,13 +64,16 @@ namespace Core.UI.Utils {
             }
         }
 
-        /// <summary>
-        /// 获取/设置当前场景（脚本）
-        /// </summary>
-        public static T getCurrentScene<T>() where T : BaseScene {
-            return getSceneObject(CurrentSceneKey) as T;
-        }
-        public static void setCurrentScene(BaseScene scene) {
+		/// <summary>
+		/// 获取/设置当前场景（脚本）
+		/// </summary>
+		public static T getCurrentScene<T>() where T : BaseScene {
+			return getSceneObject(CurrentSceneKey) as T;
+		}
+		public static BaseScene getCurrentScene() {
+			return getSceneObject(CurrentSceneKey) as BaseScene;
+		}
+		public static void setCurrentScene(BaseScene scene) {
             depositSceneObject(CurrentSceneKey, scene);
         }
 
@@ -667,7 +670,8 @@ namespace Core.UI.Utils {
 		public static Vector2 screen2Local(
 			Vector2 pos, RectTransform rt, Camera camera = null) {
 			Vector2 res; if (camera == null) camera = Camera.main;
-			
+			Debug.Log("camera: " + camera + ", Camera.main: " + Camera.main + ", Camera.current: " + Camera.current);
+
 			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
 				rt, pos, camera, out res)) return res;
 			return pos;

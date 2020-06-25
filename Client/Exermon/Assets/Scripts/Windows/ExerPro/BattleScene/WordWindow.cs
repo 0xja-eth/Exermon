@@ -1,4 +1,5 @@
 ﻿
+using UnityEngine;
 using UnityEngine.UI;
 
 using Core.UI;
@@ -6,6 +7,9 @@ using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
+
+
+using UI.Common.Controls.QuestionDisplay;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 
@@ -19,15 +23,24 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <summary>
 		/// 文本常量定义
 		/// </summary>
-		const string NormalCountFormat = "单词题（{0}/{1}）";
-		const string BonusCountFormat = "Bonuse（{0}/{1}）";
+		const string CountFormat = "{0}/{1}";
+		const string DrawCountFormat = "抽牌次数：{0}/{1}";
+
+		const int WordSecond = 10;
 
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text count;
+		public Text count, drawCnt;
 
 		public WordQuestionDisplay wordQuestionDisplay;
+		public WordChoiceContainer choiceContainer;
+
+		public QuestionTimer timer;
+
+		public GameObject bonus;
+
+		public GameObject next;
 
 		/// <summary>
 		/// 场景组件引用
@@ -44,6 +57,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 内部变量定义
 		/// </summary>
 		bool terminated = false; // 作答完毕
+		bool answering = false; // 回答中
 
 		#region 初始化
 
@@ -80,11 +94,34 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 关闭窗口
 		/// </summary>
 		public override void terminateWindow() {
-			if (terminated) base.terminateWindow();
+			base.terminateWindow();
+			wordQuestionDisplay.terminateView();
+			//if (terminated) {
+
+			//}
 		}
-		public void terminateWindow(bool force) {
-			if (force) terminated = true;
-			terminateWindow();
+		//public void terminateWindow(bool force) {
+		//	if (force) terminated = true;
+		//	terminateWindow();
+		//}
+
+		#endregion
+
+		#region 更新
+
+		/// <summary>
+		/// 更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			updateTimer();
+		}
+
+		/// <summary>
+		/// 更新计时
+		/// </summary>
+		void updateTimer() {
+			if (!answering && timer.isTimeUp()) answer();
 		}
 
 		#endregion
@@ -96,8 +133,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		protected override void refresh() {
 			base.refresh();
+			resetQuestion();
 			drawWordQuestion();
 			drawCount();
+
+			scene.refreshStatus();
+		}
+
+		/// <summary>
+		/// 重置题目
+		/// </summary>
+		void resetQuestion() {
+			next.SetActive(false);
+			choiceContainer.selectable = true;
+			wordQuestionDisplay.showAnswer = false;
+			timer.startTimer(WordSecond);
 		}
 
 		/// <summary>
@@ -106,6 +156,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		void drawWordQuestion() {
 			var word = battleSer.currentWord();
 			wordQuestionDisplay.setItem(word);
+			wordQuestionDisplay.startView();
 		}
 
 		/// <summary>
@@ -113,11 +164,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		void drawCount() {
 			var bonus = battleSer.isBonus();
-			var format = bonus ? BonusCountFormat : NormalCountFormat;
 			var index = battleSer.wordIndex();
 			var max = battleSer.wordCount();
+			var drawCnt = battleSer.drawCount();
+			var maxDraw = battleSer.maxDrawCount();
 
-			count.text = string.Format(format, index, max);
+			this.bonus.SetActive(bonus);
+			count.text = string.Format(CountFormat, index, max);
+			this.drawCnt.text = string.Format(DrawCountFormat, drawCnt, maxDraw);
 		}
 
 		#endregion
@@ -127,8 +181,11 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// <summary>
 		/// 回答单词
 		/// </summary>
-		public void answer(string chinese) {
-			battleSer.answer(chinese, onAnswerSuccess);
+		public void answer(string chinese = "") {
+			answering = true;
+			choiceContainer.selectable = false;
+			battleSer.answer(chinese, onAnswerSuccess,
+				() => answering = false);
 		}
 
 		/// <summary>
@@ -136,12 +193,16 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		/// <param name="correct"></param>
 		void onAnswerSuccess(bool correct) {
+			timer.stopTimer();
 			wordQuestionDisplay.showAnswer = true;
+
 			if (correct) onAnswerCorrect();
 			else onAnswerWrong();
 
+			next.SetActive(true);
+
 			terminated = battleSer.isStateChanged();
-			requestRefresh();
+			answering = false;
 		}
 
 		/// <summary>
@@ -156,6 +217,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// </summary>
 		void onAnswerWrong() {
 
+		}
+
+		/// <summary>
+		/// 下一题
+		/// </summary>
+		public void nextWord() {
+			if (terminated) scene.draw();
+			else requestRefresh();
 		}
 
 		#endregion

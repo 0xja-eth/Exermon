@@ -25,6 +25,10 @@ class ListeningQuesChoicesInline(BaseQuesChoicesInline):
 	model = ListeningQuesChoice
 
 
+class PlotQuesChoicesInline(BaseQuesChoicesInline):
+	model = PlotQuesChoice
+
+
 # class ReadingQuesChoicesInline(BaseQuesChoicesInline):
 # 	model = ReadingQuesChoice
 
@@ -42,8 +46,16 @@ class WrongItemsInline(object):
 	style = "table"
 
 
-class ExerProItemEffectsInline(BaseEffectsInline):
-	model = ExerProItemEffect
+class ExerProPlotEffectsInline(BaseEffectsInline):
+	model = ExerProPlotEffect
+
+
+class ExerProItemTraitsInline(BaseTraitsInline):
+	model = ExerProItemTrait
+
+
+class ExerProStateTraitsInline(BaseTraitsInline):
+	model = ExerProStateTrait
 
 
 class ExerProPotionEffectsInline(BaseEffectsInline):
@@ -83,6 +95,15 @@ class MapStagesInline(object):
 @xadmin.sites.register(ListeningSubQuestion)
 class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 	inlines = [ListeningQuesChoicesInline]
+
+
+@xadmin.sites.register(PlotQuestion)
+class PlotQuestionAdmin(BaseQuestionAdmin):
+	list_display = ['id', 'title', 'event_name', 'picture']
+
+	list_editable = ['title', 'event_name', 'picture']
+
+	inlines = [PlotQuesChoicesInline]
 
 
 # @xadmin.sites.register(ReadingSubQuestion)
@@ -146,7 +167,7 @@ class WordAdmin(object):
 @xadmin.sites.register(WordRecord)
 class WordRecordAdmin(object):
 
-	list_display = ['id', 'word', 'player', 'count', 'correct',
+	list_display = ['id', 'word', 'record', 'count', 'correct',
 					'last_date', 'first_date', 'collected', 'wrong']
 
 	list_editable = ['count', 'correct',  'last_date',
@@ -163,17 +184,36 @@ class AntonymAdmin(object):
 class BaseExerProItemAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   ['icon_index', 'star', 'gold']
+				   ['icon_index', 'start_ani_index',
+					'target_ani_index', 'star']
 
 	list_editable = BaseItemAdmin.list_editable + \
-					['icon_index', 'star', 'gold']
+					['icon_index', 'start_ani_index',
+					'target_ani_index', 'star']
 
 	field_set = [Fieldset('基本特训物品属性',
-						  'icon_index', 'star', 'gold')]
+						  'icon_index', 'start_ani_index',
+						  'target_ani_index', 'star')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
 	# form_layout = field_set
+
+
+@xadmin.sites.register(PlotQuesChoice)
+class PlotQuesChoiceAdmin(BaseExerProItemAdmin):
+
+	list_display = BaseExerProItemAdmin.list_display + \
+				   ['result_text']
+
+	list_editable = BaseExerProItemAdmin.list_editable + \
+				   ['result_text']
+
+	field_set = [Fieldset('特训物品属性')]
+
+	form_layout = BaseExerProItemAdmin.form_layout + field_set
+
+	inlines = [ExerProPlotEffectsInline]
 
 
 @xadmin.sites.register(ExerProItem)
@@ -189,7 +229,7 @@ class ExerProItemAdmin(BaseExerProItemAdmin):
 
 	form_layout = BaseExerProItemAdmin.form_layout + field_set
 
-	inlines = [ExerProItemEffectsInline]
+	inlines = [ExerProItemTraitsInline]
 
 
 @xadmin.sites.register(ExerProPotion)
@@ -227,6 +267,14 @@ class ExerProCardAdmin(BaseItemAdmin):
 	inlines = [ExerProCardEffectsInline]
 
 
+@xadmin.sites.register(FirstCardGroup)
+class FirstCardGroupAdmin(object):
+
+	list_display = ['id', 'name', 'adminCards']
+
+	list_editable = ['name']
+
+
 @xadmin.sites.register(ExerProEnemy)
 class ExerProEnemyAdmin(BaseItemAdmin):
 
@@ -245,19 +293,19 @@ class ExerProEnemyAdmin(BaseItemAdmin):
 
 
 @xadmin.sites.register(ExerProState)
-class ExerProStatusAdmin(BaseItemAdmin):
+class ExerProStateAdmin(BaseItemAdmin):
 
 	list_display = BaseItemAdmin.list_display + \
-				   []
+				   ['icon_index', 'max_turns', 'is_nega']
 
 	list_editable = BaseItemAdmin.list_editable + \
-				   []
+				   ['icon_index', 'max_turns', 'is_nega']
 
-	field_set = [Fieldset('特训状态属性')]
+	field_set = [Fieldset('特训状态属性', 'icon_index', 'max_turns', 'is_nega')]
 
 	form_layout = BaseItemAdmin.form_layout + field_set
 
-	inlines = []
+	inlines = [ExerProStateTraitsInline]
 
 
 @xadmin.sites.register(ExerProMap)
@@ -298,7 +346,9 @@ class NodeTypeAdmin(object):
 
 @xadmin.sites.register(ExerProRecord)
 class ExerProRecordAdmin(object):
-	list_display = ['id', 'word_level']
+	list_display = ['id', 'player', 'stage', 'started', 'generated',
+					'cur_index', 'node_flag', 'word_level', 'gold']
 
-	list_editable = ['word_level']
+	list_editable = ['stage', 'started', 'generated',
+					'cur_index', 'node_flag', 'word_level', 'gold']
 
