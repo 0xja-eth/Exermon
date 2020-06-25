@@ -138,13 +138,13 @@ class WebSocket:
 			data = Common.getRequestDict(data['data'], params)
 			print('getRequestDict: ' + str(data))
 
-			if 'uid' in data:
-				player = consumer.getPlayer()
-				if player is None or player.id != data['uid']:
-					raise GameException(ErrorType.InvalidUserOper)
+			# if 'uid' in data:
+			player = consumer.getPlayer()
+			# if player is None or player.id != data['uid']:
+			# 	raise GameException(ErrorType.InvalidUserOper)
 
-				data.pop('uid')
-				data['player'] = player
+			data.pop('uid')
+			data['player'] = player
 
 			# 执行
 			res['data'] = await method(consumer, **data)
