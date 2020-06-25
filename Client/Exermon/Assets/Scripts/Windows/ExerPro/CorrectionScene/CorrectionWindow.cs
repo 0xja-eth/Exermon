@@ -66,12 +66,12 @@ namespace UI.CorrectionScene.Windows {
 		public void startWindow(WordsContainer container, WordDisplay word) {
 			startWindow();
 
+			currentSenContainer = container;
+			currentWord = word;
+
 			changedBeforeValue.text = currentWord.originalWord;
 			inputField.text = currentWord.originalWord;
 			inputField.ActivateInputField();
-
-			currentSenContainer = container;
-			currentWord = word;
 		}
 
 		#endregion
