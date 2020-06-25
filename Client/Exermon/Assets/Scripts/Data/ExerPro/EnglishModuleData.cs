@@ -102,10 +102,17 @@ namespace ExerPro.EnglishModule.Data {
     /// 短语题目
     /// </summary>
     public class PhraseQuestion : BaseData {
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+
+		/// <summary>
+		/// 删除率
+		/// </summary>
+		const int DropoutRate = 20;
+		const int DropoutThreshold = 5;
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public string word { get; protected set; }
         [AutoConvert]
         public string chinese { get; protected set; }
@@ -113,23 +120,73 @@ namespace ExerPro.EnglishModule.Data {
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
-        public string[] option1 = { "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. of sth.", "sth. for sb." };
-        public string[] option2 = { "doing sth.", "to do sth.", "to doing sth." };
-        public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
-        public string[] option = { "about", "at", "for", "from", "in", "of", "with", "to" ,
-            "doing sth.", "to do sth." ,"to doing sth.", "sb. to do sth.", "sb. doing sth.",
-            "sb. into doing sth.", "sb. of sth", "sth. for sb." };
 
-        public string[] options() {
-            if (option1.ToList<string>().IndexOf(phrase) != -1)
-                return option1;
-            else if (option2.ToList<string>().IndexOf(phrase) != -1)
-                return option2;
-            else if (option3.ToList<string>().IndexOf(phrase) != -1)
-                return option3;
-            return option;
-        }
-        public static PhraseQuestion sample() {
+		/// <summary>
+		/// 选项定义
+		/// </summary>
+        public static readonly string[] option1 = {
+			"sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. of sth.", "sth. for sb." };
+        public static readonly string[] option2 = {
+			"doing sth.", "to do sth.", "to doing sth." };
+        public static readonly string[] option3 = {
+			"about", "at", "for", "from", "in", "of", "with", "to" };
+        public static readonly string[] option = {
+			"about", "at", "for", "from", "in", "of", "with", "to" ,
+            "doing sth.", "to do sth." ,"to doing sth.", "sb. to do sth.", "sb. doing sth.",
+            "sb. into doing sth.", "sb. of sth", "sth. for sb."
+		};
+
+		/// <summary>
+		/// 缓存选项
+		/// </summary>
+		string[] tmpOptions = null;
+
+		/// <summary>
+		/// 生成选项
+		/// </summary>
+		/// <returns></returns>
+		public string[] options() {
+			if (tmpOptions == null) {
+				if (option1.ToList().Contains(phrase))
+					tmpOptions = option1;
+				else if (option2.ToList().Contains(phrase))
+					tmpOptions = option2;
+				else if (option3.ToList().Contains(phrase))
+					tmpOptions = option3;
+				else tmpOptions = option;
+			}
+			return dropout(tmpOptions);
+		}
+
+		/// <summary>
+		/// 随机删除
+		/// </summary>
+		/// <param name="options"></param>
+		/// <returns></returns>
+		string[] dropout(string[] options) {
+			var res = new List<string>();
+			foreach (var opt in options) {
+				var rand = UnityEngine.Random.Range(0, 100);
+				if (res.Count > DropoutThreshold) {
+					if (rand >= DropoutRate) res.Add(opt);
+				} else res.Add(opt);
+			}
+			if (!res.Contains(phrase)) res.Add(phrase);
+			return res.ToArray();
+		}
+
+		/// <summary>
+		/// 清除缓存选项
+		/// </summary>
+		public void resetOptions() {
+			tmpOptions = null;
+		}
+
+		/// <summary>
+		/// 测试
+		/// </summary>
+		/// <returns></returns>
+		public static PhraseQuestion sample() {
             long i = UnityEngine.Random.Range(0, 10000);
 
             PhraseQuestion question = new PhraseQuestion();

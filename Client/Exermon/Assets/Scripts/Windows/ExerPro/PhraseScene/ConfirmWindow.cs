@@ -1,80 +1,118 @@
-﻿using Core.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿
 using UnityEngine;
-using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
-using Core.UI.Utils;
 using UnityEngine.UI;
-using ExerPro.EnglishModule.Data;
-using Core.Systems;
-using System.Text.RegularExpressions;
+
+using Core.UI;
+using Core.UI.Utils;
 
 namespace UI.PhraseScene.Windows {
+
+	/// <summary>
+	/// 结果窗口
+	/// </summary>
     public class ConfirmWindow : BaseWindow {
 
+		/// <summary>
+		/// 常量定义
+		/// </summary>
+		const string WrongText = "答错了！";
+		const string CorrectText = "答对了！";
 
-        /// <summary>
-        /// 场景组件引用
-        /// </summary>
+		/// <summary>
+		/// 场景组件引用
+		/// </summary>
+		PhraseScene scene;
 
-        /// <summary>
-        /// 场景对象引用
-        /// </summary>
-        public GameObject wrongImg;
-        public GameObject correctAnswerText;
-        public Text answer;
+		/// <summary>
+		/// 场景对象引用
+		/// </summary>
+		public Text answerText;
 
+		public GameObject wrongImg;
         public GameObject correctImg;
-        public GameObject correctTip;
-        public Assets.Scripts.Scenes.ExerPro.EnglishPro.PhraseScene scene;
 
-        string correctAnswer;
-        bool correctFlag;
+		public Text resultTip;
 
-        protected override void initializeOnce() {
-            base.initializeOnce();
-        }
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		string option, word, answer;
 
-        /// <summary>
-        /// 开启窗口
-        /// </summary>
-        public override void startWindow() {
-            base.startWindow();
-        }
+		#region 初始化
 
-        /// <summary>
-        /// 判断答题结果
-        /// </summary>
-        bool isCorrect(string answer) {
-            if (answer == "") return true;
-            return false;
-        }
+		protected override void initializeScene() {
+			base.initializeScene();
+			scene = SceneUtils.getCurrentScene<PhraseScene>();
+		}
 
+		#endregion
 
-        /// <summary>
-        /// 初始化显示
-        /// </summary>
-        public void initView(string word, string correctAnswer) {
-            this.correctAnswer = word + " " + correctAnswer;
-            correctFlag = isCorrect(correctAnswer);
-            scene.record(correctFlag);
-            answer.text = this.correctAnswer;
-            wrongImg.SetActive(!correctFlag);
-            correctAnswerText.SetActive(!correctFlag);
-            answer.gameObject.SetActive(!correctFlag);
-            correctImg.SetActive(correctFlag);
-            correctTip.SetActive(correctFlag);
-            startWindow();
-        }
+		#region 开启
 
-        /// <summary>
-        /// 确认
-        /// </summary>
-        public void confirm() {
-            this.terminateWindow();
+		/// <summary>
+		/// 初始化显示
+		/// </summary>
+		public void startWindow(string word, string option, string correctAnswer) {
+			startWindow();
+			setupAnswer(word, option, correctAnswer);
+		}
+
+		#endregion
+
+		#region 数据控制
+
+		/// <summary>
+		/// 判断答题结果
+		/// </summary>
+		bool isCorrect() {
+			return option == answer;
+		}
+
+		/// <summary>
+		/// 配置答案
+		/// </summary>
+		/// <param name="word">原单词</param>
+		/// <param name="option">回答答案</param>
+		/// <param name="answer">正确答案</param>
+		void setupAnswer(string word, string option, string answer) {
+			this.word = word; this.option = option;
+			this.answer = answer;
+
+			scene.record(option);
+
+			requestRefresh();
+		}
+
+		#endregion
+
+		#region 界面控制
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		protected override void refresh() {
+			base.refresh();
+			var corr = isCorrect();
+
+			answerText.text = word + " " + answer;
+			resultTip.text = corr ? CorrectText : WrongText;
+
+			wrongImg.SetActive(!corr);
+			correctImg.SetActive(corr);
+		}
+
+		#endregion
+
+		#region 流程控制
+
+		/// <summary>
+		/// 确认
+		/// </summary>
+		public void confirm() {
+            terminateWindow();
             scene.nextQuestion();
         }
-    }
+
+		#endregion
+	}
 }

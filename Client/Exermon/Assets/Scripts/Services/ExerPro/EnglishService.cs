@@ -863,6 +863,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+			
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -874,6 +876,7 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
 				} else exitNode(false);
+			
 		}
 
 		#region 休息据点
@@ -911,13 +914,13 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-            switch (Random.Range(0, 10000) % 2) {
-                case 0:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-                case 1:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-            }
-        }
+			switch (Random.Range(0, 10000) % 2) {
+				case 0:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+				case 1:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+			}
+		}   
 
         /// <summary>
         /// 商人据点
