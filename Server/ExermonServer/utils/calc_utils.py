@@ -2172,7 +2172,7 @@ class CorrectionCompute:
         elif answer_type == CorrectType.Edit.value:
 
             # 判断是否只有一个正确答案
-            if right_answer.indexOf('/') != -1:
+            if "/" in right_answer:
                 answers = right_answer.split('/')
                 if answer in answers:
                     return True
@@ -2183,39 +2183,36 @@ class CorrectionCompute:
 
         elif answer_type == CorrectType.Add.value:
 
+            # 判断增加单词前面的那个词是否来自原文
+            answer_font = answer.split(' ')[0]
+            cls.isAddValid(answer_font, wid, sentence)
+            answer_back = answer.split(' ')[1]
+
             # 判断是否只有一个正确答案
-            if right_answer.indexOf('/') != -1:
-
-                # 判断增加单词前面的那个词是否来自原文
-                answer_font = answer.split(' ')[0]
-                cls.answer(answer_font, wid, sentence)
-
-                # 组合正确答案
-                answers = right_answer.split(' ')
-                answers_back = answers[1].split('/')
-                right_answer_list = []
-
-                for back in answers_back:
-                    right_answer_list.append(answers[0] + back)
-
-                if answer in right_answer_list:
+            if "/" in right_answer:
+                # 只要答对一个正确答案即可
+                right_answers = right_answer.split('/')
+                if answer_back in right_answers:
                     return True
                 else:
                     return False
             else:
-                return answer == right_answer
+                return answer_back == right_answer
 
     # 计算改错题答对几个
     @classmethod
     def computeRightAnswer(cls, origin_article, wrong_items_frontend, wrong_items_backend):
         sentences = cls.formatSentence(origin_article)
         num = 0
+
         for wrong_item in wrong_items_backend:
             for wrong in wrong_items_frontend:
                 if wrong_item.sentence_index == wrong['sid'] \
                         and wrong_item.word_index == wrong['wid'] \
                         and cls.answer(wrong['word'], wrong_item.word,
                                        wrong['wid'], sentences[wrong_item.sentence_index-1]):
+                    print(cls.answer(wrong['word'], wrong_item.word,
+                                       wrong['wid'], sentences[wrong_item.sentence_index-1]))
                     num += 1
 
         return num
