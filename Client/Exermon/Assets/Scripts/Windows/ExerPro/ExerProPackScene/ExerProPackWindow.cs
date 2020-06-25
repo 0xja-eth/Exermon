@@ -4,6 +4,13 @@ using ExerPro.EnglishModule.Services;
 using UI.ExerPro.EnglishPro.ExerProPackScene.Controls;
 using UnityEngine;
 using UI.ExerPro.EnglishPro.ExerProPackScene.Pack;
+using Core.Systems;
+using PlayerModule.Services;
+using RecordModule.Services;
+using ItemModule.Services;
+using UI.Common.Controls.ItemDisplays;
+using ItemModule.Data;
+using UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail;
 
 namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
     public class ExerProPackWindow : BaseWindow {
@@ -12,17 +19,23 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 外部组件设置
         /// </summary>
         public PackTabController tabController;
-
+        public ExerProPackItemDetail packItemDetail;
+        public GameObject detail;
 
         /// <summary>
         /// 内部变量声明
         /// </summary>
         View view;
+        RuntimeActor player;
 
         /// <summary>
-        /// 外部系统设置
+        /// 外部系统引用
         /// </summary>
-        EnglishService engSer;
+        GameSystem gameSys = null;
+        PlayerService playerSer = null;
+        RecordService recordSer = null;
+        ItemService itemSer = null;
+        EnglishService engSer = null;
 
         /// <summary>
         /// 视图枚举
@@ -75,15 +88,16 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 当前背包容器
         /// </summary>
         /// <returns></returns>
-        //public SelectableContainerDisplay<ExerProPackItem<BaseExerProItem>>
-        //    currentPackContainer() {
-        //    switch (view) {
-        //        case View.Card: return cardPackDisplay;
-        //        case View.Item: return itemPackDisplay;
-        //            //case View.Potion: return cardPackDisplay;
-        //    }
-        //    return null;
-        //}
+        public View
+            CurrentPackContainer() {
+            //switch (view) {
+            //    case View.Item: return itemPackDisplay;
+            //    case View.Potion: return potionPackDisplay;
+            //    case View.Card: return cardPackDisplay;
+            //}
+            //return null;
+            return view;
+        }
         #endregion
 
         #region 流程控制
@@ -113,6 +127,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
                 case View.Potion: onPotionPack(); break;
                 case View.Card: onCardPack(); break;
             }
+            packItemDetail.updateButtons(view);
         }
 
         /// <summary>
@@ -137,11 +152,10 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             items[5] = ExerProPackItem.sample();
             items[6] = ExerProPackItem.sample();
             items[7] = ExerProPackItem.sample();
-            itemPackDisplay.setItems(items);
             itemPackDisplay.startView();
-
-            //startWindow(View.Item);
-            //humanPack.startView(); humanPack.setPackData(container);
+            itemPackDisplay.setItems(items);
+            detail.SetActive(true);
+            packItemDetail.clearItem();
         }
 
         /// <summary>
@@ -158,30 +172,24 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             potions[5] = ExerProPackPotion.sample();
             potions[6] = ExerProPackPotion.sample();
             potions[7] = ExerProPackPotion.sample();
-            potionPackDisplay.setItems(potions);
             potionPackDisplay.startView();
-            //startWindow(View.Potion);
-            //exerPack.startView(); exerPack.setPackData(container);
+            potionPackDisplay.setItems(potions);
+            detail.SetActive(true);
+            packItemDetail.clearItem();
         }
 
         /// <summary>
         /// 卡片背包
         /// </summary>
         void onCardPack() {
-            var container = engSer.record.actor.cardGroup;
-            ExerProPackCard[] cards = new ExerProPackCard[8];
-            cards[0] = ExerProPackCard.sample();
-            cards[1] = ExerProPackCard.sample();
-            cards[2] = ExerProPackCard.sample();
-            cards[3] = ExerProPackCard.sample();
-            cards[4] = ExerProPackCard.sample();
-            cards[5] = ExerProPackCard.sample();
-            cards[6] = ExerProPackCard.sample();
-            cards[7] = ExerProPackCard.sample();
-            cardPackDisplay.setItems(cards);
+            var cards = engSer.record.actor.cardGroup.items;
             cardPackDisplay.startView();
+            cardPackDisplay.setItems(cards.ToArray());
+            detail.SetActive(false);
+            packItemDetail.clearItem();
             //cardPackDisplay.setPackData(container);
         }
+
         /// <summary>
         /// 清除视图
         /// </summary>
@@ -189,6 +197,23 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             itemPackDisplay.terminateView();
             cardPackDisplay.terminateView();
             potionPackDisplay.terminateView();
+        }
+
+
+        /// <summary>
+        /// 装备
+        /// </summary>
+        public void equip() {
+            var slot = player.potionSlot;
+            //if ()
+        }
+
+        /// <summary>
+        /// 装备
+        /// </summary>
+        public void equip(ExerProPackPotion potion) {
+            var slot = player.potionSlot;
+            slot.setEquip(player.potionPack, potion);
         }
 
         #endregion

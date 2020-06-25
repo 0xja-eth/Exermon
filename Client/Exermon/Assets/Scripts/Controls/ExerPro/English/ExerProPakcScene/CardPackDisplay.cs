@@ -1,9 +1,7 @@
 ﻿using ExerPro.EnglishModule.Data;
-using System.Collections.Generic;
 using UI.Common.Controls.ItemDisplays;
-using UI.ExerPro.EnglishPro.BattleScene.Controls.Menu;
 using UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail;
-using UnityEngine;
+using UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu;
 using UnityEngine.UI;
 
 namespace UI.ExerPro.EnglishPro.ExerProPackScene.Pack {
@@ -22,8 +20,8 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Pack {
         }
         protected override void onSubViewCreated(SelectableItemDisplay<ExerProPackCard> sub, int index) {
             base.onSubViewCreated(sub, index);
-            ((CardDisplay)sub).setItem(items[index]);
-            ((CardDisplay)sub).description = description;
+            //((PackCardDisplay)sub).setItem(items[index]);
+            //((PackCardDisplay)sub).description = description;
         }
         protected override void onSelectChanged() {
             base.onSelectChanged();

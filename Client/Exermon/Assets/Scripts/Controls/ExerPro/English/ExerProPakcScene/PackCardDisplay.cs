@@ -13,8 +13,8 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
     /// <summary>
     /// 特训背包药水
     /// </summary>
-    public class PackPotionDisplay : PackContItemDisplay
-        <ExerProPackPotion, ExerProPotion> {
+    public class PackCardDisplay : PackContItemDisplay
+        <ExerProPackCard, ExerProCard> {
 
 
         /// <summary>
@@ -33,15 +33,15 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
         /// 绘制卡牌
         /// </summary>
         /// <param name="card"></param>
-        protected override void drawExactlyItem(ExerProPackPotion item) {
+        protected override void drawExactlyItem(ExerProPackCard item) {
             base.drawExactlyItem(item);
         }
 
-        protected override void drawItem(ExerProPotion item) {
+        protected override void drawItem(ExerProCard item) {
             base.drawItem(item);
+            description.text = item.description;
             name.text = item.name;
             icon.gameObject.SetActive(true);
-            Debug.Log("AAA" + item.icon);
             icon.overrideSprite = item.icon;
         }
 

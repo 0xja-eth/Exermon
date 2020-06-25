@@ -164,7 +164,7 @@ namespace ExerPro.EnglishModule.Data {
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
-        public string[] option1 = { "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. of sth.", "sth. for sb." };
+        public string[] option1 = { "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. for doing sth.", "sb. of sth.", "sth. for sb." };
         public string[] option2 = { "doing sth.", "to do sth.", "to doing sth." };
         public string[] option3 = { "about", "at", "for", "from", "in", "of", "with", "to" };
         public string[] option = { "about", "at", "for", "from", "in", "of", "with", "to" ,
@@ -869,8 +869,7 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         public static ExerProItem sample() {
-            ExerProItem item = new ExerProItem();
-            return item;
+            return DataService.get().exerProItem(UnityEngine.Random.Range(32, 34));
         }
     }
 
@@ -891,8 +890,7 @@ namespace ExerPro.EnglishModule.Data {
             return AssetLoader.getExerProItemIconSprite;
         }
         public static ExerProPotion sample() {
-            ExerProPotion item = new ExerProPotion();
-            return item;
+            return DataService.get().exerProPotion(UnityEngine.Random.Range(4, 8));
         }
 
         /// <summary>
@@ -992,12 +990,14 @@ namespace ExerPro.EnglishModule.Data {
         public static ExerProCard sample() {
             ExerProCard card = new ExerProCard();
             card.cost = 1;
+            card.skinIndex = 0;
             card.cardType = 0;
             card.inherent = false;
             card.disposable = false;
             card.character = "character";
-            card.target = 1;
-            card.iconIndex = 2;
+            card.target = 0;
+            card.type = 1;
+            card.iconIndex = 0;
             return card;
         }
 
@@ -1241,8 +1241,7 @@ namespace ExerPro.EnglishModule.Data {
         public static ExerProPackItem sample() {
 
             ExerProPackItem sample = new ExerProPackItem(ExerProItem.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
-
+            sample.count = UnityEngine.Random.Range(1, 10);
             return sample;
         }
 
@@ -1261,7 +1260,6 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPackPotion(ExerProPotion potion) : base(potion) { }
         public static ExerProPackPotion sample() {
             ExerProPackPotion sample = new ExerProPackPotion(ExerProPotion.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
 
             return sample;
         }
@@ -1288,11 +1286,16 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPackCard(ExerProCard card) : base(card) { }
 
         public static ExerProPackCard sample() {
-
             ExerProPackCard sample = new ExerProPackCard(ExerProCard.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
 
             return sample;
+        }
+        public static ExerProPackCard[] ExerProCard2ExerProPackCard(ExerProCard[] cards) {
+            var cnt = cards.Length;
+            var packCards = new ExerProPackCard[cnt];
+            for (int i = 0; i < cnt; ++i)
+                packCards[i] = new ExerProPackCard(cards[i]);
+            return packCards;
         }
     }
 
