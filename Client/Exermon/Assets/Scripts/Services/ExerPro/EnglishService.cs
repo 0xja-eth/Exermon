@@ -551,8 +551,8 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="answers">作答集</param>
 		/// <param name="onSuccess">成功回调</param>
 		/// <param name="onError">失败回调</param>
-		public void answerCorrection(CorrectionQuestion question, 
-			CorrectionQuestion.FrontendWrongItem[] answers, 
+		public void answerCorrection(CorrectionQuestion question,
+			CorrectionQuestion.FrontendWrongItem[] answers,
 			UnityAction<int> onSuccess, UnityAction onError = null) {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -567,6 +567,12 @@ namespace ExerPro.EnglishModule.Services {
 				answers_.Add(DataLoader.convert(answer));
 
 			answerCorrection(question.id, answers_, _onSuccess, onError);
+		}
+		public void answerCorrection(CorrectionQuestion question,
+			List<CorrectionQuestion.FrontendWrongItem> answers,
+			UnityAction<int> onSuccess, UnityAction onError = null) {
+
+			answerCorrection(question, answers.ToArray(), onSuccess, onError);
 		}
 		/// <param name="qid">听力题</param>
 		public void answerCorrection(int qid, JsonData answers,

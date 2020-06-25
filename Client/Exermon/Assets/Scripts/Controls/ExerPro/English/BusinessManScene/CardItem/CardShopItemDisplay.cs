@@ -10,7 +10,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
     /// <summary>
     /// 装备背包显示
     /// </summary>
-    public class CardItemDisplay : ExerProShopItemDisplay<ExerProCard> {
+    public class CardShopItemDisplay : ExerProShopItemDisplay<ExerProCard> {
 
 		/// <summary>
 		/// 外部组件定义

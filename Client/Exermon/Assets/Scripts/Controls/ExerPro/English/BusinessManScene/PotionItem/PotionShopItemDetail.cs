@@ -18,7 +18,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
     /// <summary>
     /// 物品详情
     /// </summary>
-    public class PotionItemDetail : ShopItemDetail<ExerProPotion> {//BaseItemDetail, IItemDetailDisplay<ExerProPotion>  {
+    public class PotionShopItemDetail : ShopItemDetail<ExerProPotion> {//BaseItemDetail, IItemDetailDisplay<ExerProPotion>  {
 
         /// <summary>
         /// 常量定义
