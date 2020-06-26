@@ -95,8 +95,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// 是否有修改
 		/// </summary>
 		/// <returns></returns>
-		public bool isChanged() {
-			return item != originalWord;
+		public bool isChanged(string word = null) {
+			if (word == null) word = item;
+			return word != originalWord;
 		}
 		
 		/// <summary>
@@ -167,7 +168,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			// 如果需要改，筛选出备选项
 			var changed = getChangedWord(word);
 			var corrChanged = getChangedWord(correctWord);
-			var corrWords = changed.Split('/').ToList();
+			var corrWords = corrChanged.Split('/').ToList();
 
 			return corrWords.Contains(changed);
 		}
@@ -249,7 +250,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		void drawStateColor(string word) {
 			var color = normalColor;
 
-			if (isShowAnswer() && isChanged()) // 需要显示答案
+			if (isShowAnswer() && isChanged(word)) // 需要显示答案
 				color = isCorrect(word) ? correctColor : wrongColor;
 
 			text.color = color;

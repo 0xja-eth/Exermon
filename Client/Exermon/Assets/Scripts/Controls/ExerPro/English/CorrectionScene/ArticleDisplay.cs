@@ -26,6 +26,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		public Text count;
 
 		/// <summary>
+		/// 外部变量定义
+		/// </summary>
+		public float scrollDelta = 64;
+
+		/// <summary>
 		/// 内部变量定义
 		/// </summary>
 		public Dictionary<WordDisplay, FrontendWrongItem> answers { get; set; }
@@ -272,6 +277,24 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			if (display == null) return;
 			display.sid = index + 1;
 			display.articleDisplay = this;
+		}
+
+		/// <summary>
+		/// 向上移动
+		/// </summary>
+		public void scrollUp() {
+			var oriPos = container.anchoredPosition;
+			oriPos.y += scrollDelta;
+			container.anchoredPosition = oriPos;
+		}
+
+		/// <summary>
+		/// 向下移动
+		/// </summary>
+		public void scrollDown() {
+			var oriPos = container.anchoredPosition;
+			oriPos.y -= scrollDelta;
+			container.anchoredPosition = oriPos;
 		}
 
 		/// <summary>
