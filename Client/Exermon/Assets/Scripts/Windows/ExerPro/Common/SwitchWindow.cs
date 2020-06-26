@@ -106,7 +106,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
         /// <summary>
         /// 完成退出
         /// </summary>
-        void onSubmitClicked() {
+        public void onSubmitClicked() {
             terminateWindow();
             terminateCallback?.Invoke();
         }

@@ -1045,6 +1045,13 @@ namespace GameModule.Services {
 			public static RuntimeActionResult[] generate(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
                 var generator = new ExerProActionResultGenerator(action);
+
+                var enemy = action.subject as RuntimeEnemy;
+                if (enemy != null) {
+                    Debug.Log("Enemy Next Result Name:" + enemy.enemy().id);
+                    if(generator.results.Length > 0)
+                        Debug.Log("Enemy Next Result Action:" + generator.results[0].hpDamage);
+                }
                 return generator.results;
             }
 
@@ -1500,6 +1507,8 @@ namespace GameModule.Services {
 
                 action = calc.generateAction();
                 runtimeAction = calc.generateRuntimeAction(actor);
+                Debug.Log("Enemy Next Name:" + (runtimeAction.subject as RuntimeEnemy)?.enemy().id);
+                Debug.Log("Enemy Next Action:" + action.typeEnum());
             }
 
             /// <summary>
@@ -1605,10 +1614,13 @@ namespace GameModule.Services {
 
 				int value = enemy.power();
 				if (actionParams.Count > 0) value += (int)actionParams[0];
-				actionParams.Add(value);
+
+                JsonData params_ = new JsonData();
+                params_.SetJsonType(JsonType.Array);
+                params_.Add(value);
 
 				effects.Add(new ExerProEffectData(
-                    ExerProEffectData.Code.Attack, actionParams));
+                    ExerProEffectData.Code.Attack, params_));
             }
 
             /// <summary>
@@ -1949,7 +1961,7 @@ namespace GameModule.Services {
 							generateCards(RewardCardNumber, 0.35, 0.4);
                         break;
 
-					case ExerProMapNode.Type.Boss:
+                    case ExerProMapNode.Type.Boss:
                         exerProCards = ExerProItemGenerator.
 							generateCards(RewardCardNumber, 0, 0);
                         break;
@@ -1970,7 +1982,7 @@ namespace GameModule.Services {
             public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
                 record.scoreRecord.killBossAccmu += boss;
 
-				var gold = record.actor.gold;
+                var gold = record.actor.gold;
                 var cards = record.actor.cardGroup.getCardNumber();
 
                 var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
@@ -2008,11 +2020,10 @@ namespace GameModule.Services {
             const int NormalStarID = 1;
             const int RareStarID = 2;
 			const int EpicStarID = 3;
-
-			double DefaultNoramlRatio = 0.8;
+            double DefaultNoramlRatio = 0.8;
             double DefaultRareRatio = 0.15;
 
-			int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+            int[] cardTypePrice = new int[3]{ 20, 50, 100 };
 
 			/*
             /// <summary>
@@ -2077,15 +2088,15 @@ namespace GameModule.Services {
 
 				int cnt = 0;
 				while (exerProCards.Count != count && cnt++ <= 100000) {
-					var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
+                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
 					if (result == null || exerProCards.Contains(result)) continue;
 
 					Debug.Log("exerProCards.Add(" + result.name + ")");
 
-					exerProCards.Add(result);
+                    exerProCards.Add(result);
                 }
 
-				return exerProCards;
+                return exerProCards;
             }
 
             /// <summary>
@@ -2105,7 +2116,7 @@ namespace GameModule.Services {
 
 					Debug.Log("exerProCards.Add(" + result.name + ")");
 
-					exerProPotions.Add(result);
+                    exerProPotions.Add(result);
                 }
 
                 return exerProPotions;
@@ -2145,8 +2156,7 @@ namespace GameModule.Services {
                 }
 
                 shuffleItems(items);
-
-                float randomValue = Random.Range(0, 1);
+				float randomValue = Random.Range(0.0f, 1.0f);
                 if (randomValue < normalRatio)
                     return items.Find(e => e.starId == NormalStarID);
                 else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)

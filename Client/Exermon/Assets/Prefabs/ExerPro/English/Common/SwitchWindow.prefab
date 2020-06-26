@@ -153,7 +153,6 @@ GameObject:
   m_Component:
   - component: {fileID: 50194686424130595}
   - component: {fileID: 8639748659147056105}
-  - component: {fileID: 5283448765123415925}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -205,32 +204,6 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
---- !u!114 &5283448765123415925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 50194686424130594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 929449b3e6a4acd4ea993f701925cf1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  container: {fileID: 50194686424130595}
-  subViewNameFormat: 
-  subViewPrefab: {fileID: 6772836410102114623, guid: 5d5554e7b70567243b2ad45dec301d87,
-    type: 3}
-  mask: {fileID: 0}
-  countText: {fileID: 0}
-  maxCheck: 0
-  defaultCapacity: 0
-  defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
-  _actived: 1
-  _selectable: 1
-  _deselectable: 0
-  _checkable: 1
-  _highlightable: 1
 --- !u!1 &50194686640959605
 GameObject:
   m_ObjectHideFlags: 0

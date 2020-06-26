@@ -21,6 +21,8 @@ namespace UI.ExerPro.EnglishPro { }
 namespace UI.ExerPro.EnglishPro.MapScene {
 
     using Controls;
+    using UI.ExerPro.EnglishPro.Common.Windows;
+    using UnityEngine.UI;
 
     /// <summary>
     /// 地图场景
@@ -32,8 +34,12 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         public StageRecordDisplay stageRecordDisplay;
 		public RestNodeDisplay restNodeDisplay;
+        public SwitchWindow switchWindow;
 
-		public BaseWindow nodeDetail;
+        public Image loseBackground;
+        public Image passBackground;
+
+        public BaseWindow nodeDetail;
 
         /// <summary>
         /// 内部变量定义
@@ -82,6 +88,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             base.update();
             engSer?.update();
 			updateRestNode();
+            updateSwitchWindow();
         }
 
 		/// <summary>
@@ -92,6 +99,24 @@ namespace UI.ExerPro.EnglishPro.MapScene {
 			restNodeDisplay.startView(engSer.randomTips());
 			stageRecordDisplay.requestRefresh();
 		}
+
+        /// <summary>
+        /// 更新死亡/关卡切换窗口
+        /// </summary>
+        void updateSwitchWindow() {
+            if (!switchWindow.gameObject.activeInHierarchy) {
+                if (engSer.record.actor.isDead()) {
+                    switchWindow.startWindow(type: SwitchWindow.Type.Die, onDieExit);
+                    loseBackground?.gameObject.SetActive(true);
+                }
+                else if(BattleService.get().result == BattleService.Result.Pass) {
+                    BattleService.get().result = BattleService.Result.None;
+                    switchWindow.startWindow(SwitchWindow.Type.Boss, onBossPass);
+                    passBackground?.gameObject.SetActive(true);
+                }
+            }
+        }
+
 
         #endregion
 
@@ -133,5 +158,21 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         }
         #endregion
 
+        #region 回调函数
+        /// <summary>
+        /// 死亡退出回调
+        /// </summary>
+        void onDieExit() {
+            popScene();
+        }
+
+        /// <summary>
+        /// 阶段通关回调
+        /// </summary>
+        void onBossPass() {
+            engSer.passExchange();
+            stageRecordDisplay.requestRefresh();
+        }
+        #endregion
     }
 }

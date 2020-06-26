@@ -1205,17 +1205,30 @@ namespace ItemModule.Data {
 		/// </summary>
 		/// <param name="index">下标</param>
 		/// <returns>返回对应索引的<装备槽项/returns>
-		public virtual T getSlotItemByIndex(int index) {
-			return findItem(item => item.index == index);
+		public virtual int getSlotIndexByItem<E>(E item) where E : PackContItem, new() {
+            foreach(var slot in items) {
+                if (slot.getEquip<E>() == item) return items.IndexOf(slot);
+            }
+            return -1;
 		}
 
-		/// <summary>
-		/// 通过装备物品获取槽
-		/// </summary>
-		/// <typeparam name="E">装备物品类型</typeparam>
-		/// <param name="equipItem">装备物品</param>
-		/// <returns>槽ID</returns>
-		public abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
+
+        /// <summary>
+        /// 通过索引获取槽
+        /// </summary>
+        /// <param name="index">下标</param>
+        /// <returns>返回对应索引的<装备槽项/returns>
+        public virtual T getSlotIndexByItem(int index) {
+            return findItem(item => item.index == index);
+        }
+
+        /// <summary>
+        /// 通过装备物品获取槽
+        /// </summary>
+        /// <typeparam name="E">装备物品类型</typeparam>
+        /// <param name="equipItem">装备物品</param>
+        /// <returns>槽ID</returns>
+        public abstract T getSlotItemByEquipItem<E>(E equipItem) where E : PackContItem, new();
 
 		/// <summary>
 		/// 查找一个空的容器项

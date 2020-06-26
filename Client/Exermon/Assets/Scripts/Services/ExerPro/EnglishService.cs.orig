@@ -37,7 +37,7 @@ namespace ExerPro.EnglishModule.Services {
 		const int PlotQuestionType = 4;
 
 		/// <summary>
-		/// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
+		/// 随机据点几率比例（敌人:藏宝:商人:精英:剧情）
 		/// </summary>
 		static readonly int[] RandomNodeRates = { 6, 2, 2, 1, 29 };
 		static readonly ExerProMapNode.Type[] RandomNodeTypes = {
@@ -58,7 +58,7 @@ namespace ExerPro.EnglishModule.Services {
 		const string ExerProSave = "保存进度";
 
 		const string QuestionGenerate = "生成题目";
-		const string QuestionGet = "获取题目";
+		const string QuestionGet = "下载题目";
 
 		const string WordGenerate = "生成单词";
 		const string WordAnswer = "提交答案";
@@ -551,8 +551,8 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="answers">作答集</param>
 		/// <param name="onSuccess">成功回调</param>
 		/// <param name="onError">失败回调</param>
-		public void answerCorrection(CorrectionQuestion question, 
-			CorrectionQuestion.FrontendWrongItem[] answers, 
+		public void answerCorrection(CorrectionQuestion question,
+			CorrectionQuestion.FrontendWrongItem[] answers,
 			UnityAction<int> onSuccess, UnityAction onError = null) {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
@@ -567,6 +567,12 @@ namespace ExerPro.EnglishModule.Services {
 				answers_.Add(DataLoader.convert(answer));
 
 			answerCorrection(question.id, answers_, _onSuccess, onError);
+		}
+		public void answerCorrection(CorrectionQuestion question,
+			List<CorrectionQuestion.FrontendWrongItem> answers,
+			UnityAction<int> onSuccess, UnityAction onError = null) {
+
+			answerCorrection(question, answers.ToArray(), onSuccess, onError);
 		}
 		/// <param name="qid">听力题</param>
 		public void answerCorrection(int qid, JsonData answers,
@@ -860,6 +866,15 @@ namespace ExerPro.EnglishModule.Services {
 		}
 		void switchNode(ExerProMapNode.Type type) {
 			Debug.Log("switchNode: " + type);
+
+			record.currentNode().realTypeId = (int)type;
+
+<<<<<<< HEAD
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+			/*
+=======
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene);
+>>>>>>> b0096f8e9a1b588b3f0146dd6d184b35d38dc61a
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -908,27 +923,13 @@ namespace ExerPro.EnglishModule.Services {
 		/// 藏宝据点
 		/// </summary>
 		void onTreasureNode() {
-<<<<<<< HEAD
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
-			//long i = UnityEngine.Random.Range(0, 10000);
-			//switch (i % 2) {
-			//    case 0:
-			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-			//    case 1:
-			//        sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-			//}
-		}
-=======
-            long i = UnityEngine.Random.Range(0, 10000);
-            i = 1;
-            switch (i % 2) {
-                case 0:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
-                case 1:
-                    sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
-            }
-        }
->>>>>>> 6449db6a81c830ad907e58aced0f120a23f8defc
+			switch (Random.Range(0, 10000) % 2) {
+				case 0:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene); break;
+				case 1:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene); break;
+			}
+		}   
 
         /// <summary>
         /// 商人据点
@@ -941,8 +942,12 @@ namespace ExerPro.EnglishModule.Services {
 		/// 剧情据点
 		/// </summary>
 		void onStoryNode() {
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProBusinessManScene);
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+			switch (Random.Range(0, 10000) % 2) {
+				case 0:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene); break;
+				case 1:
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
+			}
 		}
 
 		/// <summary>
@@ -951,13 +956,6 @@ namespace ExerPro.EnglishModule.Services {
 		void onEnemyNode() {
 			battleSer.start(ExerProMapNode.Type.Enemy);
 		}
-
-		/// <summary>
-		/// 听力据点
-		/// </summary>
-		//void onListenNode() {
-		//	sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
-		//}
 
 		/// <summary>
 		/// 精英据点
@@ -1013,13 +1011,6 @@ namespace ExerPro.EnglishModule.Services {
 					isPerfect = true;
 			}
 			rewardInfo = new RewardInfo(enemyNumber, questionNumber, bossNumber, isPerfect);
-		}
-
-		/// <summary>
-		/// 处理剧情奖励
-		/// </summary>
-		public void processPlotReward() {
-
 		}
 
 		/// <summary>
@@ -1097,6 +1088,21 @@ namespace ExerPro.EnglishModule.Services {
 			save(); sceneSys.popScene();
 		}
 
+        /// <summary>
+        /// 通关后更新数据
+        /// </summary>
+        public void passExchange() {
+            save();
+            //TODO:交互数据
+            var newStageOrder = record.stageOrder + 1;
+
+            //退出刷新缓存的数据，如当前位置等
+            //TODO：此处应该增加一个清理缓存的接口，而不是直接退出
+            terminate();
+            //交互成功后重启
+            start(1);
+        }
+        
 		#endregion
 
 		#endregion
@@ -1267,6 +1273,13 @@ namespace ExerPro.EnglishModule.Services {
 			public int killBossNumber { get; set; } = 0;
 			public bool isPerfect { get; set; } = false;
 
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			/// <param name="enemyNumber"></param>
+			/// <param name="questionNumber"></param>
+			/// <param name="killBossNumber"></param>
+			/// <param name="isPerfect"></param>
 			public RewardInfo(int enemyNumber = 0, int questionNumber = 0, int killBossNumber = 0, bool isPerfect = false) {
 				this.killEnemyNumber = enemyNumber;
 				this.correctQuestionNumber = questionNumber;
@@ -1274,7 +1287,7 @@ namespace ExerPro.EnglishModule.Services {
 				this.isPerfect = isPerfect;
 			}
 
-			public RewardInfo() { }
+			// public RewardInfo() { }
 		}
 
 		/// <summary>

@@ -16,6 +16,7 @@ using UI.PackScene.Windows;
 using UI.ExerPro.EnglishPro.ExerProPackScene.Windows;
 using UI.ExerPro.EnglishPro.BattleScene.Controls.Menu;
 using ExerPro.EnglishModule.Data;
+using static UI.ExerPro.EnglishPro.ExerProPackScene.Windows.ExerProPackWindow;
 
 namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
 
@@ -40,7 +41,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         public MultParamsDisplay itemDetail, equipDetail;
         public ParamDisplaysGroup paramsGroup;
 
-        public GameObject equip, use, discard, sell;
+        public GameObject equip, dequip;
 
         /// <summary>
         /// 外部系统设置
@@ -58,9 +59,9 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         }
         #endregion
 
-        ///// <summary>
-        ///// 配置属性组
-        ///// </summary>
+        /// <summary>
+        /// 配置属性组
+        /// </summary>
         //void configureParamsGroup() {
         //    var params_ = dataSer.staticData.configure.baseParams;
         //    paramsGroup.configure(params_);
@@ -69,10 +70,10 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         ///// <summary>
         ///// 初始化外部系统
         ///// </summary>
-        //protected override void initializeSystems() {
-        //    base.initializeSystems();
-        //    dataSer = DataService.get();
-        //}
+        protected override void initializeSystems() {
+            base.initializeSystems();
+            dataSer = DataService.get();
+        }
 
         /// <summary>
         /// 初始化绘制函数
@@ -135,15 +136,13 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         //    return item;
         //}
 
-        ///// <summary>
-        ///// 是否为装备
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool isEquip(LimitedItem item = null) {
-        //    if (item == null) item = getContainedItem();
-        //    return item.type == (int)BaseItem.Type.HumanEquip ||
-        //        item.type == (int)BaseItem.Type.ExerEquip;
-        //}
+        /// <summary>
+        /// 是否为装备
+        /// </summary>
+        /// <returns></returns>
+        public bool isEquip(BaseExerProItem item) {
+            return (item.type == (int)BaseItem.Type.ExerProPotion);
+        }
 
         ///// <summary>
         ///// 物品是否可用
@@ -166,7 +165,6 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         void drawBaseInfo(BaseExerProItem item) {
             name.text = item.name;
             description.text = item.description;
-            starsDisplay.setValue(item.starId);
 
             icon.gameObject.SetActive(true);
             icon.overrideSprite = item.icon;
@@ -180,7 +178,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包物品</param>
         void drawExerProPackItem(ExerProPackItem Item) {
             drawBaseInfo(Item.item());
-            drawItemDetail(Item);
+            //drawItemDetail(Item);
         }
 
         /// <summary>
@@ -189,7 +187,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包药水</param>
         void drawExerProPackPotion(ExerProPackPotion potionItem) {
             drawBaseInfo(potionItem.item());
-            drawItemDetail(potionItem);
+            //drawItemDetail(potionItem);
         }
 
         /// <summary>
@@ -198,7 +196,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包卡片</param>
         void drawExerProPackCard(ExerProPackCard cardItem) {
             drawBaseInfo(cardItem.item());
-            drawItemDetail(cardItem);
+            //drawItemDetail(cardItem);
         }
 
 
@@ -232,16 +230,26 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         //    equipDetail.setValue(obj, "detail");
         //}
 
-        ///// <summary>
-        ///// 配置控制按钮
-        ///// </summary>
-        ///// <param name="item">物品</param>
-        //void setupButtons(LimitedItem item) {
-        //    equip.SetActive(isEquip());
-        //    use.SetActive(isUsable());
-        //    discard.SetActive(item.discardable);
-        //    sell.SetActive(item.sellable());
-        //}
+        /// <summary>
+        /// 配置控制按钮
+        /// </summary>
+        /// <param name="item">物品</param>
+        void setupButtons(BaseExerProItem item) {
+            equip.SetActive(isEquip(item));
+        }
+
+
+        /// <summary>
+        /// 配置控制按钮
+        /// </summary>
+        /// <param name="item">物品</param>
+        public void updateButtons(View view) {
+            switch (view) {
+                case View.Item: equip.SetActive(false); break;
+                case View.Potion: equip.SetActive(true); break;
+                case View.Card: equip.SetActive(false); break;
+            }
+        }
 
         ///// <summary>
         ///// 清除物品
