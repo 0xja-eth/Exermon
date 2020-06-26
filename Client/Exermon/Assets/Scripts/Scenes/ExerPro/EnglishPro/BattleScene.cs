@@ -177,6 +177,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
             engSer.exitNode();
         }
 
+
+        /// <summary>
+        /// 测试用
+        /// </summary>
+        public void cheat() {
+            Debug.Log("cheat start!");
+            battleSer.killAllEnemy();
+        }
+
 		#endregion
 
 		#region 流程控制

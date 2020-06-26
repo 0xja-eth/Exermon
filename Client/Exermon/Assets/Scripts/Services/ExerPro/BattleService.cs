@@ -545,7 +545,19 @@ namespace ExerPro.EnglishModule.Services {
 				enemy.onBattleEnd();
 		}
 
-		#endregion
+        #endregion
 
-	}
+
+        #region 测试辅助
+        /// <summary>
+        /// 一键9999
+        /// </summary>
+        public void killAllEnemy() {
+            if (_enemies.Count == 0)
+                return;
+            result = Result.Win;
+            processRoundResult();
+        }
+        #endregion
+    }
 }

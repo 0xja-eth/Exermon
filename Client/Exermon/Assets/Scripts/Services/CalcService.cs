@@ -1045,6 +1045,13 @@ namespace GameModule.Services {
 			public static RuntimeActionResult[] generate(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
                 var generator = new ExerProActionResultGenerator(action);
+
+                var enemy = action.subject as RuntimeEnemy;
+                if (enemy != null) {
+                    Debug.Log("Enemy Next Result Name:" + enemy.enemy().id);
+                    if(generator.results.Length > 0)
+                        Debug.Log("Enemy Next Result Action:" + generator.results[0].hpDamage);
+                }
                 return generator.results;
             }
 
@@ -1500,6 +1507,8 @@ namespace GameModule.Services {
 
                 action = calc.generateAction();
                 runtimeAction = calc.generateRuntimeAction(actor);
+                Debug.Log("Enemy Next Name:" + (runtimeAction.subject as RuntimeEnemy)?.enemy().id);
+                Debug.Log("Enemy Next Action:" + action.typeEnum());
             }
 
             /// <summary>
@@ -1605,10 +1614,13 @@ namespace GameModule.Services {
 
 				int value = enemy.power();
 				if (actionParams.Count > 0) value += (int)actionParams[0];
-				actionParams.Add(value);
+
+                JsonData params_ = new JsonData();
+                params_.SetJsonType(JsonType.Array);
+                params_.Add(value);
 
 				effects.Add(new ExerProEffectData(
-                    ExerProEffectData.Code.Attack, actionParams));
+                    ExerProEffectData.Code.Attack, params_));
             }
 
             /// <summary>
