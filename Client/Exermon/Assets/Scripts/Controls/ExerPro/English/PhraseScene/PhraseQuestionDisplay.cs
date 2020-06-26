@@ -4,24 +4,27 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+using Core.Data.Loaders;
+
 using Core.UI;
 
 using ExerPro.EnglishModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
-using UI.PhraseScene.Windows;
 
 namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
+
+	using Windows;
 
 	/// <summary>
 	/// 答案显示
 	/// </summary>
-    public class PhraseQuestionDisplay : ItemDisplay<PhraseQuestion>, IDropHandler {
+	public class PhraseQuestionDisplay : ItemDisplay<PhraseQuestion>, IDropHandler {
 
 		/// <summary>
 		/// 字符串常量定义
 		/// </summary>
-		const string Blank = " ...";
+		const string Blank = "";
 		const string RotateAnimation = "Rotate";
 		const string MoveUpAnimation = "MoveUp";
 		const string MoveDownAnimation = "MoveDown";
@@ -31,21 +34,47 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// </summary>
 		public Text chineseDisplay;
 		public Text phraseDisplay;
+		public Text optionDisplay;
 
-		public Image quesImg;
-		public Color normalColor = new Color(1, 1, 0);
-		public Color correctColor = new Color(0, 1, 0);
-		public Color wrongColor = new Color(1, 0, 0);
+		public GameObject optionObject;
+
+		public Image resultEffect;
 
 		public Animation animation;
 
 		public OptionAreaDisplay areaDisplay;
-		public ConfirmWindow window;
+
+		/// <summary>
+		/// 场景引用
+		/// </summary>
+		PhraseScene scene;
+
+		/// <summary>
+		/// 外部变量定义
+		/// </summary>
+		public Texture2D correct, wrong;
 
 		/// <summary>
 		/// 内部变量定义
 		/// </summary>
 		string option = null;
+
+		Sprite correctSprite, wrongSprite;
+
+		#region 初始化
+
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			scene = SceneUtils.getCurrentScene<PhraseScene>();
+
+			correctSprite = AssetLoader.generateSprite(correct);
+			wrongSprite = AssetLoader.generateSprite(wrong);
+		}
+
+		#endregion
 
 		#region 数据控制
 
@@ -67,10 +96,20 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		}
 
 		/// <summary>
+		/// 设置选项
+		/// </summary>
+		/// <param name="option"></param>
+		public void setOption(string option) {
+			scene.answer(this.option = option);
+			requestRefresh();
+		}
+
+		/// <summary>
 		/// 清除选项
 		/// </summary>
 		public void clearOption() {
-			option = null; requestRefresh();
+			option = null;
+			requestRefresh();
 		}
 
 		#endregion
@@ -83,6 +122,9 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// <param name="item"></param>
 		protected override void drawExactlyItem(PhraseQuestion item) {
 			base.drawExactlyItem(item);
+
+			drawOption();
+
 			if (option == null)
 				drawNormalQuestion(item);
 			else
@@ -96,7 +138,6 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		void drawNormalQuestion(PhraseQuestion question) {
 			chineseDisplay.text = item.chinese;
 			phraseDisplay.text = item.word + Blank;
-			quesImg.color = normalColor;
 
 			animation.Stop(MoveUpAnimation);
 			animation.Play(MoveDownAnimation);
@@ -109,12 +150,43 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// <param name="question"></param>
 		void drawAnswerQuestion(PhraseQuestion question) {
 			chineseDisplay.text = item.chinese;
-			phraseDisplay.text = item.word + " " + option;
-			quesImg.color = isCorrect() ? correctColor : wrongColor;
+			phraseDisplay.text = item.word;
+
+			var corr = isCorrect();
+
+			resultEffect.overrideSprite =
+				corr ? correctSprite : wrongSprite;
+
+			hideCurrentOption();
+			if (!corr) drawCorrectOption();
 
 			animation.Stop(MoveDownAnimation);
 			animation.Stop(RotateAnimation);
 			animation.Play(MoveUpAnimation);
+		}
+
+		/// <summary>
+		/// 隐藏当前选项
+		/// </summary>
+		void hideCurrentOption() {
+			var option = areaDisplay.getOption(this.option);
+			option?.terminateView();
+		}
+
+		/// <summary>
+		/// 绘制正确选项
+		/// </summary>
+		void drawCorrectOption() {
+			var option = areaDisplay.getOption(item.phrase);
+			if (option) option.isCorrect = true;
+		}
+
+		/// <summary>
+		/// 绘制所选项
+		/// </summary>
+		void drawOption() {
+			optionObject.SetActive(option != null);
+			optionDisplay.text = option ?? "";
 		}
 
 		/// <summary>
@@ -153,11 +225,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
         /// </summary>
         protected void processItemDrop(OptionDisplay display) {
             if (display == null) return;
-
-			option = display.getItem();
-
-			window.startWindow(item.word, option, item.phrase);
-			requestRefresh();
+			setOption(display.getItem());
         }
 
         #endregion

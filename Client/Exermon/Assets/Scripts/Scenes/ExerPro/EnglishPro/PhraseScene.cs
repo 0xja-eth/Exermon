@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 using Core.Systems;
 using Core.UI;
@@ -6,25 +7,38 @@ using Core.UI;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
-using UI.ExerPro.EnglishPro.PhraseScene.Controls;
 using UI.ExerPro.EnglishPro.Common.Windows;
 
-namespace UI.PhraseScene {
+using UI.Common.Controls.QuestionDisplay;
+
+namespace UI.ExerPro.EnglishPro.PhraseScene {
+
+	using Controls;
 
 	/// <summary>
 	/// 短语场景
 	/// </summary>
-    public class PhraseScene : BaseScene {
+	public class PhraseScene : BaseScene {
 
 		/// <summary>
 		/// 题目数
 		/// </summary>
 		const int QuestionCount = 10;
 
+		const int PhraseSecond = 30;
+
+		const string RestCountFormat = "剩余题目：{0}/{1}";
+
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
+		public Text count;
+		public QuestionTimer timer;
+
+		public GameObject nextBtn;
+
 		public RewardWindow rewardWindow;
+
 		public PhraseQuestionDisplay questionDisplay;
 
 		/// <summary>
@@ -32,32 +46,25 @@ namespace UI.PhraseScene {
 		/// </summary>
 		PhraseQuestion[] questions;
 		string[] options;
-
-		int correctNum, wrongNum = 0;
+		
         int currentQuestionIndex = 0;
+		
+		bool answering = false; // 回答中
 
-        /// <summary>
-        /// 外部系统设置
-        /// </summary>
-        EnglishService engSer;
+		/// <summary>
+		/// 外部系统设置
+		/// </summary>
+		EnglishService engSer;
 
-        #region 初始化
+		#region 初始化
 
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
             gameSys = GameSystem.get();
-        }
-
-        /// <summary>
-        /// 初始化其他
-        /// </summary>
-        protected override void initializeOthers() {
-            base.initializeOthers();
-            correctNum = wrongNum = 0;
         }
 
 		/// <summary>
@@ -86,9 +93,37 @@ namespace UI.PhraseScene {
 		/// </summary>
 		protected override void update() {
 			base.update();
+			updateReward();
+			updateTimer();
+		}
+
+		/// <summary>
+		/// 更新计时
+		/// </summary>
+		void updateReward() {
 			var rewardInfo = engSer.rewardInfo;
 			if (rewardInfo != null)
 				rewardWindow.startWindow(rewardInfo);
+		}
+
+		/// <summary>
+		/// 更新计时
+		/// </summary>
+		void updateTimer() {
+			if (!answering && timer.isTimeUp())
+				questionDisplay.setOption("");
+		}
+
+		#endregion
+
+		#region 界面绘制
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		void refresh() {
+			count.text = string.Format(RestCountFormat,
+				currentQuestionIndex + 1, questions.Length);
 		}
 
 		#endregion
@@ -102,6 +137,7 @@ namespace UI.PhraseScene {
 			this.questions = questions;
 			options = new string[questions.Length];
 			currentQuestionIndex = -1;
+
 			nextQuestion();
 			/*
 			PhraseQuestion question = questions[currentQuesIndex++];
@@ -138,6 +174,20 @@ namespace UI.PhraseScene {
 		#region 流程控制
 
 		/// <summary>
+		/// 回答
+		/// </summary>
+		/// <param name="option"></param>
+		public void answer(string option) {
+			answering = false;
+			timer.stopTimer();
+
+			questionDisplay.areaDisplay.actived = false;
+			options[currentQuestionIndex] = option;
+
+			nextBtn.SetActive(true);
+		}
+
+		/// <summary>
 		/// 下一道
 		/// </summary>
 		public void nextQuestion() {
@@ -149,17 +199,25 @@ namespace UI.PhraseScene {
 			if (question.options().Length <= 0)
 				nextQuestion();
 			else
-				questionDisplay.startView(question);
+				onNextQuestion(question);
 		}
 
 		/// <summary>
-		/// 记录正确和错误数量
+		/// 下一题目回调
 		/// </summary>
-		public void record(string option) {
-			options[currentQuestionIndex] = option;
+		/// <param name="question"></param>
+		void onNextQuestion(PhraseQuestion question) {
+			answering = true;
+			timer.startTimer(PhraseSecond);
+
+			questionDisplay.areaDisplay.actived = true;
+			questionDisplay.startView(question);
+
+			nextBtn.SetActive(false);
+			refresh();
 		}
 
 		#endregion
 
-    }
+	}
 }

@@ -60,15 +60,27 @@ namespace UI.Common.Controls.ItemDisplays {
             rectTransform = transform as RectTransform;
         }
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 关闭
+		
+		/// <summary>
+		/// 关闭窗口
+		/// </summary>
+		public override void terminateView() {
+			base.terminateView();
+			if (isDragging()) releaseDrag();
+		}
+		
+		#endregion
 
-        /// <summary>
-        /// 是否可以拖拽
-        /// </summary>
-        /// <returns>可否拖拽</returns>
-        public virtual bool isDraggable() {
+		#region 数据控制
+
+		/// <summary>
+		/// 是否可以拖拽
+		/// </summary>
+		/// <returns>可否拖拽</returns>
+		public virtual bool isDraggable() {
             return isActived() && draggable;
         }
 
@@ -138,25 +150,32 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="data">事件数据</param>
         public void OnEndDrag(PointerEventData data) {
             Debug.Log("OnEndDrag: " + data.pointerDrag);
-            if (!isDragging()) return;
-            dragging = false;
-            onAfterDrag();
-
-            if (createDragObj) Destroy(dragObj);
-            else resetFromDraggingObject();
-            dragObj = null;
-
-            refreshStatus();
+            if (isDragging()) releaseDrag();
         }
 
         #endregion
 
         #region 拖拽控制
 
-        /// <summary>
-        /// 开始拖拽
-        /// </summary>
-        protected virtual void onBeforeDrag() { }
+		/// <summary>
+		/// 释放拖拽
+		/// </summary>
+		void releaseDrag() {
+			dragging = false;
+
+			onAfterDrag();
+
+			if (createDragObj) Destroy(dragObj);
+			else resetFromDraggingObject();
+			dragObj = null;
+
+			refreshStatus();
+		}
+
+		/// <summary>
+		/// 开始拖拽
+		/// </summary>
+		protected virtual void onBeforeDrag() { }
 
         /// <summary>
         /// 拖拽结束

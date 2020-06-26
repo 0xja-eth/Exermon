@@ -8,7 +8,6 @@ using Core.UI.Utils;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
-
 using UI.Common.Controls.QuestionDisplay;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Windows {

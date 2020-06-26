@@ -13,12 +13,28 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
     public class OptionAreaDisplay : SelectableContainerDisplay<string> {
 
 		/// <summary>
-		/// 外部变量设置
+		/// 外部组件设置
 		/// </summary>
 		public RectTransform quesImage;
 		public RectTransform draggingParent;
 
+		/// <summary>
+		/// 外部变量设置
+		/// </summary>
 		public Vector2 optionsSpacing = new Vector2(12, 12);
+		
+		#region 数据控制
+
+		/// <summary>
+		/// 获取指定内容的选项控件
+		/// </summary>
+		/// <param name="option"></param>
+		/// <returns></returns>
+		public OptionDisplay getOption(string option) {
+			return subViews.Find(sub => sub.getItem() == option) as OptionDisplay; 
+		}
+
+		#endregion
 
 		#region 界面控制
 
@@ -65,6 +81,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 			var size = container.rect.size / 2;
 			var imgSize = quesImage.rect.size / 2;
 			var rtSize = rt.rect.size / 2;
+			var oriSize = size;
 
 			size -= rtSize; imgSize += rtSize;
 
@@ -72,7 +89,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
             var y = UnityEngine.Random.Range(-size.y, size.y);
 
 			while(-imgSize.x <= x && x <= imgSize.x &&
-				-imgSize.y <= y && y <= imgSize.y) {
+				y + imgSize.y >= oriSize.y) {
 				x = UnityEngine.Random.Range(-size.x, size.x);
 				y = UnityEngine.Random.Range(-size.y, size.y);
 			}
