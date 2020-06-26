@@ -26,6 +26,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// <summary>
 		/// 文本常量定义
 		/// </summary>
+		const string AddPrevWordsAlertText = "只有句首单词才可以往前面添加单词！";
 		const string AddExceedWordsAlertText = "增添最多填写两个单词！";
 		const string EditExceedWordsAlertText = "修改只能填写一个单词！";
 
@@ -119,7 +120,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		public void confirm() {
 			var word = inputField.getValue();
 			var ori = currentWord.originalWord;
-			if (!check(word, ori)) return;
+			if (!check(word, ori, currentWord.getWid()))
+				return;
 
 			var answer = generateWrongItem(word);
 			if (word == ori) // 撤销修改
@@ -149,7 +151,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// 检查格式
 		/// </summary>
 		/// <returns></returns>
-		bool check(string word, string ori) {
+		bool check(string word, string ori, int wid) {
 			var words = word.Split(' ');
 
 			if (words.Length <= 1) return true;
@@ -157,9 +159,13 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 			if (words.Length > 2)
 				return requestAlert(AddExceedWordsAlertText);
 
-			// 如果长度为2，但是没有与原单词相同的单词
-			if (words.Length == 2 &&
-				words[0] != ori && words[1] != ori)
+			// 如果长度为2
+			if (words.Length == 2) 
+				// 第二个单词为原单词，但是wid不在句首
+				if (words[1] == ori && wid > 1)
+					return requestAlert(AddPrevWordsAlertText);
+				// 两个单词都不与原单词相同
+				else if (words[0] != ori && words[1] != ori)
 					return requestAlert(EditExceedWordsAlertText);
 
 			return true;

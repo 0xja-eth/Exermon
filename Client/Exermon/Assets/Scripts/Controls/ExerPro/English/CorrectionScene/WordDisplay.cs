@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 using Core.UI.Utils;
@@ -156,10 +160,16 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <returns></returns>
 		public bool isCorrect(string word = null) {
 			if (word == null) word = item;
+
 			if (correctWord == null) // 若不需要改
 				return word == originalWord; // 是否保持原样
-			else // 如果需要改
-				return word == correctWord; // 是否改对
+
+			// 如果需要改，筛选出备选项
+			var changed = getChangedWord(word);
+			var corrChanged = getChangedWord(correctWord);
+			var corrWords = changed.Split('/').ToList();
+
+			return corrWords.Contains(changed);
 		}
 
 		/// <summary>
@@ -239,15 +249,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		void drawStateColor(string word) {
 			var color = normalColor;
 
-			if (isShowAnswer()) // 需要显示答案
-				if (correctWord == null) {// 若不需要改
-					if (word != originalWord) // 但是却改了
-						color = wrongColor;
-				} else {// 如果需要改
-					if (word == correctWord) // 改对了
-						color = correctColor;
-					else color = wrongColor;
-				}
+			if (isShowAnswer() && isChanged()) // 需要显示答案
+				color = isCorrect(word) ? correctColor : wrongColor;
 
 			text.color = color;
 		}
