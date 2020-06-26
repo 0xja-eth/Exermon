@@ -37,7 +37,7 @@ namespace ExerPro.EnglishModule.Services {
 		const int PlotQuestionType = 4;
 
 		/// <summary>
-		/// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
+		/// 随机据点几率比例（敌人:藏宝:商人:精英:剧情）
 		/// </summary>
 		static readonly int[] RandomNodeRates = { 6, 2, 2, 1, 29 };
 		static readonly ExerProMapNode.Type[] RandomNodeTypes = {
@@ -1085,6 +1085,21 @@ namespace ExerPro.EnglishModule.Services {
 			save(); sceneSys.popScene();
 		}
 
+        /// <summary>
+        /// 通关后更新数据
+        /// </summary>
+        public void passExchange() {
+            save();
+            //TODO:交互数据
+            var newStageOrder = record.stageOrder + 1;
+
+            //退出刷新缓存的数据，如当前位置等
+            //TODO：此处应该增加一个清理缓存的接口，而不是直接退出
+            terminate();
+            //交互成功后重启
+            start(1);
+        }
+        
 		#endregion
 
 		#endregion

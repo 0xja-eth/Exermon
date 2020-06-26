@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-using UnityEditor.PackageManager.UI;
 
 using LitJson;
 
@@ -1881,7 +1880,7 @@ namespace ExerPro.EnglishModule.Data {
         /// index = 5对应大规模地图，
         /// </summary>
         List<int[]> testSteps = new List<int[]> { new int[] { 3, 4, 5, 2, 3, 5, 4, 3, 4, 3, 2, 4, 4, 2, 5, 1 },
-            new int[] { 4, 3, 2, 3, 4, 1 }, new int[] { 2, 5, 1, 4, 3, 6, 1 },
+            new int[] { 4, 1 }, new int[] { 2, 5, 1, 4, 3, 6, 1 },
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },};
@@ -2093,7 +2092,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         void generate() {
 			if (generated) return;
-			generated = CalcService.NodeGenerator.generate(this);
+            generated = CalcService.NodeGenerator.generate(this);
 			setupCards(); refreshNodeStatuses();
         }
 
@@ -2215,14 +2214,6 @@ namespace ExerPro.EnglishModule.Data {
 			createActor(); generate();
         }
 
-        /// <summary>
-        /// 进入下一阶段
-        /// </summary>
-        public void nextStage() {
-            generated = false;
-            stageOrder += 1;
-            start();
-        }
         /*
         /// <summary>
         /// 设置地图

@@ -238,7 +238,7 @@ namespace ExerPro.EnglishModule.Services {
 		void processRoundResult() {
 			if (isActorLost()) result = Result.Lose;
 			else if (isEnemiesLost()) result = Result.Win;
-            if (result == Result.Win && record.currentNode().typeEnum() == ExerProMapNode.Type.Boss)
+            if(result == Result.Win && record.currentNode().typeEnum() == ExerProMapNode.Type.Boss)
                 result = Result.Pass;
 			if (result != Result.None) onBattleEnd();
 			else nextRound();

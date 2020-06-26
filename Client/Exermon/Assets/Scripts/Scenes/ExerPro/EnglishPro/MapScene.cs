@@ -22,6 +22,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
 
     using Controls;
     using UI.ExerPro.EnglishPro.Common.Windows;
+    using UnityEngine.UI;
 
     /// <summary>
     /// 地图场景
@@ -35,7 +36,10 @@ namespace UI.ExerPro.EnglishPro.MapScene {
 		public RestNodeDisplay restNodeDisplay;
         public SwitchWindow switchWindow;
 
-		public BaseWindow nodeDetail;
+        public Image loseBackground;
+        public Image passBackground;
+
+        public BaseWindow nodeDetail;
 
         /// <summary>
         /// 内部变量定义
@@ -103,9 +107,12 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             if (!switchWindow.gameObject.activeInHierarchy) {
                 if (engSer.record.actor.isDead()) {
                     switchWindow.startWindow(type: SwitchWindow.Type.Die, onDieExit);
+                    loseBackground?.gameObject.SetActive(true);
                 }
                 else if(BattleService.get().result == BattleService.Result.Pass) {
-                    switchWindow.startWindow(SwitchWindow.Type.Boss, engSer.record.nextStage);
+                    BattleService.get().result = BattleService.Result.None;
+                    switchWindow.startWindow(SwitchWindow.Type.Boss, onBossPass);
+                    passBackground?.gameObject.SetActive(true);
                 }
             }
         }
@@ -163,7 +170,8 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// 阶段通关回调
         /// </summary>
         void onBossPass() {
-
+            engSer.passExchange();
+            stageRecordDisplay.requestRefresh();
         }
         #endregion
     }

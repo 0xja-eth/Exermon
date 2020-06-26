@@ -120,6 +120,7 @@ namespace UI.ExerPro.EnglishPro.Common.Windows {
 			if (terminateCallback != null)
 				terminateCallback.Invoke(true);
 			else scene?.popScene();
+            BattleService.get().result = BattleService.Result.Pass;
 		}
 
 		#endregion
