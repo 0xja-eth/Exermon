@@ -1,8 +1,8 @@
 ﻿
+using System.Collections.Generic;
+
 using Core.UI;
 using Core.Systems;
-
-using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,12 +15,14 @@ using ExerPro.EnglishModule.Services;
 using FrontendWrongItem = ExerPro.EnglishModule.Data.
 	CorrectionQuestion.FrontendWrongItem;
 
-using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
-using UI.CorrectionScene.Windows;
 using UI.Common.Controls.ItemDisplays;
+
+using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 using UI.ExerPro.EnglishPro.Common.Windows;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene {
+
+	using Windows;
 
     /// <summary>
     /// 场景
@@ -28,28 +30,36 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
     public class CorrectionScene : BaseScene {
 
 		/// <summary>
+		/// 文本常量定义
+		/// </summary>
+		const string UncorrectableAlertText = "已超出改错次数上限！请清除一些修改";
+
+		/// <summary>
 		/// 外部组件设置
 		/// </summary>
 		public ArticleDisplay articleDisplay;
 
-		public Text changedBeforeValue;
+		public GameObject revertBtn, confirmBtn, submitBtn, answerBtn;
 
 		public RewardWindow rewardWindow;
 		public CorrectionWindow correctionWindow;
-
-        List<int> doneIds = new List<int>();
+		
+		/// <summary>
+		/// 答题已结束
+		/// </summary>
+		bool terminated = false;
 
         /// <summary>
         /// 外部系统设置
         /// </summary>
         EnglishService engSer;
 
-        #region 初始化
+		#region 初始化
 
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
         }
@@ -66,10 +76,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// 开始
         /// </summary>
         protected override void start() {
-			engSer.generateQuestions<CorrectionQuestion>(1, (res) => {
-				articleDisplay.startView(res[0]);
-			});
 			base.start();
+			engSer.generateQuestion<CorrectionQuestion>(articleDisplay.startView);
         }
 
 		#endregion
@@ -88,6 +96,29 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 
 		#endregion
 
+		#region 数据控制
+
+		/// <summary>
+		/// 增加答案
+		/// </summary>
+		/// <returns>返回是否成功</returns>
+		public bool addAnswer(FrontendWrongItem answer) {
+			var res = articleDisplay.isCorrectEnable();
+			if (res) articleDisplay.addAnswer(answer);
+			else gameSys.requestAlert(UncorrectableAlertText);
+			return res;
+		}
+
+		/// <summary>
+		/// 撤销答案
+		/// </summary>
+		/// <returns>返回是否成功</returns>
+		public void revertAnswer(FrontendWrongItem answer) {
+			articleDisplay.revertAnswer(answer);
+		}
+
+		#endregion
+
 		#region 回调控制
 
 		/// <summary>
@@ -97,51 +128,48 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 		/// <param name="word">单词</param>
 		public void onWordSelected(WordsContainer container, WordDisplay word) {
 
-            // 清除其他句子选择
-            foreach (var sub in articleDisplay.getSubViews()) {
-				if (sub == container) continue;
-				var display = sub as SentenceDisplay;
-				display?.container?.deselect();
-            }
+			// 清除其他句子选择
+			articleDisplay.deselectAll(container);
 
-			correctionWindow.startWindow(container, word);
+			if (!terminated) correctionWindow.startWindow(container, word);
         }
 
-        /// <summary>
-        /// 提交回调
-        /// </summary>
-        public void onSubmit() {
-			var answers = generateWrongItems();
-			var question = articleDisplay.getItem();
-
-			engSer.answerCorrection(question, answers, processReward);
+		/// <summary>
+		/// 重置
+		/// </summary>
+		public void onRevert() {
+			articleDisplay.revertAllAnswers();
 		}
 
 		/// <summary>
-		/// 生成错误项列表
+		/// 切换答案显示
 		/// </summary>
-		List<FrontendWrongItem> generateWrongItems() {
-			Debug.Log("generateWrongItems");
+		public void onAnswer() {
+			articleDisplay.showAnswer = !articleDisplay.showAnswer;
+		}
 
-			var answers = new List<FrontendWrongItem>();
-			int sid = 1, wid = 1;
+		/// <summary>
+		/// 确认回调
+		/// </summary>
+		public void onConfirm() {
+			terminated = true;
+			correctionWindow.cancel();
+			articleDisplay.showAnswer = true;
 
-			// 遍历每句话
-			foreach (var sub in articleDisplay.getSubViews()) {
-				var sentenceDisplay = sub as SentenceDisplay;
-				var sentenceContainer = sentenceDisplay.container;
+			revertBtn.SetActive(false);
+			confirmBtn.SetActive(false);
+			answerBtn.SetActive(true);
+			submitBtn.SetActive(true);
+		}
 
-				wid = 1;
-				foreach (var subWord in sentenceContainer.getSubViews()) {
-					var wordDisplay = subWord as WordDisplay;
-					if (wordDisplay == null) continue;
+		/// <summary>
+		/// 提交回调
+		/// </summary>
+		public void onSubmit() {
+			var answers = articleDisplay.getWrongItems();
+			var question = articleDisplay.getItem();
 
-					var answer = wordDisplay.generateWrongItem(sid, wid++);
-					if (answer != null) answers.Add(answer);
-				}
-				sid++;
-			}
-			return answers;
+			engSer.answerCorrection(question, answers, processReward);
 		}
 
 		/// <summary>

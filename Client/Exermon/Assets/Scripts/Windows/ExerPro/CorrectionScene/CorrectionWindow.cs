@@ -1,16 +1,22 @@
-﻿using Core.UI;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Text.RegularExpressions;
 
 using UnityEngine;
-using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 using UnityEngine.UI;
-using ExerPro.EnglishModule.Data;
-using Core.Systems;
-using System.Text.RegularExpressions;
-using UI.Common.Windows;
 
-namespace UI.CorrectionScene.Windows {
+using Core.UI;
+using Core.UI.Utils;
+using Core.Systems;
+
+using ExerPro.EnglishModule.Data;
+
+using UI.Common.Controls.InputFields;
+
+using FrontendWrongItem = ExerPro.EnglishModule.Data.
+	CorrectionQuestion.FrontendWrongItem;
+
+namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
+
+	using Controls;
 
 	/// <summary>
 	/// 改错窗口
@@ -20,39 +26,47 @@ namespace UI.CorrectionScene.Windows {
 		/// <summary>
 		/// 文本常量定义
 		/// </summary>
-		const string ExceedWordsAlertText = "最多填写两个单词！";
+		const string AddExceedWordsAlertText = "增添最多填写两个单词！";
+		const string EditExceedWordsAlertText = "修改只能填写一个单词！";
 
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public InputField inputField;
+		public TextInputField inputField;
         public CorrectionQuestion question;
 
-		public Text changedBeforeValue;
+		public Text originWord;
 
 		/// <summary>
 		/// 外部系统设置
 		/// </summary>
-		GameSystem gameSys; 
+		GameSystem gameSys;
 
-        /// <summary>
-        /// 场景组件引用
-        /// </summary>
-        public string selectedChangedAfterWord;
+		/// <summary>
+		/// 场景组件引用
+		/// </summary>
+		CorrectionScene scene;
 
 		/// <summary>
 		/// 内部变量定义
 		/// </summary>
 		WordDisplay currentWord;
-		WordsContainer currentSenContainer;
 
 		#region 初始化
 
 		/// <summary>
-		/// 初始化
+		/// 初始化场景组件
 		/// </summary>
-		protected override void initializeOnce() {
-            base.initializeOnce();
+		protected override void initializeScene() {
+			base.initializeScene();
+			scene = SceneUtils.getCurrentScene<CorrectionScene>();
+		}
+
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
+            base.initializeSystems();
             gameSys = GameSystem.get();
         }
 
@@ -65,13 +79,34 @@ namespace UI.CorrectionScene.Windows {
 		/// </summary>
 		public void startWindow(WordsContainer container, WordDisplay word) {
 			startWindow();
+			setupCurrent(container, word);
+		}
 
-			currentSenContainer = container;
+		#endregion
+
+		#region 数据控制
+
+		/// <summary>
+		/// 配置当前关联内容
+		/// </summary>
+		void setupCurrent(WordsContainer container, WordDisplay word) {
 			currentWord = word;
+		}
 
-			changedBeforeValue.text = currentWord.originalWord;
-			inputField.text = currentWord.originalWord;
-			inputField.ActivateInputField();
+		#endregion
+
+		#region 界面绘制
+
+		/// <summary>
+		/// 刷新
+		/// </summary>
+		protected override void refresh() {
+			base.refresh();
+			Debug.Log("CorrectionWindow.refresh");
+
+			originWord.text = currentWord.originalWord;
+			inputField.setValue(currentWord.originalWord);
+			//inputField.activate();
 		}
 
 		#endregion
@@ -82,46 +117,68 @@ namespace UI.CorrectionScene.Windows {
 		/// 确认
 		/// </summary>
 		public void confirm() {
-			//List<string> items = currentSenContainer.getWords();
-			int currentWordIndex = currentSenContainer.getSelectedIndex();
+			var word = inputField.getValue();
+			var ori = currentWord.originalWord;
+			if (!check(word, ori)) return;
 
-			string inputText = inputField.text;
-
-			if (inputText == "") {
-				// 删除
-				currentWord.setItem(currentWord.originalWord);
-				currentWord.state = WordDisplay.State.Deleted;
-			} else if (inputText == currentWord.originalWord) {
-				// 复原
-				currentWord.state = WordDisplay.State.Original;
-				currentWord.setItem(inputText);
-			} else if (inputText.StartsWith(currentWord.originalWord)) {
-				// 增加（后）
-				currentWord.state = WordDisplay.State.AddedNext;
-				currentWord.setItem(inputText);
-			} else if (inputText.EndsWith(currentWord.originalWord)) {
-				// 增加（前）
-				currentWord.state = WordDisplay.State.AddedPrev;
-				currentWord.setItem(inputText);
-			} else { 
-				// 修改
-				if (inputText.Split(' ').Length > 2) {
-					gameSys.requestAlert(ExceedWordsAlertText);
-					return;
-				}
-				currentWord.state = WordDisplay.State.Modefied;
-				currentWord.setItem(inputText);
-			}
-			currentWord.requestRefresh();
+			var answer = generateWrongItem(word);
+			if (word == ori) // 撤销修改
+				scene.revertAnswer(answer);
+			else if (!scene.addAnswer(answer)) return;
 
 			cancel();
+		}
+		
+		/// <summary>
+		/// 生成错误项
+		/// </summary>
+		/// <param name="display"></param>
+		/// <returns></returns>
+		public FrontendWrongItem generateWrongItem(string word) {
+			int sid = currentWord.getSid();
+			int wid = currentWord.getWid();
+
+			Debug.Log("generateWrongItem: " +
+				sid + ", " + wid + ": " +
+				currentWord.originalWord + " -> " + word);
+
+			return new FrontendWrongItem(sid, wid, word);
+		}
+
+		/// <summary>
+		/// 检查格式
+		/// </summary>
+		/// <returns></returns>
+		bool check(string word, string ori) {
+			var words = word.Split(' ');
+
+			if (words.Length <= 1) return true;
+
+			if (words.Length > 2)
+				return requestAlert(AddExceedWordsAlertText);
+
+			// 如果长度为2，但是没有与原单词相同的单词
+			if (words.Length == 2 &&
+				words[0] != ori && words[1] != ori)
+					return requestAlert(EditExceedWordsAlertText);
+
+			return true;
+		}
+
+		/// <summary>
+		/// 错误提示请求
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
+		bool requestAlert(string text) {
+			gameSys.requestAlert(text); return false;
 		}
 
 		/// <summary>
 		/// 重置
 		/// </summary>
 		public void revert() {
-			inputField.text = currentWord.originalWord;
+			inputField.setValue(currentWord.originalWord);
 		}
 
 		/// <summary>
@@ -129,16 +186,17 @@ namespace UI.CorrectionScene.Windows {
 		/// </summary>
 		public void cancel() {
 			base.terminateWindow();
-			currentSenContainer?.deselect();
+			//currentSenContainer?.deselect();
 		}
-
+		/*
 		/// <summary>
 		/// 限定输入
 		/// </summary>
 		public void inputLimit() {
-			inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z| ]", "");
+			var text = inputField.getValue();
+			inputField.setValue(Regex.Replace(text, @"[^a-zA-Z| ]", ""));
 		}
-
+		*/
 		#endregion
 
 	}

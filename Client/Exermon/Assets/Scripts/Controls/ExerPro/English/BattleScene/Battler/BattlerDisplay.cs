@@ -485,7 +485,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
-		/// 削弱
+		/// 死亡
 		/// </summary>
 		public void die() {
 			animator.setVar(DieAttr, true);
