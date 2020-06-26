@@ -7,6 +7,7 @@ using Core.Systems;
 using Core.UI.Utils;
 
 using UI.Common.Windows;
+using UnityEngine;
 
 namespace Core.UI {
 
@@ -27,7 +28,7 @@ namespace Core.UI {
         public AlertWindow alertWindow; // 提示窗口
         public LoadingWindow loadingWindow; // 加载窗口
         public RebuildController rebuildController; // 布局重建器
-
+        public AudioSource audioSource;
         /// <summary>
         /// 初始化标志
         /// </summary>
@@ -58,9 +59,9 @@ namespace Core.UI {
         protected override void awake() {
             base.awake();
             initialized = true;
+            initializeOthers();
             initializeSceneUtils();
             initializeSystems();
-            initializeOthers();
             checkFirstScene();
         }
 
@@ -83,7 +84,7 @@ namespace Core.UI {
         /// 初始化其他项
         /// </summary>
         protected virtual void initializeOthers() {
-
+            audioSource = SceneUtils.get<AudioSource>(this.transform);
         }
 
         /// <summary>

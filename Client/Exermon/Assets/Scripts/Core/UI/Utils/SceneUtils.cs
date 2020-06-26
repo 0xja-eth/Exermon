@@ -109,6 +109,7 @@ namespace Core.UI.Utils {
             RebuildController rebuildController = null) {
             Debug.Log("initialize Scene: " + scene);
             initializeSystems();
+            //initializeAudioSource();
             initializeScene(scene, alertWindow, 
                 loadingWindow, rebuildController);
         }
@@ -137,16 +138,25 @@ namespace Core.UI.Utils {
                 sceneSys.gotoScene(sceneIndex);
 
             SceneUtils.setCurrentScene(scene);
-            audioSource = SceneUtils.get<AudioSource>(scene.transform);
-            if (audioSource == null) Debug.Log("dpc no SOURCE!");
-            else {
+            AudioSource audioSourceScene = scene.audioSource;
+            if (audioSourceScene != null)
+            {
+                if(audioSource == null) initializeAudioSource(audioSourceScene);
+                audioSource.clip = audioSourceScene.clip;
                 audioSource.Play();
-                UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
             }
+            else if(audioSource != null)
+                audioSource.Stop();
             SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
             SceneUtils.rebuildController = rebuildController;
         }
+
+        static void initializeAudioSource(AudioSource audioSource = null) {
+            SceneUtils.audioSource = audioSource;
+			SceneUtils.audioSource.loop = true;
+			UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
+		}
 
         #region 场景管理
 
