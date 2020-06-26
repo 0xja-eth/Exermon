@@ -196,7 +196,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 使用卡牌
 		/// </summary>
-		public void use(CardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
+		public void use(PackCardDisplay cardDisplay, EnemyDisplay enemyDisplay) {
 			if (menu.useCard(cardDisplay, enemyDisplay))
 				removeItem(cardDisplay.getItem());
 		}

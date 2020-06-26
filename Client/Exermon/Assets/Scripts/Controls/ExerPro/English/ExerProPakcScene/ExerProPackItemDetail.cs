@@ -41,7 +41,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         public MultParamsDisplay itemDetail, equipDetail;
         public ParamDisplaysGroup paramsGroup;
 
-        public GameObject equip;
+        public GameObject equip, dequip;
 
         /// <summary>
         /// 外部系统设置
@@ -169,7 +169,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
             icon.gameObject.SetActive(true);
             icon.overrideSprite = item.icon;
 
-            setupButtons(item);
+            //setupButtons(item);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包物品</param>
         void drawExerProPackItem(ExerProPackItem Item) {
             drawBaseInfo(Item.item());
-            drawItemDetail(Item);
+            //drawItemDetail(Item);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包药水</param>
         void drawExerProPackPotion(ExerProPackPotion potionItem) {
             drawBaseInfo(potionItem.item());
-            drawItemDetail(potionItem);
+            //drawItemDetail(potionItem);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail {
         /// <param name="cardItem">特训背包卡片</param>
         void drawExerProPackCard(ExerProPackCard cardItem) {
             drawBaseInfo(cardItem.item());
-            drawItemDetail(cardItem);
+            //drawItemDetail(cardItem);
         }
 
 

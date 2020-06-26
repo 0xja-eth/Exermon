@@ -131,9 +131,9 @@ namespace UI.ShopScene.Windows {
         /// <returns></returns>
         public ShopDisplay<T> currentPackContainer<T>() where T: BaseItem, new() {
             if (typeof(T) == typeof(HumanItem))
-                return (ShopDisplay<T>)(object)humanItemShop;
+                return humanItemShop as ShopDisplay<T>;
             if (typeof(T) == typeof(ExerEquip))
-                return (ShopDisplay<T>)(object)exerEquipShop;
+                return exerEquipShop as ShopDisplay<T>;
             return null;
         }
 

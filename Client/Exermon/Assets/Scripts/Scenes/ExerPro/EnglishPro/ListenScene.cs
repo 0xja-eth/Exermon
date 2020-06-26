@@ -49,37 +49,30 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         protected override void start() {
             base.start();
 			listenWindow.startWindow();
-
-			//测试用函数
-			//GameSystem.get().start();
-			//PlayerService.get().login("804173948", "123456789", configureQuestion);
 		}
 
-		////测试用
-		//void configureQuestion()
-		//{
-		//    if (GameSystem.get().isLoaded() == true)
-		//        UnityEngine.Debug.Log("danteding 登陆成功");
-		//}
 		#endregion
 
-		#region 场景控制
+		#region 更新控制
 
 		/// <summary>
 		/// 场景更新
 		/// </summary>
 		protected override void update() {
-            base.update();
-            var rewardInfo = engSer.rewardInfo;
-            if (rewardInfo != null) {
-                rewardWindow.startWindow(rewardInfo);
-            }
-        }
+			base.update();
+			var rewardInfo = engSer.rewardInfo;
+			if (rewardInfo != null)
+				rewardWindow.startWindow(rewardInfo);
+		}
+
+		#endregion
+
+		#region 场景控制
 
 		/// <summary>
 		/// 退出场景
 		/// </summary>
-        public override void popScene() {
+		public override void popScene() {
             engSer.exitNode();
         }
 

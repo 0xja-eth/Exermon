@@ -63,10 +63,10 @@ namespace UI.ShopScene.Controls {
         /// 配置筛选器
         /// </summary>
         void configureSelectors() {
-            typeSelector.configure(generateTypesData());
-            starSelector.configure(generateStarsData());
-            typeSelector.onChanged = onSelectorChanged;
-            starSelector.onChanged = onSelectorChanged;
+            typeSelector?.configure(generateTypesData());
+            starSelector?.configure(generateStarsData());
+			if (typeSelector) typeSelector.onChanged = onSelectorChanged;
+			if (starSelector) starSelector.onChanged = onSelectorChanged;
             //typeSelector.setValue(UnlimitedIndex);
             //starSelector.setValue(UnlimitedIndex);
         }
@@ -117,7 +117,8 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <returns></returns>
         Tuple<int, string>[] generateStarsData() {
-            var data = dataSer.staticData.configure.itemStars;
+
+			var data = starData();
             var res = new Tuple<int, string>[data.Length + 1];
 
             res[0] = new Tuple<int, string>(UnlimitedIndex, UnlimitedText);
@@ -128,12 +129,20 @@ namespace UI.ShopScene.Controls {
             }
 
             return res;
-        }
+		}
 
-        /// <summary>
-        /// 初始化外部系统
-        /// </summary>
-        protected override void initializeSystems() {
+		/// <summary>
+		/// 星级数据
+		/// </summary>
+		/// <returns></returns>
+		protected virtual TypeData[] starData() {
+			return dataSer.staticData.configure.itemStars;
+		}
+
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
+		protected override void initializeSystems() {
             base.initializeSystems();
             dataSer = DataService.get();
             itemSer = ItemService.get();
@@ -148,13 +157,9 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <param name="items"></param>
         public override void startView() {
-            if (shopItems == null)
-                Debug.Log("startView: " + name + ": null");
-            else
-                Debug.Log("startView: " + name + ": " + string.Join(", ", (object[])shopItems));
             if (shopItems == null || shopItems.Length == 0) {
-                base.startView(); itemSer.getShop<T>(setItems);
-            } else startView(shopItems);
+                base.startView(); generateShop();
+			} else startView(shopItems);
         }
 
         /// <summary>
@@ -162,7 +167,7 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         /// <param name="items"></param>
         void startView(ItemService.ShopItem<T>[] items) {
-            base.startView(); itemDetail.startView();
+            base.startView(); itemDetail?.startView();
             setItems(shopItems = items);
         }
 
@@ -171,18 +176,25 @@ namespace UI.ShopScene.Controls {
         /// </summary>
         public override void terminateView() {
             base.terminateView();
-            itemDetail.terminateView();
+            itemDetail?.terminateView();
         }
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
 
-        /// <summary>
-        /// 设置商品集
-        /// </summary>
-        /// <param name="items"></param>
-        public override void setItems(ItemService.ShopItem<T>[] items) {
+		/// <summary>
+		/// 生成商品
+		/// </summary>
+		protected virtual void generateShop() {
+			itemSer.getShop<T>(setItems);
+		}
+
+		/// <summary>
+		/// 设置商品集
+		/// </summary>
+		/// <param name="items"></param>
+		public override void setItems(ItemService.ShopItem<T>[] items) {
             shopItems = items; base.setItems(items);
         }
 

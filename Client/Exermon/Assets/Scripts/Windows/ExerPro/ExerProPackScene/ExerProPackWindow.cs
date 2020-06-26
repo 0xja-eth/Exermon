@@ -11,6 +11,8 @@ using ItemModule.Services;
 using UI.Common.Controls.ItemDisplays;
 using ItemModule.Data;
 using UI.ExerPro.EnglishPro.ExerProPackScene.CardPackItemDetail;
+using UnityEngine.UI;
+using System;
 
 namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
     public class ExerProPackWindow : BaseWindow {
@@ -21,6 +23,8 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         public PackTabController tabController;
         public ExerProPackItemDetail packItemDetail;
         public GameObject detail;
+        public ExerProPotionSlot potionSlot;
+        public Text gold;
 
         /// <summary>
         /// 内部变量声明
@@ -121,13 +125,20 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// </summary>
         public void refreshView() {
             clearView();
-            //refreshMoney();
+            refreshMoney();
             switch (view) {
                 case View.Item: onItemPack(); break;
                 case View.Potion: onPotionPack(); break;
                 case View.Card: onCardPack(); break;
             }
-            packItemDetail.updateButtons(view);
+            //packItemDetail.updateButtons(view);
+        }
+
+        /// <summary>
+        /// 刷新金钱
+        /// </summary>
+        private void refreshMoney() {
+            gold.text = engSer.record.actor.gold.ToString();
         }
 
         /// <summary>
@@ -142,18 +153,23 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 物品背包
         /// </summary>
         void onItemPack() {
-            //var container = engSer.record.actor.itemPack;
-            ExerProPackItem[] items = new ExerProPackItem[8];
-            items[0] = ExerProPackItem.sample();
-            items[1] = ExerProPackItem.sample();
-            items[2] = ExerProPackItem.sample();
-            items[3] = ExerProPackItem.sample();
-            items[4] = ExerProPackItem.sample();
-            items[5] = ExerProPackItem.sample();
-            items[6] = ExerProPackItem.sample();
-            items[7] = ExerProPackItem.sample();
+            var container = engSer.record.actor.itemPack;
+            //test
+            if (container.items.ToArray().Length == 0) {
+                ExerProPackItem[] items = new ExerProPackItem[8];
+                items[0] = ExerProPackItem.sample();
+                items[1] = ExerProPackItem.sample();
+                items[2] = ExerProPackItem.sample();
+                items[3] = ExerProPackItem.sample();
+                items[4] = ExerProPackItem.sample();
+                items[5] = ExerProPackItem.sample();
+                items[6] = ExerProPackItem.sample();
+                items[7] = ExerProPackItem.sample();
+                foreach (var item in items)
+                    engSer.record.actor.gainItem(item.item());
+            }
             itemPackDisplay.startView();
-            itemPackDisplay.setItems(items);
+            itemPackDisplay.setItems(container.items);
             detail.SetActive(true);
             packItemDetail.clearItem();
         }
@@ -163,17 +179,22 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// </summary>
         void onPotionPack() {
             var container = engSer.record.actor.potionPack;
-            ExerProPackPotion[] potions = new ExerProPackPotion[8];
-            potions[0] = ExerProPackPotion.sample();
-            potions[1] = ExerProPackPotion.sample();
-            potions[2] = ExerProPackPotion.sample();
-            potions[3] = ExerProPackPotion.sample();
-            potions[4] = ExerProPackPotion.sample();
-            potions[5] = ExerProPackPotion.sample();
-            potions[6] = ExerProPackPotion.sample();
-            potions[7] = ExerProPackPotion.sample();
+            //test
+            if (container.items.ToArray().Length == 0) {
+                ExerProPackPotion[] potions = new ExerProPackPotion[8];
+                potions[0] = ExerProPackPotion.sample();
+                potions[1] = ExerProPackPotion.sample();
+                potions[2] = ExerProPackPotion.sample();
+                potions[3] = ExerProPackPotion.sample();
+                potions[4] = ExerProPackPotion.sample();
+                potions[5] = ExerProPackPotion.sample();
+                potions[6] = ExerProPackPotion.sample();
+                potions[7] = ExerProPackPotion.sample();
+                foreach (var potion in potions)
+                    engSer.record.actor.gainItem(potion.item());
+            }
             potionPackDisplay.startView();
-            potionPackDisplay.setItems(potions);
+            potionPackDisplay.setItems(container.items);
             detail.SetActive(true);
             packItemDetail.clearItem();
         }
@@ -182,6 +203,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 卡片背包
         /// </summary>
         void onCardPack() {
+            var container = engSer.record.actor.cardGroup;
             var cards = engSer.record.actor.cardGroup.items;
             cardPackDisplay.startView();
             cardPackDisplay.setItems(cards.ToArray());
@@ -204,16 +226,45 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 装备
         /// </summary>
         public void equip() {
-            var slot = player.potionSlot;
-            //if ()
+            var item = potionPackDisplay.selectedItem();
+            if (item != null) equip(item);
         }
 
         /// <summary>
         /// 装备
         /// </summary>
         public void equip(ExerProPackPotion potion) {
-            var slot = player.potionSlot;
-            slot.setEquip(player.potionPack, potion);
+            var slot = engSer.record.actor.potionSlot;
+            slot.setEquip(potion);
+            potionPackDisplay.refreshItems();
+        }
+
+
+        /// <summary>
+        /// 卸下装备
+        /// </summary>
+        public void dequip() {
+            var item = potionPackDisplay.selectedItem();
+            if (item != null) dequip(item);
+        }
+
+        /// <summary>
+        /// 卸下装备
+        /// </summary>
+        public void dequip(ExerProPackPotion potion) {
+            var slot = engSer.record.actor.potionSlot;
+            slot.setEquip<ExerProPackPotion>(slot.getSlotIndexByItem(potion));
+            potionPackDisplay.refreshItems();
+        }
+
+        /// <summary>
+        /// 是否被装备
+        /// </summary>
+        public bool isEquiped(ExerProPackPotion potion) {
+            foreach (var pslot in engSer.record.actor.potionSlot.items) {
+                if (pslot.equip1 == potion) return true;
+            }
+            return false;
         }
 
         #endregion

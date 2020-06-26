@@ -60,6 +60,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		int selectNumber = 0;
 		int playCnt = 0; // 播放次数
 
+		int[] selections = null;
+
 		bool isLastPlaying = false;
 
 		Sprite playSprite, pauseSprite;
@@ -124,7 +126,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		public bool isPauseable() {
-			return false;
+			return subQuestions.showAnswer;
 		}
 		
 		/// <summary>
@@ -154,17 +156,16 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 提交答案
 		/// </summary>
 		public void onConfirmClicked() {
+
 			subQuestions.showAnswer = true;
-			var selections = subQuestions.saveSelections();
+			selections = subQuestions.saveSelections();
 
 			showTypeSelect.setIndex(ArticleViewIndex);
 
 			if (confirmButton) confirmButton.SetActive(false);
 			if (submitButton) submitButton.SetActive(true);
 
-			refreshAudioInfo();
-			// TODO: 加入判断接口
-
+			stopAudio();
 		}
 
 		/// <summary>
@@ -172,9 +173,20 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		public void onSubmitClicked() {
 			if (submitButton) submitButton.SetActive(false);
-			engSer.processReward(questionNumber: 10);
+
+			stopAudio();
+			engSer.answerListening(item, selections, processReward);
 		}
-		
+
+		/// <summary>
+		/// 处理奖励
+		/// </summary>
+		/// <param name="corrCnt">正确题目数</param>
+		void processReward(int corrCnt) {
+			Debug.Log("Correct Count = " + corrCnt);
+			engSer.processReward(questionNumber: corrCnt);
+		}
+
 		/// <summary>
 		/// 显示类型改变回调
 		/// </summary>
@@ -331,6 +343,17 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		void playAudio() {
 			audioSource.Play(); playCnt++;
+			refreshAudioInfo();
+		}
+
+		/// <summary>
+		/// 停止
+		/// </summary>
+		void stopAudio() {
+			isLastPlaying = false;
+			playButton.interactable = true;
+
+			audioSource.Stop();
 			refreshAudioInfo();
 		}
 

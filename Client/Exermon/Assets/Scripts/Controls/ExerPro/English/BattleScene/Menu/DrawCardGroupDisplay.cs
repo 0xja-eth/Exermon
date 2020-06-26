@@ -13,9 +13,7 @@ using UI.Common.Controls.ItemDisplays;
 using UI.Common.Controls.AnimationSystem;
 
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
-
-	using Windows;
-
+	
 	/// <summary>
 	/// 手牌控件
 	/// </summary
@@ -114,7 +112,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		void addToController() {
 			foreach(var sub in subViews) {
-				var display = sub as CardDisplay;
+				var display = sub as PackCardDisplay;
 				if (display == null) continue;
 				controller.add(display.animation);
 				display.isOpen = false;
@@ -126,7 +124,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		protected override void refresh() {
 			base.refresh();
-			max.text = "/" + handGroup.capacity;
+			if (max) max.text = "/" + handGroup.capacity;
 		}
 
 		/// <summary>
@@ -134,8 +132,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="count"></param>
 		public void drawCount(int count) {
-			this.count.text = count.ToString();
-			plusAni.Play();
+			if (this.count) this.count.text = count.ToString();
+			plusAni?.Play();
 		}
 
 		#endregion

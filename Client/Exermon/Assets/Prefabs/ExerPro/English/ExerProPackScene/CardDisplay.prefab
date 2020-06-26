@@ -768,7 +768,10 @@ MonoBehaviour:
   icon: {fileID: 7642604021944315621}
   name: {fileID: 438655400964495103}
   count: {fileID: 0}
+  cost: {fileID: 7150049596882096410}
   description: {fileID: 945511270949848138}
+  character: {fileID: 7146809924377051664}
+  type: {fileID: 177850384610086528}
 --- !u!1 &9156937185304149052
 GameObject:
   m_ObjectHideFlags: 0

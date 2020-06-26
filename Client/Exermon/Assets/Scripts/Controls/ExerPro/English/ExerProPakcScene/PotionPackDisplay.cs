@@ -26,15 +26,21 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Pack {
         }
         protected override void onSubViewCreated(SelectableItemDisplay<ExerProPackPotion> sub, int index) {
             base.onSubViewCreated(sub, index);
+            ((PackPotionDisplay)sub).packWindow = packWindow;
         }
         protected override void onSelectChanged() {
             base.onSelectChanged();
             int index = getSelectedIndex();
             if (index == -1) {
                 itemdetail.equip.SetActive(false);
+                itemdetail.dequip.SetActive(false);
                 return;
             }
             else {
+                var subviews = getSubViews();
+                bool isEquiped = ((PackPotionDisplay)subviews[index]).isEquiped();
+                packWindow.packItemDetail.equip.SetActive(!isEquiped);
+                packWindow.packItemDetail.dequip.SetActive(isEquiped);
                 itemdetail.setValue(items[index]);
             }
         }

@@ -1,21 +1,41 @@
-﻿using Core.Systems;
+﻿using UnityEngine;
+
+using Core.Systems;
 using Core.UI;
+
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
+
 using UI.ExerPro.EnglishPro.PhraseScene.Controls;
-using UnityEngine;
-using UI.Common.Windows;
-namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
+using UI.ExerPro.EnglishPro.Common.Windows;
+
+namespace UI.PhraseScene {
+
+	/// <summary>
+	/// 短语场景
+	/// </summary>
     public class PhraseScene : BaseScene {
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
-        public OptionAreaDisplay optionAreaDisplay;
-        int correctNum = 0;
-        int wrongNum = 0;
-        PhraseQuestion[] questions;
-        int currentQuesIndex = 0;
-        int questionNum = 10;
+
+		/// <summary>
+		/// 题目数
+		/// </summary>
+		const int QuestionCount = 10;
+
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public RewardWindow rewardWindow;
+		public PhraseQuestionDisplay questionDisplay;
+
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		PhraseQuestion[] questions;
+		string[] options;
+
+		int correctNum, wrongNum = 0;
+        int currentQuestionIndex = 0;
+
         /// <summary>
         /// 外部系统设置
         /// </summary>
@@ -40,63 +60,106 @@ namespace Assets.Scripts.Scenes.ExerPro.EnglishPro {
             correctNum = wrongNum = 0;
         }
 
-        #endregion
+		/// <summary>
+		/// 场景名
+		/// </summary>
+		/// <returns>场景名</returns>
+		public override SceneSystem.Scene sceneIndex() {
+			return SceneSystem.Scene.EnglishProPhraseScene;
+		}
+		
+		/// <summary>
+		/// 开始
+		/// </summary>
+		protected override void start() {
+			base.start();
+			engSer.generateQuestions<PhraseQuestion>(
+				QuestionCount, onQuestionGenerated);
+		}
 
-        /// <summary>
-        /// 场景名
-        /// </summary>
-        /// <returns>场景名</returns>
-        public override SceneSystem.Scene sceneIndex() {
-            return SceneSystem.Scene.EnglishProPhraseScene;
-        }
+		#endregion
+		
+		#region 更新控制
 
-        /// <summary>
-        /// 开始
-        /// </summary>
-        protected override void start() {
-            engSer.generateQuestions<PhraseQuestion>(questionNum, (res) =>
-            {
-                questions = res;
-                PhraseQuestion question = questions[currentQuesIndex++];
-                while (question.options().Length == 0)
-                    question = res[currentQuesIndex++];
-                optionAreaDisplay.startView(question);
+		/// <summary>
+		/// 场景更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			var rewardInfo = engSer.rewardInfo;
+			if (rewardInfo != null)
+				rewardWindow.startWindow(rewardInfo);
+		}
 
-            });
-            base.start();
-        }
+		#endregion
 
-        /// <summary>
-        /// 下一道
-        /// </summary>
-        public void nextQuestion() {
-            if (currentQuesIndex >= questionNum) {
-                onSubmit();
-                return;
-            }
-            PhraseQuestion question = questions[currentQuesIndex++];
-            while (question.options().Length == 0)
-                question = questions[currentQuesIndex++];
-            optionAreaDisplay.startView(question);
-        }
+		#region 回调控制
 
-        /// <summary>
-        /// 提交
-        /// </summary>
-        public void onSubmit() {
-            Debug.Log("答对：" + correctNum + "题,答错：" + wrongNum + "题。");
-            gameSys.requestAlert("答对：" + correctNum + "题,答错：" + wrongNum + "题。",
-                AlertWindow.Type.Notice);
+		/// <summary>
+		/// 题目生成完毕回调
+		/// </summary>
+		void onQuestionGenerated(PhraseQuestion[] questions) {
+			this.questions = questions;
+			options = new string[questions.Length];
+			currentQuestionIndex = -1;
+			nextQuestion();
+			/*
+			PhraseQuestion question = questions[currentQuesIndex++];
+			while (question.options().Length <= 0)
+				question = questions[currentQuesIndex++];
+			optionAreaDisplay.startView(question);
+			*/
+		}
 
-            engSer.exitNode(true);
-        }
+		/// <summary>
+		/// 提交回调
+		/// </summary>
+		public void onSubmit() {
+			engSer.answerPhrase(questions, options, processReward);
 
-        /// <summary>
-        /// 记录正确和错误数量
-        /// </summary>
-        public void record(bool isCorrect) {
-            if (isCorrect) correctNum++;
-            else wrongNum++;
-        }
+			//Debug.Log("答对：" + correctNum + "题,答错：" + wrongNum + "题。");
+			//gameSys.requestAlert("答对：" + correctNum + "题,答错：" + wrongNum + "题。",
+			//	AlertWindow.Type.Notice);
+
+			//engSer.exitNode(true);
+		}
+
+		/// <summary>
+		/// 提交成功回调
+		/// </summary>
+		/// <param name="corrCnt">正确数量</param>
+		void processReward(int corrCnt) {
+			Debug.Log("Correct Count = " + corrCnt);
+			engSer.processReward(questionNumber: corrCnt);
+		}
+
+		#endregion
+
+		#region 流程控制
+
+		/// <summary>
+		/// 下一道
+		/// </summary>
+		public void nextQuestion() {
+			if (currentQuestionIndex >= questions.Length - 1) {
+				onSubmit(); return;
+			}
+			var question = questions[++currentQuestionIndex];
+			// 如果没有选项，下一题
+			if (question.options().Length <= 0)
+				nextQuestion();
+			else
+				questionDisplay.startView(question);
+		}
+
+		/// <summary>
+		/// 记录正确和错误数量
+		/// </summary>
+		public void record(string option) {
+			options[currentQuestionIndex] = option;
+		}
+
+		#endregion
+
     }
 }

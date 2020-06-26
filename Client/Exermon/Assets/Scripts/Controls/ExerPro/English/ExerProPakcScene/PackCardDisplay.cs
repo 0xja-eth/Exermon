@@ -20,7 +20,11 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
         /// <summary>
         /// 外部组件定义
         /// </summary>
+        public Text cost;
         public Text description;
+
+        public Text character;
+        public Text type;
 
 
         #region 数据控制
@@ -41,6 +45,10 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
             base.drawItem(item);
             description.text = item.description;
             name.text = item.name;
+            cost.text = item.cost.ToString();
+            //character.text = item.character;
+            type.text = item.typeText();
+
             icon.gameObject.SetActive(true);
             icon.overrideSprite = item.icon;
         }

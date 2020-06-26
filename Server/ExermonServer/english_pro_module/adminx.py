@@ -347,8 +347,8 @@ class NodeTypeAdmin(object):
 @xadmin.sites.register(ExerProRecord)
 class ExerProRecordAdmin(object):
 	list_display = ['id', 'player', 'stage', 'started', 'generated',
-					'cur_index', 'node_flag', 'word_level']
+					'cur_index', 'node_flag', 'word_level', 'gold']
 
 	list_editable = ['stage', 'started', 'generated',
-					'cur_index', 'node_flag', 'word_level']
+					'cur_index', 'node_flag', 'word_level', 'gold']
 

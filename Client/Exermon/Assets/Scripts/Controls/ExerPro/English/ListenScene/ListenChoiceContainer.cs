@@ -28,7 +28,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 保存选项
 		/// </summary>
 		public int saveSelection() {
-			return selectedChoiceIndex = selectedIndex;
+			selectedChoiceIndex = selectedIndex;
+			var choice = selectedItem();
+			return choice == null ? 0 : choice.order;
 		}
 
 		/// <summary>

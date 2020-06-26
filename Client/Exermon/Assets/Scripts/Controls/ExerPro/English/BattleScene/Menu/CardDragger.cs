@@ -24,7 +24,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public CardDisplay cardDisplay;
+		public PackCardDisplay cardDisplay;
 
 		/// <summary>
 		/// 预制件设定
