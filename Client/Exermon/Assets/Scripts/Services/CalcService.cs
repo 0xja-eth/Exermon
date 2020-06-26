@@ -998,12 +998,29 @@ namespace GameModule.Services {
 
                 var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
 
-                foreach(var enemy in enemies) {
-                    var pos = Random.Range(0, posCnt);
-                    while (posVis[pos]) pos = Random.Range(0, posCnt);
-                    posVis[pos] = true;
-
-                    this.enemies.Add(new RuntimeEnemy(pos, enemy));
+                var cardRecord = actor.cardGroup.cardRecord();
+                int unAttackCount = 0;
+                int cardCount = cardRecord.Count;
+                foreach (var card in cardRecord)
+                {
+                    if (!card.cardType.Equals(ExerProCard.Type.Attack))
+                    {
+                        unAttackCount++;
+                    }
+                }
+                int id;
+                if (unAttackCount / cardCount >= 0.7f) id = 15; //乌龟大师
+                else if (cardCount >= 100) id= 16; // 龙王
+                else id= 14; // 中二少年
+                foreach (var enemy in enemies) {
+                    if (enemy.id == id)
+                    {
+                        /*var pos = Random.Range(0, posCnt);
+						while (posVis[pos]) pos = Random.Range(0, posCnt);
+						posVis[pos] = true;*/
+						this.enemies.Add(new RuntimeEnemy(4, enemy));
+                        break;
+                    }
                 }
             }
 

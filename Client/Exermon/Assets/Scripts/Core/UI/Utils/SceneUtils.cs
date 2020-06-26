@@ -27,7 +27,7 @@ namespace Core.UI.Utils {
         public const string LoadingWindowKey = "LoadingWindow";
         public const string RebuildControllerKey = "RebuildController";
         public const string CurrentSceneKey = "Scene";
-
+        public static AudioSource audioSource;
         /// <summary>
         /// 提示窗口（脚本）
         /// </summary>
