@@ -50,25 +50,29 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
             base.start();
 			listenWindow.startWindow();
 		}
-		
+
 		#endregion
 
-		#region 场景控制
+		#region 更新控制
 
 		/// <summary>
 		/// 场景更新
 		/// </summary>
 		protected override void update() {
-            base.update();
-            var rewardInfo = engSer.rewardInfo;
-            if (rewardInfo != null) 
-                rewardWindow.startWindow(rewardInfo);
-        }
+			base.update();
+			var rewardInfo = engSer.rewardInfo;
+			if (rewardInfo != null)
+				rewardWindow.startWindow(rewardInfo);
+		}
+
+		#endregion
+
+		#region 场景控制
 
 		/// <summary>
 		/// 退出场景
 		/// </summary>
-        public override void popScene() {
+		public override void popScene() {
             engSer.exitNode();
         }
 

@@ -54,8 +54,8 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// </summary>
         public PackTabController tabController;
 
-        public CardItemShopDisplay cardItemShop;
-        public PotionItemShopDisplay potionItemShop;
+        public CardShopDisplay cardItemShop;
+        public PotionShopDisplay potionItemShop;
 
         public RectTransform leftView;
         public RectTransform rightView;

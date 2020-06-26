@@ -1,16 +1,24 @@
 ﻿
 using Core.UI;
 using Core.Systems;
-using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
+
 using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.UI;
+
+using Core.UI.Utils;
+
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
-using static ExerPro.EnglishModule.Data.CorrectionQuestion;
-using UnityEngine.UI;
+
+using FrontendWrongItem = ExerPro.EnglishModule.Data.
+	CorrectionQuestion.FrontendWrongItem;
+
+using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 using UI.CorrectionScene.Windows;
-using Core.UI.Utils;
 using UI.Common.Controls.ItemDisplays;
+using UI.ExerPro.EnglishPro.Common.Windows;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene {
 
@@ -19,12 +27,15 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
     /// </summary>
     public class CorrectionScene : BaseScene {
 
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
-        public ArticleDisplay articleDisplay;
-        public Text changedBeforeValue;
-        public CorrectionWindow correctionWindow;
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public ArticleDisplay articleDisplay;
+
+		public Text changedBeforeValue;
+
+		public RewardWindow rewardWindow;
+		public CorrectionWindow correctionWindow;
 
         List<int> doneIds = new List<int>();
 
@@ -55,66 +66,95 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
         /// 开始
         /// </summary>
         protected override void start() {
-            engSer.generateQuestions<CorrectionQuestion>(1, (res) =>
-            {
-                articleDisplay.startView(res[0]);
-            });
-            base.start();
+			engSer.generateQuestions<CorrectionQuestion>(1, (res) => {
+				articleDisplay.startView(res[0]);
+			});
+			base.start();
         }
 
-        #endregion
+		#endregion
 
+		#region 更新控制
 
-        #region 控制
+		/// <summary>
+		/// 场景更新
+		/// </summary>
+		protected override void update() {
+			base.update();
+			var rewardInfo = engSer.rewardInfo;
+			if (rewardInfo != null)
+				rewardWindow.startWindow(rewardInfo);
+		}
 
-        /// <summary>
-        /// 单词选择回调
-        /// </summary>
-        /// <param name="container">句子容器</param>
-        /// <param name="word">单词</param>
-        public void onWordSelected(SentenceContainer container, string word) {
-            //清除其他句子选择
-            foreach (ItemDisplay<string> item in articleDisplay.getSubViews()) {
-                SentenceContainer each = SceneUtils.get<SentenceContainer>(item.gameObject);
-                if (each == container || each.getSelectedIndex() == -1)
-                    continue;
-                each.deselect();
+		#endregion
+
+		#region 回调控制
+
+		/// <summary>
+		/// 单词选择回调
+		/// </summary>
+		/// <param name="container">句子容器</param>
+		/// <param name="word">单词</param>
+		public void onWordSelected(WordsContainer container, WordDisplay word) {
+
+            // 清除其他句子选择
+            foreach (var sub in articleDisplay.getSubViews()) {
+				if (sub == container) continue;
+				var display = sub as SentenceDisplay;
+				display?.container?.deselect();
             }
-            changedBeforeValue.text = word;
-            correctionWindow.currentSenContainer = container;
-            correctionWindow.startWindow();
-        }
 
+			correctionWindow.startWindow(container, word);
+        }
 
         /// <summary>
         /// 提交回调
         /// </summary>
         public void onSubmit() {
-            int sentenceIndex = 1;
-            int wordIndex = 1;
-            List<Answer> answers = new List<Answer>();
-            foreach (var sentenceDisplay in articleDisplay.getSubViews()) {
-                SentenceContainer sentenceContainer = SceneUtils.get<SentenceContainer>(sentenceDisplay.gameObject);
-                wordIndex = 1;
-                foreach (WordDisplay wordDisplay in sentenceContainer.getSubViews()) {
-                    Debug.Log(wordDisplay.state);
-                    if (wordDisplay.state != WordDisplay.State.Original) {
-                        Answer answer = new Answer();
-                        answer.sid = sentenceIndex; answer.wid = wordIndex;
-                        answer.word = wordDisplay.getItem();
-                        Debug.Log(sentenceIndex + wordIndex + wordDisplay.getItem());
-                        answers.Add(answer);
-                    }
-                    wordIndex++;
-                }
-                sentenceIndex++;
-            }
-            Debug.Log("AAA" + answers.ToArray().Length);
+			var answers = generateWrongItems();
+			var question = articleDisplay.getItem();
 
-            engSer.exitNode(true);
-        }
-        #endregion
-    }
+			engSer.answerCorrection(question, answers, processReward);
+		}
+
+		/// <summary>
+		/// 生成错误项列表
+		/// </summary>
+		List<FrontendWrongItem> generateWrongItems() {
+			Debug.Log("generateWrongItems");
+
+			var answers = new List<FrontendWrongItem>();
+			int sid = 1, wid = 1;
+
+			// 遍历每句话
+			foreach (var sub in articleDisplay.getSubViews()) {
+				var sentenceDisplay = sub as SentenceDisplay;
+				var sentenceContainer = sentenceDisplay.container;
+
+				wid = 1;
+				foreach (var subWord in sentenceContainer.getSubViews()) {
+					var wordDisplay = subWord as WordDisplay;
+					if (wordDisplay == null) continue;
+
+					var answer = wordDisplay.generateWrongItem(sid, wid++);
+					if (answer != null) answers.Add(answer);
+				}
+				sid++;
+			}
+			return answers;
+		}
+
+		/// <summary>
+		/// 提交成功回调
+		/// </summary>
+		/// <param name="corrCnt">正确数量</param>
+		void processReward(int corrCnt) {
+			Debug.Log("Correct Count = " + corrCnt);
+			engSer.processReward(questionNumber: corrCnt);
+		}
+
+		#endregion
+	}
 
 
 }
