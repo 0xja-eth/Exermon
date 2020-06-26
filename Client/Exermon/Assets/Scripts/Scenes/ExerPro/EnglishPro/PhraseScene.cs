@@ -27,12 +27,13 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 
 		const int PhraseSecond = 30;
 
-		const string RestCountFormat = "剩余题目：{0}/{1}";
+		const string RestCountFormat = "当前题目：{0}/{1}";
+		const string CorrCountFormat = "正确题目：{0}";
 
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text count;
+		public Text count, corrCnt;
 		public QuestionTimer timer;
 
 		public GameObject nextBtn;
@@ -47,7 +48,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 		PhraseQuestion[] questions;
 		string[] options;
 		
-        int currentQuestionIndex = 0;
+        int currentIndex = 0, corrCount = 0;
 		
 		bool answering = false; // 回答中
 
@@ -110,7 +111,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 		/// 更新计时
 		/// </summary>
 		void updateTimer() {
-			if (!answering && timer.isTimeUp())
+			if (answering && timer.isTimeUp())
 				questionDisplay.setOption("");
 		}
 
@@ -123,7 +124,8 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 		/// </summary>
 		void refresh() {
 			count.text = string.Format(RestCountFormat,
-				currentQuestionIndex + 1, questions.Length);
+				currentIndex + 1, questions.Length);
+			corrCnt.text = string.Format(CorrCountFormat, corrCount);
 		}
 
 		#endregion
@@ -136,7 +138,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 		void onQuestionGenerated(PhraseQuestion[] questions) {
 			this.questions = questions;
 			options = new string[questions.Length];
-			currentQuestionIndex = -1;
+			currentIndex = -1;
 
 			nextQuestion();
 			/*
@@ -182,19 +184,23 @@ namespace UI.ExerPro.EnglishPro.PhraseScene {
 			timer.stopTimer();
 
 			questionDisplay.areaDisplay.actived = false;
-			options[currentQuestionIndex] = option;
+			options[currentIndex] = option;
+
+			if (questions[currentIndex].phrase == option)
+				corrCount++;
 
 			nextBtn.SetActive(true);
+			refresh();
 		}
 
 		/// <summary>
 		/// 下一道
 		/// </summary>
 		public void nextQuestion() {
-			if (currentQuestionIndex >= questions.Length - 1) {
+			if (currentIndex >= questions.Length - 1) {
 				onSubmit(); return;
 			}
-			var question = questions[++currentQuestionIndex];
+			var question = questions[++currentIndex];
 			// 如果没有选项，下一题
 			if (question.options().Length <= 0)
 				nextQuestion();

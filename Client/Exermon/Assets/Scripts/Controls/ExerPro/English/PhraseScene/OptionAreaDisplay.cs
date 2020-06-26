@@ -62,13 +62,17 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// 随机位置生成
 		/// </summary>
 		void randomOptionPositions() {
-			foreach(var sub in subViews) {
+			for(int i=0;i< subViews.Count; ++i) {
+				var sub = subViews[i];
 				var rt = sub.transform as RectTransform;
-				rt.anchoredPosition = generatePosition(rt);
+				var display = sub as OptionDisplay;
+				if (display == null) continue;
+
+				rt.anchoredPosition = generatePosition(display);
 
 				int cnt = 0;
-				while (isRectTransformOverlap(rt, sub) && cnt++ <= 100) 
-					rt.anchoredPosition = generatePosition(rt);
+				while (isRectTransformOverlap(i, display) && cnt++ <= 100)
+					rt.anchoredPosition = generatePosition(display);
 			}
 		}
 
@@ -77,10 +81,10 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// </summary>
 		/// <param name="sub"></param>
 		/// <returns></returns>
-		Vector2 generatePosition(RectTransform rt) {
+		Vector2 generatePosition(OptionDisplay display) {
 			var size = container.rect.size / 2;
 			var imgSize = quesImage.rect.size / 2;
-			var rtSize = rt.rect.size / 2;
+			var rtSize = display.getSize() / 2;
 			var oriSize = size;
 
 			size -= rtSize; imgSize += rtSize;
@@ -100,34 +104,32 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// <summary>
 		/// 是否重叠
 		/// </summary>
-		/// <param name="rect1"></param>
-		/// <param name="sub"></param>
+		/// <param name="i">判断前i个</param>
+		/// <param name="display"></param>
 		/// <returns></returns>
-        public bool isRectTransformOverlap(RectTransform rect1, 
-			SelectableItemDisplay<string> sub) {
+        bool isRectTransformOverlap(int i, OptionDisplay display) {
 
-			var min = rect1.anchoredPosition - rect1.rect.size / 2;
-			var max = rect1.anchoredPosition + rect1.rect.size / 2;
+			Vector2 min, max, min2, max2;
+			display.getMinMax(out min, out max);
 
-			foreach (var subView in subViews) {
-                if (subView == sub) continue;
+			for(var j = 0; j < i; ++j) {
+				var sub = subViews[j];
+				var display2 = sub as OptionDisplay;
+				if (display2 == null || display2 == display) continue;
 
-                RectTransform rect2 = subView.transform as RectTransform;
+				display2.getMinMax(out min2, out max2);
 
-				if (rect2 == null) continue;
-
-				Debug.Log("subView: " + subView.name + ".rect2.rect: " + rect2.rect);
-
-				var min2 = rect2.anchoredPosition - rect2.rect.size / 2;
-				var max2 = rect2.anchoredPosition + rect2.rect.size / 2;
+				Debug.Log("isRectTransformOverlap: " + 
+					display.name + " -> " + display2.name +":" +
+					" { " + min + ", " + max + " } " + 
+					" { " + min2 + ", " + max2 + " } " );
 
 				min2 -= optionsSpacing; max2 += optionsSpacing;
 
-				if (min.x < max2.x && min2.x < max.x && 
+				if (min.x < max2.x && min2.x < max.x &&
 					min.y < max2.y && min2.y < max.y)
-                    return true;
-            }
-
+					return true;
+			}
             return false;
         }
 		

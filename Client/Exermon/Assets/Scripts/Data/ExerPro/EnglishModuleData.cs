@@ -106,7 +106,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 删除率
 		/// </summary>
-		const int DropoutRate = 20;
+		const int DropoutRate = 50;
 		const int DropoutThreshold = 5;
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace ExerPro.EnglishModule.Data {
 			var res = new List<string>();
 			foreach (var opt in options) {
 				var rand = UnityEngine.Random.Range(0, 100);
-				if (res.Count > DropoutThreshold) {
+				if (res.Count >= DropoutThreshold) {
 					if (rand >= DropoutRate) res.Add(opt);
 				} else res.Add(opt);
 			}

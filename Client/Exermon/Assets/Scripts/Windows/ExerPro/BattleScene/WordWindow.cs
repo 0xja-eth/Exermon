@@ -56,7 +56,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 内部变量定义
 		/// </summary>
 		bool terminated = false; // 作答完毕
-		bool answering = false; // 回答中
+		bool pushingAnswer = false; // 提交作答中
 
 		#region 初始化
 
@@ -120,7 +120,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 更新计时
 		/// </summary>
 		void updateTimer() {
-			if (!answering && timer.isTimeUp()) answer();
+			if (!pushingAnswer && timer.isTimeUp()) answer();
 		}
 
 		#endregion
@@ -181,10 +181,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 		/// 回答单词
 		/// </summary>
 		public void answer(string chinese = "") {
-			answering = true;
+			pushingAnswer = true;
 			choiceContainer.selectable = false;
 			battleSer.answer(chinese, onAnswerSuccess,
-				() => answering = false);
+				() => pushingAnswer = false);
 		}
 
 		/// <summary>
@@ -201,7 +201,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Windows {
 			next.SetActive(true);
 
 			terminated = battleSer.isStateChanged();
-			answering = false;
+			pushingAnswer = false;
 		}
 
 		/// <summary>

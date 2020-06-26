@@ -202,6 +202,7 @@ MonoBehaviour:
   skin: {fileID: 6747844638375590849}
   correctFlag: {fileID: 9189014346018524939}
   image: {fileID: 4464562074515303030}
+  wdithOffset: 32
   randomColors: []
 --- !u!114 &8093415639723775149
 MonoBehaviour:

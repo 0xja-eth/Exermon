@@ -185,7 +185,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
 		/// 绘制所选项
 		/// </summary>
 		void drawOption() {
-			optionObject.SetActive(option != null);
+			optionObject.SetActive(option != null && option != "");
 			optionDisplay.text = option ?? "";
 		}
 
