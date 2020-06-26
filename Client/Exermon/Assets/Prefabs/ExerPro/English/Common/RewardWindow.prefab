@@ -291,7 +291,7 @@ MonoBehaviour:
   shownState: Shown
   hiddenState: Hidden
   shownAttr: shown
-  cardDisplay: {fileID: 8973014850243482236}
+  cardDisplay: {fileID: 6304899596673870908}
   integral: {fileID: 8803396890851007793}
   gold: {fileID: 3300034147617953284}
   confirm: {fileID: 3586116144749401754}
@@ -1342,7 +1342,8 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6421348064875430577, guid: c64d3102de067e74a8a9c98b42ad23b4, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c64d3102de067e74a8a9c98b42ad23b4, type: 3}
 --- !u!224 &7053381007561608238 stripped
 RectTransform:
@@ -1350,15 +1351,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2709965742230180045}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8973014850243482236 stripped
+--- !u!114 &6304899596673870908 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6421348064875430577, guid: c64d3102de067e74a8a9c98b42ad23b4,
+  m_CorrespondingSourceObject: {fileID: 8278807690686528753, guid: c64d3102de067e74a8a9c98b42ad23b4,
     type: 3}
   m_PrefabInstance: {fileID: 2709965742230180045}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 929449b3e6a4acd4ea993f701925cf1c, type: 3}
+  m_Script: {fileID: 11500000, guid: 443f1e2c50effda4ba959589e8c52a12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

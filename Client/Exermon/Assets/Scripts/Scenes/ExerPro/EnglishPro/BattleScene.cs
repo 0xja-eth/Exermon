@@ -20,6 +20,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 
 	using Windows;
     using Controls.Battler;
+    using UI.ExerPro.EnglishPro.Common.Windows;
 
     /// <summary>
     /// 地特训战斗场景
@@ -40,6 +41,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		public MenuWindow menuWindow;
 		public WordWindow wordWindow;
 		public DrawWindow drawWindow;
+        public RewardWindow rewardWindow;
 
 		public PlayerStatus playerStatus;
 		public MultParamsDisplay wordProgress;
@@ -96,19 +98,22 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		protected override void update() {
             base.update();
 			battleSer?.update();
-			/*
+            /*
 			if (battleSer.isStateChanged())
 				onStateChanged();*/
-		}
+            var rewardInfo = engSer.rewardInfo;
+            if (rewardInfo != null)
+                rewardWindow.startWindow(rewardInfo);
+        }
 
-		#endregion
+        #endregion
 
-		#region 回调控制
+        #region 回调控制
 
-		/// <summary>
-		/// 状态改变回调
-		/// </summary>
-		void onStateChanged() {
+        /// <summary>
+        /// 状态改变回调
+        /// </summary>
+        void onStateChanged() {
 			Debug.Log("BattleScene.onStateChanged: " + (BattleService.State)battleSer.state);
 			switch ((BattleService.State)battleSer.state) {
 				case BattleService.State.Answering: onAnswer(); break;
@@ -116,8 +121,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 				case BattleService.State.Playing: onPlay(); break;
 				case BattleService.State.Discarding: onDiscard(); break;
 				case BattleService.State.Enemy: onEnemy(); break;
-			}
-		}
+                case BattleService.State.Result: onResult(); break;
+            }
+        }
 
 		/// <summary>
 		/// 答题
@@ -154,6 +160,22 @@ namespace UI.ExerPro.EnglishPro.BattleScene {
 		void onEnemy() {
 
 		}
+
+        /// <summary>
+        /// 结算
+        /// </summary>
+        void onResult() {
+            if (battleSer.actor().isDead()) {
+                onDie();
+            }
+        }
+
+        /// <summary>
+        /// 死亡回调
+        /// </summary>
+        void onDie() {
+            engSer.exitNode();
+        }
 
 		#endregion
 

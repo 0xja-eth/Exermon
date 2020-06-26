@@ -527,15 +527,15 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		void onBattleEnd() {
 			Debug.Log("onBattleEnd: " + round);
-			// TODO: 生成奖励
-			battlersBattleEnd();
+            engSer.processReward(enemyNumber: 10, bossNumber: 0);
+            battlersBattleEnd();
 			changeState(State.Result);
 		}
 
-		/// <summary>
-		/// 战斗结束回调
-		/// </summary>
-		void battlersBattleEnd() {
+        /// <summary>
+        /// 战斗结束回调
+        /// </summary>
+        void battlersBattleEnd() {
 			actor().onBattleEnd();
 			foreach (var enemy in _enemies)
 				enemy.onBattleEnd();

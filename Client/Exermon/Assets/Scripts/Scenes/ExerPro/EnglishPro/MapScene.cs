@@ -21,6 +21,7 @@ namespace UI.ExerPro.EnglishPro { }
 namespace UI.ExerPro.EnglishPro.MapScene {
 
     using Controls;
+    using UI.ExerPro.EnglishPro.Common.Windows;
 
     /// <summary>
     /// 地图场景
@@ -32,6 +33,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         public StageRecordDisplay stageRecordDisplay;
 		public RestNodeDisplay restNodeDisplay;
+        public SwitchWindow switchWindow;
 
 		public BaseWindow nodeDetail;
 
@@ -82,6 +84,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             base.update();
             engSer?.update();
 			updateRestNode();
+            updateSwitchWindow();
         }
 
 		/// <summary>
@@ -92,6 +95,16 @@ namespace UI.ExerPro.EnglishPro.MapScene {
 			restNodeDisplay.startView(engSer.randomTips());
 			stageRecordDisplay.requestRefresh();
 		}
+
+        /// <summary>
+        /// 更新死亡/关卡切换窗口
+        /// </summary>
+        void updateSwitchWindow() {
+            if (engSer.record.actor.isDead()) {
+                switchWindow.startWindow(type: SwitchWindow.Type.Die, onDieExit);
+            }
+        }
+
 
         #endregion
 
@@ -133,5 +146,13 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         }
         #endregion
 
+        #region 回调函数
+        /// <summary>
+        /// 死亡退出回调
+        /// </summary>
+        void onDieExit() {
+            popScene();
+        }
+        #endregion
     }
 }
