@@ -12,6 +12,7 @@ using GameModule.Services;
 
 using UI.Common.Windows;
 using UI.Common.Controls.SystemExtend.QuestionText;
+using System.Runtime.CompilerServices;
 
 namespace Core.UI.Utils {
 
@@ -27,11 +28,14 @@ namespace Core.UI.Utils {
         public const string LoadingWindowKey = "LoadingWindow";
         public const string RebuildControllerKey = "RebuildController";
         public const string CurrentSceneKey = "Scene";
-        public static AudioSource audioSource;
         /// <summary>
-        /// 提示窗口（脚本）
+        /// 音频播放
         /// </summary>
-        public static AlertWindow alertWindow {
+        private static AudioSource audioSource;
+		/// <summary>
+		/// 提示窗口（脚本）
+		/// </summary>
+		public static AlertWindow alertWindow {
             get {
                 return getSceneObject(AlertWindowKey) as AlertWindow;
             }
@@ -94,7 +98,6 @@ namespace Core.UI.Utils {
         static GameSystem gameSys = null;
         static SceneSystem sceneSys = null;
         static GameService gameSer = null;
-
         /// <summary>
         /// 初始化界面工具
         /// </summary>
@@ -134,7 +137,12 @@ namespace Core.UI.Utils {
                 sceneSys.gotoScene(sceneIndex);
 
             SceneUtils.setCurrentScene(scene);
-
+            audioSource = SceneUtils.get<AudioSource>(scene.transform);
+            if (audioSource == null) Debug.Log("dpc no SOURCE!");
+            else {
+                audioSource.Play();
+                UnityEngine.Object.DontDestroyOnLoad(audioSource.gameObject);
+            }
             SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
             SceneUtils.rebuildController = rebuildController;
