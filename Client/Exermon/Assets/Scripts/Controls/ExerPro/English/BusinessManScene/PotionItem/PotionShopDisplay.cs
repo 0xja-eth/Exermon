@@ -13,12 +13,12 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
 	/// <summary>
 	/// 药水商店显示
 	/// </summary>
-	public class PotionItemShopDisplay : ExerProShopDisplay<ExerProPotion> {
+	public class PotionShopDisplay : ExerProShopDisplay<ExerProPotion> {
 
         /// <summary>
         /// 外部组件设置
         /// </summary>
-        public PotionItemDetail potionItemDetail;
+        public PotionShopItemDetail potionItemDetail;
 
         /// <summary>
         /// 内部变量
@@ -33,7 +33,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.PotionItem {
                 return potionItemDetail;
             }
             set {
-                potionItemDetail = value as PotionItemDetail;
+                potionItemDetail = value as PotionShopItemDetail;
             }
         }
 

@@ -220,24 +220,6 @@ namespace ExerPro.EnglishModule.Data {
     /// 改错题
     /// </summary>
     public class CorrectionQuestion : BaseData {
-
-        /// <summary>
-        /// 错误项
-        /// </summary>
-        public class FrontendWrongItem : BaseData {
-
-            /// <summary>
-            /// 属性
-            /// </summary>
-            [AutoConvert]
-            public int sid { get; protected set; }
-            [AutoConvert]
-            public int wid { get; protected set; }
-            [AutoConvert]
-            public string word { get; protected set; }
-
-        }
-
         /// <summary>
         /// 错误项
         /// </summary>
@@ -265,7 +247,10 @@ namespace ExerPro.EnglishModule.Data {
 
         }
 
-        public class Answer : BaseData {
+		/// <summary>
+		/// 前端错误项
+		/// </summary>
+		public class FrontendWrongItem : BaseData {
             /// <summary>
             /// 属性
             /// </summary>
@@ -275,7 +260,16 @@ namespace ExerPro.EnglishModule.Data {
             public int wid { get; set; }
             [AutoConvert]
             public string word { get; set; }
-        }
+
+			/// <summary>
+			/// 构造函数
+			/// </summary>
+			public FrontendWrongItem() { }
+			public FrontendWrongItem(int sid, int wid, string word) {
+				this.sid = sid; this.wid = wid;
+				this.word = word;
+			}
+		}
 
         /// <summary>
         /// 属性

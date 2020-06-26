@@ -11,7 +11,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
 	/// <summary>
 	/// 卡牌商店显示
 	/// </summary>
-	public class CardItemShopDisplay : ExerProShopDisplay<ExerProCard> {
+	public class CardShopDisplay : ExerProShopDisplay<ExerProCard> {
 
         /// <summary>
         /// 内部变量

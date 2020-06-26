@@ -1,28 +1,38 @@
-﻿using Core.UI.Utils;
-using ExerPro.EnglishModule.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UI.Common.Controls.ItemDisplays;
-using UI.CorrectionScene.Windows;
+﻿
 using UnityEngine;
 using UnityEngine.UI;
 
+using UI.Common.Controls.ItemDisplays;
+
+using ExerPro.EnglishModule.Data;
+
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
-
     /// <summary>
-    /// 文章
+    /// 改错题目显示
     /// </summary
     public class ArticleDisplay : ContainerDisplay<string>,
         IItemDisplay<CorrectionQuestion> {
 
-        CorrectionQuestion question;
-        public GameObject correctionWindow;
-        public Text changedBeforeValue;
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
+		public GameObject correctionWindow;
 
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		public Text changedBeforeValue { get; set; }
+
+		/// <summary>
+		/// 内部变量定义
+		/// </summary>
+		CorrectionQuestion question;
+
+		/// <summary>
+		/// 获取物品
+		/// </summary>
+		/// <returns></returns>
         public CorrectionQuestion getItem() {
             return question;
         }
@@ -34,17 +44,15 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
         /// <param name="force">强制</param>
         /// <returns>null</returns>
         public void setItem(CorrectionQuestion item, bool force = false) {
-            question = item; base.setItems(item.sentences());
+            question = item; setItems(item.sentences());
         }
-
 
         /// <summary>
         /// 开启视图
         /// </summary>
         /// <param name="item"></param>
         public void startView(CorrectionQuestion item) {
-            base.startView();
-            setItem(item, true);
+            startView(); setItem(item, true);
         }
 
     }
