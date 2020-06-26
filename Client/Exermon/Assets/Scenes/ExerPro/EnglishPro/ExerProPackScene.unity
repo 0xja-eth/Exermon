@@ -2092,6 +2092,7 @@ MonoBehaviour:
   tabController: {fileID: 1091409920}
   packItemDetail: {fileID: 641097361}
   detail: {fileID: 641097359}
+  gold: {fileID: 415436768234641549}
   itemPackDisplay: {fileID: 877852739}
   cardPackDisplay: {fileID: 255150617}
   potionPackDisplay: {fileID: 611780814}
