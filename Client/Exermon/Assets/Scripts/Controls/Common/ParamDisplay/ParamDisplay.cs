@@ -40,6 +40,11 @@ namespace UI.Common.Controls.ParamDisplays {
 
         #region 启动控制
 
+        protected override void update() {
+            base.update();
+            //Debug.Log(name + data);
+        }
+
         /// <summary>
         /// 启动窗口
         /// </summary>
@@ -121,7 +126,7 @@ namespace UI.Common.Controls.ParamDisplays {
             if (isEmptyValue(data)) drawEmptyValue();
             else drawExactlyValue(data);
         }
-        
+
         /// <summary>
         /// 绘制空物品
         /// </summary>
@@ -219,7 +224,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 启动窗口
         /// </summary>
         /// <param name="obj">值对象</param>
-        public void startView(IDisplayDataConvertable obj, 
+        public void startView(IDisplayDataConvertable obj,
             string type = "", bool immediately = false) {
             startView(); setValue(obj, type, immediately);
         }
@@ -290,7 +295,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public virtual void setKey(string key, 
+        public virtual void setKey(string key,
             JsonData value, bool refresh = false) {
             if (data != null) data[key] = value;
             requestRefresh(refresh);
@@ -324,7 +329,7 @@ namespace UI.Common.Controls.ParamDisplays {
         /// 刷新视窗
         /// </summary>
         protected sealed override void drawExactlyValue(JsonData data) {
-            base.drawExactlyValue(data); refreshMain(); 
+            base.drawExactlyValue(data); refreshMain();
         }
 
         /// <summary>

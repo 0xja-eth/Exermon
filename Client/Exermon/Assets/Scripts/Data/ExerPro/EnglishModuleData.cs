@@ -60,7 +60,7 @@ namespace ExerPro.EnglishModule.Data {
 		public ListeningSubQuestion() {
 
 		}
-		}
+	}
 
     /// <summary>
     /// 听力题
@@ -119,21 +119,16 @@ namespace ExerPro.EnglishModule.Data {
         public string phrase { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
-
-		/// <summary>
-		/// 选项定义
-		/// </summary>
-        public static readonly string[] option1 = {
-			"sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. of sth.", "sth. for sb." };
-        public static readonly string[] option2 = {
+        public string[] option1 = {
+            "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. for doing sth.", "sb. of sth.", "sth. for sb." };
+        public string[] option2 = {
 			"doing sth.", "to do sth.", "to doing sth." };
-        public static readonly string[] option3 = {
+        public string[] option3 = {
 			"about", "at", "for", "from", "in", "of", "with", "to" };
-        public static readonly string[] option = {
+        public string[] option = {
 			"about", "at", "for", "from", "in", "of", "with", "to" ,
             "doing sth.", "to do sth." ,"to doing sth.", "sb. to do sth.", "sb. doing sth.",
-            "sb. into doing sth.", "sb. of sth", "sth. for sb."
-		};
+            "sb. into doing sth.", "sb. of sth", "sth. for sb." };
 
 		/// <summary>
 		/// 缓存选项
@@ -153,7 +148,7 @@ namespace ExerPro.EnglishModule.Data {
 				else if (option3.ToList().Contains(phrase))
 					tmpOptions = option3;
 				else tmpOptions = option;
-        }
+        } 
 			return dropout(tmpOptions);
 		}
 
@@ -168,8 +163,9 @@ namespace ExerPro.EnglishModule.Data {
 				var rand = UnityEngine.Random.Range(0, 100);
 				if (res.Count > DropoutThreshold) {
 					if (rand >= DropoutRate) res.Add(opt);
-				} else res.Add(opt);
 			}
+                else res.Add(opt);
+            }
 			if (!res.Contains(phrase)) res.Add(phrase);
 			return res.ToArray();
 		}
@@ -223,7 +219,6 @@ namespace ExerPro.EnglishModule.Data {
     /// 改错题
     /// </summary>
     public class CorrectionQuestion : BaseData {
-		
         /// <summary>
         /// 错误项
         /// </summary>
@@ -900,7 +895,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         protected virtual int generatePrice() { return 0; }
 		*/
-        
+
 		/// <summary>
 		/// 起手动画/目标动画
 		/// </summary>
@@ -997,8 +992,9 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
         public static ExerProItem sample() {
-            ExerProItem item = new ExerProItem();
-            return item;
+            int index = UnityEngine.Random.Range(0, 9);
+            int[] a = { 1, 2, 4, 10, 14, 16, 19, 32, 33 };
+            return DataService.get().exerProItem(a[index]);
 	}
     }
 
@@ -1019,8 +1015,9 @@ namespace ExerPro.EnglishModule.Data {
 			return AssetLoader.getExerProItemIconSprite;
 		}
         public static ExerProPotion sample() {
-            ExerProPotion item = new ExerProPotion();
-            return item;
+            int index = UnityEngine.Random.Range(0, 8);
+            int[] a = { 4, 5, 6, 7, 14, 15, 16, 25 };
+            return DataService.get().exerProPotion(a[index]);
         }
 		/*
         /// <summary>
@@ -1121,12 +1118,14 @@ namespace ExerPro.EnglishModule.Data {
         public static ExerProCard sample() {
             ExerProCard card = new ExerProCard();
             card.cost = 1;
+            card.skinIndex = 0;
             card.cardType = 0;
             card.inherent = false;
             card.disposable = false;
             card.character = "character";
-            card.target = 1;
-            card.iconIndex = 2;
+            card.target = 0;
+            card.type = 1;
+            card.iconIndex = 0;
             return card;
 	}
 
@@ -1311,7 +1310,7 @@ namespace ExerPro.EnglishModule.Data {
     /// <summary>
     /// 特训背包物品
     /// </summary>
-    public class ExerProPackItem<T> : PackContItem<T> 
+    public class ExerProPackItem<T> : PackContItem<T>
 		where T : BaseExerProItem {
 
         /// <summary>
@@ -1371,8 +1370,7 @@ namespace ExerPro.EnglishModule.Data {
         public static ExerProPackItem sample() {
 
             ExerProPackItem sample = new ExerProPackItem(ExerProItem.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
-
+            sample.count = UnityEngine.Random.Range(1, 10);
             return sample;
 	}
 
@@ -1391,7 +1389,6 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPackPotion(ExerProPotion potion) : base(potion) { }
         public static ExerProPackPotion sample() {
             ExerProPackPotion sample = new ExerProPackPotion(ExerProPotion.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
 
             return sample;
     }
@@ -1418,11 +1415,16 @@ namespace ExerPro.EnglishModule.Data {
         public ExerProPackCard(ExerProCard card) : base(card) { }
 
         public static ExerProPackCard sample() {
-
             ExerProPackCard sample = new ExerProPackCard(ExerProCard.sample());
-            sample.itemId = UnityEngine.Random.Range(1, 3);
 
             return sample;
+    }
+        public static ExerProPackCard[] ExerProCard2ExerProPackCard(ExerProCard[] cards) {
+            var cnt = cards.Length;
+            var packCards = new ExerProPackCard[cnt];
+            for (int i = 0; i < cnt; ++i)
+                packCards[i] = new ExerProPackCard(cards[i]);
+            return packCards;
     }
     }
 
@@ -1455,7 +1457,8 @@ namespace ExerPro.EnglishModule.Data {
                 return _packPotion;
             }
             set {
-                packPotionId = value.id;
+                if (value == null) packPotionId = 0;
+                else packPotionId = value.id;
                 _packPotion = null;
             }
         }
@@ -1760,7 +1763,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public int getCardNumber() {
-            return items.Count + handGroup.items.Count + 
+            return items.Count + handGroup.items.Count +
 				drawGroup.items.Count + discardGroup.items.Count;
         }
     }
@@ -2025,7 +2028,7 @@ namespace ExerPro.EnglishModule.Data {
     /// 特训记录
     /// </summary>
     public class ExerProRecord : BaseData, ParamDisplay.IDisplayDataConvertable {
-		
+
 		/// <summary>
 		/// 常量定义 
 		/// </summary>
@@ -2187,7 +2190,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="val"></param>
 		public void gainGold(int val) {
 			gold = Math.Max(gold + val, 0);
-            }
+        } 
 
         #endregion
 
@@ -2646,7 +2649,7 @@ namespace ExerPro.EnglishModule.Data {
 				return (Type)realTypeId;
             return (Type)typeId;
         }
-		
+
         /// <summary>
         /// 获取下一节点
         /// </summary>
@@ -3766,7 +3769,7 @@ namespace ExerPro.EnglishModule.Data {
 			clearStates();
 			clearBuffs();
 		}
-		
+
 		/// <summary>
 		/// 回合开始回调
 		/// </summary>
@@ -4025,9 +4028,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 获得物品
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="T"><peparam>
 		/// <param name="item">物品</param>
-		public void gainItem<T>(T item) where T: BaseExerProItem {
+		public void gainItem<T>(T item) where T : BaseExerProItem {
 			var contItem = getContItem(item);
 			if (typeof(T) == typeof(ExerProItem))
 				itemPack.pushItem(contItem as ExerProPackItem);
@@ -4046,7 +4049,7 @@ namespace ExerPro.EnglishModule.Data {
 			where T : BaseExerProItem {
 
 			if (typeof(T) == typeof(ExerProItem))
-				return new ExerProPackItem(item as ExerProItem) as ExerProPackItem<T>; 
+                return new ExerProPackItem(item as ExerProItem) as ExerProPackItem<T>;
 			if (typeof(T) == typeof(ExerProPotion))
 				return new ExerProPackPotion(item as ExerProPotion) as ExerProPackItem<T>;
 			if (typeof(T) == typeof(ExerProCard))
@@ -4060,9 +4063,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public PackContainer<P> getContainer<P, T>()
-			where P : ExerProPackItem<T>, new() where T : BaseExerProItem {
-
+        public PackContainer<P> getContainer<P,T>()
+            where P:ExerProPackItem<T>,new() where T : BaseExerProItem {
 			if (typeof(T) == typeof(ExerProItem))
 				return itemPack as PackContainer<P>;
 			if (typeof(T) == typeof(ExerProPotion))

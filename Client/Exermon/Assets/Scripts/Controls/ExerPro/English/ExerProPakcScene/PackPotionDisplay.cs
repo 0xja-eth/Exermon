@@ -6,9 +6,10 @@ using UnityEngine.UI;
 using ExerPro.EnglishModule.Data;
 
 using UI.Common.Controls.ItemDisplays;
+using UI.ExerPro.EnglishPro.ExerProPackScene.Windows;
 
 namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
-    
+
 
     /// <summary>
     /// 特训背包药水
@@ -16,6 +17,8 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
     public class PackPotionDisplay : PackContItemDisplay
         <ExerProPackPotion, ExerProPotion> {
 
+        public ExerProPackWindow packWindow;
+        public GameObject equipFlag;
 
         /// <summary>
         /// 外部组件定义
@@ -33,9 +36,16 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
         /// 绘制卡牌
         /// </summary>
         /// <param name="card"></param>
+        protected override void drawExactlyItem(ExerProPackPotion item) {
+            base.drawExactlyItem(item);
+        }
+
         protected override void drawItem(ExerProPotion item) {
-            description.text = item.description;
+            base.drawItem(item);
             name.text = item.name;
+            icon.gameObject.SetActive(true);
+            icon.overrideSprite = item.icon;
+            equipFlag.SetActive(isEquiped());
         }
 
         /// <summary>
@@ -45,6 +55,12 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
             base.drawEmptyItem();
         }
 
+        /// <summary>
+        /// 是否被装备
+        /// </summary>
+        public bool isEquiped() {
+            return packWindow.isEquiped(item);
+        }
         #endregion
 
     }
