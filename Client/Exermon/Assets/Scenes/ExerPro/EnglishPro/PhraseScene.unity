@@ -2746,7 +2746,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.4}
   m_AnchorMax: {x: 1, y: 0.4}
   m_AnchoredPosition: {x: 96, y: 0}
-  m_SizeDelta: {x: -96, y: 24}
+  m_SizeDelta: {x: -160, y: 24}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1660292239
 MonoBehaviour:
@@ -3235,7 +3235,7 @@ GameObject:
   - component: {fileID: 1865802212}
   - component: {fileID: 1865802213}
   m_Layer: 5
-  m_Name: Timer
+  m_Name: Info
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3258,7 +3258,7 @@ RectTransform:
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.75}
-  m_AnchorMax: {x: 0.25, y: 1}
+  m_AnchorMax: {x: 0.3, y: 1}
   m_AnchoredPosition: {x: 64, y: -48}
   m_SizeDelta: {x: -64, y: -48}
   m_Pivot: {x: 0, y: 1}
