@@ -229,6 +229,13 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public class WrongItem : BaseData {
 
+			/// <summary>
+			/// 类型枚举
+			/// </summary>
+			public enum Type {
+				Add = 1, Edit = 2, Delete = 3
+			}
+
             /// <summary>
             /// 属性
             /// </summary>
@@ -241,15 +248,74 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public string word { get; protected set; }
 
-            /// <summary>
-            /// 类型文本
-            /// </summary>
-            /// <returns></returns>
-            public string typeText() {
+			/// <summary>
+			/// 对应题目
+			/// </summary>
+			public CorrectionQuestion question { get; set; }
+
+			/// <summary>
+			/// 缓存转换结果
+			/// </summary>
+			FrontendWrongItem tempFrontendWrongItem = null;
+
+			/// <summary>
+			/// 类型文本
+			/// </summary>
+			/// <returns></returns>
+			public string typeText() {
                 return DataService.get().correctType(type).Item2;
             }
 
-        }
+			/// <summary>
+			/// 类型枚举
+			/// </summary>
+			/// <returns></returns>
+			public Type typeEnum() {
+				return (Type)type;
+			}
+
+			/// <summary>
+			/// 转化为前端错误项
+			/// </summary>
+			/// <returns></returns>
+			public FrontendWrongItem convertToFrontendWrongItem() {
+				return tempFrontendWrongItem = tempFrontendWrongItem ?? 
+					new FrontendWrongItem(sentenceIndex, wordIndex, convertFrontentWord());
+			}
+
+			/// <summary>
+			/// 获取原始单词
+			/// </summary>
+			/// <returns></returns>
+			string oriWord() {
+				return question.word(sentenceIndex, wordIndex);
+			}
+
+			/// <summary>
+			/// 获取下一单词
+			/// </summary>
+			/// <returns></returns>
+			string nextWord() {
+				return question.word(sentenceIndex, wordIndex+1);
+			}
+
+			/// <summary>
+			/// 转化为前端文本
+			/// </summary>
+			/// <returns></returns>
+			string convertFrontentWord() {
+				switch (typeEnum()) {
+					case Type.Delete: return "";
+					case Type.Edit: return word;
+					case Type.Add:
+						if (wordIndex == 0) // 句首
+							return word + " " + nextWord();
+						else return oriWord() + " " + word;
+				}
+				return word;
+			}
+
+		}
 
 		/// <summary>
 		/// 前端错误项
@@ -286,69 +352,109 @@ namespace ExerPro.EnglishModule.Data {
         public WrongItem[] wrongItems { get; protected set; }
 
 		/// <summary>
-		/// 测试？
+		/// 缓存句子
+		/// </summary>
+		string[] tmpSentences = null;
+
+		/// <summary>
+		/// 读取自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			foreach (var item in wrongItems)
+				item.question = this;
+		}
+
+		/// <summary>
+		/// 获取指定位置单词
+		/// </summary>
+		/// <param name="sid">句子ID（从1开始）</param>
+		/// <param name="wid">单词ID（从1开始，0表示句首）</param>
+		/// <returns></returns>
+		public string word(int sid, int wid) {
+			if (wid == 0) return "";
+			var words = this.words(sid);
+			if (wid > words.Length) return "";
+			return words[wid - 1];
+		}
+
+		/// <summary>
+		/// 获取句子数组
 		/// </summary>
 		/// <returns></returns>
-        public string[] sentences() {
-            //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
-            article = "Dear Diary, " +
-      "Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
-       "Good night and remember, you, dear diary, is my only souvenir from my past life and my only friend.";
-            string temp = article.Replace("\n", "");
-            temp = temp.Replace("\t", "");
-            temp = temp.Replace("\r", "");
+		public string[] sentences() {
+			if (tmpSentences == null) {
+				//article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
+				//      article = "Dear Diary, " +
+				//"Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
+				// "Good night and remember, you, dear diary, is my only souvenir from my past life and my only friend.";
+				string temp = article.Replace("\n", "");
+				temp = temp.Replace("\t", "");
+				temp = temp.Replace("\r", "");
 
-            Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
-            List<string> wordList = new List<string>();
-            using (StreamReader sr = new StreamReader("word.txt")) {
-                string line;
-                while ((line = sr.ReadLine()) != null) {
-                    wordList.Add(line);
-                }
-            }
+				Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
+				List<string> wordList = new List<string>();
+				using (StreamReader sr = new StreamReader("word.txt")) {
+					string line;
+					while ((line = sr.ReadLine()) != null) {
+						wordList.Add(line);
+					}
+				}
 
-            foreach (string word in wordList) {
-                Regex regex = new Regex(word);
-                if (regex.IsMatch(temp)) {
-                    string match = Regex.Match(temp, word).Value;
-                    string hashCode = match.GetHashCode().ToString();
-                    temp = temp.Replace(match, hashCode);
-                    matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
-                }
-            }
-
-
-            temp = temp.Replace("”", "\"");
-            temp = temp.Replace("“", "\"");
-
-            temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
-
-            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
-            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
-            temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
-
-            temp = temp.Replace(",  \"", ",\"&");
-            temp = temp.Replace(".  \"", ".\"&");
-            temp = temp.Replace(" ? ", " ?&");
-            temp = temp.Replace(" . ", " .&");
-            temp = temp.Replace(" ! ", " !&");
-            Debug.Log("aaa" + temp);
-
-            temp = temp.Replace("#", ".");
-
-            while (matchWordList.Count != 0) {
-                KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
-                temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
-            }
+				foreach (string word in wordList) {
+					Regex regex = new Regex(word);
+					if (regex.IsMatch(temp)) {
+						string match = Regex.Match(temp, word).Value;
+						string hashCode = match.GetHashCode().ToString();
+						temp = temp.Replace(match, hashCode);
+						matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
+					}
+				}
 
 
-            //去除重复空格
-            temp = Regex.Replace(temp, " {2,}", " ");
+				temp = temp.Replace("”", "\"");
+				temp = temp.Replace("“", "\"");
 
-            string[] sentences = temp.Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
-            return sentences;
-        }
-    }
+				temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
+
+				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
+				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
+				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
+
+				temp = temp.Replace(",  \"", ",\"&");
+				temp = temp.Replace(".  \"", ".\"&");
+				temp = temp.Replace(" ? ", " ?&");
+				temp = temp.Replace(" . ", " .&");
+				temp = temp.Replace(" ! ", " !&");
+				Debug.Log("aaa" + temp);
+
+				temp = temp.Replace("#", ".");
+
+				while (matchWordList.Count != 0) {
+					KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
+					temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
+				}
+
+				//去除重复空格
+				temp = Regex.Replace(temp, " {2,}", " ");
+
+				tmpSentences = temp.Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+			}
+			return tmpSentences;
+		}
+
+		/// <summary>
+		/// 获取单词数组
+		/// </summary>
+		/// <param name="sid">句子ID（从1开始）</param>
+		/// <returns></returns>
+		public string[] words(int sid) {
+			if (sid <= 0) return new string[0];
+			var sentence = sentences()[sid - 1];
+			return sentence.Trim().Split(' ');
+		}
+	}
 
     /// <summary>
     /// 单词
@@ -3923,7 +4029,12 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="item">物品</param>
 		public void gainItem<T>(T item) where T: BaseExerProItem {
 			var contItem = getContItem(item);
-			getContainer<T>()?.pushItem(contItem);
+			if (typeof(T) == typeof(ExerProItem))
+				itemPack.pushItem(contItem as ExerProPackItem);
+			if (typeof(T) == typeof(ExerProPotion))
+				potionPack.pushItem(contItem as ExerProPackPotion);
+			if (typeof(T) == typeof(ExerProCard))
+				cardGroup.pushItem(contItem as ExerProPackCard);
 		}
 
 		/// <summary>
@@ -3949,15 +4060,15 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public PackContainer<ExerProPackItem<T>> getContainer<T>()
-			where T : BaseExerProItem {
+		public PackContainer<P> getContainer<P, T>()
+			where P : ExerProPackItem<T>, new() where T : BaseExerProItem {
 
 			if (typeof(T) == typeof(ExerProItem))
-				return itemPack as PackContainer<ExerProPackItem<T>>;
+				return itemPack as PackContainer<P>;
 			if (typeof(T) == typeof(ExerProPotion))
-				return potionPack as PackContainer<ExerProPackItem<T>>;
+				return potionPack as PackContainer<P>;
 			if (typeof(T) == typeof(ExerProCard))
-				return cardGroup as PackContainer<ExerProPackItem<T>>;
+				return cardGroup as PackContainer<P>;
 
 			return null;
 		}

@@ -92,6 +92,13 @@ class MapStagesInline(object):
 # 	list_editable = ['sugar', 'gold', 'ticket', 'bound_ticket']
 
 
+@xadmin.sites.register(ListeningQuesChoice)
+class ListeningQuesChoiceAdmin(object):
+	list_display = ['id', 'order', 'text', 'answer']
+
+	list_editable = ['order', 'text', 'answer']
+
+
 @xadmin.sites.register(ListeningSubQuestion)
 class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 	inlines = [ListeningQuesChoicesInline]
