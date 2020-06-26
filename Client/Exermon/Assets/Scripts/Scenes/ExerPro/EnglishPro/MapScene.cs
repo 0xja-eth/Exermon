@@ -100,8 +100,13 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// 更新死亡/关卡切换窗口
         /// </summary>
         void updateSwitchWindow() {
-            if (engSer.record.actor.isDead()) {
-                switchWindow.startWindow(type: SwitchWindow.Type.Die, onDieExit);
+            if (!switchWindow.gameObject.activeInHierarchy) {
+                if (engSer.record.actor.isDead()) {
+                    switchWindow.startWindow(type: SwitchWindow.Type.Die, onDieExit);
+                }
+                else if(BattleService.get().result == BattleService.Result.Pass) {
+                    switchWindow.startWindow(SwitchWindow.Type.Boss, engSer.record.nextStage);
+                }
             }
         }
 
@@ -152,6 +157,13 @@ namespace UI.ExerPro.EnglishPro.MapScene {
         /// </summary>
         void onDieExit() {
             popScene();
+        }
+
+        /// <summary>
+        /// 阶段通关回调
+        /// </summary>
+        void onBossPass() {
+
         }
         #endregion
     }

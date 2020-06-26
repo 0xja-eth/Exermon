@@ -2245,6 +2245,7 @@ MonoBehaviour:
   rebuildController: {fileID: 2029800017}
   stageRecordDisplay: {fileID: 2043421240}
   restNodeDisplay: {fileID: 846702313}
+  switchWindow: {fileID: 1493173659}
   nodeDetail: {fileID: 113555067}
 --- !u!1001 &1493173657
 PrefabInstance:
@@ -2253,6 +2254,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1642722875}
     m_Modifications:
+    - target: {fileID: 50194685982918176, guid: 584923b96f124d249a24ec4238644191,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: onSubmitClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 50194685982918176, guid: 584923b96f124d249a24ec4238644191,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1493173659}
     - target: {fileID: 50194685982918190, guid: 584923b96f124d249a24ec4238644191,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -2381,6 +2392,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1493173657}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1493173659 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2285088020962331172, guid: 584923b96f124d249a24ec4238644191,
+    type: 3}
+  m_PrefabInstance: {fileID: 1493173657}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22698a7165924dc4ba9598ab695e91a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1544711330
 GameObject:
   m_ObjectHideFlags: 0

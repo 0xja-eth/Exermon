@@ -2214,6 +2214,15 @@ namespace ExerPro.EnglishModule.Data {
         public void start() {
 			createActor(); generate();
         }
+
+        /// <summary>
+        /// 进入下一阶段
+        /// </summary>
+        public void nextStage() {
+            generated = false;
+            stageOrder += 1;
+            start();
+        }
         /*
         /// <summary>
         /// 设置地图
