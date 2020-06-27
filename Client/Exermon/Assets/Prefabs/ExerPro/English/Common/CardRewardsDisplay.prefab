@@ -98,7 +98,7 @@ MonoBehaviour:
   mask: {fileID: 0}
   countText: {fileID: 0}
   maxCheck: 0
-  defaultCapacity: 0
+  defaultCapacity: 3
   defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
   _actived: 1
   _selectable: 1

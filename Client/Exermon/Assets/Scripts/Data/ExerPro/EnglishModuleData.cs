@@ -548,17 +548,28 @@ namespace ExerPro.EnglishModule.Data {
     /// 剧情题目
     /// </summary>
     public class PlotQuestion : BaseQuestion {
-        public new class Choice : BaseQuestion.Choice {
-            [AutoConvert]
-            public ExerProEffectData[] effects { get; protected set; }
-            [AutoConvert]
-            public string resultText { get; protected set; }
-        }
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+		/// <summary>
+		/// 选项
+		/// </summary>
+        public new class Choice : BaseQuestion.Choice {
+
+			/// <summary>
+			/// 属性
+			/// </summary>
+			[AutoConvert]
+            public ExerProEffectData[] effects { get; protected set; }
+			[AutoConvert]
+			public int gold { get; protected set; }
+			[AutoConvert]
+			public string resultText { get; protected set; }
+
+		}
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public string eventName { get; protected set; }
         [AutoConvert]
         public Texture2D picture { get; protected set; }
@@ -572,6 +583,9 @@ namespace ExerPro.EnglishModule.Data {
             return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
         }
 
+		/// <summary>
+		/// 选项
+		/// </summary>
         public new Choice[] choices {
             get {
                 var choices = base.choices;
@@ -582,7 +596,6 @@ namespace ExerPro.EnglishModule.Data {
             }
         }
     }
-
 
 	#endregion
 
@@ -645,9 +658,16 @@ namespace ExerPro.EnglishModule.Data {
             ChangeCostDisc = 401, // 更改耗能（发现）
             ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
-            PlotAddMoney = 500, // 获得金币
+			GainGold = 500, // 获得金币
+			GainCard = 510, // 获得卡牌
+			DropCard = 511, // 失去卡牌
+			CopyCard = 512, // 复制卡牌
+			GainItem = 520, // 获得道具
+			LoseItem = 521, // 失去道具
+			GainPotion = 530, // 获得药水
+			LosePotion = 531, // 失去药水
 
-        }
+		}
 
 		/// <summary>
 		/// 效果范围
@@ -3739,13 +3759,21 @@ namespace ExerPro.EnglishModule.Data {
 		}
 
 		/// <summary>
-		/// 处理当前行动（处理后移出队列）
+		/// 处理指定行动
 		/// </summary>
 		public virtual void processAction(RuntimeAction action) {
 			if (!isMovableState()) return;
 			action.generateResults();
-            foreach (var obj in action.objects)
+			foreach (var obj in action.objects)
 				obj.applyResult(action.result(obj));
+		}
+
+		/// <summary>
+		/// 处理当前行动（处理后移出队列）
+		/// </summary>
+		/// <param name="action"></param>
+		public virtual void processCurrentAction() {
+			processAction(currentAction());
 		}
 
 		/// <summary>
@@ -4031,13 +4059,53 @@ namespace ExerPro.EnglishModule.Data {
 		/// <typeparam name="T"><peparam>
 		/// <param name="item">物品</param>
 		public void gainItem<T>(T item) where T : BaseExerProItem {
+			if (typeof(T) == typeof(ExerProItem)) gainItem(item as ExerProItem);
+			if (typeof(T) == typeof(ExerProPotion)) gainPotion(item as ExerProPotion);
+			if (typeof(T) == typeof(ExerProCard)) gainCard(item as ExerProCard);
+		}
+		public void gainItem<T>(int id) where T : BaseExerProItem {
+			if (typeof(T) == typeof(ExerProItem)) gainItem(id);
+			if (typeof(T) == typeof(ExerProPotion)) gainPotion(id);
+			if (typeof(T) == typeof(ExerProCard)) gainCard(id);
+		}
+
+		/// <summary>
+		/// 获得卡牌
+		/// </summary>
+		/// <param name="item"></param>
+		public void gainCard(ExerProCard item) {
 			var contItem = getContItem(item);
-			if (typeof(T) == typeof(ExerProItem))
-				itemPack.pushItem(contItem as ExerProPackItem);
-			if (typeof(T) == typeof(ExerProPotion))
-				potionPack.pushItem(contItem as ExerProPackPotion);
-			if (typeof(T) == typeof(ExerProCard))
+			if (contItem != null)
 				cardGroup.pushItem(contItem as ExerProPackCard);
+		}
+		public void gainCard(int id) {
+			gainCard(DataService.get().exerProCard(id));
+		}
+
+		/// <summary>
+		/// 获得卡牌
+		/// </summary>
+		/// <param name="item"></param>
+		public void gainItem(ExerProItem item) {
+			var contItem = getContItem(item);
+			if (contItem != null)
+				itemPack.pushItem(contItem as ExerProPackItem);
+		}
+		public void gainItem(int id) {
+			gainItem(DataService.get().exerProItem(id));
+		}
+
+		/// <summary>
+		/// 获得卡牌
+		/// </summary>
+		/// <param name="item"></param>
+		public void gainPotion(ExerProPotion item) {
+			var contItem = getContItem(item);
+			if (contItem != null)
+				potionPack.pushItem(contItem as ExerProPackPotion);
+		}
+		public void gainPotion(int id) {
+			gainPotion(DataService.get().exerProPotion(id));
 		}
 
 		/// <summary>
@@ -4047,6 +4115,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public ExerProPackItem<T> getContItem<T>(T item)
 			where T : BaseExerProItem {
+			if (item == null) return null;
 
 			if (typeof(T) == typeof(ExerProItem))
                 return new ExerProPackItem(item as ExerProItem) as ExerProPackItem<T>;
@@ -4577,6 +4646,26 @@ namespace ExerPro.EnglishModule.Data {
         public int consumeCardCnt { get; set; } // 消耗牌数量
         [AutoConvert]
         public bool consumeSelect { get; set; } // 消耗是否可选
+
+		/// <summary>
+		/// 剧情数据
+		/// </summary>
+		[AutoConvert]
+		public int gainGold { get; set; } // 获得卡牌
+		[AutoConvert]
+		public int gainCard { get; set; } // 获得卡牌
+		[AutoConvert]
+		public int dropCard { get; set; } // 去除卡牌
+		[AutoConvert]
+		public int copyCard { get; set; } // 复制卡牌
+		[AutoConvert]
+		public int gainItem { get; set; } // 获得道具
+		[AutoConvert]
+		public int gainPotion { get; set; } // 获得药水
+		[AutoConvert]
+		public int loseItem { get; set; } // 失去道具
+		[AutoConvert]
+		public int losePotion { get; set; } // 失去药水
 
 		/// <summary>
 		/// 行动

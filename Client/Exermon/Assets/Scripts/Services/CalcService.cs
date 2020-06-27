@@ -1209,13 +1209,41 @@ namespace GameModule.Services {
 						n = effect.get(0, 0);
 						select = effect.get(1, false);
 						consumeCards(n, select); break;
-                }
-            }
 
-            /// <summary>
-            /// 处理完美斩击
-            /// </summary>
-            void _processSlashAttack(int a, int b = 2) {
+					case ExerProEffectData.Code.GainGold:
+						a = effect.get(0, 0);
+						b = effect.get(1, a);
+						gainGold(a, b); break;
+
+					case ExerProEffectData.Code.GainCard:
+						a = effect.get(0, -1); gainCard(a); break;
+
+					case ExerProEffectData.Code.DropCard:
+						a = effect.get(0, 0); dropCard(a); break;
+
+					case ExerProEffectData.Code.CopyCard:
+						a = effect.get(0, 0); copyCard(a); break;
+
+					case ExerProEffectData.Code.GainItem:
+						a = effect.get(0, -1); gainItem(a); break;
+
+					case ExerProEffectData.Code.LoseItem:
+						a = effect.get(0, -1); loseItem(a); break;
+
+					case ExerProEffectData.Code.GainPotion:
+						a = effect.get(0, -1); gainPotion(a); break;
+
+					case ExerProEffectData.Code.LosePotion:
+						a = effect.get(0, -1); losePotion(a); break;
+				}
+			}
+
+			#region 处理函数
+
+			/// <summary>
+			/// 处理完美斩击
+			/// </summary>
+			void _processSlashAttack(int a, int b = 2) {
                 const string SlashStr = "斩击";
                 var actor = subject as RuntimeActor;
                 if (actor == null) return;
@@ -1369,12 +1397,76 @@ namespace GameModule.Services {
 				result.consumeSelect = select;
             }
 
-        }
+			/// <summary>
+			/// 获得金钱
+			/// </summary>
+			void gainGold(int a, int b) {
+				result.gainCard = Random.Range(a, b + 1);
+			}
 
-        /// <summary>
-        /// 结果应用计算类
-        /// </summary>
-        public class ResultApplyCalc {
+			/// <summary>
+			/// 获得卡牌
+			/// </summary>
+			void gainCard(int i) {
+				// TODO: 处理随机卡牌
+				result.gainCard = i;
+			}
+
+			/// <summary>
+			/// 获得道具
+			/// </summary>
+			void gainItem(int i) {
+				// TODO: 处理随机道具
+				result.gainItem = i;
+			}
+
+			/// <summary>
+			/// 获得药水
+			/// </summary>
+			void gainPotion(int i) {
+				// TODO: 处理随机药水
+				result.gainPotion = i;
+			}
+
+			/// <summary>
+			/// 去除卡牌
+			/// </summary>
+			void dropCard(int i) {
+				// TODO: 处理随机卡牌
+				result.dropCard = i;
+			}
+
+			/// <summary>
+			/// 复制卡牌
+			/// </summary>
+			void copyCard(int i) {
+				// TODO: 处理随机卡牌
+				result.copyCard = i;
+			}
+
+			/// <summary>
+			/// 失去道具
+			/// </summary>
+			void loseItem(int i) {
+				// TODO: 处理随机道具
+				result.loseItem = i;
+			}
+
+			/// <summary>
+			/// 失去药水
+			/// </summary>
+			void losePotion(int i) {
+				// TODO: 处理随机药水
+				result.losePotion = i;
+			}
+
+			#endregion
+		}
+
+		/// <summary>
+		/// 结果应用计算类
+		/// </summary>
+		public class ResultApplyCalc {
 
             /// <summary>
             /// 属性
@@ -1397,7 +1489,9 @@ namespace GameModule.Services {
                 calc.processAddStates();
                 calc.processConsume();
                 calc.processDraw();
-            }
+				calc.processEnergy();
+				calc.processGain();
+			}
 
             /// <summary>
             /// 构造函数
@@ -1469,6 +1563,18 @@ namespace GameModule.Services {
 				if (actor == null) return;
 
 				actor.addEnergy(result.energyGain);
+			}
+
+			/// <summary>
+			/// 处理物品获得
+			/// </summary>
+			void processGain() {
+				if (actor == null) return;
+
+				actor.gainGold(result.gainGold);
+				actor.gainCard(result.gainCard);
+				actor.gainItem(result.gainItem);
+				actor.gainPotion(result.gainPotion);
 			}
 		}
 

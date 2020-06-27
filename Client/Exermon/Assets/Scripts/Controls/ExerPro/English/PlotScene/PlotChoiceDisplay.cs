@@ -28,7 +28,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         public CanvasGroup canvasGroup;
         public float noAnswerAlpha = 0.4f; // 非正确答案时的透明度
 
-        public QuestionText text;
+        public Text text;
 
         #region 界面控制
 

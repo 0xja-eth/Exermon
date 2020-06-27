@@ -450,6 +450,7 @@ namespace ExerPro.EnglishModule.Services {
 
 			for (int i = 0; i < repeats; ++i)
 				actor.addAction(new RuntimeAction(actor, targets.ToArray(), item));
+
 			//foreach (var target in targets)
 			//	actor.addAction(new RuntimeAction(actor, target, effects));
 		}
@@ -549,6 +550,7 @@ namespace ExerPro.EnglishModule.Services {
 
 
         #region 测试辅助
+
         /// <summary>
         /// 一键9999
         /// </summary>
@@ -558,6 +560,7 @@ namespace ExerPro.EnglishModule.Services {
             result = Result.Win;
             processRoundResult();
         }
+
         #endregion
     }
 }

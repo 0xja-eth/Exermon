@@ -341,6 +341,7 @@ namespace Core.Data.Loaders {
 		/// <param name="id"></param>
 		/// <returns></returns>
 		public static Texture2D loadEnemyThink(int id) {
+			Debug.Log("loadEnemyThink: " + id);
 			return loadTexture2D(ExerProEnemyPath, ExerProEnemyThinkIconFileName, id);
 		}
 

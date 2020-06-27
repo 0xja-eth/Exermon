@@ -106,11 +106,21 @@ class ListeningSubQuestionAdmin(BaseQuestionAdmin):
 
 @xadmin.sites.register(PlotQuestion)
 class PlotQuestionAdmin(BaseQuestionAdmin):
-	list_display = ['id', 'title', 'event_name', 'picture']
+	list_display = ['id', 'title', 'event_name']
 
-	list_editable = ['title', 'event_name', 'picture']
+	list_editable = ['title', 'event_name']
 
 	inlines = [PlotQuesChoicesInline]
+
+
+@xadmin.sites.register(PlotQuesChoice)
+class PlotQuesChoiceAdmin(object):
+
+	list_display = ['question', 'order', 'text', 'result_text', 'gold']
+
+	list_editable = ['question', 'order', 'text', 'result_text', 'gold']
+
+	inlines = [ExerProPlotEffectsInline]
 
 
 # @xadmin.sites.register(ReadingSubQuestion)
@@ -136,7 +146,7 @@ class ListeningQuestionAdmin(GroupQuestionAdmin):
 
 
 @xadmin.sites.register(PhraseQuestion)
-class InfinitiveQuestionAdmin(object):
+class PhraseQuestionAdmin(object):
 
 	list_display = ['id', 'word', 'chinese', 'phrase']
 
@@ -205,22 +215,6 @@ class BaseExerProItemAdmin(BaseItemAdmin):
 	form_layout = BaseItemAdmin.form_layout + field_set
 
 	# form_layout = field_set
-
-
-@xadmin.sites.register(PlotQuesChoice)
-class PlotQuesChoiceAdmin(BaseExerProItemAdmin):
-
-	list_display = BaseExerProItemAdmin.list_display + \
-				   ['result_text']
-
-	list_editable = BaseExerProItemAdmin.list_editable + \
-				   ['result_text']
-
-	field_set = [Fieldset('特训物品属性')]
-
-	form_layout = BaseExerProItemAdmin.form_layout + field_set
-
-	inlines = [ExerProPlotEffectsInline]
 
 
 @xadmin.sites.register(ExerProItem)

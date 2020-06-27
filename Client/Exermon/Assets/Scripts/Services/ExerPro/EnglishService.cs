@@ -1020,6 +1020,20 @@ namespace ExerPro.EnglishModule.Services {
 
 		#endregion
 
+		#region 效果控制
+
+		/// <summary>
+		/// 处理效果
+		/// </summary>
+		/// <param name="effects"></param>
+		public void processEffects(ExerProEffectData[] effects) {
+			var actor = record.actor;
+			actor.addAction(new RuntimeAction(actor, actor, effects));
+			actor.processCurrentAction();
+		}
+
+		#endregion
+		
 		#region 游戏进程
 
 		/// <summary>

@@ -3898,7 +3898,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 15.999985, y: 0}
+  m_AnchoredPosition: {x: 16, y: 0}
   m_SizeDelta: {x: -32, y: -32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1219523490
@@ -7254,6 +7254,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: HandCardDetial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3217475486092438300, guid: 2cf962c203e43734298190002e7bdff2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3508562055357904194, guid: 2cf962c203e43734298190002e7bdff2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8369928166681604168, guid: 2cf962c203e43734298190002e7bdff2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8394381161194570094, guid: 2cf962c203e43734298190002e7bdff2,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -19.097574
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2cf962c203e43734298190002e7bdff2, type: 3}

@@ -13,6 +13,231 @@ from enum import Enum
 
 # Create your models here.
 
+# region 基本
+
+
+# ===================================================
+#  使用效果编号枚举
+# ===================================================
+class ExerProEffectCode(Enum):
+	Unset = 0  # 空
+
+	Attack = 1  # 造成伤害
+	AttackSlash = 2  # 造成伤害（完美斩击）
+	AttackBlack = 3  # 造成伤害（黑旋风）
+	AttackWave = 4  # 造成伤害（波动拳）
+	AttackRite = 5  # 造成伤害（仪式匕首）
+
+	Recover = 100  # 回复体力值
+
+	AddParam = 200  # 增加能力值
+	AddMHP = 201  # 获得MHP
+	AddPower = 202  # 获得力量
+	AddDefense = 203  # 获得格挡
+	AddAgile = 204  # 获得敏捷
+	AddParamUrgent = 205  # 增加能力值（紧急按钮）
+
+	TempAddParam = 210  # 临时增加能力值
+	TempAddMHP = 211  # 临时获得MHP
+	TempAddPower = 212  # 临时获得力量
+	TempAddDefense = 213  # 临时获得格挡
+	TempAddAgile = 214  # 临时获得敏捷
+
+	AddState = 220  # 增加状态
+	RemoveState = 221  # 移除状态
+	RemoveNegaState = 222  # 移除消极状态
+
+	AddEnergy = 230  # 回复能量
+
+	DrawCards = 300  # 抽取卡牌
+	ConsumeCards = 310  # 消耗卡牌
+
+	ChangeCost = 400  # 更改耗能
+	ChangeCostDisc = 401  # 更改耗能（发现）
+	ChangeCostCrazy = 402  # 更改耗能（疯狂）
+
+	GainGold = 500  # 获得金币
+	GainCard = 510  # 获得卡牌
+	DropCard = 511  # 失去卡牌
+	CopyCard = 512  # 复制卡牌
+	GainItem = 520  # 获得道具
+	LoseItem = 521  # 失去道具
+	GainPotion = 530  # 获得药水
+	LosePotion = 531  # 失去药水
+
+
+# ===================================================
+#  特训使用效果表
+# ===================================================
+class ExerProEffect(models.Model):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训使用效果"
+
+	CODES = [
+		(ExerProEffectCode.Unset.value, '空'),
+
+		(ExerProEffectCode.Attack.value, '造成伤害'),
+		(ExerProEffectCode.AttackSlash.value, '造成伤害（完美斩击）'),
+		(ExerProEffectCode.AttackBlack.value, '造成伤害（黑旋风）'),
+		(ExerProEffectCode.AttackWave.value, '造成伤害（波动拳）'),
+		(ExerProEffectCode.AttackRite.value, '造成伤害（仪式匕首）'),
+
+		(ExerProEffectCode.Recover.value, '回复体力值'),
+
+		(ExerProEffectCode.AddParam.value, '增加能力值'),
+		(ExerProEffectCode.AddMHP.value, '获得MHP'),
+		(ExerProEffectCode.AddPower.value, '获得力量'),
+		(ExerProEffectCode.AddDefense.value, '获得格挡'),
+		(ExerProEffectCode.AddAgile.value, '获得敏捷'),
+		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
+
+		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
+		(ExerProEffectCode.TempAddMHP.value, '临时获得MHP'),
+		(ExerProEffectCode.TempAddPower.value, '临时获得力量'),
+		(ExerProEffectCode.TempAddDefense.value, '临时获得格挡'),
+		(ExerProEffectCode.TempAddAgile.value, '临时获得敏捷'),
+
+		(ExerProEffectCode.AddState.value, '增加状态'),
+		(ExerProEffectCode.RemoveState.value, '移除状态'),
+		(ExerProEffectCode.RemoveNegaState.value, '移除消极状态'),
+
+		(ExerProEffectCode.AddEnergy.value, '回复能量'),
+
+		(ExerProEffectCode.DrawCards.value, '抽取卡牌'),
+		(ExerProEffectCode.ConsumeCards.value, '消耗卡牌'),
+
+		(ExerProEffectCode.ChangeCost.value, '更改耗能'),
+		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
+		(ExerProEffectCode.ChangeCostCrazy.value, '更改耗能（疯狂）'),
+
+		(ExerProEffectCode.GainGold.value, '获得金币'),
+		(ExerProEffectCode.GainCard.value, '获得卡牌'),
+		(ExerProEffectCode.DropCard.value, '失去卡牌'),
+		(ExerProEffectCode.CopyCard.value, '复制卡牌'),
+		(ExerProEffectCode.GainItem.value, '获得道具'),
+		(ExerProEffectCode.LoseItem.value, '失去道具'),
+		(ExerProEffectCode.GainPotion.value, '获得药水'),
+		(ExerProEffectCode.LosePotion.value, '失去药水'),
+	]
+
+	# 效果编号
+	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
+
+	# 效果参数
+	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	# 转化为字典
+	def convertToDict(self):
+		return {
+			'code': self.code,
+			'params': self.params,
+		}
+
+
+# ===================================================
+#  使用效果编号枚举
+# ===================================================
+class ExerProTraitCode(Enum):
+	Unset = 0  # 空
+
+	DamagePlus = 1  # 攻击伤害加成
+	HurtPlus = 2  # 受到伤害加成
+	RecoverPlus = 3  # 回复加成
+
+	RestRecoverPlus = 4  # 回复加成（休息据点）
+
+	RoundEndRecover = 5  # 回合结束HP回复
+	RoundStartRecover = 6  # 回合开始HP回复
+	BattleEndRecover = 7  # 战斗结束HP回复
+	BattleStartRecover = 8  # 战斗开始HP回复
+
+	ParamAdd = 9  # 属性加成值
+	ParamRoundAdd = 10  # 回合属性加成值
+	ParamBattleAdd = 11  # 战斗属性加成值
+
+	RoundDrawCards = 12  # 回合开始抽牌数加成
+	BattleDrawCards = 13  # 战斗开始抽牌数加成
+
+
+# ===================================================
+#  特训特性表
+# ===================================================
+class ExerProTraits(models.Model):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "特训使用效果"
+
+	CODES = [
+		(ExerProTraitCode.Unset.value, '空'),
+
+		(ExerProTraitCode.DamagePlus.value, '攻击伤害加成'),
+		(ExerProTraitCode.HurtPlus.value, '受到伤害加成'),
+		(ExerProTraitCode.RecoverPlus.value, '回复加成'),
+
+		(ExerProTraitCode.RestRecoverPlus.value, '回复加成（休息据点）'),
+
+		(ExerProTraitCode.RoundEndRecover.value, '回合结束HP回复'),
+		(ExerProTraitCode.RoundStartRecover.value, '回合开始HP回复'),
+		(ExerProTraitCode.BattleEndRecover.value, '战斗结束HP回复'),
+		(ExerProTraitCode.BattleStartRecover.value, '战斗开始HP回复'),
+
+		(ExerProTraitCode.ParamAdd.value, '属性加成值'),
+		(ExerProTraitCode.ParamRoundAdd.value, '回合属性加成值'),
+		(ExerProTraitCode.ParamBattleAdd.value, '战斗属性加成值'),
+
+		(ExerProTraitCode.RoundDrawCards.value, '回合开始抽牌数加成'),
+		(ExerProTraitCode.BattleDrawCards.value, '战斗开始抽牌数加成'),
+	]
+
+	# 效果编号
+	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
+
+	# 效果参数
+	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
+
+	# 转化为字典
+	def convertToDict(self):
+		return {
+			'code': self.code,
+			'params': self.params,
+		}
+
+
+# ===================================================
+#  特训物品星级表
+# ===================================================
+class ExerProItemStar(GroupConfigure):
+	class Meta:
+		verbose_name = verbose_name_plural = "特训物品星级"
+
+	# 星级颜色（#ABCDEF）
+	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
+
+	def __str__(self):
+		return self.name
+
+	# 管理界面用：显示星级颜色
+	def adminColor(self):
+		from django.utils.html import format_html
+
+		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
+
+		return format_html(res)
+
+	adminColor.short_description = "星级颜色"
+
+	def convertToDict(self):
+		return {
+			'id': self.id,
+			'name': self.name,
+			'color': self.color,
+		}
+
+
+# endregion
+
+
 # region 题目
 
 
@@ -158,7 +383,8 @@ class PlotQuestion(BaseQuestion):
 	event_name = models.CharField(max_length=64, verbose_name="剧情事件名称")
 
 	# 剧情图标
-	picture = models.ImageField(upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
+	picture = models.ImageField(null=True, blank=True,
+								upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
 
 	def __str__(self):
 		return self.picture.url
@@ -183,16 +409,13 @@ class PlotQuestion(BaseQuestion):
 	def choices(self):
 		return self.plotqueschoice_set.all()
 
-	def convertToDict(self):
-		plot_choices = ModelUtils.objectsToDict(self.choices())
+	def convertToDict(self, type=None):
+		res = super().convertToDict(type)
 
-		return {
-			'id': self.id,
-			'title': self.title,
-			'event_name': self.event_name,
-			'picture': self.convertToBase64(),
-			'choices': plot_choices
-		}
+		res['event_name'] = self.event_name
+		res['picture'] = self.convertToBase64()
+
+		return res
 
 
 # ===================================================
@@ -201,6 +424,9 @@ class PlotQuestion(BaseQuestion):
 class PlotQuesChoice(BaseQuesChoice):
 	class Meta:
 		verbose_name = verbose_name_plural = "剧情题目选项"
+
+	# 所需金币
+	gold = models.PositiveSmallIntegerField(default=0, verbose_name="所需金币")
 
 	# 选项对应的结果文本
 	result_text = models.TextField(verbose_name="选项对应的结果文本")
@@ -213,14 +439,27 @@ class PlotQuesChoice(BaseQuesChoice):
 		return self.exerproploteffect_set.all()
 
 	def convertToDict(self):
+		res = super().convertToDict()
+
 		plot_effects = ModelUtils.objectsToDict(self.effects())
 
-		return {
-			'id': self.id,
-			'text': self.text,
-			'result_text': self.result_text,
-			'effects': plot_effects
-		}
+		res['gold'] = self.gold
+		res['result_text'] = self.result_text
+		res['effects'] = plot_effects
+
+		return res
+
+
+# ===================================================
+#  剧情题目效果表
+# ===================================================
+class ExerProPlotEffect(ExerProEffect):
+	class Meta:
+		verbose_name = verbose_name_plural = "剧情题目效果"
+
+	# 选项
+	choice = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
+							 verbose_name="选项")
 
 
 # ===================================================
@@ -572,211 +811,6 @@ class WordRecord(models.Model):
 
 
 # ===================================================
-#  使用效果编号枚举
-# ===================================================
-class ExerProEffectCode(Enum):
-	Unset = 0  # 空
-
-	Attack = 1  # 造成伤害
-	AttackSlash = 2  # 造成伤害（完美斩击）
-	AttackBlack = 3  # 造成伤害（黑旋风）
-	AttackWave = 4  # 造成伤害（波动拳）
-	AttackRite = 5  # 造成伤害（仪式匕首）
-
-	Recover = 100  # 回复体力值
-
-	AddParam = 200  # 增加能力值
-	AddMHP = 201  # 获得MHP
-	AddPower = 202  # 获得力量
-	AddDefense = 203  # 获得格挡
-	AddAgile = 204  # 获得敏捷
-	AddParamUrgent = 205  # 增加能力值（紧急按钮）
-
-	TempAddParam = 210  # 临时增加能力值
-	TempAddMHP = 211  # 临时获得MHP
-	TempAddPower = 212  # 临时获得力量
-	TempAddDefense = 213  # 临时获得格挡
-	TempAddAgile = 214  # 临时获得敏捷
-
-	AddState = 220  # 增加状态
-	RemoveState = 221  # 移除状态
-	RemoveNegaState = 222  # 移除消极状态
-
-	AddEnergy = 230  # 回复能量
-
-	DrawCards = 300  # 抽取卡牌
-	ConsumeCards = 310  # 消耗卡牌
-
-	ChangeCost = 400  # 更改耗能
-	ChangeCostDisc = 401  # 更改耗能（发现）
-	ChangeCostCrazy = 402  # 更改耗能（疯狂）
-
-	PlotAddMoney = 500  # 获得金币
-
-
-# ===================================================
-#  特训使用效果表
-# ===================================================
-class ExerProEffect(models.Model):
-	class Meta:
-		abstract = True
-		verbose_name = verbose_name_plural = "特训使用效果"
-
-	CODES = [
-		(ExerProEffectCode.Unset.value, '空'),
-
-		(ExerProEffectCode.Attack.value, '造成伤害'),
-		(ExerProEffectCode.AttackSlash.value, '造成伤害（完美斩击）'),
-		(ExerProEffectCode.AttackBlack.value, '造成伤害（黑旋风）'),
-		(ExerProEffectCode.AttackWave.value, '造成伤害（波动拳）'),
-		(ExerProEffectCode.AttackRite.value, '造成伤害（仪式匕首）'),
-
-		(ExerProEffectCode.Recover.value, '回复体力值'),
-
-		(ExerProEffectCode.AddParam.value, '增加能力值'),
-		(ExerProEffectCode.AddMHP.value, '获得MHP'),
-		(ExerProEffectCode.AddPower.value, '获得力量'),
-		(ExerProEffectCode.AddDefense.value, '获得格挡'),
-		(ExerProEffectCode.AddAgile.value, '获得敏捷'),
-		(ExerProEffectCode.AddParamUrgent.value, '增加能力值（紧急按钮）'),
-
-		(ExerProEffectCode.TempAddParam.value, '临时增加能力值'),
-		(ExerProEffectCode.TempAddMHP.value, '临时获得MHP'),
-		(ExerProEffectCode.TempAddPower.value, '临时获得力量'),
-		(ExerProEffectCode.TempAddDefense.value, '临时获得格挡'),
-		(ExerProEffectCode.TempAddAgile.value, '临时获得敏捷'),
-
-		(ExerProEffectCode.AddState.value, '增加状态'),
-		(ExerProEffectCode.RemoveState.value, '移除状态'),
-		(ExerProEffectCode.RemoveNegaState.value, '移除消极状态'),
-
-		(ExerProEffectCode.AddEnergy.value, '回复能量'),
-
-		(ExerProEffectCode.DrawCards.value, '抽取卡牌'),
-		(ExerProEffectCode.ConsumeCards.value, '消耗卡牌'),
-
-		(ExerProEffectCode.ChangeCost.value, '更改耗能'),
-		(ExerProEffectCode.ChangeCostDisc.value, '更改耗能（发现）'),
-		(ExerProEffectCode.ChangeCostCrazy.value, '更改耗能（疯狂）'),
-
-		(ExerProEffectCode.PlotAddMoney.value, '获得金币'),
-	]
-
-	# 效果编号
-	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
-
-	# 效果参数
-	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
-
-	# 转化为字典
-	def convertToDict(self):
-		return {
-			'code': self.code,
-			'params': self.params,
-		}
-
-
-# ===================================================
-#  使用效果编号枚举
-# ===================================================
-class ExerProTraitCode(Enum):
-	Unset = 0  # 空
-
-	DamagePlus = 1  # 攻击伤害加成
-	HurtPlus = 2  # 受到伤害加成
-	RecoverPlus = 3  # 回复加成
-
-	RestRecoverPlus = 4  # 回复加成（休息据点）
-
-	RoundEndRecover = 5  # 回合结束HP回复
-	RoundStartRecover = 6  # 回合开始HP回复
-	BattleEndRecover = 7  # 战斗结束HP回复
-	BattleStartRecover = 8  # 战斗开始HP回复
-
-	ParamAdd = 9  # 属性加成值
-	ParamRoundAdd = 10  # 回合属性加成值
-	ParamBattleAdd = 11  # 战斗属性加成值
-
-	RoundDrawCards = 12  # 回合开始抽牌数加成
-	BattleDrawCards = 13  # 战斗开始抽牌数加成
-
-
-# ===================================================
-#  特训特性表
-# ===================================================
-class ExerProTraits(models.Model):
-	class Meta:
-		abstract = True
-		verbose_name = verbose_name_plural = "特训使用效果"
-
-	CODES = [
-		(ExerProTraitCode.Unset.value, '空'),
-
-		(ExerProTraitCode.DamagePlus.value, '攻击伤害加成'),
-		(ExerProTraitCode.HurtPlus.value, '受到伤害加成'),
-		(ExerProTraitCode.RecoverPlus.value, '回复加成'),
-
-		(ExerProTraitCode.RestRecoverPlus.value, '回复加成（休息据点）'),
-
-		(ExerProTraitCode.RoundEndRecover.value, '回合结束HP回复'),
-		(ExerProTraitCode.RoundStartRecover.value, '回合开始HP回复'),
-		(ExerProTraitCode.BattleEndRecover.value, '战斗结束HP回复'),
-		(ExerProTraitCode.BattleStartRecover.value, '战斗开始HP回复'),
-
-		(ExerProTraitCode.ParamAdd.value, '属性加成值'),
-		(ExerProTraitCode.ParamRoundAdd.value, '回合属性加成值'),
-		(ExerProTraitCode.ParamBattleAdd.value, '战斗属性加成值'),
-
-		(ExerProTraitCode.RoundDrawCards.value, '回合开始抽牌数加成'),
-		(ExerProTraitCode.BattleDrawCards.value, '战斗开始抽牌数加成'),
-	]
-
-	# 效果编号
-	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
-
-	# 效果参数
-	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
-
-	# 转化为字典
-	def convertToDict(self):
-		return {
-			'code': self.code,
-			'params': self.params,
-		}
-
-
-# ===================================================
-#  特训物品星级表
-# ===================================================
-class ExerProItemStar(GroupConfigure):
-	class Meta:
-		verbose_name = verbose_name_plural = "特训物品星级"
-
-	# 星级颜色（#ABCDEF）
-	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
-
-	def __str__(self):
-		return self.name
-
-	# 管理界面用：显示星级颜色
-	def adminColor(self):
-		from django.utils.html import format_html
-
-		res = '<div style="background: %s; width: 48px; height: 24px;"></div>' % self.color
-
-		return format_html(res)
-
-	adminColor.short_description = "星级颜色"
-
-	def convertToDict(self):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-		}
-
-
-# ===================================================
 #  基本特训物品表
 # ===================================================
 class BaseExerProItem(BaseItem):
@@ -798,16 +832,6 @@ class BaseExerProItem(BaseItem):
 
 	# 金币（0表示不可购买）
 	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
-
-	def update(self, num):
-		"""
-		更新已有记录
-		TODO: 什么鬼
-		Args:
-			num (int): 金币数量
-		"""
-		# self.gold -= num
-		# self.save()
 
 	def convertToDict(self, **kwargs):
 		"""
@@ -845,18 +869,6 @@ class ExerProItemTrait(ExerProEffect):
 	# 物品
 	item = models.ForeignKey('ExerProItem', on_delete=models.CASCADE,
 							 verbose_name="物品")
-
-
-# ===================================================
-#  剧情题目效果表
-# ===================================================
-class ExerProPlotEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "剧情题目效果"
-
-	# 效果
-	effects = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
-							 verbose_name="效果")
 
 
 # ===================================================
