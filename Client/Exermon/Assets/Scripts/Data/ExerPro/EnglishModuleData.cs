@@ -76,10 +76,10 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 属性
         /// </summary>
-        [AutoConvert]
-        public string eventName { get; protected set; }
-        [AutoConvert]
-        public Texture2D picture { get; protected set; }
+        //[AutoConvert]
+        //public string eventName { get; protected set; }
+        //[AutoConvert]
+        //public Texture2D picture { get; protected set; }
 		[AutoConvert]
 		public int times { get; protected set; }
 
@@ -450,11 +450,64 @@ namespace ExerPro.EnglishModule.Data {
 			return sentence.Trim().Split(' ');
 		}
 	}
+	
+	/// <summary>
+	/// 剧情题目
+	/// </summary>
+	public class PlotQuestion : BaseQuestion {
 
-    /// <summary>
-    /// 单词
-    /// </summary>
-    public class Word : BaseData {
+		/// <summary>
+		/// 选项
+		/// </summary>
+		public new class Choice : BaseQuestion.Choice {
+
+			/// <summary>
+			/// 属性
+			/// </summary>
+			[AutoConvert]
+			public ExerProEffectData[] effects { get; protected set; }
+			[AutoConvert]
+			public int gold { get; protected set; }
+			[AutoConvert]
+			public string resultText { get; protected set; }
+
+		}
+
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
+		public string eventName { get; protected set; }
+		[AutoConvert]
+		public Texture2D picture { get; protected set; }
+
+		/// <summary>
+		/// 加载选项Item属性
+		/// </summary>
+		/// <param name="data"></param>
+		/// <returns></returns>
+		protected override BaseQuestion.Choice loadChoice(JsonData data) {
+			return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
+		}
+
+		/// <summary>
+		/// 选项
+		/// </summary>
+		public new Choice[] choices {
+			get {
+				var choices = base.choices;
+				List<Choice> listTemp = new List<Choice>();
+				foreach (var choice in choices)
+					listTemp.Add(choice as Choice);
+				return listTemp.ToArray();
+			}
+		}
+	}
+
+	/// <summary>
+	/// 单词
+	/// </summary>
+	public class Word : BaseData {
 
         /// <summary>
         /// 属性
@@ -542,59 +595,6 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public double hurtRate { get; protected set; }
 
-    }
-
-    /// <summary>
-    /// 剧情题目
-    /// </summary>
-    public class PlotQuestion : BaseQuestion {
-
-		/// <summary>
-		/// 选项
-		/// </summary>
-        public new class Choice : BaseQuestion.Choice {
-
-			/// <summary>
-			/// 属性
-			/// </summary>
-			[AutoConvert]
-            public ExerProEffectData[] effects { get; protected set; }
-			[AutoConvert]
-			public int gold { get; protected set; }
-			[AutoConvert]
-			public string resultText { get; protected set; }
-
-		}
-
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-        public string eventName { get; protected set; }
-        [AutoConvert]
-        public Texture2D picture { get; protected set; }
-
-        /// <summary>
-        /// 加载选项Item属性
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        protected override BaseQuestion.Choice loadChoice(JsonData data) {
-            return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
-        }
-
-		/// <summary>
-		/// 选项
-		/// </summary>
-        public new Choice[] choices {
-            get {
-                var choices = base.choices;
-                List<Choice> listTemp = new List<Choice>();
-                foreach (var choice in choices)
-                    listTemp.Add(choice as Choice);
-                return listTemp.ToArray();
-            }
-        }
     }
 
 	#endregion

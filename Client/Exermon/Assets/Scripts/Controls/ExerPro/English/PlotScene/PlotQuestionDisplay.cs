@@ -37,6 +37,14 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
             }
         }
 
+		/// <summary>
+		/// 结果选项
+		/// </summary>
+		PlotQuestion.Choice resultChoice;
+
+		/// <summary>
+		/// 外部系统设置
+		/// </summary>
 		EnglishService engSer;
 
         #region 初始化
@@ -78,16 +86,10 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
             showAnswer = true;
 
             var question = choiceContainer.getItem();
-            var resultChoice = question.choices[index];
-            var resultText = resultChoice.resultText;
-            var resultEffect = resultChoice.effects;
+			resultChoice = question.choices[index];
 
-			title.text = resultText;
-
-			exitButton?.gameObject.SetActive(true);
-
-			processEffects(resultEffect);
-            requestRefresh(true);
+			processEffects(resultChoice.effects);
+            requestRefresh();
         }
 
 		/// <summary>
@@ -105,7 +107,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
 		/// </summary>
 		/// <param name="result"></param>
 		void processResult(RuntimeActionResult result) {
-
+			// TODO: 处理选择卡牌之类的结果
 		}
 
         #endregion
@@ -120,14 +122,10 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
             base.drawExactlyItem(question);
             drawBaseInfo(question);
             if (showAnswer) {
-                if (title) title.gameObject.SetActive(false);
-                if (choiceContainer) choiceContainer.gameObject.SetActive(false);
-                //if (description) description.gameObject.SetActive(true);
-            }
-            else {
-                if (title) title.gameObject.SetActive(true);
-                if (choiceContainer) choiceContainer.gameObject.SetActive(true);
-                //if (description) description.gameObject.SetActive(false);
+				choiceContainer.clearItems();
+				title.text = resultChoice.resultText;
+				exitButton.gameObject.SetActive(true);
+			} else {
                 drawTitle(question);
                 drawChoices(question);
             }
@@ -137,10 +135,11 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         /// 绘制基本信息
         /// </summary>
         void drawBaseInfo(PlotQuestion question) {
-            //if (tipName)
-            //    tipName.text = question.eventName;
-            if (image)
-                image.overrideSprite = AssetLoader.generateSprite(item.picture);
+            if (image) {
+				image.gameObject.SetActive(true);
+				image.overrideSprite = AssetLoader.generateSprite(item.picture);
+				image.SetNativeSize();
+			}
         }
 
         /// <summary>
@@ -148,8 +147,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         /// </summary>
         /// <param name="question">题目</param>
         void drawTitle(PlotQuestion question) {
-            if (title)
-                title.text = question.title;
+            title.text = question.title;
         }
 
         /// <summary>
@@ -157,7 +155,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
         /// </summary>
         /// <param name="question">题目</param>
         void drawChoices(PlotQuestion question) {
-            choiceContainer?.startView(question);
+            choiceContainer.startView(question);
         }
 
         /// <summary>
@@ -167,14 +165,10 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Controls {
             base.drawEmptyItem();
             title.text = "";
 			image.gameObject.SetActive(false);
+			choiceContainer.clearItems();
+		}
 
-            //if (tipName) tipName.text = "";
-            if (choiceContainer) choiceContainer.clearItems();
-            //if (description) description.text = "";
-            //if (description.gameObject) description.gameObject.SetActive(false);
-        }
+		#endregion
 
-        #endregion
-
-    }
+	}
 }

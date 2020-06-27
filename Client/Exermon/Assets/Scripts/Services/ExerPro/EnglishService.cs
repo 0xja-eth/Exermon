@@ -89,6 +89,8 @@ namespace ExerPro.EnglishModule.Services {
 			[AutoConvert]
 			public List<CorrectionQuestion> correctionQuestions { get; protected set; } = new List<CorrectionQuestion>();
 			[AutoConvert]
+			public List<PlotQuestion> plotQuestions { get; protected set; } = new List<PlotQuestion>();
+			[AutoConvert]
 			public List<Word> words { get; protected set; } = new List<Word>();
 
 			/// <summary>
@@ -103,6 +105,8 @@ namespace ExerPro.EnglishModule.Services {
 					return phraseQuestions as List<T>;
 				if (typeof(T) == typeof(CorrectionQuestion))
 					return correctionQuestions as List<T>;
+				if (typeof(T) == typeof(PlotQuestion))
+					return plotQuestions as List<T>;
 				if (typeof(T) == typeof(Word))
 					return words as List<T>;
 				return null;
@@ -869,7 +873,9 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene);
+			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+
+			/*
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -881,6 +887,7 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
 				} else exitNode(false);
+			*/
 		}
 
 		#region 休息据点

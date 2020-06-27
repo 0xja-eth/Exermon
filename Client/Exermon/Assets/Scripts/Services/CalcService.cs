@@ -1613,8 +1613,6 @@ namespace GameModule.Services {
 
                 action = calc.generateAction();
                 runtimeAction = calc.generateRuntimeAction(actor);
-                Debug.Log("Enemy Next Name:" + (runtimeAction.subject as RuntimeEnemy)?.enemy().id);
-                Debug.Log("Enemy Next Action:" + action.typeEnum());
             }
 
             /// <summary>

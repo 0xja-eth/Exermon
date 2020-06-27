@@ -35,11 +35,11 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// <summary>
 		/// 外部组件设置
 		/// </summary>
-		public Text tipName, article, count, time;
+		public Text article, count, time;
 		public ListenSubQuestionContainer subQuestions;
 
 		// 左部组件
-		public RawImage image;
+		//public RawImage image;
 
 		public Button playButton;
 		public Slider slider;
@@ -269,8 +269,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 绘制基本信息
 		/// </summary>
 		void drawBaseInfo(ListeningQuestion question) {
-			if (tipName) tipName.text = question.eventName;
-			if (image) image.texture = question.picture;
+			//if (tipName) tipName.text = question.eventName;
+			//if (image) image.texture = question.picture;
 
 			if (subQuestions.showAnswer) article.text = question.article;
 			else article.text = ArticleDisableTipText;
@@ -303,7 +303,6 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		protected override void drawEmptyItem() {
 			base.drawEmptyItem();
 
-			if (tipName) tipName.text = "";
 			if (count) count.text = "";
 			if (time) time.text = "";
 
