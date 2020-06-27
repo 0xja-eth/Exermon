@@ -873,9 +873,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
-			sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
 
-			/*
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -887,7 +886,6 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
 				} else exitNode(false);
-			*/
 		}
 
 		#region 休息据点

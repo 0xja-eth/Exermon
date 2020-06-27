@@ -61,6 +61,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             engSer = EnglishService.get();
         }
         #endregion
+
         #region 开启控制
 
         /// <summary>
@@ -86,14 +87,14 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         }
 
         #endregion
+
         #region 数据控制
 
         /// <summary>
         /// 当前背包容器
         /// </summary>
         /// <returns></returns>
-        public View
-            CurrentPackContainer() {
+        public View CurrentPackContainer() {
             //switch (view) {
             //    case View.Item: return itemPackDisplay;
             //    case View.Potion: return potionPackDisplay;
@@ -102,6 +103,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             //return null;
             return view;
         }
+
         #endregion
 
         #region 流程控制
@@ -116,6 +118,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
             this.view = view;
             requestRefresh(true);
         }
+
         #endregion
 
         #region 界面绘制
@@ -155,6 +158,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         void onItemPack() {
             var container = engSer.record.actor.itemPack;
             //test
+			/*
             if (container.items.ToArray().Length == 0) {
                 ExerProPackItem[] items = new ExerProPackItem[8];
                 items[0] = ExerProPackItem.sample();
@@ -168,6 +172,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
                 foreach (var item in items)
                     engSer.record.actor.gainItem(item.item());
             }
+			*/
             itemPackDisplay.startView();
             itemPackDisplay.setItems(container.items);
             detail.SetActive(true);
@@ -180,6 +185,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         void onPotionPack() {
             var container = engSer.record.actor.potionPack;
             //test
+			/*
             if (container.items.ToArray().Length == 0) {
                 ExerProPackPotion[] potions = new ExerProPackPotion[8];
                 potions[0] = ExerProPackPotion.sample();
@@ -193,6 +199,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
                 foreach (var potion in potions)
                     engSer.record.actor.gainItem(potion.item());
             }
+			*/
             potionPackDisplay.startView();
             potionPackDisplay.setItems(container.items);
             detail.SetActive(true);
