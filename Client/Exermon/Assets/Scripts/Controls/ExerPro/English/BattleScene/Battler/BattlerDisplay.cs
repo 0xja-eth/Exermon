@@ -620,6 +620,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				hpBarObj.SetActive(false);
 			}
 			states.clearItems();
+
+			powerObj.SetActive(false);
+			defenseObj.SetActive(false);
+
 			power.text = defense.text = "";
 		}
 

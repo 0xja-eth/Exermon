@@ -38,8 +38,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
 		#endregion
 
 		#region 界面绘制
-
-
+		
 		/// <summary>
 		/// 绘制基本信息
 		/// </summary>
@@ -50,6 +49,11 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Controls.Menu {
 			drawSkin(card);
 			drawCharacter(card);
 			drawType(card);
+
+			name.text = card.name;
+
+			icon.gameObject.SetActive(true);
+			icon.overrideSprite = card.icon;
 
 			cost.text = card.cost.ToString();
 			description.text = card.description;
