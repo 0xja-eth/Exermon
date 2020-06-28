@@ -20,6 +20,7 @@ namespace UI.Common.Windows {
         /// 内部变量设置
         /// </summary>
         bool enter = false;
+		bool terminateRequest = false;
 		
         #region 更新控制
 
@@ -35,6 +36,7 @@ namespace UI.Common.Windows {
         /// 更新取消事件
         /// </summary>
         void updateCancel() {
+			if (terminateRequest) terminateWindow();
 			if (!enter && isPointerDown()) onCancel();
 		}
 
@@ -48,15 +50,27 @@ namespace UI.Common.Windows {
 				Input.touchCount > 0;
 		}
 
-        #endregion
+		#endregion
 
-        #region 事件控制
+		#region 开启关闭窗口
 
-        /// <summary>
-        /// 指针进入事件
-        /// </summary>
-        /// <param name="eventData">事件数据</param>
-        public void OnPointerEnter(PointerEventData eventData) {
+		/// <summary>
+		/// 开启窗口
+		/// </summary>
+		public override void startWindow() {
+			base.startWindow();
+			terminateRequest = false;
+		}
+
+		#endregion
+
+		#region 事件控制
+
+		/// <summary>
+		/// 指针进入事件
+		/// </summary>
+		/// <param name="eventData">事件数据</param>
+		public void OnPointerEnter(PointerEventData eventData) {
             enter = true;
         }
 
@@ -72,7 +86,7 @@ namespace UI.Common.Windows {
 		/// 取消回调
 		/// </summary>
 		protected virtual void onCancel() {
-			terminateWindow();
+			terminateRequest = true;
 		}
 
         #endregion

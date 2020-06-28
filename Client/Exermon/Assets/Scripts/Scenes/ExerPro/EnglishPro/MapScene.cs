@@ -149,16 +149,17 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             engSer.terminate();
         }
 
-
         /// <summary>
         /// 打开背包
         /// </summary>
         public void openPack() {
             sceneSys.pushScene(SceneSystem.Scene.EnglishProPackScene);
         }
+
         #endregion
 
         #region 回调函数
+
         /// <summary>
         /// 死亡退出回调
         /// </summary>
@@ -173,6 +174,7 @@ namespace UI.ExerPro.EnglishPro.MapScene {
             engSer.passExchange();
             stageRecordDisplay.requestRefresh();
         }
+
         #endregion
     }
 }

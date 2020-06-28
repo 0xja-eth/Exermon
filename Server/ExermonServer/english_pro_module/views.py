@@ -94,14 +94,16 @@ class Service:
         # 返回数据：
         # words: 单词数据（数组） => 单词数据集
         # 当玩家没玩过该游戏时，就不存在ExerProRecord记录，此时不应该报错，应该创建一条新记录
-        try:
-            pro_record = Common.getExerProRecord(player)
-            Common.ensureFinishLastWords(pro_record)
-            pro_record.upgrade()
-            return pro_record.convertToDict("words")
-        except:
-            pro_record = ExerProRecord.create(player)
-            return pro_record.convertToDict()
+        # try:
+        pro_record = Common.getExerProRecord(player)
+        Common.ensureFinishLastWords(pro_record)
+
+        pro_record.upgrade()
+
+        return pro_record.convertToDict("words")
+        # except:
+        #     pro_record = ExerProRecord.create(player)
+        #     return pro_record.convertToDict()
 
     # 查询单词
     @classmethod

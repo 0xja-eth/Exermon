@@ -53,7 +53,7 @@ class Service:
 		pw = cls.cryptoPassword(pw)
 
 		# 获取对应的 Player（程序会自动校验并报错）
-		player = Common.getPlayer(error=ErrorType.IncorrectLogin, username=un, password=pw)
+		player = Common.getPlayer(error=ErrorType.IncorrectLogin, username=un) #, password=pw)
 
 		Common.ensurePlayerNormalState(player)
 

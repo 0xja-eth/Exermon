@@ -1804,11 +1804,6 @@ namespace GameModule.Services {
 			List<string> result;
 
 			/// <summary>
-			/// 距离字典
-			/// </summary>
-			Dictionary<Word, double> chi, eng;
-
-			/// <summary>
 			/// 生成
 			/// </summary>
 			/// <param name="word">单词</param>
@@ -1846,6 +1841,7 @@ namespace GameModule.Services {
 				var minVal = 999.0;
 				var minWord = words[0];
 				foreach (var word_ in words) {
+					if (word_.chinese == word.chinese) continue;
 					var val = calcDistance(word, word_, english);
 					if (val < minVal && word_ != word &&
 						!result.Contains(word_.chinese))
@@ -1877,7 +1873,7 @@ namespace GameModule.Services {
 					}
 				}
 				var res = sum * 1.0 / len2;
-				Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
+				//Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
 				return res;
 			}
 

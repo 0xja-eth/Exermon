@@ -564,11 +564,20 @@ namespace ExerPro.EnglishModule.Data {
             return EnglishService.get().getQuestion<Word>(wordId);
         }
 
-        /// <summary>
-        /// 是否当前轮正确单词
-        /// </summary>
-        /// <returns></returns>
-        public bool isCurrentCorrect() {
+		/// <summary>
+		/// 回答
+		/// </summary>
+		/// <param name="correct"></param>
+		public void answer(bool correct) {
+			currentDone = true;
+			currentCorrect = correct;
+		}
+
+		/// <summary>
+		/// 是否当前轮正确单词
+		/// </summary>
+		/// <returns></returns>
+		public bool isCurrentCorrect() {
             return currentDone && currentCorrect;
         }
 
@@ -1649,6 +1658,8 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProCardHandGroup handGroup { get; protected set; } = new ExerProCardHandGroup();
 
+		#region 记录控制
+
 		/// <summary>
 		/// 出牌记录
 		/// </summary>
@@ -1665,6 +1676,8 @@ namespace ExerPro.EnglishModule.Data {
 				res.Add(DataService.get().exerProCard(cid));
 			return res;
 		}
+
+		#endregion
 
 		#region 加入卡组
 
@@ -2098,7 +2111,7 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int wordLevel { get; protected set; } = 1;
 
-        [AutoConvert(autoConvert = false)]
+        [AutoConvert(autoConvert: false)]
         public List<WordRecord> wordRecords { get; protected set; }
 
         /// <summary>
@@ -2298,6 +2311,15 @@ namespace ExerPro.EnglishModule.Data {
             return EnglishService.get().getQuestion<Word>(next);
         }
 
+		/// <summary>
+		/// 获取指定ID的单词记录
+		/// </summary>
+		/// <param name="wid"></param>
+		/// <returns></returns>
+		public WordRecord wordRecord(int wid) {
+			return wordRecords.Find(rec => rec.wordId == wid);
+		}
+
         /// <summary>
 		/// 已有记录的单词ID
         /// </summary>
@@ -2309,6 +2331,17 @@ namespace ExerPro.EnglishModule.Data {
                 res[i] = wordRecords[i].wordId;
             return res;
         }
+
+		/// <summary>
+		/// 回答单词
+		/// </summary>
+		/// <param name="wid">单词ID</param>
+		/// <param name="correct">是否正确</param>
+		public void answerWord(int wid, bool correct, int next) {
+			this.next = next;
+			var rec = wordRecord(wid);
+			rec.answer(correct);
+		}
 
         /// <summary>
         /// 获取本轮单词正确数量
@@ -2962,7 +2995,8 @@ namespace ExerPro.EnglishModule.Data {
 			base.convertCustomAttributes(ref json);
 			var states = new JsonData();
 
-            foreach (var pair in this.states)
+			states.SetJsonType(JsonType.Object);
+			foreach (var pair in this.states)
 				states[pair.Key.ToString()] = DataLoader.convert(pair.Value);
 
 			json["states"] = states;
@@ -3933,12 +3967,12 @@ namespace ExerPro.EnglishModule.Data {
         /// <summary>
         /// 默认属性
         /// </summary>
-        public const int DefaultMHP = 50; // 初始体力值
+        public const int DefaultMHP = 100; // 初始体力值
         public const int DefaultPower = 5; // 初始力量
-        public const int DefaultDefense = 5; // 初始格挡
-        public const int DefaultAgile = 5; // 初始敏捷
+        public const int DefaultDefense = 0; // 初始格挡
+        public const int DefaultAgile = 0; // 初始敏捷
 
-		public const int DefaultEnergy = 3; // 默认能量
+		public const int DefaultEnergy = 4; // 默认能量
 
         const int EnglishSubjectId = 3; // 英语科目ID
 
@@ -3954,9 +3988,15 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert("agile")]
         public int _agile { get; protected set; }
 
+		/// <summary>
+		/// 能量
+		/// </summary>
 		[AutoConvert]
 		public int energy { get; protected set; }
 
+		/// <summary>
+		/// 背包
+		/// </summary>
 		[AutoConvert]
         public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
@@ -3964,6 +4004,9 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
 
+		/// <summary>
+		/// 药水槽
+		/// </summary>
 		[AutoConvert]
 		public ExerProPotionSlot potionSlot { get; protected set; }
 

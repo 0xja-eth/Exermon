@@ -1716,7 +1716,7 @@ class ExerProRecord(CacheableModel):
 		"""
 		word_recs = self.currentWordRecords()
 		word_recs = [word_rec for word_rec in word_recs
-					 if word_rec.current_correct is None]
+					 if not word_rec.current_correct]
 
 		if len(word_recs) <= 0: return None
 

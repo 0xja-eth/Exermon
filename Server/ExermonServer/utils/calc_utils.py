@@ -2047,8 +2047,9 @@ class NewSeasonStarNumCalc:
 # 生成当前轮单词
 # ===================================================
 class NewWordsGenerator:
-    WordNum = 50
-    NewWordPercent = 0.2
+
+    WORD_CNT = 50
+    NEW_WORD_PERCENT = 0.2
 
     # 从上一轮单词列表中拿出80%的单词和20%的新单词组成当前轮单词
     @classmethod
@@ -2073,14 +2074,15 @@ class NewWordsGenerator:
 
         # 没有旧单词&8
         if len(last_words) == 0:
-            words = cls.sample(words, cls.WordNum)
+            words = cls.sample(words, cls.WORD_CNT)
         # 已经没有新单词了
         elif len(words) == 0:
-            words = cls.sample(last_words, cls.WordNum)
+            words = cls.sample(last_words, cls.WORD_CNT)
         else:
-            old_words = cls.sample(last_words, cls.WordNum * (1 - cls.NewWordPercent))
-            new_words = cls.sample(words, cls.WordNum * cls.NewWordPercent)
-            words = old_words.extend(new_words)
+            old_words = cls.sample(last_words, cls.WORD_CNT * (1 - cls.NEW_WORD_PERCENT))
+            new_words = cls.sample(words, cls.WORD_CNT * cls.NEW_WORD_PERCENT)
+            old_words.extend(new_words)
+            words = old_words
 
         random.shuffle(words)
 
@@ -2088,6 +2090,7 @@ class NewWordsGenerator:
 
     @classmethod
     def sample(cls, words, num):
+        num = int(num)
         cnt = len(words)
         if cnt < num: return words
         return random.sample(words, num)

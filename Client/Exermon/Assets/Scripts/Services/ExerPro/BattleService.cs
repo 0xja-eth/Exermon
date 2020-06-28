@@ -238,7 +238,7 @@ namespace ExerPro.EnglishModule.Services {
 		void processRoundResult() {
 			if (isActorLost()) result = Result.Lose;
 			else if (isEnemiesLost()) result = Result.Win;
-            if(result == Result.Win && record.currentNode().typeEnum() == ExerProMapNode.Type.Boss)
+            if(result == Result.Win && record.currentNode().isBoss())
                 result = Result.Pass;
 			if (result != Result.None) onBattleEnd();
 			else nextRound();
@@ -532,7 +532,7 @@ namespace ExerPro.EnglishModule.Services {
 		void onBattleEnd() {
 			Debug.Log("onBattleEnd: " + round);
             //TODO: 此处添加杀敌数
-            engSer.processReward(enemyNumber: 10, bossNumber: 0);
+            engSer.processReward(enemyNumber: _enemies.Count, bossNumber: 0);
             battlersBattleEnd();
 			changeState(State.Result);
 		}

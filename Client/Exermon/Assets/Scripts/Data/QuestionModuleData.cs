@@ -98,53 +98,57 @@ namespace QuestionModule.Data {
         /// </summary>
         Choice[] shuffledChoices { get; set; } = null;
 
-        #region 数据转换
+		#region 数据读取
 
-        /// <summary>
-        /// 转化为显示数据
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>返回转化后的显示数据</returns>
-        public virtual JsonData convertToDisplayData(string type = "") {
+		/// <summary>
+		/// 读取自定义属性
+		/// </summary>
+		/// <param name="json"></param>
+		protected override void loadCustomAttributes(JsonData json) {
+			base.loadCustomAttributes(json);
+			var data = DataLoader.load(json, "choices");
+			if (data != null && data.IsArray) {
+				List<Choice> tempChoices = new List<Choice>();
+				for (int i = 0; i < data.Count; i++) {
+					var item = loadChoice(data[i]);
+					if (item != null)
+						tempChoices.Add(item);
+				}
+				choices = tempChoices.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// 读取选项
+		/// </summary>
+		/// <param name="data"></param>
+		/// <returns></returns>
+		protected virtual BaseQuestion.Choice loadChoice(JsonData data) {
+			return DataLoader.load<Choice>(data);
+		}
+
+		#endregion
+
+		#region 数据转换
+
+		/// <summary>
+		/// 转化为显示数据
+		/// </summary>
+		/// <param name="type">类型</param>
+		/// <returns>返回转化后的显示数据</returns>
+		public virtual JsonData convertToDisplayData(string type = "") {
             return toJson();
         }
 
-        /// <summary>
-        /// 读取自定义属性
-        /// </summary>
-        /// <param name="json"></param>
-        protected override void loadCustomAttributes(JsonData json)
-        {
-            base.loadCustomAttributes(json);
-            var data = DataLoader.load(json, "choices");
-            if (data != null && data.IsArray)
-            {
-                List<Choice> tempChoices = new List<Choice>();
-                for (int i = 0; i < data.Count; i++)
-                {
-                    var item = loadChoice(data[i]);
-                    if (item != null)
-                        tempChoices.Add(item);
-                }
-                choices = tempChoices.ToArray();
-                int a = 5;
-            }
-        }
+		#endregion
 
-        protected virtual BaseQuestion.Choice loadChoice(JsonData data)
-        {
-            return DataLoader.load<Choice>(data);
-        }
+		#region 数据操作
 
-        #endregion
-
-        #region 数据操作
-        
-        /// <summary>
-        /// 类型文本
-        /// </summary>
-        /// <returns></returns>
-        public string typeText() {
+		/// <summary>
+		/// 类型文本
+		/// </summary>
+		/// <returns></returns>
+		public string typeText() {
             return DataService.get().questionType(type).Item2;
         }
         
