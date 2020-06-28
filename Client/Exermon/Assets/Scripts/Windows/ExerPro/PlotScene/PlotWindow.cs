@@ -54,7 +54,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
         /// </summary>
         void configureQuestion() {
             engServ.generateQuestions<PlotQuestion>(1, onGetQuestionSuccess, onGetQuestionFailed);
-            onGetQuestionFailed();
+            //onGetQuestionFailed();
         }
 
         #endregion

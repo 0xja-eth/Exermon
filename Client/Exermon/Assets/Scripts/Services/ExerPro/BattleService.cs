@@ -46,7 +46,8 @@ namespace ExerPro.EnglishModule.Services {
         /// 战斗结果
         /// </summary>
         public enum Result {
-            None = 0, Win = 1, Lose = 2
+            None = 0, Win = 1, Lose = 2,
+            Pass = 3//Boss通关
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace ExerPro.EnglishModule.Services {
 		
 		int round = 1;
 		
-		Result result = Result.None;
+		public Result result = Result.None;
 
         #region 初始化
 
@@ -133,7 +134,7 @@ namespace ExerPro.EnglishModule.Services {
         /// 更新敌人
         /// </summary>
         void updateEnemy() {
-			if (processEnemiesAction()) onRoundEnd();
+			if (actor().isLost() || processEnemiesAction()) onRoundEnd();
 		}
 
         
@@ -237,6 +238,8 @@ namespace ExerPro.EnglishModule.Services {
 		void processRoundResult() {
 			if (isActorLost()) result = Result.Lose;
 			else if (isEnemiesLost()) result = Result.Win;
+            if(result == Result.Win && record.currentNode().isBoss())
+                result = Result.Pass;
 			if (result != Result.None) onBattleEnd();
 			else nextRound();
 		}
@@ -447,6 +450,7 @@ namespace ExerPro.EnglishModule.Services {
 
 			for (int i = 0; i < repeats; ++i)
 				actor.addAction(new RuntimeAction(actor, targets.ToArray(), item));
+
 			//foreach (var target in targets)
 			//	actor.addAction(new RuntimeAction(actor, target, effects));
 		}
@@ -527,21 +531,36 @@ namespace ExerPro.EnglishModule.Services {
 		/// </summary>
 		void onBattleEnd() {
 			Debug.Log("onBattleEnd: " + round);
-			// TODO: 生成奖励
-			battlersBattleEnd();
+            //TODO: 此处添加杀敌数
+            engSer.processReward(enemyNumber: _enemies.Count, bossNumber: 0);
+            battlersBattleEnd();
 			changeState(State.Result);
 		}
 
-		/// <summary>
-		/// 战斗结束回调
-		/// </summary>
-		void battlersBattleEnd() {
+        /// <summary>
+        /// 战斗结束回调
+        /// </summary>
+        void battlersBattleEnd() {
 			actor().onBattleEnd();
 			foreach (var enemy in _enemies)
 				enemy.onBattleEnd();
 		}
 
-		#endregion
+        #endregion
 
-	}
+
+        #region 测试辅助
+
+        /// <summary>
+        /// 一键9999
+        /// </summary>
+        public void killAllEnemy() {
+            if (_enemies.Count == 0)
+                return;
+            result = Result.Win;
+            processRoundResult();
+        }
+
+        #endregion
+    }
 }

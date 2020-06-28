@@ -393,11 +393,6 @@ namespace UI.Common.Controls.ItemDisplays {
             clearItems();
         }
 
-		internal void setItem(ListeningSubQuestion ques, int v, bool _)
-		{
-			throw new NotImplementedException();
-		}
-
 		#endregion
 
 	}

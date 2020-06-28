@@ -282,7 +282,7 @@ def __saveExerProEnemyActions(item: ExerProEnemy, flag, d: list):
 	index = 1
 	rounds_key_format = "rounds%d"
 	type_key_format = "act_type%d"
-	params_key_format = "params%d"
+	params_key_format = "act_params%d"
 	rate_key_format = "rate%d"
 
 	params_format = "[%s]"

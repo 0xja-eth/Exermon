@@ -304,7 +304,7 @@ class QuestionImageUpload(SystemImageUpload):
 @deconstructible
 class PlotQuestionImageUpload(SystemImageUpload):
 
-	IMAGE_DIR = 'plotQuestion/picture'
+	IMAGE_DIR = 'plot_question/picture'
 
 	def generateFileName(self, instance, filename):
 
@@ -313,7 +313,7 @@ class PlotQuestionImageUpload(SystemImageUpload):
 
 		# 定义文件名
 		rand_str = random.sample(self.CHARSET, self.RANDOM_LEN)
-		filename = "plotQuestion_%s" % rand_str
+		filename = "question_%s" % rand_str
 
 		return filename+ext
 

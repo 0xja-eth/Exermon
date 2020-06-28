@@ -37,7 +37,7 @@ namespace ExerPro.EnglishModule.Services {
 		const int PlotQuestionType = 4;
 
 		/// <summary>
-		/// 随机据点几率比例（剧情:休息:藏宝:商人:敌人）
+		/// 随机据点几率比例（敌人:藏宝:商人:精英:剧情）
 		/// </summary>
 		static readonly int[] RandomNodeRates = { 6, 2, 2, 1, 29 };
 		static readonly ExerProMapNode.Type[] RandomNodeTypes = {
@@ -82,12 +82,14 @@ namespace ExerPro.EnglishModule.Services {
 			/// <summary>
 			/// 缓存的题目
 			/// </summary>
-			[AutoConvert]
+			//[AutoConvert]
 			public List<ListeningQuestion> listeningQuestions { get; protected set; } = new List<ListeningQuestion>();
 			[AutoConvert]
 			public List<PhraseQuestion> phraseQuestions { get; protected set; } = new List<PhraseQuestion>();
 			[AutoConvert]
 			public List<CorrectionQuestion> correctionQuestions { get; protected set; } = new List<CorrectionQuestion>();
+			[AutoConvert]
+			public List<PlotQuestion> plotQuestions { get; protected set; } = new List<PlotQuestion>();
 			[AutoConvert]
 			public List<Word> words { get; protected set; } = new List<Word>();
 
@@ -103,6 +105,8 @@ namespace ExerPro.EnglishModule.Services {
 					return phraseQuestions as List<T>;
 				if (typeof(T) == typeof(CorrectionQuestion))
 					return correctionQuestions as List<T>;
+				if (typeof(T) == typeof(PlotQuestion))
+					return plotQuestions as List<T>;
 				if (typeof(T) == typeof(Word))
 					return words as List<T>;
 				return null;
@@ -310,7 +314,8 @@ namespace ExerPro.EnglishModule.Services {
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
 				// TODO: 保存奖励信息
 				//danteding 测试用
-				//record.load(res); onSuccess?.Invoke();
+				//record.load(res);
+				onSuccess?.Invoke();
 			};
 
 			saveExerPro(terminate, _onSuccess, onError);
@@ -326,6 +331,8 @@ namespace ExerPro.EnglishModule.Services {
 		#endregion
 
 		#region 题目操作
+
+		#region 其他题目
 
 		/// <summary>
 		/// 获取题目类型
@@ -404,87 +411,6 @@ namespace ExerPro.EnglishModule.Services {
 			data["qids"] = DataLoader.convert(qids); data["type"] = type;
 
 			sendRequest(Oper.QuestionGet, data, onSuccess, onError, uid: true);
-		}
-
-		/// <summary>
-		/// 生成单词数据
-		/// </summary>
-		/// <param name="wids">单词ID集</param>
-		/// <param name="onSuccess">成功回调</param>
-		/// <param name="onError">失败回调</param>
-		public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
-
-			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-				//var words = DataLoader.load<Word[]>(res, "words");
-				//questionCache.addQuestions(words);
-				record = DataLoader.load(record, res, "record");
-				onSuccess?.Invoke();
-			};
-
-			generateWords(_onSuccess, onError);
-		}
-		public void generateWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
-
-			JsonData data = new JsonData();
-			sendRequest(Oper.WordGenerate, data, onSuccess, onError, uid: true);
-		}
-
-		/// <summary>
-		/// 获取单词数据
-		/// </summary>
-		/// <param name="wids">单词ID集</param>
-		/// <param name="onSuccess">成功回调</param>
-		/// <param name="onError">失败回调</param>
-		public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
-
-			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-				var words = DataLoader.load<Word[]>(res, "words");
-				questionCache.addQuestions(words);
-				onSuccess?.Invoke(words);
-			};
-
-			getWords(wids, _onSuccess, onError);
-		}
-		public void getWords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
-
-			JsonData data = new JsonData();
-			data["wids"] = DataLoader.convert(wids);
-
-			sendRequest(Oper.WordGet, data, onSuccess, onError, uid: true);
-		}
-
-		/// <summary>
-		/// 回答单词
-		/// </summary>
-		/// <param name="word">单词对象</param>
-		/// <param name="chinese">选择的选项文本</param>
-		/// <param name="onSuccess">成功回调</param>
-		/// <param name="onError">失败回调</param>
-		public void answerWord(Word word, string chinese,
-			UnityAction<bool> onSuccess, UnityAction onError = null) {
-
-			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
-				var correct = DataLoader.load<bool>(res, "correct");
-				var new_ = DataLoader.load<bool>(res, "new");
-
-				if (new_) // 如果需要新一轮单词，再发起一次请求 
-					generateWords(() => onSuccess?.Invoke(correct), onError);
-				else {
-					record.next = DataLoader.load<int>(res, "next");
-					onSuccess?.Invoke(correct);
-				}
-			};
-
-			answerWord(word.id, chinese, _onSuccess, onError);
-		}
-		/// <param name="wid">题目ID</param>
-		public void answerWord(int wid, string chinese, 
-			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
-
-			JsonData data = new JsonData();
-			data["wid"] = wid; data["chinese"] = chinese;
-
-			sendRequest(Oper.WordAnswer, data, onSuccess, onError, uid: true);
 		}
 
 		/// <summary>
@@ -584,6 +510,8 @@ namespace ExerPro.EnglishModule.Services {
 			sendRequest(Oper.AnswerCorrection, data, onSuccess, onError, uid: true);
 		}
 
+		#endregion
+
 		///// <summary>
 		///// 获取单词数据
 		///// </summary>
@@ -603,6 +531,90 @@ namespace ExerPro.EnglishModule.Services {
 
 		//    sendRequest(Oper.WordQuery, data, onSuccess, onError, uid: true);
 		//}
+
+		#region 单词题目
+
+		/// <summary>
+		/// 生成单词数据
+		/// </summary>
+		/// <param name="wids">单词ID集</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void generateWords(UnityAction onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				//var words = DataLoader.load<Word[]>(res, "words");
+				//questionCache.addQuestions(words);
+				record = DataLoader.load(record, res, "record");
+				onSuccess?.Invoke();
+			};
+
+			generateWords(_onSuccess, onError);
+		}
+		public void generateWords(NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			sendRequest(Oper.WordGenerate, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 获取单词数据
+		/// </summary>
+		/// <param name="wids">单词ID集</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void getWords(int[] wids, UnityAction<Word[]> onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var words = DataLoader.load<Word[]>(res, "words");
+				questionCache.addQuestions(words);
+				onSuccess?.Invoke(words);
+			};
+
+			getWords(wids, _onSuccess, onError);
+		}
+		public void getWords(int[] wids, NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			data["wids"] = DataLoader.convert(wids);
+
+			sendRequest(Oper.WordGet, data, onSuccess, onError, uid: true);
+		}
+
+		/// <summary>
+		/// 回答单词
+		/// </summary>
+		/// <param name="word">单词对象</param>
+		/// <param name="chinese">选择的选项文本</param>
+		/// <param name="onSuccess">成功回调</param>
+		/// <param name="onError">失败回调</param>
+		public void answerWord(Word word, string chinese,
+			UnityAction<bool> onSuccess, UnityAction onError = null) {
+
+			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				var correct = DataLoader.load<bool>(res, "correct");
+				var new_ = DataLoader.load<bool>(res, "new");
+
+				if (new_) // 如果需要新一轮单词，再发起一次请求 
+					generateWords(() => onSuccess?.Invoke(correct), onError);
+				else {
+					record.answerWord(word.id, correct, 
+						DataLoader.load<int>(res, "next"));
+					onSuccess?.Invoke(correct);
+				}
+			};
+
+			answerWord(word.id, chinese, _onSuccess, onError);
+		}
+		/// <param name="wid">题目ID</param>
+		public void answerWord(int wid, string chinese,
+			NetworkSystem.RequestObject.SuccessAction onSuccess, UnityAction onError = null) {
+
+			JsonData data = new JsonData();
+			data["wid"] = wid; data["chinese"] = chinese;
+
+			sendRequest(Oper.WordAnswer, data, onSuccess, onError, uid: true);
+		}
 
 		/// <summary>
 		/// 获取单词记录
@@ -627,6 +639,8 @@ namespace ExerPro.EnglishModule.Services {
 			JsonData data = new JsonData();
 			sendRequest(Oper.WordRecordGet, data, onSuccess, onError, uid: true);
 		}
+
+		#endregion
 
 		#endregion
 
@@ -869,8 +883,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
-			
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
+
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -882,7 +896,6 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
 				} else exitNode(false);
-			
 		}
 
 		#region 休息据点
@@ -1017,11 +1030,25 @@ namespace ExerPro.EnglishModule.Services {
 			if (pop) sceneSys.popScene();
 			changeState(State.Idle);
 			record.nodeFlag = true;
-			//saveExerPro();
+			saveExerPro();
 		}
 
 		#endregion
 
+		#region 效果控制
+
+		/// <summary>
+		/// 处理效果
+		/// </summary>
+		/// <param name="effects"></param>
+		public void processEffects(ExerProEffectData[] effects) {
+			var actor = record.actor;
+			actor.addAction(new RuntimeAction(actor, actor, effects));
+			actor.processCurrentAction();
+		}
+
+		#endregion
+		
 		#region 游戏进程
 
 		/// <summary>
@@ -1050,7 +1077,7 @@ namespace ExerPro.EnglishModule.Services {
 			changeState(State.Moving);
 			record.moveNext(nid, force);
 			record.nodeFlag = false;
-			//saveExerPro();
+			saveExerPro();
 		}
 
 		/// <summary>
@@ -1081,10 +1108,27 @@ namespace ExerPro.EnglishModule.Services {
 		/// 结束
 		/// </summary>
 		public void terminate() {
+			if (record.actor.isDead()) saveExerPro(true);
+
 			changeState(State.NotInExerPro);
 			save(); sceneSys.popScene();
 		}
 
+        /// <summary>
+        /// 通关后更新数据
+        /// </summary>
+        public void passExchange() {
+            save();
+            //TODO:交互数据
+            var newStageOrder = record.stageOrder + 1;
+
+            //退出刷新缓存的数据，如当前位置等
+            //TODO：此处应该增加一个清理缓存的接口，而不是直接退出
+            terminate();
+            //交互成功后重启
+            start(1);
+        }
+        
 		#endregion
 
 		#endregion

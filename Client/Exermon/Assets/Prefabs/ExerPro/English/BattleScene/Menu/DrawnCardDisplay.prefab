@@ -35,9 +35,9 @@ MonoBehaviour:
   highlightFlag: {fileID: 0}
   actived: 1
   _enabled: 1
-  selectable: 1
+  selectable: 0
   checkable: 0
-  highlightable: 1
+  highlightable: 0
   clickable: 1
   forceChecked: 0
   deselectable: 1
@@ -54,7 +54,7 @@ MonoBehaviour:
   description: {fileID: 6441917799376815270}
   character: {fileID: 7676015857600526382}
   type: {fileID: 1577834171225346461}
-  cardSkin: {fileID: 2688432033876432892}
+  cardSkin: {fileID: 6467279849758605791}
   charFrame: {fileID: 2635541293646651802}
   typeIcon: {fileID: 0}
   back: {fileID: 2771709228412802477}
@@ -98,7 +98,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8920299050985438163
 RectTransform:
   m_ObjectHideFlags: 0
@@ -111,7 +111,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2688432033876432893}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -164,12 +164,27 @@ PrefabInstance:
     - target: {fileID: 2759614835804377131, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: -12.287987
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759614835804377131, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353409822879688334, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411622061350681372, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4111514556176157248, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9120931410325961305, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
@@ -281,11 +296,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 9120931410325961310, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9120931410325961311, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
       propertyPath: m_Sprite
@@ -306,24 +316,24 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 6618941776492375459}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2688432033876432892 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9120931410325961311, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
-    type: 3}
-  m_PrefabInstance: {fileID: 6618941776492375459}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2688432033876432890}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7121383768948500451 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4111514556176157248, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
     type: 3}
   m_PrefabInstance: {fileID: 6618941776492375459}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6467279849758605791 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 151803764644605052, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+    type: 3}
+  m_PrefabInstance: {fileID: 6618941776492375459}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7121383768948500451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6251115591034725659 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 944446372215900344, guid: 0c3016d1ee51cfa44aa0947573c7c48e,

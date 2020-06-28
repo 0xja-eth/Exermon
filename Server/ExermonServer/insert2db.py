@@ -187,12 +187,12 @@ if __name__ == '__main__':
 
 	# insert_words()
 	# insert_phrase_questions()
-	# insert_listening_questions()
+	insert_listening_questions()
 
 	from english_pro_module.raw_data.upload import upload
 
-	upload("ExerProItem")
-	upload("ExerProPotion")
-	upload("ExerProCard")
+	# upload("ExerProItem")
+	# upload("ExerProPotion")
+	# upload("ExerProCard")
 	upload("ExerProEnemy")
-	upload("ExerProState")
+	# upload("ExerProState")

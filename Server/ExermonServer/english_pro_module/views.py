@@ -79,7 +79,7 @@ class Service:
     @classmethod
     async def getQuestions(cls, consumer, player: Player, type: int, qids: list, ):
         # 返回数据：
-        # questions: 英语特训题目数据（数组） => 获取的题目数据（听力/阅读/改错）
+        # questions: 英语特训题目数据（数组） => 获取的题目数据（听力/阅读/改错/剧情）
         # 检验类型是否在枚举类型里面
 
         # get 的时候同时也已经对类型进行了判断
@@ -93,14 +93,17 @@ class Service:
     async def generateWords(cls, consumer, player: Player, ):
         # 返回数据：
         # words: 单词数据（数组） => 单词数据集
-
+        # 当玩家没玩过该游戏时，就不存在ExerProRecord记录，此时不应该报错，应该创建一条新记录
+        # try:
         pro_record = Common.getExerProRecord(player)
-
         Common.ensureFinishLastWords(pro_record)
 
         pro_record.upgrade()
 
         return pro_record.convertToDict("words")
+        # except:
+        #     pro_record = ExerProRecord.create(player)
+        #     return pro_record.convertToDict()
 
     # 查询单词
     @classmethod

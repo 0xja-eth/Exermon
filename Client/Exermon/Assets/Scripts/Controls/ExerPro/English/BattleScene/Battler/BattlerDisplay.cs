@@ -58,6 +58,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		public Image battle;
 
+		public Text power, defense;
+		public GameObject powerObj, defenseObj;
+
 		public StatesContainer states;
 		public HPResultsContainer hpResults;
 
@@ -208,6 +211,15 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		#endregion
 
 		#region 数据控制
+
+		/// <summary>
+		/// 是否空物品
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public override bool isNullItem(RuntimeBattler item) {
+			return base.isNullItem(item) || item.isDead() || item.isEscaped;
+		}
 
 		#region 行动数据
 
@@ -485,7 +497,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
-		/// 削弱
+		/// 死亡
 		/// </summary>
 		public void die() {
 			animator.setVar(DieAttr, true);
@@ -546,7 +558,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// <param name="item">题目</param>
 		protected override void drawExactlyItem(RuntimeBattler item) {
             base.drawExactlyItem(item);
-			drawBattle(item); drawHP(item); drawStates(item);
+			drawBattle(item);
+			drawHP(item);
+			drawParams(item);
+			drawStates(item);
 		}
 
 		/// <summary>
@@ -572,6 +587,21 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		}
 
 		/// <summary>
+		/// 绘制属性
+		/// </summary>
+		/// <param name="battler"></param>
+		void drawParams(RuntimeBattler battler) {
+			var pow = battler.power();
+			var def = battler.defense();
+
+			powerObj.SetActive(pow > 0);
+			defenseObj.SetActive(def > 0);
+
+			power.text = pow.ToString();
+			defense.text = def.ToString();
+		}
+
+		/// <summary>
 		/// 绘制状态
 		/// </summary>
 		/// <param name="item"></param>
@@ -589,6 +619,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 				hpBar.clearValue();
 				hpBarObj.SetActive(false);
 			}
+			states.clearItems();
+
+			powerObj.SetActive(false);
+			defenseObj.SetActive(false);
+
+			power.text = defense.text = "";
 		}
 
 		/// <summary>

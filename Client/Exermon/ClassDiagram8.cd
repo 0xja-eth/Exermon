@@ -1,0 +1,466 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Core.UI.BaseComponent" Collapsed="true">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAgAAAAAhAAAAAAAAAAAAAAQAAEAEA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseComponent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseScene">
+    <Position X="0.5" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAABAIAAAwAJACAAAAghAABEACAAAwQAAEAEA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseStateBehaviour">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAQAAAABAAAkCAAAAAAAQAYAAAAACAgAAAIAAACA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseStateBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.BaseView" Collapsed="true">
+    <Position X="7.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQIEGAQBAAIAAAAQGAABEQSAAEAEAAgAAEQABEAQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseView.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Core.UI.BaseWindow" Collapsed="true">
+    <Position X="9.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAEgwEAAAAAECEASEAAAQCKAAAAQAEAAAEIQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\BaseWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.GroupView&lt;T&gt;" Collapsed="true">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JEgECEAAACABAQAAgACAUAAAAAAgEAACACoAAAAREQA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\GroupView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.SplitView" Collapsed="true">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAEAAAAAAgAAFAADBIAEAAAAIAkAEAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\SplitView.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Core.UI.TabView&lt;T&gt;" Collapsed="true">
+    <Position X="3" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEAAAEAIQAAAIQAAIUCAEACBQAAAAAgAgAAAAAAAAAg=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\TabView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.Utils.AnimationUtils">
+    <Position X="14.25" Y="5.25" Width="2.25" />
+    <NestedTypes>
+      <Class Name="Core.UI.Utils.AnimationUtils.TempAnimation" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\UI\Utils\AnimationUtils.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\Utils\AnimationUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.UI.Utils.SceneUtils" Collapsed="true">
+    <Position X="14.5" Y="7.5" Width="1.25" />
+    <TypeIdentifier>
+      <HashCode>DCAQASBDEiIMABU0ASECYAgAEBABAFCLagAAAgAEUHA=</HashCode>
+      <FileName>Assets\Scripts\Core\UI\Utils\SceneUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.AnimationSystem.AnimationController">
+    <Position X="2.5" Y="6" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAiAAAAAAACAAAIAAQAAAAgEBAEAAAAAAAGAAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\AnimationSystem\AnimationController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.AnimationSystem.AnimationView">
+    <Position X="12" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAEEGAgkAIMAIEAgAGAAMAgQECgMYAkDCAgABYOogA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\AnimationSystem\AnimationView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UI.Common.Controls.AnimationSystem.AnimatorView">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAACgAAAAAABEAAAGQAAAQIEACAQAIBAABAAAuoAA=</HashCode>
+      <FileName>Assets\Scripts\Controls\Common\AnimationSystem\AnimatorView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.BaseSystem&lt;T&gt;" Collapsed="true">
+    <Position X="7.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAhAAAAAAFAAAIQAAIUARIQAAAAAAEAEAAAAAAAkAgQ=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\BaseSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.GameSystem" Collapsed="true">
+    <Position X="5.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AohAIgQAACAIAAEhygAACYQAJgABAECABgAABBIhBAo=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\GameSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.NetworkSystem" Collapsed="true">
+    <Position X="9.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QkAQYMAEAABAEBgUgAQCUJ0FAgABDEADEAECOAlEIIE=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\NetworkSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.SceneSystem">
+    <Position X="5" Y="9" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="Core.Systems.SceneSystem.Scene" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Core\Systems\SceneSystem.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAACJSAAAAAgYAAAACgQAgIAAAEATIAACAAEAAAA=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\SceneSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.StorageSystem" Collapsed="true">
+    <Position X="7.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAEABMCgAAAzAYEggAAAEAAQAEADAAQAEAAAQAg=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\StorageSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Core.Systems.TestSystem" Collapsed="true">
+    <Position X="12" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAGAAAAgAAIAAAAAACAAAAAAAAEAAAAAAIACAAAA=</HashCode>
+      <FileName>Assets\Scripts\Core\Systems\TestSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ListeningSubQuestion" Collapsed="true">
+    <Position X="27" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ListeningQuestion" Collapsed="true">
+    <Position X="25.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.PhraseQuestion" Collapsed="true">
+    <Position X="30.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EGBAAAABAAAACAAIAAAAAAAAAAABQgACAHAAAAAAACA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.CorrectionQuestion" Collapsed="true">
+    <Position X="23.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAMAAAAAAAQAAAABAAACAAAAIBAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.PlotQuestion" Collapsed="true">
+    <Position X="21.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAIAEAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.Word" Collapsed="true">
+    <Position X="21.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQACAAAAAAAAAAAAAEBAAQAAAAAAAAAABA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.WordRecord" Collapsed="true">
+    <Position X="23.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAhAAAAAAAABQAAAAAQhICAAAAAAAgAQCAAAQI=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.Antonym" Collapsed="true">
+    <Position X="21.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAACAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProItemStar" Collapsed="true">
+    <Position X="27" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProEffectData" Collapsed="true">
+    <Position X="21.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEEAAQAEAAAAAAgBBAICYAAAIAAAAIAIBQAgCAQAEAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProTraitData" Collapsed="true">
+    <Position X="21.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAQAAAIAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.BaseExerProItem" Collapsed="true">
+    <Position X="17" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABBAAEAAAAEAAAAAAABAEAACEAYABAQAAAAABAAQ=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProItem" Collapsed="true">
+    <Position X="17" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAIAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPotion" Collapsed="true">
+    <Position X="19.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProCard" Collapsed="true">
+    <Position X="14.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIQAAgAAAAAEAAIAAADAAAAAAQQQABBAAABAABAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.FirstCardGroup" Collapsed="true">
+    <Position X="23.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProEnemy" Collapsed="true">
+    <Position X="23.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAACAAACAAAAAAAAAEAAkAAwAAAAAAAAABAAI=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProState" Collapsed="true">
+    <Position X="30.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAIAAAAAAAAABAQAAEAABAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPackItem&lt;T&gt;" Collapsed="true">
+    <Position X="11" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPackItem" Collapsed="true">
+    <Position X="11" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPackPotion" Collapsed="true">
+    <Position X="13.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPackCard" Collapsed="true">
+    <Position X="8.75" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProSlotPotion" Collapsed="true">
+    <Position X="28.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAASAAAAAAAAAAAAAAAAAAACAAIQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProItemPack" Collapsed="true">
+    <Position X="25.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPotionPack" Collapsed="true">
+    <Position X="23.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProCardDrawGroup" Collapsed="true">
+    <Position X="27" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAASAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProCardDiscardGroup" Collapsed="true">
+    <Position X="25.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProCardHandGroup" Collapsed="true">
+    <Position X="30.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IACCBAAAAAgAAAAAEAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProCardGroup" Collapsed="true">
+    <Position X="28.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BBQAACBAEAAAQAAEAAAQAAAAQBAAAAABQAAAAAIBACA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProPotionSlot" Collapsed="true">
+    <Position X="25.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAgAAAAAAAAAAIAAABBAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProMap" Collapsed="true">
+    <Position X="28.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAEECAAAAAAAAAABAAQ=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProMapStage" Collapsed="true">
+    <Position X="21.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAEAABAQIAAAACAAAAAAAIAIAKiAABAIAAAACBBgA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProRecord" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAAAFRIAEQQIgQAgIIIAIgAAAAigCBAUQAEAAxpBIRg=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ScoreRecord" Collapsed="true">
+    <Position X="30.5" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAAAAAACAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.NodeType" Collapsed="true">
+    <Position X="28.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAQAAAAABAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.ExerProMapNode" Collapsed="true">
+    <Position X="30.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAAgBAAAAQAAQMCCAACBAAABABCEAAAAAwIAAAAEQ=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeBuff" Collapsed="true">
+    <Position X="27" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAEAAAAAAAAAAAAAAAAAAAAKAAAAAAAAhAAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeState" Collapsed="true">
+    <Position X="28.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAEEAAAEAEAAAACIAAAAAAAAAEAAAAAABCAAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeBattler" Collapsed="true">
+    <Position X="1.75" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>VDlrgFJGUOAKAHMCsAzEAZiFITkg7gCXqApGIIZl404=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeActor" Collapsed="true">
+    <Position X="0.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IBQEGVJNEAAIAwQCIACAAKAGACgIAAgBkEAAAIIFFBA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeEnemy" Collapsed="true">
+    <Position X="2.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAJAEAACAEAAAAqAJIAkAAgEEQAAAAAQAEAEAAI=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeAction">
+    <Position X="22.25" Y="12.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABABAAACEAQAEAAgAAQAAAAAAAAQ=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ExerPro.EnglishModule.Data.RuntimeActionResult">
+    <Position X="24.75" Y="12.25" Width="2" />
+    <NestedTypes>
+      <Class Name="ExerPro.EnglishModule.Data.RuntimeActionResult.StateChange" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAIJQAAABAIAgAAEAAAABAIAAAAiAgghEAAAAgAIAA=</HashCode>
+      <FileName>Assets\Scripts\Data\ExerPro\EnglishModuleData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

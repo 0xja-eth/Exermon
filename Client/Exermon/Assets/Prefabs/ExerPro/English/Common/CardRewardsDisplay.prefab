@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4934009896080891107}
-  - component: {fileID: 6421348064875430577}
   - component: {fileID: 4934009896080891105}
   - component: {fileID: 1042263628809810153}
+  - component: {fileID: 8278807690686528753}
   m_Layer: 5
-  m_Name: DrawCardsDisplay
+  m_Name: CardRewardsDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,33 +41,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 0, y: -124}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6421348064875430577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4934009896080891106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 929449b3e6a4acd4ea993f701925cf1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  container: {fileID: 4934009896080891107}
-  subViewNameFormat: 
-  subViewPrefab: {fileID: 6772836410102114623, guid: 5d5554e7b70567243b2ad45dec301d87,
-    type: 3}
-  mask: {fileID: 0}
-  countText: {fileID: 0}
-  maxCheck: 0
-  defaultCapacity: 3
-  defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
-  _actived: 1
-  _selectable: 1
-  _deselectable: 0
-  _checkable: 1
-  _highlightable: 1
-  controller: {fileID: 4934009896080891105}
 --- !u!114 &4934009896080891105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,6 +79,33 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &8278807690686528753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4934009896080891106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 443f1e2c50effda4ba959589e8c52a12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  container: {fileID: 4934009896080891107}
+  subViewNameFormat: 
+  subViewPrefab: {fileID: 6772836410102114623, guid: 5d5554e7b70567243b2ad45dec301d87,
+    type: 3}
+  mask: {fileID: 0}
+  countText: {fileID: 0}
+  maxCheck: 0
+  defaultCapacity: 3
+  defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
+  _actived: 1
+  _selectable: 1
+  _deselectable: 1
+  _checkable: 1
+  _highlightable: 1
+  controller: {fileID: 4934009896080891105}
 --- !u!1001 &2757900393126463958
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -181,12 +181,12 @@ PrefabInstance:
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 360
+      value: 640
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -125.2
+      value: -226
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
@@ -321,12 +321,12 @@ PrefabInstance:
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 144
+      value: 424
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -125.2
+      value: -226
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
@@ -461,12 +461,12 @@ PrefabInstance:
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 576
+      value: 856
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -125.2
+      value: -226
       objectReference: {fileID: 0}
     - target: {fileID: 6772836410102114616, guid: 5d5554e7b70567243b2ad45dec301d87,
         type: 3}

@@ -1045,6 +1045,13 @@ namespace GameModule.Services {
 			public static RuntimeActionResult[] generate(
                 ExerPro.EnglishModule.Data.RuntimeAction action) {
                 var generator = new ExerProActionResultGenerator(action);
+
+                var enemy = action.subject as RuntimeEnemy;
+                if (enemy != null) {
+                    Debug.Log("Enemy Next Result Name:" + enemy.enemy().id);
+                    if(generator.results.Length > 0)
+                        Debug.Log("Enemy Next Result Action:" + generator.results[0].hpDamage);
+                }
                 return generator.results;
             }
 
@@ -1202,13 +1209,41 @@ namespace GameModule.Services {
 						n = effect.get(0, 0);
 						select = effect.get(1, false);
 						consumeCards(n, select); break;
-                }
-            }
 
-            /// <summary>
-            /// 处理完美斩击
-            /// </summary>
-            void _processSlashAttack(int a, int b = 2) {
+					case ExerProEffectData.Code.GainGold:
+						a = effect.get(0, 0);
+						b = effect.get(1, a);
+						gainGold(a, b); break;
+
+					case ExerProEffectData.Code.GainCard:
+						a = effect.get(0, -1); gainCard(a); break;
+
+					case ExerProEffectData.Code.DropCard:
+						a = effect.get(0, 0); dropCard(a); break;
+
+					case ExerProEffectData.Code.CopyCard:
+						a = effect.get(0, 0); copyCard(a); break;
+
+					case ExerProEffectData.Code.GainItem:
+						a = effect.get(0, -1); gainItem(a); break;
+
+					case ExerProEffectData.Code.LoseItem:
+						a = effect.get(0, -1); loseItem(a); break;
+
+					case ExerProEffectData.Code.GainPotion:
+						a = effect.get(0, -1); gainPotion(a); break;
+
+					case ExerProEffectData.Code.LosePotion:
+						a = effect.get(0, -1); losePotion(a); break;
+				}
+			}
+
+			#region 处理函数
+
+			/// <summary>
+			/// 处理完美斩击
+			/// </summary>
+			void _processSlashAttack(int a, int b = 2) {
                 const string SlashStr = "斩击";
                 var actor = subject as RuntimeActor;
                 if (actor == null) return;
@@ -1362,12 +1397,76 @@ namespace GameModule.Services {
 				result.consumeSelect = select;
             }
 
-        }
+			/// <summary>
+			/// 获得金钱
+			/// </summary>
+			void gainGold(int a, int b) {
+				result.gainCard = Random.Range(a, b + 1);
+			}
 
-        /// <summary>
-        /// 结果应用计算类
-        /// </summary>
-        public class ResultApplyCalc {
+			/// <summary>
+			/// 获得卡牌
+			/// </summary>
+			void gainCard(int i) {
+				// TODO: 处理随机卡牌
+				result.gainCard = i;
+			}
+
+			/// <summary>
+			/// 获得道具
+			/// </summary>
+			void gainItem(int i) {
+				// TODO: 处理随机道具
+				result.gainItem = i;
+			}
+
+			/// <summary>
+			/// 获得药水
+			/// </summary>
+			void gainPotion(int i) {
+				// TODO: 处理随机药水
+				result.gainPotion = i;
+			}
+
+			/// <summary>
+			/// 去除卡牌
+			/// </summary>
+			void dropCard(int i) {
+				// TODO: 处理随机卡牌
+				result.dropCard = i;
+			}
+
+			/// <summary>
+			/// 复制卡牌
+			/// </summary>
+			void copyCard(int i) {
+				// TODO: 处理随机卡牌
+				result.copyCard = i;
+			}
+
+			/// <summary>
+			/// 失去道具
+			/// </summary>
+			void loseItem(int i) {
+				// TODO: 处理随机道具
+				result.loseItem = i;
+			}
+
+			/// <summary>
+			/// 失去药水
+			/// </summary>
+			void losePotion(int i) {
+				// TODO: 处理随机药水
+				result.losePotion = i;
+			}
+
+			#endregion
+		}
+
+		/// <summary>
+		/// 结果应用计算类
+		/// </summary>
+		public class ResultApplyCalc {
 
             /// <summary>
             /// 属性
@@ -1390,7 +1489,9 @@ namespace GameModule.Services {
                 calc.processAddStates();
                 calc.processConsume();
                 calc.processDraw();
-            }
+				calc.processEnergy();
+				calc.processGain();
+			}
 
             /// <summary>
             /// 构造函数
@@ -1462,6 +1563,18 @@ namespace GameModule.Services {
 				if (actor == null) return;
 
 				actor.addEnergy(result.energyGain);
+			}
+
+			/// <summary>
+			/// 处理物品获得
+			/// </summary>
+			void processGain() {
+				if (actor == null) return;
+
+				actor.gainGold(result.gainGold);
+				actor.gainCard(result.gainCard);
+				actor.gainItem(result.gainItem);
+				actor.gainPotion(result.gainPotion);
 			}
 		}
 
@@ -1605,10 +1718,13 @@ namespace GameModule.Services {
 
 				int value = enemy.power();
 				if (actionParams.Count > 0) value += (int)actionParams[0];
-				actionParams.Add(value);
+
+                JsonData params_ = new JsonData();
+                params_.SetJsonType(JsonType.Array);
+                params_.Add(value);
 
 				effects.Add(new ExerProEffectData(
-                    ExerProEffectData.Code.Attack, actionParams));
+                    ExerProEffectData.Code.Attack, params_));
             }
 
             /// <summary>
@@ -1688,11 +1804,6 @@ namespace GameModule.Services {
 			List<string> result;
 
 			/// <summary>
-			/// 距离字典
-			/// </summary>
-			Dictionary<Word, double> chi, eng;
-
-			/// <summary>
 			/// 生成
 			/// </summary>
 			/// <param name="word">单词</param>
@@ -1730,6 +1841,7 @@ namespace GameModule.Services {
 				var minVal = 999.0;
 				var minWord = words[0];
 				foreach (var word_ in words) {
+					if (word_.chinese == word.chinese) continue;
 					var val = calcDistance(word, word_, english);
 					if (val < minVal && word_ != word &&
 						!result.Contains(word_.chinese))
@@ -1761,7 +1873,7 @@ namespace GameModule.Services {
 					}
 				}
 				var res = sum * 1.0 / len2;
-				Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
+				//Debug.Log("Dist: " + s1 + " -> " + s2 + ": " + res);
 				return res;
 			}
 
@@ -1949,7 +2061,7 @@ namespace GameModule.Services {
 							generateCards(RewardCardNumber, 0.35, 0.4);
                         break;
 
-					case ExerProMapNode.Type.Boss:
+                    case ExerProMapNode.Type.Boss:
                         exerProCards = ExerProItemGenerator.
 							generateCards(RewardCardNumber, 0, 0);
                         break;
@@ -1970,7 +2082,7 @@ namespace GameModule.Services {
             public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
                 record.scoreRecord.killBossAccmu += boss;
 
-				var gold = record.actor.gold;
+                var gold = record.actor.gold;
                 var cards = record.actor.cardGroup.getCardNumber();
 
                 var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
@@ -2008,11 +2120,10 @@ namespace GameModule.Services {
             const int NormalStarID = 1;
             const int RareStarID = 2;
 			const int EpicStarID = 3;
-
-			double DefaultNoramlRatio = 0.8;
+            double DefaultNoramlRatio = 0.8;
             double DefaultRareRatio = 0.15;
 
-			int[] cardTypePrice = new int[3]{ 20, 50, 100 };
+            int[] cardTypePrice = new int[3]{ 20, 50, 100 };
 
 			/*
             /// <summary>
@@ -2077,15 +2188,15 @@ namespace GameModule.Services {
 
 				int cnt = 0;
 				while (exerProCards.Count != count && cnt++ <= 100000) {
-					var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
+                    var result = itemGenerator.generateRandomItem(normalRatio, rareRatio) as ExerProCard;
 					if (result == null || exerProCards.Contains(result)) continue;
 
 					Debug.Log("exerProCards.Add(" + result.name + ")");
 
-					exerProCards.Add(result);
+                    exerProCards.Add(result);
                 }
 
-				return exerProCards;
+                return exerProCards;
             }
 
             /// <summary>
@@ -2105,7 +2216,7 @@ namespace GameModule.Services {
 
 					Debug.Log("exerProCards.Add(" + result.name + ")");
 
-					exerProPotions.Add(result);
+                    exerProPotions.Add(result);
                 }
 
                 return exerProPotions;
@@ -2145,8 +2256,7 @@ namespace GameModule.Services {
                 }
 
                 shuffleItems(items);
-
-                float randomValue = Random.Range(0, 1);
+				float randomValue = Random.Range(0.0f, 1.0f);
                 if (randomValue < normalRatio)
                     return items.Find(e => e.starId == NormalStarID);
                 else if (randomValue >= normalRatio && randomValue <= normalRatio + rareRatio)

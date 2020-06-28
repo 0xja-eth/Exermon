@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Core.UI;
 using Core.UI.Utils;
 
-namespace UI.PhraseScene.Windows {
+namespace UI.ExerPro.EnglishPro.PhraseScene.Windows {
 
 	/// <summary>
 	/// 结果窗口
@@ -78,7 +78,7 @@ namespace UI.PhraseScene.Windows {
 			this.word = word; this.option = option;
 			this.answer = answer;
 
-			scene.record(option);
+			scene.answer(option);
 
 			requestRefresh();
 		}
