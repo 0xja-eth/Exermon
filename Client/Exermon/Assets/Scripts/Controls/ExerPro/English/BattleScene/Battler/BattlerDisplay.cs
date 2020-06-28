@@ -217,9 +217,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		/// <returns></returns>
-		public override bool isNullItem(RuntimeBattler item) {
-			return base.isNullItem(item) || item.isDead() || item.isEscaped;
-		}
+		//public override bool isNullItem(RuntimeBattler item) {
+		//	return base.isNullItem(item) || item.isDead() || item.isEscaped;
+		//}
 
 		#region 行动数据
 
@@ -594,8 +594,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var pow = battler.power();
 			var def = battler.defense();
 
-			powerObj.SetActive(pow > 0);
-			defenseObj.SetActive(def > 0);
+			powerObj.SetActive(!item.isDead() && pow > 0);
+			defenseObj.SetActive(!item.isDead() && def > 0);
 
 			power.text = pow.ToString();
 			defense.text = def.ToString();
