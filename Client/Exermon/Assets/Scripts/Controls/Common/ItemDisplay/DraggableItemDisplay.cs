@@ -68,8 +68,8 @@ namespace UI.Common.Controls.ItemDisplays {
 		/// 关闭窗口
 		/// </summary>
 		public override void terminateView() {
+			if (dragging) releaseDrag();
 			base.terminateView();
-			if (isDragging()) releaseDrag();
 		}
 		
 		#endregion
@@ -161,6 +161,7 @@ namespace UI.Common.Controls.ItemDisplays {
 		/// 释放拖拽
 		/// </summary>
 		void releaseDrag() {
+			Debug.Log("releaseDrag");
 			dragging = false;
 
 			onAfterDrag();

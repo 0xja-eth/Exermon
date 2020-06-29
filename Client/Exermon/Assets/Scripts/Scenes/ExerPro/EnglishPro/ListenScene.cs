@@ -1,6 +1,7 @@
 ﻿
 using Core.Systems;
 using Core.UI;
+using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Services;
 
@@ -48,7 +49,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
         /// </summary>
         protected override void start() {
             base.start();
-			listenWindow.startWindow();
+			pauseBGM(); listenWindow.startWindow();
 		}
 
 		#endregion
@@ -73,7 +74,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
 		/// 退出场景
 		/// </summary>
 		public override void popScene() {
-            engSer.exitNode();
+			playBGM(); engSer.exitNode();
         }
 
         #endregion

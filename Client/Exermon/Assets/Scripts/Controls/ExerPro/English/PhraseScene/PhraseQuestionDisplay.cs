@@ -224,7 +224,7 @@ namespace UI.ExerPro.EnglishPro.PhraseScene.Controls {
         /// 处理物品放下
         /// </summary>
         protected void processItemDrop(OptionDisplay display) {
-            if (display == null) return;
+            if (display == null || !display.isDragging()) return;
 			setOption(display.getItem());
         }
 

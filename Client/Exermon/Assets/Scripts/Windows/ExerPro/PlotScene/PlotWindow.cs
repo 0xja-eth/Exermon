@@ -43,7 +43,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override void initializeOnce() {
+        protected override void initializeSystems() {
             base.initializeOnce();
             engServ = EnglishService.get();
             configureQuestion();
@@ -53,7 +53,7 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
         /// 配置题目
         /// </summary>
         void configureQuestion() {
-            engServ.generateQuestions<PlotQuestion>(1, onGetQuestionSuccess, onGetQuestionFailed);
+            engServ.generateQuestion<PlotQuestion>(onGetQuestionSuccess, onGetQuestionFailed);
             //onGetQuestionFailed();
         }
 
@@ -76,12 +76,11 @@ namespace UI.ExerPro.EnglishPro.PlotScene.Windows {
         /// 获取题目回调
         /// </summary>
         /// <param name="questions"></param>
-        void onGetQuestionSuccess(PlotQuestion[] questions) {
-            if (questions.Length <= 0) {
+        void onGetQuestionSuccess(PlotQuestion question) {
+            if (question == null) {
                 Debug.Log("Plot Quesion get failed!");
                 return;
             }
-            question = questions[0];
             questionDisplay.startView(question);
         }
 

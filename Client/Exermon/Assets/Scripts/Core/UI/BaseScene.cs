@@ -3,6 +3,8 @@ using System.Collections;
 
 using LitJson;
 
+using UnityEngine;
+
 using Core.Systems;
 using Core.UI.Utils;
 
@@ -27,6 +29,9 @@ namespace Core.UI {
         public AlertWindow alertWindow; // 提示窗口
         public LoadingWindow loadingWindow; // 加载窗口
         public RebuildController rebuildController; // 布局重建器
+
+		public AudioSource audioSource;
+		public AudioClip bgmClip; // BGM
 
         /// <summary>
         /// 初始化标志
@@ -68,7 +73,8 @@ namespace Core.UI {
         /// 初始化
         /// </summary>
         void initializeSceneUtils() {
-            SceneUtils.initialize(this, alertWindow, loadingWindow, rebuildController);
+            SceneUtils.initialize(this, alertWindow, 
+				loadingWindow, rebuildController, audioSource);
         }
 
         /// <summary>
@@ -144,14 +150,38 @@ namespace Core.UI {
         /// </summary>
         public virtual void onTerminated() { }
 
-        #endregion
+		#endregion
 
-        #region 场景控制
+		#region 场景控制
 
-        /// <summary>
-        /// 返回场景
-        /// </summary>
-        public virtual void popScene() {
+		/// <summary>
+		/// 播放BGM
+		/// </summary>
+		public void playBGM() {
+			SceneUtils.audioSource?.Play();
+		}
+
+		/// <summary>
+		/// 暂停BGM
+		/// </summary>
+		public void pauseBGM() {
+			SceneUtils.audioSource?.Pause();
+		}
+
+		/// <summary>
+		/// 反转BGM
+		/// </summary>
+		public void toggleBGM() {
+			if (SceneUtils.audioSource.isPlaying)
+				pauseBGM();
+			else
+				playBGM();
+		}
+
+		/// <summary>
+		/// 返回场景
+		/// </summary>
+		public virtual void popScene() {
             sceneSys.popScene();
         }
 

@@ -180,7 +180,7 @@ namespace Core.UI {
         /// 显示视窗
         /// </summary>
         protected virtual void showView() {
-            shown = true; requestRefresh(true);
+            shown = true; requestRefresh();
             Debug.Log("showView: " + name);
         }
 

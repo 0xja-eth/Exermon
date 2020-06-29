@@ -94,7 +94,10 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
 		public void scrollToCurrent() {
 			Debug.Log("scrollToCurrent");
 			if (animation.isPlaying()) return;
-			var rt = currentNode().transform as RectTransform;
+			var node = currentNode();
+			if (node == null) return;
+
+			var rt = node.transform as RectTransform;
 			scrollTo(rt.anchoredPosition.x - xSpacing);
 		}
 

@@ -52,7 +52,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             engServ = EnglishService.get();
-        }
+			configureQuestion();
+		}
 
         #endregion
 
@@ -75,7 +76,6 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
 		/// </summary>
 		protected override void refresh() {
 			base.refresh();
-			configureQuestion();
 		}
 
 		/// <summary>

@@ -2307,6 +2307,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public Word nextWord() {
+			Debug.Log("nextWord: " + next);
             if (next <= 0) return wordRecords[0].word();
             return EnglishService.get().getQuestion<Word>(next);
         }

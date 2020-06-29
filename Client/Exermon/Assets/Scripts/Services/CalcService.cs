@@ -1799,7 +1799,7 @@ namespace GameModule.Services {
 			/// 属性
 			/// </summary>
 			Word word;
-			List<Word> words;
+			ICollection<Word> words;
 
 			List<string> result;
 
@@ -1809,7 +1809,7 @@ namespace GameModule.Services {
 			/// <param name="word">单词</param>
 			/// <param name="words">单词集</param>
 			/// <returns></returns>
-			public static List<string> generate(Word word, List<Word> words) {
+			public static List<string> generate(Word word, ICollection<Word> words) {
 				var generator = new WordChoicesGenerator(word, words);
 				return generator.result;
 			}
@@ -1817,7 +1817,7 @@ namespace GameModule.Services {
 			/// <summary>
 			/// 构造函数
 			/// </summary>
-			WordChoicesGenerator(Word word, List<Word> words) {
+			WordChoicesGenerator(Word word, ICollection<Word> words) {
 				this.word = word; this.words = words;
 				result = new List<string>(MaxChoices);
 
@@ -1839,7 +1839,7 @@ namespace GameModule.Services {
 			/// <param name="eng">英文距离</param>
 			Word generateWordChoice(bool english) {
 				var minVal = 999.0;
-				var minWord = words[0];
+				Word minWord = null;
 				foreach (var word_ in words) {
 					if (word_.chinese == word.chinese) continue;
 					var val = calcDistance(word, word_, english);

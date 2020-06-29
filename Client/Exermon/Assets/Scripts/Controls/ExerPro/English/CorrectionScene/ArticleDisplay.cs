@@ -284,7 +284,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		public void scrollUp() {
 			var oriPos = container.anchoredPosition;
-			oriPos.y += scrollDelta;
+			oriPos.y -= scrollDelta;
 			container.anchoredPosition = oriPos;
 		}
 
@@ -293,7 +293,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		public void scrollDown() {
 			var oriPos = container.anchoredPosition;
-			oriPos.y -= scrollDelta;
+			oriPos.y += scrollDelta;
 			container.anchoredPosition = oriPos;
 		}
 

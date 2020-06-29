@@ -83,32 +83,37 @@ namespace ExerPro.EnglishModule.Services {
 			/// 缓存的题目
 			/// </summary>
 			//[AutoConvert]
-			public List<ListeningQuestion> listeningQuestions { get; protected set; } = new List<ListeningQuestion>();
-			[AutoConvert]
-			public List<PhraseQuestion> phraseQuestions { get; protected set; } = new List<PhraseQuestion>();
-			[AutoConvert]
-			public List<CorrectionQuestion> correctionQuestions { get; protected set; } = new List<CorrectionQuestion>();
-			[AutoConvert]
-			public List<PlotQuestion> plotQuestions { get; protected set; } = new List<PlotQuestion>();
-			[AutoConvert]
-			public List<Word> words { get; protected set; } = new List<Word>();
+			public Dictionary<int, ListeningQuestion> listeningQuestions { get; protected set; } 
+				= new Dictionary<int, ListeningQuestion>();
+			//[AutoConvert]
+			public Dictionary<int, PhraseQuestion> phraseQuestions { get; protected set; } 
+				= new Dictionary<int, PhraseQuestion>();
+			//[AutoConvert]
+			public Dictionary<int, CorrectionQuestion> correctionQuestions { get; protected set; } 
+				= new Dictionary<int, CorrectionQuestion>();
+			//[AutoConvert]
+			public Dictionary<int, PlotQuestion> plotQuestions { get; protected set; } 
+				= new Dictionary<int, PlotQuestion>();
+			//[AutoConvert]
+			public Dictionary<int, Word> words { get; protected set; } 
+				= new Dictionary<int, Word>();
 
 			/// <summary>
 			/// 获取缓存列表
 			/// </summary>
 			/// <typeparam name="T">类型</typeparam>
 			/// <returns>返回的缓存列表</returns>
-			public List<T> getCacheList<T>() {
+			public Dictionary<int, T> getCacheList<T>() where T: BaseData {
 				if (typeof(T) == typeof(ListeningQuestion))
-					return listeningQuestions as List<T>;
+					return listeningQuestions as Dictionary<int, T>;
 				if (typeof(T) == typeof(PhraseQuestion))
-					return phraseQuestions as List<T>;
+					return phraseQuestions as Dictionary<int, T>;
 				if (typeof(T) == typeof(CorrectionQuestion))
-					return correctionQuestions as List<T>;
+					return correctionQuestions as Dictionary<int, T>;
 				if (typeof(T) == typeof(PlotQuestion))
-					return plotQuestions as List<T>;
+					return plotQuestions as Dictionary<int, T>;
 				if (typeof(T) == typeof(Word))
-					return words as List<T>;
+					return words as Dictionary<int, T>;
 				return null;
 			}
 
@@ -116,8 +121,10 @@ namespace ExerPro.EnglishModule.Services {
 			/// 添加题目
 			/// </summary>
 			/// <param name="json">题目数据</param>
-			public void addQuestions<T>(T[] questions) {
-				getCacheList<T>().AddRange(questions);
+			public void addQuestions<T>(T[] questions) where T : BaseData {
+				var dict = getCacheList<T>();
+				foreach (var question in questions)
+					dict[question.id] = question;
 			}
 
 			/// <summary>
@@ -127,10 +134,89 @@ namespace ExerPro.EnglishModule.Services {
 			protected override void loadCustomAttributes(JsonData json) {
 				base.loadCustomAttributes(json);
 
-				listeningQuestions = listeningQuestions ?? new List<ListeningQuestion>();
-				phraseQuestions = phraseQuestions ?? new List<PhraseQuestion>();
-				correctionQuestions = correctionQuestions ?? new List<CorrectionQuestion>();
-				words = words ?? new List<Word>();
+				//listeningQuestions.Clear();
+				//var questions = DataLoader.load(json, "listening_questions");
+				//if (questions != null) {
+				//	Debug.Log("Load phrase_questions: " + questions.ToJson());
+				//	questions.SetJsonType(JsonType.Object);
+				//	foreach (KeyValuePair<string, JsonData> pair in questions) {
+				//		var key = int.Parse(pair.Key);
+				//		var data = DataLoader.load<ListeningQuestion>(pair.Value);
+				//		Debug.Log("Load questions: " + key + ", " + data);
+				//		listeningQuestions.Add(key, data);
+				//	}
+				//}
+
+				phraseQuestions.Clear();
+				var questions = DataLoader.load(json, "phrase_questions");
+				if (questions != null) {
+					Debug.Log("Load phrase_questions: " + questions.ToJson());
+					questions.SetJsonType(JsonType.Object);
+					foreach (KeyValuePair<string, JsonData> pair in questions) {
+						var key = int.Parse(pair.Key);
+						var data = DataLoader.load<PhraseQuestion>(pair.Value);
+						Debug.Log("Load questions: " + key + ", " + data);
+						phraseQuestions.Add(key, data);
+					}
+				}
+
+				correctionQuestions.Clear();
+				questions = DataLoader.load(json, "correction_questions");
+				if (questions != null) {
+					Debug.Log("Load correction_questions: " + questions.ToJson());
+					questions.SetJsonType(JsonType.Object);
+					foreach (KeyValuePair<string, JsonData> pair in questions) {
+						var key = int.Parse(pair.Key);
+						var data = DataLoader.load<CorrectionQuestion>(pair.Value);
+						Debug.Log("Load questions: " + key + ", " + data);
+						correctionQuestions.Add(key, data);
+					}
+				}
+
+				words.Clear();
+				questions = DataLoader.load(json, "words");
+				if (questions != null) {
+					Debug.Log("Load words: " + questions.ToJson());
+					questions.SetJsonType(JsonType.Object);
+					foreach (KeyValuePair<string, JsonData> pair in questions) {
+						var key = int.Parse(pair.Key);
+						var data = DataLoader.load<Word>(pair.Value);
+						Debug.Log("Load questions: " + key + ", " + data);
+						words.Add(key, data);
+					}
+				}
+			}
+
+			/// <summary>
+			/// 转化自定义数据
+			/// </summary>
+			/// <param name="json"></param>
+			protected override void convertCustomAttributes(ref JsonData json) {
+				base.convertCustomAttributes(ref json);
+
+				//var questions = new JsonData();
+				//questions.SetJsonType(JsonType.Object);
+				//foreach (var pair in listeningQuestions)
+				//	questions[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+				//json["listening_questions"] = questions;
+
+				var questions = new JsonData();
+				questions.SetJsonType(JsonType.Object);
+				foreach (var pair in phraseQuestions)
+					questions[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+				json["phrase_questions"] = questions;
+
+				questions = new JsonData();
+				questions.SetJsonType(JsonType.Object);
+				foreach (var pair in correctionQuestions)
+					questions[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+				json["correction_questions"] = questions;
+
+				questions = new JsonData();
+				questions.SetJsonType(JsonType.Object);
+				foreach (var pair in words)
+					questions[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+				json["words"] = questions;
 			}
 		}
 
@@ -751,7 +837,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="qid">题目ID</param>
 		/// <returns>是否缓存</returns>
 		public bool isQuestionCached<T>(int qid) where T : BaseData, new() {
-			return questionCache.getCacheList<T>().Exists(q => q.id == qid);
+			return questionCache.getCacheList<T>().ContainsKey(qid); // (q => q.id == qid);
 		}
 
 		/// <summary>
@@ -760,7 +846,10 @@ namespace ExerPro.EnglishModule.Services {
 		/// <param name="qid">题目ID</param>
 		/// <returns>题目实例</returns>
 		public T getQuestion<T>(int qid) where T : BaseData, new() {
-			return questionCache.getCacheList<T>().Find(q => q.id == qid);
+			Debug.Log("getQuestion: " + typeof(T) + ": " + qid);
+			var questions = questionCache.getCacheList<T>();
+			if (questions.ContainsKey(qid)) return questions[qid];
+			return null;
 		}
 
 		#endregion
@@ -776,7 +865,7 @@ namespace ExerPro.EnglishModule.Services {
 		/// <returns></returns>
 		public List<string> generateWordChoices(Word word) {
 			var words = questionCache.getCacheList<Word>();
-			return CalcService.WordChoicesGenerator.generate(word, words);
+			return CalcService.WordChoicesGenerator.generate(word, words.Values);
 		}
 
 		#endregion
@@ -883,8 +972,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene);
-
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProPhraseScene);
+			
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;
@@ -896,6 +985,7 @@ namespace ExerPro.EnglishModule.Services {
 					case ExerProMapNode.Type.Unknown: onUnknownNode(); break;
 					case ExerProMapNode.Type.Boss: onBossNode(); break;
 				} else exitNode(false);
+				
 		}
 
 		#region 休息据点
@@ -954,7 +1044,7 @@ namespace ExerPro.EnglishModule.Services {
 		void onStoryNode() {
 			switch (Random.Range(0, 10000) % 2) {
 				case 0:
-					sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene); break;
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
 				case 1:
 					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
 			}

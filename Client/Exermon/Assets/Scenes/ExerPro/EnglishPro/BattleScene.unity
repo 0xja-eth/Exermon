@@ -4800,6 +4800,8 @@ MonoBehaviour:
   alertWindow: {fileID: 2029800015}
   loadingWindow: {fileID: 2029800016}
   rebuildController: {fileID: 2029800017}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 8300000, guid: 2af1e0fa9b5289543aa58fbbdcd04fe9, type: 3}
   battleGround: {fileID: 629167492}
   menuWindow: {fileID: 2087441262}
   wordWindow: {fileID: 1304475217}
