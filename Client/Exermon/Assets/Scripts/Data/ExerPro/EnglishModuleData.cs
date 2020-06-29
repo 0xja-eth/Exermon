@@ -4011,13 +4011,6 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
 		public ExerProPotionSlot potionSlot { get; protected set; }
 
-        /// <summary>
-		/// 金钱
-		/// </summary>
-		public int gold {
-			get { return racord == null ? 0 : racord.gold; }
-		}
-
 		/// <summary>
 		/// 对应的记录
 		/// </summary>

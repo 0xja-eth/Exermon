@@ -11,10 +11,6 @@ using Core.UI.Utils;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.ParamDisplays;
-using UI.Common.Controls.AnimationSystem;
-
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	using Menu;

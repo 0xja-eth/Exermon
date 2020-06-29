@@ -35,5 +35,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			battler.onResult();
 		}
 
+		/// <summary>
+		/// 死亡回调
+		/// </summary>
+		public void onDead() {
+			battler.terminateView();
+		}
+
 	}
 }

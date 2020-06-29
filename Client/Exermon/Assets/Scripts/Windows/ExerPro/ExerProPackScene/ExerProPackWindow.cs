@@ -141,7 +141,7 @@ namespace UI.ExerPro.EnglishPro.ExerProPackScene.Windows {
         /// 刷新金钱
         /// </summary>
         private void refreshMoney() {
-            gold.text = engSer.record.actor.gold.ToString();
+            gold.text = engSer.record.gold.ToString();
         }
 
         /// <summary>

@@ -39,20 +39,30 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
         ListeningQuestion question;
         ListeningSubQuestion[] questions;
 
-        #region 初始化
+		#region 初始化
 
-        /// 初始化场景
-        /// </summary>
-        protected override void initializeScene() {
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeOnce() {
+			base.initializeOnce();
+			configureQuestion();
+		}
+
+		/// <summary>
+		/// 初始化场景
+		/// </summary>
+		protected override void initializeScene() {
             scene = SceneUtils.getCurrentScene<ListenScene>();
-        }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override void initializeSystems() {
+			Debug.Log("initializeScene: " + scene);
+		}
+		
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		protected override void initializeSystems() {
             base.initializeSystems();
             engServ = EnglishService.get();
-			configureQuestion();
 		}
 
         #endregion
@@ -82,7 +92,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
 		/// 配置题目
 		/// </summary>
 		void configureQuestion() {
-			Debug.Log("configureQuestion");
+			Debug.Log("configureQuestion: currentScene = " + scene);
 			engServ.generateQuestion<ListeningQuestion>(onGetQuestionSuccess);
 			//onGetQuestionFailed();
 		}
@@ -96,7 +106,8 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Windows {
 		/// </summary>
 		/// <param name="questions"></param>
 		void onGetQuestionSuccess(ListeningQuestion remoteQuestion) {
-            Debug.Log("onGetQuestionSuccess: " + remoteQuestion.toJson().ToJson());
+			scene.pauseBGM();
+			Debug.Log("onGetQuestionSuccess: " + remoteQuestion.toJson().ToJson());
             question = remoteQuestion;
             questions = question.subQuestions;
             questionDisplay.startView(question);

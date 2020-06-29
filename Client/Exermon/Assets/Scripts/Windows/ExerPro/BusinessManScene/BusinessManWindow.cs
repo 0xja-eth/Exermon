@@ -79,9 +79,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 外部系统引用
         /// </summary>
         GameSystem gameSys = null;
-        PlayerService playerSer = null;
-        RecordService recordSer = null;
-        ItemService itemSer = null;
         EnglishService englishSer = null;
 
         #region 初始化
@@ -116,9 +113,6 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         protected override void initializeSystems() {
             base.initializeSystems();
             gameSys = GameSystem.get();
-            playerSer = PlayerService.get();
-            recordSer = RecordService.get();
-            itemSer = ItemService.get();
             englishSer = EnglishService.get();
         }
 
@@ -218,7 +212,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Windows {
         /// 刷新金钱
         /// </summary>
         void refreshMoney() {
-            moneyDisplay.setValue(player.gold);
+            moneyDisplay.setValue(englishSer.record.gold);
         }
 
         /// <summary>

@@ -2082,7 +2082,7 @@ namespace GameModule.Services {
             public static int generateScore(ExerProRecord record, int boss = 0, bool isPerfect = false) {
                 record.scoreRecord.killBossAccmu += boss;
 
-                var gold = record.actor.gold;
+                var gold = record.gold;
                 var cards = record.actor.cardGroup.getCardNumber();
 
                 var score = record.scoreRecord.killEnemyAccmu * 2 + record.scoreRecord.killBossAccmu * 50;
