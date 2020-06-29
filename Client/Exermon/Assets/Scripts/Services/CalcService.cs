@@ -965,12 +965,14 @@ namespace GameModule.Services {
             /// </summary>
             void generateElites() {
                 _generateRandomEnemies(stage.eliteEnemies());
-            }
+				if (enemies.Count <= 0)
+					_generateRandomEnemies(stage.normalEnemies());
+			}
 
-            /// <summary>
-            /// 随机生成敌人
-            /// </summary>
-            void _generateRandomEnemies(List<ExerProEnemy> enemies) {
+			/// <summary>
+			/// 随机生成敌人
+			/// </summary>
+			void _generateRandomEnemies(List<ExerProEnemy> enemies) {
                 var posCnt = MaxEnemyCols * MaxEnemyRows;
                 var enemyCnt = Math.Min(posCnt, enemies.Count);
                 var posVis = new bool[posCnt];
@@ -988,16 +990,20 @@ namespace GameModule.Services {
                 }
             }
 
-            /// <summary>
-            /// 生成BOSS
-            /// </summary>
-            void generateBoss() {
-                var enemies = stage.bosses();
-                var posCnt = MaxEnemyCols * MaxEnemyRows;
-                var posVis = new bool[posCnt];
+			/// <summary>
+			/// 生成BOSS
+			/// </summary>
+			void generateBoss() {
+				var enemies = stage.bosses();
+				if (enemies.Count <= 0) {
+					generateElites(); return;
+				}
 
-                var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+				var posCnt = MaxEnemyCols * MaxEnemyRows;
+				var posVis = new bool[posCnt];
 
+				var cnt = Random.Range(0, stage.maxBattleEnemies) + 1;
+				/*
                 foreach(var enemy in enemies) {
                     var pos = Random.Range(0, posCnt);
                     while (posVis[pos]) pos = Random.Range(0, posCnt);
@@ -1005,8 +1011,28 @@ namespace GameModule.Services {
 
                     this.enemies.Add(new RuntimeEnemy(pos, enemy));
                 }
-            }
+				*/
 
+				// 非攻击牌
+				var cardRecord = actor.cardGroup.cardRecord();
+				int unAttackCount = 0;
+				int cardCount = cardRecord.Count;
+				foreach (var card in cardRecord) 
+					if (!card.cardType.Equals(ExerProCard.Type.Attack)) 
+						unAttackCount++;
+
+				int enemyId = ExerProEnemy.BOSS1;
+				if (unAttackCount / cardCount >= 0.7f)
+					enemyId = ExerProEnemy.BOSS2; //乌龟大师
+				else if (cardCount >= 100) // 出牌数量大于100
+					enemyId = ExerProEnemy.BOSS3; // 龙王
+
+				foreach (var enemy in enemies) 
+					if (enemy.id == enemyId) {
+						this.enemies.Add(new RuntimeEnemy(4, enemy));
+						return;
+					}
+			}
         }
 
         /// <summary>
@@ -1278,12 +1304,27 @@ namespace GameModule.Services {
             }
 
 			/// <summary>
+			/// 计算性质加成
+			/// </summary>
+			/// <param name="c1"></param>
+			/// <param name="c2"></param>
+			double calcCharacterRate(string c1, string c2) {
+				var antonyms = DataService.get().staticData.configure.antonyms;
+				foreach (var ant in antonyms)
+					if (ant.cardWord == c1 && ant.enemyWord == c2) return ant.hurtRate;
+				return 1;
+			}
+
+			/// <summary>
 			/// 计算伤害
 			/// </summary>
 			/// <param name="a"></param>
 			/// <returns></returns>
 			int calcDamage(int a) {
 				double res = a + subject.power() - object_.defense();
+
+				if (subject.isActor()) res *= calcCharacterRate(
+					subject.currentCharacter(), object_.currentCharacter());
 
 				res += subject.damagePlusVal();
 				res += object_.hurtPlusVal();
@@ -1716,12 +1757,10 @@ namespace GameModule.Services {
             void _processAttack(
                 List<ExerProEffectData> effects, JsonData actionParams) {
 
-				int value = enemy.power();
-				if (actionParams.Count > 0) value += (int)actionParams[0];
-
-                JsonData params_ = new JsonData();
-                params_.SetJsonType(JsonType.Array);
-                params_.Add(value);
+				JsonData params_ = new JsonData();
+				params_.SetJsonType(JsonType.Array);
+				if (actionParams.Count > 0)
+					params_.Add(actionParams[0]);
 
 				effects.Add(new ExerProEffectData(
                     ExerProEffectData.Code.Attack, params_));

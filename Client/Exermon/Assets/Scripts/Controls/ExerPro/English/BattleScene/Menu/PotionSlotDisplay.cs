@@ -39,7 +39,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// </summary>
 		/// <param name="slotItem"></param>
 		public void use(PotionSlotItemDisplay slotItem) {
-			menu.usePotion(slotItem);
+			if (menu.usePotion(slotItem))
+				removeItem(slotItem.getItem());
 		}
 		/*
 		/// <summary>

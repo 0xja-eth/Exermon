@@ -1921,10 +1921,10 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProMapStage : BaseData {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public int order { get; protected set; }
         [AutoConvert("enemies")]
         public int[] _enemies { get; protected set; }
@@ -3025,6 +3025,12 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public abstract Texture2D getBattlePicture();
 
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public virtual string currentCharacter() { return ""; }
+
         #region 属性控制
 
         #region 属性快捷定义
@@ -4021,23 +4027,36 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerSlotItem slotItem { get; protected set; } = null;
 
-        #region 数据转化
+		#region 数据转化
 
-        ///// <summary>
-        ///// 转化为显示数据
-        ///// </summary>
-        ///// <param name="type">类型</param>
-        ///// <returns></returns>
-        //public JsonData convertToDisplayData(string type = "") {
-        //    switch (type) {
-        //        case "hp": return convertHp();
-        //        default: return toJson();
-        //    }
-        //}
+		///// <summary>
+		///// 转化为显示数据
+		///// </summary>
+		///// <param name="type">类型</param>
+		///// <returns></returns>
+		//public JsonData convertToDisplayData(string type = "") {
+		//    switch (type) {
+		//        case "hp": return convertHp();
+		//        default: return toJson();
+		//    }
+		//}
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
+
+		/// <summary>
+		/// 性质
+		/// </summary>
+		string character = "";
+
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public override string currentCharacter() {
+			return character;
+		}
 
 		/// <summary>
 		/// 得到金钱
@@ -4086,6 +4105,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="card">卡牌</param>
 		public void useCard(ExerProPackCard card) {
+			character = card.item().character;
 			cardGroup.useCard(card);
 			addEnergy(-card.cost());
 		}
@@ -4371,11 +4391,19 @@ namespace ExerPro.EnglishModule.Data {
             return enemy.battle;
         }
 
-        /// <summary>
-        /// 是否玩家
-        /// </summary>
-        /// <returns></returns>
-        public override bool isEnemy() { return true; }
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public override string currentCharacter() {
+			return enemy().character;
+		}
+
+		/// <summary>
+		/// 是否玩家
+		/// </summary>
+		/// <returns></returns>
+		public override bool isEnemy() { return true; }
 
         #region 属性控制
 
