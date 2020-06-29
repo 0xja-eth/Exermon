@@ -4129,6 +4129,8 @@ MonoBehaviour:
   alertWindow: {fileID: 1976407629}
   loadingWindow: {fileID: 1976407630}
   rebuildController: {fileID: 1976407631}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 8300000, guid: f03e4d2ccdddd4d4b87d73499c5e3613, type: 3}
   exerciseWindow: {fileID: 1369929491}
 --- !u!1 &1382342324
 GameObject:

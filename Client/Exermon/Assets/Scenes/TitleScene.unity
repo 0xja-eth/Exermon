@@ -1506,7 +1506,7 @@ MonoBehaviour:
   loadingWindow: {fileID: 93120741}
   rebuildController: {fileID: 93120742}
   audioSource: {fileID: 139132009}
-  bgmClip: {fileID: 8300000, guid: f03e4d2ccdddd4d4b87d73499c5e3613, type: 3}
+  bgmClip: {fileID: 8300000, guid: 623b65941b25a1047bf3ebacfe437aa1, type: 3}
   loginWindow: {fileID: 281108938}
   version: {fileID: 1971560949}
 --- !u!1001 &503932239

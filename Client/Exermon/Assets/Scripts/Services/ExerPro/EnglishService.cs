@@ -1044,7 +1044,7 @@ namespace ExerPro.EnglishModule.Services {
 		void onStoryNode() {
 			switch (Random.Range(0, 10000) % 2) {
 				case 0:
-					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
+					sceneSys.pushScene(SceneSystem.Scene.EnglishProPlotScene); break;
 				case 1:
 					sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene); break;
 			}

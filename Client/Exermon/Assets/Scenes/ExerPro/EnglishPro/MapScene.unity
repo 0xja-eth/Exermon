@@ -2425,7 +2425,7 @@ MonoBehaviour:
   loadingWindow: {fileID: 2029800016}
   rebuildController: {fileID: 2029800017}
   audioSource: {fileID: 0}
-  bgmClip: {fileID: 8300000, guid: 7dbde7ebc82a89149be3123ec7d2a92e, type: 3}
+  bgmClip: {fileID: 8300000, guid: ee25d015aa550904d894be3f7bbe3863, type: 3}
   stageRecordDisplay: {fileID: 2043421240}
   restNodeDisplay: {fileID: 846702313}
   switchWindow: {fileID: 1493173659}

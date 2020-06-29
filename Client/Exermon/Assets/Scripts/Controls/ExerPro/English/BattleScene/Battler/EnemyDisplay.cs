@@ -68,6 +68,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 处理敌人行动
 		/// </summary>
 		void processEnemyAction(ExerProEnemy.Action action) {
+			requestRefresh();
 			switch (action.typeEnum()) {
 				case ExerProEnemy.Action.Type.Escape:
 					processEscape(action); break;
@@ -177,10 +178,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="enemy"></param>
 		void drawThinking(RuntimeEnemy enemy) {
-			var think = AssetLoader.loadEnemyThink(
-				enemy.currentActionType());
-			if (think != null) {
-				this.think.gameObject.SetActive(true);
+			var type = enemy.currentActionType();
+			var think = AssetLoader.loadEnemyThink(type);
+			if (type > 0 && think != null) {
+				this.think.gameObject.SetActive(!enemy.isDead());
 				this.think.overrideSprite = AssetLoader.
 					generateSprite(think);
 			} else this.think.gameObject.SetActive(false);
