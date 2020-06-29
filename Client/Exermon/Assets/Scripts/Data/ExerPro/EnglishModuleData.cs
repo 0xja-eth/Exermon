@@ -1096,9 +1096,21 @@ namespace ExerPro.EnglishModule.Data {
         public bool inherent { get; protected set; }
         [AutoConvert]
         public bool disposable { get; protected set; }
-        [AutoConvert]
-        public string character { get; protected set; }
-        [AutoConvert]
+		[AutoConvert("character")]
+		public string _character { get; protected set; }
+
+		/// <summary>
+		/// 首字母大写
+		/// </summary>
+		public string character {
+			get {
+				if (_character == "") return "";
+				var s = _character;
+				return s.Substring(0, 1).ToUpper() + s.Substring(1);
+			}
+		}
+
+		[AutoConvert]
         public int target { get; protected set; }
 
 		/// <summary>
@@ -1151,7 +1163,7 @@ namespace ExerPro.EnglishModule.Data {
             card.cardType = 0;
             card.inherent = false;
             card.disposable = false;
-            card.character = "character";
+            card._character = "character";
             card.target = 0;
             card.type = 1;
             card.iconIndex = 0;
@@ -1189,10 +1201,17 @@ namespace ExerPro.EnglishModule.Data {
 	/// </summary>
 	public class ExerProEnemy : BaseItem {
 
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public enum EnemyType {
+		/// <summary>
+		/// BOSS设置
+		/// </summary>
+		public const int BOSS1 = 14; // 中二少年
+		public const int BOSS2 = 13; // 乌龟大师
+		public const int BOSS3 = 15; // 龙王
+
+		/// <summary>
+		/// 类型
+		/// </summary>
+		public enum EnemyType {
             Normal = 1, Elite = 2, Boss = 3
         }
 
@@ -1270,10 +1289,21 @@ namespace ExerPro.EnglishModule.Data {
         public int defense { get; protected set; }
         [AutoConvert("type_")]
         public int type_ { get; protected set; }
-        [AutoConvert]
-        public string character { get; protected set; } // 性格
+		[AutoConvert("character")]
+		public string _character { get; protected set; } // 性格
 
-        [AutoConvert]
+		/// <summary>
+		/// 首字母大写
+		/// </summary>
+		public string character {
+			get {
+				if (_character == "") return "";
+				var s = _character;
+				return s.Substring(0, 1).ToUpper() + s.Substring(1);
+			}
+		}
+
+		[AutoConvert]
         public Action[] actions { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
@@ -3675,7 +3705,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 清除所有状态
         /// </summary>
         public void clearStates(bool force = true) {
-            foreach (var pair in states)
+			var tmp = new Dictionary<int, RuntimeState>(states);
+			foreach (var pair in tmp)
                 removeState(pair.Value, force: force);
         }
 
@@ -4105,7 +4136,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="card">卡牌</param>
 		public void useCard(ExerProPackCard card) {
-			character = card.item().character;
+			character = card.item()._character;
 			cardGroup.useCard(card);
 			addEnergy(-card.cost());
 		}
@@ -4396,7 +4427,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public override string currentCharacter() {
-			return enemy().character;
+			return enemy()._character;
 		}
 
 		/// <summary>

@@ -125,6 +125,11 @@ PrefabInstance:
       propertyPath: m_FontData.m_VerticalOverflow
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 944446372215900344, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
+        type: 3}
+      propertyPath: m_Text
+      value: "\u75DB\u51FB"
+      objectReference: {fileID: 0}
     - target: {fileID: 1405883959414147412, guid: 0c3016d1ee51cfa44aa0947573c7c48e,
         type: 3}
       propertyPath: m_Name

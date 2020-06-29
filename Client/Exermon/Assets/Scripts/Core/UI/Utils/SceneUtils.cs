@@ -159,7 +159,7 @@ namespace Core.UI.Utils {
 			}
 			if (SceneUtils.audioSource) {
 				SceneUtils.audioSource.loop = true;
-				if (scene.bgmClip && SceneUtils.audioSource.clip.name != scene.bgmClip.name) {
+				if (scene.bgmClip && SceneUtils.audioSource.clip?.name != scene.bgmClip.name) {
 					SceneUtils.audioSource.clip = scene.bgmClip;
 					SceneUtils.audioSource.Play();
 				}

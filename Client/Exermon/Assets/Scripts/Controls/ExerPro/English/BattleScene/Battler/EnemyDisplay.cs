@@ -166,7 +166,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="enemy"></param>
 		void drawName(ExerProEnemy enemy) {
-			if (enemy.character != "")
+			if (enemy._character != "")
 				name.text = string.Format(NameFormat,
 					enemy.name, enemy.character);
 			else name.text = string.Format(PureNameFormat,

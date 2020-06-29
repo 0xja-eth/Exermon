@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,10 +18,8 @@ using BattleModule.Data;
 using ExerPro.EnglishModule.Data;
 
 using SeasonModule.Services;
-using System.Collections.Generic;
 
 using LitJson;
-using static ExerPro.EnglishModule.Data.FirstCardGroup;
 
 /// <summary>
 /// 游戏模块服务
