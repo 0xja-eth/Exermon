@@ -76,7 +76,7 @@ namespace UI.ExerPro.EnglishPro.MapScene.Controls {
         /// 绘制玩家信息
         /// </summary>
         void drawPlayerStatus(ExerProRecord item) {
-            playerStatus.setItem(item.actor);
+            playerStatus.setItem(item.actor, true);
             // 需要显示
             if (item.isFirstSelected()) {
                 var nodeDisplay = mapDisplay.currentNode();

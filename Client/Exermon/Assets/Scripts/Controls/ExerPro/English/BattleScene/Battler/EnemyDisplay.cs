@@ -74,35 +74,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 					processEscape(action); break;
 			}
 		}
-		/*
-		/// <summary>
-		/// 处理提升
-		/// </summary>
-		void processPowerUp(ExerProEnemy.Action action) {
-			skill();
-		}
 
-		/// <summary>
-		/// 处理削弱
-		/// </summary>
-		void processPowerDown(ExerProEnemy.Action action) {
-			skill();
-		}
-
-		/// <summary>
-		/// 处理附加状态
-		/// </summary>
-		void processAddStates(ExerProEnemy.Action action) {
-			skill();
-		}
-
-		/// <summary>
-		/// 处理附加状态
-		/// </summary>
-		void processAddStates(ExerProEnemy.Action action) {
-			skill();
-		}
-		*/
 		/// <summary>
 		/// 处理逃走
 		/// </summary>

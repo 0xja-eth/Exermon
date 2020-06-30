@@ -1021,7 +1021,7 @@ namespace GameModule.Services {
 						unAttackCount++;
 
 				int enemyId = ExerProEnemy.BOSS1;
-				if (unAttackCount / cardCount >= 0.7f)
+				if (cardCount > 0 && unAttackCount / cardCount >= 0.7f)
 					enemyId = ExerProEnemy.BOSS2; //乌龟大师
 				else if (cardCount >= 100) // 出牌数量大于100
 					enemyId = ExerProEnemy.BOSS3; // 龙王

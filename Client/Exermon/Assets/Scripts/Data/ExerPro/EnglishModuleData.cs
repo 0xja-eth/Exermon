@@ -1693,7 +1693,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 出牌记录
 		/// </summary>
-		[AutoConvert]
+		[AutoConvert("cardRecord")]
 		public List<int> _cardRecord { get; protected set; } = new List<int>();
 
 		/// <summary>
@@ -1701,6 +1701,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public List<ExerProCard> cardRecord() {
+			Debug.Log("_cardRecord: " + string.Join(",", _cardRecord));
 			var res = new List<ExerProCard>(_cardRecord.Count);
 			foreach (var cid in _cardRecord)
 				res.Add(DataService.get().exerProCard(cid));
@@ -1869,6 +1870,9 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="equipItem">装备物品</param>
         /// <returns>槽ID</returns>
         public override ExerProSlotPotion getSlotItemByEquipItem<E>(E equipItem) {
+			foreach (var slotItem in items)
+				if (!slotItem.isNullItem() && slotItem.packPotionId == equipItem.id)
+					return slotItem;
             return emptySlotItem();
         }
 

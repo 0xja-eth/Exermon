@@ -60,7 +60,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
 				var charFrame = AssetLoader.generateSprite(card.charFrame);
 				this.charFrame.gameObject.SetActive(true);
 				this.charFrame.overrideSprite = charFrame;
-				character.text = card._character;
+				character.text = card.character;
 			} else drawEmptyCharacter();
 		}
 

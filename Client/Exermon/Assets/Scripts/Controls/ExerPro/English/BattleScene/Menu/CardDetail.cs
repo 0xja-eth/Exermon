@@ -113,7 +113,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 				var charFrame = AssetLoader.generateSprite(card.charFrame);
 				this.charFrame.gameObject.SetActive(true);
 				this.charFrame.overrideSprite = charFrame;
-				character.text = card._character;
+				character.text = card.character;
 			} else drawEmptyCharacter();
 		}
 

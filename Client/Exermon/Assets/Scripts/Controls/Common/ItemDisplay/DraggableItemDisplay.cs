@@ -189,7 +189,7 @@ namespace UI.Common.Controls.ItemDisplays {
         GameObject createDraggingObject() {
             var go = Instantiate(gameObject, transform.parent);
             var cp = SceneUtils.get<DraggableItemDisplay<T>>(go);
-            cp.setItem(item, true); Destroy(cp);
+            cp.setItem(item, true); cp.requestRefresh(true); Destroy(cp);
             adjustDraggingObjectTransform(go);
             createDraggingObjectComponents(go);
             return go;
