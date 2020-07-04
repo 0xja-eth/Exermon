@@ -65,7 +65,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 动画更新回调函数
 		/// </summary>
 		Dictionary<string, UnityAction> updateEvents = new Dictionary<string, UnityAction>();
-
+		
 		#region 初始化
 
 		/// <summary>
@@ -224,6 +224,16 @@ namespace UI.Common.Controls.AnimationSystem {
             return animations.First.Value;
         }
 
+		/// <summary>
+		/// 当前动画状态
+		/// </summary>
+		/// <returns></returns>
+		public AnimationState curState() {
+			var ani = curAni();
+			if (ani == null) return null;
+			return animation[ani.getName()];
+		}
+
         /// <summary>
         /// 是否播放中
         /// </summary>
@@ -266,7 +276,7 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 开始下一个动画视窗
 		/// </summary>
 		public void startNextAnimationView() {
-			Debug.Log("startNextAnimationView");
+			Debug.Log(name + ": startNextAnimationView");
 			controller?.playNext();
 		}
 
@@ -287,13 +297,23 @@ namespace UI.Common.Controls.AnimationSystem {
         /// 停止
         /// </summary>
         public void stop() {
-            animation.Stop();
-        }
+			if (!isPlaying()) play();
 
-        /// <summary>
-        /// 切换到下一个动画
-        /// </summary>
-        public void next() {
+			var state = curState();
+			if (state == null) return;
+
+			var lastTime = state.time;
+			callEvents(state, lastTime);
+
+			state.time = state.length;
+			animation.Sample();
+			animation.Stop();
+		}
+
+		/// <summary>
+		/// 切换到下一个动画
+		/// </summary>
+		public void next() {
             animations.RemoveFirst();
         }
 
@@ -303,6 +323,30 @@ namespace UI.Common.Controls.AnimationSystem {
         public void playNext() {
             next(); play();
         }
+
+		/// <summary>
+		/// 调用所有事件
+		/// </summary>
+		/// <param name="state">状态</param>
+		/// <param name="startTime">开始时间</param>
+		/// <param name="endTime">结束时间</param>
+		void callEvents(AnimationState state, float startTime = 0, float endTime = -1) {
+			if (endTime <= 0) endTime = state.length;
+			callEvents(state.clip, startTime, endTime);
+		}
+		void callEvents(AnimationClip clip, float startTime, float endTime) {
+			foreach (var e in clip.events)
+				if (startTime <= e.time && e.time <= endTime)
+					callEvent(e);
+		}
+
+		/// <summary>
+		/// 调用事件
+		/// </summary>
+		/// <param name="event_">事件</param>
+		void callEvent(AnimationEvent event_) {
+			animation.SendMessage(event_.functionName);
+		}
 
 		/// <summary>
 		/// 添加动画

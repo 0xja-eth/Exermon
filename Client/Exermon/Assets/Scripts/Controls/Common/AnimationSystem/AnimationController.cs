@@ -130,8 +130,14 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 停止
 		/// </summary>
 		public void stop() {
-			foreach (var ani in playingAnimations) ani.stop();
-			foreach (var ani in animations) ani.stop();
+			var tmp1 = playingAnimations.ToArray();
+			var tmp2 = animations.ToArray();
+			foreach (var ani in tmp1) {
+				ani.stop(); onPlayed?.Invoke(ani);
+			}
+			foreach (var ani in tmp2) {
+				ani.stop(); onPlayed?.Invoke(ani);
+			}
 			playingAnimations.Clear();
 			animations.Clear();
 		}
@@ -140,7 +146,10 @@ namespace UI.Common.Controls.AnimationSystem {
 		/// 停止当前播放动画
 		/// </summary>
 		public void stopCurrent() {
-			foreach (var ani in playingAnimations) ani.stop();
+			var tmp = playingAnimations.ToArray();
+			foreach (var ani in tmp) {
+				ani.stop(); onPlayed?.Invoke(ani);
+			}
 			playingAnimations.Clear();
 		}
 

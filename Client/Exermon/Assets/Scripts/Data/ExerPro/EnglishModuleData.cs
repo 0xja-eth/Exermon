@@ -1766,8 +1766,10 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public void drawCard() {
 			if (drawGroup.items.Count <= 0) recycleDiscard();
-			drawGroup.transferItem(handGroup, drawGroup.firstCard());
-        }
+			var card = drawGroup.firstCard();
+			drawGroup.transferItem(handGroup, card);
+			debugShow("drawCard: " + card.item().name);
+		}
 
 		/// <summary>
 		/// 回收弃牌
@@ -1782,6 +1784,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 使用牌
 		/// </summary>
 		public void useCard(ExerProPackCard card) {
+			debugShow("useCard: " + card.item().name);
 			_cardRecord.Add(card.itemId);
 			if (card.item().disposable) consumeCard(card);
             else discardCard(card);
@@ -1791,25 +1794,50 @@ namespace ExerPro.EnglishModule.Data {
         /// 弃牌
         /// </summary>
         public void discardCard(ExerProPackCard card) {
-            handGroup.transferItem(discardGroup, card);
-        }
-        public void discardCard() {
+			handGroup.transferItem(discardGroup, card);
+			debugShow("discardCard: " + card.item().name);
+		}
+		public void discardCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-            handGroup.transferItem(discardGroup, card);
+			discardCard(card);
+			//handGroup.transferItem(discardGroup, card);
         }
 
         /// <summary>
         /// 消耗牌（本次战斗不再出现）
         /// </summary>
         public void consumeCard(ExerProPackCard card) {
-            handGroup.transferItem(this, card);
-        }
-        public void consumeCard() {
+			handGroup.transferItem(this, card);
+			debugShow("consumeCard: " + card.item().name);
+		}
+		public void consumeCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-            handGroup.transferItem(this, card);
+			consumeCard(card);
         }
+
+		/// <summary>
+		/// 显示调试信息
+		/// </summary>
+		void debugShow(string oper = "") {
+			var format = "Debug: {0}\nCard Group: {1}\n" +
+				"Draw Group: {2}\nDiscard Group: {3}\nHand Group: {4}";
+			Debug.Log(string.Format(format, oper, debugCards(this), 
+				debugCards(drawGroup), debugCards(discardGroup), debugCards(handGroup)));
+		}
+
+		/// <summary>
+		/// 显示调试卡牌
+		/// </summary>
+		/// <param name="container"></param>
+		/// <returns></returns>
+		string debugCards(PackContainer<ExerProPackCard> container) {
+			var res = container.items.Count.ToString();
+			foreach (var card in container.items)
+				res += " " + card.item().name;
+			return res;
+		}
 
         #endregion
 

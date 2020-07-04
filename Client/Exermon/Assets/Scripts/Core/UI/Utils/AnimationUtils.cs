@@ -38,7 +38,7 @@ namespace Core.UI.Utils {
             /// <summary>
             /// 动画片段
             /// </summary>
-            AnimationClip clip;
+            public AnimationClip clip;
 
             /// <summary>
             /// 动画组件

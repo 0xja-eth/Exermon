@@ -1592,7 +1592,7 @@ namespace GameModule.Services {
                 if (result.consumeSelect) return;
                 if (actor == null) return;
 
-                for (int i = 0; i < result.drawCardCnt; ++i)
+                for (int i = 0; i < result.consumeCardCnt; ++i)
                     actor.cardGroup.consumeCard();
             }
 
