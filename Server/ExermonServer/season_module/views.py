@@ -12,7 +12,7 @@ class Service:
 
         rec = Common.getSeasonRecord(player, sid)
 
-        return {"record": rec.convertToDict()}
+        return {"record": rec.convert()}
 
     # 查询赛季排行
     @classmethod
@@ -21,7 +21,7 @@ class Service:
         # ranks: 赛季排行数据（数组） => 赛季排行
         season = CompSeason.get(id=sid)
 
-        return {'ranks': season.convertToDict('ranks', player, count)}
+        return {'ranks': season.convert('ranks', player, count)}
 
 
 class Common:

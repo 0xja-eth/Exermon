@@ -1,12 +1,14 @@
 from django.db import models
 from django.conf import settings
 from item_module.models import *
-from utils.model_utils import CacheableModel, \
+from utils.model_utils import \
 	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 from game_module.models import ParamValue, ParamRate, HumanEquipType
 from season_module.models import SeasonRecord
 from season_module.runtimes import SeasonManager
+from utils.data_manager import CacheableModel
+
 from enum import Enum
 import os, base64, datetime
 
@@ -97,7 +99,7 @@ class Character(models.Model):
 
 		return bust_data, face_data, battle_data
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		# bust_data, face_data, battle_data = self.convertToBase64()
 
@@ -414,81 +416,140 @@ class Player(CacheableModel):
 
 	adminMoney.short_description = "持有金钱"
 
+	# 需要缓存的模型类列表（必须为外键）
+	@classmethod
+	def cacheOneToOneModels(cls):
+		from exermon_module.models import ExerPack, \
+			ExerHub, ExerFragPack, ExerGiftPool, ExerSlot
+		from question_module.models import QuesSugarPack
+		from battle_module.models import BattleItemSlot
+
+		return [HumanPack, HumanEquipSlot, ExerPack, ExerHub,
+				ExerFragPack, ExerGiftPool, ExerSlot,
+				QuesSugarPack, BattleItemSlot, PlayerMoney]
+
+	@classmethod
+	def cacheForeignKeyModels(cls): return []
+
 	# region 字典生成
 
 	def _packContainerIndices(self):
+		from utils.data_manager import DataManager
 
-		human_pack = ModelUtils.objectToDict(self.humanPack())
+		res = {}
 
-		exer_pack = ModelUtils.objectToDict(self.exerPack())
+		for cla in self.cacheOneToOneModels():
+			if PackContainer in cla.__mro__:
+				name = DataManager.hump2Underline(cla.__name__)
+				obj = self.getOneToOneModel(cla)
+				res[name] = ModelUtils.objectToDict(obj)
 
-		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack())
+		return res
 
-		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool())
-
-		exer_hub = ModelUtils.objectToDict(self.exerHub())
-
-		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack())
-
-		return {
-			'human_pack': human_pack,
-			'exer_pack': exer_pack,
-			'exer_frag_pack': exer_frag_pack,
-			'exer_gift_pool': exer_gift_pool,
-			'exer_hub': exer_hub,
-			'ques_sugar_pack': ques_sugar_pack,
-		}
+		# human_pack = ModelUtils.objectToDict(self.humanpack)
+		#
+		# exer_pack = ModelUtils.objectToDict(self.exerPack())
+		#
+		# exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack())
+		#
+		# exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool())
+		#
+		# exer_hub = ModelUtils.objectToDict(self.exerHub())
+		#
+		# ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack())
+		#
+		# return {
+		# 	'human_pack': human_pack,
+		# 	'exer_pack': exer_pack,
+		# 	'exer_frag_pack': exer_frag_pack,
+		# 	'exer_gift_pool': exer_gift_pool,
+		# 	'exer_hub': exer_hub,
+		# 	'ques_sugar_pack': ques_sugar_pack,
+		# }
 
 	def _slotContainerIndices(self):
+		from utils.data_manager import DataManager
 
-		exer_slot = ModelUtils.objectToDict(self.exerSlot())
+		res = {}
 
-		human_equip_slot = ModelUtils.objectToDict(self.humanEquipSlot())
+		for cla in self.cacheOneToOneModels():
+			if SlotContainer in cla.__mro__:
+				name = DataManager.hump2Underline(cla.__name__)
+				obj = self.getOneToOneModel(cla)
+				res[name] = ModelUtils.objectToDict(obj)
 
-		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
+		return res
 
-		return {
-			'exer_slot': exer_slot,
-			'human_equip_slot': human_equip_slot,
-			'battle_item_slot': battle_item_slot,
-		}
+		# exer_slot = ModelUtils.objectToDict(self.exerSlot())
+		#
+		# human_equip_slot = ModelUtils.objectToDict(self.humanEquipSlot())
+		#
+		# battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
+		#
+		# return {
+		# 	'exer_slot': exer_slot,
+		# 	'human_equip_slot': human_equip_slot,
+		# 	'battle_item_slot': battle_item_slot,
+		# }
 
 	def _packContainerItems(self):
+		from utils.data_manager import DataManager
 
-		human_pack = ModelUtils.objectToDict(self.humanPack(), type='items')
+		res = {}
 
-		exer_pack = ModelUtils.objectToDict(self.exerPack(), type='items')
+		for cla in self.cacheOneToOneModels():
+			if PackContainer in cla.__mro__:
+				name = DataManager.hump2Underline(cla.__name__)
+				obj = self.getOneToOneModel(cla)
+				res[name] = ModelUtils.objectToDict(obj, type='items')
 
-		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack(), type='items')
+		return res
 
-		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool(), type='items')
-
-		exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
-
-		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack(), type='items')
-
-		return {
-			'human_pack': human_pack,
-			'exer_pack': exer_pack,
-			'exer_frag_pack': exer_frag_pack,
-			'exer_gift_pool': exer_gift_pool,
-			'exer_hub': exer_hub,
-			'ques_sugar_pack': ques_sugar_pack,
-		}
+		# human_pack = ModelUtils.objectToDict(self.humanPack(), type='items')
+		#
+		# exer_pack = ModelUtils.objectToDict(self.exerPack(), type='items')
+		#
+		# exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack(), type='items')
+		#
+		# exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool(), type='items')
+		#
+		# exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
+		#
+		# ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack(), type='items')
+		#
+		# return {
+		# 	'human_pack': human_pack,
+		# 	'exer_pack': exer_pack,
+		# 	'exer_frag_pack': exer_frag_pack,
+		# 	'exer_gift_pool': exer_gift_pool,
+		# 	'exer_hub': exer_hub,
+		# 	'ques_sugar_pack': ques_sugar_pack,
+		# }
 
 	def _slotContainerItems(self):
+		from utils.data_manager import DataManager
 
-		exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
+		res = {}
 
-		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
+		for cla in self.cacheOneToOneModels():
+			if SlotContainer in cla.__mro__:
+				name = DataManager.hump2Underline(cla.__name__)
+				obj = self.getOneToOneModel(cla)
+				res[name] = ModelUtils.objectToDict(obj, type='items')
 
-		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+		return res
 
-		return {
-			'exer_slot': exerslot,
-			'human_equip_slot': humanequipslot,
-			'battle_item_slot': battle_item_slot,
-		}
+		# exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
+		#
+		# humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
+		#
+		# battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+		#
+		# return {
+		# 	'exer_slot': exerslot,
+		# 	'human_equip_slot': humanequipslot,
+		# 	'battle_item_slot': battle_item_slot,
+		# }
 
 	# 对战信息
 	def _battleInfo(self):
@@ -600,7 +661,7 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def convertToDict(self, type: str = None, online_player=None, battle_player=None) -> dict:
+	def convert(self, type: str = None, online_player=None, battle_player=None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -660,7 +721,7 @@ class Player(CacheableModel):
 			# base['battle_item_slot'] = battle_item_slot
 
 			# 运行时数据
-			battle_player.convertToDict(base)
+			battle_player.convert(base)
 
 			return base
 
@@ -824,7 +885,7 @@ class Player(CacheableModel):
 		self._clearCache()
 
 	def _setLoginInfo(self, login_info):
-		self._cache(self.LOGININFO_CACHE_KEY, login_info)
+		self._setCache(self.LOGININFO_CACHE_KEY, login_info)
 
 	def _getLoginInfo(self):
 		return self._getCache(self.LOGININFO_CACHE_KEY)
@@ -876,7 +937,7 @@ class Player(CacheableModel):
 		# for player_exer in player_exers:
 		# 	player_exer.save()
 
-		self._cache(ExerSlot, exer_slot)
+		self._setCache(ExerSlot, exer_slot)
 
 		self.status = PlayerStatus.ExermonsCreated.value
 		self.save()
@@ -1174,7 +1235,7 @@ class Player(CacheableModel):
 		Args:
 			ques_set (QuestionSetRecord): 题目集
 		"""
-		self._cache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
+		self._setCache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
 
 	def currentQuestionSet(self) -> 'QuestionRecord':
 		"""
@@ -1315,8 +1376,8 @@ class HumanItem(UsableItem):
 	def contItemClass(cls): return HumanPackItem
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		return res
 
@@ -1394,8 +1455,8 @@ class HumanEquip(EquipableItem):
 	def contItemClass(cls): return HumanPackEquip
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['e_type'] = self.e_type_id
 
@@ -1640,8 +1701,8 @@ class HumanEquipSlotItem(SlotContItem):
 	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['e_type'] = self.e_type_id
 

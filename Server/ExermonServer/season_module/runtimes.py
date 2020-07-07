@@ -41,7 +41,7 @@ class RankListData:
 		count = min(count, len(records))
 
 		for i in range(count):
-			data = records[i].convertToDict('rank', i + 1)
+			data = records[i].convert('rank', i + 1)
 			self.rank_list.append(data)
 
 		self.update_time = datetime.datetime.now()
@@ -60,7 +60,7 @@ class RankListData:
 		record = player.seasonRecord(season=self.season)
 
 		if record is None: return {}
-		return record.convertToDict('rank', 0)
+		return record.convert('rank', 0)
 
 	def isUpdateRequired(self):
 		"""
@@ -76,7 +76,7 @@ class RankListData:
 		# return now.minute in self.UPDATE_MINUTES and \
 		# 	now - self.update_time >= self.MIN_DELTA
 
-	def convertToDict(self, player: 'Player', count=MAX_RANK):
+	def convert(self, player: 'Player', count=MAX_RANK):
 		"""
 		转化为字典
 		Args:

@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.utils.deconstruct import deconstructible
 import os, random
 
-#
+
 # # ===================================================
 # #  缓存机制模型
 # # ===================================================
@@ -439,7 +439,7 @@ class Common:
 
 		if objects is None: return []
 		for obj in objects:
-			result.append(obj.convertToDict(**kwargs))
+			result.append(obj.convert(**kwargs))
 
 		return result
 
@@ -448,7 +448,7 @@ class Common:
 	def objectToDict(cls, object, **kwargs):
 
 		if object is None: return {}
-		return object.convertToDict(**kwargs)
+		return object.convert(**kwargs)
 
 	@classmethod
 	def sum(cls, list_: list, map: callable = None, **kwargs) -> object:

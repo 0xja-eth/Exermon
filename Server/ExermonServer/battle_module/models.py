@@ -7,7 +7,8 @@ from exermon_module.models import ExerSkill, HitType, TargetType
 from player_module.models import Player, HumanPackItem, HumanPack
 from record_module.models import QuestionSetRecord, PlayerQuestion, RecordSource
 from utils.calc_utils import ExerciseSingleRewardCalc, BattleResultRewardCalc
-from utils.model_utils import CacheableModel, Common as ModelUtils
+from utils.model_utils import Common as ModelUtils
+from utils.data_manager import CacheableModel
 from utils.exception import ErrorType, GameException
 from enum import Enum
 import random, datetime
@@ -37,7 +38,7 @@ class BattleResultJudge(GroupConfigure):
 	# 失败增加星星（负数为减少）
 	lose = models.SmallIntegerField(default=0, verbose_name="失败增星数")
 
-	def convertToDict(self, type: str = None, **kwargs) -> dict:
+	def convert(self, type: str = None, **kwargs) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -46,7 +47,7 @@ class BattleResultJudge(GroupConfigure):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['score'] = self.score
 		res['win'] = self.win
@@ -286,7 +287,7 @@ class BattleRecord(CacheableModel):
 
 		return rec
 
-	def convertToDict(self, type: str = None, **kwargs) -> dict:
+	def convert(self, type: str = None, **kwargs) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -348,8 +349,8 @@ class BattleRecord(CacheableModel):
 		"""
 		初始化所有缓存数据
 		"""
-		self._cache(self.BATTLE_PLAYERS_CACHE_KEY, [])
-		self._cache(self.BATTLE_ROUNDS_CACHE_KEY, [])
+		self._setCache(self.BATTLE_PLAYERS_CACHE_KEY, [])
+		self._setCache(self.BATTLE_ROUNDS_CACHE_KEY, [])
 
 	# region 玩家操作
 
@@ -570,7 +571,7 @@ class BattleRound(models.Model):
 	def __str__(self):
 		return str(self.record)+" 回合 "+str(self.order)
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -762,7 +763,7 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		return None
 
-	def _playerQuestions(self) -> QuerySet:
+	def playerQuestions(self) -> QuerySet:
 		"""
 		获取所有题目关系（数据库）
 		Returns:
@@ -796,7 +797,7 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		self.record = record
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -804,7 +805,7 @@ class BattlePlayer(QuestionSetRecord):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['pid'] = self.player_id
 		res['score_incr'] = self.score_incr
@@ -842,7 +843,7 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		if self.finished: return None
 
-		cache = self._getQuestionsCache()
+		cache = self.getPlayerQuestionsList()
 		if len(cache) > 0: return cache[-1]
 		return None
 
@@ -1029,7 +1030,7 @@ class BattleRoundResult(PlayerQuestion):
 		"""
 		return RecordSource.Battle
 
-	def convertToDict(self, type: str = None,
+	def convert(self, type: str = None,
 					  runtime_battler: 'RuntimeBattlePlayer' = None) -> dict:
 		"""
 		转化为字典
@@ -1039,7 +1040,7 @@ class BattleRoundResult(PlayerQuestion):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['order'] = self.round.order
 		res['attack'] = self.attack
@@ -1051,7 +1052,7 @@ class BattleRoundResult(PlayerQuestion):
 		res['recovery'] = self.recovery
 
 		if runtime_battler is not None:
-			runtime_battler.convertToDict(res)
+			runtime_battler.convert(res)
 
 		return res
 

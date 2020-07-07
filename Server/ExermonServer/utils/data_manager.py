@@ -173,16 +173,16 @@ class BaseData:
 
 	# region 数据读取/转化
 
-	def load(self, data: dict):
+	def load(self, data: dict, *args, **kwargs):
 		"""
 		从JSON数据中读取
 		Args:
 			data (dict): 原始数据
 		"""
-		self.__loadAutoAttrs(data)
-		self._loadCustomAttrs(data)
+		self.__loadAutoAttrs(data, *args, **kwargs)
+		self._loadCustomAttrs(data, *args, **kwargs)
 
-	def __loadAutoAttrs(self, data):
+	def __loadAutoAttrs(self, data, *args, **kwargs):
 		"""
 		读取自动属性
 		"""
@@ -196,25 +196,25 @@ class BaseData:
 			if hasattr(self, key) and key in data:
 				setattr(self, key, loader(data[key]))
 
-	def _loadCustomAttrs(self, data):
+	def _loadCustomAttrs(self, data, *args, **kwargs):
 		"""
 		读取自定义属性
 		"""
 		pass
 
-	def convert(self) -> dict:
+	def convert(self, *args, **kwargs) -> dict:
 		"""
 		转化为JSON数据
 		Returns:
 			返回转化后的JSON数据
 		"""
 		data = {}
-		self.__convertAutoAttrs(data)
-		self._convertCustomAttrs(data)
+		self.__convertAutoAttrs(data, *args, **kwargs)
+		self._convertCustomAttrs(data, *args, **kwargs)
 
 		return data
 
-	def __convertAutoAttrs(self, data):
+	def __convertAutoAttrs(self, data, *args, **kwargs):
 		"""
 		转化自动属性
 		"""
@@ -229,7 +229,7 @@ class BaseData:
 			if hasattr(self, key) and key in data:
 				setattr(self, key, converter(data[key]))
 
-	def _convertCustomAttrs(self, data):
+	def _convertCustomAttrs(self, data, *args, **kwargs):
 		"""
 		转化自动属性
 		"""
@@ -263,7 +263,7 @@ class CoreModel:
 	def _setupKwargs(cls): return {}
 
 	@classmethod
-	def get(cls, cond: callable = None, **kwargs) -> 'BaseData':
+	def get(cls, cond: callable = None, **kwargs):
 		"""
 		根据条件获取单个数据
 		Args:
@@ -348,17 +348,23 @@ class CacheableModel(models.Model):
 	class Meta:
 		abstract = True
 
-	# 需要缓存的模型类列表（必须为外键）
-	CACHE_ONE_TO_ONE_MODELS = []
-	CACHE_FOREIGN_KEY_MODELS = []
-
 	cache_pool: 'CachePool' = None
+
+	cache_values = None
+
+	# 需要缓存的模型类列表（必须为外键）
+	@classmethod
+	def cacheOneToOneModels(cls): return []
+
+	@classmethod
+	def cacheForeignKeyModels(cls): return []
 
 	def __init__(self, *args, **kwargs):
 		self.saved = True
 		self.cache_lock = False
 		self.delete_save = False
 		self.cache_pool = CachePool()
+		self.cache_values = {}
 
 		super().__init__(*args, **kwargs)
 
@@ -369,16 +375,41 @@ class CacheableModel(models.Model):
 		if key != 'saved': self.saved = False
 		super().__setattr__(key, value)
 
+	# region 值缓存
+
+	# 进行缓存
+	def _setCache(self, key, value):
+		self.cache_values[key] = value
+
+	# 获取缓存
+	def _getCache(self, key):
+		if key in self.cache_values:
+			return self.cache_values[key]
+		return None
+
+	# 删除缓存
+	def _deleteCache(self, key):
+		if key in self.cache_values:
+			del self.cache_values[key]
+
+	# 获取或者设置（如果不存在）缓存
+	def _getOrSetCache(self, key, func):
+		if key not in self.cache_values:
+			self._setCache(key, func())
+		return self.cache_values[key]
+
+	# endregion
+
 	# region 关联缓存
 
 	def __getattribute__(self, name):
 
 		if not self.cache_lock:
-			for cla in self.CACHE_ONE_TO_ONE_MODELS:
+			for cla in self.cacheOneToOneModels():
 				if name == cla.__name__.lower():
 					return self.getOneToOneModel(cla)
 
-			for cla in self.CACHE_FOREIGN_KEY_MODELS:
+			for cla in self.cacheForeignKeyModels():
 				if name == cla.__name__.lower() + '_set':
 					return self.getForeignKeyModel(cla)
 
@@ -433,9 +464,12 @@ class CacheableModel(models.Model):
 
 	def save(self, *args, **kwargs):
 
-		super().save(*args, **kwargs)
-		self.cache_pool.saveAll()
+		if not self.saved:
+			super().save(*args, **kwargs)
+			print(str(self) + " saved!")
+			self.saved = True
 
+		self.cache_pool.saveAll()
 
 	# endregion
 
@@ -450,22 +484,52 @@ class CacheItem:
 	"""
 	QuerySet 缓存项
 	"""
-	def __init__(self, obj_type, objects=None, **kwargs):
+
+	# QuerySet 缓存
+	query_set = None
+
+	# 实际数据缓存
+	data = None
+
+	def __init__(self, obj_type=None, objects=None, **kwargs):
 
 		self.obj_type = obj_type
-
-		if isinstance(objects, QuerySet):
-			self.query_set = objects
+		self.kwargs = kwargs
+		self.objects = objects
+		
+		self._load()
+			
+	def _load(self):
+		if isinstance(self.objects, QuerySet):
+			self.query_set = self.objects
 			self.data = None
 
-		elif isinstance(objects, list):
+		elif isinstance(self.objects, list):
 			self.query_set = None
-			self.data = objects
+			self.data = self.objects
+
+		elif self.obj_type is not None:
+			self.query_set: QuerySet = \
+				self.obj_type.objects.filter(**self.kwargs)
+			self.data = None  # 缓存列表
 
 		else:
-			self.query_set: QuerySet = \
-				obj_type.objects.filter(**kwargs)
-			self.data = None  # 缓存列表
+			self.query_set = self.data = None
+
+	def reload(self, save=True):
+		"""
+		重新从数据库中载入
+		"""
+		if save: self.save()
+		self._load()
+
+	def isEmpty(self):
+		"""
+		缓存是否为空
+		Returns:
+			返回当前缓存是否为空
+		"""
+		return self.query_set is None and self.data is None
 
 	def append(self, obj: models.Model):
 		"""
@@ -474,7 +538,8 @@ class CacheItem:
 			obj (models.Model): 数据
 		"""
 		if not self.isCached():
-			self.data = list(self.query_set)
+			self.data = list(self.query_set) \
+				if self.query_set is not None else []
 		
 		self.data.append(obj)
 
@@ -484,10 +549,13 @@ class CacheItem:
 		Args:
 			obj (models.Model): 数据
 		"""
+		if self.isEmpty(): return
+
 		if not self.isCached():
 			self.data = list(self.query_set)
 
-		self.data.remove(obj)
+		if obj in self.data:
+			self.data.remove(obj)
 
 	def query(self, cond: callable = None, **kwargs) -> QuerySet or list:
 		"""
@@ -498,6 +566,8 @@ class CacheItem:
 		Returns:
 			返回按条件查询到的数据
 		"""
+		if self.isEmpty(): return []
+
 		if cond is not None:
 			return self._queryByCond(cond)
 
@@ -535,6 +605,8 @@ class CacheItem:
 		Returns:
 			返回按条件查询到的数据（第一条）
 		"""
+		if self.isEmpty(): return None
+
 		if cond is not None:
 			return self._getByCond(cond)
 
@@ -584,6 +656,8 @@ class CacheItem:
 		Returns:
 			返回数据数量
 		"""
+		if self.isEmpty(): return 0
+
 		if cond is not None:
 			return len(self._queryByCond(cond))
 
@@ -597,6 +671,8 @@ class CacheItem:
 		Returns:
 			返回第一个数据
 		"""
+		if self.isEmpty(): return None
+
 		if self.isCached():
 			if len(self.data) > 0:
 				return self.data[0]
@@ -627,8 +703,14 @@ class CacheItem:
 		"""
 		保存缓存数据到数据库
 		"""
-		for obj in self.objs():
-			obj.save()
+		for obj in self.objs(): obj.save()
+
+	def clear(self, save=True):
+		"""
+		清空缓存数据
+		"""
+		if save: self.save()
+		self.query_set = self.data = None
 
 
 class CachePool:
@@ -641,7 +723,7 @@ class CachePool:
 
 	def __init__(self): self.objects = {}
 
-	def setObjects(self, cla, key=None, save=True, objects=None, **kwargs):
+	def setObjects(self, cla=None, key=None, save=True, objects=None, **kwargs):
 		"""
 		设置 QuerySet 缓存
 		Args:
@@ -652,10 +734,31 @@ class CachePool:
 			**kwargs (**dict): 查询参数
 		"""
 		if key is None: key = cla
+		if key is None: return
 		
-		if self.contains(key): self.clear(save)
+		if self.contains(key): self.delete(save)
 
 		self.objects[key] = CacheItem(cla, objects, **kwargs)
+
+	def appendObject(self, key, obj: object):
+		"""
+		加入物体
+		Args:
+			key (object): 键
+			obj (object): 对象
+		"""
+		if self.contains(key):
+			self.getItem(key).append(obj)
+
+	def removeObject(self, key, obj: object):
+		"""
+		移出物体
+		Args:
+			key (object): 键
+			obj (object): 对象
+		"""
+		if self.contains(key):
+			self.getItem(key).remove(obj)
 
 	def queryObjects(self, key, cond: callable = None, **kwargs) -> QuerySet or list:
 		"""
@@ -786,12 +889,31 @@ class CachePool:
 			save (bool): 是否保存
 		"""
 		if self.contains(key):
-			if save: self.objects[key].save()
-			del self.objects[key]
+			self.objects[key].clear(save)
 
 	def clearAll(self, save=True):
 		"""
 		清除全部缓存
+		Args:
+			save (bool): 是否保存
+		"""
+		for key in self.objects:
+			self.objects[key].clear(save)
+
+	def delete(self, key, save=True):
+		"""
+		删除缓存
+		Args:
+			key (object): 键
+			save (bool): 是否保存
+		"""
+		if self.contains(key):
+			if save: self.objects[key].save()
+			del self.objects[key]
+
+	def deleteAll(self, save=True):
+		"""
+		删除全部缓存
 		Args:
 			save (bool): 是否保存
 		"""
@@ -1098,14 +1220,14 @@ class DataManager:
 		cls.CommonCachePool.save(cla)
 
 	@classmethod
-	def clear(cls, cla, save=True):
+	def delete(cls, cla, save=True):
 		"""
 		清除缓存
 		Args:
 			cla (type): 类型
 			save (bool): 是否保存
 		"""
-		cls.CommonCachePool.clear(cla, save)
+		cls.CommonCachePool.delete(cla, save)
 
 	@classmethod
 	def getItem(cls, cla) -> CacheItem:
@@ -1154,7 +1276,7 @@ class DataManager:
 		for char in val:
 			if i > 0 and char.isupper():
 				res += spliter + char.lower()
-			else: res += char
+			else: res += char.lower()
 			i += 1
 
 		return res

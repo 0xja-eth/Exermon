@@ -44,7 +44,7 @@ class QuestionDetail:
 		else:
 			detail = cls.RecordDict[question_id] = QuestionDetail(question_id)
 
-		return detail.convertToDict(type, player)
+		return detail.convert(type, player)
 
 	def __init__(self, question_id):
 		self.question_id = question_id
@@ -73,7 +73,7 @@ class QuestionDetail:
 
 		self.update_time = datetime.datetime.now()
 
-		# dict[self.ques_id] = self.convertToDict(self.ques_id, type="overall")
+		# dict[self.ques_id] = self.convert(self.ques_id, type="overall")
 
 	def isUpdateRequired(self):
 		"""
@@ -87,7 +87,7 @@ class QuestionDetail:
 		# 当更新时间间隔大于指定值，表示需要更新
 		return delta >= self.MIN_DELTA
 
-	def convertToDict(self, type=None, player=None):
+	def convert(self, type=None, player=None):
 		"""
 		转化为字典
 		Args:

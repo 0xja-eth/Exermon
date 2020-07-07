@@ -73,7 +73,7 @@ class SeasonRecord(models.Model):
 
 		return new_rec
 
-	def convertToDict(self, type=None, order=None):
+	def convert(self, type=None, order=None):
 
 		if type == "rank":
 			return {
@@ -255,7 +255,7 @@ class SuspensionRecord(models.Model):
 
 		return record
 
-	def convertToDict(self):
+	def convert(self):
 		start_time = ModelUtils.timeToStr(self.start_time)
 		end_time = ModelUtils.timeToStr(self.end_time)
 
@@ -295,14 +295,14 @@ class CompSeason(GroupConfigure):
 
 		rank_list = SeasonManager.getRankList(season=self)
 
-		return rank_list.convertToDict(player, count)
+		return rank_list.convert(player, count)
 
-	def convertToDict(self, type=None, player=None, count=None):
+	def convert(self, type=None, player=None, count=None):
 
 		if type == "ranks":
 			return self._convertRanksData(player, count)
 
-		res = super().convertToDict()
+		res = super().convert()
 
 		start_time = ModelUtils.timeToStr(self.start_time)
 		end_time = ModelUtils.timeToStr(self.end_time)
@@ -367,8 +367,8 @@ class CompRank(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['color'] = self.color
 		res['sub_rank_num'] = self.sub_rank_num

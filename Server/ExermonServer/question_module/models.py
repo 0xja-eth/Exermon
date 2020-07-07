@@ -34,7 +34,7 @@ class BaseQuesChoice(models.Model):
 	#
 	# adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'order': self.order,
 			'text': self.text,
@@ -100,7 +100,7 @@ class BaseQuestion(models.Model):
 
 	adminCorrectAnswer.short_description = "正确选项"
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		if type == 'info':
 			return {
@@ -202,7 +202,7 @@ class QuesPicture(models.Model):
 
 		return data.decode()
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'number': self.number,
 			'desc_pic': self.desc_pic,
@@ -266,9 +266,9 @@ class Question(BaseQuestion):
 	# 删除标记
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		if type == 'info':
 			res['star_id'] = self.star_id
@@ -389,7 +389,7 @@ class GroupQuestion(models.Model):
 	def __str__(self):
 		return "%s. %s" % (self.id, self.article)
 
-	def convertToDict(self):
+	def convert(self):
 		sub_questions = ModelUtils.objectsToDict(self.subQuestions())
 
 		return {
@@ -490,7 +490,7 @@ class QuesReport(models.Model):
 
 		return report
 
-	def convertToDict(self):
+	def convert(self):
 
 		create_time = ModelUtils.timeToStr(self.create_time)
 		result_time = ModelUtils.timeToStr(self.result_time)
@@ -586,7 +586,7 @@ class QuesSugar(BaseItem):
 	adminParams.short_description = "属性基础值"
 
 	# 转化为 dict
-	def convertToDict(self):
+	def convert(self):
 		buy_price = ModelUtils.objectToDict(self.buyPrice())
 
 		if type == "shop":
@@ -596,7 +596,7 @@ class QuesSugar(BaseItem):
 				'price': buy_price
 			}
 
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['question_id'] = self.question
 		res['buy_price'] = buy_price

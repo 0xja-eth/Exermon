@@ -117,12 +117,12 @@ class Common:
 			else:
 				raise GameException(error)
 
-		# 如果是获取 字典 数据（通过 convertToDict）：
+		# 如果是获取 字典 数据（通过 convert）：
 		if return_type == 'dict':
 			object = cls.getObject(obj_type, error, objects,
 								   'object', include_deleted, **kwargs)
 
-			return object.convertToDict()
+			return object.convert()
 
 		# 实际上执行查询的部分：
 		try:

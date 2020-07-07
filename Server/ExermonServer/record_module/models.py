@@ -3,10 +3,11 @@ from django.db.models.query import QuerySet
 
 from item_module.models import BaseItem, BaseContainer
 # from player_module.models import Player
-from utils.model_utils import CacheableModel, Common as ModelUtils
+from utils.model_utils import Common as ModelUtils
 from utils.calc_utils import QuestionGenerateType, QuestionGenerateConfigure, \
 	QuestionSetResultRewardCalc, QuestionSetSingleRewardCalc, \
 	ExerciseSingleRewardCalc
+from utils.data_manager import CacheableModel
 from utils.exception import ErrorType, GameException
 from enum import Enum
 import jsonfield, datetime
@@ -97,7 +98,7 @@ class QuestionRecord(models.Model):
 		return '%s (%s)' % (self.question.number(), self.player)
 
 	# 转化为字典
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		last_date = ModelUtils.timeToStr(self.last_date)
 		first_date = ModelUtils.timeToStr(self.first_date)
@@ -233,7 +234,7 @@ class PlayerQuestion(CacheableModel):
 
 	adminAnswer.short_description = "正确答案"
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -369,7 +370,7 @@ class PlayerQuestion(CacheableModel):
 		"""
 		开始答题
 		"""
-		self._cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
+		self._setCache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
 	def answer(self, selection: list, timespan: int, record: 'QuestionSetRecord'):
 		"""
@@ -523,7 +524,7 @@ class QuestionSetReward(models.Model):
 		return reward
 
 	# 转化为字典
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		转化为字典
 		Returns:
@@ -608,8 +609,7 @@ class QuestionSetRecord(CacheableModel):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self._cache(self.REWARD_CACHE_KEY, [])
-		self._cache(self.REMOVED_CACHE_KEY, [])
+		self.cache_pool.setObjects(key=self.REMOVED_CACHE_KEY)
 
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
@@ -685,6 +685,11 @@ class QuestionSetRecord(CacheableModel):
 
 		return record
 
+	# 需要缓存的模型类列表（必须为外键）
+	@classmethod
+	def cacheForeignKeyModels(cls):
+		return [cls.playerQuesClass()]
+
 	# 奖励计算类
 	@classmethod
 	def rewardCalculator(cls) -> 'QuestionSetResultRewardCalc':
@@ -729,7 +734,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		return '题目集记录'
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -739,7 +744,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		create_time = ModelUtils.timeToStr(self.create_time)
 		player_questions = ModelUtils.objectsToDict(
-			self.playerQuestions(), type=type)
+			self.getPlayerQuestionsQuerySet(), type=type)
 
 		base = {
 			'id': self.id,
@@ -759,25 +764,84 @@ class QuestionSetRecord(CacheableModel):
 
 		return base
 
-	def playerQuestions(self) -> QuerySet:
+	def exactlyPlayer(self):  # -> Player:
 		"""
-		获取所有题目关系（缓存）
-		执行该函数后，对应缓存项将改变为 QuerySet 类型，故需要在题目集结束后调用
+		TODO: 重构
+		获取实际玩家在线信息
+		Returns:
+			实际玩家在线信息（OnlinePlayer）
+		"""
+		from player_module.views import Common
+
+		online_player = Common.getOnlinePlayer(self.player_id)
+
+		if online_player is None:
+			player = self.player
+			# 如果获取不到实际的玩家，该对象释放时需要自动保存
+			player.delete_save = True
+
+		else:
+			player = online_player.player
+
+		return player
+
+	# region 题目操作
+
+	def getPlayerQuestionsQuerySet(self) -> QuerySet:
+		"""
+		获取所有题目关系（QuerySet）
+		执行该函数后，对应缓存项将改变为 QuerySet 类型，
+		故需要在题目集结束后调用
 		Returns:
 			题目关系 QuerySet 对象
 		"""
-		cache = self._getCache(self.QUES_CACHE_KEY)
+		item = self.cache_pool.getItem(self.playerQuesClass())
 
-		# 如果已有的缓存为 list 保存并删除之再重新读取
-		if isinstance(cache, list):
-			self._deleteCache(self.QUES_CACHE_KEY)
-			self._saveCache(self.REMOVED_CACHE_KEY)
-			self._cache(self.REMOVED_CACHE_KEY, [])
-		
-		return self._getOrSetCache(self.QUES_CACHE_KEY,
-								   lambda: self._playerQuestions())
+		if item.isCached():
+			self.cache_pool.clear(self.REMOVED_CACHE_KEY)
+			item.reload()
 
-	def _playerQuestions(self) -> QuerySet:
+		# # 如果已有的缓存为 list 保存并删除之再重新读取
+		# if isinstance(cache, list):
+		# 	# 清空并保存所有缓存
+		# 	self.cache_pool.delete(self.playerQuesClass())
+		# 	self.cache_pool.clear(self.REMOVED_CACHE_KEY)
+		#
+		# 	cache = self._playerQuestions()
+
+		return item.query_set
+
+		# 	self._deleteCache(self.QUES_CACHE_KEY)
+		# 	self._saveCache(self.REMOVED_CACHE_KEY)
+		# 	self._setCache(self.REMOVED_CACHE_KEY, [])
+		#
+		# return self._getOrSetCache(self.QUES_CACHE_KEY,
+		# 						   lambda: self._playerQuestions())
+
+	def getPlayerQuestionsList(self) -> list:
+		"""
+		获取所有题目关系（list）
+		Returns:
+			题目关系数组
+		"""
+		return list(self.playerQuestions())
+
+		# cache = self._getCache(self.QUES_CACHE_KEY)
+		#
+		# if cache is None: return []
+		#
+		# # 如果已有的缓存为 QuerySet 保存并删除并重新缓存
+		# if isinstance(cache, QuerySet):
+		# 	cache_list = list(cache)
+		#
+		# 	self._deleteCache(self.QUES_CACHE_KEY)
+		# 	self._setCache(self.QUES_CACHE_KEY, cache_list)
+		#
+		# 	return cache_list
+		#
+		# return cache
+
+	def playerQuestions(self) -> QuerySet or list:
 		"""
 		获取所有题目关系（数据库）
 		Returns:
@@ -793,87 +857,64 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			对应ID的题目关系对象
 		"""
-		res = self.playerQuestions().filter(question_id=question_id)
-		if res.exists(): return res.first()
-		return None
+		return self.cache_pool.getObject(
+			self.playerQuesClass(), question_id=question_id)
 
-	def cachedPlayerQuestion(self, question_id: int) -> PlayerQuestion:
-		"""
-		获取单个题目关系（仅查询缓存）
-		Args:
-			question_id (int): 题目ID
-		Returns:
-			对应ID的题目关系对象
-		"""
-		cache = self._getQuestionsCache()
-		for player_ques in cache:
-			if player_ques.question_id == question_id:
-				return player_ques
+		# res = self.getPlayerQuestionsQuerySet().filter(question_id=question_id)
+		# if res.exists(): return res.first()
+		# return None
 
-		return None
+	# def cachedPlayerQuestion(self, question_id: int) -> PlayerQuestion:
+	# 	"""
+	# 	获取单个题目关系（仅查询缓存）
+	# 	Args:
+	# 		question_id (int): 题目ID
+	# 	Returns:
+	# 		对应ID的题目关系对象
+	# 	"""
+	# 	return self.cache_pool.getObject(
+	# 		self.playerQuesClass(), question_id=question_id)
+	#
+	# 	# cache = self._getQuestionsCache()
+	# 	# for player_ques in cache:
+	# 	# 	if player_ques.question_id == question_id:
+	# 	# 		return player_ques
+	# 	#
+	# 	# return None
 
-	def _initQuestionCache(self):
-		"""
-		初始化题目缓存
-		"""
-		self._cache(self.QUES_CACHE_KEY, [])
+	# def _initQuestionCache(self):
+	# 	"""
+	# 	初始化题目缓存
+	# 	"""
+	# 	self._setCache(self.QUES_CACHE_KEY, [])
 
-	def _getQuestionsCache(self) -> list:
-		"""
-		获取题目缓存
-		Returns:
-			题目关系数组
-		"""
-		cache = self._getCache(self.QUES_CACHE_KEY)
-
-		if cache is None: return []
-
-		# 如果已有的缓存为 QuerySet 保存并删除并重新缓存
-		if isinstance(cache, QuerySet):
-			cache_list = list(cache)
-
-			self._deleteCache(self.QUES_CACHE_KEY)
-			self._cache(self.QUES_CACHE_KEY, cache_list)
-			
-			return cache_list
-
-		return cache
-
-	def _addQuestionToCache(self, player_ques: PlayerQuestion):
+	def _addPlayerQuestion(self, player_ques: PlayerQuestion):
 		"""
 		往缓存中添加题目
 		Args:
 			player_ques (PlayerQuestion): 题目关系
 		"""
-		self._getQuestionsCache().append(player_ques)
+		self.cache_pool.appendObject(self.playerQuesClass(), player_ques)
 
-	def _removeQuestionFromCache(self, player_ques: PlayerQuestion):
+	def _removePlayerQuestion(self, player_ques: PlayerQuestion):
 		"""
 		往缓存中移除题目
 		Args:
 			player_ques (PlayerQuestion): 题目关系
 		"""
-		cache = self._getQuestionsCache()
-		if player_ques in cache:
-			cache.remove(player_ques)
-			player_ques.clearQuestionSet()
-			self._getCache(self.REMOVED_CACHE_KEY).append(player_ques)
+		# cache = self._getQuestionsCache()
 
-	def exactlyPlayer(self): # -> Player:
-		"""
-		获取实际玩家在线信息
-		Returns:
-			实际玩家在线信息（OnlinePlayer）
-		"""
-		from player_module.views import Common
+		self.cache_pool.removeObject(self.playerQuesClass(), player_ques)
+		self.cache_pool.appendObject(
+			self.REMOVED_CACHE_KEY, player_ques)
 
-		player = self.player
-		# 如果获取不到实际的玩家，该对象释放时需要自动保存
-		player.delete_save = True
+		player_ques.clearQuestionSet()
 
-		online_player = Common.getOnlinePlayer(player.id)
+		# if player_ques in cache:
+		# 	cache.remove(player_ques)
+		# 	player_ques.clearQuestionSet()
 
-		return online_player.player or player
+	# endregion
 
 	# region 开始题目集
 
@@ -883,7 +924,7 @@ class QuestionSetRecord(CacheableModel):
 		Args:
 			**kwargs (**dict): 子类重载参数
 		"""
-		self._initQuestionCache()
+		# self._initQuestionCache()
 
 		# 设置当前的题目集
 		self.exactlyPlayer().setCurrentQuestionSet(self)
@@ -944,7 +985,7 @@ class QuestionSetRecord(CacheableModel):
 
 		if calc is None: return None
 
-		return calc.calc(self, self.playerQuestions(), **kwargs)
+		return calc.calc(self, self.getPlayerQuestionsQuerySet(), **kwargs)
 
 	def _applyResult(self, calc: QuestionSetResultRewardCalc):
 		"""
@@ -1013,7 +1054,7 @@ class QuestionSetRecord(CacheableModel):
 
 		player_ques = cla.create(self, question_id, **kwargs)
 
-		self._addQuestionToCache(player_ques)
+		self._addPlayerQuestion(player_ques)
 
 		return player_ques
 
@@ -1086,7 +1127,7 @@ class QuestionSetRecord(CacheableModel):
 		res = []
 
 		if player_queses is None:
-			player_queses = self.playerQuestions()
+			player_queses = self.getPlayerQuestionsQuerySet()
 
 		for data in player_queses:
 			res.append(func(data))
@@ -1120,7 +1161,7 @@ class QuestionSetRecord(CacheableModel):
 		res = 0
 
 		if player_queses is None:
-			player_queses = self.playerQuestions()
+			player_queses = self.getPlayerQuestionsQuerySet()
 
 		for data in player_queses:
 			res += int(func(data))
@@ -1339,17 +1380,17 @@ class ExerciseRecord(QuestionSetRecord):
 									   self.subject.name)
 
 	# 获取所有题目关系
-	def _playerQuestions(self) -> 'QuerySet':
+	def playerQuestions(self) -> 'QuerySet':
 		"""
 		获取所有题目关系（所有题目）
 		Returns:
 			返回通过 _set.all() 获得的 QuerySet 对象
 		"""
-		return self.exercisequestion_set.all()
+		return self.exercisequestion_set # .all()
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['season_id'] = self.season_id
 		res['subject_id'] = self.subject_id
@@ -1382,11 +1423,11 @@ class ExerciseRecord(QuestionSetRecord):
 		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
 		"""
 
-		player_queses = self._getQuestionsCache().copy()
+		player_queses = self.getPlayerQuestionsList().copy()
 
 		for player_ques in player_queses:
 			if not player_ques.answered:
-				self._removeQuestionFromCache(player_ques)
+				self._removePlayerQuestion(player_ques)
 
 	# 终止答题
 	def terminate(self, **kwargs):

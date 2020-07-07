@@ -194,7 +194,7 @@ class Service:
 		GeneralItemEffectProcessor.process(cont_item, player, count,
 										   target_item, target_slot_item)
 
-		return {'player': player.convertToDict(type="status")}
+		return {'player': player.convert(type="status")}
 
 	# 背包类容器丢弃
 	@classmethod
@@ -236,7 +236,7 @@ class Service:
 		player.gainMoney(gold=item.sell_price * count)
 
 		res = cls.convertContainers(container)
-		res['money'] = player.playerMoney().convertToDict()
+		res['money'] = player.playerMoney().convert()
 
 		return res
 
@@ -263,7 +263,7 @@ class Service:
 		player.processBuy(buy_price * count, buy_type)
 
 		res = cls.convertContainers(container)
-		res['money'] = player.playerMoney().convertToDict()
+		res['money'] = player.playerMoney().convert()
 
 		return res
 
@@ -280,7 +280,7 @@ class Service:
 		items = ViewUtils.getObjects(cla)
 		shop_list = ModelUtils.filter(
 			items, lambda i: i.isBoughtable(),
-			lambda i: i.convertToDict(type="shop"))
+			lambda i: i.convert(type="shop"))
 
 		return {'items': shop_list}
 
@@ -321,13 +321,13 @@ class Service:
 		Returns:
 			返回返回到前端的容器项数据
 		"""
-		res = {'container': container.convertToDict(type=type)}
+		res = {'container': container.convert(type=type)}
 
 		if target is not None:
-			res['target'] = target.convertToDict(type=type)
+			res['target'] = target.convert(type=type)
 
 		if slot is not None:
-			res['slot'] = slot.convertToDict(type=type)
+			res['slot'] = slot.convert(type=type)
 
 		return res
 

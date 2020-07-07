@@ -4,6 +4,7 @@ from django.db.utils import ProgrammingError
 from utils.model_utils import Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import GameException, ErrorType
+from utils.data_manager import CoreModel
 from enum import Enum
 import jsonfield, traceback
 
@@ -80,7 +81,7 @@ class GameVersion(models.Model):
 		self.is_used = True
 		self.save()
 
-	def convertToDict(self):
+	def convert(self):
 
 		update_time = ModelUtils.timeToStr(self.update_time)
 
@@ -246,7 +247,7 @@ class ParamValue(models.Model):
 	def isPercent(self):
 		return self.param.isPercent()
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'param_id': self.param_id,
 			'value': self.getValue(),
@@ -315,7 +316,7 @@ class ParamValueRange(models.Model):
 	def getValue(self):
 		return self.min_value/self.scale(), self.max_value/self.scale()
 
-	def convertToDict(self):
+	def convert(self):
 		values = self.getValue()
 		return {
 			'param_id': self.param_id,
@@ -341,19 +342,19 @@ class ParamRateRange(ParamValueRange):
 # ===================================================
 # 集合型配置
 # ===================================================
-class GroupConfigure(models.Model):
+class GroupConfigure(models.Model, CoreModel):
 
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "集合型配置"
 
-	NOT_EXIST_ERROR = ErrorType.UnknownError
-
-	# 全局变量，GroupConfigure 所有实例
-	Objects = None
-
-	# 全局变量，GroupConfigure 数
-	Count = None
+	# NOT_EXIST_ERROR = ErrorType.UnknownError
+	#
+	# # 全局变量，GroupConfigure 所有实例
+	# Objects = None
+	#
+	# # 全局变量，GroupConfigure 数
+	# Count = None
 
 	# 所属配置
 	configure = models.ForeignKey('game_module.GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
@@ -367,7 +368,7 @@ class GroupConfigure(models.Model):
 	def __str__(self):
 		return self.name
 
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		将数据转化为字典
 		Returns:
@@ -379,84 +380,91 @@ class GroupConfigure(models.Model):
 			'description': self.description
 		}
 
+	# 读取参数
 	@classmethod
-	def load(cls):
-		"""
-		读取数据
-		"""
+	def _setupKwargs(cls):
 		configure: GameConfigure = GameConfigure.get()
 
-		if configure is None:
-			raise GameException(ErrorType.NoCurConfigure)
+		return {"configure": configure}
 
-		cls.Objects = ViewUtils.getObjects(cls, configure=configure)
-		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, **kwargs) -> 'GroupConfigure':
-		"""
-		根据条件获取单个数据
-		Args:
-			**kwargs (**dict): 查询条件
-		Returns:
-			按照条件返回指定数据（若有多个返回第一个）
-		Raises:
-			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
-		Examples:
-			获取 id 为 3 的科目：
-			subject = Subject.get(id=3)
-			获取 属性缩写 为 mhp 的属性：
-			param = BaseParam.get(attr='mhp')
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
-								   objects=cls.Objects, **kwargs)
-
-	@classmethod
-	def ensure(cls, **kwargs):
-		"""
-		确保指定条件的数据存在
-		Args:
-			**kwargs (**dict): 查询条件
-		Raises:
-			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
-		Examples:
-			确保 id 为 3 且名字为 英语 的科目存在：
-			Subject.ensure(id=3, name="英语")
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.ensureObjectExist(cls, cls.NOT_EXIST_ERROR,
-										   objects=cls.Objects, **kwargs)
-
-	@classmethod
-	def objs(cls, **kwargs) -> QuerySet:
-		"""
-		按照一定条件获取多个数据
-		Args:
-			**kwargs (**dict): 查询条件
-		Returns:
-			返回符合指定条件的数据列表
-		Examples:
-			获取全部属性数据：
-			params = BaseParam.objs()
-			获取分值为 150 的所有科目数据：
-			subjects = Subject.objs(max_score=150)
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.getObjects(cls, cls.Objects, **kwargs)
-
-	@classmethod
-	def count(cls) -> int:
-		"""
-		获取数据的数量
-		Returns:
-			返回该数据在数据库中的数量
-		"""
-		if cls.Count is None: cls.load()
-		return cls.Count
+	# @classmethod
+	# def load(cls):
+	# 	"""
+	# 	读取数据
+	# 	"""
+	# 	configure: GameConfigure = GameConfigure.get()
+	#
+	# 	if configure is None:
+	# 		raise GameException(ErrorType.NoCurConfigure)
+	#
+	# 	cls.Objects = ViewUtils.getObjects(cls, configure=configure)
+	# 	cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
+	#
+	# @classmethod
+	# def get(cls, **kwargs) -> 'GroupConfigure':
+	# 	"""
+	# 	根据条件获取单个数据
+	# 	Args:
+	# 		**kwargs (**dict): 查询条件
+	# 	Returns:
+	# 		按照条件返回指定数据（若有多个返回第一个）
+	# 	Raises:
+	# 		若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+	# 	Examples:
+	# 		获取 id 为 3 的科目：
+	# 		subject = Subject.get(id=3)
+	# 		获取 属性缩写 为 mhp 的属性：
+	# 		param = BaseParam.get(attr='mhp')
+	# 	"""
+	# 	if cls.Objects is None: cls.load()
+	#
+	# 	return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
+	# 							   objects=cls.Objects, **kwargs)
+	#
+	# @classmethod
+	# def ensure(cls, **kwargs):
+	# 	"""
+	# 	确保指定条件的数据存在
+	# 	Args:
+	# 		**kwargs (**dict): 查询条件
+	# 	Raises:
+	# 		若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+	# 	Examples:
+	# 		确保 id 为 3 且名字为 英语 的科目存在：
+	# 		Subject.ensure(id=3, name="英语")
+	# 	"""
+	# 	if cls.Objects is None: cls.load()
+	#
+	# 	return ViewUtils.ensureObjectExist(cls, cls.NOT_EXIST_ERROR,
+	# 									   objects=cls.Objects, **kwargs)
+	#
+	# @classmethod
+	# def objs(cls, **kwargs) -> QuerySet:
+	# 	"""
+	# 	按照一定条件获取多个数据
+	# 	Args:
+	# 		**kwargs (**dict): 查询条件
+	# 	Returns:
+	# 		返回符合指定条件的数据列表
+	# 	Examples:
+	# 		获取全部属性数据：
+	# 		params = BaseParam.objs()
+	# 		获取分值为 150 的所有科目数据：
+	# 		subjects = Subject.objs(max_score=150)
+	# 	"""
+	# 	if cls.Objects is None: cls.load()
+	#
+	# 	return ViewUtils.getObjects(cls, cls.Objects, **kwargs)
+	#
+	# @classmethod
+	# def count(cls) -> int:
+	# 	"""
+	# 	获取数据的数量
+	# 	Returns:
+	# 		返回该数据在数据库中的数量
+	# 	"""
+	# 	if cls.Count is None: cls.load()
+	# 	return cls.Count
 
 
 # ===================================================
@@ -490,8 +498,8 @@ class GameTip(GroupConfigure):
 	type = models.PositiveSmallIntegerField(default=TipType.Study.value,
 											choices=TYPES, verbose_name="小贴士类型")
 
-	def convertToDict(self, type: str = None, **kwargs):
-		res = super().convertToDict()
+	def convert(self, type: str = None, **kwargs):
+		res = super().convert()
 
 		res['type'] = self.type
 
@@ -530,8 +538,8 @@ class Subject(GroupConfigure):
 
 	adminColor.short_description = "科目颜色"
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['color'] = self.color
 		res['max_score'] = self.max_score
@@ -586,8 +594,8 @@ class BaseParam(GroupConfigure):
 
 	adminColor.short_description = "属性颜色"
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['color'] = self.color
 		res['attr'] = self.attr
@@ -612,9 +620,9 @@ class BaseParam(GroupConfigure):
 	def isPercent(self):
 		return self.scale == 10000
 
-	@classmethod
-	def getAttr(cls, id):
-		return cls.get(id=id).attr
+	# @classmethod
+	# def getAttr(cls, id):
+	# 	return cls.get(id=id).attr
 
 
 # ===================================================
@@ -778,7 +786,7 @@ class ExerStar(GroupConfigure):
 		res['base_ranges'] = ModelUtils.objectsToDict(self.paramBaseRanges())
 		res['rate_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
 
-	def convertToDict(self):
+	def convert(self):
 
 		level_exp_factors: dict = self.level_exp_factors
 		level_exp_factors = list(level_exp_factors.values())
@@ -843,7 +851,7 @@ class ExerGiftStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 
 		return {
 			'id': self.id,
@@ -882,7 +890,7 @@ class ItemStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 
 		return {
 			'id': self.id,
@@ -931,7 +939,7 @@ class QuestionStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'id': self.id,
 			'name': self.name,
@@ -981,7 +989,7 @@ class GameConfigure(models.Model):
 	def __str__(self):
 		return "%d. %s 配置" % (self.id, self.name)
 
-	def convertToDict(self, type="static"):
+	def convert(self, type="static"):
 
 		if type == 'static': return self._convertStaticDataToDict()
 		if type == 'dynamic': return self._convertDynamicDataToDict()

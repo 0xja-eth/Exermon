@@ -128,7 +128,7 @@ class ExerProEffect(models.Model):
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
 
 	# 转化为字典
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'code': self.code,
 			'params': self.params,
@@ -197,7 +197,7 @@ class ExerProTraits(models.Model):
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
 
 	# 转化为字典
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'code': self.code,
 			'params': self.params,
@@ -227,7 +227,7 @@ class ExerProItemStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'id': self.id,
 			'name': self.name,
@@ -310,8 +310,8 @@ class ListeningQuestion(GroupQuestion):
 
 		return data.decode()
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['times'] = self.times
 		res['audio'] = self.convertToBase64()
@@ -409,8 +409,8 @@ class PlotQuestion(BaseQuestion):
 	def choices(self):
 		return self.plotqueschoice_set.all()
 
-	def convertToDict(self, type=None):
-		res = super().convertToDict(type)
+	def convert(self, type=None):
+		res = super().convert(type)
 
 		res['event_name'] = self.event_name
 		res['picture'] = self.convertToBase64()
@@ -438,8 +438,8 @@ class PlotQuesChoice(BaseQuesChoice):
 	def effects(self):
 		return self.exerproploteffect_set.all()
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		plot_effects = ModelUtils.objectsToDict(self.effects())
 
@@ -499,7 +499,7 @@ class PhraseQuestion(models.Model):
 	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
 											choices=TYPES, verbose_name="修改类型")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -529,7 +529,7 @@ class CorrectionQuestion(models.Model):
 	# 解析
 	description = models.TextField(null=True, blank=True, verbose_name="解析")
 
-	def convertToDict(self):
+	def convert(self):
 		wrong_items = ModelUtils.objectsToDict(self.wrongItems())
 
 		return {
@@ -588,7 +588,7 @@ class WrongItem(models.Model):
 	question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
 								 verbose_name="改错题目")
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'id': self.id,
 			'sentence_index': self.sentence_index,
@@ -626,7 +626,7 @@ class Word(models.Model):
 	def __str__(self):
 		return "%d. %s" % (self.id, self.english)
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'id': self.id,
 			'english': self.english,
@@ -682,7 +682,7 @@ class WordRecord(models.Model):
 		return '%s (%s)' % (self.word, self.record)
 
 	# 转化为字典
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		last_date = ModelUtils.timeToStr(self.last_date)
 		first_date = ModelUtils.timeToStr(self.first_date)
@@ -801,7 +801,7 @@ class WordRecord(models.Model):
 # 	# 单词
 # 	word = models.ForeignKey('EnglishWord', on_delete=models.CASCADE, verbose_name="单词")
 #
-# 	def convertToDict(self):
+# 	def convert(self):
 # 		return self.source
 #
 
@@ -833,13 +833,13 @@ class BaseExerProItem(BaseItem):
 	# 金币（0表示不可购买）
 	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
 
-	def convertToDict(self, **kwargs):
+	def convert(self, **kwargs):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict(**kwargs)
+		res = super().convert(**kwargs)
 
 		res['icon_index'] = self.icon_index
 		res['start_ani_index'] = self.start_ani_index
@@ -879,13 +879,13 @@ class ExerProItem(BaseExerProItem):
 		verbose_name = verbose_name_plural = "特训物品"
 
 	# 道具类型 self.exerproitemeffect_set.all()
-	def convertToDict(self, type: str = None, **kwargs):
+	def convert(self, type: str = None, **kwargs):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		traits = ModelUtils.objectsToDict(self.traits())
 
@@ -922,13 +922,13 @@ class ExerProPotion(BaseExerProItem):
 	# 道具类型
 	TYPE = ItemType.ExerProPotion
 
-	# def convertToDict(self):
+	# def convert(self):
 	# 	"""
 	# 	转化为字典
 	# 	Returns:
 	# 		返回转化后的字典
 	# 	"""
-	# 	res = super().convertToDict()
+	# 	res = super().convert()
 	#
 	# 	return res
 
@@ -964,7 +964,7 @@ class Antonym(GroupConfigure):
 	# 伤害比率（*100）
 	hurt_rate = models.SmallIntegerField(default=100, verbose_name="伤害比率")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -1042,13 +1042,13 @@ class ExerProCard(BaseExerProItem):
 	target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
 											  choices=TARGETS, verbose_name="目标")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['cost'] = self.cost
 		res['card_type'] = self.card_type
@@ -1074,13 +1074,13 @@ class FirstCardGroup(GroupConfigure):
 	# 卡组ID集
 	cards = jsonfield.JSONField(default=[], verbose_name="卡组ID集")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res["cards"] = self.cards
 
@@ -1155,7 +1155,7 @@ class EnemyAction(models.Model):
 	# 敌人
 	enemy = models.ForeignKey("ExerProEnemy", on_delete=models.CASCADE, verbose_name="敌人")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -1210,13 +1210,13 @@ class ExerProEnemy(BaseItem):
 	# 格挡
 	character = models.CharField(default="", blank=True, max_length=32, verbose_name="性格")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		actions = ModelUtils.objectsToDict(self.actions())
 		effects = ModelUtils.objectsToDict(self.effects())
@@ -1279,11 +1279,11 @@ class ExerProState(BaseItem):
 	# 是否负面状态
 	is_nega = models.BooleanField(default=False, verbose_name="是否负面状态")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['max_turns'] = self.max_turns
 		res['is_nega'] = self.is_nega
@@ -1316,13 +1316,13 @@ class NodeType(GroupConfigure):
 	# 题型
 	ques_types = models.CharField(max_length=32, verbose_name="题型")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['ques_types'] = self.ques_types
 
@@ -1351,7 +1351,7 @@ class ExerProMap(models.Model):
 	def __str__(self):
 		return "%d. %s" % (self.id, self.name)
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -1439,7 +1439,7 @@ class ExerProMapStage(models.Model):
 	def __str__(self):
 		return "%s 第 %s 关" % (self.map, self.order)
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -1531,7 +1531,7 @@ class ExerProRecord(CacheableModel):
 
 		return record
 
-	def convertToDict(self, type: str = None, **kwargs):
+	def convert(self, type: str = None, **kwargs):
 		"""
 		转化为字典
 		Args:

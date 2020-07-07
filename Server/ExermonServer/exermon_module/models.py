@@ -141,8 +141,8 @@ class Exermon(BaseItem):
 		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
 	# 转化为 dict
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['animal'] = self.animal
 		res['star_id'] = self.star_id
@@ -235,13 +235,13 @@ class PlayerExerParamBase(ParamValue):
 	# 过期时间
 	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		expires_time = ModelUtils.timeToStr(self.expires_time)
 
@@ -281,13 +281,13 @@ class PlayerExerParamRate(ParamRate):
 	# 过期时间
 	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
 			返回转化后的字典
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		expires_time = ModelUtils.timeToStr(self.expires_time)
 
@@ -364,8 +364,8 @@ class PlayerExermon(PackContItem):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self._cache(self.PARAMS_CACHE_KEY, {})
-		self._cache(self.REMOVED_PLUS_PARAMS_CACHE_KEY, [])
+		self._setCache(self.PARAMS_CACHE_KEY, {})
+		self._setCache(self.REMOVED_PLUS_PARAMS_CACHE_KEY, [])
 
 	# 所属容器的类
 	@classmethod
@@ -377,8 +377,8 @@ class PlayerExermon(PackContItem):
 
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
-		self._cache(self.EXERSKILL_CACHE_KEY,
-					ExerSkillSlot.create(player_exer=self))
+		self._setCache(self.EXERSKILL_CACHE_KEY,
+					   ExerSkillSlot.create(player_exer=self))
 
 	# 创建容器项
 	# def transfer(self, container, **kwargs):
@@ -405,10 +405,10 @@ class PlayerExermon(PackContItem):
 		res['plus_param_rates'] = ModelUtils.objectsToDict(self.plusParamRates())
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
+	def convert(self, **kwargs):
 		from utils.calc_utils import ExermonLevelCalc
 
-		res = super().convertToDict(**kwargs)
+		res = super().convert(**kwargs)
 
 		star = self.item.star
 		next = ExermonLevelCalc.getDetlaExp(star, self.level)
@@ -638,7 +638,7 @@ class PlayerExermon(PackContItem):
 
 	# 清除属性缓存
 	def _clearParamsCache(self):
-		self._cache(self.PARAMS_CACHE_KEY, {})
+		self._setCache(self.PARAMS_CACHE_KEY, {})
 
 	# 修改昵称
 	def editNickname(self, name):
@@ -736,9 +736,9 @@ class ExerFrag(BaseItem):
 	def contItemClass(cls): return ExerFragPackItem
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
+	def convert(self, **kwargs):
 
-		res = super().convertToDict(**kwargs)
+		res = super().convert(**kwargs)
 
 		res['eid'] = self.o_exermon_id
 		res['sell_price'] = self.sell_price
@@ -889,8 +889,8 @@ class ExerGift(BaseItem):
 		return super().__getattr__(item)
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['star_id'] = self.star_id
 		res['color'] = self.color
@@ -1164,7 +1164,7 @@ class ExerSlotItem(SlotContItem):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self._cache(self.PARAMS_CACHE_KEY, {})
+		self._setCache(self.PARAMS_CACHE_KEY, {})
 
 	# def _equipItem(self, index):
 	# 	if index == 0: return self.player_exer
@@ -1187,8 +1187,8 @@ class ExerSlotItem(SlotContItem):
 			ExerEquipSlot, self.EQUIPSLOT_CACHE_KEY)
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		level, next = self.slotLevel(True)
 
@@ -1207,8 +1207,8 @@ class ExerSlotItem(SlotContItem):
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
 		self.container.setPlayerExer(self, self.init_exer)
-		self._cache(self.EQUIPSLOT_CACHE_KEY,
-					ExerEquipSlot.create(exer_slot=self))
+		self._setCache(self.EQUIPSLOT_CACHE_KEY,
+					   ExerEquipSlot.create(exer_slot=self))
 
 	# 移动容器项
 	def transfer(self, container: ExerSlot, **kwargs):
@@ -1312,7 +1312,7 @@ class ExerSlotItem(SlotContItem):
 
 	# 清除属性缓存
 	def _clearParamsCache(self):
-		self._cache(self.PARAMS_CACHE_KEY, {})
+		self._setCache(self.PARAMS_CACHE_KEY, {})
 
 	# 刷新艾瑟萌
 	def refresh(self):
@@ -1526,8 +1526,8 @@ class ExerSkill(BaseItem):
 		return icon_data, ani_data, target_ani_data
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		# icon_data, ani_data, target_ani_data = self.convertToBase64()
 
@@ -1654,8 +1654,8 @@ class ExerSkillSlotItem(SlotContItem):
 	# endregion
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['skill_id'] = self.skill_id
 		res['use_count'] = self.use_count
@@ -1754,8 +1754,8 @@ class ExerItem(UsableItem):
 	def contItemClass(cls): return ExerPackItem
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['rate'] = self.rate
 
@@ -1835,8 +1835,8 @@ class ExerEquip(EquipableItem):
 	def contItemClass(cls): return ExerPackEquip
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['e_type'] = self.e_type_id
 
@@ -2089,8 +2089,8 @@ class ExerEquipSlotItem(SlotContItem):
 	def acceptedEquipItemAttr(cls): return ('pack_equip', )
 
 	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
+	def convert(self, **kwargs):
+		res = super().convert(**kwargs)
 
 		res['e_type'] = self.e_type_id
 
