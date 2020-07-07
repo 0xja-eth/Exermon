@@ -690,9 +690,9 @@ class EquipableItem(LimitedItem):
     def levelParam(self, param_id=None, attr=None):
         param = None
         if param_id is not None:
-            param = self.levelParams().filter(param_id=param_id)
+            param = self.levelParams()._queryByCond(param_id=param_id)
         if attr is not None:
-            param = self.levelParams().filter(param__attr=attr)
+            param = self.levelParams()._queryByCond(param__attr=attr)
 
         if param is None or not param.exists(): return 0
 
@@ -702,9 +702,9 @@ class EquipableItem(LimitedItem):
     def baseParam(self, param_id=None, attr=None):
         param = None
         if param_id is not None:
-            param = self.baseParams().filter(param_id=param_id)
+            param = self.baseParams()._queryByCond(param_id=param_id)
         if attr is not None:
-            param = self.baseParams().filter(param__attr=attr)
+            param = self.baseParams()._queryByCond(param__attr=attr)
 
         if param is None or not param.exists(): return 0
 

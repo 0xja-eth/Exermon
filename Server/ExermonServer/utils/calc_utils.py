@@ -879,7 +879,7 @@ class QuestionGenerator:
 
             print("min_star, max_star: %d, %d" % (min_star, max_star))
 
-            sub = sub.filter(star_id__in=range(min_star, max_star))
+            sub = sub._queryByCond(star_id__in=range(min_star, max_star))
 
         elif gen_type >= QuestionGenerateType.SimpleFirst.value:
             raise GameException(ErrorType.InvalidGenerateConfigure)
@@ -934,7 +934,7 @@ class QuestionGenerator:
             if exclude:
                 sub = questions.exclude(id__in=id_limit)
             else:
-                sub = questions.filter(id__in=id_limit)
+                sub = questions._queryByCond(id__in=id_limit)
 
         print("sub questions count: %d" % sub.count())
         for q in sub:
@@ -2268,7 +2268,7 @@ class ShopItemGenerator:
 
         # 生成 星级 - 物品集 字典
         for i in range(len(rates)):
-            item_dict[i+1] = list(items.filter(star_id=i+1))
+            item_dict[i+1] = list(items._queryByCond(star_id=i + 1))
 
         for i in range(cnt):
             index = 1  # 星级ID

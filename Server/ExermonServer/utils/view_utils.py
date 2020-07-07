@@ -91,9 +91,9 @@ class Common:
 		# 实际上执行查询的部分：
 		try:
 			if not include_deleted and hasattr(obj_type, 'is_deleted'):
-				return objects.filter(is_deleted=False, **kwargs).exists()
+				return objects._queryByCond(is_deleted=False, **kwargs).exists()
 			else:
-				return objects.filter(**kwargs).exists()
+				return objects._queryByCond(**kwargs).exists()
 
 		except:
 			raise GameException(ErrorType.ParameterError)
@@ -127,9 +127,9 @@ class Common:
 		# 实际上执行查询的部分：
 		try:
 			if not include_deleted and hasattr(obj_type, 'is_deleted'):
-				return objects.filter(is_deleted=False, **kwargs)
+				return objects._queryByCond(is_deleted=False, **kwargs)
 			else:
-				return objects.filter(**kwargs)
+				return objects._queryByCond(**kwargs)
 
 		except:
 			raise GameException(ErrorType.ParameterError)
@@ -144,12 +144,12 @@ class Common:
 
 		# 过滤 deleted：
 		if not include_deleted and hasattr(obj_type, 'is_deleted'):
-			result = objects.filter(is_deleted=False)
+			result = objects._queryByCond(is_deleted=False)
 		else:
 			result = objects
 
 		# 执行查询：
-		result = result.filter(**kwargs)
+		result = result._queryByCond(**kwargs)
 
 		if return_type == 'dict':
 

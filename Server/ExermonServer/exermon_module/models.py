@@ -168,9 +168,9 @@ class Exermon(BaseItem):
 	def paramBase(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.paramBases().filter(param_id=param_id)
+			param = self.paramBases()._queryByCond(param_id=param_id)
 		if attr is not None:
-			param = self.paramBases().filter(param__attr=attr)
+			param = self.paramBases()._queryByCond(param__attr=attr)
 
 		if param is None or not param.exists(): return 0
 
@@ -180,9 +180,9 @@ class Exermon(BaseItem):
 	def paramRate(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.paramRates().filter(param_id=param_id)
+			param = self.paramRates()._queryByCond(param_id=param_id)
 		if attr is not None:
-			param = self.paramRates().filter(param__attr=attr)
+			param = self.paramRates()._queryByCond(param__attr=attr)
 
 		if param is None or not param.exists(): return 0
 
@@ -907,9 +907,9 @@ class ExerGift(BaseItem):
 	def paramRate(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.paramRates().filter(param_id=param_id)
+			param = self.paramRates()._queryByCond(param_id=param_id)
 		if attr is not None:
-			param = self.paramRates().filter(param__attr=attr)
+			param = self.paramRates()._queryByCond(param__attr=attr)
 
 		if param is None or not param.exists(): return 0
 

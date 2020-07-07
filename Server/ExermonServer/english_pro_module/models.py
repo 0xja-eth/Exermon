@@ -1385,7 +1385,7 @@ class ExerProMap(models.Model):
 		Returns:
 			返回指定序号的关卡对象
 		"""
-		stage = self.stages().filter(order=order)
+		stage = self.stages()._queryByCond(order=order)
 
 		if stage.exists(): return stage.first()
 

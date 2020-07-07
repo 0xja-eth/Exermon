@@ -27,7 +27,7 @@ class ErrorType(Enum):
 	StarNotExist = 22  # 星级不存在
 	TypeNotExist = 23  # 类型不存在
 	DatabaseError = 30  # 数据库错误
-	UnknownError = 999  # 未知错误
+	UnknownError = -1  # 未知错误
 
 	# PlayerCommon
 	PlayerNotExist = 100  # 玩家不存在
@@ -213,10 +213,10 @@ class ErrorType(Enum):
 	# EnglishProShop
 	ShopNotGenerated = 840  # 商品尚未生成
 	ShopItemNotExist = 841  # 商品不存在
-	InvalidBuyNum = 842  # 金钱不足
+	InvalidBuyNum = 842  # 购买数量不合法
 
 	# EnglishProAnswer
-	InvalidAnswer = 843  # 题目答案不合法
+	InvalidAnswer = 850  # 题目答案不合法
 
 
 class GameException(Exception):
@@ -423,7 +423,7 @@ class GameException(Exception):
 		# EnglishProShop
 		ErrorType.ShopNotGenerated: "商品尚未生成！",
 		ErrorType.ShopItemNotExist: "商品不存在或已售出！",
-		ErrorType.InvalidBuyNum: "金钱不足！",
+		ErrorType.InvalidBuyNum: "购买数量不合法！",
 
 		# EnglishProAnswer
 		ErrorType.InvalidAnswer: "题目答案不合法！",

@@ -134,7 +134,7 @@ class BaseQuestion(models.Model):
 
 	# 正确选项
 	def correctChoices(self):
-		return self.choices().filter(answer=True)
+		return self.choices()._queryByCond(answer=True)
 
 	# 计算选择是否正确
 	def calcCorrect(self, selection):
@@ -626,9 +626,9 @@ class QuesSugar(BaseItem):
 	def param(self, param_id=None, attr=None):
 		param = None
 		if param_id is not None:
-			param = self.params().filter(param_id=param_id)
+			param = self.params()._queryByCond(param_id=param_id)
 		if attr is not None:
-			param = self.params().filter(param__attr=attr)
+			param = self.params()._queryByCond(param__attr=attr)
 
 		if param is None or not param.exists(): return 0
 

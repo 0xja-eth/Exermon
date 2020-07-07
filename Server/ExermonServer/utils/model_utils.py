@@ -4,130 +4,132 @@ from django.db.models.query import QuerySet
 from django.utils.deconstruct import deconstructible
 import os, random
 
-
-# ===================================================
-#  缓存机制模型
-# ===================================================
-class CacheableModel(models.Model):
-
-	class Meta:
-		abstract = True
-
-	cached_dict = None
-
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.cached_dict = {}
-		self.delete_save = False
-		self.saved = True
-
-	def __del__(self):
-		if self.delete_save:
-			self.save()
-
-	def __setattr__(self, key, value):
-		if key != 'saved': self.saved = False
-		super().__setattr__(key, value)
-
-	# 进行缓存
-	def _cache(self, key, value):
-		self.cached_dict[key] = value
-
-	# 获取缓存
-	def _getCache(self, key):
-		if key in self.cached_dict:
-			return self.cached_dict[key]
-		return None
-
-	# 获取或者设置（如果不存在）缓存
-	def _getOrSetCache(self, key, func):
-		if key not in self.cached_dict:
-			self._cache(key, func())
-		return self.cached_dict[key]
-
-	# 获取一对一关系的缓存
-	def _getOneToOneCache(self, cla, key=None):
-		try:
-			if key is None: key = cla
-			attr_name = cla.__name__.lower()
-			return self._getOrSetCache(key,
-				lambda: getattr(self, attr_name))
-		except cla.DoesNotExist: return None
-		except AttributeError: return None
-
-	# 获取外键关系的缓存
-	def _getForeignKeyCache(self, cla, key=None):
-		try:
-			if key is None: key = cla
-			attr_name = cla.__name__.lower()+'_set'
-			return self._getOrSetCache(key,
-									   lambda: list(getattr(self, attr_name).all()))
-		except AttributeError: return None
-
-	# 保存缓存
-	def _saveCache(self, key=None):
-		if key is None:
-			self.__saveCacheItem(self.cached_dict)
-
-		elif key in self.cached_dict:
-			self.__saveCacheItem(self.cached_dict[key])
-
-	# 保存缓存项
-	def __saveCacheItem(self, item):
-		if isinstance(item, (list, tuple)):
-			tmp_item = item.copy()
-			for val in tmp_item: self.__saveCacheItem(val)
-
-		elif isinstance(item, dict):
-			tmp_item = item.copy()
-			for key in tmp_item: self.__saveCacheItem(item[key])
-
-		elif hasattr(item, '__iter__'):
-			for val in item: self.__saveCacheItem(val)
-
-		elif isinstance(item, models.Model): item.save()
-
-	# 删除缓存
-	def _deleteCache(self, key=None):
-		if key is None:
-			self.__deleteCacheItem(self.cached_dict)
-
-		elif key in self.cached_dict:
-			self.__deleteCacheItem(self.cached_dict[key])
-
-		self._clearCache(key, False)
-
-	# 删除缓存项
-	def __deleteCacheItem(self, item):
-		if isinstance(item, (list, tuple)):
-			for val in item: self.__saveCacheItem(val)
-
-		elif isinstance(item, dict):
-			for key in item: self.__saveCacheItem(item[key])
-
-		elif hasattr(item, '__iter__'):
-			for val in item: self.__saveCacheItem(val)
-
-		elif isinstance(item, models.Model): item.delete()
-
-	# 清除缓存
-	def _clearCache(self, key=None, save=True):
-		if save: self._saveCache(key)
-
-		if key is None:
-			self.cached_dict.clear()
-		elif key in self.cached_dict:
-			self.cached_dict.pop(key)
-
-	# 重载保存函数
-	def save(self, **kwargs):
-
-		if not self.saved:
-			super().save(**kwargs)
-			# print(str(self)+" saved!")
-
-		self.saved = True
-		self._saveCache()
+#
+# # ===================================================
+# #  缓存机制模型
+# # ===================================================
+# class CacheableModel(models.Model):
+#
+# 	class Meta:
+# 		abstract = True
+#
+# 	CACHE_KEYS = []
+#
+# 	cached_dict = None
+#
+# 	def __init__(self, *args, **kwargs):
+# 		super().__init__(*args, **kwargs)
+# 		self.cached_dict = {}
+# 		self.delete_save = False
+# 		self.saved = True
+#
+# 	def __del__(self):
+# 		if self.delete_save:
+# 			self.save()
+#
+# 	def __setattr__(self, key, value):
+# 		if key != 'saved': self.saved = False
+# 		super().__setattr__(key, value)
+#
+# 	# 进行缓存
+# 	def _cache(self, key, value):
+# 		self.cached_dict[key] = value
+#
+# 	# 获取缓存
+# 	def _getCache(self, key):
+# 		if key in self.cached_dict:
+# 			return self.cached_dict[key]
+# 		return None
+#
+# 	# 获取或者设置（如果不存在）缓存
+# 	def _getOrSetCache(self, key, func):
+# 		if key not in self.cached_dict:
+# 			self._cache(key, func())
+# 		return self.cached_dict[key]
+#
+# 	# 获取一对一关系的缓存
+# 	def _getOneToOneCache(self, cla, key=None):
+# 		try:
+# 			if key is None: key = cla
+# 			attr_name = cla.__name__.lower()
+# 			return self._getOrSetCache(key,
+# 				lambda: getattr(self, attr_name))
+# 		except cla.DoesNotExist: return None
+# 		except AttributeError: return None
+#
+# 	# 获取外键关系的缓存
+# 	def _getForeignKeyCache(self, cla, key=None):
+# 		try:
+# 			if key is None: key = cla
+# 			attr_name = cla.__name__.lower()+'_set'
+# 			return self._getOrSetCache(key,
+# 									   lambda: list(getattr(self, attr_name).all()))
+# 		except AttributeError: return None
+#
+# 	# 保存缓存
+# 	def _saveCache(self, key=None):
+# 		if key is None:
+# 			self.__saveCacheItem(self.cached_dict)
+#
+# 		elif key in self.cached_dict:
+# 			self.__saveCacheItem(self.cached_dict[key])
+#
+# 	# 保存缓存项
+# 	def __saveCacheItem(self, item):
+# 		if isinstance(item, (list, tuple)):
+# 			tmp_item = item.copy()
+# 			for val in tmp_item: self.__saveCacheItem(val)
+#
+# 		elif isinstance(item, dict):
+# 			tmp_item = item.copy()
+# 			for key in tmp_item: self.__saveCacheItem(item[key])
+#
+# 		elif hasattr(item, '__iter__'):
+# 			for val in item: self.__saveCacheItem(val)
+#
+# 		elif isinstance(item, models.Model): item.save()
+#
+# 	# 删除缓存
+# 	def _deleteCache(self, key=None):
+# 		if key is None:
+# 			self.__deleteCacheItem(self.cached_dict)
+#
+# 		elif key in self.cached_dict:
+# 			self.__deleteCacheItem(self.cached_dict[key])
+#
+# 		self._clearCache(key, False)
+#
+# 	# 删除缓存项
+# 	def __deleteCacheItem(self, item):
+# 		if isinstance(item, (list, tuple)):
+# 			for val in item: self.__saveCacheItem(val)
+#
+# 		elif isinstance(item, dict):
+# 			for key in item: self.__saveCacheItem(item[key])
+#
+# 		elif hasattr(item, '__iter__'):
+# 			for val in item: self.__saveCacheItem(val)
+#
+# 		elif isinstance(item, models.Model): item.delete()
+#
+# 	# 清除缓存
+# 	def _clearCache(self, key=None, save=True):
+# 		if save: self._saveCache(key)
+#
+# 		if key is None:
+# 			self.cached_dict.clear()
+# 		elif key in self.cached_dict:
+# 			self.cached_dict.pop(key)
+#
+# 	# 重载保存函数
+# 	def save(self, **kwargs):
+#
+# 		if not self.saved:
+# 			super().save(**kwargs)
+# 			# print(str(self)+" saved!")
+#
+# 		self.saved = True
+# 		self._saveCache()
 
 
 # ===================================================
