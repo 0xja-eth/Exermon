@@ -12,8 +12,6 @@ using ItemModule.Services;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
-using UI.ShopScene.Windows;
-
 namespace UI.ShopScene.Controls {
 
     /// <summary>

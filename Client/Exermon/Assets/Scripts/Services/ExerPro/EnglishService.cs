@@ -1205,6 +1205,7 @@ namespace ExerPro.EnglishModule.Services {
             //TODO:退出处理要更改
             //GameService.get().exitGame();
             sceneSys.popScene();
+            start(1);
         }
 
         /// <summary>

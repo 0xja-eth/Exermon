@@ -12,7 +12,6 @@ using ExermonModule.Data;
 using UI.Common.Controls.ParamDisplays;
 using UI.Common.Controls.ItemDisplays;
 
-using UI.PackScene.Windows;
 using UI.ExerPro.EnglishPro.ExerProPackScene.Windows;
 using UI.ExerPro.EnglishPro.BattleScene.Controls.Menu;
 using ExerPro.EnglishModule.Data;

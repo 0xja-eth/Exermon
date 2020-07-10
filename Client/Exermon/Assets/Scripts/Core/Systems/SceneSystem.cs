@@ -33,17 +33,6 @@ namespace Core.Systems {
 
             TitleScene = 0,
             StartScene,
-            MainScene,
-
-            StatusScene, PackScene, ShopScene,
-
-            ExerciseScene, RecordScene,
-
-            BattleStartScene,
-            BattleMatchingScene, 
-            BattleScene,
-            BattleResultScene,
-            BattleAnswerScene,
 
             EnglishProMapScene,
             EnglishProBusinessManScene,
