@@ -177,7 +177,7 @@ namespace UI.StartScene {
         /// 处理创建完成
         /// </summary>
         void processFinished() {
-            sceneSys.pushScene(SceneSystem.Scene.MainScene, data: true);
+            sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene, data: true);
         }
 
         /// <summary>

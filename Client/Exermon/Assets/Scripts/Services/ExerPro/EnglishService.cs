@@ -1201,8 +1201,11 @@ namespace ExerPro.EnglishModule.Services {
 			if (record.actor.isDead()) saveExerPro(true);
 
 			changeState(State.NotInExerPro);
-			save(); sceneSys.popScene();
-		}
+			save();
+            //TODO:退出处理要更改
+            //GameService.get().exitGame();
+            sceneSys.popScene();
+        }
 
         /// <summary>
         /// 通关后更新数据

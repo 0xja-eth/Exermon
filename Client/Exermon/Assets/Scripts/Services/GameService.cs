@@ -15,6 +15,7 @@ using Core.Systems;
 using Core.UI.Utils;
 
 using PlayerModule.Services;
+using ExerPro.EnglishModule.Services;
 
 /// <summary>
 /// 基本系统
@@ -40,6 +41,7 @@ namespace GameModule.Services {
         SceneSystem sceneSys;
         StorageSystem storageSys;
         PlayerService playerSer;
+        EnglishService engSer;
 
         /// <summary>
         /// 初始化外部系统
@@ -49,6 +51,7 @@ namespace GameModule.Services {
             sceneSys = SceneSystem.get();
             storageSys = StorageSystem.get();
             playerSer = PlayerService.get();
+            engSer = EnglishService.get();
             gameSys.reconnectedCallback = onReconnected;
         }
 
@@ -75,7 +78,8 @@ namespace GameModule.Services {
         /// 继续游戏（已经有角色的玩家）
         /// </summary>
         public void loadGame() {
-            sceneSys.pushScene(SceneSystem.Scene.MainScene);
+            engSer.start(1);
+            //sceneSys.pushScene(SceneSystem.Scene.EnglishProMapScene);
         }
 
         /// <summary>
