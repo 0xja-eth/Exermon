@@ -2289,12 +2289,15 @@ class ShopItemGenerator:
                 else: index += 1
 
     def __generateRandomShopItem(self, items):
+        from english_pro_module.models import ExerProCard, ExerProCardType
+
         if len(items) <= 0: return None
 
         cnt = 0
-        item = random.choice(items)
-        # 如果商店已经包含该物品，同时循环次数 <= 10000，则重新选择
-        while self.shop.contains(item) and cnt <= 10000:
+        item: ExerProCard = random.choice(items)
+        # 如果商店已经包含该物品或者物品不是可购买的，同时循环次数 <= 10000，则重新选择
+        while (self.shop.contains(item) or not item.isBoughtable()) \
+                and cnt <= 10000:
             item = random.choice(items)
             cnt += 1
 

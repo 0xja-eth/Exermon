@@ -1035,6 +1035,9 @@ class ExerProCard(BaseExerProItem):
 	# 消耗（一次性的）
 	disposable = models.BooleanField(default=False, verbose_name="消耗")
 
+	# 消耗（一次性的）
+	boughtable = models.BooleanField(default=True, verbose_name="可否购买")
+
 	# 性质
 	character = models.CharField(default="", blank=True, max_length=32, verbose_name="性质")
 
@@ -1061,6 +1064,14 @@ class ExerProCard(BaseExerProItem):
 
 	def effects(self):
 		return self.exerprocardeffect_set.all()
+
+	def isBoughtable(self):
+		"""
+		能否购买
+		"""
+		if self.card_type == ExerProCardType.Evil.value: return False
+
+		return self.boughtable
 
 
 # ===================================================

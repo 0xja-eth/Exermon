@@ -41,6 +41,8 @@ namespace ItemModule.Services {
 			[AutoConvert]
 			public int type { get; protected set; }
 			[AutoConvert]
+			public bool isBought { get; protected set; } = false;
+			[AutoConvert]
             public ItemPrice price { get; protected set; }
 
 			/// <summary>
@@ -48,6 +50,13 @@ namespace ItemModule.Services {
 			/// </summary>
 			public int gold {
 				get { return price.gold; }
+			}
+
+			/// <summary>
+			/// 购买
+			/// </summary>
+			public void buy() {
+				isBought = true;
 			}
 
         }
