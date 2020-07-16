@@ -20,7 +20,7 @@ using UI.ShopScene.Controls;
 namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls {
 
     /// <summary>
-    /// 商人据点显示
+    /// 特训商店显示
     /// </summary>
     public abstract class ExerProShopDisplay<T> : 
 		ShopDisplay<T> where T : BaseExerProItem, new() {

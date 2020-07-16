@@ -213,6 +213,8 @@ namespace UI.ShopScene.Controls {
         protected override bool isIncluded(ItemService.ShopItem<T> shopItem) {
             if (!base.isIncluded(shopItem)) return false;
 
+			if (shopItem.isBought) return false;
+
             // 判断星级
             var item = shopItem.item() as LimitedItem;
 

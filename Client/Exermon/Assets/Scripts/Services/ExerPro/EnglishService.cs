@@ -774,6 +774,7 @@ namespace ExerPro.EnglishModule.Services {
 			where T : BaseExerProItem, new() {
 
 			NetworkSystem.RequestObject.SuccessAction _onSuccess = (res) => {
+				shopItem.buy();
 				record.gainGold(-shopItem.gold);
 				record.actor.gainItem(shopItem.item());
 				onSuccess?.Invoke();
