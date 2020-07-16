@@ -25,8 +25,10 @@ namespace Core.UI.Utils {
         /// </summary>
         public const string AlertWindowKey = "AlertWindow";
         public const string LoadingWindowKey = "LoadingWindow";
-        public const string RebuildControllerKey = "RebuildController";
-        public const string CurrentSceneKey = "Scene";
+		public const string AudioSourceKey = "AudioSource";
+		public const string RebuildControllerKey = "RebuildController";
+
+		public const string CurrentSceneKey = "Scene";
 
         /// <summary>
         /// 提示窗口（脚本）
@@ -50,19 +52,19 @@ namespace Core.UI.Utils {
             set {
                 depositSceneObject(LoadingWindowKey, value);
             }
-        }
+		}
 
-        /// <summary>
-        /// 界面重构控制器（脚本）
-        /// </summary>
-        public static RebuildController rebuildController {
-            get {
-                return getSceneObject(RebuildControllerKey) as RebuildController;
-            }
-            set {
-                depositSceneObject(RebuildControllerKey, value);
-            }
-        }
+		/// <summary>
+		/// 界面重构控制器（脚本）
+		/// </summary>
+		public static RebuildController rebuildController {
+			get {
+				return getSceneObject(RebuildControllerKey) as RebuildController;
+			}
+			set {
+				depositSceneObject(RebuildControllerKey, value);
+			}
+		}
 
 		/// <summary>
 		/// 获取/设置当前场景（脚本）
@@ -77,10 +79,15 @@ namespace Core.UI.Utils {
             depositSceneObject(CurrentSceneKey, scene);
         }
 
-        /// <summary>
-        /// 提示文本缓存
-        /// </summary>
-        public static string alertText { get; set; } = "";
+		/// <summary>
+		/// BGM播放源
+		/// </summary>
+		public static AudioSource audioSource;
+
+		/// <summary>
+		/// 提示文本缓存
+		/// </summary>
+		public static string alertText { get; set; } = "";
 
         /// <summary>
         /// 场景物体托管
@@ -103,11 +110,11 @@ namespace Core.UI.Utils {
         /// <param name="loadingWindow">当前场景的加载窗口</param>
         public static void initialize(BaseScene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
-            RebuildController rebuildController = null) {
+			RebuildController rebuildController = null, AudioSource audioSource = null) {
             Debug.Log("initialize Scene: " + scene);
             initializeSystems();
             initializeScene(scene, alertWindow, 
-                loadingWindow, rebuildController);
+                loadingWindow, rebuildController, audioSource);
         }
 
         /// <summary>
@@ -127,28 +134,47 @@ namespace Core.UI.Utils {
         /// <param name="loadingWindow">当前场景的加载窗口</param>
         static void initializeScene(BaseScene scene,
             AlertWindow alertWindow = null, LoadingWindow loadingWindow = null,
-            RebuildController rebuildController = null) {
+			RebuildController rebuildController = null, AudioSource audioSource = null) {
 
             var sceneIndex = scene.sceneIndex();
             if (sceneSys.currentScene() != sceneIndex)
                 sceneSys.gotoScene(sceneIndex);
 
-            SceneUtils.setCurrentScene(scene);
+            setCurrentScene(scene);
+			setupAduioSource(scene, audioSource);
 
-            SceneUtils.alertWindow = alertWindow;
+			SceneUtils.alertWindow = alertWindow;
             SceneUtils.loadingWindow = loadingWindow;
-            SceneUtils.rebuildController = rebuildController;
+			SceneUtils.rebuildController = rebuildController;
         }
 
-        #region 场景管理
+		/// <summary>
+		/// 配置音乐源
+		/// </summary>
+		/// <param name="audioSource"></param>
+		static void setupAduioSource(BaseScene scene, AudioSource audioSource) {
+			if (SceneUtils.audioSource == null && audioSource != null) {
+				SceneUtils.audioSource = audioSource;
+				UnityEngine.Object.DontDestroyOnLoad(audioSource);
+			}
+			if (SceneUtils.audioSource) {
+				SceneUtils.audioSource.loop = true;
+				if (scene.bgmClip && SceneUtils.audioSource.clip?.name != scene.bgmClip.name) {
+					SceneUtils.audioSource.clip = scene.bgmClip;
+					SceneUtils.audioSource.Play();
+				}
+			}
+		}
 
-        /// <summary>
-        /// 托管场景物体（键每个单词首字母必须为大写）
-        /// </summary>
-        /// <param name="key">键</param>
-        /// <param name="obj">场景物体</param>
-        /// <return>场景物体</return>
-        public static UnityEngine.Object depositSceneObject(string key, UnityEngine.Object obj) {
+		#region 场景管理
+
+		/// <summary>
+		/// 托管场景物体（键每个单词首字母必须为大写）
+		/// </summary>
+		/// <param name="key">键</param>
+		/// <param name="obj">场景物体</param>
+		/// <return>场景物体</return>
+		public static UnityEngine.Object depositSceneObject(string key, UnityEngine.Object obj) {
             //if (key == AlertWindowKey) alertWindow = (AlertWindow)obj;
             //if (key == LoadingWindowKey) loadingWindow = (LoadingWindow)obj;
             Debug.Log("depositSceneObject: " + key + ", " + obj);

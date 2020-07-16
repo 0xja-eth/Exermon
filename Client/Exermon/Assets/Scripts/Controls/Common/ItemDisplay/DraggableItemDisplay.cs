@@ -68,8 +68,8 @@ namespace UI.Common.Controls.ItemDisplays {
 		/// 关闭窗口
 		/// </summary>
 		public override void terminateView() {
+			if (dragging) releaseDrag();
 			base.terminateView();
-			if (isDragging()) releaseDrag();
 		}
 		
 		#endregion
@@ -161,6 +161,7 @@ namespace UI.Common.Controls.ItemDisplays {
 		/// 释放拖拽
 		/// </summary>
 		void releaseDrag() {
+			Debug.Log("releaseDrag");
 			dragging = false;
 
 			onAfterDrag();
@@ -188,7 +189,7 @@ namespace UI.Common.Controls.ItemDisplays {
         GameObject createDraggingObject() {
             var go = Instantiate(gameObject, transform.parent);
             var cp = SceneUtils.get<DraggableItemDisplay<T>>(go);
-            cp.setItem(item, true); Destroy(cp);
+            cp.setItem(item, true); cp.requestRefresh(true); Destroy(cp);
             adjustDraggingObjectTransform(go);
             createDraggingObjectComponents(go);
             return go;

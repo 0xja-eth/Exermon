@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 using Core.Data.Loaders;
 
+using Core.Systems;
+
 using Core.UI;
 using Core.UI.Utils;
 
@@ -29,6 +31,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		const string TimeFormat = "{0}/{1}";
 
 		const string ArticleDisableTipText = "作答中不可查看听力材料";
+		const string ArticleEmptyText = "暂无听力材料";
+
+		const string InvalidSubmitAlertText = "请认真做题！";
 
 		const int ArticleViewIndex = 2;
 
@@ -63,6 +68,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		int[] selections = null;
 
 		bool isLastPlaying = false;
+		bool isPlayed = false;
 
 		Sprite playSprite, pauseSprite;
 
@@ -70,6 +76,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 外部系统
 		/// </summary>
 		EnglishService engSer;
+		GameSystem gameSys;
 
 		#region 初始化
 
@@ -90,6 +97,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		protected override void initializeSystems() {
 			base.initializeSystems();
 			engSer = EnglishService.get();
+			gameSys = GameSystem.get();
 		}
 
 		#endregion
@@ -108,7 +116,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 更新音频
 		/// </summary>
 		void updateAudio() {
-			playButton.interactable = !audioSource.isPlaying || isPauseable();
+			playButton.interactable = isPlayable() || isPauseable();
 
 			if (audioSource.isPlaying)
 				drawTimer(audioSource.time, audioSource.clip.length);
@@ -126,6 +134,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		public bool isPauseable() {
+			if (!audioSource.isPlaying) return false;
 			return subQuestions.showAnswer;
 		}
 		
@@ -149,6 +158,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 音频停止回调
 		/// </summary>
 		public void onAudioStop() {
+			isPlayed = true;
 			refreshAudioInfo();
 		}
 
@@ -156,16 +166,18 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 		/// 提交答案
 		/// </summary>
 		public void onConfirmClicked() {
+			if (!isPlayed) gameSys.requestAlert(InvalidSubmitAlertText);
+			else {
+				subQuestions.showAnswer = true;
+				selections = subQuestions.saveSelections();
 
-			subQuestions.showAnswer = true;
-			selections = subQuestions.saveSelections();
+				showTypeSelect.setIndex(ArticleViewIndex);
 
-			showTypeSelect.setIndex(ArticleViewIndex);
+				if (confirmButton) confirmButton.SetActive(false);
+				if (submitButton) submitButton.SetActive(true);
 
-			if (confirmButton) confirmButton.SetActive(false);
-			if (submitButton) submitButton.SetActive(true);
-
-			stopAudio();
+				stopAudio();
+			}
 		}
 
 		/// <summary>
@@ -272,7 +284,10 @@ namespace UI.ExerPro.EnglishPro.ListenScene.Controls {
 			//if (tipName) tipName.text = question.eventName;
 			//if (image) image.texture = question.picture;
 
-			if (subQuestions.showAnswer) article.text = question.article;
+			if (subQuestions.showAnswer)
+				if (question.article == "")
+					article.text = ArticleEmptyText;
+				else article.text = question.article;
 			else article.text = ArticleDisableTipText;
 		}
 

@@ -643,6 +643,36 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448977, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448977, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448978, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448978, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448978, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651245094633448978, guid: 44674d3597925f74aa9f8cc5c9fcb488,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 44674d3597925f74aa9f8cc5c9fcb488, type: 3}
 --- !u!224 &120245331 stripped
@@ -2982,6 +3012,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1927358909}
     m_Modifications:
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: draggingParent
+      value: 
+      objectReference: {fileID: 2087441259}
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: createDragObj
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4899883062282213855, guid: 84f4b11f2c160ff409ad2d452840e4d6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3573,6 +3613,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1927358909}
     m_Modifications:
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: draggingParent
+      value: 
+      objectReference: {fileID: 2087441259}
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: createDragObj
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4899883062282213855, guid: 84f4b11f2c160ff409ad2d452840e4d6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4504,6 +4554,16 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: draggingParent
+      value: 
+      objectReference: {fileID: 2087441259}
+    - target: {fileID: 3143993905869442658, guid: 84f4b11f2c160ff409ad2d452840e4d6,
+        type: 3}
+      propertyPath: createDragObj
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4899883062282213855, guid: 84f4b11f2c160ff409ad2d452840e4d6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4800,6 +4860,8 @@ MonoBehaviour:
   alertWindow: {fileID: 2029800015}
   loadingWindow: {fileID: 2029800016}
   rebuildController: {fileID: 2029800017}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 8300000, guid: 7504c1ad263488c4f856e8e1d87b5759, type: 3}
   battleGround: {fileID: 629167492}
   menuWindow: {fileID: 2087441262}
   wordWindow: {fileID: 1304475217}
@@ -5886,7 +5948,7 @@ RectTransform:
   - {fileID: 935317120}
   - {fileID: 141536568}
   m_Father: {fileID: 2087441259}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
@@ -6016,7 +6078,7 @@ RectTransform:
   - {fileID: 1328913892}
   - {fileID: 977396673}
   m_Father: {fileID: 2087441259}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -6707,8 +6769,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1927358909}
   - {fileID: 1933041196}
+  - {fileID: 1927358909}
   m_Father: {fileID: 1642722875}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

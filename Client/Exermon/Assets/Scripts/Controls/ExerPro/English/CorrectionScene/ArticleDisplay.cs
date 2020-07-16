@@ -249,7 +249,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			Debug.Log("Article: getWrongItems");
 
 			var res = new List<FrontendWrongItem>();
-
+			/*
 			foreach (var sub in subViews) {
 				var display = sub as SentenceDisplay;
 				if (display == null) continue;
@@ -257,6 +257,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 				var answer = display.getWrongItems();
 				res.AddRange(answer);
 			}
+			*/
+			foreach (var pair in answers)
+				res.Add(pair.Value);
 
 			return res;
 		}
@@ -284,7 +287,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		public void scrollUp() {
 			var oriPos = container.anchoredPosition;
-			oriPos.y += scrollDelta;
+			oriPos.y -= scrollDelta;
 			container.anchoredPosition = oriPos;
 		}
 
@@ -293,7 +296,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		public void scrollDown() {
 			var oriPos = container.anchoredPosition;
-			oriPos.y -= scrollDelta;
+			oriPos.y += scrollDelta;
 			container.anchoredPosition = oriPos;
 		}
 

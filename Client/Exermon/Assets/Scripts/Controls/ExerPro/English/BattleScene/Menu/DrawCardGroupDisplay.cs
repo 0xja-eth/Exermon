@@ -144,9 +144,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Menu {
 		/// 关闭
 		/// </summary>
 		public void next() {
-			scene.play();
-			//if (controller.isPlaying()) controller.stop();
-			//else scene.play();
+			//scene.play();
+			if (controller.isPlaying()) controller.stop();
+			else scene.play();
 		}
 
 		#endregion

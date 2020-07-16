@@ -62,6 +62,14 @@ namespace UI.Common.Windows {
 			terminateRequest = false;
 		}
 
+		/// <summary>
+		/// 关闭窗口
+		/// </summary>
+		public override void terminateWindow() {
+			base.terminateWindow();
+			terminateRequest = false;
+		}
+
 		#endregion
 
 		#region 事件控制
@@ -86,6 +94,7 @@ namespace UI.Common.Windows {
 		/// 取消回调
 		/// </summary>
 		protected virtual void onCancel() {
+			Debug.Log(name + ": onCancel");
 			terminateRequest = true;
 		}
 

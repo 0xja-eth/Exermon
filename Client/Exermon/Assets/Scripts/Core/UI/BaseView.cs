@@ -88,8 +88,6 @@ namespace Core.UI {
         /// 初始化
         /// </summary>
         void initialize() {
-            var name = gameObject.name;
-            var init = this.initialized;
             if (!initialized) {
                 initialized = true;
                 initializeSystems();
@@ -180,7 +178,7 @@ namespace Core.UI {
         /// 显示视窗
         /// </summary>
         protected virtual void showView() {
-            shown = true; requestRefresh(true);
+            shown = true; requestRefresh();
             Debug.Log("showView: " + name);
         }
 

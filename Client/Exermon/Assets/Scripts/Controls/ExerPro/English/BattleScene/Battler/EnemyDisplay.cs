@@ -11,10 +11,6 @@ using Core.UI.Utils;
 using ExerPro.EnglishModule.Data;
 using ExerPro.EnglishModule.Services;
 
-using UI.Common.Controls.ItemDisplays;
-using UI.Common.Controls.ParamDisplays;
-using UI.Common.Controls.AnimationSystem;
-
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
 	using Menu;
@@ -72,40 +68,13 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// 处理敌人行动
 		/// </summary>
 		void processEnemyAction(ExerProEnemy.Action action) {
+			requestRefresh();
 			switch (action.typeEnum()) {
 				case ExerProEnemy.Action.Type.Escape:
 					processEscape(action); break;
 			}
 		}
-		/*
-		/// <summary>
-		/// 处理提升
-		/// </summary>
-		void processPowerUp(ExerProEnemy.Action action) {
-			skill();
-		}
 
-		/// <summary>
-		/// 处理削弱
-		/// </summary>
-		void processPowerDown(ExerProEnemy.Action action) {
-			skill();
-		}
-
-		/// <summary>
-		/// 处理附加状态
-		/// </summary>
-		void processAddStates(ExerProEnemy.Action action) {
-			skill();
-		}
-
-		/// <summary>
-		/// 处理附加状态
-		/// </summary>
-		void processAddStates(ExerProEnemy.Action action) {
-			skill();
-		}
-		*/
 		/// <summary>
 		/// 处理逃走
 		/// </summary>
@@ -169,7 +138,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="enemy"></param>
 		void drawName(ExerProEnemy enemy) {
-			if (enemy.character != "")
+			if (enemy._character != "")
 				name.text = string.Format(NameFormat,
 					enemy.name, enemy.character);
 			else name.text = string.Format(PureNameFormat,
@@ -181,10 +150,10 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="enemy"></param>
 		void drawThinking(RuntimeEnemy enemy) {
-			var think = AssetLoader.loadEnemyThink(
-				enemy.currentActionType());
-			if (think != null) {
-				this.think.gameObject.SetActive(true);
+			var type = enemy.currentActionType();
+			var think = AssetLoader.loadEnemyThink(type);
+			if (type > 0 && think != null) {
+				this.think.gameObject.SetActive(!enemy.isDead());
 				this.think.overrideSprite = AssetLoader.
 					generateSprite(think);
 			} else this.think.gameObject.SetActive(false);

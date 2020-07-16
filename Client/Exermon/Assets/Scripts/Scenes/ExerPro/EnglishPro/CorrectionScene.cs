@@ -33,6 +33,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 		/// 文本常量定义
 		/// </summary>
 		const string UncorrectableAlertText = "已超出改错次数上限！请清除一些修改";
+		const string InvalidSubmitAlertText = "请认真做题！";
+
+		const int SubmitThreshold = 2;
 
 		/// <summary>
 		/// 外部组件设置
@@ -152,14 +155,18 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 		/// 确认回调
 		/// </summary>
 		public void onConfirm() {
-			terminated = true;
-			correctionWindow.cancel();
-			articleDisplay.showAnswer = true;
+			if (articleDisplay.getRestCount() > SubmitThreshold)
+				gameSys.requestAlert(InvalidSubmitAlertText);
+			else {
+				terminated = true;
+				correctionWindow.cancel();
+				articleDisplay.showAnswer = true;
 
-			revertBtn.SetActive(false);
-			confirmBtn.SetActive(false);
-			answerBtn.SetActive(true);
-			submitBtn.SetActive(true);
+				revertBtn.SetActive(false);
+				confirmBtn.SetActive(false);
+				answerBtn.SetActive(true);
+				submitBtn.SetActive(true);
+			}
 		}
 
 		/// <summary>

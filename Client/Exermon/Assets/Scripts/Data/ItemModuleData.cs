@@ -860,7 +860,9 @@ namespace ItemModule.Data {
 			var et = typeof(E); var tt = typeof(T);
 			if (et == tt || tt.IsSubclassOf(et)) {
 				var lastEquip = equip1;
-				equip1 = (T)(object)equipItem;
+				equip1 = equipItem as T;
+				lastEquip?.doDequip();
+				equip1?.doEquip();
 				if (lastEquip != equip1) onEquipChanged();
 			}
 		}
@@ -1170,13 +1172,11 @@ namespace ItemModule.Data {
 			setEquip(getSlotItemByEquipItem(equipItem), container, equipItem);
 		}
 		public void setEquip<E>(T slotItem, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
-			if (slotItem == null) return;
-			var oriEquip = getEquip<E>(slotItem);
+			//if (slotItem == null) return;
+			//var oriEquip = getEquip<E>(slotItem);
 			//container.removeItem(equipItem); // 移出装备
 			//container.pushItem(oriEquip); // 卸下原装备
 			setEquip(slotItem, equipItem); // 设置新装备
-			if (oriEquip != null) oriEquip.doDequip();
-			if (equipItem != null) equipItem.doEquip();
 		}
 		public void setEquip<E>(int slotIndex, PackContainer<E> container, E equipItem = null) where E : PackContItem, new() {
 			setEquip(getSlotItem(slotIndex), container, equipItem);

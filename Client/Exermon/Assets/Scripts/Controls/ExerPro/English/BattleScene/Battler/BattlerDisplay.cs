@@ -217,9 +217,9 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		/// <returns></returns>
-		public override bool isNullItem(RuntimeBattler item) {
-			return base.isNullItem(item) || item.isDead() || item.isEscaped;
-		}
+		//public override bool isNullItem(RuntimeBattler item) {
+		//	return base.isNullItem(item) || item.isDead() || item.isEscaped;
+		//}
 
 		#region 行动数据
 
@@ -241,6 +241,14 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var res = resultFlag;
 			resultFlag = false;
 			return res;
+		}
+
+		/// <summary>
+		/// 是否死亡
+		/// </summary>
+		/// <returns></returns>
+		public bool isLost() {
+			return item.isLost();
 		}
 
 		/// <summary>
@@ -582,7 +590,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		void drawHP(RuntimeBattler item) {
 			if (hpBar) {
 				hpBar.setValue(item, "hp");
-				hpBarObj.SetActive(!item.isDead());
+				hpBarObj.SetActive(!isLost());
 			}
 		}
 
@@ -594,8 +602,8 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			var pow = battler.power();
 			var def = battler.defense();
 
-			powerObj.SetActive(pow > 0);
-			defenseObj.SetActive(def > 0);
+			powerObj.SetActive(!isLost() && pow > 0);
+			defenseObj.SetActive(!isLost() && def > 0);
 
 			power.text = pow.ToString();
 			defense.text = def.ToString();
@@ -606,7 +614,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		/// </summary>
 		/// <param name="item"></param>
 		void drawStates(RuntimeBattler item) {
-			states.gameObject.SetActive(!item.isDead());
+			states.gameObject.SetActive(!isLost());
 			states.setItems(item.allRuntimeStates());
 		}
 

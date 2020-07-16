@@ -111,10 +111,7 @@ namespace Core.UI {
         /// </summary>
         public virtual void startWindow() {
             Debug.Log("startWindow: " + name + ": " + shown + ", " + isHiding);
-            if (!shown || isHiding) {
-                isShowing = true;
-                isHiding = false;
-            }
+            //if (!shown || isHiding) isShowing = true;
             base.startView();
         }
 
@@ -123,12 +120,13 @@ namespace Core.UI {
         /// </summary>
         protected override void showView() {
             Debug.Log("showView: " + name + ": " + shown);
-            if (shown) onWindowShown();
-            else {
-                shown = true;
-                if (!animator) onWindowShown();
-                else setVar(shownAttr, true);
-            }
+			//if (shown && !isHiding) onWindowShown();
+			//else {
+			base.showView();
+			isHiding = false; isShowing = true;
+			if (!animator) onWindowShown();
+            else setVar(shownAttr, true);
+            //}
         }
 
         /// <summary>
@@ -136,10 +134,9 @@ namespace Core.UI {
         /// </summary>
         public virtual void terminateWindow() {
             Debug.Log("terminateWindow: " + name + ": "+ shown + ", " + isShowing);
-            if (shown || isShowing) {
-                isShowing = false;
-                isHiding = true;
-            }
+            //if (shown || isShowing) {
+            //    isHiding = true;
+            //}
             base.terminateView();
         }
 
@@ -148,18 +145,19 @@ namespace Core.UI {
         /// </summary>
         protected override void hideView() {
             Debug.Log("hideView: " + name + ": " + shown);
-            if (!shown || !animator) onWindowHidden();
+			isHiding = true; isShowing = false;
+			if (!animator) onWindowHidden();
             else setVar(shownAttr, false);
-        }
+		}
 
-        /// <summary>
-        /// 窗口完全显示回调
-        /// </summary>
-        protected virtual void onWindowShown() {
+		/// <summary>
+		/// 窗口完全显示回调
+		/// </summary>
+		protected virtual void onWindowShown() {
             Debug.Log("onWindowShown: " + name + ": " + isShowing);
             if (isShowing) {
                 isShowing = false;
-                requestRefresh(true);
+                //requestRefresh(true);
             }
         }
 

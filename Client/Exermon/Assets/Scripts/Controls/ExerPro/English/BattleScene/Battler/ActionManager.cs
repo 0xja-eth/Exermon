@@ -105,7 +105,7 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 			if (!item.isStarted) start(item);
 			if (subject.isHit()) hit(item);
 			foreach(var target in targets)
-				if (target.isResult()) end(item);
+				if (target.isLost() || target.isResult()) end(item);
 		}
 
 		#endregion

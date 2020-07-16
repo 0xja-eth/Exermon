@@ -1096,9 +1096,21 @@ namespace ExerPro.EnglishModule.Data {
         public bool inherent { get; protected set; }
         [AutoConvert]
         public bool disposable { get; protected set; }
-        [AutoConvert]
-        public string character { get; protected set; }
-        [AutoConvert]
+		[AutoConvert("character")]
+		public string _character { get; protected set; }
+
+		/// <summary>
+		/// 首字母大写
+		/// </summary>
+		public string character {
+			get {
+				if (_character == "") return "";
+				var s = _character;
+				return s.Substring(0, 1).ToUpper() + s.Substring(1);
+			}
+		}
+
+		[AutoConvert]
         public int target { get; protected set; }
 
 		/// <summary>
@@ -1151,7 +1163,7 @@ namespace ExerPro.EnglishModule.Data {
             card.cardType = 0;
             card.inherent = false;
             card.disposable = false;
-            card.character = "character";
+            card._character = "character";
             card.target = 0;
             card.type = 1;
             card.iconIndex = 0;
@@ -1189,10 +1201,17 @@ namespace ExerPro.EnglishModule.Data {
 	/// </summary>
 	public class ExerProEnemy : BaseItem {
 
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public enum EnemyType {
+		/// <summary>
+		/// BOSS设置
+		/// </summary>
+		public const int BOSS1 = 14; // 中二少年
+		public const int BOSS2 = 13; // 乌龟大师
+		public const int BOSS3 = 15; // 龙王
+
+		/// <summary>
+		/// 类型
+		/// </summary>
+		public enum EnemyType {
             Normal = 1, Elite = 2, Boss = 3
         }
 
@@ -1270,10 +1289,21 @@ namespace ExerPro.EnglishModule.Data {
         public int defense { get; protected set; }
         [AutoConvert("type_")]
         public int type_ { get; protected set; }
-        [AutoConvert]
-        public string character { get; protected set; } // 性格
+		[AutoConvert("character")]
+		public string _character { get; protected set; } // 性格
 
-        [AutoConvert]
+		/// <summary>
+		/// 首字母大写
+		/// </summary>
+		public string character {
+			get {
+				if (_character == "") return "";
+				var s = _character;
+				return s.Substring(0, 1).ToUpper() + s.Substring(1);
+			}
+		}
+
+		[AutoConvert]
         public Action[] actions { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
@@ -1663,7 +1693,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// <summary>
 		/// 出牌记录
 		/// </summary>
-		[AutoConvert]
+		[AutoConvert("cardRecord")]
 		public List<int> _cardRecord { get; protected set; } = new List<int>();
 
 		/// <summary>
@@ -1671,6 +1701,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <returns></returns>
 		public List<ExerProCard> cardRecord() {
+			Debug.Log("_cardRecord: " + string.Join(",", _cardRecord));
 			var res = new List<ExerProCard>(_cardRecord.Count);
 			foreach (var cid in _cardRecord)
 				res.Add(DataService.get().exerProCard(cid));
@@ -1735,8 +1766,10 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public void drawCard() {
 			if (drawGroup.items.Count <= 0) recycleDiscard();
-			drawGroup.transferItem(handGroup, drawGroup.firstCard());
-        }
+			var card = drawGroup.firstCard();
+			drawGroup.transferItem(handGroup, card);
+			debugShow("drawCard: " + card.item().name);
+		}
 
 		/// <summary>
 		/// 回收弃牌
@@ -1751,6 +1784,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// 使用牌
 		/// </summary>
 		public void useCard(ExerProPackCard card) {
+			debugShow("useCard: " + card.item().name);
 			_cardRecord.Add(card.itemId);
 			if (card.item().disposable) consumeCard(card);
             else discardCard(card);
@@ -1760,25 +1794,50 @@ namespace ExerPro.EnglishModule.Data {
         /// 弃牌
         /// </summary>
         public void discardCard(ExerProPackCard card) {
-            handGroup.transferItem(discardGroup, card);
-        }
-        public void discardCard() {
+			handGroup.transferItem(discardGroup, card);
+			debugShow("discardCard: " + card.item().name);
+		}
+		public void discardCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-            handGroup.transferItem(discardGroup, card);
+			discardCard(card);
+			//handGroup.transferItem(discardGroup, card);
         }
 
         /// <summary>
         /// 消耗牌（本次战斗不再出现）
         /// </summary>
         public void consumeCard(ExerProPackCard card) {
-            handGroup.transferItem(this, card);
-        }
-        public void consumeCard() {
+			handGroup.transferItem(this, card);
+			debugShow("consumeCard: " + card.item().name);
+		}
+		public void consumeCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-            handGroup.transferItem(this, card);
+			consumeCard(card);
         }
+
+		/// <summary>
+		/// 显示调试信息
+		/// </summary>
+		void debugShow(string oper = "") {
+			var format = "Debug: {0}\nCard Group: {1}\n" +
+				"Draw Group: {2}\nDiscard Group: {3}\nHand Group: {4}";
+			Debug.Log(string.Format(format, oper, debugCards(this), 
+				debugCards(drawGroup), debugCards(discardGroup), debugCards(handGroup)));
+		}
+
+		/// <summary>
+		/// 显示调试卡牌
+		/// </summary>
+		/// <param name="container"></param>
+		/// <returns></returns>
+		string debugCards(PackContainer<ExerProPackCard> container) {
+			var res = container.items.Count.ToString();
+			foreach (var card in container.items)
+				res += " " + card.item().name;
+			return res;
+		}
 
         #endregion
 
@@ -1839,6 +1898,9 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="equipItem">装备物品</param>
         /// <returns>槽ID</returns>
         public override ExerProSlotPotion getSlotItemByEquipItem<E>(E equipItem) {
+			foreach (var slotItem in items)
+				if (!slotItem.isNullItem() && slotItem.packPotionId == equipItem.id)
+					return slotItem;
             return emptySlotItem();
         }
 
@@ -1921,10 +1983,10 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProMapStage : BaseData {
 
-        /// <summary>
-        /// 属性
-        /// </summary>
-        [AutoConvert]
+		/// <summary>
+		/// 属性
+		/// </summary>
+		[AutoConvert]
         public int order { get; protected set; }
         [AutoConvert("enemies")]
         public int[] _enemies { get; protected set; }
@@ -2307,6 +2369,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public Word nextWord() {
+			Debug.Log("nextWord: " + next);
             if (next <= 0) return wordRecords[0].word();
             return EnglishService.get().getQuestion<Word>(next);
         }
@@ -3024,6 +3087,12 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public abstract Texture2D getBattlePicture();
 
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public virtual string currentCharacter() { return ""; }
+
         #region 属性控制
 
         #region 属性快捷定义
@@ -3668,7 +3737,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 清除所有状态
         /// </summary>
         public void clearStates(bool force = true) {
-            foreach (var pair in states)
+			var tmp = new Dictionary<int, RuntimeState>(states);
+			foreach (var pair in tmp)
                 removeState(pair.Value, force: force);
         }
 
@@ -4010,13 +4080,6 @@ namespace ExerPro.EnglishModule.Data {
 		[AutoConvert]
 		public ExerProPotionSlot potionSlot { get; protected set; }
 
-        /// <summary>
-		/// 金钱
-		/// </summary>
-		public int gold {
-			get { return racord == null ? 0 : racord.gold; }
-		}
-
 		/// <summary>
 		/// 对应的记录
 		/// </summary>
@@ -4027,23 +4090,36 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public ExerSlotItem slotItem { get; protected set; } = null;
 
-        #region 数据转化
+		#region 数据转化
 
-        ///// <summary>
-        ///// 转化为显示数据
-        ///// </summary>
-        ///// <param name="type">类型</param>
-        ///// <returns></returns>
-        //public JsonData convertToDisplayData(string type = "") {
-        //    switch (type) {
-        //        case "hp": return convertHp();
-        //        default: return toJson();
-        //    }
-        //}
+		///// <summary>
+		///// 转化为显示数据
+		///// </summary>
+		///// <param name="type">类型</param>
+		///// <returns></returns>
+		//public JsonData convertToDisplayData(string type = "") {
+		//    switch (type) {
+		//        case "hp": return convertHp();
+		//        default: return toJson();
+		//    }
+		//}
 
-        #endregion
+		#endregion
 
-        #region 数据控制
+		#region 数据控制
+
+		/// <summary>
+		/// 性质
+		/// </summary>
+		string character = "";
+
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public override string currentCharacter() {
+			return character;
+		}
 
 		/// <summary>
 		/// 得到金钱
@@ -4092,6 +4168,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		/// <param name="card">卡牌</param>
 		public void useCard(ExerProPackCard card) {
+			character = card.item()._character;
 			cardGroup.useCard(card);
 			addEnergy(-card.cost());
 		}
@@ -4377,11 +4454,19 @@ namespace ExerPro.EnglishModule.Data {
             return enemy.battle;
         }
 
-        /// <summary>
-        /// 是否玩家
-        /// </summary>
-        /// <returns></returns>
-        public override bool isEnemy() { return true; }
+		/// <summary>
+		/// 当前性格/性质
+		/// </summary>
+		/// <returns></returns>
+		public override string currentCharacter() {
+			return enemy()._character;
+		}
+
+		/// <summary>
+		/// 是否玩家
+		/// </summary>
+		/// <returns></returns>
+		public override bool isEnemy() { return true; }
 
         #region 属性控制
 

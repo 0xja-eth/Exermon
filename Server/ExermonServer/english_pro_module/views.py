@@ -100,7 +100,7 @@ class Service:
 
         pro_record.upgrade()
 
-        return pro_record.convertToDict("words")
+        return {'record': pro_record.convertToDict("words")}
         # except:
         #     pro_record = ExerProRecord.create(player)
         #     return pro_record.convertToDict()

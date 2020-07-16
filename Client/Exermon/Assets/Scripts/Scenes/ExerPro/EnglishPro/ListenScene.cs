@@ -1,6 +1,7 @@
 ﻿
 using Core.Systems;
 using Core.UI;
+using Core.UI.Utils;
 
 using ExerPro.EnglishModule.Services;
 
@@ -38,6 +39,9 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
             return SceneSystem.Scene.EnglishProListenScene;
         }
 
+		/// <summary>
+		/// 初始化外部系统
+		/// </summary>
         protected override void initializeSystems() {
             base.initializeSystems();
             engSer = EnglishService.get();
@@ -61,8 +65,10 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
 		protected override void update() {
 			base.update();
 			var rewardInfo = engSer.rewardInfo;
-			if (rewardInfo != null)
+			if (rewardInfo != null) {
+				playBGM();
 				rewardWindow.startWindow(rewardInfo);
+			}
 		}
 
 		#endregion
@@ -73,7 +79,7 @@ namespace UI.ExerPro.EnglishPro.ListenScene {
 		/// 退出场景
 		/// </summary>
 		public override void popScene() {
-            engSer.exitNode();
+			engSer.exitNode();
         }
 
         #endregion

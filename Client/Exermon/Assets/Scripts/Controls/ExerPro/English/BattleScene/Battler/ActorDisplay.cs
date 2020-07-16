@@ -2,6 +2,7 @@
 using System;
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 using Core.UI.Utils;
 
@@ -17,10 +18,12 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls { }
 /// </summary>
 namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 
+	using Menu;
+
 	/// <summary>
 	/// 角色显示控件
 	/// </summary
-	public class ActorDisplay : BattlerDisplay {
+	public class ActorDisplay : BattlerDisplay, IDropHandler {
 
 		/// <summary>
 		/// 场景组件引用
@@ -61,6 +64,30 @@ namespace UI.ExerPro.EnglishPro.BattleScene.Controls.Battler {
 		protected override void drawExactlyItem(RuntimeBattler item) {
 			base.drawExactlyItem(item);
 			scene.refreshStatus();
+		}
+
+		#endregion
+
+		#region 事件控制
+
+		/// <summary>
+		/// 拖拽释放回调
+		/// </summary>
+		public void OnDrop(PointerEventData eventData) {
+			var display = getPotionDisplay(eventData);
+			Debug.Log("Dragger: " + display);
+			display?.use();
+		}
+
+		/// <summary>
+		/// 获取拖拽中的物品显示项
+		/// </summary>
+		/// <param name="data">事件数据</param>
+		/// <returns>物品显示项</returns>
+		PotionSlotItemDisplay getPotionDisplay(PointerEventData data) {
+			Debug.Log("data.pointerDrag: " + data.pointerDrag);
+			var obj = data.pointerDrag; if (obj == null) return null;
+			return SceneUtils.get<PotionSlotItemDisplay>(obj);
 		}
 
 		#endregion

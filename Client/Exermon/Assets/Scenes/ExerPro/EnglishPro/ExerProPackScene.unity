@@ -903,8 +903,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 295.19998, y: 0}
-  m_SizeDelta: {x: 590.39996, y: 0}
+  m_AnchoredPosition: {x: 275.6, y: 0}
+  m_SizeDelta: {x: 551.2, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &255150617
 MonoBehaviour:
@@ -1007,8 +1007,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 120.80002, y: 0}
-  m_SizeDelta: {x: 241.60004, y: 0}
+  m_AnchoredPosition: {x: 112.399994, y: 0}
+  m_SizeDelta: {x: 224.79999, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &300491959
 MonoBehaviour:
@@ -1295,7 +1295,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1066937799}
   m_HandleRect: {fileID: 1066937798}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5636,6 +5636,8 @@ MonoBehaviour:
   alertWindow: {fileID: 0}
   loadingWindow: {fileID: 0}
   rebuildController: {fileID: 0}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 0}
   exerProPackWindow: {fileID: 692245001}
 --- !u!1 &2114649309
 GameObject:

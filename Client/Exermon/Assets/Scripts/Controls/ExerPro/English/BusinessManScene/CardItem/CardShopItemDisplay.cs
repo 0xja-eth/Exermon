@@ -56,7 +56,7 @@ namespace UI.ExerPro.EnglishPro.BusinessManScene.Controls.CardItem {
 		/// </summary>
 		/// <param name="card"></param>
 		void drawCharacter(ExerProCard card) {
-			if (card.character != "") {
+			if (card._character != "") {
 				var charFrame = AssetLoader.generateSprite(card.charFrame);
 				this.charFrame.gameObject.SetActive(true);
 				this.charFrame.overrideSprite = charFrame;
