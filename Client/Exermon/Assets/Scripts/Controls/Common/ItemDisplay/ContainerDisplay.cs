@@ -241,9 +241,10 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="items">物品集</param>
         public void setItems(T[] items) {
             clearItems();
-            var tmpItems = new List<T>(items);
-            this.items = tmpItems.FindAll(isIncluded);
-            onItemsChanged();
+			this.items = items == null ?
+				new List<T>() : new List<T>(items);
+			//this.items = tmpItems.FindAll(isIncluded);
+			onItemsChanged();
         }
         public void setItems(List<T> items) {
             setItems(items.ToArray());
@@ -313,7 +314,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// 物品变更回调
         /// </summary>
         protected virtual void onItemsChanged() {
-            refreshItemDisplays();
+			items = items.FindAll(isIncluded);
+
+			refreshItemDisplays();
             requestRefresh();
             callbackItemsChange();
         }

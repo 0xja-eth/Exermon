@@ -304,11 +304,11 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
             //    lastText = m_Text;
             perfectSize = new Vector2(0, 0);
 
-            TestSystem.startTest("Parse Text Start");
+            TestSystem.startTimer("Parse Text Start");
 
             createParser().parseText(m_Text);
 
-            TestSystem.endTest("Parse Text End");
+            TestSystem.endTimer("Parse Text End");
 
             //}
         }
@@ -318,7 +318,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
         /// </summary>
         readonly UIVertex[] m_TempVerts = new UIVertex[4];
         protected override void OnPopulateMesh(VertexHelper toFill) {
-            TestSystem.startTest("OnPopulateMesh Start");
+            TestSystem.startTimer("OnPopulateMesh Start");
 
             if (font == null) return;
             if (parser == null) return;
@@ -335,19 +335,19 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
 
             var resText = parser.processedText();
 
-            TestSystem.catchTest("Populate Start");
+            TestSystem.catchTimer("Populate Start");
 
             cachedTextGenerator.Populate(resText, settings);
 
-            TestSystem.catchTest("Parse End");
+            TestSystem.catchTimer("Parse End");
 
             IList<UIVertex> verts = cachedTextGenerator.verts;
 
-            TestSystem.startTest("Parse Verts Start");
+            TestSystem.startTimer("Parse Verts Start");
 
             verts = parser.parseVertices(enterHeight, verts);
 
-            TestSystem.catchTest("Parse Verts End");
+            TestSystem.catchTimer("Parse Verts End");
 
             float unitsPerPixel = 1 / pixelsPerUnit;
             //Last 4 verts are always a new line... (\n)
@@ -408,7 +408,7 @@ namespace UI.Common.Controls.SystemExtend.QuestionText {
 
             parser.clear();
 
-            TestSystem.endTest("OnPopulateMesh End");
+            TestSystem.endTimer("OnPopulateMesh End");
         }
 
         /// <summary>
