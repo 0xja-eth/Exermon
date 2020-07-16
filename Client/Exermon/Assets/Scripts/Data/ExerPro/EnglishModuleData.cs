@@ -380,61 +380,64 @@ namespace ExerPro.EnglishModule.Data {
 		/// <returns></returns>
 		public string[] sentences() {
 			if (tmpSentences == null) {
-				//article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
-				//      article = "Dear Diary, " +
-				//"Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
-				// "Good night and remember, you, dear diary, is my only souvenir from my past life and my only friend.";
-				string temp = article.Replace("\n", "");
+                //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
+                //      article = "Dear Diary, " +
+                //"Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
+                // "Good night and remember, you, dear diary, is my only souvenir from my past life and my only friend.";
+                //article = "My uncle is the owner of a restaurant close to that I live.|Though not very big, but the restaurant is popular in our area.|It is always crowded with customers at meal times.|Some people even had to wait outside.|My uncle tells me that the key to his success is honest.|Every day he makes sure that fresh vegetables or high quality oil are using for cooking.|My uncle says that he never dreams becoming rich in the short period of time.|Instead, he hopes that our business will grow steady.";
+                //article = "Mr Johnson is a hardworking teacher.|Every day, he spends too much time with his work.|With little sleep and hardly any break, so he works from morning till night.|Hard work have made him very ill.|“He has ruined his healthy.|We are worried about him.”|That is which other teachers say.|Yesterday afternoon, I paid visit to Mr.|Johnson.|I was eager to see him, but outside her room I stopped.|I had to calm myself down.|Quietly I step into the room.|I saw him lying in bed, looking at some of the picture we had taken together.|I understood that he missed us just as many as we missed him.";
+
+                string temp = article.Replace("\n", "");
 				temp = temp.Replace("\t", "");
 				temp = temp.Replace("\r", "");
 
-				Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
-				List<string> wordList = new List<string>();
-				using (StreamReader sr = new StreamReader("word.txt")) {
-					string line;
-					while ((line = sr.ReadLine()) != null) {
-						wordList.Add(line);
-					}
-				}
+				//Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
+				//List<string> wordList = new List<string>();
+				//using (StreamReader sr = new StreamReader("word.txt")) {
+				//	string line;
+				//	while ((line = sr.ReadLine()) != null) {
+				//		wordList.Add(line);
+				//	}
+				//}
 
-				foreach (string word in wordList) {
-					Regex regex = new Regex(word);
-					if (regex.IsMatch(temp)) {
-						string match = Regex.Match(temp, word).Value;
-						string hashCode = match.GetHashCode().ToString();
-						temp = temp.Replace(match, hashCode);
-						matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
-					}
-				}
+				//foreach (string word in wordList) {
+				//	Regex regex = new Regex(word);
+				//	if (regex.IsMatch(temp)) {
+				//		string match = Regex.Match(temp, word).Value;
+				//		string hashCode = match.GetHashCode().ToString();
+				//		temp = temp.Replace(match, hashCode);
+				//		matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
+				//	}
+				//}
 
 
-				temp = temp.Replace("”", "\"");
-				temp = temp.Replace("“", "\"");
+				//temp = temp.Replace("”", "\"");
+				//temp = temp.Replace("“", "\"");
 
-				temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
+				//temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
 
-				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
-				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
-				temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
+				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
+				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
+				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
 
-				temp = temp.Replace(",  \"", ",\"&");
-				temp = temp.Replace(".  \"", ".\"&");
-				temp = temp.Replace(" ? ", " ?&");
-				temp = temp.Replace(" . ", " .&");
-				temp = temp.Replace(" ! ", " !&");
-				Debug.Log("aaa" + temp);
+				//temp = temp.Replace(",  \"", ",\"&");
+				//temp = temp.Replace(".  \"", ".\"&");
+				//temp = temp.Replace(" ? ", " ?&");
+				//temp = temp.Replace(" . ", " .&");
+				//temp = temp.Replace(" ! ", " !&");
+				//Debug.Log("aaa" + temp);
 
-				temp = temp.Replace("#", ".");
+				//temp = temp.Replace("#", ".");
 
-				while (matchWordList.Count != 0) {
-					KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
-					temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
-				}
+				//while (matchWordList.Count != 0) {
+				//	KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
+				//	temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
+				//}
 
-				//去除重复空格
-				temp = Regex.Replace(temp, " {2,}", " ");
+				////去除重复空格
+				//temp = Regex.Replace(temp, " {2,}", " ");
 
-				tmpSentences = temp.Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+				tmpSentences = temp.Split(new char[1] { '|' }, StringSplitOptions.RemoveEmptyEntries);
 			}
 			return tmpSentences;
 		}
