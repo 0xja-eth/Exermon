@@ -49,8 +49,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <summary>
 		/// 内部变量定义
 		/// </summary>
-        /// 
-		public string originalWord { get; set; } // 原始文章
+		string _originalWord; // 原始文章
+		public string originalWord {
+			get { return _originalWord; }
+			set {
+				_originalWord = value;
+				noPunWord = filterWord(value);
+			}
+		} 
 
         public string noPunWord { get; set; } // 去除标点后的word，用于判断，orginalWord用于展示
         public string correctWord { get; set; } = null; // 正确答案
@@ -105,16 +111,26 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		}
 		
 		/// <summary>
+		/// 过滤单词非法符号
+		/// </summary>
+		/// <param name="str">原单词</param>
+		/// <returns></returns>
+		string filterWord(string str) {
+			return Regex.Replace(str, @"[^a-zA-Z '‘\-]", "");
+		}
+
+		/// <summary>
 		/// 计算当前修改状态
 		/// </summary>
 		/// <returns></returns>
 		State calcState(string word) {
-            word = Regex.Replace(word, @"[^a-zA-Z|'|\-]", "");
             if (word == "") return State.Deleted;
+			word = filterWord(word); // Regex.Replace(word, @"[^a-zA-Z '‘\-]", "");
 
-            var words = word.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            //var words = word.Split("", StringSplitOptions.RemoveEmptyEntries);
+			var words = word.Split(' ');
 
-            if (words.Length == 2) {
+			if (words.Length == 2) {
                 if (words[0] == noPunWord) return State.AddedNext;
                 if (words[1] == noPunWord) return State.AddedPrev;
             }

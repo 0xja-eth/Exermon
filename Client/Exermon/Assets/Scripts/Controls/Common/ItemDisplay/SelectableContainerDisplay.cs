@@ -353,9 +353,9 @@ namespace UI.Common.Controls.ItemDisplays {
         /// <param name="items">物品集</param>
         public virtual void setItems(T[] items) {
             deselect(); clearChecks();
-            var tmpItems = items == null ? 
+            this.items = items == null ? 
                 new List<T>() : new List<T>(items);
-            this.items = tmpItems.FindAll(isIncluded);
+            //this.items = tmpItems.FindAll(isIncluded);
             onItemsChanged();
         }
         public virtual void setItems(List<T> items) {
@@ -489,7 +489,9 @@ namespace UI.Common.Controls.ItemDisplays {
 		/// 物品变更回调
 		/// </summary>
 		protected virtual void onItemsChanged() {
-            refreshItemDisplays();
+			items = items.FindAll(isIncluded);
+
+			refreshItemDisplays();
             processForceCheckItems();
             requestRefresh();
             callbackItemsChange();

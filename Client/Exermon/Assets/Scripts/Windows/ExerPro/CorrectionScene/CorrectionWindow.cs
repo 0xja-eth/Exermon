@@ -125,7 +125,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 				return;
 
 			var answer = generateWrongItem(word);
-			if (currentWord.originalWord.Contains(word) && word.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length < 2) // 撤销修改
+			if (currentWord.noPunWord == word) // 撤销修改
 				scene.revertAnswer(answer);
 			else if (!scene.addAnswer(answer)) return;
 

@@ -94,7 +94,7 @@ namespace Core.Data.Loaders {
                     return val;
                 } else return _load(type, data);
             } catch (Exception e) {
-                Debug.LogError(e.StackTrace + "\n\nError (load type: " + type + ", ori val: " + val + ")\n" + 
+                Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (load type: " + type + ", ori val: " + val + ")\n" + 
 					" in " + data.ToJson());
                 throw new Exception();
             }
@@ -104,7 +104,7 @@ namespace Core.Data.Loaders {
             try {
                 return (T)_load(typeof(T), json[key]);
             } catch (Exception e) {
-				Debug.LogError(e.StackTrace + "\n\nError (load type: " + typeof(T) + ")\n" +
+				Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (load type: " + typeof(T) + ")\n" +
 					" in " + key + " of " + json.ToJson());
                 throw new Exception();
             }
@@ -114,7 +114,7 @@ namespace Core.Data.Loaders {
             try {
                 return (T)_load(typeof(T), data);
             } catch (Exception e) {
-				Debug.LogError(e.StackTrace + "\n\nError (load type: " + typeof(T) + ")\n" +
+				Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (load type: " + typeof(T) + ")\n" +
 					" in " + data.ToJson());
 				throw new Exception();
             }
@@ -124,7 +124,7 @@ namespace Core.Data.Loaders {
             try {
                 return _load(type, json[key]);
             } catch (Exception e) {
-                Debug.LogError(e.StackTrace + "\n\nError (load type: " + type + ")\n" +
+                Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (load type: " + type + ")\n" +
 					" in " + key + " of " + json.ToJson());
                 throw new Exception();
             }
@@ -133,7 +133,7 @@ namespace Core.Data.Loaders {
             try {
                 return _load(type, data);
             } catch (Exception e) {
-                Debug.LogError(e.StackTrace + "\n\nError (load type: " + type + ")\n" +
+                Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (load type: " + type + ")\n" +
 					" in " + data.ToJson());
                 throw new Exception();
             }
@@ -369,7 +369,7 @@ namespace Core.Data.Loaders {
 				// 其他情况下，直接返回即可
 				return data as JsonData;
 			} catch (Exception e) {
-				Debug.LogError(e.StackTrace + "\n\nError (convert type: " 
+				Debug.LogError(e + "\n" + e.StackTrace + "\n\nError (convert type: " 
 					+ type + ") in covnerting " + data);
 				throw new Exception();
 			}
