@@ -131,27 +131,27 @@ PrefabInstance:
     - target: {fileID: 6207163382210240567, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6207163382210240567, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7397420113453085417, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7397420113453085417, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7397420113453085417, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: -17
       objectReference: {fileID: 0}
     - target: {fileID: 8169879698306504359, guid: 4a482426d937a024b89b44cfc11c9ceb,
         type: 3}
@@ -262,6 +262,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LogDisplay
+      objectReference: {fileID: 0}
+    - target: {fileID: 9158858589611552945, guid: 4a482426d937a024b89b44cfc11c9ceb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a482426d937a024b89b44cfc11c9ceb, type: 3}

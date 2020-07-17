@@ -23,6 +23,8 @@ namespace UI.Common.Controls.LogDisplay {
 		/// </summary>
 		public Text type, output, stack;
 
+		public int maxStrLen = 3000;
+
 		#region 界面控制
 
 		/// <summary>
@@ -31,9 +33,21 @@ namespace UI.Common.Controls.LogDisplay {
 		/// <param name="item"></param>
 		protected override void drawExactlyItem(TestSystem.LogItem item) {
 			base.drawExactlyItem(item);
-			output.text = item.output;
-			stack.text = item.stack;
+
+			output.text = processText(item.output);
+			stack.text = processText(item.stack);
 			type.text = item.type.ToString();
+		}
+
+		/// <summary>
+		/// 处理文本
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
+		string processText(string str) {
+			if (str.Length > maxStrLen)
+				str = str.Substring(0, maxStrLen);
+			return str;
 		}
 		
         #endregion
