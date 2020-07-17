@@ -973,8 +973,8 @@ namespace ExerPro.EnglishModule.Services {
 
 			record.currentNode().realTypeId = (int)type;
 
-			//sceneSys.pushScene(SceneSystem.Scene.EnglishProListenScene);
-			
+			//sceneSys.pushScene(SceneSystem.Scene.EnglishProCorrectionScene);
+
 			if (!record.nodeFlag)
 				switch (type) {
 					case ExerProMapNode.Type.Rest: onRestNode(); break;

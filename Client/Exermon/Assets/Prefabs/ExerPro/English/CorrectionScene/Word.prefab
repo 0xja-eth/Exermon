@@ -344,7 +344,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Word
+  m_Text: 
 --- !u!114 &4134240681640238828
 MonoBehaviour:
   m_ObjectHideFlags: 0

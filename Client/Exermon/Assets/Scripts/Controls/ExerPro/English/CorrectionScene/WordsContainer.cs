@@ -118,10 +118,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			//SceneUtils.text(sub.gameObject).text = items[index];
 
 			var display = sub as WordDisplay;
-            if (display) {
+            if (display) 
                 display.originalWord = items[index];
-                display.noPunWord = Regex.Replace(items[index], @"[^a-zA-Z|'|\-]", "");
-            }
 		}
 
 		#endregion
