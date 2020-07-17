@@ -100,10 +100,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 			if (oriAnswer == null) answers.Add(word, answer);
 			else oriAnswer.word = answer.word;
-
+            Debug.Log("修改前：" + word.getItem());
 			word.setItem(answer.word);
+            Debug.Log("修改后：" + word.getItem());
 
-			refreshRestCount();
+            refreshRestCount();
 			//refreshWords();
 		}
 

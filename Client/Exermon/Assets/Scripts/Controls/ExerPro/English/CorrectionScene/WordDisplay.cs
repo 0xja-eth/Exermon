@@ -11,6 +11,7 @@ using UI.Common.Controls.ItemDisplays;
 
 using FrontendWrongItem = ExerPro.EnglishModule.Data.
 	CorrectionQuestion.FrontendWrongItem;
+using System.Text.RegularExpressions;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
@@ -48,8 +49,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <summary>
 		/// 内部变量定义
 		/// </summary>
+        /// 
 		public string originalWord { get; set; } // 原始文章
-		public string correctWord { get; set; } = null; // 正确答案
+
+        public string noPunWord { get; set; } // 去除标点后的word，用于判断，orginalWord用于展示
+        public string correctWord { get; set; } = null; // 正确答案
 		
 		#region 初始化
 
@@ -97,7 +101,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <returns></returns>
 		public bool isChanged(string word = null) {
 			if (word == null) word = item;
-			return word != originalWord;
+			return word != noPunWord;
 		}
 		
 		/// <summary>
@@ -105,15 +109,18 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		State calcState(string word) {
-			if (word == "") return State.Deleted; 
-			if (word == originalWord) return State.Original;
+            word = Regex.Replace(word, @"[^a-zA-Z|'|\-]", "");
+            if (word == "") return State.Deleted;
 
-			var words = word.Split(' ');
+            var words = word.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-			if (words.Length == 2) {
-				if (words[0] == originalWord) return State.AddedNext;
-				if (words[1] == originalWord) return State.AddedPrev;
-			}
+            if (words.Length == 2) {
+                if (words[0] == noPunWord) return State.AddedNext;
+                if (words[1] == noPunWord) return State.AddedPrev;
+            }
+
+            if (word == noPunWord) return State.Original;
+
 
 			return State.Modefied;
 		}
@@ -128,7 +135,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			if (words.Length <= 0) return "";
 
 			if (words.Length == 2 && 
-				words[0] == originalWord) return words[1];
+				words[0] == noPunWord) return words[1];
 
 			return words[0];
 		}

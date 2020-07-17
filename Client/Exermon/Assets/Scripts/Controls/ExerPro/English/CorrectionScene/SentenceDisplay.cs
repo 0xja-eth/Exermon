@@ -10,6 +10,7 @@ using UI.Common.Controls.ItemDisplays;
 
 using FrontendWrongItem = ExerPro.EnglishModule.Data.
 	CorrectionQuestion.FrontendWrongItem;
+using System;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
@@ -125,8 +126,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// 生成单词
 		/// </summary>
 		string[] generateWords() {
-			return item.Trim().Split(' ');
-			/*
+            return item.Trim().Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            /*
 			string temp = item.Trim();
 			List<string> words = temp.Split(' ').ToList();
 
@@ -144,7 +145,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 			return words;
 			*/
-		}
+        }
 
 		/// <summary>
 		/// 返回所有错误项

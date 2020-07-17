@@ -17,11 +17,12 @@ using FrontendWrongItem = ExerPro.EnglishModule.Data.
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 
 	using Controls;
+    using System;
 
-	/// <summary>
-	/// 改错窗口
-	/// </summary>
-	public class CorrectionWindow : BaseWindow {
+    /// <summary>
+    /// 改错窗口
+    /// </summary>
+    public class CorrectionWindow : BaseWindow {
 
 		/// <summary>
 		/// 文本常量定义
@@ -105,8 +106,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 			base.refresh();
 			Debug.Log("CorrectionWindow.refresh");
 
-			originWord.text = currentWord.originalWord;
-			inputField.setValue(currentWord.originalWord);
+            originWord.text = currentWord.noPunWord;
+			inputField.setValue(currentWord.noPunWord);
 			//inputField.activate();
 		}
 
@@ -119,12 +120,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// </summary>
 		public void confirm() {
 			var word = inputField.getValue();
-			var ori = currentWord.originalWord;
+			var ori = currentWord.noPunWord;
 			if (!check(word, ori, currentWord.getWid()))
 				return;
 
 			var answer = generateWrongItem(word);
-			if (word == ori) // 撤销修改
+			if (currentWord.originalWord.Contains(word) && word.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length < 2) // 撤销修改
 				scene.revertAnswer(answer);
 			else if (!scene.addAnswer(answer)) return;
 
@@ -152,9 +153,9 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// </summary>
 		/// <returns></returns>
 		bool check(string word, string ori, int wid) {
-			var words = word.Split(' ');
+            var words = word.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-			if (words.Length <= 1) return true;
+            if (words.Length <= 1) return true;
 
 			if (words.Length > 2)
 				return requestAlert(AddExceedWordsAlertText);
