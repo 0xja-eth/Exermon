@@ -437,7 +437,7 @@ namespace ExerPro.EnglishModule.Data {
 				////去除重复空格
 				//temp = Regex.Replace(temp, " {2,}", " ");
 
-				tmpSentences = temp.Split(new char[1] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+				tmpSentences = temp.Split(new char[2] { '|',' ' }, StringSplitOptions.RemoveEmptyEntries);
 			}
 			return tmpSentences;
 		}
