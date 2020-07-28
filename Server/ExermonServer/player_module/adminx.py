@@ -7,137 +7,149 @@ import xadmin
 
 # Register your models here.
 
+#
+# class HumanItemEffectsInline(BaseEffectsInline): model = HumanItemEffect
+#
+#
+# class HumanEquipLevelParamsInline(EquipParamsInline): model = HumanEquipLevelParam
+#
+#
+# class HumanEquipBaseParamsInline(EquipParamsInline): model = HumanEquipBaseParam
+#
+#
+# class HumanPackItemsInline(BaseContItemsInline): model = HumanPackItem
+#
+#
+# class HumanPackEquipsInline(BaseContItemsInline): model = HumanPackEquip
+#
+#
+# class HumanEquipSlotItemsInline(BaseContItemsInline): model = HumanEquipSlotItem
+#
+#
+# class PlayerMoneyInline(CurrencyInline): model = PlayerMoney
+#
+#
+# class HumanItemPriceInline(CurrencyInline): model = HumanItemPrice
+#
+#
+# class HumanEquipPriceInline(CurrencyInline): model = HumanEquipPrice
 
-class HumanItemEffectsInline(BaseEffectsInline): model = HumanItemEffect
 
-
-class HumanEquipLevelParamsInline(EquipParamsInline): model = HumanEquipLevelParam
-
-
-class HumanEquipBaseParamsInline(EquipParamsInline): model = HumanEquipBaseParam
-
-
-class HumanPackItemsInline(BaseContItemsInline): model = HumanPackItem
-
-
-class HumanPackEquipsInline(BaseContItemsInline): model = HumanPackEquip
-
-
-class HumanEquipSlotItemsInline(BaseContItemsInline): model = HumanEquipSlotItem
-
-
-class PlayerMoneyInline(CurrencyInline): model = PlayerMoney
-
-
-class HumanItemPriceInline(CurrencyInline): model = HumanItemPrice
-
-
-class HumanEquipPriceInline(CurrencyInline): model = HumanEquipPrice
-
-
-@xadmin.sites.register(LoginInfo)
+@AdminXHelper.relatedModel(LoginInfo)
 class LoginInfoAdmin(object):
 
-	list_display = ['id', 'player', 'time', 'logout', 'ip_address']
+	# list_display = ['id', 'player', 'time', 'logout', 'ip_address']
+	pass
 
 
-@xadmin.sites.register(PasswordRecord)
+@AdminXHelper.relatedModel(PasswordRecord)
 class PasswordRecordAdmin(object):
 
-	list_display = ['id', 'player', 'time', 'password', 'ip_address']
+	# list_display = ['id', 'player', 'time', 'password', 'ip_address']
+	pass
 
 
-@xadmin.sites.register(Character)
+@AdminXHelper.relatedModel(Character)
 class CharacterAdmin(object):
 
-	list_display = ['id', 'name', 'description', 'gender']
+	# list_display = ['id', 'name', 'description', 'gender']
+	#
+	# list_editable = ['name', 'description', 'gender']
+	pass
 
-	list_editable = ['name', 'description', 'gender']
 
-
-@xadmin.sites.register(PlayerMoney)
+@AdminXHelper.relatedModel(PlayerMoney)
 class PlayerMoneyAdmin(object):
 
-	list_display = ['id', 'gold', 'ticket', 'bound_ticket', 'player']
+	# list_display = ['id', 'gold', 'ticket', 'bound_ticket', 'player']
+	#
+	# list_editable = ['gold', 'ticket', 'bound_ticket', 'player']
+	pass
 
-	list_editable = ['gold', 'ticket', 'bound_ticket', 'player']
 
-
-@xadmin.sites.register(Player)
+@AdminXHelper.relatedModel(Player)
 class PlayerAdmin(object):
 
-	list_display = ['id', 'username', 'phone', 'email', 'name', 'status',
-					'character', 'exp', 'adminLevel', 'adminMoney', 'online',
-					'type', 'grade', 'create_time', 'last_refresh_time']
+	# list_display = ['id', 'username', 'phone', 'email', 'name', 'status',
+	# 				'character', 'exp', 'adminLevel', 'adminMoney', 'online',
+	# 				'type', 'grade', 'create_time', 'last_refresh_time']
+	#
+	# list_editable = ['username', 'phone', 'email', 'name', 'character', 'exp',
+	# 				 'status', 'type', 'online', 'grade']
+	#
+	# inlines = [PlayerMoneyInline]
+	pass
 
-	list_editable = ['username', 'phone', 'email', 'name', 'character', 'exp',
-					 'status', 'type', 'online', 'grade']
 
-	inlines = [PlayerMoneyInline]
-
-
-@xadmin.sites.register(HumanItem)
+@AdminXHelper.relatedModel(HumanItem)
 class HumanItemAdmin(UsableItemAdmin):
-	inlines = [HumanItemPriceInline, HumanItemEffectsInline]
+
+	# inlines = [HumanItemPriceInline, HumanItemEffectsInline]
+	pass
 
 
-@xadmin.sites.register(HumanEquip)
+@AdminXHelper.relatedModel(HumanEquip)
 class HumanEquipAdmin(EquipableItemAdmin):
-	inlines = [HumanEquipPriceInline,
-			   HumanEquipLevelParamsInline,
-			   HumanEquipBaseParamsInline]
+
+	# inlines = [HumanEquipPriceInline,
+	# 		   HumanEquipLevelParamsInline,
+	# 		   HumanEquipBaseParamsInline]
+	pass
 
 
-@xadmin.sites.register(HumanPack)
+@AdminXHelper.relatedModel(HumanPack)
 class HumanPackAdmin(PackContainerAdmin):
 
-	list_display = PackContainerAdmin.list_display + \
-				   ['player']
+	# list_display = PackContainerAdmin.list_display + \
+	# 			   ['player']
+	#
+	# field_set = [Fieldset('人类背包属性', 'player')]
+	#
+	# form_layout = PackContainerAdmin.form_layout + field_set
+	#
+	# inlines = [HumanPackItemsInline, HumanPackEquipsInline]
+	pass
 
-	field_set = [Fieldset('人类背包属性', 'player')]
 
-	form_layout = PackContainerAdmin.form_layout + field_set
-
-	inlines = [HumanPackItemsInline, HumanPackEquipsInline]
-
-
-@xadmin.sites.register(HumanEquipSlot)
+@AdminXHelper.relatedModel(HumanEquipSlot)
 class HumanEquipSlotAdmin(SlotContainerAdmin):
 
-	list_display = SlotContainerAdmin.list_display + \
-				   ['player']
+	# list_display = SlotContainerAdmin.list_display + \
+	# 			   ['player']
+	#
+	# field_set = [Fieldset('人类装备槽属性', 'player')]
+	#
+	# form_layout = SlotContainerAdmin.form_layout + field_set
+	#
+	# inlines = [HumanEquipSlotItemsInline]
+	pass
 
-	field_set = [Fieldset('人类装备槽属性', 'player')]
 
-	form_layout = SlotContainerAdmin.form_layout + field_set
-
-	inlines = [HumanEquipSlotItemsInline]
-
-
-@xadmin.sites.register(HumanPackItem)
+@AdminXHelper.relatedModel(HumanPackItem)
 class HumanPackItemAdmin(PackContItemAdmin):
 	pass
 
 
-@xadmin.sites.register(HumanPackEquip)
+@AdminXHelper.relatedModel(HumanPackEquip)
 class HumanPackEquipAdmin(PackContItemAdmin):
 	pass
 
 
-@xadmin.sites.register(HumanEquipSlotItem)
+@AdminXHelper.relatedModel(HumanEquipSlotItem)
 class HumanEquipSlotItemAdmin(SlotContItemAdmin):
 
-	list_display = SlotContItemAdmin.list_display + \
-				   ['pack_equip', 'e_type']
-
-	list_editable = SlotContItemAdmin.list_display + \
-				   ['pack_equip']
-
-	field_set = [Fieldset('人类装备槽项属性', 'pack_equip')]
-
-	exclude = ['e_type']
-
-	form_layout = SlotContItemAdmin().form_layout + field_set
+	# list_display = SlotContItemAdmin.list_display + \
+	# 			   ['pack_equip', 'e_type']
+	#
+	# list_editable = SlotContItemAdmin.list_display + \
+	# 			   ['pack_equip']
+	#
+	# field_set = [Fieldset('人类装备槽项属性', 'pack_equip')]
+	#
+	# exclude = ['e_type']
+	#
+	# form_layout = SlotContItemAdmin().form_layout + field_set
+	pass
 
 
 xadmin.site.register(HumanItemEffect, BaseEffectAdmin)

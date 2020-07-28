@@ -52,7 +52,7 @@ class Service:
 	@classmethod
 	def _generateDynamicData(cls):
 		configure = GameConfigure.get()
-		return configure.convertToDict("dynamic")
+		return configure.convert("dynamic")
 
 	# 生成版本数据
 	@classmethod
@@ -62,7 +62,7 @@ class Service:
 		last_versions = ModelUtils.objectsToDict(last_versions)
 
 		return {
-			'cur_version': cur_version.convertToDict(),
+			'cur_version': cur_version.convert(),
 			'last_versions': last_versions,
 		}
 
@@ -123,7 +123,7 @@ class Service:
 	def _generateMainData(cls, data, cur_version: GameVersion):
 		configure = cur_version.configure
 
-		data['configure'] = configure.convertToDict("static")
+		data['configure'] = configure.convert("static")
 		data['data'] = cls._generateResourceData()
 
 		return data

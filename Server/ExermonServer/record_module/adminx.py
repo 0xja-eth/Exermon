@@ -8,62 +8,71 @@ import xadmin
 # Register your models here.
 
 
+@AdminXHelper.registerBaseInline(ExerciseQuestion)
 class ExerciseQuestionsInline(object):
 
 	model = ExerciseQuestion
 	style = "table"
 
 
-@xadmin.sites.register(QuestionRecord)
+@AdminXHelper.relatedModel(QuestionRecord)
 class QuestionRecordAdmin(object):
 
-	list_display = ['id', 'question', 'player', 'count', 'correct',
-					'last_date', 'first_date', 'first_time', 'avg_time',
-					'corr_time', 'sum_exp', 'sum_gold', 'source',
-					'collected', 'wrong', 'note']
+	# list_display = ['id', 'question', 'player', 'count', 'correct',
+	# 				'last_date', 'first_date', 'first_time', 'avg_time',
+	# 				'corr_time', 'sum_exp', 'sum_gold', 'source',
+	# 				'collected', 'wrong', 'note']
+	#
+	# list_editable = ['question', 'player', 'count', 'correct',
+	# 				'last_date', 'first_date', 'first_time', 'avg_time',
+	# 				'corr_time', 'sum_exp', 'sum_gold', 'source',
+	# 				'collected', 'wrong', 'note']
+	pass
 
-	list_editable = ['question', 'player', 'count', 'correct',
-					'last_date', 'first_date', 'first_time', 'avg_time',
-					'corr_time', 'sum_exp', 'sum_gold', 'source',
-					'collected', 'wrong', 'note']
 
-
+@AdminXHelper.relatedModel(PlayerQuestion)
 class PlayerQuestionAdmin(object):
 
-	list_display = ['id', 'question', 'answered', 'adminSelection',
-					'adminAnswer', 'timespan', 'exp_incr',
-					'slot_exp_incr', 'gold_incr', 'is_new']
+	# list_display = ['id', 'question', 'answered', 'adminSelection',
+	# 				'adminAnswer', 'timespan', 'exp_incr',
+	# 				'slot_exp_incr', 'gold_incr', 'is_new']
+	#
+	# list_editable = ['question', 'answered', 'timespan', 'exp_incr',
+	# 				 'slot_exp_incr', 'gold_incr', 'is_new']
+	pass
 
-	list_editable = ['question', 'answered', 'timespan', 'exp_incr',
-					 'slot_exp_incr', 'gold_incr', 'is_new']
 
-
-@xadmin.sites.register(ExerciseQuestion)
+@AdminXHelper.relatedModel(ExerciseQuestion)
 class ExerciseQuestionAdmin(PlayerQuestionAdmin):
 
-	list_display = PlayerQuestionAdmin.list_display + \
-				   ['exercise']
+	# list_display = PlayerQuestionAdmin.list_display + \
+	# 			   ['exercise']
+	#
+	# list_editable = PlayerQuestionAdmin.list_editable + \
+	# 			   ['exercise']
+	pass
 
-	list_editable = PlayerQuestionAdmin.list_editable + \
-				   ['exercise']
 
-
+@AdminXHelper.relatedModel(QuestionSetRecord)
 class QuestionSetRecordAdmin(object):
+	#
+	# list_display = ['id', 'player', 'create_time', 'finished',
+	# 				'adminExerExpIncrs', 'adminSlotExpIncrs',
+	# 				'adminExpIncrs', 'gold_incr']
+	#
+	# list_editable = ['player', 'create_time', 'finished', 'gold_incr']
+	pass
 
-	list_display = ['id', 'player', 'create_time', 'finished',
-					'adminExerExpIncrs', 'adminSlotExpIncrs',
-					'adminExpIncrs', 'gold_incr']
 
-	list_editable = ['player', 'create_time', 'finished', 'gold_incr']
-
-
-@xadmin.sites.register(ExerciseRecord)
+@AdminXHelper.relatedModel(ExerciseRecord)
 class ExerciseRecordAdmin(QuestionSetRecordAdmin):
 
-	list_display = QuestionSetRecordAdmin.list_display + \
-				   ['subject', 'count', 'gen_type']
+	# list_display = QuestionSetRecordAdmin.list_display + \
+	# 			   ['subject', 'count', 'gen_type']
+	#
+	# list_editable = BaseItemAdmin.list_editable + \
+	# 			   ['subject', 'count', 'gen_type']
+	#
+	# inlines = [ExerciseQuestionsInline]
+	pass
 
-	list_editable = BaseItemAdmin.list_editable + \
-				   ['subject', 'count', 'gen_type']
-
-	inlines = [ExerciseQuestionsInline]

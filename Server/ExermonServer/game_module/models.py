@@ -1,11 +1,12 @@
 from django.db import models
 from django.db.models.query import QuerySet
-from django.db.utils import ProgrammingError
-from utils.model_utils import Common as ModelUtils
+
+from utils.model_utils import CoreModel, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import GameException, ErrorType
+
 from enum import Enum
-import jsonfield, traceback
+import jsonfield
 
 # Create your models here.
 
@@ -18,6 +19,8 @@ class GameVersion(models.Model):
 	class Meta:
 
 		verbose_name = verbose_name_plural = "游戏版本"
+
+	LIST_EDITABLE_EXCLUDE = ['update_time', 'description']
 
 	# 当前版本的 GameVersion 实例
 	Version = None
@@ -80,7 +83,7 @@ class GameVersion(models.Model):
 		self.is_used = True
 		self.save()
 
-	def convertToDict(self):
+	def convert(self):
 
 		update_time = ModelUtils.timeToStr(self.update_time)
 
@@ -246,7 +249,7 @@ class ParamValue(models.Model):
 	def isPercent(self):
 		return self.param.isPercent()
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'param_id': self.param_id,
 			'value': self.getValue(),
@@ -261,6 +264,42 @@ class ParamRate(ParamValue):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "属性率"
+
+	# 比例
+	def scale(self):
+		return 100
+
+	# 最大值
+	def maxVal(self):
+		return None
+
+	# 最小值
+	def minVal(self):
+		return None
+
+	# 是否百分数
+	def isPercent(self):
+		return True
+
+
+# ===================================================
+#  装备属性值
+# ===================================================
+class EquipParamValue(ParamValue):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "装备属性值"
+
+
+# ===================================================
+#  装备属性率
+# ===================================================
+class EquipParamRate(EquipParamValue):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "装备属性率"
 
 	# 比例
 	def scale(self):
@@ -315,7 +354,7 @@ class ParamValueRange(models.Model):
 	def getValue(self):
 		return self.min_value/self.scale(), self.max_value/self.scale()
 
-	def convertToDict(self):
+	def convert(self):
 		values = self.getValue()
 		return {
 			'param_id': self.param_id,
@@ -341,19 +380,10 @@ class ParamRateRange(ParamValueRange):
 # ===================================================
 # 集合型配置
 # ===================================================
-class GroupConfigure(models.Model):
+class GroupConfigure(CoreModel):
 
 	class Meta:
 		abstract = True
-		verbose_name = verbose_name_plural = "集合型配置"
-
-	NOT_EXIST_ERROR = ErrorType.UnknownError
-
-	# 全局变量，GroupConfigure 所有实例
-	Objects = None
-
-	# 全局变量，GroupConfigure 数
-	Count = None
 
 	# 所属配置
 	configure = models.ForeignKey('game_module.GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
@@ -367,7 +397,7 @@ class GroupConfigure(models.Model):
 	def __str__(self):
 		return self.name
 
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		将数据转化为字典
 		Returns:
@@ -379,84 +409,12 @@ class GroupConfigure(models.Model):
 			'description': self.description
 		}
 
+	# 读取参数
 	@classmethod
-	def load(cls):
-		"""
-		读取数据
-		"""
+	def _setupKwargs(cls):
 		configure: GameConfigure = GameConfigure.get()
 
-		if configure is None:
-			raise GameException(ErrorType.NoCurConfigure)
-
-		cls.Objects = ViewUtils.getObjects(cls, configure=configure)
-		cls.Count = len(list(cls.Objects))  # 强制查询，加入缓存
-
-	@classmethod
-	def get(cls, **kwargs) -> 'GroupConfigure':
-		"""
-		根据条件获取单个数据
-		Args:
-			**kwargs (**dict): 查询条件
-		Returns:
-			按照条件返回指定数据（若有多个返回第一个）
-		Raises:
-			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
-		Examples:
-			获取 id 为 3 的科目：
-			subject = Subject.get(id=3)
-			获取 属性缩写 为 mhp 的属性：
-			param = BaseParam.get(attr='mhp')
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.getObject(cls, cls.NOT_EXIST_ERROR,
-								   objects=cls.Objects, **kwargs)
-
-	@classmethod
-	def ensure(cls, **kwargs):
-		"""
-		确保指定条件的数据存在
-		Args:
-			**kwargs (**dict): 查询条件
-		Raises:
-			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
-		Examples:
-			确保 id 为 3 且名字为 英语 的科目存在：
-			Subject.ensure(id=3, name="英语")
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.ensureObjectExist(cls, cls.NOT_EXIST_ERROR,
-										   objects=cls.Objects, **kwargs)
-
-	@classmethod
-	def objs(cls, **kwargs) -> QuerySet:
-		"""
-		按照一定条件获取多个数据
-		Args:
-			**kwargs (**dict): 查询条件
-		Returns:
-			返回符合指定条件的数据列表
-		Examples:
-			获取全部属性数据：
-			params = BaseParam.objs()
-			获取分值为 150 的所有科目数据：
-			subjects = Subject.objs(max_score=150)
-		"""
-		if cls.Objects is None: cls.load()
-
-		return ViewUtils.getObjects(cls, cls.Objects, **kwargs)
-
-	@classmethod
-	def count(cls) -> int:
-		"""
-		获取数据的数量
-		Returns:
-			返回该数据在数据库中的数量
-		"""
-		if cls.Count is None: cls.load()
-		return cls.Count
+		return {"configure": configure}
 
 
 # ===================================================
@@ -490,8 +448,8 @@ class GameTip(GroupConfigure):
 	type = models.PositiveSmallIntegerField(default=TipType.Study.value,
 											choices=TYPES, verbose_name="小贴士类型")
 
-	def convertToDict(self, type: str = None, **kwargs):
-		res = super().convertToDict()
+	def convert(self, type: str = None, **kwargs):
+		res = super().convert()
 
 		res['type'] = self.type
 
@@ -507,6 +465,8 @@ class Subject(GroupConfigure):
 		verbose_name = verbose_name_plural = "科目"
 
 	NOT_EXIST_ERROR = ErrorType.SubjectNotExist
+
+	LIST_DISPLAY_APPEND = ['adminColor']
 
 	# 选科最大数目
 	MAX_SELECTED = 6
@@ -530,8 +490,8 @@ class Subject(GroupConfigure):
 
 	adminColor.short_description = "科目颜色"
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['color'] = self.color
 		res['max_score'] = self.max_score
@@ -557,6 +517,8 @@ class BaseParam(GroupConfigure):
 		verbose_name = verbose_name_plural = "基本属性"
 
 	NOT_EXIST_ERROR = ErrorType.BaseParamNotExist
+
+	LIST_DISPLAY_APPEND = ['adminColor']
 
 	# 属性颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="属性颜色")
@@ -586,8 +548,8 @@ class BaseParam(GroupConfigure):
 
 	adminColor.short_description = "属性颜色"
 
-	def convertToDict(self):
-		res = super().convertToDict()
+	def convert(self):
+		res = super().convert()
 
 		res['color'] = self.color
 		res['attr'] = self.attr
@@ -708,6 +670,9 @@ class ExerStar(GroupConfigure):
 
 	NOT_EXIST_ERROR = ErrorType.StarNotExist
 
+	LIST_DISPLAY_APPEND = ['adminColor', 'adminLevelExpFactors',
+						   'adminParamBaseRanges', 'adminParamRateRanges']
+
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
 
@@ -778,7 +743,7 @@ class ExerStar(GroupConfigure):
 		res['base_ranges'] = ModelUtils.objectsToDict(self.paramBaseRanges())
 		res['rate_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
 
-	def convertToDict(self):
+	def convert(self):
 
 		level_exp_factors: dict = self.level_exp_factors
 		level_exp_factors = list(level_exp_factors.values())
@@ -827,6 +792,8 @@ class ExerGiftStar(GroupConfigure):
 
 	NOT_EXIST_ERROR = ErrorType.StarNotExist
 
+	LIST_DISPLAY_APPEND = ['adminColor']
+
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
 
@@ -843,7 +810,7 @@ class ExerGiftStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 
 		return {
 			'id': self.id,
@@ -866,6 +833,8 @@ class ItemStar(GroupConfigure):
 
 		verbose_name = verbose_name_plural = "物品星级"
 
+	LIST_DISPLAY_APPEND = ['adminColor']
+
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
 
@@ -882,7 +851,7 @@ class ItemStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 
 		return {
 			'id': self.id,
@@ -899,6 +868,8 @@ class QuestionStar(GroupConfigure):
 		verbose_name = verbose_name_plural = "题目星级"
 
 	NOT_EXIST_ERROR = ErrorType.StarNotExist
+
+	LIST_DISPLAY_APPEND = ['adminColor']
 
 	# 星级颜色（#ABCDEF）
 	color = models.CharField(max_length=7, null=False, default='#000000', verbose_name="星级颜色")
@@ -931,7 +902,7 @@ class QuestionStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convertToDict(self):
+	def convert(self):
 		return {
 			'id': self.id,
 			'name': self.name,
@@ -975,16 +946,32 @@ class GameConfigure(models.Model):
 	# 激活
 	# activated = models.BooleanField(default=True, verbose_name="激活")
 
-	GROUP_CONFIGURES = [BaseParam, Subject, ExerStar, ExerGiftStar,
-						UsableItemType, HumanEquipType, ExerEquipType]
-
 	def __str__(self):
 		return "%d. %s 配置" % (self.id, self.name)
 
-	def convertToDict(self, type="static"):
+	def convert(self, type="static"):
 
 		if type == 'static': return self._convertStaticDataToDict()
 		if type == 'dynamic': return self._convertDynamicDataToDict()
+
+	@classmethod
+	def groupConfigures(cls):
+		from utils.model_utils import AdminXHelper
+
+		return AdminXHelper.allRelatedModels(cls)
+
+	def _convertGroupConfigureToDict(self, data):
+		from utils.data_manager import DataManager
+		group_configure_clas = self.groupConfigures()
+
+		for cla in group_configure_clas:
+			cla_name = cla.__name__
+			key_name = DataManager.hump2Underline(cla_name) + 's'
+			attr_name = cla_name.lower() + '_set'
+
+			objs = getattr(self, attr_name).all()
+
+			data[key_name] = ModelUtils.objectsToDict(objs)
 
 	def _convertStaticDataToDict(self):
 		from item_module.models import UsableItem
@@ -995,27 +982,9 @@ class GameConfigure(models.Model):
 		from battle_module.models import BattleRecord, BattlePlayer, BattleRoundResult
 		from english_pro_module.models import WrongItem, ExerProCard, ExerProEnemy
 
-		subjects = ModelUtils.objectsToDict(self.subject_set.all())
-		base_params = ModelUtils.objectsToDict(self.baseparam_set.all())
-		usable_item_types = ModelUtils.objectsToDict(self.usableitemtype_set.all())
-		human_equip_types = ModelUtils.objectsToDict(self.humanequiptype_set.all())
-		exer_equip_types = ModelUtils.objectsToDict(self.exerequiptype_set.all())
-		exer_stars = ModelUtils.objectsToDict(self.exerstar_set.all())
-		exer_gift_stars = ModelUtils.objectsToDict(self.exergiftstar_set.all())
-		ques_stars = ModelUtils.objectsToDict(self.questionstar_set.all())
-		item_stars = ModelUtils.objectsToDict(self.itemstar_set.all())
-		comp_ranks = ModelUtils.objectsToDict(self.comprank_set.all())
-		result_judges = ModelUtils.objectsToDict(self.battleresultjudge_set.all())
-		game_tips = ModelUtils.objectsToDict(self.gametip_set.all())
-
 		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
 
-		first_card_groups = ModelUtils.objectsToDict(self.firstcardgroup_set.all())
-		exer_pro_item_stars = ModelUtils.objectsToDict(self.exerproitemstar_set.all())
-		antonyms = ModelUtils.objectsToDict(self.antonym_set.all())
-		node_types = ModelUtils.objectsToDict(self.nodetype_set.all())
-
-		return {
+		data = {
 			'name': self.name,
 			'eng_name': self.eng_name,
 			'gold': self.gold,
@@ -1062,26 +1031,11 @@ class GameConfigure(models.Model):
 			'correct_types': WrongItem.TYPES,
 			'card_types': ExerProCard.CARD_TYPES,
 			'enemy_types': ExerProEnemy.ENEMY_TYPES,
-
-			# 组合配置
-			'subjects': subjects,
-			'base_params': base_params,
-			'usable_item_types': usable_item_types,
-			'human_equip_types': human_equip_types,
-			'exer_equip_types': exer_equip_types,
-			'exer_stars': exer_stars,
-			'exer_gift_stars': exer_gift_stars,
-			'ques_stars': ques_stars,
-			'item_stars': item_stars,
-			'comp_ranks': comp_ranks,
-			'result_judges': result_judges,
-			'game_tips': game_tips,
-
-			'first_card_groups': first_card_groups,
-			'exer_pro_item_stars': exer_pro_item_stars,
-			'antonyms': antonyms,
-			'node_types': node_types,
 		}
+
+		self._convertGroupConfigureToDict(data)
+
+		return data
 
 	def _convertDynamicDataToDict(self):
 		from season_module.runtimes import SeasonManager
@@ -1105,8 +1059,8 @@ class GameConfigure(models.Model):
 
 		cls.Configure = version.configure
 
-		for conf in cls.GROUP_CONFIGURES:
-			conf.load()
+		for conf in cls.groupConfigures():
+			if isinstance(conf, GroupConfigure): conf.setup()
 
 	@classmethod
 	def get(cls):

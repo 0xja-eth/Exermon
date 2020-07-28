@@ -21,60 +21,63 @@ import xadmin
 # 	style = "one"
 
 
-class ListeningQuesChoicesInline(BaseQuesChoicesInline):
-	model = ListeningQuesChoice
-
-
-class PlotQuesChoicesInline(BaseQuesChoicesInline):
-	model = PlotQuesChoice
+# class ListeningQuesChoicesInline(BaseQuesChoicesInline):
+# 	model = ListeningQuesChoice
+#
+#
+# class PlotQuesChoicesInline(BaseQuesChoicesInline):
+# 	model = PlotQuesChoice
 
 
 # class ReadingQuesChoicesInline(BaseQuesChoicesInline):
 # 	model = ReadingQuesChoice
 
 
-class ListeningSubQuestionsInline(BaseQuestionsInline):
-	model = ListeningSubQuestion
+# class ListeningSubQuestionsInline(BaseQuestionsInline):
+# 	model = ListeningSubQuestion
 
 
 # class ReadingSubQuestionsInline(BaseQuestionsInline):
 # 	model = ReadingSubQuestion
 
 
+@AdminXHelper.registerBaseInline(WrongItem)
 class WrongItemsInline(object):
+
 	model = WrongItem
 	style = "table"
 
+# class ExerProPlotEffectsInline(BaseEffectsInline):
+# 	model = ExerProPlotEffect
+#
+#
+# class ExerProItemTraitsInline(BaseTraitsInline):
+# 	model = ExerProItemTrait
+#
+#
+# class ExerProStateTraitsInline(BaseTraitsInline):
+# 	model = ExerProStateTrait
+#
+#
+# class ExerProPotionEffectsInline(BaseEffectsInline):
+# 	model = ExerProPotionEffect
+#
+#
+# class ExerProCardEffectsInline(BaseEffectsInline):
+# 	model = ExerProCardEffect
+#
+#
+# class EnemyEffectsInline(BaseEffectsInline):
+# 	model = EnemyEffect
+#
+#
+# class EnemyActionsInline(BaseEffectsInline):
+# 	model = EnemyAction
 
-class ExerProPlotEffectsInline(BaseEffectsInline):
-	model = ExerProPlotEffect
 
-
-class ExerProItemTraitsInline(BaseTraitsInline):
-	model = ExerProItemTrait
-
-
-class ExerProStateTraitsInline(BaseTraitsInline):
-	model = ExerProStateTrait
-
-
-class ExerProPotionEffectsInline(BaseEffectsInline):
-	model = ExerProPotionEffect
-
-
-class ExerProCardEffectsInline(BaseEffectsInline):
-	model = ExerProCardEffect
-
-
-class EnemyEffectsInline(BaseEffectsInline):
-	model = EnemyEffect
-
-
-class EnemyActionsInline(BaseEffectsInline):
-	model = EnemyAction
-
-
+@AdminXHelper.registerBaseInline(ExerProMapStage)
 class MapStagesInline(object):
+
 	model = ExerProMapStage
 	style = "accordion"
 
@@ -92,264 +95,290 @@ class MapStagesInline(object):
 # 	list_editable = ['sugar', 'gold', 'ticket', 'bound_ticket']
 
 
-@xadmin.sites.register(ListeningQuesChoice)
+@AdminXHelper.relatedModel(ListeningQuesChoice)
 class ListeningQuesChoiceAdmin(object):
-	list_display = ['id', 'order', 'text', 'answer']
 
-	list_editable = ['order', 'text', 'answer']
+	# list_display = ['id', 'order', 'text', 'answer']
+	#
+	# list_editable = ['order', 'text', 'answer']
+	pass
 
 
-@xadmin.sites.register(ListeningSubQuestion)
+@AdminXHelper.relatedModel(ListeningSubQuestion)
 class ListeningSubQuestionAdmin(BaseQuestionAdmin):
-	inlines = [ListeningQuesChoicesInline]
 
+	# inlines = [ListeningQuesChoicesInline]
+	pass
 
-@xadmin.sites.register(PlotQuestion)
+@AdminXHelper.relatedModel(PlotQuestion)
 class PlotQuestionAdmin(BaseQuestionAdmin):
-	list_display = ['id', 'title', 'event_name']
 
-	list_editable = ['title', 'event_name']
+	# list_display = ['id', 'title', 'event_name']
+	#
+	# list_editable = ['title', 'event_name']
+	#
+	# inlines = [PlotQuesChoicesInline]
+	pass
 
-	inlines = [PlotQuesChoicesInline]
 
-
-@xadmin.sites.register(PlotQuesChoice)
+@AdminXHelper.relatedModel(PlotQuesChoice)
 class PlotQuesChoiceAdmin(object):
 
-	list_display = ['question', 'order', 'text', 'result_text', 'gold']
+	# list_display = ['question', 'order', 'text', 'result_text', 'gold']
+	#
+	# list_editable = ['question', 'order', 'text', 'result_text', 'gold']
+	#
+	# inlines = [ExerProPlotEffectsInline]
+	pass
 
-	list_editable = ['question', 'order', 'text', 'result_text', 'gold']
 
-	inlines = [ExerProPlotEffectsInline]
-
-
-# @xadmin.sites.register(ReadingSubQuestion)
+# @AdminXHelper.relatedModel(ReadingSubQuestion)
 # class ReadingSubQuestionAdmin(BaseQuestionAdmin):
 # 	inlines = [ReadingQuesChoicesInline]
 
 
-@xadmin.sites.register(ListeningQuestion)
+@AdminXHelper.relatedModel(ListeningQuestion)
 class ListeningQuestionAdmin(GroupQuestionAdmin):
 
-	list_display = GroupQuestionAdmin.list_display + \
-				   ['times']
+	# list_display = GroupQuestionAdmin.list_display + \
+	# 			   ['times']
+	#
+	# list_editable = GroupQuestionAdmin.list_editable + \
+	# 			   ['times']
+	#
+	# inlines = [ListeningSubQuestionsInline]
+	pass
 
-	list_editable = GroupQuestionAdmin.list_editable + \
-				   ['times']
 
-	inlines = [ListeningSubQuestionsInline]
-
-
-# @xadmin.sites.register(ReadingQuestion)
+# @AdminXHelper.relatedModel(ReadingQuestion)
 # class ReadingQuestionAdmin(GroupQuestionAdmin):
 # 	inlines = [ReadingSubQuestionsInline]
 
 
-@xadmin.sites.register(PhraseQuestion)
+@AdminXHelper.relatedModel(PhraseQuestion)
 class PhraseQuestionAdmin(object):
 
-	list_display = ['id', 'word', 'chinese', 'phrase']
+	# list_display = ['id', 'word', 'chinese', 'phrase']
+	#
+	# list_editable = ['word', 'chinese', 'phrase']
+	pass
 
-	list_editable = ['word', 'chinese', 'phrase']
 
-
-@xadmin.sites.register(CorrectionQuestion)
+@AdminXHelper.relatedModel(CorrectionQuestion)
 class CorrectionQuestionAdmin(object):
 
-	list_display = ['id', 'article', 'description']
+	# list_display = ['id', 'article', 'description']
+	#
+	# list_editable = ['article', 'description']
+	#
+	# inlines = [WrongItemsInline]
+	pass
 
-	list_editable = ['article', 'description']
 
-	inlines = [WrongItemsInline]
-
-
-@xadmin.sites.register(WrongItem)
+@AdminXHelper.relatedModel(WrongItem)
 class WrongItemAdmin(object):
 
-	list_display = ['id', 'sentence_index', 'word_index', 'type', 'word']
+	# list_display = ['id', 'sentence_index', 'word_index', 'type', 'word']
+	#
+	# list_editable = ['sentence_index', 'word_index', 'type', 'word']
+	pass
 
-	list_editable = ['sentence_index', 'word_index', 'type', 'word']
 
-
-@xadmin.sites.register(Word)
+@AdminXHelper.relatedModel(Word)
 class WordAdmin(object):
 
-	list_display = ['id', 'english', 'chinese', 'type',
-					'level', 'is_middle', 'is_high']
+	# list_display = ['id', 'english', 'chinese', 'type',
+	# 				'level', 'is_middle', 'is_high']
+	#
+	# list_editable = ['english', 'chinese', 'type',
+	# 				 'level', 'is_middle', 'is_high']
+	pass
 
-	list_editable = ['english', 'chinese', 'type',
-					 'level', 'is_middle', 'is_high']
 
-
-@xadmin.sites.register(WordRecord)
+@AdminXHelper.relatedModel(WordRecord)
 class WordRecordAdmin(object):
 
-	list_display = ['id', 'word', 'record', 'count', 'correct',
-					'last_date', 'first_date', 'collected', 'wrong']
+	# list_display = ['id', 'word', 'record', 'count', 'correct',
+	# 				'last_date', 'first_date', 'collected', 'wrong']
+	#
+	# list_editable = ['count', 'correct', 'last_date',
+	# 				 'first_date', 'collected', 'wrong']
+	pass
 
-	list_editable = ['count', 'correct',  'last_date',
-					 'first_date', 'collected', 'wrong']
 
-
-@xadmin.sites.register(Antonym)
+@AdminXHelper.relatedModel(Antonym)
 class AntonymAdmin(object):
-	list_display = ['id', 'card_word', 'enemy_word', 'hurt_rate']
+	# list_display = ['id', 'card_word', 'enemy_word', 'hurt_rate']
+	#
+	# list_editable = ['card_word', 'enemy_word', 'hurt_rate']
+	pass
 
-	list_editable = ['card_word', 'enemy_word', 'hurt_rate']
 
-
+@AdminXHelper.relatedModel(BaseItem)
 class BaseExerProItemAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin.list_display + \
-				   ['icon_index', 'start_ani_index',
-					'target_ani_index', 'star']
-
-	list_editable = BaseItemAdmin.list_editable + \
-					['icon_index', 'start_ani_index',
-					'target_ani_index', 'star']
-
-	field_set = [Fieldset('基本特训物品属性',
-						  'icon_index', 'start_ani_index',
-						  'target_ani_index', 'star')]
-
-	form_layout = BaseItemAdmin.form_layout + field_set
+	# list_display = BaseItemAdmin.list_display + \
+	# 			   ['icon_index', 'start_ani_index',
+	# 				'target_ani_index', 'star']
+	#
+	# list_editable = BaseItemAdmin.list_editable + \
+	# 				['icon_index', 'start_ani_index',
+	# 				'target_ani_index', 'star']
+	#
+	# field_set = [Fieldset('基本特训物品属性',
+	# 					  'icon_index', 'start_ani_index',
+	# 					  'target_ani_index', 'star')]
+	#
+	# form_layout = BaseItemAdmin.form_layout + field_set
 
 	# form_layout = field_set
+	pass
 
 
-@xadmin.sites.register(ExerProItem)
+@AdminXHelper.relatedModel(ExerProItem)
 class ExerProItemAdmin(BaseExerProItemAdmin):
 
-	list_display = BaseExerProItemAdmin.list_display + \
-				   []
+	# list_display = BaseExerProItemAdmin.list_display + \
+	# 			   []
+	#
+	# list_editable = BaseExerProItemAdmin.list_editable + \
+	# 			   []
+	#
+	# field_set = [Fieldset('特训物品属性')]
+	#
+	# form_layout = BaseExerProItemAdmin.form_layout + field_set
+	#
+	# inlines = [ExerProItemTraitsInline]
+	pass
 
-	list_editable = BaseExerProItemAdmin.list_editable + \
-				   []
 
-	field_set = [Fieldset('特训物品属性')]
-
-	form_layout = BaseExerProItemAdmin.form_layout + field_set
-
-	inlines = [ExerProItemTraitsInline]
-
-
-@xadmin.sites.register(ExerProPotion)
+@AdminXHelper.relatedModel(ExerProPotion)
 class ExerProPotionAdmin(BaseExerProItemAdmin):
 
-	list_display = BaseExerProItemAdmin.list_display + \
-				   []
+	# list_display = BaseExerProItemAdmin.list_display + \
+	# 			   []
+	#
+	# list_editable = BaseExerProItemAdmin.list_editable + \
+	# 			   []
+	#
+	# field_set = [Fieldset('特训物品属性')]
+	#
+	# form_layout = BaseItemAdmin.form_layout + field_set
+	#
+	# inlines = [ExerProPotionEffectsInline]
+	pass
 
-	list_editable = BaseExerProItemAdmin.list_editable + \
-				   []
 
-	field_set = [Fieldset('特训物品属性')]
-
-	form_layout = BaseItemAdmin.form_layout + field_set
-
-	inlines = [ExerProPotionEffectsInline]
-
-
-@xadmin.sites.register(ExerProCard)
+@AdminXHelper.relatedModel(ExerProCard)
 class ExerProCardAdmin(BaseItemAdmin):
 
-	list_display = BaseExerProItemAdmin.list_display + \
-				   ['cost', 'card_type', 'inherent', 'disposable',
-					'character', 'target']
+	# list_display = BaseExerProItemAdmin.list_display + \
+	# 			   ['cost', 'card_type', 'inherent', 'disposable',
+	# 				'character', 'target']
+	#
+	# list_editable = BaseExerProItemAdmin.list_editable + \
+	# 			   ['cost', 'card_type', 'inherent', 'disposable',
+	# 				'character', 'target']
+	#
+	# field_set = [Fieldset('特训卡片属性', 'cost', 'card_type',
+	# 					  'inherent', 'disposable', 'character', 'target')]
+	#
+	# form_layout = BaseExerProItemAdmin.form_layout + field_set
+	#
+	# inlines = [ExerProCardEffectsInline]
+	pass
 
-	list_editable = BaseExerProItemAdmin.list_editable + \
-				   ['cost', 'card_type', 'inherent', 'disposable',
-					'character', 'target']
 
-	field_set = [Fieldset('特训卡片属性', 'cost', 'card_type',
-						  'inherent', 'disposable', 'character', 'target')]
-
-	form_layout = BaseExerProItemAdmin.form_layout + field_set
-
-	inlines = [ExerProCardEffectsInline]
-
-
-@xadmin.sites.register(FirstCardGroup)
+@AdminXHelper.relatedModel(FirstCardGroup)
 class FirstCardGroupAdmin(object):
 
-	list_display = ['id', 'name', 'adminCards']
+	# list_display = ['id', 'name', 'adminCards']
+	#
+	# list_editable = ['name']
+	pass
 
-	list_editable = ['name']
 
-
-@xadmin.sites.register(ExerProEnemy)
+@AdminXHelper.relatedModel(ExerProEnemy)
 class ExerProEnemyAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin.list_display + \
-				   ['type', 'mhp', 'power', 'defense', 'character']
+	# list_display = BaseItemAdmin.list_display + \
+	# 			   ['type', 'mhp', 'power', 'defense', 'character']
+	#
+	# list_editable = BaseItemAdmin.list_editable + \
+	# 			   ['type', 'mhp', 'power', 'defense', 'character']
+	#
+	# field_set = [Fieldset('特训敌人属性', 'type', 'mhp', 'power',
+	# 					  'defense', 'character')]
+	#
+	# form_layout = BaseItemAdmin.form_layout + field_set
+	#
+	# inlines = [EnemyActionsInline, EnemyEffectsInline]
+	pass
 
-	list_editable = BaseItemAdmin.list_editable + \
-				   ['type', 'mhp', 'power', 'defense', 'character']
 
-	field_set = [Fieldset('特训敌人属性', 'type', 'mhp', 'power',
-						  'defense', 'character')]
-
-	form_layout = BaseItemAdmin.form_layout + field_set
-
-	inlines = [EnemyActionsInline, EnemyEffectsInline]
-
-
-@xadmin.sites.register(ExerProState)
+@AdminXHelper.relatedModel(ExerProState)
 class ExerProStateAdmin(BaseItemAdmin):
 
-	list_display = BaseItemAdmin.list_display + \
-				   ['icon_index', 'max_turns', 'is_nega']
+	# list_display = BaseItemAdmin.list_display + \
+	# 			   ['icon_index', 'max_turns', 'is_nega']
+	#
+	# list_editable = BaseItemAdmin.list_editable + \
+	# 			   ['icon_index', 'max_turns', 'is_nega']
+	#
+	# field_set = [Fieldset('特训状态属性', 'icon_index', 'max_turns', 'is_nega')]
+	#
+	# form_layout = BaseItemAdmin.form_layout + field_set
+	#
+	# inlines = [ExerProStateTraitsInline]
+	pass
 
-	list_editable = BaseItemAdmin.list_editable + \
-				   ['icon_index', 'max_turns', 'is_nega']
 
-	field_set = [Fieldset('特训状态属性', 'icon_index', 'max_turns', 'is_nega')]
-
-	form_layout = BaseItemAdmin.form_layout + field_set
-
-	inlines = [ExerProStateTraitsInline]
-
-
-@xadmin.sites.register(ExerProMap)
+@AdminXHelper.relatedModel(ExerProMap)
 class ExerProMapAdmin(object):
 
-	list_display = ['id', 'name', 'description', 'level', 'min_level']
+	# list_display = ['id', 'name', 'description', 'level', 'min_level']
+	#
+	# list_editable = ['name', 'description', 'level', 'min_level']
+	#
+	# inlines = [MapStagesInline]
+	pass
 
-	list_editable = ['name', 'description', 'level', 'min_level']
 
-	inlines = [MapStagesInline]
-
-
-@xadmin.sites.register(ExerProMapStage)
+@AdminXHelper.relatedModel(ExerProMapStage)
 class ExerProMapStageAdmin(object):
 
-	list_display = ['id', 'order', 'map', 'enemies', 'max_battle_enemies',
-					'steps', 'max_fork_node', 'max_fork', 'node_rate']
-
-	list_editable = ['order', 'enemies', 'max_battle_enemies',
-					 'steps', 'max_fork_node', 'max_fork', 'node_rate']
+	# list_display = ['id', 'order', 'map', 'enemies', 'max_battle_enemies',
+	# 				'steps', 'max_fork_node', 'max_fork', 'node_rate']
+	#
+	# list_editable = ['order', 'enemies', 'max_battle_enemies',
+	# 				 'steps', 'max_fork_node', 'max_fork', 'node_rate']
 
 	# inlines = [EnemiesInline]
+	pass
 
 
-@xadmin.sites.register(ExerProItemStar)
+@AdminXHelper.relatedModel(ExerProItemStar)
 class ExerProItemStarAdmin(object):
-	list_display = ['id', 'name', 'color', 'adminColor']
+	# list_display = ['id', 'name', 'color', 'adminColor']
+	#
+	# list_editable = ['name', 'color']
+	pass
 
-	list_editable = ['name', 'color']
 
-
-@xadmin.sites.register(NodeType)
+@AdminXHelper.relatedModel(NodeType)
 class NodeTypeAdmin(object):
-	list_display = ['id', 'name', 'ques_types', 'configure']
+	# list_display = ['id', 'name', 'ques_types', 'configure']
+	#
+	# list_editable = ['name', 'ques_types', 'configure']
+	pass
 
-	list_editable = ['name', 'ques_types', 'configure']
 
-
-@xadmin.sites.register(ExerProRecord)
+@AdminXHelper.relatedModel(ExerProRecord)
 class ExerProRecordAdmin(object):
-	list_display = ['id', 'player', 'stage', 'started', 'generated',
-					'cur_index', 'node_flag', 'word_level', 'gold']
-
-	list_editable = ['stage', 'started', 'generated',
-					'cur_index', 'node_flag', 'word_level', 'gold']
+	# list_display = ['id', 'player', 'stage', 'started', 'generated',
+	# 				'cur_index', 'node_flag', 'word_level', 'gold']
+	#
+	# list_editable = ['stage', 'started', 'generated',
+	# 				'cur_index', 'node_flag', 'word_level', 'gold']
+	pass
 

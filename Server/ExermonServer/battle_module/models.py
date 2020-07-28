@@ -1,14 +1,19 @@
 from django.db import models
 from django.db.models.query import QuerySet
 
+from .item_system.containers import *
+from .item_system.cont_items import *
+
 from game_module.models import GroupConfigure, Subject, QuestionStar
-from item_module.models import *
+
+from player_module.models import Player
 from exermon_module.models import ExerSkill, HitType, TargetType
-from player_module.models import Player, HumanPackItem, HumanPack
 from record_module.models import QuestionSetRecord, PlayerQuestion, RecordSource
+
 from utils.calc_utils import ExerciseSingleRewardCalc, BattleResultRewardCalc
 from utils.model_utils import CacheableModel, Common as ModelUtils
 from utils.exception import ErrorType, GameException
+
 from enum import Enum
 import random, datetime
 
@@ -37,7 +42,7 @@ class BattleResultJudge(GroupConfigure):
 	# 失败增加星星（负数为减少）
 	lose = models.SmallIntegerField(default=0, verbose_name="失败增星数")
 
-	def convertToDict(self, type: str = None, **kwargs) -> dict:
+	def convert(self, type: str = None, **kwargs) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -46,157 +51,13 @@ class BattleResultJudge(GroupConfigure):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict()
+		res = super().convert()
 
 		res['score'] = self.score
 		res['win'] = self.win
 		res['lose'] = self.lose
 
 		return res
-
-
-# ===================================================
-#  对战物资槽
-# ===================================================
-class BattleItemSlot(SlotContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "对战物资槽"
-
-	# 容器类型
-	TYPE = ContainerType.BattleItemSlot
-
-	# 最大物资槽数
-	MAX_ITEM_COUNT = 3
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 所接受的容器项类
-	@classmethod
-	def baseContItemClass(cls): return HumanPackItem
-
-	# 所接受的槽项类
-	@classmethod
-	def acceptedSlotItemClass(cls): return BattleItemSlotItem
-
-	# 获取容器容量（0为无限）
-	@classmethod
-	def defaultCapacity(cls): return cls.MAX_ITEM_COUNT
-
-	def _equipContainer(self, index: int) -> HumanPack:
-		"""
-		获取指定装备ID的所属容器
-		Args:
-			index (int): 装备ID
-		Returns:
-			指定装备ID的所属容器项
-		"""
-		return self.exactlyPlayer().humanPack()
-
-	def _create(self, player: Player):
-		"""
-		创建对战物资容器（创建角色时候执行）
-		Args:
-			player (Player): 玩家
-		"""
-		super()._create()
-		self.player = player
-
-	def owner(self) -> Player:
-		"""
-		获取容器的持有者
-		Returns:
-			持有玩家
-		"""
-		return self.player
-
-	def ensureItemEquipable(self, equip_item: HumanPackItem):
-		"""
-		保证物品可以装备（战斗中使用）
-		Args:
-			equip_item (HumanPackItem): 装备项
-		Raises:
-			ErrorType.IncorrectItemType: 不正确的物品类型
-		"""
-		if equip_item.count != 1:
-			raise GameException(ErrorType.IncorrectItemType)
-
-		if not equip_item.item.battle_use:
-			raise GameException(ErrorType.IncorrectItemType)
-
-	def ensureEquipCondition(self, slot_item: 'BattleItemSlotItem',
-							 equip_item: HumanPackItem):
-		"""
-		确保满足装备条件
-		Args:
-			slot_item (BattleItemSlotItem): 装备槽项
-			equip_item (HumanPackItem): 装备项
-		"""
-		super().ensureEquipCondition(slot_item, equip_item)
-
-		self.ensureItemEquipable(equip_item)
-
-		return True
-
-	def setPackItem(self, pack_item: HumanPackItem = None, index: int = None, force: bool = False):
-		"""
-		设置物资槽物品
-		Args:
-			pack_item (HumanPackItem): 人类物品容器项
-			index (int): 槽编号
-			force (bool): 是否强制设置（不损失背包物品）
-		"""
-		self.setEquip(equip_index=0, equip_item=pack_item, index=index, force=force)
-
-
-# ===================================================
-#  对战物资槽项
-# ===================================================
-class BattleItemSlotItem(SlotContItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "对战物资槽项"
-
-	# 容器项类型
-	TYPE = ContItemType.BattleItemSlotItem
-
-	# 容器
-	container = models.ForeignKey('BattleItemSlot', on_delete=models.CASCADE,
-							   null=True, verbose_name="容器")
-
-	# 装备项
-	pack_item = models.OneToOneField('player_module.HumanPackItem', null=True, blank=True,
-									  on_delete=models.SET_NULL, verbose_name="装备")
-
-	# 所属容器的类
-	@classmethod
-	def containerClass(cls): return BattleItemSlot
-
-	# 所接受的装备项类（可多个）
-	@classmethod
-	def acceptedEquipItemClass(cls): return (HumanPackItem, )
-
-	# 所接受的装备项属性名（可多个）
-	@classmethod
-	def acceptedEquipItemAttr(cls): return ('pack_item', )
-
-	def isUsable(self) -> bool:
-		"""
-		能否使用
-		Returns:
-			返回能否使用
-		"""
-		return True
-
-	def useItem(self, **kwargs):
-		"""
-		使用物品
-		Args:
-			**kwargs (**dict): 拓展参数
-		"""
-		super().useItem(ItemUseOccasion.Battle, **kwargs)
-		self.dequip(index=0)
 
 
 # ===================================================
@@ -286,7 +147,7 @@ class BattleRecord(CacheableModel):
 
 		return rec
 
-	def convertToDict(self, type: str = None, **kwargs) -> dict:
+	def convert(self, type: str = None, **kwargs) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -348,8 +209,8 @@ class BattleRecord(CacheableModel):
 		"""
 		初始化所有缓存数据
 		"""
-		self._cache(self.BATTLE_PLAYERS_CACHE_KEY, [])
-		self._cache(self.BATTLE_ROUNDS_CACHE_KEY, [])
+		# self._cache(self.BATTLE_PLAYERS_CACHE_KEY, [])
+		# self._cache(self.BATTLE_ROUNDS_CACHE_KEY, [])
 
 	# region 玩家操作
 
@@ -570,7 +431,7 @@ class BattleRound(models.Model):
 	def __str__(self):
 		return str(self.record)+" 回合 "+str(self.order)
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -686,6 +547,8 @@ class BattlePlayer(QuestionSetRecord):
 		(BattlePlayerResult.Tie.value, "平局"),
 	]
 
+	LIST_DISPLAY_APPEND = ['adminScores']
+
 	# 关联的记录
 	record = models.ForeignKey('BattleRecord', on_delete=models.CASCADE, verbose_name="对战记录")
 
@@ -796,7 +659,7 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		self.record = record
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -804,7 +667,7 @@ class BattlePlayer(QuestionSetRecord):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['pid'] = self.player_id
 		res['score_incr'] = self.score_incr
@@ -981,6 +844,8 @@ class BattleRoundResult(PlayerQuestion):
 		(HitResultType.Miss.value, "回避"),
 	]
 
+	LIST_EDITABLE_EXCLUDE = ['round', 'battle_player']
+
 	# 关联的回合
 	round = models.ForeignKey('BattleRound', on_delete=models.CASCADE, verbose_name="回合")
 
@@ -1029,7 +894,7 @@ class BattleRoundResult(PlayerQuestion):
 		"""
 		return RecordSource.Battle
 
-	def convertToDict(self, type: str = None,
+	def convert(self, type: str = None,
 					  runtime_battler: 'RuntimeBattlePlayer' = None) -> dict:
 		"""
 		转化为字典
@@ -1039,7 +904,7 @@ class BattleRoundResult(PlayerQuestion):
 		Returns:
 			转化后的字典数据
 		"""
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['order'] = self.round.order
 		res['attack'] = self.attack
@@ -1051,7 +916,7 @@ class BattleRoundResult(PlayerQuestion):
 		res['recovery'] = self.recovery
 
 		if runtime_battler is not None:
-			runtime_battler.convertToDict(res)
+			runtime_battler.convert(res)
 
 		return res
 

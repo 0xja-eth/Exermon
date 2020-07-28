@@ -21,7 +21,7 @@ class RuntimeShopItem:
 
 		self.gold = self.generatePrice()
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -61,7 +61,7 @@ class RuntimeShop(RuntimeData):
 		self.type_ = type_
 		self.items = []
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:

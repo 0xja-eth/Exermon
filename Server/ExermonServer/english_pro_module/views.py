@@ -41,7 +41,7 @@ class Service:
         if not pro_record.started:
             pro_record.setupMap(map)
 
-        return {'record': pro_record.convertToDict()}
+        return {'record': pro_record.convert()}
 
     # 保存英语特训
     @classmethod
@@ -100,10 +100,10 @@ class Service:
 
         pro_record.upgrade()
 
-        return {'record': pro_record.convertToDict("words")}
+        return {'record': pro_record.convert("words")}
         # except:
         #     pro_record = ExerProRecord.create(player)
-        #     return pro_record.convertToDict()
+        #     return pro_record.convert()
 
     # 查询单词
     @classmethod
@@ -123,7 +123,7 @@ class Service:
 
         pro_record = Common.getExerProRecord(player)
 
-        return {'word_records': pro_record.convertToDict("records")}
+        return {'word_records': pro_record.convert("records")}
 
     # 回答当前轮单词
     @classmethod
@@ -188,7 +188,7 @@ class Service:
     #
     #     pro_record = Common.getExerProRecord(player)
     #
-    #     return pro_record.convertToDict("status")
+    #     return pro_record.convert("status")
 
     # 商品生成
     @classmethod
@@ -201,7 +201,7 @@ class Service:
 
         shop = Common.generateShop(pro_record, type)
 
-        return shop.convertToDict()
+        return shop.convert()
 
     # 购买物品校验
     @classmethod

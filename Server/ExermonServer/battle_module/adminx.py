@@ -5,71 +5,78 @@ from record_module.adminx import *
 from .models import *
 
 
-class BattleItemSlotItemsInline(BaseContItemsInline): model = BattleItemSlotItem
+# class BattleItemSlotItemsInline(BaseContItemsInline): model = BattleItemSlotItem
 
 
-@xadmin.sites.register(BattleResultJudge)
+@AdminXHelper.relatedModel(BattleResultJudge)
 class SeasonRecordAdmin(object):
-	list_display = ['id', 'name', 'score', 'win', 'lose']
+	# list_display = ['id', 'name', 'score', 'win', 'lose']
+	#
+	# list_editable = ['name', 'score', 'win', 'lose']
+	pass
 
-	list_editable = ['name', 'score', 'win', 'lose']
 
-
-@xadmin.sites.register(BattleItemSlot)
+@AdminXHelper.relatedModel(BattleItemSlot)
 class HumanEquipSlotAdmin(SlotContainerAdmin):
 
 	# list_display = SlotContainerAdmin.list_display
 
-	field_set = [Fieldset('对战物资槽属性', 'player')]
+	# field_set = [Fieldset('对战物资槽属性', 'player')]
+	#
+	# form_layout = SlotContainerAdmin.form_layout + field_set
+	#
+	# inlines = [BattleItemSlotItemsInline]
+	pass
 
-	form_layout = SlotContainerAdmin.form_layout + field_set
 
-	inlines = [BattleItemSlotItemsInline]
-
-
-@xadmin.sites.register(BattleItemSlotItem)
+@AdminXHelper.relatedModel(BattleItemSlotItem)
 class BattleItemSlotItemAdmin(SlotContItemAdmin):
 
-	list_display = SlotContItemAdmin.list_display + \
-				   ['pack_item']
+	# list_display = SlotContItemAdmin.list_display + \
+	# 			   ['pack_item']
+	#
+	# list_editable = SlotContItemAdmin.list_display + \
+	# 			   ['pack_equip']
+	#
+	# field_set = [Fieldset('对战物资槽项属性', 'pack_item')]
+	#
+	# form_layout = SlotContItemAdmin().form_layout + field_set
+	pass
 
-	list_editable = SlotContItemAdmin.list_display + \
-				   ['pack_equip']
 
-	field_set = [Fieldset('对战物资槽项属性', 'pack_item')]
-
-	form_layout = SlotContItemAdmin().form_layout + field_set
-
-
-@xadmin.sites.register(BattleRecord)
+@AdminXHelper.relatedModel(BattleRecord)
 class BattleRecordAdmin(object):
-	list_display = ['id', 'mode', 'season', 'create_time', 'result_time']
+	# list_display = ['id', 'mode', 'season', 'create_time', 'result_time']
+	#
+	# list_editable = ['mode', 'season', 'create_time', 'result_time']
+	pass
 
-	list_editable = ['mode', 'season', 'create_time', 'result_time']
 
-
-@xadmin.sites.register(BattleRound)
+@AdminXHelper.relatedModel(BattleRound)
 class BattleRoundAdmin(object):
-	list_display = ['id', 'order', 'record', 'question']
+	# list_display = ['id', 'order', 'record', 'question']
+	#
+	# list_editable = ['name', 'start_time', 'question']
+	pass
 
-	list_editable = ['name', 'start_time', 'question']
 
-
-@xadmin.sites.register(BattlePlayer)
+@AdminXHelper.relatedModel(BattlePlayer)
 class BattlePlayerAdmin(QuestionSetRecordAdmin):
-	list_display = QuestionSetRecordAdmin.list_display + \
-					['record', 'adminScores', 'score_incr', 'result', 'status']
+	# list_display = QuestionSetRecordAdmin.list_display + \
+	# 				['record', 'adminScores', 'score_incr', 'result', 'status']
+	#
+	# list_editable = QuestionSetRecordAdmin.list_editable + \
+	# 				 ['record', 'score_incr', 'result', 'status']
+	pass
 
-	list_editable = QuestionSetRecordAdmin.list_editable + \
-					 ['record', 'score_incr', 'result', 'status']
 
-
-@xadmin.sites.register(BattleRoundResult)
+@AdminXHelper.relatedModel(BattleRoundResult)
 class BattleRoundResultAdmin(PlayerQuestionAdmin):
-	list_display = PlayerQuestionAdmin.list_display + \
-				   ['round', 'battle_player', 'attack', 'skill', 'target_type',
-					   'result_type', 'hurt', 'damage', 'recovery']
-
-	list_editable = PlayerQuestionAdmin.list_editable + \
-					['attack', 'skill', 'target_type',
-					 'result_type', 'hurt', 'damage', 'recovery']
+	# list_display = PlayerQuestionAdmin.list_display + \
+	# 			   ['round', 'battle_player', 'attack', 'skill', 'target_type',
+	# 				   'result_type', 'hurt', 'damage', 'recovery']
+	#
+	# list_editable = PlayerQuestionAdmin.list_editable + \
+	# 				['attack', 'skill', 'target_type',
+	# 				 'result_type', 'hurt', 'damage', 'recovery']
+	pass

@@ -97,7 +97,7 @@ class QuestionRecord(models.Model):
 		return '%s (%s)' % (self.question.number(), self.player)
 
 	# 转化为字典
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		last_date = ModelUtils.timeToStr(self.last_date)
 		first_date = ModelUtils.timeToStr(self.first_date)
@@ -185,6 +185,8 @@ class PlayerQuestion(CacheableModel):
 	CORRECT_CACHE_KEY = 'correct'
 	SCORE_CACHE_KEY = 'score'
 
+	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
+
 	# 题目
 	question = models.ForeignKey('question_module.Question',
 								 on_delete=models.CASCADE, verbose_name="题目")
@@ -233,7 +235,7 @@ class PlayerQuestion(CacheableModel):
 
 	adminAnswer.short_description = "正确答案"
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -523,7 +525,7 @@ class QuestionSetReward(models.Model):
 		return reward
 
 	# 转化为字典
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		转化为字典
 		Returns:
@@ -552,7 +554,7 @@ class QuestionSetReward(models.Model):
 		Returns:
 			容器类型
 		"""
-		return self.item().contItemClass().containerClass()
+		return self.item().containerClass()
 
 
 # ===================================================
@@ -577,6 +579,9 @@ class QuestionSetRecord(CacheableModel):
 		verbose_name = verbose_name_plural = "题目集记录"
 
 	TYPE = QuestionSetType.Unset
+
+	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
+						   'adminSlotExpIncrs', 'adminExpIncrs']
 
 	# 题目缓存键
 	QUES_CACHE_KEY = 'player_ques'
@@ -729,7 +734,7 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		return '题目集记录'
 
-	def convertToDict(self, type: str = None) -> dict:
+	def convert(self, type: str = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -1347,9 +1352,9 @@ class ExerciseRecord(QuestionSetRecord):
 		"""
 		return self.exercisequestion_set.all()
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
-		res = super().convertToDict(type)
+		res = super().convert(type)
 
 		res['season_id'] = self.season_id
 		res['subject_id'] = self.subject_id

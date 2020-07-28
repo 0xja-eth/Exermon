@@ -139,7 +139,7 @@ class BattleBuff:
 		self.rate_params = rate_params
 		self.round = round
 
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		转化为字典
 		Returns:
@@ -183,7 +183,7 @@ class RuntimeBattleItem:
 		self.slot_item = slot_item
 		self.freeze_round = 0
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -287,7 +287,7 @@ class RuntimeBattleExerSkill:
 		self.use_count = 0
 		self.freeze_round = 0
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -440,7 +440,7 @@ class RuntimeBattleExermon:
 
 	# endregion
 
-	def convertToDict(self) -> dict:
+	def convert(self) -> dict:
 		"""
 		转化为字典
 		Returns:
@@ -644,7 +644,7 @@ class RuntimeAction:
 	def __init__(self, type: ActionType):
 		self.type = type
 
-	def convertToDict(self):
+	def convert(self):
 		"""
 		转化为字典
 		Returns:
@@ -757,7 +757,7 @@ class RuntimeBattlePlayer(RuntimeData):
 		"""
 		return self.player.id
 
-	def convertToDict(self, res: dict = None) -> dict:
+	def convert(self, res: dict = None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -1217,10 +1217,10 @@ class RuntimeBattle(RuntimeData):
 		online_player2 = self.getOnlinePlayer(self.player2)
 
 		return {
-			'player1': self.player1.convertToDict(
+			'player1': self.player1.convert(
 				type="matched", online_player=online_player1,
 				battle_player=self.runtime_battler1),
-			'player2': self.player2.convertToDict(
+			'player2': self.player2.convert(
 				type="matched", online_player=online_player2,
 				battle_player=self.runtime_battler2),
 		}
@@ -1385,7 +1385,7 @@ class RuntimeBattle(RuntimeData):
 		Returns:
 			返回当前回合的数据
 		"""
-		return {'round': self.record.currentRound().convertToDict()}
+		return {'round': self.record.currentRound().convert()}
 
 	# endregion
 
@@ -1716,9 +1716,9 @@ class RuntimeBattle(RuntimeData):
 		if result2 is None: result2 = self.runtime_battler2.battle_player.currentRound()
 
 		return {
-			'player1': result1.convertToDict(
+			'player1': result1.convert(
 				type="result", runtime_battler=self.runtime_battler1),
-			'player2': result2.convertToDict(
+			'player2': result2.convert(
 				type="result", runtime_battler=self.runtime_battler2)
 		}
 
@@ -1759,9 +1759,9 @@ class RuntimeBattle(RuntimeData):
 		# result2 = self.runtime_battler2.battle_player
 
 		return {
-			'record': self.record.convertToDict(type="result")
-			# 'player1': result1.convertToDict(type="result"),
-			# 'player2': result2.convertToDict(type="result")
+			'record': self.record.convert(type="result")
+			# 'player1': result1.convert(type="result"),
+			# 'player2': result2.convert(type="result")
 		}
 
 	# endregion

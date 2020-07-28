@@ -1,13 +1,19 @@
 from django.db import models
 from django.conf import settings
-from item_module.models import *
+
+from .item_system.items import *
+from .item_system.containers import *
+from .item_system.cont_items import *
+
+from season_module.models import SeasonRecord
+from season_module.runtimes import SeasonManager
+
 from utils.model_utils import CacheableModel, \
 	CharacterImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
-from game_module.models import ParamValue, ParamRate, HumanEquipType
-from season_module.models import SeasonRecord
-from season_module.runtimes import SeasonManager
+
 from enum import Enum
+
 import os, base64, datetime
 
 # Create your models here.
@@ -97,7 +103,7 @@ class Character(models.Model):
 
 		return bust_data, face_data, battle_data
 
-	def convertToDict(self, type=None):
+	def convert(self, type=None):
 
 		# bust_data, face_data, battle_data = self.convertToBase64()
 
@@ -118,6 +124,8 @@ class Character(models.Model):
 class LoginInfo(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = "登录记录"
+
+	LIST_EDITABLE = []
 
 	# 登陆玩家
 	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
@@ -147,6 +155,8 @@ class LoginInfo(models.Model):
 class PasswordRecord(models.Model):
 	class Meta:
 		verbose_name = verbose_name_plural = "改密记录"
+
+	LIST_EDITABLE = []
 
 	# 登陆玩家
 	player = models.ForeignKey('Player', on_delete=models.CASCADE, verbose_name="玩家")
@@ -326,6 +336,12 @@ class Player(CacheableModel):
 		(PlayerType.Other.value, '其他')
 	]
 
+	LIST_DISPLAY_APPEND = ['adminLevel', 'adminMoney']
+
+	LIST_DISPLAY_EXCLUDE = ['password']
+
+	LIST_EDITABLE_EXCLUDE = ['password', 'create_time', 'last_refresh_time']
+
 	# 登录信息缓存键
 	LOGININFO_CACHE_KEY = 'login_info'
 
@@ -413,6 +429,19 @@ class Player(CacheableModel):
 		return "无"
 
 	adminMoney.short_description = "持有金钱"
+
+	@classmethod
+	def _cacheOneToOneModels(cls):
+		from exermon_module.models import ExerPack, \
+			ExerHub, ExerFragPack, ExerGiftPool, ExerSlot
+		from question_module.models import QuesSugarPack
+		from battle_module.models import BattleItemSlot
+		from english_pro_module.models import ExerProRecord
+
+		return [HumanPack, HumanEquipSlot, ExerPack, ExerHub,
+				ExerFragPack, ExerGiftPool, ExerSlot,
+				QuesSugarPack, BattleItemSlot, 
+				PlayerMoney, ExerProRecord]
 
 	# region 字典生成
 
@@ -600,7 +629,7 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def convertToDict(self, type: str = None, online_player=None, battle_player=None) -> dict:
+	def convert(self, type: str = None, online_player=None, battle_player=None) -> dict:
 		"""
 		转化为字典
 		Args:
@@ -660,7 +689,7 @@ class Player(CacheableModel):
 			# base['battle_item_slot'] = battle_item_slot
 
 			# 运行时数据
-			battle_player.convertToDict(base)
+			battle_player.convert(base)
 
 			return base
 
@@ -1271,402 +1300,3 @@ class Player(CacheableModel):
 		super().save(**kwargs)
 
 	""" 占位符 """
-
-
-# ===================================================
-#  人类物品使用效果表
-# ===================================================
-class HumanItemEffect(BaseEffect):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类物品使用效果"
-
-	# 物品
-	item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
-							 verbose_name="物品")
-
-
-# ===================================================
-#  人类物品价格
-# ===================================================
-class HumanItemPrice(Currency):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类物品价格"
-
-	# 物品
-	item = models.OneToOneField('HumanItem', on_delete=models.CASCADE,
-							 verbose_name="物品")
-
-
-# ===================================================
-#  人类物品表
-# ===================================================
-class HumanItem(UsableItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类物品"
-
-	# 道具类型
-	TYPE = ItemType.HumanItem
-
-	# 对应的容器项类
-	@classmethod
-	def contItemClass(cls): return HumanPackItem
-
-	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
-
-		return res
-
-	# 获取所有的效果
-	def effects(self):
-		return self.humanitemeffect_set.all()
-
-	# 购买价格
-	def buyPrice(self):
-		try: return self.humanitemprice
-		except HumanItemPrice.DoesNotExist: return None
-
-
-# ===================================================
-#  人类装备等级属性值表
-# ===================================================
-class HumanEquipLevelParam(ParamRate):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备等级属性值"
-
-	# 装备
-	equip = models.ForeignKey("HumanEquip", on_delete=models.CASCADE, verbose_name="装备")
-
-
-# ===================================================
-#  人类装备属性值表
-# ===================================================
-class HumanEquipBaseParam(ParamValue):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备属性值"
-
-	# 装备
-	equip = models.ForeignKey("HumanEquip", on_delete=models.CASCADE, verbose_name="装备")
-
-	# 最大值
-	def maxVal(self):
-		return None
-
-	# 最小值
-	def minVal(self):
-		return None
-
-
-# ===================================================
-#  人类装备价格
-# ===================================================
-class HumanEquipPrice(Currency):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备价格"
-
-	# 物品
-	item = models.OneToOneField('HumanEquip', on_delete=models.CASCADE,
-							 verbose_name="物品")
-
-
-# ===================================================
-#  人类装备
-# ===================================================
-class HumanEquip(EquipableItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备"
-
-	# 道具类型
-	TYPE = ItemType.HumanEquip
-
-	# 装备类型
-	e_type = models.ForeignKey("game_module.HumanEquipType",
-							   on_delete=models.CASCADE, verbose_name="装备类型")
-
-	# 对应的容器项类
-	@classmethod
-	def contItemClass(cls): return HumanPackEquip
-
-	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
-
-		res['e_type'] = self.e_type_id
-
-		return res
-	
-	# 获取所有的属性基本值
-	def levelParams(self):
-		return self.humanequiplevelparam_set.all()
-
-	# 获取所有的属性基本值
-	def baseParams(self):
-		return self.humanequipbaseparam_set.all()
-
-	# 购买价格
-	def buyPrice(self):
-		try: return self.humanequipprice
-		except HumanEquipPrice.DoesNotExist: return None
-
-
-# ===================================================
-#  人类背包
-# ===================================================
-class HumanPack(PackContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包"
-
-	# 容器类型
-	TYPE = ContainerType.HumanPack
-
-	# 默认容量
-	DEFAULT_CAPACITY = 0
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 所接受的容器项类
-	@classmethod
-	def acceptedContItemClasses(cls): return HumanPackItem, HumanPackEquip
-
-	# 获取容器容量（0为无限）
-	@classmethod
-	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
-
-	# 创建一个背包（创建角色时候执行）
-	def _create(self, player):
-		super()._create()
-		self.player = player
-
-	# 持有者
-	def owner(self): return self.player
-
-
-# ===================================================
-#  人类背包物品
-# ===================================================
-class HumanPackItem(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包物品"
-
-	# 容器项类型
-	TYPE = ContItemType.HumanPackItem
-
-	# 容器
-	container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
-							   null=True, verbose_name="容器")
-
-	# 物品
-	item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
-							 null=True, verbose_name="物品")
-
-	# 所属容器的类
-	@classmethod
-	def containerClass(cls): return HumanPack
-
-	# 所接受的物品类
-	@classmethod
-	def acceptedItemClass(cls): return HumanItem
-
-	def isContItemUsable(self, occasion: ItemUseOccasion,
-						 target=None, count=1) -> bool:
-		"""
-		配置当前物品是否可用
-		Args:
-			occasion (ItemUseOccasion): 使用场合枚举
-			target (PlayerExermon): 目标
-			count (int): 使用次数
-		Returns:
-			返回当前物品是否可用
-		"""
-		return self.item.isUsable(occasion, target, count)
-
-
-# ===================================================
-#  人类背包装备
-# ===================================================
-class HumanPackEquip(PackContItem):
-	class Meta:
-		verbose_name = verbose_name_plural = "人类背包装备"
-
-	# 容器项类型
-	TYPE = ContItemType.HumanPackEquip
-
-	# 容器
-	container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
-							   null=True, verbose_name="容器")
-
-	# 物品
-	item = models.ForeignKey('HumanEquip', on_delete=models.CASCADE,
-							 null=True, verbose_name="物品")
-
-	# 所属容器的类
-	@classmethod
-	def containerClass(cls): return HumanPack
-
-	# 所接受的物品类
-	@classmethod
-	def acceptedItemClass(cls): return HumanEquip
-
-	# 获取等级属性值
-	def levelParam(self, param_id=None, attr=None):
-		return self.item.levelParam(param_id, attr)
-
-	# 获取属性值
-	def baseParam(self, param_id=None, attr=None):
-		return self.item.baseParam(param_id, attr)
-
-
-# ===================================================
-#  人类装备槽
-# ===================================================
-class HumanEquipSlot(SlotContainer):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备槽"
-
-	# 容器类型
-	TYPE = ContainerType.HumanEquipSlot
-
-	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# # 人类背包
-	# human_pack = models.ForeignKey('HumanPack', on_delete=models.CASCADE, verbose_name="人类背包")
-
-	# 所接受的槽项类
-	@classmethod
-	def acceptedSlotItemClass(cls): return HumanEquipSlotItem
-
-	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
-	@classmethod
-	def baseContItemClass(cls): return HumanPackEquip
-
-	# 默认容器容量（0为无限）
-	@classmethod
-	def defaultCapacity(cls): return HumanEquipType.count()
-
-	def _create(self, player: Player):
-		"""
-		创建对战物资容器（创建角色时候执行）
-		Args:
-			player (Player): 玩家
-		"""
-		super()._create()
-		self.player = player
-
-	def _equipContainer(self, index: int) -> HumanPack:
-		"""
-		获取指定装备ID的所属容器
-		Args:
-			index (int): 装备ID
-		Returns:
-			指定装备ID的所属容器项
-		"""
-		return self.exactlyPlayer().humanPack()
-
-	# 保证装备类型与槽一致
-	def ensureEquipType(self, slot_item, equip):
-		if slot_item.e_type_id != equip.item.e_type_id:
-			raise GameException(ErrorType.IncorrectEquipType)
-
-		return True
-
-	# 保证满足装备条件
-	def ensureEquipCondition(self, slot_item, equip_item):
-		super().ensureEquipCondition(slot_item, equip_item)
-
-		self.ensureEquipType(slot_item, equip_item)
-
-		return True
-
-	# 设置艾瑟萌装备
-	def setPackEquip(self, pack_equip: HumanPackEquip = None, e_type_id=None, force=False):
-
-		if pack_equip is not None:
-			e_type_id = pack_equip.item.e_type_id
-
-		self.setEquip(equip_index=0, equip_item=pack_equip, e_type_id=e_type_id, force=force)
-
-	def owner(self) -> Player:
-		"""
-		获取容器的持有者
-		Returns:
-			持有玩家
-		"""
-		return self.player
-
-
-# ===================================================
-#  人类装备槽项
-# ===================================================
-class HumanEquipSlotItem(SlotContItem):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "人类装备槽项"
-
-	# 容器项类型
-	TYPE = ContItemType.HumanEquipSlotItem
-
-	# 容器
-	container = models.ForeignKey('HumanEquipSlot', on_delete=models.CASCADE,
-							   null=True, verbose_name="容器")
-
-	# 装备项
-	pack_equip = models.OneToOneField('HumanPackEquip', null=True, blank=True,
-									  on_delete=models.SET_NULL, verbose_name="装备")
-
-	# 装备槽类型
-	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
-							   verbose_name="装备槽类型")
-
-	# 所属容器的类
-	@classmethod
-	def containerClass(cls): return HumanEquipSlot
-
-	# 所接受的装备项类（可多个）
-	@classmethod
-	def acceptedEquipItemClass(cls): return (HumanPackEquip, )
-
-	# 所接受的装备项属性名（可多个）
-	@classmethod
-	def acceptedEquipItemAttr(cls): return ('pack_equip', )
-
-	# 转化为 dict
-	def convertToDict(self, **kwargs):
-		res = super().convertToDict(**kwargs)
-
-		res['e_type'] = self.e_type_id
-
-		return res
-
-	# def _equipItem(self, index):
-	# 	if index == 0: return self.pack_equip
-
-	# 配置索引
-	def setupIndex(self, index, **kwargs):
-		super().setupIndex(index, **kwargs)
-		self.e_type_id = index
-
-	# 获取属性值
-	def param(self, param_id=None, attr=None):
-		return self.pack_equip.param(param_id, attr)
-
-	# # 装备
-	# def equip(self, pack_equip=None, **kwargs):
-	# 	self.pack_equip: HumanPackEquip = pack_equip
-	# 	self.pack_equip.transfer(self.container)
-	#
-	# # 卸下
-	# def dequip(self, **kwargs):
-	# 	self.pack_equip.remove()
-	# 	pack_equip = self.pack_equip
-	# 	self.pack_equip = None
-	# 	return pack_equip

@@ -152,7 +152,7 @@ class Service:
 		# 添加在线玩家
 		Common.addOnlinePlayer(player, consumer)
 
-		return {'player': player.convertToDict("status")}
+		return {'player': player.convert("status")}
 
 	# 实际执行发送验证码操作
 	@classmethod
@@ -333,7 +333,7 @@ class Service:
 			type = "others"
 			target_player = Common.getPlayer(id=get_uid)
 
-		return {'player': target_player.convertToDict(type=type)}
+		return {'player': target_player.convert(type=type)}
 
 	# 获取玩家状态界面信息
 	@classmethod
@@ -343,7 +343,7 @@ class Service:
 
 		target_player = Common.getPlayer(id=get_uid)
 
-		return {'player': target_player.convertToDict(type="status")}
+		return {'player': target_player.convert(type="status")}
 
 	# 获取玩家状态界面信息
 	@classmethod
@@ -353,7 +353,7 @@ class Service:
 
 		target_player = Common.getPlayer(id=get_uid)
 
-		return {'player': target_player.convertToDict(type="battle")}
+		return {'player': target_player.convert(type="battle")}
 
 	# 获取玩家状态界面信息
 	@classmethod
@@ -363,7 +363,7 @@ class Service:
 
 		target_player = Common.getPlayer(id=get_uid)
 
-		return {'player': target_player.convertToDict(type="pack")}
+		return {'player': target_player.convert(type="pack")}
 
 	# 玩家修改昵称
 	@classmethod

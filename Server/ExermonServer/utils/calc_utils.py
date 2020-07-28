@@ -1136,7 +1136,7 @@ class GeneralItemEffectProcessor:
 
             item: BaseItem = ItemCommon.getItem(type_, id=item_id)
 
-            container_class = item.contItemClass().containerClass()
+            container_class = item.containerClass()
             container = player.getContainer(container_class)
 
             value = random.randint(min_cnt, max_cnt)

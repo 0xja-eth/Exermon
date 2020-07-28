@@ -19,7 +19,7 @@ class Service:
 		# exercise_records: 刷题结果数据（数组） => 所有刷题记录
 		# exam_records: 考核记录数据（数组） => 所有考核记录
 		# battle_records: 对战记录数据（数组） => 所有对战记录
-		return player.convertToDict("records")
+		return player.convert("records")
 
 	# 收藏/解除收藏题目
 	@classmethod
@@ -77,7 +77,7 @@ class Service:
 		rec = ExerciseRecord.create(player, subject=subject,
 									gen_type=gen_type, count=count)
 
-		return {'record': rec.convertToDict()}
+		return {'record': rec.convert()}
 
 	# 开始刷题
 	@classmethod
@@ -100,7 +100,7 @@ class Service:
 		if terminate:
 			exercise.terminate()
 
-			return {'result': exercise.convertToDict('result')}
+			return {'result': exercise.convert('result')}
 
 
 # =======================

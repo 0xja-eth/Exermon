@@ -2,133 +2,424 @@ from django.db import models
 from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.deconstruct import deconstructible
+from .data_manager import *
+from enum import Enum
 import os, random
 
 
 # ===================================================
-#  缓存机制模型
+#  AdminX帮助类
 # ===================================================
-class CacheableModel(models.Model):
+class AdminXHelper:
+
+	InlinesMapper = {}
+
+	# region 装饰器
+
+	@classmethod
+	def relatedModel(cls, model: models.Model, *inline_clas):
+		"""
+		关联一个模型
+		Args:
+			model (type): 模型类
+			*inline_clas (*tuple): 关联类
+		"""
+		inline_clas = list(inline_clas)
+
+		def wrapper(adminx_cla: type):
+			import xadmin
+
+			if not model._meta.abstract:
+				xadmin.site.register(model, adminx_cla)
+
+			processKey(adminx_cla, "list_display", True)
+			processKey(adminx_cla, "list_editable")
+
+			processInlines(adminx_cla)
+
+			processFormLayout(adminx_cla)
+
+			return adminx_cla
+
+		def processKey(adminx_cla: type, key: str, include_id=False):
+			const_key = key.upper()
+			adminx_key = key.lower()
+
+			if hasattr(model, const_key) and \
+					getattr(model, const_key) is not None:
+				tmp_val = list(getattr(model, const_key))
+			else:
+				tmp_val = cls.localKeys(model, include_id)
+
+			append_key = const_key+"_APPEND"
+			if hasattr(model, append_key):
+				tmp_val.extend(getattr(model, append_key))
+
+			exclude_key = const_key+"_EXCLUDE"
+			if hasattr(model, exclude_key):
+				for key in getattr(model, exclude_key):
+					tmp_val.remove(key)
+
+			cls._inhertAttr(adminx_cla, adminx_key, tmp_val)
+
+		def processInlines(adminx_cla: type):
+
+			excludes = cls._inlineClasses2Models(inline_clas)
+
+			releated_models = cls.getRelatedModels(model, excludes)
+
+			for inline_model in releated_models:
+				inline_cla = cls.generateInlineClass(inline_model)
+				if inline_cla is not None:
+					inline_clas.append(inline_cla)
+
+			print("processInlines: %s.inline = %s" % (adminx_cla.__name__, inline_clas))
+
+			cls._inhertAttr(adminx_cla, 'inlines', inline_clas)
+
+		def processFormLayout(adminx_cla: type):
+			from xadmin.layout import Fieldset
+
+			name = model._meta.verbose_name
+
+			field_set = [Fieldset(name+"属性", *cls.localKeys(model))]
+
+			cls._inhertAttr(adminx_cla, 'form_layout', field_set)
+
+		return wrapper
+
+	@classmethod
+	def registerBaseInline(cls, model: models.Model):
+		"""
+		注册基本行内关系
+		Args:
+			model (type): 模型
+		"""
+		def wrapper(inline_cla: type):
+
+			cls.InlinesMapper[model] = inline_cla
+
+			if not model._meta.abstract:
+				inline_cla.model = model
+
+			return inline_cla
+
+		return wrapper
+
+	# endregion
+
+	# region Inline 处理
+
+	@classmethod
+	def findBaseInlineClass(cls, model: models.Model):
+		"""
+		获取行内关系类
+		Args:
+			model (type): 模型
+		Returns:
+			返回对应行内类的基类
+		"""
+		for cla in model.mro():
+			if cla in cls.InlinesMapper:
+				return cls.InlinesMapper[cla]
+
+		return None
+
+	@classmethod
+	def generateInlineClass(cls, inline_model: models.Model):
+
+		base_cla = cls.findBaseInlineClass(inline_model)
+
+		if base_cla is None: return None
+
+		if hasattr(base_cla, 'model') and \
+				base_cla.model == inline_model:
+			return base_cla
+
+		inline_cla = type("%sInline" % inline_model.__name__,
+						  (base_cla, ), {"model": inline_model})
+
+		return inline_cla
+
+	@classmethod
+	def _inlineClasses2Models(cls, inline_classes: list):
+		res = []
+		for inline in inline_classes:
+			res.append(inline.model)
+
+		return res
+
+	# endregion
+
+	# region Model 字段处理
+
+	@classmethod
+	def allKeys(cls, model: models.Model, include_id=False) -> list:
+
+		res = cls._allMetaAttr(model, 'fields', 'name')
+
+		if 'id' in res and not include_id: res.remove('id')
+
+		return res
+
+	@classmethod
+	def localKeys(cls, model: models.Model, include_id=False) -> list:
+
+		res = cls._deltaMetaAttr(model, 'fields', 'name')
+
+		if 'id' in res and not include_id: res.remove('id')
+
+		return res
+
+		# keys = []
+		#
+		# base_cla = model.__bases__[0]
+		# base_fields = base_cla._meta.fields \
+		# 	if hasattr(base_cla, '_meta') else []
+		#
+		# for field in model._meta.fields:
+		# 	if field in base_fields: continue
+		# 	if field.name != 'id' or include_id:
+		# 		keys.append(field.name)
+		#
+		# return keys
+
+	@classmethod
+	def getRelatedModels(cls, model: models.Model, excludes=[]):
+
+		if hasattr(model, "INLINE_MODELS") and \
+				model.INLINE_MODELS is not None:
+			return model.INLINE_MODELS
+
+		excludes += model.EXCLUDE_INLINES \
+			if hasattr(model, "EXCLUDE_INLINES") else []
+
+		return cls.localRelatedModels(model, excludes)
+
+	@classmethod
+	def allRelatedModels(cls, model: models.Model, excludes=[]):
+
+		return cls._allMetaAttr(model, 'related_objects',
+								'related_model', excludes)
+
+	@classmethod
+	def localRelatedModels(cls, model: models.Model, excludes=[]):
+
+		return cls._deltaMetaAttr(model, 'related_objects',
+								  'related_model', excludes)
+
+	# endregion
+
+	# region 属性获取
+
+	@classmethod
+	def _allMetaAttr(cls, model: models.Model, key, map_key=None, excludes=[]):
+		"""
+		所有Meta属性
+		"""
+		res = []
+
+		for val in getattr(model._meta, key):
+			item = val if map_key is None \
+				else getattr(val, map_key)
+
+			if item not in excludes:
+				res.append(item)
+
+		return res
+
+	@classmethod
+	def _deltaMetaAttr(cls, model: models.Model, key, map_key=None, excludes=[]):
+		"""
+		与父类Meta相差的属性
+		"""
+		res = []
+		base_cla = model.__bases__[0]
+
+		if hasattr(base_cla, '_meta') and \
+			hasattr(base_cla._meta, key):
+			base_vals = getattr(base_cla._meta, key)
+		else:
+			base_vals = []
+
+		for val in getattr(model._meta, key):
+			if val in base_vals: continue
+
+			item = val if map_key is None \
+				else getattr(val, map_key)
+
+			if item not in excludes:
+				res.append(item)
+
+		return res
+
+	@classmethod
+	def _inhertAttr(cls, adminx_cla, key, val):
+		"""
+		继承属性
+		"""
+		base_cla = adminx_cla.__bases__[0]
+
+		if hasattr(base_cla, key):
+			base_val = getattr(base_cla, key)
+			val = base_val + val
+
+		# print("inhertAttr %s.%s: %s" % (adminx_cla, key, val))
+		setattr(adminx_cla, key, val)
+
+	# endregion
+
+	"""分隔符"""
+
+
+# ===================================================
+#  枚举映射类
+# ===================================================
+class EnumMapper:
+
+	_Content = {}
+
+	@classmethod
+	def register(cls, enum: Enum, cla: type):
+		"""
+		注册枚举
+		Args:
+			enum (Enum): 枚举
+			cla (type): 类型
+		Returns:
+			返回类本身（用于装饰器）
+		"""
+		cls._Content[enum] = cla
+		return cla
+
+	@classmethod
+	def get(cls, enum: Enum):
+		"""
+		获取映射
+		Args:
+			enum (Enum): 枚举
+		Returns:
+			返回枚举对应的映射对象
+		"""
+		if enum in cls._Content:
+			return cls._Content[enum]
+
+		return None
+
+	@classmethod
+	def registerClass(cls, cla):
+		"""
+		注册物品/容器/容器项
+		Args:
+			cla (any): 物品/容器/容器项类型
+		Returns:
+			返回类本身（用于装饰器）
+		"""
+		return cls.register(cla.TYPE, cla)
+
+# region 核心（静态/动态/游戏资料）数据类型 CoreModel
+
+
+# ===================================================
+#  核心模型
+# ===================================================
+class CoreModel(models.Model):
 
 	class Meta:
 		abstract = True
 
-	cached_dict = None
+	# 没能找到时候抛出的异常
+	NOT_EXIST_ERROR = ErrorType.UnknownError
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.cached_dict = {}
-		self.delete_save = False
-		self.saved = True
+	# region 数据获取
 
-	def __del__(self):
-		if self.delete_save:
-			self.save()
+	@classmethod
+	def setup(cls):
+		"""
+		读取数据
+		"""
+		DataManager.setObjects(cls, **cls._setupKwargs())
 
-	def __setattr__(self, key, value):
-		if key != 'saved': self.saved = False
-		super().__setattr__(key, value)
+	# 读取参数
+	@classmethod
+	def _setupKwargs(cls): return {}
 
-	# 进行缓存
-	def _cache(self, key, value):
-		self.cached_dict[key] = value
+	@classmethod
+	def get(cls, cond: callable = None, **kwargs):
+		"""
+		根据条件获取单个数据
+		Args:
+			cond (callable): 查询函数
+			**kwargs (**dict): 查询条件
+		Returns:
+			按照条件返回指定数据（若有多个返回第一个）
+		Raises:
+			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+		Examples:
+			获取 id 为 3 的科目：
+			subject = Subject.get(id=3)
+			获取 属性缩写 为 mhp 的属性：
+			param = BaseParam.get(attr='mhp')
+		"""
+		if not DataManager.contains(cls): cls.setup()
 
-	# 获取缓存
-	def _getCache(self, key):
-		if key in self.cached_dict:
-			return self.cached_dict[key]
-		return None
+		return DataManager.getObject(cls, cond, **kwargs)
 
-	# 获取或者设置（如果不存在）缓存
-	def _getOrSetCache(self, key, func):
-		if key not in self.cached_dict:
-			self._cache(key, func())
-		return self.cached_dict[key]
+	@classmethod
+	def ensure(cls, cond: callable = None, **kwargs):
+		"""
+		确保指定条件的数据存在
+		Args:
+			cond (callable): 查询函数
+			**kwargs (**dict): 查询条件
+		Raises:
+			若不存在，抛出事先设置的异常（NOT_EXIST_ERROR）
+		Examples:
+			确保 id 为 3 且名字为 英语 的科目存在：
+			Subject.ensure(id=3, name="英语")
+		"""
+		if not DataManager.contains(cls): cls.setup()
 
-	# 获取一对一关系的缓存
-	def _getOneToOneCache(self, cla, key=None):
-		try:
-			if key is None: key = cla
-			attr_name = cla.__name__.lower()
-			return self._getOrSetCache(key,
-				lambda: getattr(self, attr_name))
-		except cla.DoesNotExist: return None
-		except AttributeError: return None
+		DataManager.ensureObjects(cls, cls.NOT_EXIST_ERROR, cond, **kwargs)
 
-	# 获取外键关系的缓存
-	def _getForeignKeyCache(self, cla, key=None):
-		try:
-			if key is None: key = cla
-			attr_name = cla.__name__.lower()+'_set'
-			return self._getOrSetCache(key,
-									   lambda: list(getattr(self, attr_name).all()))
-		except AttributeError: return None
+	@classmethod
+	def objs(cls, cond: callable = None, **kwargs) -> QuerySet or list:
+		"""
+		按照一定条件获取多个数据
+		Args:
+			cond (callable): 查询函数
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回符合指定条件的数据列表
+		Examples:
+			获取全部属性数据：
+			params = BaseParam.objs()
+			获取分值为 150 的所有科目数据：
+			subjects = Subject.objs(max_score=150)
+		"""
+		if not DataManager.contains(cls): cls.setup()
 
-	# 保存缓存
-	def _saveCache(self, key=None):
-		if key is None:
-			self.__saveCacheItem(self.cached_dict)
+		return DataManager.queryObjects(cls, cond, **kwargs)
 
-		elif key in self.cached_dict:
-			self.__saveCacheItem(self.cached_dict[key])
+	@classmethod
+	def count(cls, cond: callable = None, **kwargs) -> int:
+		"""
+		获取数据的数量
+		Args:
+			cond (callable): 查询函数
+			**kwargs (**dict): 查询条件
+		Returns:
+			返回该数据在数据库中的数量
+		"""
+		if not DataManager.contains(cls): cls.setup()
 
-	# 保存缓存项
-	def __saveCacheItem(self, item):
-		if isinstance(item, (list, tuple)):
-			tmp_item = item.copy()
-			for val in tmp_item: self.__saveCacheItem(val)
+		return DataManager.getCount(cls, cond, **kwargs)
 
-		elif isinstance(item, dict):
-			tmp_item = item.copy()
-			for key in tmp_item: self.__saveCacheItem(item[key])
+	# endregion
 
-		elif hasattr(item, '__iter__'):
-			for val in item: self.__saveCacheItem(val)
+# endregion
 
-		elif isinstance(item, models.Model): item.save()
-
-	# 删除缓存
-	def _deleteCache(self, key=None):
-		if key is None:
-			self.__deleteCacheItem(self.cached_dict)
-
-		elif key in self.cached_dict:
-			self.__deleteCacheItem(self.cached_dict[key])
-
-		self._clearCache(key, False)
-
-	# 删除缓存项
-	def __deleteCacheItem(self, item):
-		if isinstance(item, (list, tuple)):
-			for val in item: self.__saveCacheItem(val)
-
-		elif isinstance(item, dict):
-			for key in item: self.__saveCacheItem(item[key])
-
-		elif hasattr(item, '__iter__'):
-			for val in item: self.__saveCacheItem(val)
-
-		elif isinstance(item, models.Model): item.delete()
-
-	# 清除缓存
-	def _clearCache(self, key=None, save=True):
-		if save: self._saveCache(key)
-
-		if key is None:
-			self.cached_dict.clear()
-		elif key in self.cached_dict:
-			self.cached_dict.pop(key)
-
-	# 重载保存函数
-	def save(self, **kwargs):
-
-		if not self.saved:
-			super().save(**kwargs)
-			# print(str(self)+" saved!")
-
-		self.saved = True
-		self._saveCache()
-
+# region 文件上传类
 
 # ===================================================
 #  图片上传处理（父类）
@@ -337,6 +628,8 @@ class QuestionAudioUpload(SystemImageUpload):
 
 		return filename+ext
 
+# endregion
+
 
 # ============================================
 # 公用类：处理模型函数的共有业务逻辑
@@ -437,7 +730,7 @@ class Common:
 
 		if objects is None: return []
 		for obj in objects:
-			result.append(obj.convertToDict(**kwargs))
+			result.append(obj.convert(**kwargs))
 
 		return result
 
@@ -446,7 +739,7 @@ class Common:
 	def objectToDict(cls, object, **kwargs):
 
 		if object is None: return {}
-		return object.convertToDict(**kwargs)
+		return object.convert(**kwargs)
 
 	@classmethod
 	def sum(cls, list_: list, map: callable = None, **kwargs) -> object:

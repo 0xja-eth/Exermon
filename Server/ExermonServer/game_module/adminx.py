@@ -1,12 +1,14 @@
 import xadmin
 
 from .models import *
+from utils.model_utils import AdminXHelper
 
 # Register your models here.
 
 DEFAULT_PARAM_COUNT = 6
 
 
+@AdminXHelper.registerBaseInline(ParamValue)
 class ParamsInline(object):
 
 	min_num = DEFAULT_PARAM_COUNT
@@ -16,6 +18,7 @@ class ParamsInline(object):
 	style = "table"
 
 
+@AdminXHelper.registerBaseInline(EquipParamValue)
 class EquipParamsInline(ParamsInline):
 
 	min_num = 0
@@ -56,111 +59,123 @@ class EquipParamsInline(ParamsInline):
 # 	model = ExerGiftStar
 # 	style = "accordion"
 
+#
+# class ExerParamBaseRangesInline(ParamsInline):
+# 	model = ExerParamBaseRange
+#
+#
+# class ExerParamRateRangesInline(ParamsInline):
+# 	model = ExerParamRateRange
+#
+#
+# class ExerGiftParamRateRangesInline(ParamsInline):
+# 	model = ExerGiftParamRateRange
 
-class ExerParamBaseRangesInline(ParamsInline):
-	model = ExerParamBaseRange
 
-
-class ExerParamRateRangesInline(ParamsInline):
-	model = ExerParamRateRange
-
-
-class ExerGiftParamRateRangesInline(ParamsInline):
-	model = ExerGiftParamRateRange
-
-
-@xadmin.sites.register(GameTip)
+@AdminXHelper.relatedModel(GameTip)
 class GameTipAdmin(object):
-	list_display = ['id', 'name', 'description']
+	# list_display = ['id', 'name', 'description']
+	#
+	# list_editable = ['name', 'description']
+	pass
 
-	list_editable = ['name', 'description']
 
-
-@xadmin.sites.register(Subject)
+@AdminXHelper.relatedModel(Subject)
 class SubjectAdmin(object):
-	list_display = ['id', 'name', 'max_score', 'force', 'color', 'adminColor', 'configure']
+	# list_display = ['id', 'name', 'max_score', 'force', 'color', 'adminColor', 'configure']
+	#
+	# list_editable = ['name', 'max_score', 'force', 'color', 'configure']
+	pass
 
-	list_editable = ['name', 'max_score', 'force', 'color', 'configure']
 
-
-@xadmin.sites.register(BaseParam)
+@AdminXHelper.relatedModel(BaseParam)
 class BaseParamAdmin(object):
-	list_display = ['id', 'name', 'description', 'attr', 'color', 'adminColor', 'configure']
+	# list_display = ['id', 'name', 'description', 'attr', 'color', 'adminColor', 'configure']
+	#
+	# list_editable = ['name', 'description', 'attr', 'color', 'configure']
+	pass
 
-	list_editable = ['name', 'description', 'attr', 'color', 'configure']
 
-
-@xadmin.sites.register(UsableItemType)
+@AdminXHelper.relatedModel(UsableItemType)
 class UsableItemTypeAdmin(object):
-	list_display = ['id', 'name', 'description', 'configure']
+	# list_display = ['id', 'name', 'description', 'configure']
+	#
+	# list_editable = ['name', 'description', 'configure']
+	pass
 
-	list_editable = ['name', 'description', 'configure']
 
-
-@xadmin.sites.register(HumanEquipType)
+@AdminXHelper.relatedModel(HumanEquipType)
 class HumanEquipTypeAdmin(object):
-	list_display = ['id', 'name', 'description', 'configure']
+	# list_display = ['id', 'name', 'description', 'configure']
+	#
+	# list_editable = ['name', 'description', 'configure']
+	pass
 
-	list_editable = ['name', 'description', 'configure']
 
-
-@xadmin.sites.register(ExerEquipType)
+@AdminXHelper.relatedModel(ExerEquipType)
 class ExerEquipTypeAdmin(object):
-	list_display = ['id', 'name', 'description', 'configure']
+	# list_display = ['id', 'name', 'description', 'configure']
+	#
+	# list_editable = ['name', 'description', 'configure']
+	pass
 
-	list_editable = ['name', 'description', 'configure']
 
-
-@xadmin.sites.register(ExerStar)
+@AdminXHelper.relatedModel(ExerStar)
 class ExerStarAdmin(object):
-	list_display = ['id', 'name', 'color',
-					'adminColor', 'max_level', 'adminLevelExpFactors',
-					'adminParamBaseRanges', 'adminParamRateRanges', 'configure']
+	# list_display = ['id', 'name', 'color',
+	# 				'adminColor', 'max_level', 'adminLevelExpFactors',
+	# 				'adminParamBaseRanges', 'adminParamRateRanges', 'configure']
+	#
+	# list_editable = ['name', 'color', 'max_level', 'configure']
+	#
+	# inlines = [ExerParamBaseRangesInline, ExerParamRateRangesInline]
+	pass
 
-	list_editable = ['name', 'color', 'max_level', 'configure']
 
-	inlines = [ExerParamBaseRangesInline, ExerParamRateRangesInline]
-
-
-@xadmin.sites.register(ExerGiftStar)
+@AdminXHelper.relatedModel(ExerGiftStar)
 class ExerGiftStarAdmin(object):
-	list_display = ['id', 'name', 'color', 'adminColor', 'configure']
+	# list_display = ['id', 'name', 'color', 'adminColor', 'configure']
+	#
+	# list_editable = ['name', 'color', 'configure']
+	#
+	# inlines = [ExerGiftParamRateRangesInline]
+	pass
 
-	list_editable = ['name', 'color', 'configure']
 
-	inlines = [ExerGiftParamRateRangesInline]
-
-
-@xadmin.sites.register(ItemStar)
+@AdminXHelper.relatedModel(ItemStar)
 class ItemStarAdmin(object):
-	list_display = ['id', 'name', 'color', 'adminColor', 'configure']
+	# list_display = ['id', 'name', 'color', 'adminColor', 'configure']
+	#
+	# list_editable = ['name', 'color', 'configure']
+	pass
 
-	list_editable = ['name', 'color', 'configure']
 
-
-@xadmin.sites.register(QuestionStar)
+@AdminXHelper.relatedModel(QuestionStar)
 class QuestionStarAdmin(object):
-	list_display = ['id', 'name', 'color', 'adminColor', 'level', 'weight',
-					'exp_incr', 'gold_incr', 'std_time', 'min_time']
+	# list_display = ['id', 'name', 'color', 'adminColor', 'level', 'weight',
+	# 				'exp_incr', 'gold_incr', 'std_time', 'min_time']
+	#
+	# list_editable = ['name', 'color', 'level', 'weight', 'exp_incr', 'gold_incr',
+	# 				 'std_time', 'min_time', 'configure']
+	pass
 
-	list_editable = ['name', 'color', 'level', 'weight', 'exp_incr', 'gold_incr',
-					 'std_time', 'min_time', 'configure']
 
-
-@xadmin.sites.register(GameVersion)
+@AdminXHelper.relatedModel(GameVersion)
 class GameVersionAdmin(object):
-	list_display = ['id', 'main_version', 'sub_version', 'update_time',
-					'update_note', 'description', 'is_used', 'configure']
+	# list_display = ['id', 'main_version', 'sub_version', 'update_time',
+	# 				'update_note', 'description', 'is_used', 'configure']
+	#
+	# list_editable = ['main_version', 'sub_version', 'is_used', 'configure']
+	pass
 
-	list_editable = ['main_version', 'sub_version', 'is_used', 'configure']
 
-
-@xadmin.sites.register(GameConfigure)
+@AdminXHelper.relatedModel(GameConfigure)
 class GameConfigureAdmin(object):
-	list_display = ['id', 'name', 'eng_name', 'gold', 'ticket', 'bound_ticket']
-
-	list_editable = ['name', 'eng_name', 'gold', 'ticket', 'bound_ticket']
+	# list_display = ['id', 'name', 'eng_name', 'gold', 'ticket', 'bound_ticket']
+	#
+	# list_editable = ['name', 'eng_name', 'gold', 'ticket', 'bound_ticket']
 
 	# inlines = [BaseParamsInline, SubjectsInline, UsableItemTypesInline,
 	# 		   HumanEquipTypesInline, ExerEquipTypesInline,
 	# 		   ExerStarsInline, ExerGiftStarsInline]
+	pass
