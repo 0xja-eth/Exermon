@@ -1,13 +1,17 @@
 from django.db import models
 from django.db.models.query import QuerySet
 
-from game_module.models import GameConfigure
+from game_module.models import GameConfigure, \
+	BaseParam, ParamValue
 
-from utils.model_utils import EnumMapper, CacheableModel, \
-	CoreModel, Common as ModelUtils
+from utils.cache_utils import CachePool, CacheHelper
 from utils.view_utils import Common as ViewUtils
+from utils.model_utils import EnumMapper, \
+	CacheableModel, CoreModel, Common as ModelUtils
 from utils.exception import ErrorType, GameException
+
 from enum import Enum
+
 import jsonfield, math
 
 
@@ -121,6 +125,11 @@ class ContItemType(Enum):
 	BattleItemSlotItem = 301  # 对战物资槽项
 
 
+# endregion
+
+# region 物品系统管理类
+
+
 class ItemManager:
 	"""
 	物品管理类
@@ -153,30 +162,16 @@ class ItemManager:
 
 	@classmethod
 	def registerPackContainer(cls, verbose_name):
-		# *accepted_cont_item_clas):
 		"""
 		注册容器
 		Args:
 			verbose_name (str): 别名
-			# *accepted_cont_item_clas (*list): 容器项类（可设置多个）
 		"""
 		def wrapper(cla: PackContainer):
-			print("registerPackContainer: %s" % cla)
-
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name
 
-			# base_cont_item_cla = cls.\
-			# 	_getCommonSuperClass(*accepted_cont_item_clas)
-
 			cla.TYPE = eval("ContainerType.%s" % cla.__name__)
-
-			# cla.BASE_CONTITEM_CLASS = base_cont_item_cla
-			# cla.ACCEPTED_CONTITEM_CLASSES = accepted_cont_item_clas
-			#
-			# for cont_item_cla in accepted_cont_item_clas:
-			# 	item_cla = cont_item_cla.acceptedItemClass()
-			# 	item_cla.CONTAINER_CLASS = cla
 
 			EnumMapper.registerClass(cla)
 
@@ -186,33 +181,16 @@ class ItemManager:
 
 	@classmethod
 	def registerSlotContainer(cls, verbose_name):
-		# accepted_slot_item_cla: 'SlotContItem',
-		# *accepted_pack_item_clas):
 		"""
 		注册容器
 		Args:
 			verbose_name (str): 别名
-			# accepted_slot_item_cla (type): 槽项类
-			# *accepted_pack_item_clas (*list): 装备项类（可设置多个）
 		"""
-		# if len(accepted_pack_item_clas) <= 0:
-		# 	accepted_pack_item_clas = \
-		# 		accepted_slot_item_cla.acceptedEquipItemClasses()
-
 		def wrapper(cla: SlotContainer):
-			print("registerSlotContainer: %s" % cla)
-
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name
 
-			# base_cont_item_cla = cls.\
-			# 	_getCommonSuperClass(*accepted_pack_item_clas)
-
 			cla.TYPE = eval("ContainerType.%s" % cla.__name__)
-
-			# cla.BASE_CONTITEM_CLASS = base_cont_item_cla
-			# cla.ACCEPTED_SLOTITEM_CLASS = accepted_slot_item_cla
-			# cla.ACCEPTED_CONTITEM_CLASSES = accepted_pack_item_clas
 
 			EnumMapper.registerClass(cla)
 
@@ -232,8 +210,6 @@ class ItemManager:
 			accepted_item_cla (type): 接受物品类
 		"""
 		def wrapper(cla: PackContItem):
-			print("registerPackContItem: %s" % cla)
-
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name
 
@@ -290,7 +266,6 @@ class ItemManager:
 			**equip_item_args (**dict): 装备项参数（键：装备项键名，值：装备项类型）
 		"""
 		def wrapper(cla: SlotContItem):
-			print("registerSlotContItem: %s" % cla)
 
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name
@@ -334,7 +309,7 @@ class ItemManager:
 				_getCommonSuperClass(*pack_item_clas)
 
 			container_cla.BASE_CONTITEM_CLASS = base_cont_item_cla
-			container_cla.ACCEPTED_CONTITEM_CLASSES = equip_item_args
+			container_cla.ACCEPTED_CONTITEM_CLASSES = pack_item_clas
 			container_cla.ACCEPTED_SLOTITEM_CLASS = cla
 
 		return wrapper
@@ -364,8 +339,236 @@ class ItemManager:
 
 # endregion
 
+# region 属性对象
 
-# region 基本物品
+class BaseParamsObject:
+	"""
+	基本属性对象
+	"""
+	# 管理界面显示属性
+	def _adminParams(self, params):
+		from django.utils.html import format_html
+
+		res = ''
+		for p in params:
+			res += str(p) + "<br>"
+
+		return format_html(res)
+
+	def _getVals(self, db_vals, val_func,
+				 param_cla, clamp=True) -> QuerySet or list:
+
+		if param_cla is None: return []
+
+		# 尝试获取数据库值（如果有的话）
+		if db_vals is not None: return db_vals
+
+		vals = []
+		params = BaseParam.objs()
+
+		for param in params:
+			val = param_cla(param=param)
+			val.setValue(val_func(param_id=param.id), clamp)
+			vals.append(val)
+
+		return vals
+
+	def _getVal(self, params, **kwargs):
+
+		if isinstance(params, QuerySet):
+			params = params.filter(**kwargs)
+
+			if not params.exists(): return 0
+			param: ParamValue = params.first()
+
+		else:
+			param: ParamValue = ModelUtils.get(params, **kwargs)
+
+		return 0 if param is None else param.getValue()
+
+
+class ParamsObject(BaseParamsObject):
+	"""
+	拥有属性计算的对象
+	术语：Val：实际值，Base：基础值，Rate：成长率
+	"""
+
+	# 管理界面用：显示属性基础值
+	def adminParamVals(self):
+		return self._adminParams(self.paramVals())
+
+	adminParamVals.short_description = "属性实际值"
+
+	# 管理界面用：显示属性基础值
+	def adminParamBases(self):
+		return self._adminParams(self.paramBases())
+
+	adminParamBases.short_description = "属性基础值"
+
+	# 管理界面用：显示属性成长率
+	def adminParamRates(self):
+		return self._adminParams(self.paramRates())
+
+	adminParamRates.short_description = "属性成长率"
+
+	# 管理界面用：显示属性成长率
+	def adminBattlePoint(self):
+		return self.battlePoint()
+
+	adminBattlePoint.short_description = "战斗力"
+
+	# 类型配置
+	@classmethod
+	def paramValueClass(cls):
+		return cls.paramBaseClass()
+
+	@classmethod
+	def paramBaseClass(cls): return None
+
+	@classmethod
+	def paramRateClass(cls): return None
+
+	# 数据库值获取（默认为 None 表示无）
+	def _paramVals(self) -> QuerySet:
+		return self._paramBases()
+
+	def _paramBases(self) -> QuerySet:
+		return None
+
+	def _paramRates(self) -> QuerySet:
+		return None
+
+	# 值计算（用于无法从数据库直接获取的属性，一般用于计算）
+	def _paramVal(self, **kwargs) -> float:
+		return self._paramBase(**kwargs)
+
+	def _paramBase(self, **kwargs) -> float:
+		return 0
+
+	def _paramRate(self, **kwargs) -> float:
+		return 0
+
+	# 最终值数组（缓存）
+	@CacheHelper.normalCache
+	def paramVals(self) -> QuerySet or list:
+		"""
+		获取所有实际属性数组
+		Returns:
+			返回所有实际属性的数组（元素类型为 ExerParamBase）
+		"""
+		return self._getVals(self._paramVals(), self._paramVal,
+							 self.paramValueClass())
+
+		# # 尝试获取数据库值（如果有的话）
+		# vals = self._paramVals()
+		# if vals is not None: return vals
+		#
+		# vals = []
+		# params = BaseParam.objs()
+		#
+		# for param in params:
+		# 	val = self.paramValueClass()(param=param)
+		# 	val.setValue(self._paramVal(param_id=param.id), False)
+		# 	vals.append(val)
+		#
+		# return vals
+
+	@CacheHelper.normalCache
+	def paramBases(self) -> QuerySet or list:
+		return self._getVals(self._paramBases(), self._paramBase,
+							 self.paramBaseClass())
+
+	@CacheHelper.normalCache
+	def paramRates(self) -> QuerySet or list:
+		return self._getVals(self._paramRates(), self._paramRate,
+							 self.paramRateClass())
+
+	# 单个值获取（通过缓存）
+	def paramVal(self, **kwargs):
+		return self._getVal(self.paramVals(), **kwargs)
+
+	def paramBase(self, **kwargs):
+		return self._getVal(self.paramBases(), **kwargs)
+
+	def paramRate(self, **kwargs):
+		return self._getVal(self.paramRates(), **kwargs)
+
+	# 清除属性缓存
+	def _clearParamsCache(self):
+		CacheHelper.clearCache(self,
+			self.paramVals, self.paramBases, self.paramRates)
+
+	# 战斗力
+	def battlePoint(self):
+		from utils.calc_utils import BattlePointCalc
+		return BattlePointCalc.calc(self.paramVal)
+
+
+class EquipParamsObject(BaseParamsObject):
+	"""
+	装备属性计算的对象
+	术语：Level：等级加成值，Base：基础值
+	"""
+
+	# 管理界面用：显示属性基础值
+	def adminLevelParams(self):
+		return self._adminParams(self.levelParams())
+
+	adminLevelParams.short_description = "等级属性值"
+
+	# 管理界面用：显示属性基础值
+	def adminBaseParams(self):
+		return self._adminParams(self.baseParams())
+
+	adminBaseParams.short_description = "基础属性值"
+
+	# 类型配置
+	@classmethod
+	def levelParamClass(cls): return None
+
+	@classmethod
+	def baseParamClass(cls): return None
+
+	# 数据库值获取或者间接获取（默认为 None 表示无）
+	def _levelParams(self) -> QuerySet or list:
+		return None
+
+	def _baseParams(self) -> QuerySet or list:
+		return None
+
+	# 值计算（用于无法从数据库直接获取的属性，一般用于计算）
+	def _levelParam(self, **kwargs) -> float:
+		return 0
+
+	def _baseParam(self, **kwargs) -> float:
+		return 0
+
+	# 最终值数组（缓存）
+	@CacheHelper.normalCache
+	def levelParams(self) -> QuerySet or list:
+		return self._getVals(self._levelParams(), self._levelParam,
+							 self.levelParamClass(), False)
+
+	@CacheHelper.normalCache
+	def baseParams(self) -> QuerySet or list:
+		return self._getVals(self._baseParams(), self._baseParam,
+							 self.baseParamClass(), False)
+
+	# 单个值获取（通过缓存）
+	def levelParam(self, **kwargs):
+		return self._getVal(self.levelParams(), **kwargs)
+
+	def baseParam(self, **kwargs):
+		return self._getVal(self.baseParams(), **kwargs)
+
+	# 清除属性缓存
+	def _clearParamsCache(self):
+		CacheHelper.clearCache(self,
+			self.levelParams, self.baseParams)
+
+# endregion
+
+# region 物品系统
 
 
 # ===================================================
@@ -865,7 +1068,7 @@ class UsableItem(LimitedItem):
 # ===================================================
 #  可装备物品
 # ===================================================
-class EquipableItem(LimitedItem):
+class EquipableItem(LimitedItem, EquipParamsObject):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "可装备物品"
@@ -930,47 +1133,16 @@ class EquipableItem(LimitedItem):
 		return res
 
 	# 获取所有的等级属性值
-	def levelParams(self):
+	def _levelParams(self):
 		raise NotImplementedError
 
 	# 获取所有的属性基本值
-	def baseParams(self):
+	def _baseParams(self):
 		raise NotImplementedError
 
 	# 获取购买价格
 	def buyPrice(self):
 		raise NotImplementedError
-
-	# # 用于获取属性值
-	# def __getattr__(self, item):
-	# 	param = self.param(attr=item)
-	# 	if param is None: return super().__getattr__(item)
-	# 	return param
-
-	# 获取等级属性值
-	def levelParam(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.levelParams().filter(param_id=param_id)
-		if attr is not None:
-			param = self.levelParams().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
-
-	# 获取属性值
-	def baseParam(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.baseParams().filter(param_id=param_id)
-		if attr is not None:
-			param = self.baseParams().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
-
 
 # endregion
 
@@ -1090,6 +1262,11 @@ class BaseContainer(CacheableModel):
 	def _create(self, **kwargs):
 		pass
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.exactlyPlayer().registerContainer(self)
+
 	# endregion
 
 	# region 类型配置
@@ -1201,6 +1378,9 @@ class BaseContainer(CacheableModel):
 
 		if online_player is None: return player
 		return online_player.player
+
+	def cateData(self):
+		return type(self), self.id
 
 	# 获取容器容量（0为无限）
 	def getCapacity(self):
@@ -1466,6 +1646,9 @@ class BaseContainer(CacheableModel):
 	# 转移物品（从 self 转移到 container）
 	def transfer(self, container, **kwargs):
 		container.acceptTransfer(self, **self.prepareTransfer(container, **kwargs))
+
+	def refresh(self):
+		pass
 
 
 # ===================================================
@@ -2343,12 +2526,17 @@ class SlotContainer(BaseContainer):
 	def contItemClass(self, **kwargs):
 		return self.acceptedSlotItemClass()
 
-	# 装备项
+	# 装备容器类
+	def equipContainerClass(self, index):
+
+		pack_item_cla: PackContItem = self.acceptedContItemClasses()[index]
+		return pack_item_cla.containerClass()
+
+	# 装备容器实例
 	def equipContainer(self, index):
 
-		pack_item_cla = self.acceptedContItemClasses()[index]
-
-		return self.exactlyPlayer().getContainer(pack_item_cla)
+		return self.exactlyPlayer().getContainer(
+			self.equipContainerClass(index))
 
 		# key = self.CONTAINERS_CACHE_KEY % index
 		#
@@ -2748,12 +2936,14 @@ class BaseContItem(CacheableModel):
 			**kwargs (**dict): 附加参数
 		"""
 		self.container = container
+		self.refresh()
 
 	def remove(self):
 		"""
 		移除容器项（从当前容器中移除）
 		"""
 		self.container = None
+		self.refresh()
 
 	# endregion
 
@@ -2793,11 +2983,33 @@ class BaseContItem(CacheableModel):
 
 	# endregion
 
+	# region 数据获取
+
+	# 实际的容器
+	def exactlyContainer(self):
+		return self.exactlyPlayer().getContainer(container=self.container)
+
+	# 实际的容器
+	def exactlyPlayer(self):
+		return self.container.exactlyPlayer()
+
+	def getContainer(self, cla: BaseContainer):
+		attr_name = cla.__name__.lower()
+
+		try: container = getattr(self, attr_name)
+		except cla.DoesNotExist: return None
+
+		return self.exactlyPlayer().getContainer(container=container)
+
+	# endregion
+
 	def refresh(self):
 		"""
 		刷新容器项
 		"""
-		pass
+		container = self.exactlyContainer()
+
+		if container is not None: container.refresh()
 
 	# endregion
 
@@ -2994,6 +3206,8 @@ class PackContItem(BaseContItem):
 
 		self.count += count
 
+		self.refresh()
+
 		max_count = self.maxCount()
 		# 如果有最大叠加限制
 		if max_count > 0:
@@ -3016,6 +3230,8 @@ class PackContItem(BaseContItem):
 			return count  # 未设置物品和容器
 
 		self.count -= count
+
+		self.refresh()
 
 		# 如果数量为 0
 		if self.count <= 0:
@@ -3242,9 +3458,8 @@ class SlotContItem(BaseContItem):
 			obj: PackContItem = getattr(self, attr)
 			if obj is None: return None
 
-			container: PackContainer = self.container.equipContainer(index)
-
-			return container.contItem(cla=type(obj), include_equipped=True, id=obj.id)
+			return self.exactlyPlayer().getContItem(
+				cont_item=obj, include_equipped=True)
 
 		return None
 
@@ -3424,7 +3639,6 @@ class SlotContItem(BaseContItem):
 		"""
 		if type_ is not None:
 			index = self.getEquipItemIndex(type_=type_)
-			# return self.dequip()
 
 		return self.equip(None, index)
 		#
@@ -3455,7 +3669,8 @@ class SlotContItem(BaseContItem):
 		if equip_item is not None:
 			equip_item.ensureContItemUsable(occasion, count, **kwargs)
 
-	def useItem(self, occasion: ItemUseOccasion, index: int = 0, type_: type = None, count: int = 1, **kwargs):
+	def useItem(self, occasion: ItemUseOccasion, index: int = 0,
+				type_: type = None, count: int = 1, **kwargs):
 		"""
 		使用物品
 		Args:

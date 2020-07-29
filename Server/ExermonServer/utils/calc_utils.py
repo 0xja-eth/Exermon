@@ -153,13 +153,14 @@ class ExerSlotItemParamRateCalc:
     # 计算属性
     @classmethod
     def calc(cls, exerslot_item, **kwargs):
+
         if exerslot_item is None: return 0
 
-        player_exer = exerslot_item.player_exer
+        player_exer = exerslot_item.playerExer()
         if player_exer is None: return 0
         epr = player_exer.paramRate(**kwargs)
 
-        player_gift = exerslot_item.player_gift
+        player_gift = exerslot_item.playerGift()
         if player_gift is None: return epr
         gprr = player_gift.paramRate(**kwargs)
 
@@ -202,7 +203,7 @@ class ExerSlotItemParamCalc:
         if self.exermon is None: return
 
         self.player_gift: PlayerExerGift = self.exerslot_item.playerGift()
-        self.exerequip_slot: ExerEquipSlot = self.exerslot_item.exerEquipSlot()
+        self.exer_equip_slot: ExerEquipSlot = self.exerslot_item.exerEquipSlot()
 
         self.kwargs = kwargs
 
@@ -243,8 +244,8 @@ class ExerSlotItemParamCalc:
 
     # 计算 EPPV 装备附加值
     def _calcEquipPlusParamValue(self):
-        if self.exerequip_slot is None: return 0
-        return self.exerequip_slot.param(**self.kwargs)
+        if self.exer_equip_slot is None: return 0
+        return self.exer_equip_slot.paramVal(**self.kwargs)
 
     # 计算 SPPV 状态附加值
     def _calcStatusPlusParamValue(self):
@@ -276,48 +277,51 @@ class ExerSlotItemParamCalc:
 
     # 获取属性实例
     @classmethod
-    def getParam(cls, param_id=None, attr=None):
+    def getParam(cls, **kwargs):
         from game_module.models import BaseParam
 
-        if param_id is not None:
-            return BaseParam.get(id=param_id)
-        if attr is not None:
-            return BaseParam.get(attr=attr)
-        return None
+        if 'param_id' in kwargs:
+            kwargs['id'] = kwargs['param_id']
+            kwargs.pop('param_id')
+
+        return BaseParam.get(**kwargs)
 
 
 # ================================
 # 装备属性计算类
 # ================================
-class EquipParamCalc:
+class ExerEquipParamCalc:
 
     # 计算属性
     @classmethod
-    def calc(cls, equipslot_item, param_id=None, attr=None):
-        calc_obj = cls(equipslot_item, param_id, attr)
+    def calc(cls, equip_slot_item, **kwargs):
+        calc_obj = cls(equip_slot_item, **kwargs)
         return calc_obj.value
 
-    def __init__(self, equipslot_item, param_id=None, attr=None):
+    def __init__(self, equip_slot_item, **kwargs):
         from exermon_module.models import PlayerExermon, \
             ExerSlotItem, ExerEquipSlotItem, ExerPackEquip
+        from player_module.models import Player
 
         self.value = 0
 
-        self.equipslot_item: ExerEquipSlotItem = equipslot_item
+        self.equip_slot_item: ExerEquipSlotItem = equip_slot_item
 
-        self.pack_equip: ExerPackEquip = self.equipslot_item.pack_equip
+        self.player: Player = self.equip_slot_item.exactlyPlayer()
+
+        self.pack_equip: ExerPackEquip = self.equip_slot_item.packEquip()
         if self.pack_equip is None: return
 
         self.equip = self.pack_equip.item
         if self.equip is None: return
 
         self.exerslot_item: ExerSlotItem = \
-            self.equipslot_item.container.exer_slot
+            self.equip_slot_item.container.exerSlotItem()
 
-        self.player_exer: PlayerExermon = self.exerslot_item.player_exer
+        self.player_exer: PlayerExermon = self.exerslot_item.playerExer()
         if self.player_exer is None: return
 
-        self.param = ExerSlotItemParamCalc.getParam(param_id, attr)
+        self.param = ExerSlotItemParamCalc.getParam(**kwargs)
         if self.param is None: return
 
         self.value = self._calc()
@@ -1245,7 +1249,7 @@ class BattleItemEffectProcessor:
         Args:
             item (QuesSugar): 题目糖
         """
-        params = item.params()
+        params = item.paramBases()
         exermon = self.player.getCurrentExermon()
         exermon.addBuff(rate_params=list(params))
 

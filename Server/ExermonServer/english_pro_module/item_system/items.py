@@ -394,6 +394,8 @@ class ExerProCard(BaseExerProItem):
 		(ExerProCardTarget.All.value, '群体'),
 	]
 
+	NOT_EXIST_ERROR = ErrorType.ExerProCardNotExist
+
 	# 消耗能量
 	cost = models.PositiveSmallIntegerField(default=1, verbose_name="消耗能量")
 

@@ -72,8 +72,7 @@ class FirstCardGroup(GroupConfigure):
 	def adminCards(self):
 		res = ""
 		for id in self.cards:
-			res += ViewUtils.getObject(ExerProCard,
-		   		ErrorType.ExerProCardNotExist, id=id).name + " "
+			res += ExerProCard.get(id=id).name + " "
 
 		return res
 

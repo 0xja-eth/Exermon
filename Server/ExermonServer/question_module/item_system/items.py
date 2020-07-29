@@ -40,7 +40,9 @@ class QuesSugarPrice(Currency):
 #  题目糖表
 # ===================================================
 @ItemManager.registerItem("题目糖")  #, ContItems.QuesSugarPackItem)
-class QuesSugar(BaseItem):
+class QuesSugar(BaseItem, ParamsObject):
+
+	LIST_DISPLAY_APPEND = ['adminBuyPrice', 'adminParamBases']
 
 	# 题目
 	question = models.ForeignKey("Question", on_delete=models.CASCADE, verbose_name="对应题目")
@@ -64,19 +66,8 @@ class QuesSugar(BaseItem):
 
 	adminBuyPrice.short_description = "购入价格"
 
-	# 管理界面用：显示属性基础值
-	def adminParams(self):
-		from django.utils.html import format_html
-
-		params = self.params()
-
-		res = ''
-		for p in params:
-			res += str(p) + "<br>"
-
-		return format_html(res)
-
-	adminParams.short_description = "属性基础值"
+	@classmethod
+	def paramBaseClass(cls): return QuesSugarParam
 
 	# 转化为 dict
 	def convert(self):
@@ -101,7 +92,8 @@ class QuesSugar(BaseItem):
 		return res
 
 	# 获取所有的属性成长率
-	def params(self):
+	@CacheHelper.staticCache
+	def _paramBases(self):
 		return self.quessugarparam_set.all()
 
 	# 可否被购买
@@ -111,18 +103,19 @@ class QuesSugar(BaseItem):
 		return not buy_price.isEmpty()
 
 	# 购买价格
+	@CacheHelper.staticCache
 	def buyPrice(self):
 		try: return self.quessugarprice
 		except QuesSugarPrice.DoesNotExist: return None
 
-	# 获取属性值
-	def param(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.params().filter(param_id=param_id)
-		if attr is not None:
-			param = self.params().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
+	# # 获取属性值
+	# def param(self, param_id=None, attr=None):
+	# 	param = None
+	# 	if param_id is not None:
+	# 		param = self.params().filter(param_id=param_id)
+	# 	if attr is not None:
+	# 		param = self.params().filter(param__attr=attr)
+	#
+	# 	if param is None or not param.exists(): return 0
+	#
+	# 	return param.first().getValue()

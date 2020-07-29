@@ -3,6 +3,83 @@ from django.db.models.query import QuerySet
 from .exception import *
 
 
+class CacheHelper:
+	"""
+	缓存帮助类
+	"""
+	@classmethod
+	def cacheValName(cls, func):
+		return "_cached_%s" % func.__name__
+
+	@classmethod
+	def staticCache(cls, func):
+		"""
+		静态缓存，无法进行缓存清除处理
+		"""
+		cache_val_name = cls.cacheValName(func)
+
+		def wrapper(self):
+
+			# 如果缓存属性不存在，或者缓存值为None
+			if not hasattr(self, cache_val_name) or \
+					getattr(self, cache_val_name) is None:
+
+				setattr(self, cache_val_name, func(self))
+
+			return getattr(self, cache_val_name)
+
+		return wrapper
+
+	@classmethod
+	def normalCache(cls, func):
+		"""
+		普通缓存，可以进行缓存清除处理
+		"""
+		cache_val_name = cls.cacheValName(func)
+
+		def wrapper(self):
+
+			# 如果缓存属性不存在，或者缓存值为None
+			if not hasattr(self, cache_val_name) or \
+					getattr(self, cache_val_name) is None:
+
+				setattr(self, cache_val_name, func(self))
+
+			return getattr(self, cache_val_name)
+
+		wrapper.cache_val_name = cache_val_name
+
+		return wrapper
+
+	@classmethod
+	def clearCache(cls, obj, *funcs):
+		"""
+		清除缓存
+		Args:
+			obj (object): 对象
+			*funcs (*tuple): 缓存的函数
+		"""
+
+		for func in funcs:
+			if hasattr(func, 'cache_val_name') and \
+				func.cache_val_name is not None:
+
+				setattr(obj, func.cache_val_name, None)
+
+	@classmethod
+	def clearAllCache(cls, obj):
+		"""
+		清除所有缓存
+		Args:
+			obj (object): 对象
+		"""
+		for key in dir(obj):
+			func = getattr(obj, key)
+			if hasattr(func, 'cache_val_name') and \
+				func.cache_val_name is not None:
+
+				setattr(obj, func.cache_val_name, None)
+
 class CacheItem:
 	"""
 	QuerySet 缓存项，用于缓存 QuerySet 或 Model 的列表
@@ -94,8 +171,6 @@ class CacheItem:
 
 		if index == -1:  # 未找到
 			self.data.append(obj)
-		else:
-			self.data[index] = obj
 
 	def remove(self, obj: models.Model):
 		"""
@@ -369,15 +444,19 @@ class CachePool:
 
 		self.objects[key] = CacheItem(cla, objects, **kwargs)
 
-	def appendObject(self, key, obj: object):
+	def appendObject(self, key, obj: object, set_new=True):
 		"""
 		加入物体
 		Args:
 			key (object): 键
 			obj (object): 对象
+			set_new (bool): 如果不存在的时候是否设置一个新的缓存
 		"""
 		if self.contains(key):
 			self.getItem(key).append(obj)
+
+		elif set_new:
+			self.setObjects(key=key, objects=[obj])
 
 	def removeObject(self, key, obj: object):
 		"""
@@ -568,78 +647,34 @@ class CachePool:
 
 
 # ===================================================
-#  缓存机制模型
+#  可缓存对象
 # ===================================================
-class CacheableModel(models.Model):
-
-	class Meta:
-		abstract = True
+class CacheableObject:
 
 	cache_pool: CachePool = None
 
 	cache_values = None
 
 	def __init__(self, *args, **kwargs):
-		self.saved = True
-		self.cache_lock = False
-		self.delete_save = False
 		self.cache_values = {}
+		self.cache_pool = CachePool()
 
-		self.setupCachePool()
-
-		super().__init__(*args, **kwargs)
+		self._setupCachePool()
 
 	# 配置缓存池
-	def setupCachePool(self):
+	def _setupCachePool(self):
 		self._setupCustomCacheItems()
-
-		for cla in self._cacheOneToOneModels():
-			obj = self._getOneToOneModelInDb(cla)
-			self._setModelCache(key=cla, objects=[obj])
-
-		for cla in self._cacheForeignKeyModels():
-			objs = self._getForeignKeyModelInDb(cla)
-			self._setModelCache(key=cla, objects=objs)
 
 	# 配置自定义缓存项
 	def _setupCustomCacheItems(self): pass
-
-	# region 关系操作
-
-	# 需要缓存的模型类列表（必须为 OneToOne）
-	@classmethod
-	def _cacheOneToOneModels(cls): return []
-
-	# 需要缓存的模型类列表（必须为 外键）
-	@classmethod
-	def _cacheForeignKeyModels(cls): return []
-
-	# 从数据库获取
-	def _getOneToOneModelInDb(self, cla):
-		name = cla.__name__.lower()
-		try:
-			return getattr(self, name)
-		# 捕捉到异常就跳过
-		except cla.DoesNotExist: return None
-		except AttributeError: return None
-
-	# 从数据库获取
-	def _getForeignKeyModelInDb(self, cla) -> QuerySet:
-		name = cla.__name__.lower() + '_set'
-		try:
-			return getattr(self, name).all()
-		except AttributeError:
-			return None
-
-	# endregion
 
 	# region 缓存池操作
 
 	def _setModelCache(self, cla=None, key=None, save=True, objects=None, **kwargs):
 		self.cache_pool.setObjects(cla, key, save, objects, **kwargs)
 
-	def _appendModelCache(self, key, obj: object):
-		self.cache_pool.appendObject(key, obj)
+	def _appendModelCache(self, key, obj: object, set_new=True):
+		self.cache_pool.appendObject(key, obj, set_new)
 
 	def _removeModelCache(self, key, obj: object):
 		self.cache_pool.removeObject(key, obj)
@@ -678,29 +713,7 @@ class CacheableModel(models.Model):
 	def _modelCacheItem(self, key) -> CacheItem:
 		return self.cache_pool.getItem(key)
 
-	def _getOneToOneCache(self, key) -> models.Model:
-		if key in self._cacheOneToOneModels():
-			return self._firstModelCache(key)
-		return None
-
-	def _getForeignKeyCache(self, key, cond: callable = None, **kwargs) -> models.Model:
-		if key in self._cacheForeignKeyModels():
-			return self._getModelCache(key, cond, **kwargs)
-		return None
-
-	def _getForeignKeyCaches(self, key, cond: callable = None, **kwargs) -> models.Model:
-		if key in self._cacheForeignKeyModels():
-			return self._queryModelCache(key, cond, **kwargs)
-		return None
-
 	# endregion
-
-	def __del__(self):
-		if self.delete_save: self.save()
-
-	def __setattr__(self, key, value):
-		if key != 'saved': self.saved = False
-		super().__setattr__(key, value)
 
 	# region 值缓存
 
@@ -726,6 +739,91 @@ class CacheableModel(models.Model):
 		return self.cache_values[key]
 
 	# endregion
+
+	"""占位符"""
+
+
+# ===================================================
+#  缓存机制模型
+# ===================================================
+class CacheableModel(models.Model, CacheableObject):
+
+	class Meta:
+		abstract = True
+
+	def __init__(self, *args, **kwargs):
+		self.saved = True
+		self.delete_save = False
+
+		self.cache_values = {}
+		self.cache_pool = CachePool()
+
+		self._setupCachePool()
+
+		super().__init__(*args, **kwargs)
+
+	# 配置缓存池
+	def _setupCachePool(self):
+		super()._setupCachePool()
+
+		for cla in self._cacheOneToOneModels():
+			obj = self._getOneToOneModelInDb(cla)
+			self._setModelCache(key=cla, objects=[obj])
+
+		for cla in self._cacheForeignKeyModels():
+			objs = self._getForeignKeyModelInDb(cla)
+			self._setModelCache(key=cla, objects=objs)
+
+	# region 关系操作
+
+	# 需要缓存的模型类列表（必须为 OneToOne）
+	@classmethod
+	def _cacheOneToOneModels(cls): return []
+
+	# 需要缓存的模型类列表（必须为 外键）
+	@classmethod
+	def _cacheForeignKeyModels(cls): return []
+
+	# 从数据库获取
+	def _getOneToOneModelInDb(self, cla):
+		name = cla.__name__.lower()
+		try:
+			return getattr(self, name)
+		# 捕捉到异常就跳过
+		except cla.DoesNotExist: return None
+		except AttributeError: return None
+
+	# 从数据库获取
+	def _getForeignKeyModelInDb(self, cla) -> QuerySet:
+		name = cla.__name__.lower() + '_set'
+		try:
+			return getattr(self, name).all()
+		except AttributeError:
+			return None
+
+	def _getOneToOneCache(self, key) -> models.Model:
+		if key in self._cacheOneToOneModels():
+			return self._firstModelCache(key)
+		return None
+
+	def _getForeignKeyCache(self, key, cond: callable = None, **kwargs) -> models.Model:
+		if key in self._cacheForeignKeyModels():
+			return self._getModelCache(key, cond, **kwargs)
+		return None
+
+	def _getForeignKeyCaches(self, key, cond: callable = None, **kwargs) -> models.Model:
+		if key in self._cacheForeignKeyModels():
+			return self._queryModelCache(key, cond, **kwargs)
+		return None
+
+	# endregion
+
+	def __del__(self):
+		if self.delete_save: self.save()
+
+	def __setattr__(self, key, value):
+		if key != 'saved': self.saved = False
+		super().__setattr__(key, value)
 
 	def save(self, *args, **kwargs):
 

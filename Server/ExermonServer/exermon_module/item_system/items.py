@@ -1,6 +1,8 @@
-from item_module.models import *
 from game_module.models import ParamValue, ParamRate, \
 	EquipParamValue, EquipParamRate
+from item_module.models import *
+
+# from utils.cache_utils import CacheHelper
 
 
 # ===================================================
@@ -41,7 +43,7 @@ class ExermonType(Enum):
 #  艾瑟萌表
 # ===================================================
 @ItemManager.registerItem("艾瑟萌")  #, ContItems.PlayerExermon)
-class Exermon(BaseItem):
+class Exermon(BaseItem, ParamsObject):
 
 	NAME_LEN = 4
 
@@ -79,33 +81,13 @@ class Exermon(BaseItem):
 	e_type = models.PositiveSmallIntegerField(default=ExermonType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌类型")
 
-	# 管理界面用：显示属性基础值
-	def adminParamBases(self):
-		from django.utils.html import format_html
+	@classmethod
+	def paramBaseClass(cls):
+		return ExerParamBase
 
-		params = self.paramBases()
-
-		res = ''
-		for p in params:
-			res += str(p) + "<br>"
-
-		return format_html(res)
-
-	adminParamBases.short_description = "属性基础值"
-
-	# 管理界面用：显示属性成长率
-	def adminParamRates(self):
-		from django.utils.html import format_html
-
-		params = self.paramRates()
-
-		res = ''
-		for p in params:
-			res += str(p) + "<br>"
-
-		return format_html(res)
-
-	adminParamRates.short_description = "属性成长率"
+	@classmethod
+	def paramRateClass(cls):
+		return ExerParamRate
 
 	# 用于获取属性值
 	# def __getattr__(self, item):
@@ -138,45 +120,48 @@ class Exermon(BaseItem):
 		return res
 
 	# 获取艾瑟萌的技能
-	def skills(self, **kwargs):
-		return ViewUtils.getObjects(ExerSkill, o_exermon_id=self.id, **kwargs)
+	@CacheHelper.staticCache
+	def skills(self):
+		return self.exerskill_set.all()
 
 	# 获取所有的属性基本值
-	def paramBases(self):
+	@CacheHelper.staticCache
+	def _paramBases(self):
 		return self.exerparambase_set.all()
 
 	# 获取所有的属性成长率
-	def paramRates(self):
+	@CacheHelper.staticCache
+	def _paramRates(self):
 		return self.exerparamrate_set.all()
 
-	# 获取属性基本值
-	def paramBase(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.paramBases().filter(param_id=param_id)
-		if attr is not None:
-			param = self.paramBases().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
-
-	# 获取属性成长值
-	def paramRate(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.paramRates().filter(param_id=param_id)
-		if attr is not None:
-			param = self.paramRates().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
+	# # 获取属性基本值
+	# def paramBase(self, param_id=None, attr=None):
+	# 	param = None
+	# 	if param_id is not None:
+	# 		param = self.paramBases().filter(param_id=param_id)
+	# 	if attr is not None:
+	# 		param = self.paramBases().filter(param__attr=attr)
+	#
+	# 	if param is None or not param.exists(): return 0
+	#
+	# 	return param.first().getValue()
+	#
+	# # 获取属性成长值
+	# def paramRate(self, param_id=None, attr=None):
+	# 	param = None
+	# 	if param_id is not None:
+	# 		param = self.paramRates().filter(param_id=param_id)
+	# 	if attr is not None:
+	# 		param = self.paramRates().filter(param__attr=attr)
+	#
+	# 	if param is None or not param.exists(): return 0
+	#
+	# 	return param.first().getValue()
 
 	# 战斗力
-	def battlePoint(self):
-		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramBase)
+	# def battlePoint(self):
+	# 	from utils.calc_utils import BattlePointCalc
+	# 	return BattlePointCalc.calc(self.paramBase)
 
 
 # ===================================================
@@ -203,7 +188,9 @@ class ExerGiftType(Enum):
 #  艾瑟萌天赋表
 # ===================================================
 @ItemManager.registerItem("艾瑟萌天赋")  #, ContItems.PlayerExerGift)
-class ExerGift(BaseItem):
+class ExerGift(BaseItem, ParamsObject):
+
+	LIST_DISPLAY_APPEND = ['adminParamRates']
 
 	TYPES = [
 		(ExerGiftType.Initial.value, '初始天赋'),
@@ -220,6 +207,10 @@ class ExerGift(BaseItem):
 	g_type = models.PositiveSmallIntegerField(default=ExerGiftType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌天赋类型")
 
+	@classmethod
+	def paramRateClass(cls):
+		return ExerParamRate
+
 	# 管理界面用：显示天赋颜色
 	def adminColor(self):
 		from django.utils.html import format_html
@@ -229,20 +220,6 @@ class ExerGift(BaseItem):
 		return format_html(res)
 
 	adminColor.short_description = "天赋颜色"
-
-	# 管理界面用：显示属性成长率
-	def adminParamRates(self):
-		from django.utils.html import format_html
-
-		params = self.paramRates()
-
-		res = ''
-		for p in params:
-			res += str(p) + "<br>"
-
-		return format_html(res)
-
-	adminParamRates.short_description = "属性成长率"
 
 	# 用于获取属性值
 	# def __getattr__(self, item):
@@ -265,20 +242,21 @@ class ExerGift(BaseItem):
 		return res
 
 	# 获取所有的属性成长加成率
-	def paramRates(self):
+	@CacheHelper.staticCache
+	def _paramRates(self):
 		return self.giftparamrate_set.all()
 
-	# 获取属性成长加成率
-	def paramRate(self, param_id=None, attr=None):
-		param = None
-		if param_id is not None:
-			param = self.paramRates().filter(param_id=param_id)
-		if attr is not None:
-			param = self.paramRates().filter(param__attr=attr)
-
-		if param is None or not param.exists(): return 0
-
-		return param.first().getValue()
+	# # 获取属性成长加成率
+	# def paramRate(self, param_id=None, attr=None):
+	# 	param = None
+	# 	if param_id is not None:
+	# 		param = self.paramRates().filter(param_id=param_id)
+	# 	if attr is not None:
+	# 		param = self.paramRates().filter(param__attr=attr)
+	#
+	# 	if param is None or not param.exists(): return 0
+	#
+	# 	return param.first().getValue()
 
 
 # ===================================================
@@ -286,8 +264,6 @@ class ExerGift(BaseItem):
 # ===================================================
 @ItemManager.registerItem("艾瑟萌碎片")  #, ContItems.ExerFragPackItem)
 class ExerFrag(BaseItem):
-
-	LIST_DISPLAY_APPEND = ['adminParamRates']
 
 	# 所属艾瑟萌
 	o_exermon = models.ForeignKey('Exermon', on_delete=models.CASCADE,
@@ -482,6 +458,7 @@ class ExerSkill(BaseItem):
 		return res
 
 	# 获取所有的效果
+	@CacheHelper.staticCache
 	def effects(self):
 		return self.skilleffect_set.all()
 
@@ -530,10 +507,12 @@ class ExerItem(UsableItem):
 		return res
 
 	# 获取所有的效果
+	@CacheHelper.staticCache
 	def effects(self):
 		return self.exeritemeffect_set.all()
 
 	# 购买价格
+	@CacheHelper.staticCache
 	def buyPrice(self):
 		try: return self.exeritemprice
 		except ExerItemPrice.DoesNotExist: return None
@@ -602,15 +581,26 @@ class ExerEquip(EquipableItem):
 
 		return res
 
+	@classmethod
+	def levelParamClass(cls):
+		return ExerEquipLevelParam
+
+	@classmethod
+	def baseParamClass(cls):
+		return ExerEquipBaseParam
+
 	# 获取所有的属性基本值
-	def levelParams(self):
+	@CacheHelper.staticCache
+	def _levelParams(self):
 		return self.exerequiplevelparam_set.all()
 
 	# 获取所有的属性基本值
-	def baseParams(self):
+	@CacheHelper.staticCache
+	def _baseParams(self):
 		return self.exerequipbaseparam_set.all()
 
 	# 购买价格
+	@CacheHelper.staticCache
 	def buyPrice(self):
 		try: return self.exerequipprice
 		except ExerEquipPrice.DoesNotExist: return None

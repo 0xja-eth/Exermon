@@ -49,7 +49,7 @@ class HumanPackItem(PackContItem):
 # ===================================================
 @ItemManager.registerPackContItem("人类背包装备",
 	Containers.HumanPack, Items.HumanItem)
-class HumanPackEquip(PackContItem):
+class HumanPackEquip(PackContItem, EquipParamsObject):
 
 	# # 容器
 	# container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
@@ -67,13 +67,25 @@ class HumanPackEquip(PackContItem):
 	# @classmethod
 	# def acceptedItemClass(cls): return Items.HumanEquip
 
+	@classmethod
+	def baseParamClass(cls):
+		return cls.acceptedItemClass().baseParamClass()
+
+	@classmethod
+	def levelParamClass(cls):
+		return cls.acceptedItemClass().levelParamClass()
+
 	# 获取等级属性值
-	def levelParam(self, param_id=None, attr=None):
-		return self.item.levelParam(param_id, attr)
+	def _levelParam(self, **kwargs):
+		return self.item.levelParam(**kwargs)
 
 	# 获取属性值
-	def baseParam(self, param_id=None, attr=None):
-		return self.item.baseParam(param_id, attr)
+	def _baseParam(self, **kwargs):
+		return self.item.baseParam(**kwargs)
+
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()
 
 
 # ===================================================
@@ -81,7 +93,7 @@ class HumanPackEquip(PackContItem):
 # ===================================================
 @ItemManager.registerSlotContItem("人类装备槽项",
 	Containers.HumanEquipSlot, pack_equip=HumanPackEquip)
-class HumanEquipSlotItem(SlotContItem):
+class HumanEquipSlotItem(SlotContItem, ParamsObject):
 
 	# 容器
 	# container = models.ForeignKey('HumanEquipSlot', on_delete=models.CASCADE,
@@ -107,6 +119,11 @@ class HumanEquipSlotItem(SlotContItem):
 	# @classmethod
 	# def acceptedEquipItemAttrs(cls): return ('pack_equip',)
 
+	@classmethod
+	def paramValueClass(cls):
+		cla = cls.acceptedEquipItemClasses()[0]
+		return cla.baseParamClass()
+
 	# 转化为 dict
 	def convert(self, **kwargs):
 		res = super().convert(**kwargs)
@@ -115,26 +132,23 @@ class HumanEquipSlotItem(SlotContItem):
 
 		return res
 
-	# def _equipItem(self, index):
-	# 	if index == 0: return self.pack_equip
+	# 装备
+	def packEquip(self) -> HumanPackEquip:
+		return self.equipItem(0)
 
 	# 配置索引
 	def setupIndex(self, index, **kwargs):
 		super().setupIndex(index, **kwargs)
 		self.e_type_id = index
 
-	# 获取属性值
-	def param(self, param_id=None, attr=None):
-		return self.pack_equip.param(param_id, attr)
+	# # 获取属性值
+	# def _paramVal(self, **kwargs) -> float:
+	# 	"""
+	# 	获取装备属性值
+	# 	"""
+	# 	from utils.calc_utils import EquipParamCalc
+	# 	return EquipParamCalc.calc(self, **kwargs)
 
-	# # 装备
-	# def equip(self, pack_equip=None, **kwargs):
-	# 	self.pack_equip: HumanPackEquip = pack_equip
-	# 	self.pack_equip.transfer(self.container)
-	#
-	# # 卸下
-	# def dequip(self, **kwargs):
-	# 	self.pack_equip.remove()
-	# 	pack_equip = self.pack_equip
-	# 	self.pack_equip = None
-	# 	return pack_equip
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()

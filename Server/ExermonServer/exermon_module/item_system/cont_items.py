@@ -4,6 +4,8 @@ from game_module.models import BaseParam, ParamValue, ParamRate
 import exermon_module.item_system.items as Items
 import exermon_module.item_system.containers as Containers
 
+from utils.cache_utils import CacheHelper
+
 import datetime
 
 
@@ -104,10 +106,7 @@ class PlayerExerParamRate(ParamRate):
 # ===================================================
 @ItemManager.registerPackContItem("玩家艾瑟萌",
 	Containers.ExerHub, Items.Exermon)
-class PlayerExermon(PackContItem):
-
-	# 艾瑟萌技能缓存键
-	EXERSKILL_CACHE_KEY = 'exerskill'
+class PlayerExermon(PackContItem, ParamsObject):
 
 	# 属性缓存键
 	PARAMS_CACHE_KEY = 'params'
@@ -157,10 +156,28 @@ class PlayerExermon(PackContItem):
 	# @classmethod
 	# def acceptedItemClass(cls): return Items.Exermon
 
+	@classmethod
+	def _cacheForeignKeyModels(cls):
+		return [PlayerExerParamBase, PlayerExerParamRate]
+
+	@classmethod
+	def paramBaseClass(cls):
+		return Items.ExerParamBase
+	
+	@classmethod
+	def paramRateClass(cls):
+		return Items.ExerParamRate
+
 	# 创建之后调用
 	def afterCreated(self, **kwargs):
-		self._cache(self.EXERSKILL_CACHE_KEY,
-					Containers.ExerSkillSlot.create(player_exer=self))
+		self._createExerSkillSlot()
+
+	def _createExerSkillSlot(self):
+		Containers.ExerSkillSlot.create(player_exer=self)
+
+	# 获取艾瑟萌技能槽
+	def exerSkillSlot(self):
+		return self.getContainer(Containers.ExerSkillSlot)
 
 	# 创建容器项
 	# def transfer(self, container, **kwargs):
@@ -172,11 +189,6 @@ class PlayerExermon(PackContItem):
 	def exermon(self): return self.item
 
 	# endregion
-
-	# 获取艾瑟萌技能槽
-	def exerSkillSlot(self):
-		return self._getOneToOneCache(
-			Containers.ExerSkillSlot, self.EXERSKILL_CACHE_KEY)
 
 	# 转换属性为 dict
 	def _convertParamsToDict(self, res):
@@ -207,88 +219,85 @@ class PlayerExermon(PackContItem):
 
 		return res
 
-	# 用于获取属性值
-	def __getattr__(self, item):
-		type = item[4:]
+	# # 用于获取属性值
+	# def __getattr__(self, item):
+	# 	type = item[4:]
+	#
+	# 	if type == 'value':
+	# 		return self.paramVal(attr=item[:3])
+	#
+	# 	if type == 'base':
+	# 		return self.paramBase(attr=item[:3])
+	#
+	# 	if type == 'rate':
+	# 		return self.paramRate(attr=item[:3])
+	#
+	# 	return super().__getattr__(item)
 
-		if type == 'value':
-			return self.paramVal(attr=item[:3])
-
-		if type == 'base':
-			return self.paramBase(attr=item[:3])
-
-		if type == 'rate':
-			return self.paramRate(attr=item[:3])
-
-		return super().__getattr__(item)
-
-	# 战斗力
-	def battlePoint(self):
-		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramVal)
+	# region 属性
 
 	# 获取所有属性
-	def paramVals(self):
-		vals = []
-		params = BaseParam.objs()
+	# @CacheHelper.normalCache
+	# def paramVals(self):
+	# 	vals = []
+	# 	params = BaseParam.objs()
+	#
+	# 	for param in params:
+	# 		val = Items.ExerParamBase(param=param)
+	# 		val.setValue(self._paramVal(param_id=param.id), False)
+	# 		vals.append(val)
+	#
+	# 	return vals
+	#
+	# # 获取属性当前值（缓存/计算）
+	# def paramVal(self, param_id=None, attr=None):
+	#
+	# 	params = self.paramVals()
+	#
+	# 	param: Items.ExerParamBase = None
+	# 	if param_id is not None:
+	# 		param = ModelUtils.get(params, param_id=param_id)
+	#
+	# 	if attr is not None:
+	# 		param = ModelUtils.get(params, attr=attr)
+	#
+	# 	return 0 if param is None else param.getValue()
 
-		for param in params:
-			val = Items.ExerParamBase(param=param)
-			val.setValue(self.paramVal(param_id=param.id), False)
-			vals.append(val)
-
-		return vals
-
-	# 获取属性当前值
-	def paramVal(self, param_id=None, attr=None):
-		key = attr or param_id
-		if key is None: return 0
-
+	# 获取属性当前值（计算）
+	def _paramVal(self, **kwargs):
 		from utils.calc_utils import ExermonParamCalc
 
-		cache = self._getCache(self.PARAMS_CACHE_KEY)
+		base = self.paramBase(**kwargs)
+		rate = self.paramRate(**kwargs)
 
-		# 如果该属性没有缓存
-		if key not in cache:
+		plus = self.plusParamVal(**kwargs)
+		plus_rate = self.plusParamRate(**kwargs)
 
-			base = self.paramBase(param_id, attr)
-			rate = self.paramRate(param_id, attr)
-
-			plus = self.plusParamVal(param_id, attr)
-			plus_rate = self.plusParamRate(param_id, attr)
-
-			cache[key] = ExermonParamCalc.calc(
-				base, rate, self.level, plus, plus_rate)
-
-		return cache[key]
+		return ExermonParamCalc.calc(
+			base, rate, self.level, plus, plus_rate)
 
 	# 艾瑟萌基础属性
-	def paramBase(self, param_id=None, attr=None):
-		exermon = self.exermon()
-
-		if exermon is None: return 0
-		return exermon.paramBase(param_id, attr)
-
-	# 艾瑟萌基础属性
-	def paramBases(self):
+	def _paramBases(self):
 		exermon = self.exermon()
 
 		if exermon is None: return []
 		return exermon.paramBases()
 
 	# 获取属性成长值
-	def paramRate(self, param_id=None, attr=None):
-		exermon = self.exermon()
-
-		if exermon is None: return 0
-		return exermon.paramRate(param_id, attr)
-
-	# 获取属性成长值
-	def paramRates(self):
+	def _paramRates(self):
 		exermon = self.exermon()
 
 		if exermon is None: return []
 		return exermon.paramRates()
+
+	# # 战斗力
+	# def battlePoint(self):
+	# 	from utils.calc_utils import BattlePointCalc
+	# 	return BattlePointCalc.calc(self.paramVal)
+	#
+	# # 清除属性缓存
+	# def _clearParamsCache(self):
+	# 	CacheHelper.clearCache(self, self.paramVals)
 
 	# region 附加能力值
 
@@ -313,7 +322,6 @@ class PlayerExermon(PackContItem):
 			seconds (int): 持续秒数（为 None 则永久）
 			count (int): 叠加次数
 		"""
-		now = datetime.datetime.now()
 		if seconds is None: duration = None
 		else:
 			duration = datetime.timedelta(0, seconds, 0)
@@ -322,22 +330,26 @@ class PlayerExermon(PackContItem):
 		rate = pow(rate, count)
 
 		if val != 0:
-			cache = self.plusParamVals(False)
-			param = PlayerExerParamBase(param_id=param_id)
-			param.player_exer = self
-			if duration is not None:
-				param.expires_time = now + duration
-			param.setValue(val)
-			cache.append(param)
+			self._addPlusParam(PlayerExerParamBase,
+							   param_id, val, duration)
 
 		if rate != 0:
-			cache = self.plusParamRates(False)
-			param = PlayerExerParamRate(param_id=param_id)
-			param.player_exer = self
-			if duration is not None:
-				param.expires_time = now + duration
-			param.setValue(rate)
-			cache.append(param)
+			self._addPlusParam(PlayerExerParamRate,
+							   param_id, rate, duration)
+
+		self._clearParamsCache()
+
+	def _addPlusParam(self, cla, param_id, value, duration):
+		now = datetime.datetime.now()
+
+		param = cla(param_id=param_id)
+		param.player_exer = self
+		param.setValue(value)
+
+		if duration is not None:
+			param.expires_time = now + duration
+
+		self._appendModelCache(cla, param)
 
 	# 附加艾瑟萌属性
 	def plusParamVal(self, param_id=None, attr=None):
@@ -371,61 +383,41 @@ class PlayerExermon(PackContItem):
 
 	# 所有附加的能力值
 	def plusParamVals(self, need_filter=True) -> list:
-		cache = self._getOrSetCache(self.PLUS_PARAM_VALS_CACHE_KEY,
-									lambda: list(self._plusParamVals()))
-
-		if not need_filter: return cache
-		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
+		return self._plusParam(PlayerExerParamBase, need_filter)
 
 	# 所有附加的能力加成率
 	def plusParamRates(self, need_filter=True) -> list:
-		cache = self._getOrSetCache(self.PLUS_PARAM_RATES_CACHE_KEY,
-									lambda: list(self._plusParamRates()))
+		return self._plusParam(PlayerExerParamRate, need_filter)
 
-		if not need_filter: return cache
-		return ModelUtils.filter(cache, lambda v: not v.isOutOfDate())
+	# 所有附加的能力加成率
+	def _plusParam(self, cla, need_filter=True) -> list:
+		if not need_filter:
+			return self._queryModelCache(cla)
 
-	def _plusParamVals(self) -> QuerySet:
-		return self.playerexerparambase_set.all()
-
-	def _plusParamRates(self) -> QuerySet:
-		return self.playerexerparamrate_set.all()
+		return self._queryModelCache(
+			cla, lambda v: not v.isOutOfDate())
 
 	def updatePlusParams(self):
 		"""
 		更新附加能力值（判断过期自动删除）
 		"""
-		self._updatePlusParamVals()
-		self._updatePlusParamRates()
+		self._updatePlusParam(PlayerExerParamBase)
+		self._updatePlusParam(PlayerExerParamRate)
+		
+		self._clearParamsCache()
 
-	def _updatePlusParamVals(self):
-		cache = self.plusParamVals(False)
-		for param in cache:
+	def _updatePlusParam(self, cla):
+		params = self._queryModelCache(cla)
+
+		for param in params:
 			if param.isOutOfDate():
-				self.removePlusParams(cache, param)
-
-	def _updatePlusParamRates(self):
-		cache = self.plusParamRates(False)
-		for param in cache:
-			if param.isOutOfDate():
-				self.removePlusParams(cache, param)
-
-	def removePlusParams(self, cache, param):
-		if param in cache:
-			cache.remove(param)
-			param.player_exer = None
-			self._getCache(self.REMOVED_PLUS_PARAMS_CACHE_KEY).append(param)
+				self._removeModelCache(cla, param)
 
 	# endregion
 
-	# 清除属性缓存
-	def _clearParamsCache(self):
-		self._cache(self.PARAMS_CACHE_KEY, {})
+	# endregion
 
-	# 修改昵称
-	def editNickname(self, name):
-		self.nickname = name
-		self.save()
+	# region 等级相关
 
 	# 总经验
 	def sumExp(self):
@@ -455,14 +447,8 @@ class PlayerExermon(PackContItem):
 		self.exp += int(val)
 		self.refresh()
 
-	# 刷新艾瑟萌
-	def refresh(self):
-		self._clearParamsCache()
-		self.refreshLevel()
-		# self.save()
-
 	# 刷新等级
-	def refreshLevel(self):
+	def _refreshLevel(self):
 		from utils.calc_utils import ExermonLevelCalc
 
 		exp = self.exp
@@ -489,6 +475,18 @@ class PlayerExermon(PackContItem):
 	# 升级触发事件
 	def _onUpgrade(self):
 		pass
+
+	# endregion
+
+	# 修改昵称
+	def editNickname(self, name):
+		self.nickname = name
+
+	# 刷新艾瑟萌
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()
+		self._refreshLevel()
 
 
 # ===================================================
@@ -570,13 +568,7 @@ class ExerFragPackItem(PackContItem):
 # ===================================================
 @ItemManager.registerSlotContItem("艾瑟萌槽项", Containers.ExerSlot,
 	player_exer=PlayerExermon, player_gift=PlayerExerGift)
-class ExerSlotItem(SlotContItem):
-
-	# 装备槽缓存键
-	EQUIPSLOT_CACHE_KEY = 'equip_slot'
-
-	# 属性缓存键
-	PARAMS_CACHE_KEY = 'params'
+class ExerSlotItem(SlotContItem, ParamsObject):
 
 	# 容器
 	# container = models.ForeignKey('ExerSlot', on_delete=models.CASCADE,
@@ -618,12 +610,16 @@ class ExerSlotItem(SlotContItem):
 	# 	return 'player_exer', 'player_gift'
 
 	@classmethod
-	def _cacheOneToOneModels(cls):
-		return [Containers.ExerEquipSlot]
+	def paramBaseClass(cls):
+		return Items.ExerParamBase
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self._cache(self.PARAMS_CACHE_KEY, {})
+	@classmethod
+	def paramRateClass(cls):
+		return Items.ExerParamRate
+
+	# def __init__(self, *args, **kwargs):
+		# super().__init__(*args, **kwargs)
+		# self._cache(self.PARAMS_CACHE_KEY, {})
 
 	# def _equipItem(self, index):
 	# 	if index == 0: return self.player_exer
@@ -633,16 +629,6 @@ class ExerSlotItem(SlotContItem):
 	def _convertParamsToDict(self, res):
 		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
 		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
-
-	def playerExer(self):
-		return self.equipItem(0)
-
-	def playerGift(self):
-		return self.equipItem(1)
-
-	# 获取艾瑟萌技能槽
-	def exerEquipSlot(self):
-		return self._getOneToOneCache(Containers.ExerEquipSlot)
 
 	# 转化为 dict
 	def convert(self, **kwargs):
@@ -662,16 +648,13 @@ class ExerSlotItem(SlotContItem):
 
 		return res
 
-	# 创建之后调用
-	def afterCreated(self, **kwargs):
-		self.container.setPlayerExer(self, self.init_exer)
-		self._cache(self.EQUIPSLOT_CACHE_KEY,
-					Containers.ExerEquipSlot.create(exer_slot=self))
+	def playerExer(self):
+		return self.equipItem(0)
 
-	# 移动容器项
-	def transfer(self, container: Containers.ExerSlot, **kwargs):
-		super().transfer(container, **kwargs)
-		self.player = container.player
+	def playerGift(self):
+		return self.equipItem(1)
+
+	# region 容器相关
 
 	# 配置索引
 	def setupIndex(self, index, init_exer: PlayerExermon = None, **kwargs):
@@ -679,102 +662,90 @@ class ExerSlotItem(SlotContItem):
 		self.subject = init_exer.exermon().subject
 		self.init_exer = init_exer
 
+	# 创建之后调用
+	def afterCreated(self, **kwargs):
+		self.container.setPlayerExer(self, self.init_exer)
+		self._createEquipSlot()
+
+	def _createEquipSlot(self):
+		Containers.ExerEquipSlot.create(exer_slot_item=self)
+
+	# 获取艾瑟萌技能槽
+	def exerEquipSlot(self):
+		return self.getContainer(Containers.ExerEquipSlot)
+
+	# 移动容器项
+	def transfer(self, container: Containers.ExerSlot, **kwargs):
+		super().transfer(container, **kwargs)
+		self.player = container.player
+
+	# endregion
+
 	# region 属性
 
-	def paramVals(self) -> list:
-		"""
-		获取艾瑟萌槽的所有实际属性数组
-		Returns:
-			返回所有实际属性的数组（元素类型为 ExerParamBase）
-		"""
-		vals = []
-		params = BaseParam.objs()
+	# @CacheHelper.normalCache
+	# def paramVals(self) -> list:
+	# 	"""
+	# 	获取艾瑟萌槽的所有实际属性数组
+	# 	Returns:
+	# 		返回所有实际属性的数组（元素类型为 ExerParamBase）
+	# 	"""
+	# 	vals = []
+	# 	params = BaseParam.objs()
+	#
+	# 	for param in params:
+	# 		val = Items.ExerParamBase(param=param)
+	# 		val.setValue(self._paramVal(param_id=param.id), False)
+	# 		vals.append(val)
+	#
+	# 	return vals
+	#
+	# # 获取属性当前值（缓存/计算）
+	# def paramVal(self, param_id=None, attr=None):
+	#
+	# 	params = self.paramVals()
+	#
+	# 	param: Items.ExerParamBase = None
+	# 	if param_id is not None:
+	# 		param = ModelUtils.get(params, param_id=param_id)
+	#
+	# 	if attr is not None:
+	# 		param = ModelUtils.get(params, attr=attr)
+	#
+	# 	return 0 if param is None else param.getValue()
 
-		for param in params:
-			val = Items.ExerParamBase(param=param)
-			val.setValue(self.paramVal(param_id=param.id), False)
-			vals.append(val)
+	def _paramVal(self, **kwargs) -> float:
 
-		return vals
+		from utils.calc_utils import ExerSlotItemParamCalc
 
-	def paramVal(self, param_id: int = None, attr: str = None) -> float:
-		"""
-		获取艾瑟萌属性实际值（RPV）（有缓存机制）
-		Args:
-			param_id (int): 属性ID
-			attr (str): 属性缩写
-		Returns:
-			返回计算后的实际属性值
-		"""
-		key = attr or param_id
-		if key is None: return 0
-
-		cache = self._getCache(self.PARAMS_CACHE_KEY)
-
-		# 如果该属性没有缓存
-		if key not in cache:
-			from utils.calc_utils import ExerSlotItemParamCalc
-
-			cache[key] = ExerSlotItemParamCalc. \
-				calc(self, param_id=param_id, attr=attr)
-
-		return cache[key]
-
-	def paramBase(self, param_id: int = None, attr: str = None) -> float:
-		"""
-		获取基础属性值
-		Args:
-			param_id (int): 属性ID
-			attr (str): 属性缩写
-		Returns:
-			返回指定属性的基础属性值
-		"""
-		player_exer: PlayerExermon = self.player_exer
-
-		if player_exer is None: return 0
-		return player_exer.paramBase(param_id, attr)
+		return ExerSlotItemParamCalc.calc(self, **kwargs)
 
 	# 所有属性基础值
-	def paramBases(self):
+	def _paramBases(self):
 		player_exer: PlayerExermon = self.player_exer
 
 		if player_exer is None: return []
 		return player_exer.paramBases()
 
 	# 所有属性成长值
-	def paramRate(self, param_id=None, attr=None):
+	def _paramRate(self, **kwargs) -> float:
 
 		from utils.calc_utils import ExerSlotItemParamRateCalc
 
-		return ExerSlotItemParamRateCalc. \
-			calc(self, param_id=param_id, attr=attr)
+		return ExerSlotItemParamRateCalc.calc(self, **kwargs)
 
-	# 所有属性成长值
-	def paramRates(self):
-		vals = []
-		params = BaseParam.objs()
-
-		for param in params:
-			val = Items.ExerParamRate(param=param)
-			val.setValue(self.paramRate(param_id=param.id), False)
-			vals.append(val)
-
-		return vals
-
-	# 战斗力
-	def battlePoint(self):
-		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramVal)
+	# # 战斗力
+	# def battlePoint(self):
+	# 	from utils.calc_utils import BattlePointCalc
+	# 	return BattlePointCalc.calc(self.paramVal)
+	#
+	# # 清除属性缓存
+	# def _clearParamsCache(self):
+	# 	CacheHelper.clearCache(self, self.paramVals)
 
 	# endregion
 
-	# 清除属性缓存
-	def _clearParamsCache(self):
-		self._cache(self.PARAMS_CACHE_KEY, {})
-
-	# 刷新艾瑟萌
-	def refresh(self):
-		self._clearParamsCache()
+	# region 等级相关
 
 	# 槽等级（本等级, 下一级所需经验）
 	def slotLevel(self, calc_next=False):
@@ -803,6 +774,12 @@ class ExerSlotItem(SlotContItem):
 		self.exp += int(slot_exp)
 		self.refresh()
 		self.save()
+
+	# endregion
+
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()
 
 
 # ===================================================
@@ -926,13 +903,8 @@ class ExerPackItem(PackContItem):
 # ===================================================
 @ItemManager.registerPackContItem("艾瑟萌背包装备",
 	Containers.ExerPack, Items.ExerEquip)
-class ExerPackEquip(PackContItem):
-	# class Meta:
-	# 	verbose_name = verbose_name_plural = "艾瑟萌背包装备"
-	#
-	# # 容器项类型
-	# TYPE = ContItemType.ExerPackEquip
-	#
+class ExerPackEquip(PackContItem, EquipParamsObject):
+
 	# # 容器
 	# container = models.ForeignKey('ExerPack', on_delete=models.CASCADE,
 	# 						   null=True, verbose_name="容器")
@@ -949,21 +921,33 @@ class ExerPackEquip(PackContItem):
 	# @classmethod
 	# def acceptedItemClass(cls): return Items.ExerEquip
 
+	@classmethod
+	def levelParamClass(cls):
+		return cls.acceptedItemClass().levelParamClass()
+
+	@classmethod
+	def baseParamClass(cls):
+		return cls.acceptedItemClass().baseParamClass()
+
 	# 获取等级属性值
-	def levelParam(self, param_id=None, attr=None):
-		return self.item.levelParam(param_id, attr)
+	def _levelParam(self, **kwargs):
+		return self.item.levelParam(**kwargs)
 
 	# 获取属性值
-	def baseParam(self, param_id=None, attr=None):
-		return self.item.baseParam(param_id, attr)
+	def _baseParam(self, **kwargs):
+		return self.item.baseParam(**kwargs)
+
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()
 
 
 # ===================================================
 #  艾瑟萌装备槽项
 # ===================================================
 @ItemManager.registerSlotContItem("艾瑟萌装备槽项",
-	Containers.ExerSlot, pack_equip=ExerPackEquip)
-class ExerEquipSlotItem(SlotContItem):
+	Containers.ExerEquipSlot, pack_equip=ExerPackEquip)
+class ExerEquipSlotItem(SlotContItem, ParamsObject):
 
 	# # 容器
 	# container = models.ForeignKey('ExerEquipSlot', on_delete=models.CASCADE,
@@ -989,6 +973,11 @@ class ExerEquipSlotItem(SlotContItem):
 	# @classmethod
 	# def acceptedEquipItemAttrs(cls): return ('pack_equip',)
 
+	@classmethod
+	def paramValueClass(cls):
+		cla = cls.acceptedEquipItemClasses()[0]
+		return cla.baseParamClass()
+
 	# 转化为 dict
 	def convert(self, **kwargs):
 		res = super().convert(**kwargs)
@@ -997,20 +986,23 @@ class ExerEquipSlotItem(SlotContItem):
 
 		return res
 
+	# 装备
+	def packEquip(self) -> ExerPackEquip:
+		return self.equipItem(0)
+
 	# 配置索引
 	def setupIndex(self, index, **kwargs):
 		super().setupIndex(index, **kwargs)
 		self.e_type_id = index
 
 	# 获取属性值
-	def param(self, param_id: int = None, attr: str = None) -> float:
+	def _paramVal(self, **kwargs) -> float:
 		"""
 		获取装备属性值
-		Args:
-			param_id (int): 属性ID
-			attr (str): 属性缩写
-		Returns:
-			装备的指定属性值
 		"""
-		from utils.calc_utils import EquipParamCalc
-		return EquipParamCalc.calc(self, param_id, attr)
+		from utils.calc_utils import ExerEquipParamCalc
+		return ExerEquipParamCalc.calc(self, **kwargs)
+
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()

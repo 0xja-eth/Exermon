@@ -413,6 +413,9 @@ class Player(CacheableModel):
 	# 删除标志
 	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
 
+	# 快捷访问容器
+	containers = {}
+
 	def __str__(self):
 		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
@@ -432,16 +435,9 @@ class Player(CacheableModel):
 
 	@classmethod
 	def _cacheOneToOneModels(cls):
-		from exermon_module.models import ExerPack, \
-			ExerHub, ExerFragPack, ExerGiftPool, ExerSlot
-		from question_module.models import QuesSugarPack
-		from battle_module.models import BattleItemSlot
 		from english_pro_module.models import ExerProRecord
 
-		return [HumanPack, HumanEquipSlot, ExerPack, ExerHub,
-				ExerFragPack, ExerGiftPool, ExerSlot,
-				QuesSugarPack, BattleItemSlot, 
-				PlayerMoney, ExerProRecord]
+		return [PlayerMoney, ExerProRecord]
 
 	# region 字典生成
 
@@ -749,52 +745,124 @@ class Player(CacheableModel):
 
 	# region 容器管理
 
-	# 获取相关容器
-	def getContainer(self, cla):
-		return self._getOneToOneCache(cla)
+	def registerContainer(self, container: 'BaseContainer'):
+		"""
+		注册容器到缓存池中
+		Args:
+			container (BaseContainer): 容器实例
+		"""
+		self._appendModelCache(type(container), container)
+
+	def getContainer(self, cla=None, id=None,
+					 container: BaseContainer = None) -> BaseContainer:
+		"""
+		获取（缓存）容器
+		Args:
+			cla (type): 容器类型
+			id (int): 容器ID
+			container (BaseContainer): 容器实例
+		Returns:
+			返回缓存的容器实例
+		"""
+
+		if container is not None:
+			return self.getContainer(type(container), container.id)
+
+		if cla is None: return None
+
+		if id is None: return self._firstModelCache(cla)
+
+		return self._getModelCache(cla, id=id)
+
+	def getContItems(self, container_cla=None, container_id=None,
+					container: BaseContainer = None, **kwargs) -> list or QuerySet:
+		"""
+		获取容器项（多个）
+		Args:
+			container_cla (type): 容器类
+			container_id (int): 容器ID
+			container (BaseContainer): 容器实例
+			**kwargs (**dict): 查询参数（同 contItems() 的参数）
+		Returns:
+			返回缓存的容器项实例（多个）
+		"""
+		container = self.getContainer(container_cla, container_id, container)
+
+		if container is None: return None
+
+		return container.contItems(**kwargs)
+
+	def getContItem(self, container_cla=None, container_id=None,
+					container: BaseContainer = None,
+					cont_item: BaseContItem = None, **kwargs) -> BaseContItem:
+		"""
+		获取容器项
+		Args:
+			container_cla (type): 容器类
+			container_id (int): 容器ID
+			container (BaseContainer): 容器实例
+			cont_item (BaseContItem): 容器项实例
+			**kwargs (**dict): 查询参数（同 contItem() 的参数）
+		Returns:
+			返回缓存的容器项实例
+		"""
+
+		# 如果有传入 cont_item 参数
+		if cont_item is not None:
+			container = cont_item.container
+
+		container = self.getContainer(container_cla, container_id, container)
+
+		if container is None: return None
+
+		if cont_item is not None:
+			return container.contItem(
+				cla=type(cont_item), id=cont_item.id)
+
+		return container.contItem(**kwargs)
 
 	# 获取人类背包
 	def humanPack(self) -> 'HumanPack':
-		return self._getOneToOneCache(HumanPack)
+		return self.getContainer(HumanPack)
 
 	# 获取艾瑟萌背包
 	def exerPack(self) -> 'ExerPack':
 		from exermon_module.models import ExerPack
-		return self._getOneToOneCache(ExerPack)
+		return self.getContainer(ExerPack)
 
 	# 获取艾瑟萌碎片背包
 	def exerFragPack(self) -> 'ExerFragPack':
 		from exermon_module.models import ExerFragPack
-		return self._getOneToOneCache(ExerFragPack)
+		return self.getContainer(ExerFragPack)
 
 	# 获取艾瑟萌天赋池
 	def exerGiftPool(self) -> 'ExerGiftPool':
 		from exermon_module.models import ExerGiftPool
-		return self._getOneToOneCache(ExerGiftPool)
+		return self.getContainer(ExerGiftPool)
 
 	# 获取艾瑟萌仓库
 	def exerHub(self) -> 'ExerHub':
 		from exermon_module.models import ExerHub
-		return self._getOneToOneCache(ExerHub)
+		return self.getContainer(ExerHub)
 
 	# 获取题目糖背包
 	def quesSugarPack(self) -> 'QuesSugarPack':
 		from question_module.models import QuesSugarPack
-		return self._getOneToOneCache(QuesSugarPack)
+		return self.getContainer(QuesSugarPack)
 
 	# 获取艾瑟萌槽
 	def exerSlot(self) -> 'ExerSlot':
 		from exermon_module.models import ExerSlot
-		return self._getOneToOneCache(ExerSlot)
+		return self.getContainer(ExerSlot)
 
 	# 获取装备槽
 	def humanEquipSlot(self) -> 'HumanEquipSlot':
-		return self._getOneToOneCache(HumanEquipSlot)
+		return self.getContainer(HumanEquipSlot)
 
 	# 获取对战物资槽
 	def battleItemSlot(self) -> 'BattleItemSlot':
 		from battle_module.models import BattleItemSlot
-		return self._getOneToOneCache(BattleItemSlot)
+		return self.getContainer(BattleItemSlot)
 
 	# 获取金钱
 	def playerMoney(self) -> PlayerMoney:
@@ -829,9 +897,9 @@ class Player(CacheableModel):
 		"""
 		登陆操作
 		"""
-		self._setLoginInfo(
-			LoginInfo.create(self.id, consumer.ip_address)
-		)
+		self._setLoginInfo(LoginInfo.create(
+			self.id, consumer.ip_address))
+
 		self.online = True
 
 		self.checkRelations()
@@ -850,13 +918,11 @@ class Player(CacheableModel):
 		self.online = False
 		self.save()
 
-		self._clearCache()
-
 	def _setLoginInfo(self, login_info):
-		self._cache(self.LOGININFO_CACHE_KEY, login_info)
+		self._setModelCache(key=self.LOGININFO_CACHE_KEY, objects=[login_info])
 
 	def _getLoginInfo(self):
-		return self._getCache(self.LOGININFO_CACHE_KEY)
+		return self._firstModelCache(key=self.LOGININFO_CACHE_KEY)
 
 	# 重置密码
 	def resetPassword(self, consumer, pw):
@@ -904,8 +970,6 @@ class Player(CacheableModel):
 
 		# for player_exer in player_exers:
 		# 	player_exer.save()
-
-		self._cache(ExerSlot, exer_slot)
 
 		self.status = PlayerStatus.ExermonsCreated.value
 		self.save()
@@ -1203,7 +1267,8 @@ class Player(CacheableModel):
 		Args:
 			ques_set (QuestionSetRecord): 题目集
 		"""
-		self._cache(self.CUR_QUES_SET_CACHE_KEY, ques_set)
+		self._setModelCache(key=self.CUR_QUES_SET_CACHE_KEY,
+							objects=[ques_set])
 
 	def currentQuestionSet(self) -> 'QuestionRecord':
 		"""
@@ -1217,7 +1282,7 @@ class Player(CacheableModel):
 		"""
 		清除当前题目集记录
 		"""
-		self._clearCache(self.CUR_QUES_SET_CACHE_KEY)
+		self._clearModelCache(self.CUR_QUES_SET_CACHE_KEY)
 
 	# region EnglishPro
 

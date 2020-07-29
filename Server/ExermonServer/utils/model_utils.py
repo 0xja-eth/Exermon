@@ -264,7 +264,8 @@ class AdminXHelper:
 			base_val = getattr(base_cla, key)
 			val = base_val + val
 
-		# print("inhertAttr %s.%s: %s" % (adminx_cla, key, val))
+		val = list(set(val))
+
 		setattr(adminx_cla, key, val)
 
 	# endregion

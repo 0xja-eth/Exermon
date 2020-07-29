@@ -44,10 +44,12 @@ class HumanItem(UsableItem):
 	# 	return res
 
 	# 获取所有的效果
+	@CacheHelper.staticCache
 	def effects(self):
 		return self.humanitemeffect_set.all()
 
 	# 购买价格
+	@CacheHelper.staticCache
 	def buyPrice(self):
 		try: return self.humanitemprice
 		except HumanItemPrice.DoesNotExist: return None
@@ -113,15 +115,26 @@ class HumanEquip(EquipableItem):
 
 		return res
 
+	@classmethod
+	def levelParamClass(cls):
+		return HumanEquipLevelParam
+
+	@classmethod
+	def baseParamClass(cls):
+		return HumanEquipBaseParam
+
 	# 获取所有的属性基本值
-	def levelParams(self):
+	@CacheHelper.staticCache
+	def _levelParams(self):
 		return self.humanequiplevelparam_set.all()
 
 	# 获取所有的属性基本值
-	def baseParams(self):
+	@CacheHelper.staticCache
+	def _baseParams(self):
 		return self.humanequipbaseparam_set.all()
 
 	# 购买价格
+	@CacheHelper.staticCache
 	def buyPrice(self):
 		try:
 			return self.humanequipprice

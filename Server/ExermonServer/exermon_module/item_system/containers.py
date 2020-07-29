@@ -192,9 +192,6 @@ class ExerSkillSlot(SlotContainer):
 		self.player_exer = player_exer
 		self.skills = player_exer.exermon().skills()
 
-	def _equipContainer(self, index):
-		return None
-
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
 		if index >= self.skills.count(): skill = None
@@ -244,11 +241,11 @@ class ExerPack(PackContainer):
 #  有 ExermonEquipType.Count 个固定的槽
 # ===================================================
 @ItemManager.registerSlotContainer("艾瑟萌装备槽")  # , ContItems.ExerEquipSlotItem)
-class ExerEquipSlot(SlotContainer):
+class ExerEquipSlot(SlotContainer, ParamsObject):
 
 	# 艾瑟萌
-	exer_slot = models.OneToOneField('exermon_module.ExerSlotItem',
-								   on_delete=models.CASCADE, verbose_name="艾瑟萌")
+	exer_slot_item = models.OneToOneField('exermon_module.ExerSlotItem',
+										  on_delete=models.CASCADE, verbose_name="艾瑟萌")
 
 	# # 所接受的槽项类
 	# @classmethod
@@ -265,13 +262,19 @@ class ExerEquipSlot(SlotContainer):
 	def defaultCapacity(cls):
 		return ExerEquipType.count()
 
-	# 创建一个槽（创建角色时候执行）
-	def _create(self, exer_slot):
-		super()._create()
-		self.exer_slot = exer_slot
+	@classmethod
+	def paramValueClass(cls):
+		cla = cls.acceptedSlotItemClass()
+		return cla.paramValueClass()
 
-	def _equipContainer(self, index):
-		return self.exactlyPlayer().exerPack()
+	# 创建一个槽（创建角色时候执行）
+	def _create(self, exer_slot_item):
+		super()._create()
+		self.exer_slot_item = exer_slot_item
+
+	def exerSlotItem(self):
+		return self.exactlyPlayer().getContItem(
+			cont_item=self.exer_slot_item)
 
 	def ensureEquipCondition(self, slot_item, equip_item):
 		"""
@@ -307,7 +310,7 @@ class ExerEquipSlot(SlotContainer):
 			ErrorType.InsufficientLevel: 等级不足
 		"""
 		# player_exer = self.exer_slot.player_exer
-		if self.exer_slot.slotLevel() < equip_item.item.min_level:
+		if self.exerSlotItem().slotLevel() < equip_item.item.min_level:
 			raise GameException(ErrorType.InsufficientLevel)
 
 	# 设置艾瑟萌装备
@@ -319,17 +322,21 @@ class ExerEquipSlot(SlotContainer):
 		self.setEquip(equip_index=0, equip_item=pack_equip, e_type_id=e_type_id, force=force)
 
 	# 获取属性值
-	def param(self, param_id=None, attr=None):
+	def _paramVal(self, **kwargs):
 		sum = 0
 		slot_items = self.contItems()
 
 		for slot_item in slot_items:
-			sum += slot_item.param(param_id, attr)
+			sum += slot_item.paramVal(**kwargs)
 
 		return sum
 
 	# 持有者
-	def owner(self): return self.exer_slot
+	def owner(self): return self.exer_slot_item
 
 	# 持有玩家
 	def ownerPlayer(self): return self.owner().player
+
+	def refresh(self):
+		super().refresh()
+		self._clearParamsCache()
