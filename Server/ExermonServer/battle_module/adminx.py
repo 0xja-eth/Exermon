@@ -9,74 +9,28 @@ from .models import *
 
 
 @AdminXHelper.relatedModel(BattleResultJudge)
-class SeasonRecordAdmin(object):
-	# list_display = ['id', 'name', 'score', 'win', 'lose']
-	#
-	# list_editable = ['name', 'score', 'win', 'lose']
-	pass
+class SeasonRecordAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(BattleItemSlot)
-class HumanEquipSlotAdmin(SlotContainerAdmin):
-
-	# list_display = SlotContainerAdmin.list_display
-
-	# field_set = [Fieldset('对战物资槽属性', 'player')]
-	#
-	# form_layout = SlotContainerAdmin.form_layout + field_set
-	#
-	# inlines = [BattleItemSlotItemsInline]
-	pass
+class HumanEquipSlotAdmin(SlotContainerAdmin): pass
 
 
 @AdminXHelper.relatedModel(BattleItemSlotItem)
-class BattleItemSlotItemAdmin(SlotContItemAdmin):
-
-	# list_display = SlotContItemAdmin.list_display + \
-	# 			   ['pack_item']
-	#
-	# list_editable = SlotContItemAdmin.list_display + \
-	# 			   ['pack_equip']
-	#
-	# field_set = [Fieldset('对战物资槽项属性', 'pack_item')]
-	#
-	# form_layout = SlotContItemAdmin().form_layout + field_set
-	pass
+class BattleItemSlotItemAdmin(SlotContItemAdmin): pass
 
 
 @AdminXHelper.relatedModel(BattleRecord)
-class BattleRecordAdmin(object):
-	# list_display = ['id', 'mode', 'season', 'create_time', 'result_time']
-	#
-	# list_editable = ['mode', 'season', 'create_time', 'result_time']
-	pass
+class BattleRecordAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(BattleRound)
-class BattleRoundAdmin(object):
-	# list_display = ['id', 'order', 'record', 'question']
-	#
-	# list_editable = ['name', 'start_time', 'question']
-	pass
+class BattleRoundAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(BattlePlayer)
-class BattlePlayerAdmin(QuestionSetRecordAdmin):
-	# list_display = QuestionSetRecordAdmin.list_display + \
-	# 				['record', 'adminScores', 'score_incr', 'result', 'status']
-	#
-	# list_editable = QuestionSetRecordAdmin.list_editable + \
-	# 				 ['record', 'score_incr', 'result', 'status']
-	pass
+class BattlePlayerAdmin(QuestionSetRecordAdmin): pass
 
 
 @AdminXHelper.relatedModel(BattleRoundResult)
-class BattleRoundResultAdmin(PlayerQuestionAdmin):
-	# list_display = PlayerQuestionAdmin.list_display + \
-	# 			   ['round', 'battle_player', 'attack', 'skill', 'target_type',
-	# 				   'result_type', 'hurt', 'damage', 'recovery']
-	#
-	# list_editable = PlayerQuestionAdmin.list_editable + \
-	# 				['attack', 'skill', 'target_type',
-	# 				 'result_type', 'hurt', 'damage', 'recovery']
-	pass
+class BattleRoundResultAdmin(PlayerQuestionAdmin): pass

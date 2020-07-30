@@ -1276,7 +1276,7 @@ class Player(CacheableModel):
 		Returns:
 			返回当前题目集记录
 		"""
-		return self._getCache(self.CUR_QUES_SET_CACHE_KEY)
+		return self._firstModelCache(self.CUR_QUES_SET_CACHE_KEY)
 
 	def clearCurrentQuestionSet(self):
 		"""
@@ -1286,13 +1286,13 @@ class Player(CacheableModel):
 
 	# region EnglishPro
 
-	def wordRecords(self) -> QuerySet:
-		"""
-		获取所有单词记录
-		Returns:
-			所有与该玩家相关的单词记录 QuerySet 对象
-		"""
-		return self.wordrecord_set.all()
+	# def wordRecords(self) -> QuerySet:
+	# 	"""
+	# 	获取所有单词记录
+	# 	Returns:
+	# 		所有与该玩家相关的单词记录 QuerySet 对象
+	# 	"""
+	# 	return self.wordrecord_set.all()
 
 	# endregion
 

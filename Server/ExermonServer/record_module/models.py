@@ -371,7 +371,7 @@ class PlayerQuestion(CacheableModel):
 		"""
 		开始答题
 		"""
-		self._cache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
+		self._setCache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
 	def answer(self, selection: list, timespan: int, record: 'QuestionSetRecord'):
 		"""
@@ -583,15 +583,6 @@ class QuestionSetRecord(CacheableModel):
 	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
 						   'adminSlotExpIncrs', 'adminExpIncrs']
 
-	# 题目缓存键
-	QUES_CACHE_KEY = 'player_ques'
-
-	# 奖励缓存键
-	REWARD_CACHE_KEY = 'rewards'
-
-	# 已删除容器项缓存键
-	REMOVED_CACHE_KEY = 'removed'
-
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
 							   verbose_name="玩家")
@@ -611,13 +602,10 @@ class QuestionSetRecord(CacheableModel):
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self._cache(self.REWARD_CACHE_KEY, [])
-		self._cache(self.REMOVED_CACHE_KEY, [])
-
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
+
+	# region 管理显示
 
 	def adminExerExpIncrs(self):
 		"""
@@ -670,6 +658,44 @@ class QuestionSetRecord(CacheableModel):
 
 	adminExpIncrs.short_description = "人物经验奖励"
 
+	# endregion
+
+	# region 配置项
+
+	# 奖励计算类
+	@classmethod
+	def rewardCalculator(cls) -> 'QuestionSetResultRewardCalc':
+		"""
+		获取奖励计算的类
+		Returns:
+			奖励计算类或其子类本身
+		"""
+		return NotImplementedError  # QuestionSetResultRewardCalc
+
+	@classmethod
+	def playerQuesClass(cls) -> 'PlayerQuestion':
+		"""
+		该类对应的玩家题目关系类，用于 addQuestion 中创建一个题目关系
+		Returns:
+			返回一个 PlayerQuestion 子类本身
+		"""
+		raise NotImplementedError
+
+	@classmethod
+	def rewardClass(cls) -> 'QuestionSetReward':
+		"""
+		该类对应的奖励记录类
+		Returns:
+			返回某个 QuestionSetReward 子类本身
+		"""
+		raise NotImplementedError
+
+	@classmethod
+	def _cacheForeignKeyModels(cls):
+		return [cls.playerQuesClass(), cls.rewardClass()]
+
+	# endregion
+
 	# 创建一个题目集
 	@classmethod
 	def create(cls, player: 'Player', **kwargs) -> 'QuestionSetRecord':
@@ -689,34 +715,6 @@ class QuestionSetRecord(CacheableModel):
 		record.start(**kwargs)
 
 		return record
-
-	# 奖励计算类
-	@classmethod
-	def rewardCalculator(cls) -> 'QuestionSetResultRewardCalc':
-		"""
-		获取奖励计算的类
-		Returns:
-			奖励计算类或其子类本身
-		"""
-		return QuestionSetResultRewardCalc
-
-	@classmethod
-	def playerQuesClass(cls) -> 'PlayerQuestion':
-		"""
-		该类对应的玩家题目关系类，用于 addQuestion 中创建一个题目关系
-		Returns:
-			返回一个 PlayerQuestion 子类本身
-		"""
-		raise NotImplementedError
-
-	@classmethod
-	def rewardClass(cls) -> 'QuestionSetReward':
-		"""
-		该类对应的奖励记录类
-		Returns:
-			返回某个 QuestionSetReward 子类本身
-		"""
-		raise NotImplementedError
 
 	def _create(self, **kwargs):
 		"""
@@ -764,106 +762,6 @@ class QuestionSetRecord(CacheableModel):
 
 		return base
 
-	def playerQuestions(self) -> QuerySet:
-		"""
-		获取所有题目关系（缓存）
-		执行该函数后，对应缓存项将改变为 QuerySet 类型，故需要在题目集结束后调用
-		Returns:
-			题目关系 QuerySet 对象
-		"""
-		cache = self._getCache(self.QUES_CACHE_KEY)
-
-		# 如果已有的缓存为 list 保存并删除之再重新读取
-		if isinstance(cache, list):
-			self._deleteCache(self.QUES_CACHE_KEY)
-			self._saveCache(self.REMOVED_CACHE_KEY)
-			self._cache(self.REMOVED_CACHE_KEY, [])
-		
-		return self._getOrSetCache(self.QUES_CACHE_KEY,
-								   lambda: self._playerQuestions())
-
-	def _playerQuestions(self) -> QuerySet:
-		"""
-		获取所有题目关系（数据库）
-		Returns:
-			题目关系 QuerySet 对象
-		"""
-		raise NotImplementedError
-
-	def playerQuestion(self, question_id: int) -> PlayerQuestion:
-		"""
-		获取单个题目关系（缓存/数据库）
-		Args:
-			question_id (int): 题目ID
-		Returns:
-			对应ID的题目关系对象
-		"""
-		res = self.playerQuestions().filter(question_id=question_id)
-		if res.exists(): return res.first()
-		return None
-
-	def cachedPlayerQuestion(self, question_id: int) -> PlayerQuestion:
-		"""
-		获取单个题目关系（仅查询缓存）
-		Args:
-			question_id (int): 题目ID
-		Returns:
-			对应ID的题目关系对象
-		"""
-		cache = self._getQuestionsCache()
-		for player_ques in cache:
-			if player_ques.question_id == question_id:
-				return player_ques
-
-		return None
-
-	def _initQuestionCache(self):
-		"""
-		初始化题目缓存
-		"""
-		self._cache(self.QUES_CACHE_KEY, [])
-
-	def _getQuestionsCache(self) -> list:
-		"""
-		获取题目缓存
-		Returns:
-			题目关系数组
-		"""
-		cache = self._getCache(self.QUES_CACHE_KEY)
-
-		if cache is None: return []
-
-		# 如果已有的缓存为 QuerySet 保存并删除并重新缓存
-		if isinstance(cache, QuerySet):
-			cache_list = list(cache)
-
-			self._deleteCache(self.QUES_CACHE_KEY)
-			self._cache(self.QUES_CACHE_KEY, cache_list)
-			
-			return cache_list
-
-		return cache
-
-	def _addQuestionToCache(self, player_ques: PlayerQuestion):
-		"""
-		往缓存中添加题目
-		Args:
-			player_ques (PlayerQuestion): 题目关系
-		"""
-		self._getQuestionsCache().append(player_ques)
-
-	def _removeQuestionFromCache(self, player_ques: PlayerQuestion):
-		"""
-		往缓存中移除题目
-		Args:
-			player_ques (PlayerQuestion): 题目关系
-		"""
-		cache = self._getQuestionsCache()
-		if player_ques in cache:
-			cache.remove(player_ques)
-			player_ques.clearQuestionSet()
-			self._getCache(self.REMOVED_CACHE_KEY).append(player_ques)
-
 	def exactlyPlayer(self): # -> Player:
 		"""
 		获取实际玩家在线信息
@@ -879,6 +777,85 @@ class QuestionSetRecord(CacheableModel):
 		online_player = Common.getOnlinePlayer(player.id)
 
 		return online_player.player or player
+
+	# region 题目操作
+
+	def playerQuestions(self) -> QuerySet or list:
+		"""
+		获取所有题目关系（缓存）
+		执行该函数后，对应缓存项将改变为 QuerySet 类型，故需要在题目集结束后调用
+		Returns:
+			题目关系 QuerySet 或 list 对象
+		"""
+		return self._queryModelCache(self.playerQuesClass())
+
+	def playerQuestion(self, question_id: int) -> PlayerQuestion:
+		"""
+		获取单个题目关系（缓存/数据库）
+		Args:
+			question_id (int): 题目ID
+		Returns:
+			对应ID的题目关系对象
+		"""
+		return self._getModelCache(self.playerQuesClass(), id=question_id)
+
+	def _initQuestionCache(self):
+		"""
+		初始化题目缓存
+		"""
+		self._clearModelCache(self.playerQuesClass())
+
+	def _addQuestion(self, player_ques: PlayerQuestion):
+		"""
+		往缓存中添加题目
+		Args:
+			player_ques (PlayerQuestion): 题目关系
+		"""
+		self._appendModelCache(self.playerQuesClass(), player_ques)
+
+	def _removeQuestion(self, player_ques: PlayerQuestion):
+		"""
+		往缓存中移除题目
+		Args:
+			player_ques (PlayerQuestion): 题目关系
+		"""
+		self._removeModelCache(self.playerQuesClass(), player_ques)
+
+	# endregion
+
+	# region 奖励操作
+
+	def rewards(self) -> list:
+		"""
+		获取所有奖励（缓存）
+		Returns:
+			题目集奖励列表
+		"""
+		return self._queryModelCache(self.rewardClass())
+
+	def addReward(self, item: BaseItem, count: int):
+		"""
+		添加结算奖励
+		Args:
+			item (BaseItem): 物品
+			count (int): 数目
+		"""
+		cla = self.rewardClass()
+		if cla is None: return
+
+		reward = cla.create(self, item, count)
+
+		self._addReward(reward)
+
+	def _addReward(self, reward: QuestionSetReward):
+		"""
+		添加奖励到缓存中
+		Args:
+			reward (QuestionSetReward): 奖励对象
+		"""
+		self._appendModelCache(self.rewardClass(), reward)
+
+	# endregion
 
 	# region 开始题目集
 
@@ -920,6 +897,66 @@ class QuestionSetRecord(CacheableModel):
 			配置类对象
 		"""
 		return None
+
+	def addQuestion(self, question_id: int, **kwargs) -> PlayerQuestion:
+		"""
+		增加题目（临时加入到内存）
+		Args:
+			question_id (int): 题目ID
+			**kwargs (**dict): 子类重载参数
+		Returns:
+			新增的玩家题目关系对象
+		"""
+
+		cla = self.playerQuesClass()
+
+		player_ques = cla.create(self, question_id, **kwargs)
+
+		self._addQuestion(player_ques)
+
+		return player_ques
+
+	# endregion
+
+	# region 题目集过程
+
+	def startQuestion(self, question_id: int = None, player_ques: PlayerQuestion = None):
+		"""
+		开始作答题目
+		Args:
+			question_id (int): 题目ID
+			player_ques (PlayerQuestion): 玩家题目关系对象
+		"""
+
+		# 从缓存中读取
+		if player_ques is None:
+			player_ques = self.playerQuestion(question_id)
+
+		player_ques.start()
+
+	def answerQuestion(self, selection: list, timespan: int,
+					   question_id: int = None, player_ques: PlayerQuestion = None):
+		"""
+		回答指定题目
+		Args:
+			question_id (int): 题目ID
+			player_ques (PlayerQuestion): 玩家题目关系对象
+			selection (list): 选择情况
+			timespan (int): 用时
+		"""
+
+		# 从缓存中读取
+		if player_ques is None:
+			player_ques = self.playerQuestion(question_id)
+
+		if question_id is None:
+			question_id = player_ques.question_id
+
+		rec = QuestionRecord.create(self.player, question_id)
+
+		player_ques.answer(selection, timespan, rec)
+
+		rec.updateRecord(player_ques)
 
 	# endregion
 
@@ -999,66 +1036,6 @@ class QuestionSetRecord(CacheableModel):
 			cla = reward.containerType()
 			container = player.getContainer(cla)
 			container.gainItems(reward.item(), reward.count)
-
-	# endregion
-
-	# region 题目集过程
-
-	def addQuestion(self, question_id: int, **kwargs) -> PlayerQuestion:
-		"""
-		增加题目（临时加入到内存）
-		Args:
-			question_id (int): 题目ID
-			**kwargs (**dict): 子类重载参数
-		Returns:
-			新增的玩家题目关系对象
-		"""
-
-		cla = self.playerQuesClass()
-
-		player_ques = cla.create(self, question_id, **kwargs)
-
-		self._addQuestionToCache(player_ques)
-
-		return player_ques
-
-	def startQuestion(self, question_id: int = None, player_ques: PlayerQuestion = None):
-		"""
-		开始作答题目
-		Args:
-			question_id (int): 题目ID
-			player_ques (PlayerQuestion): 玩家题目关系对象
-		"""
-
-		# 从缓存中读取
-		if player_ques is None:
-			player_ques = self.cachedPlayerQuestion(question_id)
-
-		player_ques.start()
-
-	def answerQuestion(self, selection: list, timespan: int,
-					   question_id: int = None, player_ques: PlayerQuestion = None):
-		"""
-		回答指定题目
-		Args:
-			question_id (int): 题目ID
-			player_ques (PlayerQuestion): 玩家题目关系对象
-			selection (list): 选择情况
-			timespan (int): 用时
-		"""
-
-		# 从缓存中读取
-		if player_ques is None:
-			player_ques = self.cachedPlayerQuestion(question_id)
-
-		if question_id is None:
-			question_id = player_ques.question_id
-
-		rec = QuestionRecord.create(self.player, question_id)
-
-		player_ques.answer(selection, timespan, rec)
-
-		rec.updateRecord(player_ques)
 
 	# endregion
 
@@ -1235,49 +1212,6 @@ class QuestionSetRecord(CacheableModel):
 
 	# endregion
 
-	# region 奖励操作
-
-	def addReward(self, item: BaseItem, count: int):
-		"""
-		添加结算奖励
-		Args:
-			item (BaseItem): 物品
-			count (int): 数目
-		"""
-		cla = self.rewardClass()
-		if cla is None: return
-
-		reward = cla.create(self, item, count)
-
-		self._addCachedReward(reward)
-
-	def _addCachedReward(self, reward: QuestionSetReward):
-		"""
-		添加奖励到缓存中
-		Args:
-			reward (QuestionSetReward): 奖励对象
-		"""
-		self._getCache(self.REWARD_CACHE_KEY).append(reward)
-
-	def rewards(self) -> list:
-		"""
-		获取所有奖励（缓存）
-		Returns:
-			题目集奖励列表
-		"""
-		return self._getOrSetCache(self.REWARD_CACHE_KEY,
-								   lambda: list(self._rewards()))
-
-	def _rewards(self) -> QuerySet:
-		"""
-		获取所有奖励（数据库）
-		Returns:
-			题目集奖励 QuerySet 对象
-		"""
-		raise NotImplementedError
-
-	# endregion
-
 	"""占位符"""
 
 
@@ -1343,15 +1277,6 @@ class ExerciseRecord(QuestionSetRecord):
 		return self.NAME_STRING_FMT % (self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
 									   self.subject.name)
 
-	# 获取所有题目关系
-	def _playerQuestions(self) -> 'QuerySet':
-		"""
-		获取所有题目关系（所有题目）
-		Returns:
-			返回通过 _set.all() 获得的 QuerySet 对象
-		"""
-		return self.exercisequestion_set.all()
-
 	def convert(self, type=None):
 
 		res = super().convert(type)
@@ -1387,11 +1312,12 @@ class ExerciseRecord(QuestionSetRecord):
 		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
 		"""
 
-		player_queses = self._getQuestionsCache().copy()
+		player_queses = self.playerQuestions()
+		player_queses = list(player_queses).copy()
 
 		for player_ques in player_queses:
 			if not player_ques.answered:
-				self._removeQuestionFromCache(player_ques)
+				self._removeQuestion(player_ques)
 
 	# 终止答题
 	def terminate(self, **kwargs):

@@ -705,8 +705,8 @@ class BattlePlayer(QuestionSetRecord):
 		"""
 		if self.finished: return None
 
-		cache = self._getQuestionsCache()
-		if len(cache) > 0: return cache[-1]
+		rounds = list(self.playerQuestions())
+		if len(rounds) > 0: return rounds[-1]
 		return None
 
 	# region 回合操作

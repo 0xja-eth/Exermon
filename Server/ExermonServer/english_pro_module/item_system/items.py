@@ -308,6 +308,7 @@ class ExerProItem(BaseExerProItem):
 	def effects(self):
 		return None
 
+	@CacheHelper.staticCache
 	def traits(self):
 		return self.exerproitemtrait_set.all()
 
@@ -340,6 +341,7 @@ class ExerProPotion(BaseExerProItem):
 	#
 	# 	return res
 
+	@CacheHelper.staticCache
 	def effects(self):
 		return self.exerpropotioneffect_set.all()
 
@@ -439,6 +441,7 @@ class ExerProCard(BaseExerProItem):
 
 		return res
 
+	@CacheHelper.staticCache
 	def effects(self):
 		return self.exerprocardeffect_set.all()
 
@@ -584,6 +587,7 @@ class ExerProEnemy(BaseItem):
 
 		return res
 
+	@CacheHelper.staticCache
 	def actions(self):
 		"""
 		获取敌人的行动计划
@@ -592,6 +596,7 @@ class ExerProEnemy(BaseItem):
 		"""
 		return self.enemyaction_set.all()
 
+	@CacheHelper.staticCache
 	def effects(self):
 		"""
 		获取敌人的攻击效果
@@ -646,5 +651,6 @@ class ExerProState(BaseItem):
 
 		return res
 
+	@CacheHelper.staticCache
 	def traits(self):
 		return self.exerprostatetrait_set.all()
