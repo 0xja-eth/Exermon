@@ -11,22 +11,6 @@ import question_module.item_system.containers as Containers
 	Containers.QuesSugarPack, Items.QuesSugar)
 class QuesSugarPackItem(PackContItem):
 
-	# # 容器
-	# container = models.ForeignKey('QuesSugarPack', on_delete=models.CASCADE,
-	# 						   null=True, verbose_name="容器")
-	#
-	# # 物品
-	# item = models.ForeignKey('QuesSugar', on_delete=models.CASCADE,
-	# 						 null=True, verbose_name="物品")
-	#
-	# # 所属容器的类
-	# @classmethod
-	# def containerClass(cls): return Containers.QuesSugarPack
-	#
-	# # 所接受的物品类
-	# @classmethod
-	# def acceptedItemClass(cls): return Items.QuesSugar
-
 	def isContItemUsable(self, occasion: ItemUseOccasion, **kwargs) -> bool:
 		"""
 		配置当前物品是否可用

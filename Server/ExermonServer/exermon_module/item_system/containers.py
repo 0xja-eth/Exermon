@@ -174,14 +174,6 @@ class ExerSkillSlot(SlotContainer):
 
 	skills = None
 
-	# # 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
-	# @classmethod
-	# def baseContItemClass(cls): return None
-	#
-	# # 所接受的容器项类
-	# @classmethod
-	# def acceptedContItemClasses(cls): return ()
-
 	# 默认容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return cls.MAX_SKILL_COUNT
@@ -218,11 +210,6 @@ class ExerPack(PackContainer):
 	# 玩家
 	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
 
-	# # 所接受的容器项类
-	# @classmethod
-	# def acceptedContItemClasses(cls):
-	# 	return ContItems.ExerPackItem, ContItems.ExerPackEquip
-
 	# 获取容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls): return cls.DEFAULT_CAPACITY
@@ -246,16 +233,6 @@ class ExerEquipSlot(SlotContainer, ParamsObject):
 	# 艾瑟萌
 	exer_slot_item = models.OneToOneField('exermon_module.ExerSlotItem',
 										  on_delete=models.CASCADE, verbose_name="艾瑟萌")
-
-	# # 所接受的槽项类
-	# @classmethod
-	# def acceptedSlotItemClass(cls):
-	# 	return ContItems.ExerEquipSlotItem
-	#
-	# # 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
-	# @classmethod
-	# def baseContItemClass(cls):
-	# 	return ContItems.ExerPackEquip
 
 	# 默认容器容量（0为无限）
 	@classmethod
@@ -309,7 +286,6 @@ class ExerEquipSlot(SlotContainer, ParamsObject):
 		Raises:
 			ErrorType.InsufficientLevel: 等级不足
 		"""
-		# player_exer = self.exer_slot.player_exer
 		if self.exerSlotItem().slotLevel() < equip_item.item.min_level:
 			raise GameException(ErrorType.InsufficientLevel)
 

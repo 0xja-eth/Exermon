@@ -327,8 +327,14 @@ class Question(BaseQuestion):
 	# 	return answers
 
 	# 选项
+	@CacheHelper.staticCache
 	def choices(self):
 		return self.queschoice_set.all()
+
+	# 图片
+	@CacheHelper.staticCache
+	def pictures(self):
+		return self.quespicture_set.all()
 
 	# # 正确选项
 	# def correctChoices(self):
@@ -359,10 +365,6 @@ class Question(BaseQuestion):
 		if count == len(answers): return self.score
 		elif count > 0: return round(self.score * self.UNDER_SELECT_SCORE_RATE)
 		else: return 0
-
-	# 图片
-	def pictures(self):
-		return self.quespicture_set.all()
 
 	# 基础经验值增量
 	def expIncr(self):

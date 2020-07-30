@@ -42,7 +42,7 @@ class ExermonType(Enum):
 # ===================================================
 #  艾瑟萌表
 # ===================================================
-@ItemManager.registerItem("艾瑟萌")  #, ContItems.PlayerExermon)
+@ItemManager.registerItem("艾瑟萌")
 class Exermon(BaseItem, ParamsObject):
 
 	NAME_LEN = 4
@@ -65,18 +65,6 @@ class Exermon(BaseItem, ParamsObject):
 	# 科目
 	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE, verbose_name="科目")
 
-	# 全身像
-	# full = models.ImageField(upload_to=ExermonImageUpload('full'), null=True, blank=True,
-	# 						 verbose_name="全身像")
-	#
-	# # 缩略图
-	# icon = models.ImageField(upload_to=ExermonImageUpload('icon'), null=True, blank=True,
-	# 						 verbose_name="缩略图")
-	#
-	# # 战斗图
-	# battle = models.ImageField(upload_to=ExermonImageUpload('battle'), null=True, blank=True,
-	# 						   verbose_name="战斗图")
-
 	# 艾瑟萌类型
 	e_type = models.PositiveSmallIntegerField(default=ExermonType.Initial.value,
 											choices=TYPES, verbose_name="艾瑟萌类型")
@@ -88,18 +76,6 @@ class Exermon(BaseItem, ParamsObject):
 	@classmethod
 	def paramRateClass(cls):
 		return ExerParamRate
-
-	# 用于获取属性值
-	# def __getattr__(self, item):
-	# 	type = item[4:]
-	#
-	# 	if type == 'base':
-	# 		return self.paramBase(attr=item[:3])
-	#
-	# 	if type == 'rate':
-	# 		return self.paramRate(attr=item[:3])
-	#
-	# 	return super().__getattr__(item)
 
 	# 转换属性为 dict
 	def _convertParamsToDict(self, res):
@@ -133,35 +109,6 @@ class Exermon(BaseItem, ParamsObject):
 	@CacheHelper.staticCache
 	def _paramRates(self):
 		return self.exerparamrate_set.all()
-
-	# # 获取属性基本值
-	# def paramBase(self, param_id=None, attr=None):
-	# 	param = None
-	# 	if param_id is not None:
-	# 		param = self.paramBases().filter(param_id=param_id)
-	# 	if attr is not None:
-	# 		param = self.paramBases().filter(param__attr=attr)
-	#
-	# 	if param is None or not param.exists(): return 0
-	#
-	# 	return param.first().getValue()
-	#
-	# # 获取属性成长值
-	# def paramRate(self, param_id=None, attr=None):
-	# 	param = None
-	# 	if param_id is not None:
-	# 		param = self.paramRates().filter(param_id=param_id)
-	# 	if attr is not None:
-	# 		param = self.paramRates().filter(param__attr=attr)
-	#
-	# 	if param is None or not param.exists(): return 0
-	#
-	# 	return param.first().getValue()
-
-	# 战斗力
-	# def battlePoint(self):
-	# 	from utils.calc_utils import BattlePointCalc
-	# 	return BattlePointCalc.calc(self.paramBase)
 
 
 # ===================================================
@@ -221,15 +168,6 @@ class ExerGift(BaseItem, ParamsObject):
 
 	adminColor.short_description = "天赋颜色"
 
-	# 用于获取属性值
-	# def __getattr__(self, item):
-	# 	type = item[4:]
-	#
-	# 	if type == 'rate':
-	# 		return self.paramRate(attr=item[:3])
-	#
-	# 	return super().__getattr__(item)
-
 	# 转化为 dict
 	def convert(self, **kwargs):
 		res = super().convert(**kwargs)
@@ -245,18 +183,6 @@ class ExerGift(BaseItem, ParamsObject):
 	@CacheHelper.staticCache
 	def _paramRates(self):
 		return self.giftparamrate_set.all()
-
-	# # 获取属性成长加成率
-	# def paramRate(self, param_id=None, attr=None):
-	# 	param = None
-	# 	if param_id is not None:
-	# 		param = self.paramRates().filter(param_id=param_id)
-	# 	if attr is not None:
-	# 		param = self.paramRates().filter(param__attr=attr)
-	#
-	# 	if param is None or not param.exists(): return 0
-	#
-	# 	return param.first().getValue()
 
 
 # ===================================================

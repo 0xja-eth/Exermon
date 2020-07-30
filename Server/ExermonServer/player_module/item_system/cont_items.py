@@ -12,24 +12,6 @@ import player_module.item_system.containers as Containers
 	Containers.HumanPack, Items.HumanItem)
 class HumanPackItem(PackContItem):
 
-	# # 容器
-	# container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
-	# 						   null=True, verbose_name="容器")
-	#
-	# # 物品
-	# item = models.ForeignKey('HumanItem', on_delete=models.CASCADE,
-	# 						 null=True, verbose_name="物品")
-
-	# # 所属容器的类
-	# @classmethod
-	# def containerClass(cls):
-	# 	return Containers.HumanPack
-	#
-	# # 所接受的物品类
-	# @classmethod
-	# def acceptedItemClass(cls):
-	# 	return Items.HumanItem
-
 	def isContItemUsable(self, occasion: ItemUseOccasion,
 						 target=None, count=1) -> bool:
 		"""
@@ -50,22 +32,6 @@ class HumanPackItem(PackContItem):
 @ItemManager.registerPackContItem("人类背包装备",
 	Containers.HumanPack, Items.HumanItem)
 class HumanPackEquip(PackContItem, EquipParamsObject):
-
-	# # 容器
-	# container = models.ForeignKey('HumanPack', on_delete=models.CASCADE,
-	# 						   null=True, verbose_name="容器")
-	#
-	# # 物品
-	# item = models.ForeignKey('HumanEquip', on_delete=models.CASCADE,
-	# 						 null=True, verbose_name="物品")
-
-	# # 所属容器的类
-	# @classmethod
-	# def containerClass(cls): return Containers.HumanPack
-	#
-	# # 所接受的物品类
-	# @classmethod
-	# def acceptedItemClass(cls): return Items.HumanEquip
 
 	@classmethod
 	def baseParamClass(cls):
@@ -95,29 +61,9 @@ class HumanPackEquip(PackContItem, EquipParamsObject):
 	Containers.HumanEquipSlot, pack_equip=HumanPackEquip)
 class HumanEquipSlotItem(SlotContItem, ParamsObject):
 
-	# 容器
-	# container = models.ForeignKey('HumanEquipSlot', on_delete=models.CASCADE,
-	# 						   null=True, verbose_name="容器")
-
-	# 装备项
-	# pack_equip = models.OneToOneField('HumanPackEquip', null=True, blank=True,
-	# 								  on_delete=models.SET_NULL, verbose_name="装备")
-
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.HumanEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
-
-	# # 所属容器的类
-	# @classmethod
-	# def containerClass(cls): return Containers.HumanEquipSlot
-	#
-	# # 所接受的装备项类（可多个）
-	# @classmethod
-	# def acceptedEquipItemClasses(cls): return (HumanPackEquip,)
-	#
-	# # 所接受的装备项属性名（可多个）
-	# @classmethod
-	# def acceptedEquipItemAttrs(cls): return ('pack_equip',)
 
 	@classmethod
 	def paramValueClass(cls):
@@ -140,14 +86,6 @@ class HumanEquipSlotItem(SlotContItem, ParamsObject):
 	def setupIndex(self, index, **kwargs):
 		super().setupIndex(index, **kwargs)
 		self.e_type_id = index
-
-	# # 获取属性值
-	# def _paramVal(self, **kwargs) -> float:
-	# 	"""
-	# 	获取装备属性值
-	# 	"""
-	# 	from utils.calc_utils import EquipParamCalc
-	# 	return EquipParamCalc.calc(self, **kwargs)
 
 	def refresh(self):
 		super().refresh()

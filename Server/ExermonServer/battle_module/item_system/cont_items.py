@@ -12,27 +12,6 @@ import battle_module.item_system.containers as Containers
 	Containers.BattleItemSlot, pack_item=HumanPackItem)
 class BattleItemSlotItem(SlotContItem):
 
-	# # 容器
-	# container = models.ForeignKey('BattleItemSlot', on_delete=models.CASCADE,
-	# 						   null=True, verbose_name="容器")
-	#
-	# # 装备项
-	# pack_item = models.OneToOneField('player_module.HumanPackItem', null=True, blank=True,
-	# 								  on_delete=models.SET_NULL, verbose_name="装备")
-
-	# # 所属容器的类
-	# @classmethod
-	# def containerClass(cls):
-	# 	return Containers.BattleItemSlot
-	#
-	# # 所接受的装备项类（可多个）
-	# @classmethod
-	# def acceptedEquipItemClasses(cls): return (HumanPackItem,)
-	#
-	# # 所接受的装备项属性名（可多个）
-	# @classmethod
-	# def acceptedEquipItemAttrs(cls): return ('pack_item',)
-
 	def isUsable(self) -> bool:
 		"""
 		能否使用

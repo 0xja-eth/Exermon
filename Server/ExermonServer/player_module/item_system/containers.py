@@ -1,15 +1,11 @@
 from item_module.models import *
 from game_module.models import HumanEquipType
 
-# import player_module.item_system.cont_items as ContItems
-# from . import *
-
 
 # ===================================================
 #  人类背包
 # ===================================================
 @ItemManager.registerPackContainer("人类背包")
-# ContItems.HumanPackItem, ContItems.HumanPackEquip)
 class HumanPack(PackContainer):
 
 	# 默认容量
@@ -17,11 +13,6 @@ class HumanPack(PackContainer):
 
 	# 玩家
 	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# # 所接受的容器项类
-	# @classmethod
-	# def acceptedContItemClasses(cls):
-	# 	return ContItems.HumanPackItem, ContItems.HumanPackEquip
 
 	# 获取容器容量（0为无限）
 	@classmethod
@@ -39,22 +30,11 @@ class HumanPack(PackContainer):
 # ===================================================
 #  人类装备槽
 # ===================================================
-@ItemManager.registerSlotContainer("人类装备槽")  #, ContItems.HumanEquipSlotItem)
+@ItemManager.registerSlotContainer("人类装备槽")
 class HumanEquipSlot(SlotContainer, ParamsObject):
 
 	# 玩家
 	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# # 人类背包
-	# human_pack = models.ForeignKey('HumanPack', on_delete=models.CASCADE, verbose_name="人类背包")
-
-	# # 所接受的槽项类
-	# @classmethod
-	# def acceptedSlotItemClass(cls): return ContItems.HumanEquipSlotItem
-	#
-	# # 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
-	# @classmethod
-	# def baseContItemClass(cls): return ContItems.HumanPackEquip
 
 	# 默认容器容量（0为无限）
 	@classmethod

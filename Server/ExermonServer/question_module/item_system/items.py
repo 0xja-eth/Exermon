@@ -39,7 +39,7 @@ class QuesSugarPrice(Currency):
 # ===================================================
 #  题目糖表
 # ===================================================
-@ItemManager.registerItem("题目糖")  #, ContItems.QuesSugarPackItem)
+@ItemManager.registerItem("题目糖")
 class QuesSugar(BaseItem, ParamsObject):
 
 	LIST_DISPLAY_APPEND = ['adminBuyPrice', 'adminParamBases']
@@ -55,10 +55,6 @@ class QuesSugar(BaseItem, ParamsObject):
 
 	# 获得个数
 	get_count = models.PositiveSmallIntegerField(default=1, verbose_name="获得个数")
-
-	# @classmethod
-	# def contItemClass(cls):
-	# 	return ContItems.QuesSugarPackItem
 
 	# 管理界面用：显示购入价格
 	def adminBuyPrice(self):

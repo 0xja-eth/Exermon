@@ -7,24 +7,15 @@ from player_module.item_system.containers import HumanPack
 # ===================================================
 #  对战物资槽
 # ===================================================
-@ItemManager.registerSlotContainer("对战物资槽")  #, ContItems.BattleItemSlotItem)
+@ItemManager.registerSlotContainer("对战物资槽")
 class BattleItemSlot(SlotContainer):
 
 	# 最大物资槽数
 	MAX_ITEM_COUNT = 3
 
 	# 玩家
-	player = models.OneToOneField('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
-
-	# # 所接受的容器项类
-	# @classmethod
-	# def baseContItemClass(cls):
-	# 	return HumanPackItem
-	#
-	# # 所接受的槽项类
-	# @classmethod
-	# def acceptedSlotItemClass(cls):
-	# 	return ContItems.BattleItemSlotItem
+	player = models.OneToOneField('player_module.Player',
+								  on_delete=models.CASCADE, verbose_name="玩家")
 
 	# 获取容器容量（0为无限）
 	@classmethod
@@ -84,7 +75,8 @@ class BattleItemSlot(SlotContainer):
 
 		return True
 
-	def setPackItem(self, pack_item: HumanPackItem = None, index: int = None, force: bool = False):
+	def setPackItem(self, pack_item: HumanPackItem = None,
+					index: int = None, force: bool = False):
 		"""
 		设置物资槽物品
 		Args:
@@ -92,4 +84,5 @@ class BattleItemSlot(SlotContainer):
 			index (int): 槽编号
 			force (bool): 是否强制设置（不损失背包物品）
 		"""
-		self.setEquip(equip_index=0, equip_item=pack_item, index=index, force=force)
+		self.setEquip(equip_index=0, equip_item=pack_item,
+					  index=index, force=force)

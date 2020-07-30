@@ -34,14 +34,8 @@ class HumanItemPrice(Currency):
 # ===================================================
 #  人类物品表
 # ===================================================
-@ItemManager.registerItem("人类物品")  #, ContItems.HumanPackItem)
+@ItemManager.registerItem("人类物品")
 class HumanItem(UsableItem):
-
-	# 转化为 dict
-	# def convert(self, **kwargs):
-	# 	res = super().convert(**kwargs)
-	#
-	# 	return res
 
 	# 获取所有的效果
 	@CacheHelper.staticCache
@@ -100,7 +94,7 @@ class HumanEquipPrice(Currency):
 # ===================================================
 #  人类装备
 # ===================================================
-@ItemManager.registerItem("人类装备")  #, ContItems.HumanPackEquip)
+@ItemManager.registerItem("人类装备")
 class HumanEquip(EquipableItem):
 
 	# 装备类型
