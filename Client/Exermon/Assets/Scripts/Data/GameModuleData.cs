@@ -293,7 +293,7 @@ namespace GameModule.Data {
     /// <summary>
     /// 题目星级数据
     /// </summary>
-    public class QuesStar : TypeData {
+    public class QuestionStar : TypeData {
 
         /// <summary>
         /// 属性
@@ -468,7 +468,7 @@ namespace GameModule.Data {
         [AutoConvert]
         public ItemStar[] itemStars { get; protected set; }
         [AutoConvert]
-        public QuesStar[] quesStars { get; protected set; }
+        public QuestionStar[] questionStars { get; protected set; }
         [AutoConvert]
         public CompRank[] compRanks { get; protected set; }
         [AutoConvert]

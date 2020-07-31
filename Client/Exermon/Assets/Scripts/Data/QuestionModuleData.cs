@@ -90,8 +90,8 @@ namespace QuestionModule.Data {
         public string description { get; protected set; }
         [AutoConvert]
         public int type { get; protected set; }
-
-        public Choice[] choices { get; protected set; }
+		[AutoConvert(autoLoad:false)]
+		public Choice[] choices { get; protected set; }
 
         /// <summary>
         /// 打乱的选项
@@ -123,7 +123,7 @@ namespace QuestionModule.Data {
 		/// </summary>
 		/// <param name="data"></param>
 		/// <returns></returns>
-		protected virtual BaseQuestion.Choice loadChoice(JsonData data) {
+		protected virtual Choice loadChoice(JsonData data) {
 			return DataLoader.load<Choice>(data);
 		}
 
@@ -351,8 +351,8 @@ namespace QuestionModule.Data {
         /// 星级实例
         /// </summary>
         /// <returns></returns>
-        public QuesStar star() {
-            return DataService.get().quesStar(starId);
+        public QuestionStar star() {
+            return DataService.get().questionStar(starId);
         }
 
         /// <summary>

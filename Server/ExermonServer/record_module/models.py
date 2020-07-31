@@ -1313,7 +1313,7 @@ class ExerciseRecord(QuestionSetRecord):
 	def _makeGenerateConfigure(self, **kwargs):
 		from utils.calc_utils import QuestionGenerateConfigure
 
-		return QuestionGenerateConfigure(self, self.player, self.subject,
+		return QuestionGenerateConfigure(self, self.exactlyPlayer(), self.subject,
 										 gen_type=self.gen_type, count=self.count)
 
 	def _shrinkQuestions(self):

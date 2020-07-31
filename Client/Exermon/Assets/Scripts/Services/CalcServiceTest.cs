@@ -445,8 +445,8 @@ namespace GameModule.Services.Test {
             /// <param name="player">玩家</param>
             /// <param name="sid">科目ID</param>
             /// <returns></returns>
-            static public QuesStar calc(Player player, int sid) {
-                var stars = DataService.get().staticData.configure.quesStars;
+            static public QuestionStar calc(Player player, int sid) {
+                var stars = DataService.get().staticData.configure.questionStars;
                 var exerSlot = player.slotContainers.exerSlot;
                 var exerSlotItem = exerSlot.getSlotItem(sid);
 

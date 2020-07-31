@@ -2046,6 +2046,8 @@ MonoBehaviour:
   alertWindow: {fileID: 1151065919}
   loadingWindow: {fileID: 1370592254042265331}
   rebuildController: {fileID: 1370592254042265332}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 0}
   startAni: {fileID: 1253343443}
   prepareWindow: {fileID: 1453049233}
   questionWindow: {fileID: 1651515326}
@@ -5588,7 +5590,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 12.800001, y: 12}
+  m_AnchoredPosition: {x: 12.800003, y: 12}
   m_SizeDelta: {x: -15.999997, y: 72}
   m_Pivot: {x: 0.2, y: 0}
 --- !u!114 &456639667
@@ -19299,16 +19301,16 @@ Canvas:
   m_GameObject: {fileID: 2013070845}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 1
+  m_RenderMode: 1
+  m_Camera: {fileID: 200864843}
+  m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
-  m_SortingLayerID: 1162879463
+  m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &2013070849

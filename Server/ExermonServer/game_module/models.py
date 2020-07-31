@@ -965,6 +965,9 @@ class GameConfigure(models.Model):
 		group_configure_clas = self.groupConfigures()
 
 		for cla in group_configure_clas:
+
+			if GroupConfigure not in cla.mro(): continue
+
 			cla_name = cla.__name__
 			key_name = DataManager.hump2Underline(cla_name) + 's'
 			attr_name = cla_name.lower() + '_set'

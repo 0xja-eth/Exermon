@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 1638369296}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -6769,6 +6769,8 @@ MonoBehaviour:
   alertWindow: {fileID: 1631926186}
   loadingWindow: {fileID: 1631926187}
   rebuildController: {fileID: 1631926188}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 0}
   packWindow: {fileID: 666843406}
 --- !u!1 &1457087434
 GameObject:

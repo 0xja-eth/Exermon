@@ -193,8 +193,8 @@ namespace BattleModule.Data {
         /// 题目星级对象
         /// </summary>
         /// <returns>返回本回合题目星级对象</returns>
-        public QuesStar star() {
-            return DataService.get().quesStar(starId);
+        public QuestionStar star() {
+            return DataService.get().questionStar(starId);
         }
 
         /// <summary>

@@ -229,7 +229,7 @@ class BattleRecord(CacheableModel):
 			如果有第一个玩家，则返回其实例，否则返回 None
 		"""
 		players = self.battlePlayers()
-		if players.count() >= 1: return players[0]
+		if len(players) >= 1: return players[0]
 
 		return None
 
@@ -240,7 +240,7 @@ class BattleRecord(CacheableModel):
 			如果有第二个玩家，则返回其实例，否则返回 None
 		"""
 		players = self.battlePlayers()
-		if players.count() >= 2: return players[1]
+		if len(players) >= 2: return players[1]
 
 		return None
 
@@ -374,7 +374,7 @@ class BattleRecord(CacheableModel):
 		"""
 		player = self.firstPlayer()
 		if player is None: return []
-		player = player.player
+		player = player.exactlyPlayer()
 
 		return player.subjects()
 
@@ -455,7 +455,7 @@ class BattleRound(models.Model):
 		battler = self.record.firstPlayer() if self.order % 2 == 1 \
 			else self.record.secondPlayer()
 
-		return battler.player
+		return battler.exactlyPlayer()
 
 	def generateQuestion(self):
 		"""

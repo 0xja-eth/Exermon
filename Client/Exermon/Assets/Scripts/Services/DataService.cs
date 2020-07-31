@@ -417,8 +417,8 @@ namespace GameModule.Services {
         public ItemStar itemStar(int id) {
             return get(staticData.configure.itemStars, id);
         }
-        public QuesStar quesStar(int id) {
-            return get(staticData.configure.quesStars, id);
+        public QuestionStar questionStar(int id) {
+            return get(staticData.configure.questionStars, id);
         }
         public CompRank compRank(int id) {
             return get(staticData.configure.compRanks, id);

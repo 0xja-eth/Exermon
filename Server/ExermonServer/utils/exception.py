@@ -133,6 +133,7 @@ class ErrorType(Enum):
 	QuestionNotExist = 400  # 题目不存在
 	QuesSugarNotExist = 401  # 题目糖不存在
 	QuestionLinkNotExist = 402  # 题目关系不存在
+	PictureNotFound = 403  # 图片不存在
 
 	# QuestionGenerate
 	InvalidGenerateConfigure = 410  # 非法的题目生成配置
@@ -343,6 +344,7 @@ class GameException(Exception):
 		ErrorType.QuestionNotExist: "题目不存在！",
 		ErrorType.QuesSugarNotExist: "题目糖不存在！",
 		ErrorType.QuestionLinkNotExist: "题目不存在！",
+		ErrorType.PictureNotFound: "找不到图片文件！",
 
 		# QuestionGenerate
 		ErrorType.InvalidGenerateConfigure: "非法的题目生成配置！",

@@ -712,9 +712,10 @@ class RuntimeBattlePlayer(RuntimeData):
 		self.battle = battle
 
 		self.battle_player = battle_player
-		self.player = battle_player.player  # 只读
-		self.exer_slot = self.player.exerSlot()  # 只读
-		self.battle_item_slot = self.player.battleItemSlot()  # 只读
+		self.player = battle_player.exactlyPlayer()
+		self.exer_slot = self.player.exerSlot()
+		self.battle_item_slot = self.player.battleItemSlot()
+
 		self.initExermons()
 		self.initBattleItems()
 		self.initParams()
