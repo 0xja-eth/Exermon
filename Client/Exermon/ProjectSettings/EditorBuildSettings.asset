@@ -67,4 +67,8 @@ EditorBuildSettings:
     guid: 8bea23897a9d81b45af4340952723673
   - enabled: 1
     path: Assets/Scenes/ExerPro/EnglishPro/ExerProPackScene.unity
-    guid: bf7749d33c51cbe448ac4ce807bda281  m_configObjects: {}
+    guid: bf7749d33c51cbe448ac4ce807bda281
+  - enabled: 1
+    path: Assets/Scenes/ExerPro/EnglishPro/CorrectTestScene.unity
+    guid: f0e510a55dfe6d24f8621bcb233bfd1d
+  m_configObjects: {}

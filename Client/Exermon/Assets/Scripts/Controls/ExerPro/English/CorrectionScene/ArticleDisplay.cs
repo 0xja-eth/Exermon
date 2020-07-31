@@ -154,12 +154,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// 重置所有答案
 		/// </summary>
 		public void revertAllAnswers() {
-			foreach (var pair in answers)
+            foreach (var pair in answers)
 				pair.Key.revert();
 
 			answers.Clear();
 			refreshRestCount();
-		}
+        }
 
 		/// <summary>
 		/// 寻找答案项

@@ -32,10 +32,10 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		public Color correctColor = new Color(72, 127, 74, 255) / 255f;
 		public Color wrongColor = new Color(150, 28, 70, 255) / 255f;
 
-		/// <summary>
-		/// 内部组件设置
-		/// </summary>
-		Text changeText, addPrevText, addNextText;
+        /// <summary>
+        /// 内部组件设置
+        /// </summary>
+        Text changeText, addPrevText, addNextText;
 
         /// <summary>
         /// 状态枚举
