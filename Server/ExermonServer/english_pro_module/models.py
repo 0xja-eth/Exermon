@@ -869,6 +869,10 @@ class ExerProRecord(CacheableModel):
 	def __str__(self):
 		return "%d. %s 特训记录" % (self.id, self.player)
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self._setupCachePool()
+
 	# 创建新记录
 	@classmethod
 	def create(cls, player):

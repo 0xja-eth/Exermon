@@ -579,8 +579,6 @@ class Currency(models.Model):
 		abstract = True
 		verbose_name = verbose_name_plural = "货币"
 
-	LIST_DISPLAY_APPEND = ['item']
-
 	# 金币
 	gold = models.PositiveIntegerField(default=0, verbose_name="金币")
 
@@ -1216,7 +1214,7 @@ class BaseContainer(CacheableModel):
 		Returns:
 			所接受的容器项类数元组
 		"""
-		return cls.ACCEPTED_CONTITEM_CLASSES or (cls.baseContItemClass(),)
+		return tuple(cls.ACCEPTED_CONTITEM_CLASSES or [cls.baseContItemClass()])
 
 	@classmethod
 	def _cacheForeignKeyModels(cls):
@@ -1255,16 +1253,31 @@ class BaseContainer(CacheableModel):
 	def create(cls, **kwargs):
 		container = cls()
 		container._create(**kwargs)
+
 		container.save()
+
+		container._afterCreated(**kwargs)
+
 		return container
 
 	# 创建实例
 	def _create(self, **kwargs):
 		pass
 
+	def _afterCreated(self, **kwargs):
+
+		self._registerContainer()
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
+		self._setupCachePool()
+
+		# 已经创建了实例
+		if self.pk is not None:
+			self._registerContainer()
+
+	def _registerContainer(self):
 		self.exactlyPlayer().registerContainer(self)
 
 	# endregion
@@ -1278,9 +1291,6 @@ class BaseContainer(CacheableModel):
 	def __str__(self):
 		name = self._meta.verbose_name
 		return '%s %s(%s)' % (str(self.id), name, str(self.owner()))
-
-	def __getattr__(self, item):
-		raise AttributeError(item)
 
 	# 获取类型名称
 	# def getTypeName(self):
@@ -1371,8 +1381,6 @@ class BaseContainer(CacheableModel):
 		from player_module.views import Common
 
 		player = self.ownerPlayer()
-		# 如果获取不到实际的玩家，该对象释放时需要自动保存
-		player.delete_save = True
 
 		online_player = Common.getOnlinePlayer(player.id)
 
@@ -1401,7 +1409,7 @@ class BaseContainer(CacheableModel):
 		return False
 
 	def contItems(self, cla: type = None,
-				  cond: callable = None, **kwargs) -> list or QuerySet:
+				  cond: callable = None, **kwargs) -> list:
 		"""
 		获取满足一定条件的容器项（并载入缓存）
 		支持条件获取和映射获取
@@ -1414,13 +1422,13 @@ class BaseContainer(CacheableModel):
 		"""
 		if cla is not None:
 			# 根据 cache_pool 中储存类型返回 list or QuerySet
-			return self._queryModelCache(cla, cond, **kwargs)
+			return list(self._queryModelCache(cla, cond, True, **kwargs))
 
 		# 只返回 list，且只读
 		cont_items = []
 		for _cla in self.acceptedContItemClasses():
 			cont_items += list(self._queryModelCache(
-				_cla, cond, **kwargs))
+				_cla, cond, True, **kwargs))
 
 		return cont_items
 
@@ -1581,13 +1589,15 @@ class BaseContainer(CacheableModel):
 	# 获取一个容器项
 	def contItem(self, *args, **kwargs):
 		cont_items = self.contItems(*args, **kwargs)
-
-		if isinstance(cont_items, QuerySet):
-			if cont_items.exists(): return cont_items.first()
-		else:
-			if len(cont_items) > 0: return cont_items[0]
-
+		if len(cont_items) > 0: return cont_items[0]
 		return None
+
+		# if isinstance(cont_items, QuerySet):
+		# 	if cont_items.exists(): return cont_items.first()
+		# else:
+		# 	if len(cont_items) > 0: return cont_items[0]
+		#
+		# return None
 
 	# 创建一个容器项
 	# cla: 直接提供一个容器项类型
@@ -2492,11 +2502,11 @@ class SlotContainer(BaseContainer):
 		return 1
 
 	# 创建实例（创建槽）
-	@classmethod
-	def create(cls, **kwargs):
-		container: SlotContainer = super().create(**kwargs)
-		container.createSlots(**kwargs)
-		return container
+	# @classmethod
+	# def create(cls, **kwargs):
+	# 	container: SlotContainer = super().create(**kwargs)
+	# 	container.createSlots(**kwargs)
+	# 	return container
 
 	# 所接受的槽项类（用于 contItemClass ）
 	@classmethod
@@ -2505,9 +2515,13 @@ class SlotContainer(BaseContainer):
 
 	# 所接受的装备项类（用于 contItemClass ）
 	@classmethod
-	def acceptedContItemClasses(cls):
-		return cls.ACCEPTED_CONTITEM_CLASSES or \
-			   cls.acceptedSlotItemClass().acceptedEquipItemClasses()
+	def acceptedContItemClasses(cls) -> tuple:
+		return tuple(cls.ACCEPTED_CONTITEM_CLASSES or
+			   cls.acceptedSlotItemClass().acceptedEquipItemClasses())
+
+	@classmethod
+	def _cacheForeignKeyModels(cls):
+		return [cls.acceptedSlotItemClass()]
 
 	# 所接受的装备项基类（由于重载了 contItemClass，该函数意义有改变）
 	# @classmethod
@@ -2517,6 +2531,38 @@ class SlotContainer(BaseContainer):
 	# def __init__(self, *args, **kwargs):
 	# 	super().__init__(*args, **kwargs)
 	# 	self.cache(self.CONTAINERS_CACHE_KEY, [])
+
+	def _afterCreated(self, **kwargs):
+		super()._afterCreated(**kwargs)
+		self.createSlots(**kwargs)
+
+	# 创建一组槽
+	def createSlots(self, **kwargs):
+		# slot_items = []
+		cla = self.contItemClass(**kwargs)
+		cnt = self.getCapacity()
+
+		for i in range(cnt):
+			self._createSlot(cla, i, **kwargs)
+
+	# 创建一个槽
+	def _createSlot(self, cla, index, **kwargs):
+		return self._createContItem(cla, index=index + 1, **kwargs)
+
+	def contItems(self, cla=None, cond: callable = None, **kwargs) -> list:
+		"""
+		获取满足一定条件的容器项（并载入缓存）
+		支持条件获取和映射获取
+		Args:
+			cla (any): 忽略的参数
+			cond (callable): 条件函数
+			**kwargs (dict): 查询参数
+		Returns:
+			返回满足条件的所有容器项
+		"""
+		cla = self.acceptedSlotItemClass()
+
+		return self._queryModelCache(cla, cond, True, **kwargs)
 
 	# 持有者
 	def owner(self):
@@ -2571,27 +2617,6 @@ class SlotContainer(BaseContainer):
 			return isinstance(slot_item, self.acceptedSlotItemClass())
 
 		return super().isItemAcceptable(cont_item=cont_item)
-
-	# 创建一组槽
-	def createSlots(self, **kwargs):
-		# slot_items = []
-		cla = self.contItemClass(**kwargs)
-		cnt = self.getCapacity()
-
-		for i in range(cnt):
-			self._createSlot(cla, i, **kwargs)
-
-	# slot.afterCreated(**kwargs)
-
-	# cla.objects.bulk_create(slot_items)
-
-	# 创建一个槽
-	def _createSlot(self, cla, index, **kwargs):
-		return self._createContItem(cla, index=index + 1, **kwargs)
-
-	# slot_item: SlotContItem = self._createContItem(cla, **kwargs)
-	# slot_item.setupIndex(index+1, **kwargs)
-	# return slot_item
 
 	def ensureEquipCondition(self, slot_item: 'SlotContItem', equip_item: 'PackContItem'):
 		"""
@@ -2671,16 +2696,18 @@ class SlotContainer(BaseContainer):
 
 		old_equip_item = slot_item.equipItem(equip_index)
 
-		# 如果装备前和装备后的装备都是空
-		if old_equip_item is None and equip_item is None:
-			return container, None
+		# 如果装备相同
+		if old_equip_item is equip_item:
+			return container, old_equip_item
 
 		if equip_item is None:
 			# 如果要装备的装备为空，则相当于卸下，需要确保容器有位置
 			container.ensureCapacityAvailable()
 		# 其他情况下都不需要判断
 
-		self._dequipSlot(slot_item, equip_index=equip_index)
+		# 如果旧装备不为空，需要先卸下
+		if old_equip_item is not None:
+			self._dequipSlot(slot_item, equip_index=equip_index)
 
 		# self.transfer(container, slot_item=slot_item, index=equip_index)
 
@@ -2688,6 +2715,9 @@ class SlotContainer(BaseContainer):
 		if equip_item is not None:
 			self._equipSlot(slot_item, equip_index, equip_item)
 			# container.transfer(self, slot_item=slot_item, cont_item=equip_item)
+
+		# TODO: 在 contItems 函数中读取缓存
+		# slot_item.save()
 
 		return container, old_equip_item
 
@@ -2809,8 +2839,9 @@ class BaseContItem(CacheableModel):
 		owner = self.container.owner() if self.container else None
 		return '%d %s(%s)' % (self.id, name, str(owner))
 
-	def __getattr__(self, item):
-		raise AttributeError(item)
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self._setupCachePool()
 
 	# 转化为 dict
 	def convert(self, **kwargs):
@@ -2845,8 +2876,11 @@ class BaseContItem(CacheableModel):
 		"""
 		cont_item = cls()
 		cont_item._create(container, **kwargs)
+
 		cont_item.save(judge=False)
-		cont_item.afterCreated()
+
+		cont_item._afterCreated(**kwargs)
+
 		return cont_item
 
 	# 创建容器项（包含移动）
@@ -2861,7 +2895,7 @@ class BaseContItem(CacheableModel):
 		self.transfer(container, **kwargs)
 
 	# 创建之后调用
-	def afterCreated(self, **kwargs):
+	def _afterCreated(self, **kwargs):
 		"""
 		创建后回调
 		Args:
@@ -2985,12 +3019,22 @@ class BaseContItem(CacheableModel):
 
 	# region 数据获取
 
-	# 实际的容器
-	def exactlyContainer(self):
-		return self.exactlyPlayer().getContainer(container=self.container)
+	# 所属玩家
+	def ownerPlayer(self):
+		if self.container is None: return None
+		return self.container.ownerPlayer()
 
 	# 实际的容器
+	def exactlyContainer(self):
+		player = self.exactlyPlayer()
+		
+		if player is None: return None
+
+		return player.getContainer(container=self.container)
+
+	# 实际的玩家
 	def exactlyPlayer(self):
+		if self.container is None: return None
 		return self.container.exactlyPlayer()
 
 	def getContainer(self, cla: BaseContainer):
@@ -3334,13 +3378,13 @@ class SlotContItem(BaseContItem):
 
 	# 所接受的装备项类（可多个）
 	@classmethod
-	def acceptedEquipItemClasses(cls):
-		return cls.ACCEPTED_EQUIP_ITEM_CLASSES
+	def acceptedEquipItemClasses(cls) -> tuple:
+		return tuple(cls.ACCEPTED_EQUIP_ITEM_CLASSES)
 
 	# 所接受的装备项属性名（可多个）
 	@classmethod
-	def acceptedEquipItemAttrs(cls):
-		return cls.ACCEPTED_EQUIP_ITEM_ATTRS
+	def acceptedEquipItemAttrs(cls) -> tuple:
+		return tuple(cls.ACCEPTED_EQUIP_ITEM_ATTRS)
 
 	# 装备数目
 	@classmethod
@@ -3401,8 +3445,18 @@ class SlotContItem(BaseContItem):
 		clas = self.acceptedEquipItemClasses()
 
 		for i in range(len(clas)):
+
+			def genReloadFunc():
+
+				_i = i
+
+				def reloadFunc():
+					return [self._equipItem(_i)]
+
+				return reloadFunc
+
 			self._setModelCache(key=clas[i],
-								reload_func=lambda: self._equipItem(i))
+								reload_func=genReloadFunc())
 
 	# region 创建容器项
 
@@ -3531,6 +3585,9 @@ class SlotContItem(BaseContItem):
 		"""
 		old_equip_item = self.equipItem(index)
 
+		if old_equip_item == equip_item:
+			return old_equip_item
+
 		if old_equip_item is not None:
 			old_equip_item.dequip()
 
@@ -3538,7 +3595,8 @@ class SlotContItem(BaseContItem):
 		attr = self.acceptedEquipItemAttrs()[index]
 		# 设置属性（必须为 Django model 中的外键）
 		setattr(self, attr, equip_item)
-		equip_item.equip()
+		if equip_item is not None:
+			equip_item.equip()
 
 		self._reloadEquipItem(index)
 

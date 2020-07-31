@@ -145,6 +145,7 @@ class LoginInfo(models.Model):
 		info = cls()
 		info.player_id = player_id
 		info.ip_address = addr
+		info.save()
 
 		return info
 
@@ -434,10 +435,19 @@ class Player(CacheableModel):
 	adminMoney.short_description = "持有金钱"
 
 	@classmethod
+	@CacheHelper.staticCache
 	def _cacheOneToOneModels(cls):
 		from english_pro_module.models import ExerProRecord
+		from utils.model_utils import AdminXHelper
 
-		return [PlayerMoney, ExerProRecord]
+		res = [PlayerMoney, ExerProRecord]
+
+		relateds = AdminXHelper.allRelatedModels(cls)
+
+		for cla in relateds:
+			if BaseContainer in cla.mro(): res.append(cla)
+
+		return res
 
 	# region 字典生成
 
@@ -751,7 +761,10 @@ class Player(CacheableModel):
 		Args:
 			container (BaseContainer): 容器实例
 		"""
-		self._appendModelCache(type(container), container)
+		cla = type(container)
+
+		if cla not in self._cacheOneToOneModels():
+			self._appendModelCache(cla, container)
 
 	def getContainer(self, cla=None, id=None,
 					 container: BaseContainer = None) -> BaseContainer:
@@ -764,7 +777,6 @@ class Player(CacheableModel):
 		Returns:
 			返回缓存的容器实例
 		"""
-
 		if container is not None:
 			return self.getContainer(type(container), container.id)
 
@@ -817,7 +829,7 @@ class Player(CacheableModel):
 
 		if cont_item is not None:
 			return container.contItem(
-				cla=type(cont_item), id=cont_item.id)
+				cla=type(cont_item), id=cont_item.id, **kwargs)
 
 		return container.contItem(**kwargs)
 
@@ -897,6 +909,8 @@ class Player(CacheableModel):
 		"""
 		登陆操作
 		"""
+		self._setupCachePool()
+
 		self._setLoginInfo(LoginInfo.create(
 			self.id, consumer.ip_address))
 
@@ -964,7 +978,7 @@ class Player(CacheableModel):
 
 		# PlayerExermon.objects.bulk_create(player_exers)
 
-		if self.exerSlot(): self._deleteCache(ExerSlot)
+		# if self.exerSlot(): self._deleteModelCache(ExerSlot)
 
 		exer_slot = ExerSlot.create(player=self, player_exers=player_exers)
 

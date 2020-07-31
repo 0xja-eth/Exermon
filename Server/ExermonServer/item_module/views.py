@@ -251,7 +251,7 @@ class Service:
 		Check.ensureItemBoughtable(item)
 
 		container_class = item.containerClass()
-		container = player.getContainer(container_class)
+		container: PackContainer = player.getContainer(container_class)
 
 		buy_price = item.buyPrice()
 
@@ -459,7 +459,7 @@ class Common:
 		"""
 		if cla is None:
 			Check.ensureContainerType(type_)
-			cla = eval(ContainerType(type_).name)
+			cla = EnumMapper.get(ContainerType(type_))
 
 		if player is None:
 			return ViewUtils.getObject(cla, error, **kwargs)

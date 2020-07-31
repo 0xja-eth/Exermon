@@ -142,7 +142,7 @@ class PlayerExermon(PackContItem, ParamsObject):
 		return Items.ExerParamRate
 
 	# 创建之后调用
-	def afterCreated(self, **kwargs):
+	def _afterCreated(self, **kwargs):
 		self._createExerSkillSlot()
 
 	def _createExerSkillSlot(self):
@@ -363,6 +363,8 @@ class PlayerExermon(PackContItem, ParamsObject):
 
 	# 刷新等级
 	def _refreshLevel(self):
+		if self.item is None: return
+
 		from utils.calc_utils import ExermonLevelCalc
 
 		exp = self.exp
@@ -492,8 +494,10 @@ class ExerSlotItem(SlotContItem, ParamsObject):
 		self.init_exer = init_exer
 
 	# 创建之后调用
-	def afterCreated(self, **kwargs):
-		self.container.setPlayerExer(self, self.init_exer)
+	def _afterCreated(self, **kwargs):
+		container = self.exactlyContainer()
+		container.setPlayerExer(self, self.init_exer)
+
 		self._createEquipSlot()
 
 	def _createEquipSlot(self):

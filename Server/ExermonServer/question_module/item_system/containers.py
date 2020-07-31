@@ -13,8 +13,8 @@ class QuesSugarPack(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有者
 	def owner(self): return self.player

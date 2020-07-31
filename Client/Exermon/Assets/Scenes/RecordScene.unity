@@ -479,6 +479,8 @@ MonoBehaviour:
   alertWindow: {fileID: 1985090420}
   loadingWindow: {fileID: 1985090421}
   rebuildController: {fileID: 1985090422}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 0}
   recordWindow: {fileID: 1007870147}
 --- !u!1001 &209909711
 PrefabInstance:
@@ -6578,9 +6580,9 @@ Canvas:
   m_GameObject: {fileID: 2013070845}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 1
+  m_RenderMode: 1
+  m_Camera: {fileID: 200864843}
+  m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0

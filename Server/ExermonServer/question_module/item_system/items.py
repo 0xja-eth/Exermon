@@ -31,6 +31,8 @@ class QuesSugarPrice(Currency):
 	class Meta:
 		verbose_name = verbose_name_plural = "题目糖价格"
 
+	LIST_DISPLAY_APPEND = ['item']
+
 	# 物品
 	item = models.OneToOneField('QuesSugar', on_delete=models.CASCADE,
 							 verbose_name="物品")

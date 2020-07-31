@@ -26,6 +26,8 @@ class HumanItemPrice(Currency):
 	class Meta:
 		verbose_name = verbose_name_plural = "人类物品价格"
 
+	LIST_DISPLAY_APPEND = ['item']
+
 	# 物品
 	item = models.OneToOneField('HumanItem', on_delete=models.CASCADE,
 							 verbose_name="物品")
@@ -85,6 +87,8 @@ class HumanEquipBaseParam(EquipParamValue):
 class HumanEquipPrice(Currency):
 	class Meta:
 		verbose_name = verbose_name_plural = "人类装备价格"
+
+	LIST_DISPLAY_APPEND = ['item']
 
 	# 物品
 	item = models.OneToOneField('HumanEquip', on_delete=models.CASCADE,

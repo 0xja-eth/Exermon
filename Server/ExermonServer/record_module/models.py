@@ -215,6 +215,11 @@ class PlayerQuestion(CacheableModel):
 	# 所属题目集（用于子类继承）
 	# question_set = None
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self._setupCachePool()
+
 	def __str__(self):
 		return "%s %s" % (self.questionSet(), self.question)
 
@@ -605,6 +610,11 @@ class QuestionSetRecord(CacheableModel):
 	def __str__(self):
 		return "%s %s" % (self.player, self.generateName())
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self._setupCachePool()
+
 	# region 管理显示
 
 	def adminExerExpIncrs(self):
@@ -762,7 +772,7 @@ class QuestionSetRecord(CacheableModel):
 
 		return base
 
-	def exactlyPlayer(self): # -> Player:
+	def exactlyPlayer(self):  # -> Player:
 		"""
 		获取实际玩家在线信息
 		Returns:
@@ -771,8 +781,6 @@ class QuestionSetRecord(CacheableModel):
 		from player_module.views import Common
 
 		player = self.player
-		# 如果获取不到实际的玩家，该对象释放时需要自动保存
-		player.delete_save = True
 
 		online_player = Common.getOnlinePlayer(player.id)
 

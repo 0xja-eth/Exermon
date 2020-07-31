@@ -410,6 +410,8 @@ class ExerItemPrice(Currency):
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌物品价格"
 
+	LIST_DISPLAY_APPEND = ['item']
+
 	# 物品
 	item = models.OneToOneField('ExerItem', on_delete=models.CASCADE,
 							 verbose_name="物品")
@@ -483,6 +485,8 @@ class ExerEquipPrice(Currency):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备价格"
+
+	LIST_DISPLAY_APPEND = ['item']
 
 	# 物品
 	item = models.OneToOneField('ExerEquip', on_delete=models.CASCADE,

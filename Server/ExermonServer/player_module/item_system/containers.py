@@ -20,8 +20,8 @@ class HumanPack(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有者
 	def owner(self): return self.player
@@ -51,8 +51,8 @@ class HumanEquipSlot(SlotContainer, ParamsObject):
 		Args:
 			player (Player): 玩家
 		"""
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 保证装备类型与槽一致
 	def ensureEquipType(self, slot_item, equip):

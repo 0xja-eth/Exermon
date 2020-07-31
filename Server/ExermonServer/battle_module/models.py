@@ -102,6 +102,10 @@ class BattleRecord(CacheableModel):
 	def __str__(self):
 		return "%s. %s" % (str(self.id), self.generateName())
 
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self._setupCachePool()
+
 	def generateName(self):
 		"""
 		生成名称

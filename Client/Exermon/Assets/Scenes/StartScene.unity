@@ -697,9 +697,9 @@ Canvas:
   m_GameObject: {fileID: 224197833}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 470629041}
-  m_PlaneDistance: 1
+  m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1617,13 +1617,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470629040}
-  m_LocalRotation: {x: -0, y: -0.76098245, z: -0, w: 0.6487725}
-  m_LocalPosition: {x: 84.57, y: 24.9, z: 55.49}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -99.102005, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &470629046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1639,6 +1639,8 @@ MonoBehaviour:
   alertWindow: {fileID: 2144663324}
   loadingWindow: {fileID: 2144663325}
   rebuildController: {fileID: 2144663326}
+  audioSource: {fileID: 0}
+  bgmClip: {fileID: 0}
   characterWindow: {fileID: 1242599742}
   exermonsWindow: {fileID: 217987915}
   giftsWindow: {fileID: 298413052}
@@ -8631,7 +8633,7 @@ PrefabInstance:
     - target: {fileID: 5356854844677375628, guid: 992ac4f6e7053c6468f887975d19aaa7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -7.999977
+      value: -7.9999847
       objectReference: {fileID: 0}
     - target: {fileID: 7643428743995881248, guid: 992ac4f6e7053c6468f887975d19aaa7,
         type: 3}

@@ -37,8 +37,8 @@ class BattleItemSlot(SlotContainer):
 		Args:
 			player (Player): 玩家
 		"""
-		super()._create()
 		self.player = player
+		super()._create()
 
 	def owner(self) -> 'Player':
 		"""

@@ -80,6 +80,7 @@ class CacheHelper:
 
 				setattr(obj, func.cache_val_name, None)
 
+
 class CacheItem:
 	"""
 	QuerySet 缓存项，用于缓存 QuerySet 或 Model 的列表
@@ -134,6 +135,10 @@ class CacheItem:
 				self.query_set = None
 				self.data = tmp_data
 
+			else:
+				self.query_set = None
+				self.data = [tmp_data]
+
 		elif self.obj_type is not None:
 			self.query_set: QuerySet = \
 				self.obj_type.objects.filter(**self.kwargs)
@@ -141,6 +146,10 @@ class CacheItem:
 
 		else:
 			self.query_set = self.data = None
+
+		if self.data is not None:
+			while None in self.data:
+				self.data.remove(None)
 
 	def reload(self, save=True):
 		"""
@@ -155,7 +164,30 @@ class CacheItem:
 		Returns:
 			返回当前缓存是否为空
 		"""
-		return self.query_set is None and self.data is None
+		return self.query_set is None and (
+				self.data is None or len(self.data) <= 0)
+
+	def _isReloadEmpty(self):
+		"""
+		若为空则重载并判断是否为空
+		Returns:
+			返回当前缓存是否为空
+		"""
+		if not self.isEmpty(): return False
+
+		self.reload()
+
+		return self.isEmpty()
+
+	def _genData(self):
+		"""
+		从 QuerySet 转化为 list 数据
+		"""
+		if not self.isCached():
+			self.data = list(self.query_set) \
+				if self.query_set is not None else []
+
+		return self.data
 
 	def append(self, obj: models.Model):
 		"""
@@ -163,9 +195,7 @@ class CacheItem:
 		Args:
 			obj (models.Model): 数据
 		"""
-		if not self.isCached():
-			self.data = list(self.query_set) \
-				if self.query_set is not None else []
+		self._genData()
 
 		index = self._findExactly(obj)
 
@@ -178,10 +208,9 @@ class CacheItem:
 		Args:
 			obj (models.Model): 数据
 		"""
-		if self.isEmpty(): return
+		if self._isReloadEmpty(): return
 
-		if not self.isCached():
-			self.data = list(self.query_set)
+		self._genData()
 
 		index = self._findExactly(obj)
 
@@ -201,19 +230,23 @@ class CacheItem:
 
 		return -1
 
-	def query(self, cond: callable = None, **kwargs) -> QuerySet or list:
+	def query(self, cond: callable = None,
+			  listed=False, **kwargs) -> QuerySet or list:
 		"""
 		查询数据
 		Args:
 			cond (callable): 查询函数
+			listed (bool): 以列表形式返回
 			**kwargs (**dict): 查询参数
 		Returns:
 			返回按条件查询到的数据
 		"""
-		if self.isEmpty(): return []
+		if self._isReloadEmpty(): return []
+
+		if listed: self._genData()
 
 		if cond is not None:
-			data = self._queryByCond(cond)
+			data = self._queryByCond(cond=cond)
 		else:
 			data = self.objs()
 
@@ -265,16 +298,18 @@ class CacheItem:
 		"""
 		return self.query_set.filter(**kwargs)
 
-	def get(self, cond: callable = None, **kwargs) -> models.Model:
+	def get(self, cond: callable = None,
+			listed=False, **kwargs) -> models.Model:
 		"""
 		获取数据
 		Args:
 			cond (callable): 查询函数
+			listed (bool): 以列表形式返回
 			**kwargs (**dict): 查询参数
 		Returns:
 			返回按条件查询到的数据（第一条）
 		"""
-		objs = self.query(cond, **kwargs)
+		objs = self.query(cond, listed, **kwargs)
 
 		if isinstance(objs, QuerySet):
 			if objs.exists(): return objs.first()
@@ -337,7 +372,7 @@ class CacheItem:
 		Returns:
 			返回数据数量
 		"""
-		if self.isEmpty(): return 0
+		if self._isReloadEmpty(): return 0
 
 		if cond is not None:
 			return len(self._queryByCond(cond))
@@ -346,13 +381,17 @@ class CacheItem:
 			return len(self._queryCache(**kwargs))
 		return self._queryDjango(**kwargs).count()
 
-	def first(self) -> models.Model:
+	def first(self, listed=False) -> models.Model:
 		"""
 		获取第一个数据
+		Args:
+			listed (bool): 以列表形式返回
 		Returns:
 			返回第一个数据
 		"""
-		if self.isEmpty(): return None
+		if self._isReloadEmpty(): return None
+
+		if listed: self._genData()
 
 		if self.isCached():
 			if len(self.data) > 0:
@@ -370,7 +409,9 @@ class CacheItem:
 		Returns:
 			返回所有缓存对象
 		"""
-		return self.data or self.query_set
+		if self.data is None: return self.query_set
+
+		return self.data
 
 	def isCached(self) -> bool:
 		"""
@@ -384,7 +425,8 @@ class CacheItem:
 		"""
 		保存缓存数据到数据库
 		"""
-		for obj in self.objs(): obj.save()
+		if self.objs() is not None:
+			for obj in self.objs(): obj.save()
 
 		for obj in self.removed: obj.save()
 		self.removed = []
@@ -427,14 +469,17 @@ class CachePool:
 
 	def __init__(self): self.objects = {}
 
-	def setObjects(self, cla=None, key=None, save=True, objects=None, **kwargs):
+	def setObjects(self, cla=None, key=None,
+				   objects=None, reload_func=None,
+				   save=True, **kwargs):
 		"""
 		设置 QuerySet 缓存
 		Args:
 			cla (type): 类型
 			key (object): 键
-			save (bool): 是否保存
 			objects (list or QuerySet): 默认值
+			reload_func (callable): 加载函数
+			save (bool): 是否保存
 			**kwargs (**dict): 查询参数
 		"""
 		if key is None: key = cla
@@ -442,7 +487,7 @@ class CachePool:
 
 		if self.contains(key): self.delete(save)
 
-		self.objects[key] = CacheItem(cla, objects, **kwargs)
+		self.objects[key] = CacheItem(cla, objects, reload_func, **kwargs)
 
 	def appendObject(self, key, obj: object, set_new=True):
 		"""
@@ -468,18 +513,20 @@ class CachePool:
 		if self.contains(key):
 			self.getItem(key).remove(obj)
 
-	def queryObjects(self, key, cond: callable = None, **kwargs) -> QuerySet or list:
+	def queryObjects(self, key, cond: callable = None,
+					 listed=False, **kwargs) -> QuerySet or list:
 		"""
 		读取所有指定类型的 Object
 		Args:
 			key (object): 键
 			cond (callable): 查询函数
+			listed (bool): 以数组形式返回
 			**kwargs (**dict): 查询参数
 		Returns:
 			返回该类型数据 QuerySet 或者 列表
 		"""
 		if self.contains(key):
-			return self.getItem(key).query(cond, **kwargs)
+			return self.getItem(key).query(cond, listed, **kwargs)
 		return []
 
 	def ensureObjects(self, key, error: ErrorType,
@@ -498,30 +545,33 @@ class CachePool:
 			return self.getItem(key).ensure(error, cond, **kwargs)
 		return []
 
-	def getObject(self, key, cond: callable = None, **kwargs) -> models.Model:
+	def getObject(self, key, cond: callable = None,
+				  listed=False, **kwargs) -> models.Model:
 		"""
 		读取单个指定条件类型的 Object
 		Args:
 			key (object): 键
 			cond (callable): 查询函数
+			listed (bool): 以数组形式返回
 			**kwargs (**dict): 查询参数
 		Returns:
 			返回指定条件类型的第一个数据
 		"""
 		if self.contains(key):
-			return self.getItem(key).get(cond, **kwargs)
+			return self.getItem(key).get(cond, listed, **kwargs)
 		return None
 
-	def firstObject(self, key) -> models.Model:
+	def firstObject(self, key, listed=False) -> models.Model:
 		"""
 		读取第一个指定类型的 Object
 		Args:
 			key (object): 键
+			listed (bool): 以数组形式返回
 		Returns:
 			返回指定类型的第一个数据
 		"""
 		if self.contains(key):
-			return self.getItem(key).first()
+			return self.getItem(key).first(listed)
 		return None
 
 	def contains(self, key) -> bool:
@@ -659,7 +709,7 @@ class CacheableObject:
 		self.cache_values = {}
 		self.cache_pool = CachePool()
 
-		self._setupCachePool()
+		# self._setupCachePool()
 
 	# 配置缓存池
 	def _setupCachePool(self):
@@ -670,8 +720,10 @@ class CacheableObject:
 
 	# region 缓存池操作
 
-	def _setModelCache(self, cla=None, key=None, save=True, objects=None, **kwargs):
-		self.cache_pool.setObjects(cla, key, save, objects, **kwargs)
+	def _setModelCache(self, cla=None, key=None, objects=None,
+					   reload_func=None, save=True, **kwargs):
+		self.cache_pool.setObjects(cla, key, objects,
+								   reload_func, save, **kwargs)
 
 	def _appendModelCache(self, key, obj: object, set_new=True):
 		self.cache_pool.appendObject(key, obj, set_new)
@@ -679,18 +731,20 @@ class CacheableObject:
 	def _removeModelCache(self, key, obj: object):
 		self.cache_pool.removeObject(key, obj)
 
-	def _queryModelCache(self, key, cond: callable = None, **kwargs) -> QuerySet or list:
-		return self.cache_pool.queryObjects(key, cond, **kwargs)
+	def _queryModelCache(self, key, cond: callable = None,
+						 listed=False, **kwargs) -> QuerySet or list:
+		return self.cache_pool.queryObjects(key, cond, listed, **kwargs)
 
 	def _ensureModelCache(self, key, error: ErrorType,
 					  cond: callable = None, **kwargs) -> QuerySet or list:
 		return self.cache_pool.ensureObjects(key, error, cond, **kwargs)
 
-	def _getModelCache(self, key, cond: callable = None, **kwargs) -> models.Model:
-		return self.cache_pool.getObject(key, cond, **kwargs)
+	def _getModelCache(self, key, cond: callable = None,
+					   listed=False, **kwargs) -> models.Model:
+		return self.cache_pool.getObject(key, cond, listed, **kwargs)
 
-	def _firstModelCache(self, key) -> models.Model:
-		return self.cache_pool.firstObject(key)
+	def _firstModelCache(self, key, listed=False) -> models.Model:
+		return self.cache_pool.firstObject(key, listed)
 
 	def _containsModelKey(self, key) -> bool:
 		return self.cache_pool.contains(key)
@@ -758,7 +812,7 @@ class CacheableModel(models.Model, CacheableObject):
 		self.cache_values = {}
 		self.cache_pool = CachePool()
 
-		self._setupCachePool()
+		# self._setupCachePool()
 
 		super().__init__(*args, **kwargs)
 
@@ -767,8 +821,16 @@ class CacheableModel(models.Model, CacheableObject):
 		super()._setupCachePool()
 
 		for cla in self._cacheOneToOneModels():
-			obj = self._getOneToOneModelInDb(cla)
-			self._setModelCache(key=cla, objects=[obj])
+
+			def genReloadFunc():
+				_cla = cla
+
+				def reloadFunc():
+					return [self._getOneToOneModelInDb(_cla)]
+
+				return reloadFunc
+
+			self._setModelCache(key=cla, reload_func=genReloadFunc())
 
 		for cla in self._cacheForeignKeyModels():
 			objs = self._getForeignKeyModelInDb(cla)
@@ -829,7 +891,7 @@ class CacheableModel(models.Model, CacheableObject):
 
 		if not self.saved:
 			super().save(*args, **kwargs)
-			print(str(self) + " saved!")
+			# print(str(self) + " saved!")
 			self.saved = True
 
 		self.cache_pool.saveAll()

@@ -13,8 +13,8 @@ class ExerHub(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有玩家
 	def owner(self): return self.player
@@ -31,8 +31,8 @@ class ExerGiftPool(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有玩家
 	def owner(self): return self.player
@@ -49,8 +49,8 @@ class ExerFragPack(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有玩家
 	def owner(self): return self.player
@@ -59,7 +59,7 @@ class ExerFragPack(PackContainer):
 # ===================================================
 #  艾瑟萌槽表
 # ===================================================
-@ItemManager.registerSlotContainer("艾瑟萌槽")  # , ContItems.ExerSlotItem)
+@ItemManager.registerSlotContainer("艾瑟萌槽")
 class ExerSlot(SlotContainer):
 
 	# 玩家
@@ -73,9 +73,9 @@ class ExerSlot(SlotContainer):
 
 	# 创建一个艾瑟萌槽（选择艾瑟萌时候执行）
 	def _create(self, player, player_exers):
-		super()._create()
 		self.player = player
 		self.init_exers = player_exers
+		super()._create()
 
 	def _equipContainer(self, index):
 		if index == 0: return self.exactlyPlayer().exerHub()
@@ -180,9 +180,9 @@ class ExerSkillSlot(SlotContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player_exer):
-		super()._create()
 		self.player_exer = player_exer
 		self.skills = player_exer.exermon().skills()
+		super()._create()
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
@@ -195,7 +195,7 @@ class ExerSkillSlot(SlotContainer):
 	def owner(self): return self.player_exer
 
 	# 持有玩家
-	def ownerPlayer(self): return self.owner().player
+	def ownerPlayer(self): return self.owner().ownerPlayer()
 
 
 # ===================================================
@@ -216,8 +216,8 @@ class ExerPack(PackContainer):
 
 	# 创建一个背包（创建角色时候执行）
 	def _create(self, player):
-		super()._create()
 		self.player = player
+		super()._create()
 
 	# 持有玩家
 	def owner(self): return self.player
@@ -246,8 +246,8 @@ class ExerEquipSlot(SlotContainer, ParamsObject):
 
 	# 创建一个槽（创建角色时候执行）
 	def _create(self, exer_slot_item):
-		super()._create()
 		self.exer_slot_item = exer_slot_item
+		super()._create()
 
 	def exerSlotItem(self):
 		return self.exactlyPlayer().getContItem(

@@ -266,6 +266,10 @@ class AdminXHelper:
 
 		val = list(set(val))
 
+		if 'id' in val:
+			val.remove('id')
+			val.insert(0, 'id')
+
 		setattr(adminx_cla, key, val)
 
 	# endregion
