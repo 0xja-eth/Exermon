@@ -821,6 +821,7 @@ class CacheableModel(models.Model, CacheableObject):
 		super()._setupCachePool()
 
 		for cla in self._cacheOneToOneModels():
+			if cla is None: continue
 
 			def genReloadFunc():
 				_cla = cla
@@ -833,6 +834,7 @@ class CacheableModel(models.Model, CacheableObject):
 			self._setModelCache(key=cla, reload_func=genReloadFunc())
 
 		for cla in self._cacheForeignKeyModels():
+			if cla is None: continue
 			objs = self._getForeignKeyModelInDb(cla)
 			self._setModelCache(key=cla, objects=objs)
 

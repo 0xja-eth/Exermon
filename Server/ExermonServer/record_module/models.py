@@ -805,7 +805,8 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			对应ID的题目关系对象
 		"""
-		return self._getModelCache(self.playerQuesClass(), id=question_id)
+		return self._getModelCache(self.playerQuesClass(),
+								   question_id=question_id)
 
 	def _initQuestionCache(self):
 		"""

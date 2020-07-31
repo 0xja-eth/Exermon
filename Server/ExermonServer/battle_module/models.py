@@ -80,10 +80,10 @@ class BattleRecord(CacheableModel):
 	]
 
 	# 对战玩家缓存键
-	BATTLE_PLAYERS_CACHE_KEY = "players"
+	# BATTLE_PLAYERS_CACHE_KEY = "players"
 
 	# 对战玩家缓存键
-	BATTLE_ROUNDS_CACHE_KEY = "rounds"
+	# BATTLE_ROUNDS_CACHE_KEY = "rounds"
 
 	# 对战模式
 	mode = models.PositiveSmallIntegerField(default=BattleMode.Normal.value,
@@ -102,9 +102,8 @@ class BattleRecord(CacheableModel):
 	def __str__(self):
 		return "%s. %s" % (str(self.id), self.generateName())
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self._setupCachePool()
+	# def __init__(self, *args, **kwargs):
+	# 	super().__init__(*args, **kwargs)
 
 	def generateName(self):
 		"""
@@ -127,6 +126,10 @@ class BattleRecord(CacheableModel):
 		return '-' if player is None else str(player)
 
 	adminPlayer2.short_description = "玩家2"
+
+	@classmethod
+	def _cacheForeignKeyModels(cls):
+		return [BattlePlayer, BattleRound]
 
 	@classmethod
 	def create(cls, player1: Player, player2: Player, mode: int) -> 'BattleRecord':
@@ -188,7 +191,7 @@ class BattleRecord(CacheableModel):
 			player1 (Player): 玩家1
 			player2 (Player): 玩家2
 		"""
-		self._initCaches()
+		self._setupCachePool()
 
 		self.addPlayer(player1)
 		self.addPlayer(player2)
@@ -209,26 +212,15 @@ class BattleRecord(CacheableModel):
 
 		self.save()
 
-	def _initCaches(self):
-		"""
-		初始化所有缓存数据
-		"""
-		# self._cache(self.BATTLE_PLAYERS_CACHE_KEY, [])
-		# self._cache(self.BATTLE_ROUNDS_CACHE_KEY, [])
-
 	# region 玩家操作
 
-	def battlePlayers(self) -> QuerySet:
+	def battlePlayers(self) -> QuerySet or list:
 		"""
-		获取对战玩家
+		获取战斗玩家
 		Returns:
-			对战玩家 QuerySet 对象
+			返回战斗玩家集
 		"""
-		# 结算时间为空，表示正在对战中
-		if self.result_time is None:
-			return self._getCachedBattlePlayers()
-
-		return self.battleplayer_set.all()
+		return self._queryModelCache(BattlePlayer)
 
 	def firstPlayer(self) -> 'BattlePlayer':
 		"""
@@ -236,14 +228,9 @@ class BattleRecord(CacheableModel):
 		Returns:
 			如果有第一个玩家，则返回其实例，否则返回 None
 		"""
-		# 结算时间为空，表示正在对战中
-		if self.result_time is None:
-			players = self._getCachedBattlePlayers()
-			return players[0] if players is not None else None
-
 		players = self.battlePlayers()
-		if players.count() >= 1:
-			return players[0]
+		if players.count() >= 1: return players[0]
+
 		return None
 
 	def secondPlayer(self) -> 'BattlePlayer':
@@ -252,13 +239,9 @@ class BattleRecord(CacheableModel):
 		Returns:
 			如果有第二个玩家，则返回其实例，否则返回 None
 		"""
-		if self.result_time is None:
-			players = self._getCachedBattlePlayers()
-			return players[1] if players is not None else None
-
 		players = self.battlePlayers()
-		if players.count() >= 2:
-			return players[1]
+		if players.count() >= 2: return players[1]
+
 		return None
 
 	def getBattlePlayer(self, player: Player = None, battle_player: 'BattlePlayer' = None):
@@ -316,38 +299,29 @@ class BattleRecord(CacheableModel):
 			player (Player): 玩家
 		"""
 		player = BattlePlayer.create(player, record=self)
-		self._addBattlePlayerCache(player)
+		self._addBattlePlayer(player)
 
 		return player
 
-	def _addBattlePlayerCache(self, player: 'BattlePlayer'):
+	def _addBattlePlayer(self, player: 'BattlePlayer'):
 		"""
 		添加对战玩家到缓存中
 		Args:
 			player (BattlePlayer): 对战玩家
 		"""
-		cache = self._getCachedBattlePlayers()
-		cache.append(player)
-
-	def _getCachedBattlePlayers(self) -> list:
-		"""
-		获取缓存对战玩家数组
-		Returns:
-			返回当前缓存对战玩家数组
-		"""
-		return self._getCache(self.BATTLE_PLAYERS_CACHE_KEY)
+		self._appendModelCache(BattlePlayer, player)
 
 	# endregion
 
 	# region 回合操作
 
-	def battleRounds(self) -> QuerySet:
+	def battleRounds(self) -> QuerySet or list:
 		"""
-		获取所有对战回合数据
+		获取对战回合数据
 		Returns:
-			对战回合 QuerySet 对象
+			返回对战回合数据
 		"""
-		return self.battleround_set.all()
+		return self._queryModelCache(BattleRound)
 
 	def currentRound(self) -> 'BattleRound':
 		"""
@@ -356,22 +330,22 @@ class BattleRecord(CacheableModel):
 			若对战未结束，返回最后一个回合（当前回合），否则返回空
 		"""
 		if self.result_time is not None: return None
-		cache = self._getCachedBattleRounds()
+		rounds = list(self.battleRounds())
 
-		if len(cache) > 0: return cache[-1]
+		if len(rounds) > 0: return rounds[-1]
 		return None
 
 	def addRound(self) -> 'BattleRound':
 		"""
 		添加一个对战回合
 		"""
-		cache = self._getCachedBattleRounds()
-		round = BattleRound.create(self, len(cache))
+		rounds = self.battleRounds()
+		round = BattleRound.create(self, len(rounds))
 
-		players = self._getCachedBattlePlayers()
+		players = self.battlePlayers()
 		for player in players: player.addRound(round)
 
-		self._addBattleRoundCache(round)
+		self._addBattleRound(round)
 
 		return round
 
@@ -379,25 +353,16 @@ class BattleRecord(CacheableModel):
 		"""
 		开始当前回合（答题用）
 		"""
-		players = self._getCachedBattlePlayers()
+		players = self.battlePlayers()
 		for player in players: player.startCurrentRound()
 
-	def _addBattleRoundCache(self, round: 'BattleRound'):
+	def _addBattleRound(self, round: 'BattleRound'):
 		"""
 		添加对战回合到缓存中
 		Args:
 			round (BattleRound): 对战回合
 		"""
-		cache = self._getCachedBattleRounds()
-		cache.append(round)
-
-	def _getCachedBattleRounds(self) -> list:
-		"""
-		获取缓存对战回合数组
-		Returns:
-			返回当前缓存对战回合数组
-		"""
-		return self._getCache(self.BATTLE_ROUNDS_CACHE_KEY)
+		self._appendModelCache(BattleRound, round)
 
 	# endregion
 
