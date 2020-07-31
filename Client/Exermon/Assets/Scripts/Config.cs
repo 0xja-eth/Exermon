@@ -24,7 +24,7 @@ public class Config {
 	/// <summary>
 	/// 前端副版本号
 	/// </summary>
-	public const string LocalSubVersion = "20200717";
+	public const string LocalSubVersion = "20200731";
 
 	/// <summary>
 	/// 初始场景

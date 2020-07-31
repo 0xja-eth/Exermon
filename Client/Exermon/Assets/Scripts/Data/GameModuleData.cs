@@ -472,7 +472,7 @@ namespace GameModule.Data {
         [AutoConvert]
         public CompRank[] compRanks { get; protected set; }
         [AutoConvert]
-        public ResultJudge[] resultJudges { get; protected set; }
+        public BattleResultJudge[] battleResultJudges { get; protected set; }
 
 		[AutoConvert]
 		public GameTip[] gameTips { get; protected set; }

@@ -423,8 +423,8 @@ namespace GameModule.Services {
         public CompRank compRank(int id) {
             return get(staticData.configure.compRanks, id);
         }
-        public ResultJudge resultJudge(int id) {
-            return get(staticData.configure.resultJudges, id);
+        public BattleResultJudge battleResultJudge(int id) {
+            return get(staticData.configure.battleResultJudges, id);
 		}
 		public GameTip gameTip(int id) {
 			return get(staticData.configure.gameTips, id);

@@ -359,7 +359,7 @@ class BattlePointCalc:
         for param in params:
             attr = param.attr
             if attr == 'def': attr = 'def_'
-            kwargs[attr] = func(param.id)
+            kwargs[attr] = func(param_id=param.id)
 
         return cls.doCalc(**kwargs)
 

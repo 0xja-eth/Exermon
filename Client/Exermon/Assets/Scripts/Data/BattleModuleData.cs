@@ -41,7 +41,7 @@ namespace BattleModule.Data {
     /// <summary>
     /// 评分数据
     /// </summary>
-    public class ResultJudge : TypeData, IComparable<ResultJudge> {
+    public class BattleResultJudge : TypeData, IComparable<BattleResultJudge> {
 
         /// <summary>
         /// 属性
@@ -58,7 +58,7 @@ namespace BattleModule.Data {
         /// </summary>
         /// <param name="b">另一实例</param>
         /// <returns>大小关系</returns>
-        public int CompareTo(ResultJudge b) {
+        public int CompareTo(BattleResultJudge b) {
             return score.CompareTo(b.score);
         }
     }
@@ -404,7 +404,7 @@ namespace BattleModule.Data {
         /// <summary>
         /// 评价（缓存）
         /// </summary>
-        ResultJudge judge_ = null;
+        BattleResultJudge judge_ = null;
 
         /// <summary>
         /// 最终评分
@@ -421,10 +421,10 @@ namespace BattleModule.Data {
         /// 获取评价
         /// </summary>
         /// <returns>返回评价</returns>
-        public ResultJudge judge() {
+        public BattleResultJudge judge() {
             if (judge_ == null) {
                 var score = this.score();
-                var judges = DataService.get().staticData.configure.resultJudges;
+                var judges = DataService.get().staticData.configure.battleResultJudges;
                 judge_ = judges[0];
                 foreach (var judge in judges)
                     if (score >= judge.score) judge_ = judge;
