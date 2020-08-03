@@ -29,6 +29,7 @@ public class Config {
 	/// <summary>
 	/// 初始场景
 	/// </summary>
-	public const SceneSystem.Scene FirstScene = SceneSystem.Scene.TitleScene;
+	//public const SceneSystem.Scene FirstScene = SceneSystem.Scene.TitleScene;
+	public const SceneSystem.Scene FirstScene = SceneSystem.Scene.CorrectTestScene;
 
 }

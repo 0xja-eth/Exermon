@@ -13,16 +13,14 @@ namespace UI.Common.Controls.InputFields {
     /// </summary>
     public class DateTimePickersPlane : ToggleWindow {
 
-        /// <summary>
-        /// 外部组件设置
-        /// </summary>
+		/// <summary>
+		/// 外部组件设置
+		/// </summary>
 
-        /// <summary>
-        /// 内部变量设置
-        /// </summary>
-        bool enter = false;
-
-        DateTimeField field;
+		/// <summary>
+		/// 内部变量设置
+		/// </summary>
+		DateTimeField field;
 
         #region 启动窗口
 
