@@ -54,13 +54,13 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="data"></param>
         /// <returns></returns>
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ListeningSubQuestion() {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ListeningSubQuestion() {
 
-		}
-	}
+        }
+    }
 
     /// <summary>
     /// 听力题
@@ -80,10 +80,10 @@ namespace ExerPro.EnglishModule.Data {
         //public string eventName { get; protected set; }
         //[AutoConvert]
         //public Texture2D picture { get; protected set; }
-		[AutoConvert]
-		public int times { get; protected set; }
+        [AutoConvert]
+        public int times { get; protected set; }
 
-        }
+    }
 
     /*
     /// <summary>
@@ -106,9 +106,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// 删除率
 		/// </summary>
 		const int DropoutRate = 50;
-		const int DropoutThreshold = 5;
+        const int DropoutThreshold = 5;
 
-		/// <summary>
+        /// <summary>
         /// 属性
         /// </summary>
         [AutoConvert]
@@ -122,65 +122,65 @@ namespace ExerPro.EnglishModule.Data {
         public string[] option1 = {
             "sb. to do sth.", "sb. do sth.", "sb. doing sth.", "sb. into doing sth.", "sb. for doing sth.", "sb. of sth.", "sth. for sb." };
         public string[] option2 = {
-			"doing sth.", "to do sth.", "to doing sth." };
+            "doing sth.", "to do sth.", "to doing sth." };
         public string[] option3 = {
-			"about", "at", "for", "from", "in", "of", "with", "to" };
+            "about", "at", "for", "from", "in", "of", "with", "to" };
         public string[] option = {
-			"about", "at", "for", "from", "in", "of", "with", "to" ,
+            "about", "at", "for", "from", "in", "of", "with", "to" ,
             "doing sth.", "to do sth." ,"to doing sth.", "sb. to do sth.", "sb. doing sth.",
             "sb. into doing sth.", "sb. of sth", "sth. for sb." };
 
-		/// <summary>
-		/// 缓存选项
-		/// </summary>
-		string[] tmpOptions = null;
+        /// <summary>
+        /// 缓存选项
+        /// </summary>
+        string[] tmpOptions = null;
 
-		/// <summary>
-		/// 生成选项
-		/// </summary>
-		/// <returns></returns>
+        /// <summary>
+        /// 生成选项
+        /// </summary>
+        /// <returns></returns>
         public string[] options() {
-			if (tmpOptions == null) {
-				if (option1.ToList().Contains(phrase))
-					tmpOptions = option1;
-				else if (option2.ToList().Contains(phrase))
-					tmpOptions = option2;
-				else if (option3.ToList().Contains(phrase))
-					tmpOptions = option3;
-				else tmpOptions = option;
-        } 
-			return dropout(tmpOptions);
-		}
+            if (tmpOptions == null) {
+                if (option1.ToList().Contains(phrase))
+                    tmpOptions = option1;
+                else if (option2.ToList().Contains(phrase))
+                    tmpOptions = option2;
+                else if (option3.ToList().Contains(phrase))
+                    tmpOptions = option3;
+                else tmpOptions = option;
+            }
+            return dropout(tmpOptions);
+        }
 
-		/// <summary>
-		/// 随机删除
-		/// </summary>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		string[] dropout(string[] options) {
-			var res = new List<string>();
-			foreach (var opt in options) {
-				var rand = UnityEngine.Random.Range(0, 100);
-				if (res.Count >= DropoutThreshold) {
-					if (rand >= DropoutRate) res.Add(opt);
-			}
+        /// <summary>
+        /// 随机删除
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        string[] dropout(string[] options) {
+            var res = new List<string>();
+            foreach (var opt in options) {
+                var rand = UnityEngine.Random.Range(0, 100);
+                if (res.Count >= DropoutThreshold) {
+                    if (rand >= DropoutRate) res.Add(opt);
+                }
                 else res.Add(opt);
             }
-			if (!res.Contains(phrase)) res.Add(phrase);
-			return res.ToArray();
-		}
+            if (!res.Contains(phrase)) res.Add(phrase);
+            return res.ToArray();
+        }
 
-		/// <summary>
-		/// 清除缓存选项
-		/// </summary>
-		public void resetOptions() {
-			tmpOptions = null;
-		}
+        /// <summary>
+        /// 清除缓存选项
+        /// </summary>
+        public void resetOptions() {
+            tmpOptions = null;
+        }
 
-		/// <summary>
-		/// 测试
-		/// </summary>
-		/// <returns></returns>
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <returns></returns>
         public static PhraseQuestion sample() {
             long i = UnityEngine.Random.Range(0, 10000);
 
@@ -224,12 +224,12 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public class WrongItem : BaseData {
 
-			/// <summary>
-			/// 类型枚举
-			/// </summary>
-			public enum Type {
-				Add = 1, Edit = 2, Delete = 3
-			}
+            /// <summary>
+            /// 类型枚举
+            /// </summary>
+            public enum Type {
+                Add = 1, Edit = 2, Delete = 3
+            }
 
             /// <summary>
             /// 属性
@@ -243,79 +243,79 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public string word { get; protected set; }
 
-			/// <summary>
-			/// 对应题目
-			/// </summary>
-			public CorrectionQuestion question { get; set; }
+            /// <summary>
+            /// 对应题目
+            /// </summary>
+            public CorrectionQuestion question { get; set; }
 
-			/// <summary>
-			/// 缓存转换结果
-			/// </summary>
-			FrontendWrongItem tempFrontendWrongItem = null;
+            /// <summary>
+            /// 缓存转换结果
+            /// </summary>
+            FrontendWrongItem tempFrontendWrongItem = null;
 
-			/// <summary>
-			/// 类型文本
-			/// </summary>
-			/// <returns></returns>
-			public string typeText() {
+            /// <summary>
+            /// 类型文本
+            /// </summary>
+            /// <returns></returns>
+            public string typeText() {
                 return DataService.get().correctType(type).Item2;
             }
 
-			/// <summary>
-			/// 类型枚举
-			/// </summary>
-			/// <returns></returns>
-			public Type typeEnum() {
-				return (Type)type;
-			}
+            /// <summary>
+            /// 类型枚举
+            /// </summary>
+            /// <returns></returns>
+            public Type typeEnum() {
+                return (Type)type;
+            }
 
-			/// <summary>
-			/// 转化为前端错误项
-			/// </summary>
-			/// <returns></returns>
-			public FrontendWrongItem convertToFrontendWrongItem() {
-				return tempFrontendWrongItem = tempFrontendWrongItem ?? 
-					new FrontendWrongItem(sentenceIndex, wordIndex, convertFrontentWord());
-			}
+            /// <summary>
+            /// 转化为前端错误项
+            /// </summary>
+            /// <returns></returns>
+            public FrontendWrongItem convertToFrontendWrongItem() {
+                return tempFrontendWrongItem = tempFrontendWrongItem ??
+                    new FrontendWrongItem(sentenceIndex, wordIndex, convertFrontentWord());
+            }
 
-			/// <summary>
-			/// 获取原始单词
-			/// </summary>
-			/// <returns></returns>
-			string oriWord() {
-				return question.word(sentenceIndex, wordIndex);
-			}
+            /// <summary>
+            /// 获取原始单词
+            /// </summary>
+            /// <returns></returns>
+            string oriWord() {
+                return question.word(sentenceIndex, wordIndex);
+            }
 
-			/// <summary>
-			/// 获取下一单词
-			/// </summary>
-			/// <returns></returns>
-			string nextWord() {
-				return question.word(sentenceIndex, wordIndex+1);
-			}
+            /// <summary>
+            /// 获取下一单词
+            /// </summary>
+            /// <returns></returns>
+            string nextWord() {
+                return question.word(sentenceIndex, wordIndex + 1);
+            }
 
-			/// <summary>
-			/// 转化为前端文本
-			/// </summary>
-			/// <returns></returns>
-			string convertFrontentWord() {
-				switch (typeEnum()) {
-					case Type.Delete: return "";
-					case Type.Edit: return word;
-					case Type.Add:
-						if (wordIndex == 0) // 句首
-							return word + " " + nextWord();
-						else return oriWord() + " " + word;
-				}
-				return word;
-			}
+            /// <summary>
+            /// 转化为前端文本
+            /// </summary>
+            /// <returns></returns>
+            string convertFrontentWord() {
+                switch (typeEnum()) {
+                    case Type.Delete: return "";
+                    case Type.Edit: return word;
+                    case Type.Add:
+                        if (wordIndex == 0) // 句首
+                            return word + " " + nextWord();
+                        else return oriWord() + " " + word;
+                }
+                return word;
+            }
 
-		}
+        }
 
-		/// <summary>
-		/// 前端错误项
-		/// </summary>
-		public class FrontendWrongItem : BaseData {
+        /// <summary>
+        /// 前端错误项
+        /// </summary>
+        public class FrontendWrongItem : BaseData {
             /// <summary>
             /// 属性
             /// </summary>
@@ -326,13 +326,13 @@ namespace ExerPro.EnglishModule.Data {
             [AutoConvert]
             public string word { get; set; }
 
-			/// <summary>
-			/// 构造函数
-			/// </summary>
-			public FrontendWrongItem() { }
-			public FrontendWrongItem(int sid, int wid, string word) {
-				this.sid = sid; this.wid = wid;
-				this.word = word;
+            /// <summary>
+            /// 构造函数
+            /// </summary>
+            public FrontendWrongItem() { }
+            public FrontendWrongItem(int sid, int wid, string word) {
+                this.sid = sid; this.wid = wid;
+                this.word = word;
             }
         }
 
@@ -346,40 +346,46 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public WrongItem[] wrongItems { get; protected set; }
 
-		/// <summary>
-		/// 缓存句子
-		/// </summary>
-		string[] tmpSentences = null;
+        /// <summary>
+        /// 缓存句子
+        /// </summary>
+        string[] tmpSentences = null;
 
-		/// <summary>
-		/// 读取自定义属性
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void loadCustomAttributes(JsonData json) {
-			base.loadCustomAttributes(json);
-			foreach (var item in wrongItems)
-				item.question = this;
-		}
+        /// <summary>
+        /// 缓存单词
+        /// </summary>
+        string[] tepWords = null;
 
-		/// <summary>
-		/// 获取指定位置单词
-		/// </summary>
-		/// <param name="sid">句子ID（从1开始）</param>
-		/// <param name="wid">单词ID（从1开始，0表示句首）</param>
-		/// <returns></returns>
-		public string word(int sid, int wid) {
-			if (wid == 0) return "";
-			var words = this.words(sid);
-			if (wid > words.Length) return "";
-			return words[wid - 1];
-		}
 
-		/// <summary>
-		/// 获取句子数组
-		/// </summary>
-		/// <returns></returns>
-		public string[] sentences() {
-			if (tmpSentences == null) {
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
+            foreach (var item in wrongItems)
+                item.question = this;
+        }
+
+        /// <summary>
+        /// 获取指定位置单词
+        /// </summary>
+        /// <param name="sid">句子ID（从1开始）</param>
+        /// <param name="wid">单词ID（从1开始，0表示句首）</param>
+        /// <returns></returns>
+        public string word(int sid, int wid) {
+            if (wid == 0) return "";
+            var words = this.words(sid);
+            if (wid > words.Length) return "";
+            return words[wid - 1];
+        }
+
+        /// <summary>
+        /// 获取句子数组
+        /// </summary>
+        /// <returns></returns>
+        public string[] sentences() {
+            if (tmpSentences == null) {
                 //article = "I hardly remember my grandmother. a, “asdd.”She 12:20 a.m. Mr. Miss. 12:20 Mr. used to holding me ono her knees and sing old songs. I was only four when she passes away. She is just a distant memory for me now. I remember my grandfather very much. He was tall, with broad shoulder and a beard that turned from black toward gray over the years. He had a deep voice, which set himself apart from others in our small town, he was strong and powerful. In a fact, he even scared my classmates away during they came over to play or do homework with me. However, he was the gentlest man I have never known.";
                 //      article = "Dear Diary, " +
                 //"Here I am in the middle of a city, 350 miles far away from our farmhouse. Do you want to know why we move last week? Dad lost his job, and as Mom explained, “He was lucky to find other one.” His new job meant I had to say goodbye to my classmate, my school or just everything else I love in the world. To make matters bad, now I have to share a room with my younger sister, Maggie. Tomorrow is first day of school. I am awfully tiring, but I know I’ll never fall sleep." +
@@ -388,129 +394,133 @@ namespace ExerPro.EnglishModule.Data {
                 //article = "Mr Johnson is a hardworking teacher.|Every day, he spends too much time with his work.|With little sleep and hardly any break, so he works from morning till night.|Hard work have made him very ill.|“He has ruined his healthy.|We are worried about him.”|That is which other teachers say.|Yesterday afternoon, I paid visit to Mr.|Johnson.|I was eager to see him, but outside her room I stopped.|I had to calm myself down.|Quietly I step into the room.|I saw him lying in bed, looking at some of the picture we had taken together.|I understood that he missed us just as many as we missed him.";
 
                 string temp = article.Replace("\n", "");
-				temp = temp.Replace("\t", "");
-				temp = temp.Replace("\r", "");
+                temp = temp.Replace("\t", "");
+                temp = temp.Replace("\r", "");
 
-				//Queue<KeyValuePair<string, string>> matchWordList = new Queue<KeyValuePair<string, string>>();
-				//List<string> wordList = new List<string>();
-				//using (StreamReader sr = new StreamReader("word.txt")) {
-				//	string line;
-				//	while ((line = sr.ReadLine()) != null) {
-				//		wordList.Add(line);
-				//	}
-				//}
+                tmpSentences = temp.Split(new char[1] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return tmpSentences;
+        }
 
-				//foreach (string word in wordList) {
-				//	Regex regex = new Regex(word);
-				//	if (regex.IsMatch(temp)) {
-				//		string match = Regex.Match(temp, word).Value;
-				//		string hashCode = match.GetHashCode().ToString();
-				//		temp = temp.Replace(match, hashCode);
-				//		matchWordList.Enqueue(new KeyValuePair<string, string>(match, hashCode));
-				//	}
-				//}
-
-
-				//temp = temp.Replace("”", "\"");
-				//temp = temp.Replace("“", "\"");
-
-				//temp = Regex.Replace(temp, @"(?<str>[A-Z][^ ]*?)(\.)", "${str}#");
-
-				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])", "${str} ");
-				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#])  ", "${str} ");
-				//temp = Regex.Replace(temp, @"(?<str>[^A-Za-z0-9| |\-|’|#]) ", " ${str} ");
-
-				//temp = temp.Replace(",  \"", ",\"&");
-				//temp = temp.Replace(".  \"", ".\"&");
-				//temp = temp.Replace(" ? ", " ?&");
-				//temp = temp.Replace(" . ", " .&");
-				//temp = temp.Replace(" ! ", " !&");
-				//Debug.Log("aaa" + temp);
-
-				//temp = temp.Replace("#", ".");
-
-				//while (matchWordList.Count != 0) {
-				//	KeyValuePair<string, string> keyValuePair = matchWordList.Dequeue();
-				//	temp = temp.Replace(keyValuePair.Value, keyValuePair.Key);
-				//}
-
-				////去除重复空格
-				//temp = Regex.Replace(temp, " {2,}", " ");
-
-				tmpSentences = temp.Split(new char[2] { '|',' ' }, StringSplitOptions.RemoveEmptyEntries);
-			}
-			return tmpSentences;
-		}
-
-		/// <summary>
+        /// <summary>
 		/// 获取单词数组
 		/// </summary>
-		/// <param name="sid">句子ID（从1开始）</param>
 		/// <returns></returns>
-		public string[] words(int sid) {
-			if (sid <= 0) return new string[0];
-			var sentence = sentences()[sid - 1];
-			return sentence.Trim().Split(' ');
-		}
-	}
-	
-	/// <summary>
-	/// 剧情题目
-	/// </summary>
-	public class PlotQuestion : BaseQuestion {
+		public string[] words() {
+            if (tepWords == null) {
+                string temp = article.Replace("\n", "");
+                temp = temp.Replace("\t", "");
+                temp = temp.Replace("\r", "");
 
-		/// <summary>
-		/// 选项
-		/// </summary>
-		public new class Choice : BaseQuestion.Choice {
+                tepWords = temp.Split(new char[2] { '|', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return tepWords;
+        }
 
-			/// <summary>
-			/// 属性
-			/// </summary>
-			[AutoConvert]
-			public ExerProEffectData[] effects { get; protected set; }
-			[AutoConvert]
-			public int gold { get; protected set; }
-			[AutoConvert]
-			public string resultText { get; protected set; }
 
-		}
+        /// <summary>
+        /// 获取单词的在句中的id
+        /// </summary>
+        /// <returns></returns>
+        public int wid(int index) {
+            string[] sen = sentences();
+            int senid = sid(index);
+            Debug.Log("bbbindex" + index);
+            Debug.Log("bbbsenid" + senid);
+            int wordNum = 0;
+            for(int i = 1; i < senid; i++) {
+                wordNum += words(i).Length;
+                Debug.Log("bbbwordNum" + wordNum);
+            }
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public string eventName { get; protected set; }
-		[AutoConvert]
-		public Texture2D picture { get; protected set; }
+            return index - wordNum + 1;
+        }
 
-		/// <summary>
-		/// 加载选项Item属性
-		/// </summary>
-		/// <param name="data"></param>
-		/// <returns></returns>
-		protected override BaseQuestion.Choice loadChoice(JsonData data) {
-			return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
-		}
+        /// <summary>
+        /// 获取单词的句子id
+        /// </summary>
+        /// <returns></returns>
+        public int sid(int index) {
+            string[] sen = sentences();
+            int sid = 1;
+            int wordNum = sen[0].Split(new char[1] {' '}).Length;
+            for (int i = 1; i < sen.Length; i++) {
+                if (index < wordNum) break;
+                wordNum += sen[i].Split(new char[1] { ' ' }).Length;
+                sid++;
+            }
+            return sid;
+        }
 
-		/// <summary>
-		/// 选项
-		/// </summary>
-		public new Choice[] choices {
-			get {
-				var choices = base.choices;
-				List<Choice> listTemp = new List<Choice>();
-				foreach (var choice in choices)
-					listTemp.Add(choice as Choice);
-				return listTemp.ToArray();
-			}
-		}
-	}
+        /// <summary>
+        /// 获取单词数组
+        /// </summary>
+        /// <param name="sid">句子ID（从1开始）</param>
+        /// <returns></returns>
+        public string[] words(int sid) {
+            if (sid <= 0) return new string[0];
+            var sentence = sentences()[sid - 1];
+            return sentence.Trim().Split(' ');
+        }
+    }
 
-	/// <summary>
-	/// 单词
-	/// </summary>
-	public class Word : BaseData {
+    /// <summary>
+    /// 剧情题目
+    /// </summary>
+    public class PlotQuestion : BaseQuestion {
+
+        /// <summary>
+        /// 选项
+        /// </summary>
+        public new class Choice : BaseQuestion.Choice {
+
+            /// <summary>
+            /// 属性
+            /// </summary>
+            [AutoConvert]
+            public ExerProEffectData[] effects { get; protected set; }
+            [AutoConvert]
+            public int gold { get; protected set; }
+            [AutoConvert]
+            public string resultText { get; protected set; }
+
+        }
+
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public string eventName { get; protected set; }
+        [AutoConvert]
+        public Texture2D picture { get; protected set; }
+
+        /// <summary>
+        /// 加载选项Item属性
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected override BaseQuestion.Choice loadChoice(JsonData data) {
+            return DataLoader.load<Choice>(data) as BaseQuestion.Choice;
+        }
+
+        /// <summary>
+        /// 选项
+        /// </summary>
+        public new Choice[] choices {
+            get {
+                var choices = base.choices;
+                List<Choice> listTemp = new List<Choice>();
+                foreach (var choice in choices)
+                    listTemp.Add(choice as Choice);
+                return listTemp.ToArray();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 单词
+    /// </summary>
+    public class Word : BaseData {
 
         /// <summary>
         /// 属性
@@ -567,20 +577,20 @@ namespace ExerPro.EnglishModule.Data {
             return EnglishService.get().getQuestion<Word>(wordId);
         }
 
-		/// <summary>
-		/// 回答
-		/// </summary>
-		/// <param name="correct"></param>
-		public void answer(bool correct) {
-			currentDone = true;
-			currentCorrect = correct;
-		}
+        /// <summary>
+        /// 回答
+        /// </summary>
+        /// <param name="correct"></param>
+        public void answer(bool correct) {
+            currentDone = true;
+            currentCorrect = correct;
+        }
 
-		/// <summary>
-		/// 是否当前轮正确单词
-		/// </summary>
-		/// <returns></returns>
-		public bool isCurrentCorrect() {
+        /// <summary>
+        /// 是否当前轮正确单词
+        /// </summary>
+        /// <returns></returns>
+        public bool isCurrentCorrect() {
             return currentDone && currentCorrect;
         }
 
@@ -609,31 +619,31 @@ namespace ExerPro.EnglishModule.Data {
 
     }
 
-	#endregion
+    #endregion
 
-	#region 物品
+    #region 物品
 
-	/// <summary>
-	/// 特训物品星级数据
-	/// </summary>
-	public class ExerProItemStar : TypeData {
+    /// <summary>
+    /// 特训物品星级数据
+    /// </summary>
+    public class ExerProItemStar : TypeData {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public Color color { get; protected set; }
-	}
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public Color color { get; protected set; }
+    }
 
-	/// <summary>
-	/// 特训效果数据
-	/// </summary>
-	public class ExerProEffectData : BaseData {
+    /// <summary>
+    /// 特训效果数据
+    /// </summary>
+    public class ExerProEffectData : BaseData {
 
-		/// <summary>
-		/// 效果代码枚举
-		/// </summary>
-		public enum Code {
+        /// <summary>
+        /// 效果代码枚举
+        /// </summary>
+        public enum Code {
             Unset = 0, // 空
 
             Attack = 1, // 造成伤害
@@ -670,243 +680,243 @@ namespace ExerPro.EnglishModule.Data {
             ChangeCostDisc = 401, // 更改耗能（发现）
             ChangeCostCrazy = 402, // 更改耗能（疯狂）
 
-			GainGold = 500, // 获得金币
-			GainCard = 510, // 获得卡牌
-			DropCard = 511, // 失去卡牌
-			CopyCard = 512, // 复制卡牌
-			GainItem = 520, // 获得道具
-			LoseItem = 521, // 失去道具
-			GainPotion = 530, // 获得药水
-			LosePotion = 531, // 失去药水
+            GainGold = 500, // 获得金币
+            GainCard = 510, // 获得卡牌
+            DropCard = 511, // 失去卡牌
+            CopyCard = 512, // 复制卡牌
+            GainItem = 520, // 获得道具
+            LoseItem = 521, // 失去道具
+            GainPotion = 530, // 获得药水
+            LosePotion = 531, // 失去药水
 
-		}
+        }
 
-		/// <summary>
-		/// 效果范围
-		/// </summary>
-		static readonly int[] AttackEffectRange = new int[] { 1, 99 };
-		static readonly int[] RecoverEffectRange = new int[] { 100, 199 };
-		static readonly int[] BuffEffectRange = new int[] { 200, 219 };
-		static readonly int[] StateEffectRange = new int[] { 220, 229 };
-		static readonly int[] EnergyEffectRange = new int[] { 230, 239 };
-		static readonly int[] CardEffectRange = new int[] { 300, 399 };
-		static readonly int[] CostEffectRange = new int[] { 400, 499 };
+        /// <summary>
+        /// 效果范围
+        /// </summary>
+        static readonly int[] AttackEffectRange = new int[] { 1, 99 };
+        static readonly int[] RecoverEffectRange = new int[] { 100, 199 };
+        static readonly int[] BuffEffectRange = new int[] { 200, 219 };
+        static readonly int[] StateEffectRange = new int[] { 220, 229 };
+        static readonly int[] EnergyEffectRange = new int[] { 230, 239 };
+        static readonly int[] CardEffectRange = new int[] { 300, 399 };
+        static readonly int[] CostEffectRange = new int[] { 400, 499 };
 
-		static readonly int[] PlotEffectRange = new int[] { 500, 599 };
+        static readonly int[] PlotEffectRange = new int[] { 500, 599 };
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public int code { get; protected set; }
-		[AutoConvert("params")]
-		public JsonData params_ { get; protected set; } // 参数（数组）
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int code { get; protected set; }
+        [AutoConvert("params")]
+        public JsonData params_ { get; protected set; } // 参数（数组）
 
-		#region 数据获取
+        #region 数据获取
 
-		/// <summary>
-		/// 获取指定下标下的数据
-		/// </summary>
-		/// <typeparam name="T">类型</typeparam>
-		/// <param name="index">下标</param>
-		/// <param name="default_">默认值</param>
-		/// <returns></returns>
-		public T get<T>(int index, T default_ = default) {
-			if (params_ == null || !params_.IsArray) return default_;
-			if (index < params_.Count) return DataLoader.load<T>(params_[index]);
-			return default_;
-		}
+        /// <summary>
+        /// 获取指定下标下的数据
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="index">下标</param>
+        /// <param name="default_">默认值</param>
+        /// <returns></returns>
+        public T get<T>(int index, T default_ = default) {
+            if (params_ == null || !params_.IsArray) return default_;
+            if (index < params_.Count) return DataLoader.load<T>(params_[index]);
+            return default_;
+        }
 
-		/// <summary>
-		/// 效果代码枚举
-		/// </summary>
-		/// <returns></returns>
-		public Code codeEnum() {
-			return (Code)code;
-		}
+        /// <summary>
+        /// 效果代码枚举
+        /// </summary>
+        /// <returns></returns>
+        public Code codeEnum() {
+            return (Code)code;
+        }
 
-		#endregion
+        #endregion
 
-		#region 效果判断
+        #region 效果判断
 
-		/// <summary>
-		/// 效果代码是否属于某范围
-		/// </summary>
-		/// <param name="range">范围（最小值，最大值）</param>
-		/// <returns></returns>
-		public bool isCodeInsideRange(int[] range) {
-			return range[0] <= code && code <= range[1];
-		}
+        /// <summary>
+        /// 效果代码是否属于某范围
+        /// </summary>
+        /// <param name="range">范围（最小值，最大值）</param>
+        /// <returns></returns>
+        public bool isCodeInsideRange(int[] range) {
+            return range[0] <= code && code <= range[1];
+        }
 
-		/// <summary>
-		/// 是否攻击效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isAttackEffect() {
-			return isCodeInsideRange(AttackEffectRange);
-		}
+        /// <summary>
+        /// 是否攻击效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isAttackEffect() {
+            return isCodeInsideRange(AttackEffectRange);
+        }
 
-		/// <summary>
-		/// 是否回复效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isRecoverEffect() {
-			return isCodeInsideRange(RecoverEffectRange);
-		}
+        /// <summary>
+        /// 是否回复效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isRecoverEffect() {
+            return isCodeInsideRange(RecoverEffectRange);
+        }
 
-		/// <summary>
-		/// 是否BUFF效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isBuffEffect() {
-			return isCodeInsideRange(BuffEffectRange);
-		}
+        /// <summary>
+        /// 是否BUFF效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isBuffEffect() {
+            return isCodeInsideRange(BuffEffectRange);
+        }
 
-		/// <summary>
-		/// 是否状态效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isStateEffect() {
-			return isCodeInsideRange(StateEffectRange);
-		}
+        /// <summary>
+        /// 是否状态效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isStateEffect() {
+            return isCodeInsideRange(StateEffectRange);
+        }
 
-		/// <summary>
-		/// 是否能量效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isEnergyEffect() {
-			return isCodeInsideRange(EnergyEffectRange);
-		}
+        /// <summary>
+        /// 是否能量效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isEnergyEffect() {
+            return isCodeInsideRange(EnergyEffectRange);
+        }
 
-		/// <summary>
-		/// 是否卡牌效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isCardEffect() {
-			return isCodeInsideRange(CardEffectRange);
-		}
+        /// <summary>
+        /// 是否卡牌效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isCardEffect() {
+            return isCodeInsideRange(CardEffectRange);
+        }
 
-		/// <summary>
-		/// 是否耗能效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isCostEffect() {
-			return isCodeInsideRange(CostEffectRange);
-		}
+        /// <summary>
+        /// 是否耗能效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isCostEffect() {
+            return isCodeInsideRange(CostEffectRange);
+        }
 
-		/// <summary>
-		/// 是否剧情效果
-		/// </summary>
-		/// <returns></returns>
-		public bool isPlotEffect() {
-			return isCodeInsideRange(PlotEffectRange);
-		}
+        /// <summary>
+        /// 是否剧情效果
+        /// </summary>
+        /// <returns></returns>
+        public bool isPlotEffect() {
+            return isCodeInsideRange(PlotEffectRange);
+        }
 
-		#endregion
+        #endregion
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ExerProEffectData() { }
-		public ExerProEffectData(Code code, JsonData params_) {
-			this.code = (int)code; this.params_ = params_;
-		}
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProEffectData() { }
+        public ExerProEffectData(Code code, JsonData params_) {
+            this.code = (int)code; this.params_ = params_;
+        }
 
-	}
+    }
 
-	/// <summary>
-	/// 特训效果数据
-	/// </summary>
-	public class ExerProTraitData : BaseData {
+    /// <summary>
+    /// 特训效果数据
+    /// </summary>
+    public class ExerProTraitData : BaseData {
 
-		/// <summary>
-		/// 效果代码枚举
-		/// </summary>
-		public enum Code {
-			Unset = 0, // 空
+        /// <summary>
+        /// 效果代码枚举
+        /// </summary>
+        public enum Code {
+            Unset = 0, // 空
 
-			DamagePlus = 1, // 攻击伤害加成
-			HurtPlus = 2, // 受到伤害加成
-			RecoverPlus = 3, // 回复加成
+            DamagePlus = 1, // 攻击伤害加成
+            HurtPlus = 2, // 受到伤害加成
+            RecoverPlus = 3, // 回复加成
 
-			RestRecoverPlus = 4, // 回复加成（休息据点）
+            RestRecoverPlus = 4, // 回复加成（休息据点）
 
-			RoundEndRecover = 5, // 回合结束HP回复
-			RoundStartRecover = 6, // 回合开始HP回复
-			BattleEndRecover = 7, // 战斗结束HP回复
-			BattleStartRecover = 8, // 战斗开始HP回复
+            RoundEndRecover = 5, // 回合结束HP回复
+            RoundStartRecover = 6, // 回合开始HP回复
+            BattleEndRecover = 7, // 战斗结束HP回复
+            BattleStartRecover = 8, // 战斗开始HP回复
 
-			ParamAdd = 9, // 属性加成值
-			ParamRoundAdd = 10, // 回合属性加成值
-			ParamBattleAdd = 11, // 战斗属性加成值
+            ParamAdd = 9, // 属性加成值
+            ParamRoundAdd = 10, // 回合属性加成值
+            ParamBattleAdd = 11, // 战斗属性加成值
 
-			RoundDrawCards = 12, // 回合开始抽牌数加成
-			BattleDrawCards = 13, // 战斗开始抽牌数加成
-		}
+            RoundDrawCards = 12, // 回合开始抽牌数加成
+            BattleDrawCards = 13, // 战斗开始抽牌数加成
+        }
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public int code { get; protected set; }
-		[AutoConvert("params")]
-		public JsonData params_ { get; protected set; } // 参数（数组）
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int code { get; protected set; }
+        [AutoConvert("params")]
+        public JsonData params_ { get; protected set; } // 参数（数组）
 
-		#region 数据获取
+        #region 数据获取
 
-		/// <summary>
-		/// 获取指定下标下的数据
-		/// </summary>
-		/// <typeparam name="T">类型</typeparam>
-		/// <param name="index">下标</param>
-		/// <param name="default_">默认值</param>
-		/// <returns></returns>
-		public T get<T>(int index, T default_ = default) {
-			if (params_ == null || !params_.IsArray) return default_;
-			if (index < params_.Count) return DataLoader.load<T>(params_[index]);
-			return default_;
-		}
+        /// <summary>
+        /// 获取指定下标下的数据
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="index">下标</param>
+        /// <param name="default_">默认值</param>
+        /// <returns></returns>
+        public T get<T>(int index, T default_ = default) {
+            if (params_ == null || !params_.IsArray) return default_;
+            if (index < params_.Count) return DataLoader.load<T>(params_[index]);
+            return default_;
+        }
 
-		/// <summary>
-		/// 特性代码枚举
-		/// </summary>
-		/// <returns></returns>
-		public Code codeEnum() {
-			return (Code)code;
-		}
+        /// <summary>
+        /// 特性代码枚举
+        /// </summary>
+        /// <returns></returns>
+        public Code codeEnum() {
+            return (Code)code;
+        }
 
-		#endregion
+        #endregion
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ExerProTraitData() { }
-		public ExerProTraitData(Code code, JsonData params_) {
-			this.code = (int)code; this.params_ = params_;
-		}
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProTraitData() { }
+        public ExerProTraitData(Code code, JsonData params_) {
+            this.code = (int)code; this.params_ = params_;
+        }
 
-	}
+    }
 
-	/// <summary>
-	/// 特训物品数据
-	/// </summary>
-	public abstract class BaseExerProItem : BaseItem {
+    /// <summary>
+    /// 特训物品数据
+    /// </summary>
+    public abstract class BaseExerProItem : BaseItem {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public int iconIndex { get; protected set; }
-		[AutoConvert]
-		public int startAniIndex { get; protected set; }
-		[AutoConvert]
-		public int targetAniIndex { get; protected set; }
-		[AutoConvert]
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int iconIndex { get; protected set; }
+        [AutoConvert]
+        public int startAniIndex { get; protected set; }
+        [AutoConvert]
+        public int targetAniIndex { get; protected set; }
+        [AutoConvert]
         public int starId { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
 
-		/*
+        /*
 		/// <summary>
 		/// 物品价格，用于商店
 		/// </summary>
@@ -928,37 +938,37 @@ namespace ExerPro.EnglishModule.Data {
         protected virtual int generatePrice() { return 0; }
 		*/
 
-		/// <summary>
-		/// 起手动画/目标动画
-		/// </summary>
-		public AnimationClip startAni { get; protected set; } = null;
-		public AnimationClip targetAni { get; protected set; } = null;
+        /// <summary>
+        /// 起手动画/目标动画
+        /// </summary>
+        public AnimationClip startAni { get; protected set; } = null;
+        public AnimationClip targetAni { get; protected set; } = null;
 
-		/// <summary>
-		/// 物品图标
-		/// </summary>
-		public Sprite icon { get; protected set; }
+        /// <summary>
+        /// 物品图标
+        /// </summary>
+        public Sprite icon { get; protected set; }
 
-		/// <summary>
-		/// 读取函数
-		/// </summary>
-		/// <param name="index">索引</param>
-		/// <returns>返回裁剪后的精灵</returns>
-		public delegate Sprite IconLoadFun(int index);
+        /// <summary>
+        /// 读取函数
+        /// </summary>
+        /// <param name="index">索引</param>
+        /// <returns>返回裁剪后的精灵</returns>
+        public delegate Sprite IconLoadFun(int index);
 
-		/// <summary>
-		/// 读取函数
-		/// </summary>
-		/// <param name="index">索引</param>
-		/// <returns>返回裁剪后的精灵</returns>
-		public delegate AnimationClip AniLoadFun(int index, bool start);
+        /// <summary>
+        /// 读取函数
+        /// </summary>
+        /// <param name="index">索引</param>
+        /// <returns>返回裁剪后的精灵</returns>
+        public delegate AnimationClip AniLoadFun(int index, bool start);
 
-		/// <summary>
-		/// 获取读取函数
-		/// </summary>
-		/// <returns>读取函数</returns>
-		protected abstract IconLoadFun iconLoadFun();
-		protected virtual AniLoadFun aniLoadFun() { return null; }
+        /// <summary>
+        /// 获取读取函数
+        /// </summary>
+        /// <returns>读取函数</returns>
+        protected abstract IconLoadFun iconLoadFun();
+        protected virtual AniLoadFun aniLoadFun() { return null; }
 
         /// <summary>
         /// 物品星级
@@ -968,66 +978,66 @@ namespace ExerPro.EnglishModule.Data {
             return DataService.get().exerProItemStar(starId);
         }
 
-		/// <summary>
-		/// 重复次数
-		/// </summary>
-		/// <returns></returns>
-		public int repeats() {
-			var res = 1;
-			var effects = attackEffects();
-			foreach (var effect in effects)
-				res = Math.Max(res, effect.get(1, 1));
-			return res;
-		}
+        /// <summary>
+        /// 重复次数
+        /// </summary>
+        /// <returns></returns>
+        public int repeats() {
+            var res = 1;
+            var effects = attackEffects();
+            foreach (var effect in effects)
+                res = Math.Max(res, effect.get(1, 1));
+            return res;
+        }
 
-		/// <summary>
-		/// 攻击类效果
-		/// </summary>
-		/// <returns></returns>
-		public ExerProEffectData[] attackEffects() {
-			var res = new List<ExerProEffectData>();
-			foreach (var effect in effects)
-				if (effect.isAttackEffect()) res.Add(effect);
-			return res.ToArray();
-		}
+        /// <summary>
+        /// 攻击类效果
+        /// </summary>
+        /// <returns></returns>
+        public ExerProEffectData[] attackEffects() {
+            var res = new List<ExerProEffectData>();
+            foreach (var effect in effects)
+                if (effect.isAttackEffect()) res.Add(effect);
+            return res.ToArray();
+        }
 
-		/// <summary>
-		/// 加载自定义属性
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void loadCustomAttributes(JsonData json) {
-			base.loadCustomAttributes(json);
+        /// <summary>
+        /// 加载自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
 
-			icon = iconLoadFun()?.Invoke(iconIndex);
-			startAni = AssetLoader.loadAnimation(startAniIndex);
-			targetAni = AssetLoader.loadAnimation(targetAniIndex);
-		}
-	}
+            icon = iconLoadFun()?.Invoke(iconIndex);
+            startAni = AssetLoader.loadAnimation(startAniIndex);
+            targetAni = AssetLoader.loadAnimation(targetAniIndex);
+        }
+    }
 
     /// <summary>
     /// 特训物品数据
     /// </summary>
     public class ExerProItem : BaseExerProItem {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public ExerProTraitData[] traits { get; protected set; }
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public ExerProTraitData[] traits { get; protected set; }
 
-		/// <summary>
-		/// 获取读取函数
-		/// </summary>
-		/// <returns>读取函数</returns>
-		protected override IconLoadFun iconLoadFun() {
-			return AssetLoader.getExerProItemIconSprite;
-		}
+        /// <summary>
+        /// 获取读取函数
+        /// </summary>
+        /// <returns>读取函数</returns>
+        protected override IconLoadFun iconLoadFun() {
+            return AssetLoader.getExerProItemIconSprite;
+        }
 
         public static ExerProItem sample() {
             int index = UnityEngine.Random.Range(0, 9);
             int[] a = { 1, 2, 4, 10, 14, 16, 19, 32, 33 };
             return DataService.get().exerProItem(a[index]);
-	}
+        }
     }
 
     /// <summary>
@@ -1035,23 +1045,23 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProPotion : BaseExerProItem {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
+        /// <summary>
+        /// 属性
+        /// </summary>
 
-		/// <summary>
-		/// 获取读取函数
-		/// </summary>
-		/// <returns>读取函数</returns>
-		protected override IconLoadFun iconLoadFun() {
-			return AssetLoader.getExerProItemIconSprite;
-		}
+        /// <summary>
+        /// 获取读取函数
+        /// </summary>
+        /// <returns>读取函数</returns>
+        protected override IconLoadFun iconLoadFun() {
+            return AssetLoader.getExerProItemIconSprite;
+        }
         public static ExerProPotion sample() {
             int index = UnityEngine.Random.Range(0, 8);
             int[] a = { 4, 5, 6, 7, 14, 15, 16, 25 };
             return DataService.get().exerProPotion(a[index]);
         }
-		/*
+        /*
         /// <summary>
         /// 药水定价策略
         /// </summary>
@@ -1076,15 +1086,15 @@ namespace ExerPro.EnglishModule.Data {
             All = 2,  // 敌方全体
         }
 
-		/// <summary>
-		/// 卡牌类型
-		/// </summary>
-		public new enum Type {
-			Attack = 1, // 攻击
-			Skill = 2, // 技能
-			Ability = 3, // 能力
-			Evil = 4 // 诅咒
-		}
+        /// <summary>
+        /// 卡牌类型
+        /// </summary>
+        public new enum Type {
+            Attack = 1, // 攻击
+            Skill = 2, // 技能
+            Ability = 3, // 能力
+            Evil = 4 // 诅咒
+        }
 
         /// <summary>
         /// 属性
@@ -1093,44 +1103,44 @@ namespace ExerPro.EnglishModule.Data {
         public int cost { get; protected set; }
         [AutoConvert]
         public int cardType { get; protected set; }
-		[AutoConvert]
-		public int skinIndex { get; protected set; }
-		[AutoConvert]
+        [AutoConvert]
+        public int skinIndex { get; protected set; }
+        [AutoConvert]
         public bool inherent { get; protected set; }
         [AutoConvert]
         public bool disposable { get; protected set; }
-		[AutoConvert("character")]
-		public string _character { get; protected set; }
+        [AutoConvert("character")]
+        public string _character { get; protected set; }
 
-		/// <summary>
-		/// 首字母大写
-		/// </summary>
-		public string character {
-			get {
-				if (_character == "") return "";
-				var s = _character;
-				return s.Substring(0, 1).ToUpper() + s.Substring(1);
-			}
-		}
+        /// <summary>
+        /// 首字母大写
+        /// </summary>
+        public string character {
+            get {
+                if (_character == "") return "";
+                var s = _character;
+                return s.Substring(0, 1).ToUpper() + s.Substring(1);
+            }
+        }
 
-		[AutoConvert]
+        [AutoConvert]
         public int target { get; protected set; }
 
-		/// <summary>
-		/// 图片
-		/// </summary>
-		public Texture2D skin { get; protected set; }
-		public Texture2D charFrame { get; protected set; }
-		public Texture2D typeIcon { get; protected set; }
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public Texture2D skin { get; protected set; }
+        public Texture2D charFrame { get; protected set; }
+        public Texture2D typeIcon { get; protected set; }
 
-		/// <summary>
-		/// 类型文本
-		/// </summary>
-		/// <returns></returns>
-		public string typeText() {
-			return DataService.get().cardType(cardType).Item2;
-		}
-		/*
+        /// <summary>
+        /// 类型文本
+        /// </summary>
+        /// <returns></returns>
+        public string typeText() {
+            return DataService.get().cardType(cardType).Item2;
+        }
+        /*
         /// <summary>
         /// 卡牌定价策略
         /// </summary>
@@ -1139,25 +1149,25 @@ namespace ExerPro.EnglishModule.Data {
             return CalcService.ExerProItemGenerator.generateCardPrice(this);
         }
 		*/
-		/// <summary>
-		/// 获取读取函数
-		/// </summary>
-		/// <returns>读取函数</returns>
-		protected override IconLoadFun iconLoadFun() {
-			return AssetLoader.getExerProCardIconSprite;
-		}
+        /// <summary>
+        /// 获取读取函数
+        /// </summary>
+        /// <returns>读取函数</returns>
+        protected override IconLoadFun iconLoadFun() {
+            return AssetLoader.getExerProCardIconSprite;
+        }
 
-		/// <summary>
-		/// 读取自定义属性
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void loadCustomAttributes(JsonData json) {
-			base.loadCustomAttributes(json);
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
 
-			skin = AssetLoader.loadCardSkin(starId, cardType, skinIndex);
-			charFrame = AssetLoader.loadCardCharFrame(starId, skinIndex);
-			typeIcon = AssetLoader.loadCardTypeIcon(cardType);
-		}
+            skin = AssetLoader.loadCardSkin(starId, cardType, skinIndex);
+            charFrame = AssetLoader.loadCardCharFrame(starId, skinIndex);
+            typeIcon = AssetLoader.loadCardTypeIcon(cardType);
+        }
 
         public static ExerProCard sample() {
             ExerProCard card = new ExerProCard();
@@ -1171,50 +1181,50 @@ namespace ExerPro.EnglishModule.Data {
             card.type = 1;
             card.iconIndex = 0;
             return card;
-	}
+        }
 
     }
 
-	/// <summary>
-	/// 初始卡组
-	/// </summary>
+    /// <summary>
+    /// 初始卡组
+    /// </summary>
     public class FirstCardGroup : TypeData {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public int[] cards { get; protected set; }
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int[] cards { get; protected set; }
 
-		/// <summary>
-		/// 获取所有卡牌
-		/// </summary>
-		/// <returns></returns>
-		public ExerProCard[] getCards() {
-			var cnt = cards.Length;
-			var res = new ExerProCard[cnt];
-			for (int i = 0; i < cnt; ++i)
-				res[i] = DataService.get().exerProCard(cards[i]);
-			return res;
-		}
-	}
+        /// <summary>
+        /// 获取所有卡牌
+        /// </summary>
+        /// <returns></returns>
+        public ExerProCard[] getCards() {
+            var cnt = cards.Length;
+            var res = new ExerProCard[cnt];
+            for (int i = 0; i < cnt; ++i)
+                res[i] = DataService.get().exerProCard(cards[i]);
+            return res;
+        }
+    }
 
-	/// <summary>
-	/// 特训敌人数据
-	/// </summary>
-	public class ExerProEnemy : BaseItem {
+    /// <summary>
+    /// 特训敌人数据
+    /// </summary>
+    public class ExerProEnemy : BaseItem {
 
-		/// <summary>
-		/// BOSS设置
-		/// </summary>
-		public const int BOSS1 = 14; // 中二少年
-		public const int BOSS2 = 13; // 乌龟大师
-		public const int BOSS3 = 15; // 龙王
+        /// <summary>
+        /// BOSS设置
+        /// </summary>
+        public const int BOSS1 = 14; // 中二少年
+        public const int BOSS2 = 13; // 乌龟大师
+        public const int BOSS3 = 15; // 龙王
 
-		/// <summary>
-		/// 类型
-		/// </summary>
-		public enum EnemyType {
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public enum EnemyType {
             Normal = 1, Elite = 2, Boss = 3
         }
 
@@ -1228,9 +1238,9 @@ namespace ExerPro.EnglishModule.Data {
             /// </summary>
             public enum Type {
                 Attack = 1,
-				PowerUp = 2, PosStates = 3,
-				PowerDown = 4, NegStates = 5,
-				Escape = 6, Unset = 0
+                PowerUp = 2, PosStates = 3,
+                PowerDown = 4, NegStates = 5,
+                Escape = 6, Unset = 0
             }
 
             /// <summary>
@@ -1292,21 +1302,21 @@ namespace ExerPro.EnglishModule.Data {
         public int defense { get; protected set; }
         [AutoConvert("type_")]
         public int type_ { get; protected set; }
-		[AutoConvert("character")]
-		public string _character { get; protected set; } // 性格
+        [AutoConvert("character")]
+        public string _character { get; protected set; } // 性格
 
-		/// <summary>
-		/// 首字母大写
-		/// </summary>
-		public string character {
-			get {
-				if (_character == "") return "";
-				var s = _character;
-				return s.Substring(0, 1).ToUpper() + s.Substring(1);
-			}
-		}
+        /// <summary>
+        /// 首字母大写
+        /// </summary>
+        public string character {
+            get {
+                if (_character == "") return "";
+                var s = _character;
+                return s.Substring(0, 1).ToUpper() + s.Substring(1);
+            }
+        }
 
-		[AutoConvert]
+        [AutoConvert]
         public Action[] actions { get; protected set; }
         [AutoConvert]
         public ExerProEffectData[] effects { get; protected set; }
@@ -1331,23 +1341,23 @@ namespace ExerPro.EnglishModule.Data {
         }
     }
 
-	/// <summary>
-	/// 特训状态数据
-	/// </summary>
-	public class ExerProState : BaseItem {
+    /// <summary>
+    /// 特训状态数据
+    /// </summary>
+    public class ExerProState : BaseItem {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
-		public int iconIndex { get; protected set; }
-		[AutoConvert]
-		public int maxTurns { get; protected set; } // 最大状态叠加回合数
-		[AutoConvert]
-		public bool isNega { get; protected set; } // 是否负面
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
+        public int iconIndex { get; protected set; }
+        [AutoConvert]
+        public int maxTurns { get; protected set; } // 最大状态叠加回合数
+        [AutoConvert]
+        public bool isNega { get; protected set; } // 是否负面
 
-		[AutoConvert]
-		public ExerProTraitData[] traits { get; protected set; }
+        [AutoConvert]
+        public ExerProTraitData[] traits { get; protected set; }
 
 
         /// <summary>
@@ -1373,7 +1383,7 @@ namespace ExerPro.EnglishModule.Data {
     /// 特训背包物品
     /// </summary>
     public class ExerProPackItem<T> : PackContItem<T>
-		where T : BaseExerProItem {
+        where T : BaseExerProItem {
 
         /// <summary>
         /// 使用对象池
@@ -1416,25 +1426,25 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProPackItem : ExerProPackItem<ExerProItem> {
 
-		/// <summary>
-		/// 特性
-		/// </summary>
-		/// <returns></returns>
-		public ExerProTraitData[] traits() {
-			return item().traits;
-		}
+        /// <summary>
+        /// 特性
+        /// </summary>
+        /// <returns></returns>
+        public ExerProTraitData[] traits() {
+            return item().traits;
+        }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ExerProPackItem() { }
-		public ExerProPackItem(ExerProItem item) : base(item) { }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProPackItem() { }
+        public ExerProPackItem(ExerProItem item) : base(item) { }
         public static ExerProPackItem sample() {
 
             ExerProPackItem sample = new ExerProPackItem(ExerProItem.sample());
             sample.count = UnityEngine.Random.Range(1, 10);
             return sample;
-	}
+        }
 
 
     }
@@ -1453,22 +1463,22 @@ namespace ExerPro.EnglishModule.Data {
             ExerProPackPotion sample = new ExerProPackPotion(ExerProPotion.sample());
 
             return sample;
-    }
+        }
     }
 
     /// <summary>
     /// 特训背包卡片
     /// </summary>
     public class ExerProPackCard : ExerProPackItem<ExerProCard> {
-		/// <summary>
-		/// 消耗能量
-		/// </summary>
-		/// <returns></returns>
-		public int cost() {
-			var item = this.item();
-			if (item == null) return 0;
-			return item.cost;
-		}
+        /// <summary>
+        /// 消耗能量
+        /// </summary>
+        /// <returns></returns>
+        public int cost() {
+            var item = this.item();
+            if (item == null) return 0;
+            return item.cost;
+        }
 
         /// <summary>
         /// 构造函数
@@ -1480,14 +1490,14 @@ namespace ExerPro.EnglishModule.Data {
             ExerProPackCard sample = new ExerProPackCard(ExerProCard.sample());
 
             return sample;
-    }
+        }
         public static ExerProPackCard[] ExerProCard2ExerProPackCard(ExerProCard[] cards) {
             var cnt = cards.Length;
             var packCards = new ExerProPackCard[cnt];
             for (int i = 0; i < cnt; ++i)
                 packCards[i] = new ExerProPackCard(cards[i]);
             return packCards;
-    }
+        }
     }
 
     /// <summary>
@@ -1525,49 +1535,49 @@ namespace ExerPro.EnglishModule.Data {
             }
         }
 
-		/// <summary>
-		/// 装备
-		/// </summary>
-		public override ExerProPackPotion equip1 {
-			get { return packPotion; }
-			protected set { packPotion = value; }
-		}
+        /// <summary>
+        /// 装备
+        /// </summary>
+        public override ExerProPackPotion equip1 {
+            get { return packPotion; }
+            protected set { packPotion = value; }
+        }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ExerProSlotPotion() { }
-		public ExerProSlotPotion(ExerProPotionSlot slot, int index) {
-			potionSlot = slot; this.index = index;
-		}
-	}
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProSlotPotion() { }
+        public ExerProSlotPotion(ExerProPotionSlot slot, int index) {
+            potionSlot = slot; this.index = index;
+        }
+    }
 
     #endregion
 
     #region 容器
 
-	/// <summary>
-	/// 特训物品背包
-	/// </summary>
-	public class ExerProItemPack : PackContainer<ExerProPackItem> {
+    /// <summary>
+    /// 特训物品背包
+    /// </summary>
+    public class ExerProItemPack : PackContainer<ExerProPackItem> {
 
-		/// <summary>
-		/// 特性
-		/// </summary>
-		/// <returns></returns>
-		public List<ExerProTraitData> traits() {
-			var res = new List<ExerProTraitData>();
-			foreach (var item in items)
-				res.AddRange(item.traits());
-			return res;
-		}
+        /// <summary>
+        /// 特性
+        /// </summary>
+        /// <returns></returns>
+        public List<ExerProTraitData> traits() {
+            var res = new List<ExerProTraitData>();
+            foreach (var item in items)
+                res.AddRange(item.traits());
+            return res;
+        }
 
-	}
+    }
 
-	/// <summary>
-	/// 特训药水背包
-	/// </summary>
-	public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
+    /// <summary>
+    /// 特训药水背包
+    /// </summary>
+    public class ExerProPotionPack : PackContainer<ExerProPackPotion> { }
 
     /// <summary>
     /// 特训抽牌堆
@@ -1606,7 +1616,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
         public ExerProPackCard firstCard() {
-			if (items.Count <= 0) return null;
+            if (items.Count <= 0) return null;
             return items[items.Count - 1];
         }
     }
@@ -1650,26 +1660,26 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         List<ExerProPackCard> drawnCards = new List<ExerProPackCard>();
 
-		/// <summary>
-		/// 获取并清除抽取的卡牌
-		/// </summary>
-		public ExerProPackCard[] getDrawnCards() {
-			var res = drawnCards.ToArray();
-			clearDrawnCards(); return res;
-		}
+        /// <summary>
+        /// 获取并清除抽取的卡牌
+        /// </summary>
+        public ExerProPackCard[] getDrawnCards() {
+            var res = drawnCards.ToArray();
+            clearDrawnCards(); return res;
+        }
 
-		/// <summary>
-		/// 获取并清除抽取的卡牌
-		/// </summary>
-		public void clearDrawnCards() {
-			drawnCards.Clear();
-		}
+        /// <summary>
+        /// 获取并清除抽取的卡牌
+        /// </summary>
+        public void clearDrawnCards() {
+            drawnCards.Clear();
+        }
 
-		/// <summary>
-		/// 接收物品
-		/// </summary>
-		/// <param name="item"></param>
-		protected override bool acceptItem(ExerProPackCard item) {
+        /// <summary>
+        /// 接收物品
+        /// </summary>
+        /// <param name="item"></param>
+        protected override bool acceptItem(ExerProPackCard item) {
             var res = base.acceptItem(item);
             if (res) drawnCards.Add(item);
             return res;
@@ -1691,34 +1701,34 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public ExerProCardHandGroup handGroup { get; protected set; } = new ExerProCardHandGroup();
 
-		#region 记录控制
+        #region 记录控制
 
-		/// <summary>
-		/// 出牌记录
-		/// </summary>
-		[AutoConvert("cardRecord")]
-		public List<int> _cardRecord { get; protected set; } = new List<int>();
+        /// <summary>
+        /// 出牌记录
+        /// </summary>
+        [AutoConvert("cardRecord")]
+        public List<int> _cardRecord { get; protected set; } = new List<int>();
 
-		/// <summary>
-		/// 获取出牌记录的卡牌实例
-		/// </summary>
-		/// <returns></returns>
-		public List<ExerProCard> cardRecord() {
-			Debug.Log("_cardRecord: " + string.Join(",", _cardRecord));
-			var res = new List<ExerProCard>(_cardRecord.Count);
-			foreach (var cid in _cardRecord)
-				res.Add(DataService.get().exerProCard(cid));
-			return res;
-		}
+        /// <summary>
+        /// 获取出牌记录的卡牌实例
+        /// </summary>
+        /// <returns></returns>
+        public List<ExerProCard> cardRecord() {
+            Debug.Log("_cardRecord: " + string.Join(",", _cardRecord));
+            var res = new List<ExerProCard>(_cardRecord.Count);
+            foreach (var cid in _cardRecord)
+                res.Add(DataService.get().exerProCard(cid));
+            return res;
+        }
 
-		#endregion
+        #endregion
 
-		#region 加入卡组
+        #region 加入卡组
 
-		/// <summary>
-		/// 加入卡组
-		/// </summary>
-		public void addCard(ExerProCard card) {
+        /// <summary>
+        /// 加入卡组
+        /// </summary>
+        public void addCard(ExerProCard card) {
             pushItem(new ExerProPackCard(card));
         }
 
@@ -1736,8 +1746,8 @@ namespace ExerPro.EnglishModule.Data {
                     transferItem(handGroup, item);
                 else
                     transferItem(drawGroup, item);
-			handGroup.clearDrawnCards();
-		}
+            handGroup.clearDrawnCards();
+        }
 
         /// <summary>
         /// 战斗结束，回收牌堆
@@ -1768,28 +1778,28 @@ namespace ExerPro.EnglishModule.Data {
         /// 抽牌
         /// </summary>
         public void drawCard() {
-			if (drawGroup.items.Count <= 0) recycleDiscard();
-			var card = drawGroup.firstCard();
-			drawGroup.transferItem(handGroup, card);
-			debugShow("drawCard: " + card.item().name);
-		}
+            if (drawGroup.items.Count <= 0) recycleDiscard();
+            var card = drawGroup.firstCard();
+            drawGroup.transferItem(handGroup, card);
+            debugShow("drawCard: " + card.item().name);
+        }
 
-		/// <summary>
-		/// 回收弃牌
-		/// </summary>
-		public void recycleDiscard() {
-			var tmpItems = discardGroup.items.ToArray();
-			foreach (var item in tmpItems)
-				discardGroup.transferItem(drawGroup, item);
-		}
+        /// <summary>
+        /// 回收弃牌
+        /// </summary>
+        public void recycleDiscard() {
+            var tmpItems = discardGroup.items.ToArray();
+            foreach (var item in tmpItems)
+                discardGroup.transferItem(drawGroup, item);
+        }
 
-		/// <summary>
-		/// 使用牌
-		/// </summary>
-		public void useCard(ExerProPackCard card) {
-			debugShow("useCard: " + card.item().name);
-			_cardRecord.Add(card.itemId);
-			if (card.item().disposable) consumeCard(card);
+        /// <summary>
+        /// 使用牌
+        /// </summary>
+        public void useCard(ExerProPackCard card) {
+            debugShow("useCard: " + card.item().name);
+            _cardRecord.Add(card.itemId);
+            if (card.item().disposable) consumeCard(card);
             else discardCard(card);
         }
 
@@ -1797,50 +1807,50 @@ namespace ExerPro.EnglishModule.Data {
         /// 弃牌
         /// </summary>
         public void discardCard(ExerProPackCard card) {
-			handGroup.transferItem(discardGroup, card);
-			debugShow("discardCard: " + card.item().name);
-		}
-		public void discardCard() {
+            handGroup.transferItem(discardGroup, card);
+            debugShow("discardCard: " + card.item().name);
+        }
+        public void discardCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-			discardCard(card);
-			//handGroup.transferItem(discardGroup, card);
+            discardCard(card);
+            //handGroup.transferItem(discardGroup, card);
         }
 
         /// <summary>
         /// 消耗牌（本次战斗不再出现）
         /// </summary>
         public void consumeCard(ExerProPackCard card) {
-			handGroup.transferItem(this, card);
-			debugShow("consumeCard: " + card.item().name);
-		}
-		public void consumeCard() {
+            handGroup.transferItem(this, card);
+            debugShow("consumeCard: " + card.item().name);
+        }
+        public void consumeCard() {
             var card = handGroup.getRandomItem(); // 随机
             if (card == null) return;
-			consumeCard(card);
+            consumeCard(card);
         }
 
-		/// <summary>
-		/// 显示调试信息
-		/// </summary>
-		void debugShow(string oper = "") {
-			var format = "Debug: {0}\nCard Group: {1}\n" +
-				"Draw Group: {2}\nDiscard Group: {3}\nHand Group: {4}";
-			Debug.Log(string.Format(format, oper, debugCards(this), 
-				debugCards(drawGroup), debugCards(discardGroup), debugCards(handGroup)));
-		}
+        /// <summary>
+        /// 显示调试信息
+        /// </summary>
+        void debugShow(string oper = "") {
+            var format = "Debug: {0}\nCard Group: {1}\n" +
+                "Draw Group: {2}\nDiscard Group: {3}\nHand Group: {4}";
+            Debug.Log(string.Format(format, oper, debugCards(this),
+                debugCards(drawGroup), debugCards(discardGroup), debugCards(handGroup)));
+        }
 
-		/// <summary>
-		/// 显示调试卡牌
-		/// </summary>
-		/// <param name="container"></param>
-		/// <returns></returns>
-		string debugCards(PackContainer<ExerProPackCard> container) {
-			var res = container.items.Count.ToString();
-			foreach (var card in container.items)
-				res += " " + card.item().name;
-			return res;
-		}
+        /// <summary>
+        /// 显示调试卡牌
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        string debugCards(PackContainer<ExerProPackCard> container) {
+            var res = container.items.Count.ToString();
+            foreach (var card in container.items)
+                res += " " + card.item().name;
+            return res;
+        }
 
         #endregion
 
@@ -1859,7 +1869,7 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public int getCardNumber() {
             return items.Count + handGroup.items.Count +
-				drawGroup.items.Count + discardGroup.items.Count;
+                drawGroup.items.Count + discardGroup.items.Count;
         }
     }
 
@@ -1868,31 +1878,31 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProPotionSlot : SlotContainer<ExerProSlotPotion> {
 
-		/// <summary>
-		/// 槽数
-		/// </summary>
-		public const int SlotItemCount = 3;
+        /// <summary>
+        /// 槽数
+        /// </summary>
+        public const int SlotItemCount = 3;
 
-		/// <summary>
-		/// 所属玩家
-		/// </summary>
-		public RuntimeActor actor { get; set; }
+        /// <summary>
+        /// 所属玩家
+        /// </summary>
+        public RuntimeActor actor { get; set; }
 
-		/// <summary>
-		/// 默认容量
-		/// </summary>
-		/// <returns></returns>
-		public override int defaultCapacity() {
-			return SlotItemCount;
-		}
+        /// <summary>
+        /// 默认容量
+        /// </summary>
+        /// <returns></returns>
+        public override int defaultCapacity() {
+            return SlotItemCount;
+        }
 
-		/// <summary>
-		/// 配置槽项（初始化）
-		/// </summary>
-		void setupSlotItems() {
+        /// <summary>
+        /// 配置槽项（初始化）
+        /// </summary>
+        void setupSlotItems() {
             for (int i = 0; i < SlotItemCount; ++i)
-				items.Add(new ExerProSlotPotion(this, i));
-		}
+                items.Add(new ExerProSlotPotion(this, i));
+        }
 
         /// <summary>
         /// 通过装备物品获取槽ID
@@ -1901,9 +1911,9 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="equipItem">装备物品</param>
         /// <returns>槽ID</returns>
         public override ExerProSlotPotion getSlotItemByEquipItem<E>(E equipItem) {
-			foreach (var slotItem in items)
-				if (!slotItem.isNullItem() && slotItem.packPotionId == equipItem.id)
-					return slotItem;
+            foreach (var slotItem in items)
+                if (!slotItem.isNullItem() && slotItem.packPotionId == equipItem.id)
+                    return slotItem;
             return emptySlotItem();
         }
 
@@ -1918,14 +1928,14 @@ namespace ExerPro.EnglishModule.Data {
             return slotItem;
         }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public ExerProPotionSlot() { }
-		public ExerProPotionSlot(RuntimeActor actor) {
-			this.actor = actor; setupSlotItems();
-		}
-	}
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ExerProPotionSlot() { }
+        public ExerProPotionSlot(RuntimeActor actor) {
+            this.actor = actor; setupSlotItems();
+        }
+    }
 
     #endregion
 
@@ -1986,10 +1996,10 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProMapStage : BaseData {
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
         public int order { get; protected set; }
         [AutoConvert("enemies")]
         public int[] _enemies { get; protected set; }
@@ -2020,11 +2030,11 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns>返回敌人数组</returns>
         public List<ExerProEnemy> enemies() {
             if (tmpEnemies == null) {
-				if (_enemies == null) return null;
-				tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
+                if (_enemies == null) return null;
+                tmpEnemies = new List<ExerProEnemy>(_enemies.Length);
                 foreach (var enemy in _enemies)
-					tmpEnemies.Add(DataService.get().exerProEnemy(enemy));
-			}
+                    tmpEnemies.Add(DataService.get().exerProEnemy(enemy));
+            }
             return tmpEnemies;
         }
 
@@ -2033,7 +2043,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回BOSS敌人数组</returns>
         public List<ExerProEnemy> bosses() {
-			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Boss);
+            return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Boss);
         }
 
         /// <summary>
@@ -2041,7 +2051,7 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回普通敌人数组</returns>
         public List<ExerProEnemy> normalEnemies() {
-			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Normal);
+            return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Normal);
         }
 
         /// <summary>
@@ -2049,17 +2059,17 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns>返回精英敌人数组</returns>
         public List<ExerProEnemy> eliteEnemies() {
-			return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Elite);
+            return enemies().FindAll(e => e.type_ == (int)ExerProEnemy.EnemyType.Elite);
         }
 
-		/// <summary>
-		/// 测试
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void loadCustomAttributes(JsonData json) {
-			base.loadCustomAttributes(json);
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
             Debug.Log("loadCustomAttributes: " + json.ToJson());
-		}
+        }
 
         /*
         /// <summary>
@@ -2091,8 +2101,8 @@ namespace ExerPro.EnglishModule.Data {
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },
             new int[] { 3, 5, 7, 4, 2, 3, 5, 4, 6, 3, 3, 4, 2, 1 },};
-        List<int> testMaxForkNodes = new List<int> { 10, 2, 5, 5, 8, 10};
-        List<int> testMaxForks = new List<int> { 3, 2, 3, 3, 3, 3};
+        List<int> testMaxForkNodes = new List<int> { 10, 2, 5, 5, 8, 10 };
+        List<int> testMaxForks = new List<int> { 3, 2, 3, 3, 3, 3 };
 
         List<int[]> testNodeRates = new List<int[]> { new int[] { 2, 1, 1, 1, 1, 4 },
             new int[] { 2, 0, 0, 0, 0, 0 }, new int[]{ 0, 1} , new int[]{ 0, 0,1}  };
@@ -2127,9 +2137,9 @@ namespace ExerPro.EnglishModule.Data {
     /// </summary>
     public class ExerProRecord : BaseData, ParamDisplay.IDisplayDataConvertable {
 
-		/// <summary>
-		/// 常量定义 
-		/// </summary>
+        /// <summary>
+        /// 常量定义 
+        /// </summary>
         public const int DefaultGold = 100; // 初始金币
 
         /// <summary>
@@ -2164,8 +2174,8 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int curIndex { get; protected set; } = -1; // 当前节点索引
         [AutoConvert]
-		public int gold { get; protected set; } = DefaultGold; // 金币
-		[AutoConvert]
+        public int gold { get; protected set; } = DefaultGold; // 金币
+        [AutoConvert]
         public bool nodeFlag { get; set; } = false; // 是否完成据点事件
         [AutoConvert]
         public RuntimeActor actor { get; protected set; } = null;
@@ -2183,9 +2193,9 @@ namespace ExerPro.EnglishModule.Data {
 		/// 积分记录
 		/// </summary>
 		[AutoConvert]
-		public ScoreRecord scoreRecord { get; protected set; } = new ScoreRecord();
+        public ScoreRecord scoreRecord { get; protected set; } = new ScoreRecord();
 
-		/// <summary>
+        /// <summary>
         /// 下一单词ID
         /// </summary>
         public int next { get; set; } = 0;
@@ -2287,8 +2297,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
 		/// <param name="val"></param>
 		public void gainGold(int val) {
-			gold = Math.Max(gold + val, 0);
-        } 
+            gold = Math.Max(gold + val, 0);
+        }
 
         #endregion
 
@@ -2298,9 +2308,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 生成地图
         /// </summary>
         void generate() {
-			if (generated) return;
+            if (generated) return;
             generated = CalcService.NodeGenerator.generate(this);
-			setupCards(); refreshNodeStatuses();
+            setupCards(); refreshNodeStatuses();
         }
 
         /// <summary>
@@ -2310,8 +2320,8 @@ namespace ExerPro.EnglishModule.Data {
 		/// <param name="yOrder">Y序号</param>
 		/// <param name="type">据点类型</param>
 		public ExerProMapNode createNode(int xOrder, int yOrder, ExerProMapNode.Type type) {
-			var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
-			nodes.Add(node); return node;
+            var node = new ExerProMapNode(nodes.Count, this, xOrder, yOrder, type);
+            nodes.Add(node); return node;
         }
 
         /// <summary>
@@ -2363,28 +2373,28 @@ namespace ExerPro.EnglishModule.Data {
             return curIndex >= 0;
         }
 
-		#endregion
+        #endregion
 
-		#region 记录控制
+        #region 记录控制
 
         /// <summary>
         /// 下一个单词
         /// </summary>
         /// <returns></returns>
         public Word nextWord() {
-			Debug.Log("nextWord: " + next);
+            Debug.Log("nextWord: " + next);
             if (next <= 0) return wordRecords[0].word();
             return EnglishService.get().getQuestion<Word>(next);
         }
 
-		/// <summary>
-		/// 获取指定ID的单词记录
-		/// </summary>
-		/// <param name="wid"></param>
-		/// <returns></returns>
-		public WordRecord wordRecord(int wid) {
-			return wordRecords.Find(rec => rec.wordId == wid);
-		}
+        /// <summary>
+        /// 获取指定ID的单词记录
+        /// </summary>
+        /// <param name="wid"></param>
+        /// <returns></returns>
+        public WordRecord wordRecord(int wid) {
+            return wordRecords.Find(rec => rec.wordId == wid);
+        }
 
         /// <summary>
 		/// 已有记录的单词ID
@@ -2398,16 +2408,16 @@ namespace ExerPro.EnglishModule.Data {
             return res;
         }
 
-		/// <summary>
-		/// 回答单词
-		/// </summary>
-		/// <param name="wid">单词ID</param>
-		/// <param name="correct">是否正确</param>
-		public void answerWord(int wid, bool correct, int next) {
-			this.next = next;
-			var rec = wordRecord(wid);
-			rec.answer(correct);
-		}
+        /// <summary>
+        /// 回答单词
+        /// </summary>
+        /// <param name="wid">单词ID</param>
+        /// <param name="correct">是否正确</param>
+        public void answerWord(int wid, bool correct, int next) {
+            this.next = next;
+            var rec = wordRecord(wid);
+            rec.answer(correct);
+        }
 
         /// <summary>
         /// 获取本轮单词正确数量
@@ -2432,14 +2442,14 @@ namespace ExerPro.EnglishModule.Data {
         }
 
         #endregion
-       
+
         #region 游戏控制
 
         /// <summary>
         /// 开始特训
         /// </summary>
         public void start() {
-			createActor(); generate();
+            createActor(); generate();
         }
 
         /*
@@ -2470,15 +2480,15 @@ namespace ExerPro.EnglishModule.Data {
         }
         */
 
-		/// <summary>
-		/// 配置初始卡牌
-		/// </summary>
-		public void setupCards() {
-			var group = DataService.get().firstCardGroup(1);
-			var cards = group.getCards();
-			foreach (var card in cards)
-				actor.cardGroup.addCard(card);
-		}
+        /// <summary>
+        /// 配置初始卡牌
+        /// </summary>
+        public void setupCards() {
+            var group = DataService.get().firstCardGroup(1);
+            var cards = group.getCards();
+            foreach (var card in cards)
+                actor.cardGroup.addCard(card);
+        }
 
         /// <summary>
         /// 重置单词
@@ -2580,8 +2590,8 @@ namespace ExerPro.EnglishModule.Data {
             var player = PlayerService.get().player;
             if (player == null) return;
 
-			if (actor == null)
-				actor = new RuntimeActor(this, player);
+            if (actor == null)
+                actor = new RuntimeActor(this, player);
             else actor.setupPlayer(player);
         }
 
@@ -2600,9 +2610,9 @@ namespace ExerPro.EnglishModule.Data {
         #endregion
     }
 
-	/// <summary>
-	/// 积分记录
-	/// </summary>
+    /// <summary>
+    /// 积分记录
+    /// </summary>
     public class ScoreRecord : BaseData {
 
         /// <summary>
@@ -2700,7 +2710,7 @@ namespace ExerPro.EnglishModule.Data {
 		/// </summary>
 		public int realTypeId { get; set; } = 0;
 
-		/// <summary>
+        /// <summary>
         /// 下一个Y序号（数组）
         /// </summary>
         [AutoConvert]
@@ -2764,8 +2774,8 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         /// <returns></returns>
 		public Type typeEnum(bool real = true) {
-			if (realTypeId > 0 && real)
-				return (Type)realTypeId;
+            if (realTypeId > 0 && real)
+                return (Type)realTypeId;
             return (Type)typeId;
         }
 
@@ -2799,13 +2809,13 @@ namespace ExerPro.EnglishModule.Data {
             return status == (int)Status.Current;
         }
 
-		/// <summary>
-		/// 是否BOSS据点
-		/// </summary>
-		/// <returns></returns>
-		public bool isBoss() {
-			return typeId == (int)Type.Boss;
-		}
+        /// <summary>
+        /// 是否BOSS据点
+        /// </summary>
+        /// <returns></returns>
+        public bool isBoss() {
+            return typeId == (int)Type.Boss;
+        }
 
         #endregion
 
@@ -2892,16 +2902,16 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int turns { get; protected set; } // 状态回合
 
-		/// <summary>
-		/// 状态对象
-		/// </summary>
-		ExerProState _state = null;
+        /// <summary>
+        /// 状态对象
+        /// </summary>
+        ExerProState _state = null;
 
-		/// <summary>
-		/// 获取状态
-		/// </summary>
-		/// <returns></returns>
-		public ExerProState state() {
+        /// <summary>
+        /// 获取状态
+        /// </summary>
+        /// <returns></returns>
+        public ExerProState state() {
             return _state = _state ?? DataService.get().exerProState(stateId);
         }
 
@@ -2947,18 +2957,18 @@ namespace ExerPro.EnglishModule.Data {
                 this.turns = max;
         }
 
-		/// <summary>
-		/// 特性
-		/// </summary>
-		/// <returns></returns>
-		public ExerProTraitData[] traits() {
-			return state().traits;
-		}
+        /// <summary>
+        /// 特性
+        /// </summary>
+        /// <returns></returns>
+        public ExerProTraitData[] traits() {
+            return state().traits;
+        }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public RuntimeState() { }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeState() { }
         public RuntimeState(int stateId, int turns = 0) {
             this.stateId = stateId; this.turns = turns;
         }
@@ -2976,14 +2986,14 @@ namespace ExerPro.EnglishModule.Data {
         public const int MHPParamId = 1;
         public const int PowerParamId = 2;
         public const int DefenseParamId = 3;
-		public const int AgileParamId = 4;
+        public const int AgileParamId = 4;
 
-		public const int MaxParamCount = 4;
+        public const int MaxParamCount = 4;
 
-		/// <summary>
-		/// 属性
-		/// </summary>
-		[AutoConvert]
+        /// <summary>
+        /// 属性
+        /// </summary>
+        [AutoConvert]
         public int hp { get; protected set; }
 
         /// <summary>
@@ -3028,49 +3038,49 @@ namespace ExerPro.EnglishModule.Data {
 
         #endregion
 
-		#region 数据读取
+        #region 数据读取
 
-		/// <summary>
-		/// 读取自定义属性
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void loadCustomAttributes(JsonData json) {
-			base.loadCustomAttributes(json);
+        /// <summary>
+        /// 读取自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void loadCustomAttributes(JsonData json) {
+            base.loadCustomAttributes(json);
 
-			this.states.Clear();
+            this.states.Clear();
 
-			var states = DataLoader.load(json, "states");
-			if (states != null) {
-				Debug.Log("Load states: " + states.ToJson());
+            var states = DataLoader.load(json, "states");
+            if (states != null) {
+                Debug.Log("Load states: " + states.ToJson());
                 states.SetJsonType(JsonType.Object);
                 foreach (KeyValuePair<string, JsonData> pair in states) {
-					var key = int.Parse(pair.Key);
-					var data = DataLoader.load<RuntimeState>(pair.Value);
-					Debug.Log("Load states: " + key + ", " + data);
-					this.states.Add(key, data);
-				}
-			}
+                    var key = int.Parse(pair.Key);
+                    var data = DataLoader.load<RuntimeState>(pair.Value);
+                    Debug.Log("Load states: " + key + ", " + data);
+                    this.states.Add(key, data);
+                }
+            }
 
-		}
+        }
 
-		/// <summary>
-		/// 转化自定义属性
-		/// </summary>
-		/// <param name="json"></param>
-		protected override void convertCustomAttributes(ref JsonData json) {
-			base.convertCustomAttributes(ref json);
-			var states = new JsonData();
+        /// <summary>
+        /// 转化自定义属性
+        /// </summary>
+        /// <param name="json"></param>
+        protected override void convertCustomAttributes(ref JsonData json) {
+            base.convertCustomAttributes(ref json);
+            var states = new JsonData();
 
-			states.SetJsonType(JsonType.Object);
-			foreach (var pair in this.states)
-				states[pair.Key.ToString()] = DataLoader.convert(pair.Value);
+            states.SetJsonType(JsonType.Object);
+            foreach (var pair in this.states)
+                states[pair.Key.ToString()] = DataLoader.convert(pair.Value);
 
-			json["states"] = states;
-		}
+            json["states"] = states;
+        }
 
-		#endregion
+        #endregion
 
-		#region 数据控制
+        #region 数据控制
 
         /// <summary>
         /// 是否玩家
@@ -3090,11 +3100,11 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public abstract Texture2D getBattlePicture();
 
-		/// <summary>
-		/// 当前性格/性质
-		/// </summary>
-		/// <returns></returns>
-		public virtual string currentCharacter() { return ""; }
+        /// <summary>
+        /// 当前性格/性质
+        /// </summary>
+        /// <returns></returns>
+        public virtual string currentCharacter() { return ""; }
 
         #region 属性控制
 
@@ -3208,18 +3218,18 @@ namespace ExerPro.EnglishModule.Data {
             _deltaHP.critical = true;
         }
 
-		/// <summary>
-		/// 设置值变化
-		/// </summary>
-		/// <param name="value"></param>
-		public void setHPChange(int value) {
-			_deltaHP = _deltaHP ?? new DeltaHP();
-			_deltaHP.value += value;
+        /// <summary>
+        /// 设置值变化
+        /// </summary>
+        /// <param name="value"></param>
+        public void setHPChange(int value) {
+            _deltaHP = _deltaHP ?? new DeltaHP();
+            _deltaHP.value += value;
 
-			Debug.Log("setHPChange: " + value + ", sum: " + _deltaHP.value);
-		}
+            Debug.Log("setHPChange: " + value + ", sum: " + _deltaHP.value);
+        }
 
-		#endregion
+        #endregion
 
         /// <summary>
         /// 改变HP
@@ -3248,56 +3258,56 @@ namespace ExerPro.EnglishModule.Data {
         /// <param name="rate">增加率</param>
         /// <param name="show">是否显示</param>
         public void addHP(double rate, bool show = true) {
-			changeHP((int)Math.Round(hp + mhp() * rate), show);
-		}
+            changeHP((int)Math.Round(hp + mhp() * rate), show);
+        }
 
-		/// <summary>
-		/// 增加HP
-		/// </summary>
-		/// <param name="rate">增加率</param>
-		/// <param name="show">是否显示</param>
-		public void addHPInRestNode(double rate, bool show = true) {
-			var traits = filterTraits(ExerProTraitData.Code.RestRecoverPlus);
+        /// <summary>
+        /// 增加HP
+        /// </summary>
+        /// <param name="rate">增加率</param>
+        /// <param name="show">是否显示</param>
+        public void addHPInRestNode(double rate, bool show = true) {
+            var traits = filterTraits(ExerProTraitData.Code.RestRecoverPlus);
 
-			int val = sumTraits(traits);
-			rate += sumTraits(traits, 1) / 100.0;
-			addHP((int)Math.Round(mhp() * rate + val));
-		}
+            int val = sumTraits(traits);
+            rate += sumTraits(traits, 1) / 100.0;
+            addHP((int)Math.Round(mhp() * rate + val));
+        }
 
-		/// <summary>
-		/// 回复所有HP
-		/// </summary>
-		/// <param name="show">是否显示</param>
-		public void recoverAll(bool show = true) {
-			changeHP(mhp(), show);
-		}
+        /// <summary>
+        /// 回复所有HP
+        /// </summary>
+        /// <param name="show">是否显示</param>
+        public void recoverAll(bool show = true) {
+            changeHP(mhp(), show);
+        }
 
-		/// <summary>
-		/// 是否死亡
-		/// </summary>
-		/// <returns></returns>
-		public bool isDead() {
+        /// <summary>
+        /// 是否死亡
+        /// </summary>
+        /// <returns></returns>
+        public bool isDead() {
             return hp <= 0;
         }
 
-		/// <summary>
-		/// 是否失败
-		/// </summary>
-		/// <returns></returns>
-		public bool isLost() {
-			return isDead() || isEscaped;
-		}
+        /// <summary>
+        /// 是否失败
+        /// </summary>
+        /// <returns></returns>
+        public bool isLost() {
+            return isDead() || isEscaped;
+        }
 
-		#endregion
+        #endregion
 
-		#region 属性统一接口
+        #region 属性统一接口
 
-		/// <summary>
-		/// 基本属性值
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <returns>属性值</returns>
-		public virtual int baseParam(int paramId) {
+        /// <summary>
+        /// 基本属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性值</returns>
+        public virtual int baseParam(int paramId) {
             switch (paramId) {
                 case MHPParamId: return baseMHP();
                 case PowerParamId: return basePower();
@@ -3329,215 +3339,215 @@ namespace ExerPro.EnglishModule.Data {
             foreach (var buff in buffs)
                 if (buff.paramId == paramId && !buff.isOutOfDate()) rate *= buff.rate;
             return rate;
-		}
+        }
 
-		/// <summary>
-		/// 特性属性
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <returns></returns>
-		public virtual int traitParamVal(int paramId) {
-			return sumTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
-		}
+        /// <summary>
+        /// 特性属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public virtual int traitParamVal(int paramId) {
+            return sumTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
+        }
 
-		/// <summary>
-		/// 特性属性
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <returns></returns>
-		public virtual double traitParamRate(int paramId) {
-			return multTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
-		}
+        /// <summary>
+        /// 特性属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public virtual double traitParamRate(int paramId) {
+            return multTraits<int>(ExerProTraitData.Code.ParamAdd, paramId);
+        }
 
-		/// <summary>
-		/// 额外属性
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <returns></returns>
-		public virtual int extraParam(int paramId) {
-			return 0;
-		}
+        /// <summary>
+        /// 额外属性
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns></returns>
+        public virtual int extraParam(int paramId) {
+            return 0;
+        }
 
-		/// <summary>
-		/// 属性值
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <returns>属性值</returns>
-		public int param(int paramId) {
-			var base_ = baseParam(paramId) + traitParamVal(paramId) + buffValue(paramId);
-			var rate = buffRate(paramId) * traitParamRate(paramId);
-			var extra = extraParam(paramId);
-			return (int)Math.Round((base_) * rate + extra);
-		}
+        /// <summary>
+        /// 属性值
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <returns>属性值</returns>
+        public int param(int paramId) {
+            var base_ = baseParam(paramId) + traitParamVal(paramId) + buffValue(paramId);
+            var rate = buffRate(paramId) * traitParamRate(paramId);
+            var extra = extraParam(paramId);
+            return (int)Math.Round((base_) * rate + extra);
+        }
 
-		/// <summary>
-		/// 属性相加
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <param name="value">增加值</param>
-		public void addParam(int paramId, int value) {
-			addBuff(paramId, value);
-		}
-		public void addParam(int paramId, int value, double rate) {
-			addBuff(paramId, value, rate);
-		}
+        /// <summary>
+        /// 属性相加
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">增加值</param>
+        public void addParam(int paramId, int value) {
+            addBuff(paramId, value);
+        }
+        public void addParam(int paramId, int value, double rate) {
+            addBuff(paramId, value, rate);
+        }
 
-		/// <summary>
-		/// 属性相乘
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <param name="rate">比率</param>
-		public void multParam(int paramId, double rate) {
+        /// <summary>
+        /// 属性相乘
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="rate">比率</param>
+        public void multParam(int paramId, double rate) {
             addBuff(paramId, 0, rate);
-		}
+        }
 
-		/// <summary>
-		/// 伤害加成
-		/// </summary>
-		public int damagePlusVal() {
-			return sumTraits(ExerProTraitData.Code.DamagePlus);
-		}
-		public double damagePlusRate() {
-			return multTraits(ExerProTraitData.Code.DamagePlus);
-		}
+        /// <summary>
+        /// 伤害加成
+        /// </summary>
+        public int damagePlusVal() {
+            return sumTraits(ExerProTraitData.Code.DamagePlus);
+        }
+        public double damagePlusRate() {
+            return multTraits(ExerProTraitData.Code.DamagePlus);
+        }
 
-		/// <summary>
-		/// 受伤加成
-		/// </summary>
-		public int hurtPlusVal() {
-			return sumTraits(ExerProTraitData.Code.HurtPlus);
-		}
-		public double hurtPlusRate() {
-			return multTraits(ExerProTraitData.Code.HurtPlus);
-		}
+        /// <summary>
+        /// 受伤加成
+        /// </summary>
+        public int hurtPlusVal() {
+            return sumTraits(ExerProTraitData.Code.HurtPlus);
+        }
+        public double hurtPlusRate() {
+            return multTraits(ExerProTraitData.Code.HurtPlus);
+        }
 
-		/// <summary>
-		/// 回复加成
-		/// </summary>
-		public int recoverPlusVal() {
-			return sumTraits(ExerProTraitData.Code.RecoverPlus);
-		}
-		public double recoverPlusRate() {
-			return multTraits(ExerProTraitData.Code.RecoverPlus);
-		}
+        /// <summary>
+        /// 回复加成
+        /// </summary>
+        public int recoverPlusVal() {
+            return sumTraits(ExerProTraitData.Code.RecoverPlus);
+        }
+        public double recoverPlusRate() {
+            return multTraits(ExerProTraitData.Code.RecoverPlus);
+        }
 
-		#endregion
+        #endregion
 
-		#endregion
+        #endregion
 
-		#region 特性控制
+        #region 特性控制
 
-		/// <summary>
-		/// 获取所有特性
-		/// </summary>
-		/// <returns></returns>
-		public virtual List<ExerProTraitData> traits() {
-			return statesTraits();
-		}
+        /// <summary>
+        /// 获取所有特性
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<ExerProTraitData> traits() {
+            return statesTraits();
+        }
 
-		/// <summary>
-		/// 所有状态特性
-		/// </summary>
-		List<ExerProTraitData> statesTraits() {
-			var res = new List<ExerProTraitData>();
-			foreach (var state in states)
-				res.AddRange(state.Value.traits());
-			return res;
-		}
+        /// <summary>
+        /// 所有状态特性
+        /// </summary>
+        List<ExerProTraitData> statesTraits() {
+            var res = new List<ExerProTraitData>();
+            foreach (var state in states)
+                res.AddRange(state.Value.traits());
+            return res;
+        }
 
-		/// <summary>
-		/// 获取特定特性
-		/// </summary>
-		/// <param name="code">特性枚举</param>
-		/// <returns>返回符合条件的特性</returns>
-		public List<ExerProTraitData> filterTraits(ExerProTraitData.Code code) {
-			return traits().FindAll(trait => trait.code == (int)code);
-		}
-		/// <param name="param">参数取值</param>
-		/// <param name="id">参数下标</param>
-		public List<ExerProTraitData> filterTraits<T>(ExerProTraitData.Code code, T param, int id = 0) {
+        /// <summary>
+        /// 获取特定特性
+        /// </summary>
+        /// <param name="code">特性枚举</param>
+        /// <returns>返回符合条件的特性</returns>
+        public List<ExerProTraitData> filterTraits(ExerProTraitData.Code code) {
+            return traits().FindAll(trait => trait.code == (int)code);
+        }
+        /// <param name="param">参数取值</param>
+        /// <param name="id">参数下标</param>
+        public List<ExerProTraitData> filterTraits<T>(ExerProTraitData.Code code, T param, int id = 0) {
             return traits().FindAll(trait => trait.code == (int)code
-				&& Equals(trait.get<T>(id), param));
-		}
+                && Equals(trait.get<T>(id), param));
+        }
 
-		/// <summary>
-		/// 特性值求和
-		/// </summary>
-		/// <param name="code">特性枚举</param>
-		/// <param name="index">特性参数索引</param>
-		/// <param name="base_">求和基础值</param>
-		/// <returns></returns>
-		public int sumTraits(ExerProTraitData.Code code, int index = 0, int base_ = 0) {
-			return sumTraits(filterTraits(code), index, base_);
-		}
-		/// <param name="param">参数取值</param>
-		/// <param name="id">参数下标</param>
-		public int sumTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 1, int base_ = 0) {
-			return sumTraits(filterTraits(code, param, id), index, base_);
-		}
-		public int sumTraits(List<ExerProTraitData> traits, int index = 0, int base_ = 0) {
-			var res = base_;
-			foreach (var trait in traits)
-				res += trait.get(index, 0);
-			return res;
-		}
+        /// <summary>
+        /// 特性值求和
+        /// </summary>
+        /// <param name="code">特性枚举</param>
+        /// <param name="index">特性参数索引</param>
+        /// <param name="base_">求和基础值</param>
+        /// <returns></returns>
+        public int sumTraits(ExerProTraitData.Code code, int index = 0, int base_ = 0) {
+            return sumTraits(filterTraits(code), index, base_);
+        }
+        /// <param name="param">参数取值</param>
+        /// <param name="id">参数下标</param>
+        public int sumTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 1, int base_ = 0) {
+            return sumTraits(filterTraits(code, param, id), index, base_);
+        }
+        public int sumTraits(List<ExerProTraitData> traits, int index = 0, int base_ = 0) {
+            var res = base_;
+            foreach (var trait in traits)
+                res += trait.get(index, 0);
+            return res;
+        }
 
-		/// <summary>
-		/// 特性值求积
-		/// </summary>
-		/// <param name="code">特性枚举</param>
-		/// <param name="index">特性参数索引</param>
-		/// <param name="base_">概率基础值</param>
-		/// <returns></returns>
-		public double multTraits(ExerProTraitData.Code code, int index = 1, int base_ = 100) {
-			return multTraits(filterTraits(code), index, base_);
-		}
-		/// <param name="param">参数取值</param>
-		/// <param name="id">参数下标</param>
-		public double multTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 2, int base_ = 100) {
-			return multTraits(filterTraits(code, param, id), index, base_);
-		}
-		public double multTraits(List<ExerProTraitData> traits, int index = 1, int base_ = 100) {
-			var res = 1.0;
-			foreach (var trait in traits)
-				res *= (base_ + trait.get(index, 0)) / 100.0;
-			return res;
-		}
+        /// <summary>
+        /// 特性值求积
+        /// </summary>
+        /// <param name="code">特性枚举</param>
+        /// <param name="index">特性参数索引</param>
+        /// <param name="base_">概率基础值</param>
+        /// <returns></returns>
+        public double multTraits(ExerProTraitData.Code code, int index = 1, int base_ = 100) {
+            return multTraits(filterTraits(code), index, base_);
+        }
+        /// <param name="param">参数取值</param>
+        /// <param name="id">参数下标</param>
+        public double multTraits<T>(ExerProTraitData.Code code, T param, int id = 0, int index = 2, int base_ = 100) {
+            return multTraits(filterTraits(code, param, id), index, base_);
+        }
+        public double multTraits(List<ExerProTraitData> traits, int index = 1, int base_ = 100) {
+            var res = 1.0;
+            foreach (var trait in traits)
+                res *= (base_ + trait.get(index, 0)) / 100.0;
+            return res;
+        }
 
-		#endregion
+        #endregion
 
-		#region Buff控制
+        #region Buff控制
 
-		/// <summary>
-		/// 状态是否改变
-		/// </summary>
-		List<RuntimeBuff> _addedBuffs = new List<RuntimeBuff>();
-		public List<RuntimeBuff> addedBuffs {
-			get {
-				var res = _addedBuffs;
-				_addedBuffs.Clear(); return res;
-			}
-		}
+        /// <summary>
+        /// 状态是否改变
+        /// </summary>
+        List<RuntimeBuff> _addedBuffs = new List<RuntimeBuff>();
+        public List<RuntimeBuff> addedBuffs {
+            get {
+                var res = _addedBuffs;
+                _addedBuffs.Clear(); return res;
+            }
+        }
 
-		#region Buff变更
+        #region Buff变更
 
-		/// <summary>
-		/// 添加Buff
-		/// </summary>
-		/// <param name="paramId">属性ID</param>
-		/// <param name="value">变化值</param>
-		/// <param name="rate">变化率</param>
-		/// <param name="turns">持续回合</param>
-		/// <returns>返回添加的Buff</returns>
-		public RuntimeBuff addBuff(int paramId,
+        /// <summary>
+        /// 添加Buff
+        /// </summary>
+        /// <param name="paramId">属性ID</param>
+        /// <param name="value">变化值</param>
+        /// <param name="rate">变化率</param>
+        /// <param name="turns">持续回合</param>
+        /// <returns>返回添加的Buff</returns>
+        public RuntimeBuff addBuff(int paramId,
             int value = 0, double rate = 1, int turns = 0) {
             return addBuff(new RuntimeBuff(paramId, value, rate, turns));
         }
         public RuntimeBuff addBuff(RuntimeBuff buff) {
             buffs.Add(buff); onBuffAdded(buff);
-			_addedBuffs.Add(buff);
+            _addedBuffs.Add(buff);
 
-			return buff;
+            return buff;
         }
 
         /// <summary>
@@ -3547,16 +3557,16 @@ namespace ExerPro.EnglishModule.Data {
         public void removeBuff(int index, bool force = false) {
             var buff = buffs[index];
             buffs.RemoveAt(index);
-			_addedBuffs.Remove(buff);
+            _addedBuffs.Remove(buff);
 
-			onBuffRemoved(buff, force);
+            onBuffRemoved(buff, force);
         }
         /// <param name="buff">Buff对象</param>
         public void removeBuff(RuntimeBuff buff, bool force = false) {
             buffs.Remove(buff);
-			_addedBuffs.Remove(buff);
+            _addedBuffs.Remove(buff);
 
-			onBuffRemoved(buff, force);
+            onBuffRemoved(buff, force);
         }
 
         /// <summary>
@@ -3740,8 +3750,8 @@ namespace ExerPro.EnglishModule.Data {
         /// 清除所有状态
         /// </summary>
         public void clearStates(bool force = true) {
-			var tmp = new Dictionary<int, RuntimeState>(states);
-			foreach (var pair in tmp)
+            var tmp = new Dictionary<int, RuntimeState>(states);
+            foreach (var pair in tmp)
                 removeState(pair.Value, force: force);
         }
 
@@ -3790,13 +3800,13 @@ namespace ExerPro.EnglishModule.Data {
             return res;
         }
 
-		/// <summary>
-		/// 是否处于可移动状态
-		/// </summary>
-		/// <returns></returns>
-		public bool isMovableState() {
-			return !isEscaped && !isDead();
-		}
+        /// <summary>
+        /// 是否处于可移动状态
+        /// </summary>
+        /// <returns></returns>
+        public bool isMovableState() {
+            return !isEscaped && !isDead();
+        }
 
         #endregion
 
@@ -3825,152 +3835,152 @@ namespace ExerPro.EnglishModule.Data {
         /// <returns></returns>
         public RuntimeActionResult getResult() {
             var res = currentResult;
-			clearResult();
-			return res;
+            clearResult();
+            return res;
         }
 
-		/// <summary>
-		/// 清除当前结果
-		/// </summary>
-		public void clearResult() {
-			currentResult = null;
-		}
-
-		#endregion
-
-        #region 行动控制
-
-		/// <summary>
-		/// 行动序列
-		/// </summary>
-		Queue<RuntimeAction> actions = new Queue<RuntimeAction>();
-
-		/// <summary>
-		/// 当前行动
-		/// </summary>
-		/// <returns></returns>
-		public virtual RuntimeAction currentAction() {
-			if (actions.Count <= 0) return null;
-			var action = actions.Dequeue();
-			if (!isMovableState()) return null;
-			return action;
-		}
-
-		/// <summary>
-		/// 增加行动
-		/// </summary>
-		/// <param name="action">行动</param>
-		public void addAction(RuntimeAction action) {
-			Debug.Log(this + " addAction " + action?.toJson().ToJson());
-			actions.Enqueue(action);
-		}
-
-		/// <summary>
-		/// 处理指定行动
-		/// </summary>
-		public virtual void processAction(RuntimeAction action) {
-			if (!isMovableState()) return;
-			action.generateResults();
-			foreach (var obj in action.objects)
-				obj.applyResult(action.result(obj));
-		}
-
-		/// <summary>
-		/// 处理当前行动（处理后移出队列）
-		/// </summary>
-		/// <param name="action"></param>
-		public virtual void processCurrentAction() {
-			processAction(currentAction());
-		}
-
-		/// <summary>
-		/// 清除所有行动
-		/// </summary>
-		public void clearActions() {
-			actions.Clear();
-		}
-
-		#endregion
-
-		#region 回调控制
-
-		/// <summary>
-		/// 战斗开始回调
-		/// </summary>
-		public virtual void onBattleStart() {
-			CalcService.ExerProTraitsCalc.calcOnBattleStart(this);
-
-			onRoundStart(0);
-			clearStates();
-			clearBuffs();
-		}
-
-		/// <summary>
-		/// 回合开始回调
-		/// </summary>
-		/// <param name="round">回合数</param>
-		public virtual void onRoundStart(int round) {
-			if (round > 0)
-				CalcService.ExerProTraitsCalc.calcOnRoundStart(this);
-
-			_deltaHP = null;
-			_addedBuffs.Clear();
-			_isStateChanged = false;
-			clearActions();
-		}
-
-		#region BUFF回调
-
-		/// <summary>
-		/// BUFF添加回调
-		/// </summary>
-		public virtual void onBuffAdded(RuntimeBuff buff) { }
-
-		/// <summary>
-		/// BUFF移除回调
-		/// </summary>
-		public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
-
-		#endregion
-
-		#region 状态回调
-
-		/// <summary>
-		/// 状态添加回调
-		/// </summary>
-		public virtual void onStateAdded(RuntimeState state) { }
-
-		/// <summary>
-		/// 状态解除回调
-		/// </summary>
-		public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
+        /// <summary>
+        /// 清除当前结果
+        /// </summary>
+        public void clearResult() {
+            currentResult = null;
+        }
 
         #endregion
 
-		/// <summary>
-		/// 当前行动结束回调
-		/// </summary>
-		public virtual void onActionEnd(RuntimeAction action) { }
+        #region 行动控制
 
-		/// <summary>
-		/// 逃跑回调
-		/// </summary>
-		public virtual void onEscape() {
-			isEscaped = true; onActionEnd(null);
-		}
+        /// <summary>
+        /// 行动序列
+        /// </summary>
+        Queue<RuntimeAction> actions = new Queue<RuntimeAction>();
 
-		/// <summary>
-		/// 死亡回调
-		/// </summary>
-		protected virtual void onDie() { }
+        /// <summary>
+        /// 当前行动
+        /// </summary>
+        /// <returns></returns>
+        public virtual RuntimeAction currentAction() {
+            if (actions.Count <= 0) return null;
+            var action = actions.Dequeue();
+            if (!isMovableState()) return null;
+            return action;
+        }
 
-		/// <summary>
-		/// 回合结束回调
-		/// </summary>
-		/// <param name="round">回合数</param>
-		public virtual void onRoundEnd(int round) {
-			if (round > 0)
-				CalcService.ExerProTraitsCalc.calcOnRoundEnd(this);
+        /// <summary>
+        /// 增加行动
+        /// </summary>
+        /// <param name="action">行动</param>
+        public void addAction(RuntimeAction action) {
+            Debug.Log(this + " addAction " + action?.toJson().ToJson());
+            actions.Enqueue(action);
+        }
+
+        /// <summary>
+        /// 处理指定行动
+        /// </summary>
+        public virtual void processAction(RuntimeAction action) {
+            if (!isMovableState()) return;
+            action.generateResults();
+            foreach (var obj in action.objects)
+                obj.applyResult(action.result(obj));
+        }
+
+        /// <summary>
+        /// 处理当前行动（处理后移出队列）
+        /// </summary>
+        /// <param name="action"></param>
+        public virtual void processCurrentAction() {
+            processAction(currentAction());
+        }
+
+        /// <summary>
+        /// 清除所有行动
+        /// </summary>
+        public void clearActions() {
+            actions.Clear();
+        }
+
+        #endregion
+
+        #region 回调控制
+
+        /// <summary>
+        /// 战斗开始回调
+        /// </summary>
+        public virtual void onBattleStart() {
+            CalcService.ExerProTraitsCalc.calcOnBattleStart(this);
+
+            onRoundStart(0);
+            clearStates();
+            clearBuffs();
+        }
+
+        /// <summary>
+        /// 回合开始回调
+        /// </summary>
+        /// <param name="round">回合数</param>
+        public virtual void onRoundStart(int round) {
+            if (round > 0)
+                CalcService.ExerProTraitsCalc.calcOnRoundStart(this);
+
+            _deltaHP = null;
+            _addedBuffs.Clear();
+            _isStateChanged = false;
+            clearActions();
+        }
+
+        #region BUFF回调
+
+        /// <summary>
+        /// BUFF添加回调
+        /// </summary>
+        public virtual void onBuffAdded(RuntimeBuff buff) { }
+
+        /// <summary>
+        /// BUFF移除回调
+        /// </summary>
+        public virtual void onBuffRemoved(RuntimeBuff buff, bool force = false) { }
+
+        #endregion
+
+        #region 状态回调
+
+        /// <summary>
+        /// 状态添加回调
+        /// </summary>
+        public virtual void onStateAdded(RuntimeState state) { }
+
+        /// <summary>
+        /// 状态解除回调
+        /// </summary>
+        public virtual void onStateRemoved(RuntimeState state, bool force = false) { }
+
+        #endregion
+
+        /// <summary>
+        /// 当前行动结束回调
+        /// </summary>
+        public virtual void onActionEnd(RuntimeAction action) { }
+
+        /// <summary>
+        /// 逃跑回调
+        /// </summary>
+        public virtual void onEscape() {
+            isEscaped = true; onActionEnd(null);
+        }
+
+        /// <summary>
+        /// 死亡回调
+        /// </summary>
+        protected virtual void onDie() { }
+
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        /// <param name="round">回合数</param>
+        public virtual void onRoundEnd(int round) {
+            if (round > 0)
+                CalcService.ExerProTraitsCalc.calcOnRoundEnd(this);
 
             clearActions();
 
@@ -3978,10 +3988,10 @@ namespace ExerPro.EnglishModule.Data {
             processStatesRoundEnd();
         }
 
-		/// <summary>
-		/// 处理状态回合结束
-		/// </summary>
-		void processBuffsRoundEnd() {
+        /// <summary>
+        /// 处理状态回合结束
+        /// </summary>
+        void processBuffsRoundEnd() {
             for (int i = buffs.Count - 1; i >= 0; --i) {
                 var buff = buffs[i]; buff.onRoundEnd();
                 if (buff.isOutOfDate()) removeBuff(i);
@@ -4007,9 +4017,9 @@ namespace ExerPro.EnglishModule.Data {
         /// 战斗结束回调
         /// </summary>
         public virtual void onBattleEnd() {
-			CalcService.ExerProTraitsCalc.calcOnBattleEnd(this);
-			isEscaped = false;
-		}
+            CalcService.ExerProTraitsCalc.calcOnBattleEnd(this);
+            isEscaped = false;
+        }
 
         #endregion
 
@@ -4024,13 +4034,13 @@ namespace ExerPro.EnglishModule.Data {
 
         #endregion
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public RuntimeBattler() {
-			//reset();
-		}
-	}
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeBattler() {
+            //reset();
+        }
+    }
 
     /// <summary>
     /// 特训玩家
@@ -4045,7 +4055,7 @@ namespace ExerPro.EnglishModule.Data {
         public const int DefaultDefense = 0; // 初始格挡
         public const int DefaultAgile = 0; // 初始敏捷
 
-		public const int DefaultEnergy = 4; // 默认能量
+        public const int DefaultEnergy = 4; // 默认能量
 
         const int EnglishSubjectId = 3; // 英语科目ID
 
@@ -4061,84 +4071,84 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert("agile")]
         public int _agile { get; protected set; }
 
-		/// <summary>
-		/// 能量
-		/// </summary>
-		[AutoConvert]
-		public int energy { get; protected set; }
+        /// <summary>
+        /// 能量
+        /// </summary>
+        [AutoConvert]
+        public int energy { get; protected set; }
 
-		/// <summary>
-		/// 背包
-		/// </summary>
-		[AutoConvert]
+        /// <summary>
+        /// 背包
+        /// </summary>
+        [AutoConvert]
         public ExerProItemPack itemPack { get; protected set; } = new ExerProItemPack();
         [AutoConvert]
         public ExerProPotionPack potionPack { get; protected set; } = new ExerProPotionPack();
         [AutoConvert]
         public ExerProCardGroup cardGroup { get; protected set; } = new ExerProCardGroup();
 
-		/// <summary>
-		/// 药水槽
-		/// </summary>
-		[AutoConvert]
-		public ExerProPotionSlot potionSlot { get; protected set; }
+        /// <summary>
+        /// 药水槽
+        /// </summary>
+        [AutoConvert]
+        public ExerProPotionSlot potionSlot { get; protected set; }
 
-		/// <summary>
-		/// 对应的记录
-		/// </summary>
-		public ExerProRecord racord { get; protected set; } = null;
+        /// <summary>
+        /// 对应的记录
+        /// </summary>
+        public ExerProRecord racord { get; protected set; } = null;
 
-		/// <summary>
+        /// <summary>
         /// 对应的艾瑟萌槽项
         /// </summary>
         public ExerSlotItem slotItem { get; protected set; } = null;
 
-		#region 数据转化
+        #region 数据转化
 
-		///// <summary>
-		///// 转化为显示数据
-		///// </summary>
-		///// <param name="type">类型</param>
-		///// <returns></returns>
-		//public JsonData convertToDisplayData(string type = "") {
-		//    switch (type) {
-		//        case "hp": return convertHp();
-		//        default: return toJson();
-		//    }
-		//}
+        ///// <summary>
+        ///// 转化为显示数据
+        ///// </summary>
+        ///// <param name="type">类型</param>
+        ///// <returns></returns>
+        //public JsonData convertToDisplayData(string type = "") {
+        //    switch (type) {
+        //        case "hp": return convertHp();
+        //        default: return toJson();
+        //    }
+        //}
 
-		#endregion
+        #endregion
 
-		#region 数据控制
+        #region 数据控制
 
-		/// <summary>
-		/// 性质
-		/// </summary>
-		string character = "";
+        /// <summary>
+        /// 性质
+        /// </summary>
+        string character = "";
 
-		/// <summary>
-		/// 当前性格/性质
-		/// </summary>
-		/// <returns></returns>
-		public override string currentCharacter() {
-			return character;
-		}
+        /// <summary>
+        /// 当前性格/性质
+        /// </summary>
+        /// <returns></returns>
+        public override string currentCharacter() {
+            return character;
+        }
 
-		/// <summary>
-		/// 得到金钱
-		/// </summary>
-		/// <param name="val"></param>
-		public void gainGold(int val) {
-			racord?.gainGold(val);
-		}
+        /// <summary>
+        /// 得到金钱
+        /// </summary>
+        /// <param name="val"></param>
+        public void gainGold(int val) {
+            racord?.gainGold(val);
+        }
 
-		/// <summary>
-		/// 添加能量
-		/// </summary>
-		/// <param name="val"></param>
-		public void addEnergy(int val) {
-			energy = Math.Max(energy + val, 0);
-		}
+        /// <summary>
+        /// 添加能量
+        /// </summary>
+        /// <param name="val"></param>
+        public void addEnergy(int val) {
+            energy = Math.Max(energy + val, 0);
+        }
 
         /// <summary>
         /// 获取战斗图
@@ -4166,118 +4176,118 @@ namespace ExerPro.EnglishModule.Data {
             potionPack.removeItem(potion);
         }
 
-		/// <summary>
-		/// 使用卡牌
-		/// </summary>
-		/// <param name="card">卡牌</param>
-		public void useCard(ExerProPackCard card) {
-			character = card.item()._character;
-			cardGroup.useCard(card);
-			addEnergy(-card.cost());
-		}
+        /// <summary>
+        /// 使用卡牌
+        /// </summary>
+        /// <param name="card">卡牌</param>
+        public void useCard(ExerProPackCard card) {
+            character = card.item()._character;
+            cardGroup.useCard(card);
+            addEnergy(-card.cost());
+        }
 
-		/// <summary>
-		/// 获得物品
-		/// </summary>
-		/// <typeparam name="T"><peparam>
-		/// <param name="item">物品</param>
-		public void gainItem<T>(T item) where T : BaseExerProItem {
-			if (typeof(T) == typeof(ExerProItem)) gainItem(item as ExerProItem);
-			if (typeof(T) == typeof(ExerProPotion)) gainPotion(item as ExerProPotion);
-			if (typeof(T) == typeof(ExerProCard)) gainCard(item as ExerProCard);
-		}
-		public void gainItem<T>(int id) where T : BaseExerProItem {
-			if (typeof(T) == typeof(ExerProItem)) gainItem(id);
-			if (typeof(T) == typeof(ExerProPotion)) gainPotion(id);
-			if (typeof(T) == typeof(ExerProCard)) gainCard(id);
-		}
+        /// <summary>
+        /// 获得物品
+        /// </summary>
+        /// <typeparam name="T"><peparam>
+        /// <param name="item">物品</param>
+        public void gainItem<T>(T item) where T : BaseExerProItem {
+            if (typeof(T) == typeof(ExerProItem)) gainItem(item as ExerProItem);
+            if (typeof(T) == typeof(ExerProPotion)) gainPotion(item as ExerProPotion);
+            if (typeof(T) == typeof(ExerProCard)) gainCard(item as ExerProCard);
+        }
+        public void gainItem<T>(int id) where T : BaseExerProItem {
+            if (typeof(T) == typeof(ExerProItem)) gainItem(id);
+            if (typeof(T) == typeof(ExerProPotion)) gainPotion(id);
+            if (typeof(T) == typeof(ExerProCard)) gainCard(id);
+        }
 
-		/// <summary>
-		/// 获得卡牌
-		/// </summary>
-		/// <param name="item"></param>
-		public void gainCard(ExerProCard item) {
-			var contItem = getContItem(item);
-			if (contItem != null)
-				cardGroup.pushItem(contItem as ExerProPackCard);
-		}
-		public void gainCard(int id) {
-			gainCard(DataService.get().exerProCard(id));
-		}
+        /// <summary>
+        /// 获得卡牌
+        /// </summary>
+        /// <param name="item"></param>
+        public void gainCard(ExerProCard item) {
+            var contItem = getContItem(item);
+            if (contItem != null)
+                cardGroup.pushItem(contItem as ExerProPackCard);
+        }
+        public void gainCard(int id) {
+            gainCard(DataService.get().exerProCard(id));
+        }
 
-		/// <summary>
-		/// 获得卡牌
-		/// </summary>
-		/// <param name="item"></param>
-		public void gainItem(ExerProItem item) {
-			var contItem = getContItem(item);
-			if (contItem != null)
-				itemPack.pushItem(contItem as ExerProPackItem);
-		}
-		public void gainItem(int id) {
-			gainItem(DataService.get().exerProItem(id));
-		}
+        /// <summary>
+        /// 获得卡牌
+        /// </summary>
+        /// <param name="item"></param>
+        public void gainItem(ExerProItem item) {
+            var contItem = getContItem(item);
+            if (contItem != null)
+                itemPack.pushItem(contItem as ExerProPackItem);
+        }
+        public void gainItem(int id) {
+            gainItem(DataService.get().exerProItem(id));
+        }
 
-		/// <summary>
-		/// 获得卡牌
-		/// </summary>
-		/// <param name="item"></param>
-		public void gainPotion(ExerProPotion item) {
-			var contItem = getContItem(item);
-			if (contItem != null)
-				potionPack.pushItem(contItem as ExerProPackPotion);
-		}
-		public void gainPotion(int id) {
-			gainPotion(DataService.get().exerProPotion(id));
-		}
+        /// <summary>
+        /// 获得卡牌
+        /// </summary>
+        /// <param name="item"></param>
+        public void gainPotion(ExerProPotion item) {
+            var contItem = getContItem(item);
+            if (contItem != null)
+                potionPack.pushItem(contItem as ExerProPackPotion);
+        }
+        public void gainPotion(int id) {
+            gainPotion(DataService.get().exerProPotion(id));
+        }
 
-		/// <summary>
-		/// 获取容器
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public ExerProPackItem<T> getContItem<T>(T item)
-			where T : BaseExerProItem {
-			if (item == null) return null;
+        /// <summary>
+        /// 获取容器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public ExerProPackItem<T> getContItem<T>(T item)
+            where T : BaseExerProItem {
+            if (item == null) return null;
 
-			if (typeof(T) == typeof(ExerProItem))
+            if (typeof(T) == typeof(ExerProItem))
                 return new ExerProPackItem(item as ExerProItem) as ExerProPackItem<T>;
-			if (typeof(T) == typeof(ExerProPotion))
-				return new ExerProPackPotion(item as ExerProPotion) as ExerProPackItem<T>;
-			if (typeof(T) == typeof(ExerProCard))
-				return new ExerProPackCard(item as ExerProCard) as ExerProPackItem<T>;
+            if (typeof(T) == typeof(ExerProPotion))
+                return new ExerProPackPotion(item as ExerProPotion) as ExerProPackItem<T>;
+            if (typeof(T) == typeof(ExerProCard))
+                return new ExerProPackCard(item as ExerProCard) as ExerProPackItem<T>;
 
-			return null;
-		}
+            return null;
+        }
 
-		/// <summary>
-		/// 获取容器
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-        public PackContainer<P> getContainer<P,T>()
-            where P:ExerProPackItem<T>,new() where T : BaseExerProItem {
-			if (typeof(T) == typeof(ExerProItem))
-				return itemPack as PackContainer<P>;
-			if (typeof(T) == typeof(ExerProPotion))
-				return potionPack as PackContainer<P>;
-			if (typeof(T) == typeof(ExerProCard))
-				return cardGroup as PackContainer<P>;
+        /// <summary>
+        /// 获取容器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public PackContainer<P> getContainer<P, T>()
+            where P : ExerProPackItem<T>, new() where T : BaseExerProItem {
+            if (typeof(T) == typeof(ExerProItem))
+                return itemPack as PackContainer<P>;
+            if (typeof(T) == typeof(ExerProPotion))
+                return potionPack as PackContainer<P>;
+            if (typeof(T) == typeof(ExerProCard))
+                return cardGroup as PackContainer<P>;
 
-			return null;
-		}
+            return null;
+        }
 
-		/// <summary>
-		/// 获取所有特性
-		/// </summary>
-		/// <returns></returns>
-		public override List<ExerProTraitData> traits() {
-			var res = base.traits();
-			res.AddRange(itemPack.traits());
-			return res;
-		}
+        /// <summary>
+        /// 获取所有特性
+        /// </summary>
+        /// <returns></returns>
+        public override List<ExerProTraitData> traits() {
+            var res = base.traits();
+            res.AddRange(itemPack.traits());
+            return res;
+        }
 
-		#region 属性定义
+        #region 属性定义
 
         /// <summary>
         /// 基础最大生命值
@@ -4307,57 +4317,57 @@ namespace ExerPro.EnglishModule.Data {
 
         #region 回调控制
 
-		/// <summary>
-		/// 战斗开始回调
-		/// </summary>
-		public override void onBattleStart() {
-			base.onBattleStart();
-			cardGroup.onBattleStart();
-		}
+        /// <summary>
+        /// 战斗开始回调
+        /// </summary>
+        public override void onBattleStart() {
+            base.onBattleStart();
+            cardGroup.onBattleStart();
+        }
 
-		/// <summary>
-		/// 回合开始回调
-		/// </summary>
-		public override void onRoundStart(int round) {
-			base.onRoundStart(round);
-			energy = DefaultEnergy;
-		}
+        /// <summary>
+        /// 回合开始回调
+        /// </summary>
+        public override void onRoundStart(int round) {
+            base.onRoundStart(round);
+            energy = DefaultEnergy;
+        }
 
-		#region 卡牌事件
+        #region 卡牌事件
 
-		/// <summary>
-		/// 卡牌使用回调
-		/// </summary>
-		/// <param name="card">卡牌</param>
-		public virtual void onUseCard(ExerProPackCard card) {
+        /// <summary>
+        /// 卡牌使用回调
+        /// </summary>
+        /// <param name="card">卡牌</param>
+        public virtual void onUseCard(ExerProPackCard card) {
 
-		}
+        }
 
-		/// <summary>
-		/// 卡牌丢弃回调
-		/// </summary>
-		/// <param name="card">卡牌</param>
-		public virtual void onDiscardCard(ExerProPackCard card) {
+        /// <summary>
+        /// 卡牌丢弃回调
+        /// </summary>
+        /// <param name="card">卡牌</param>
+        public virtual void onDiscardCard(ExerProPackCard card) {
 
-		}
+        }
 
-		/// <summary>
-		/// 卡牌消耗回调
-		/// </summary>
-		/// <param name="card">卡牌</param>
-		public virtual void onConsumeCard(ExerProPackCard card) {
+        /// <summary>
+        /// 卡牌消耗回调
+        /// </summary>
+        /// <param name="card">卡牌</param>
+        public virtual void onConsumeCard(ExerProPackCard card) {
 
-		}
+        }
 
-		#endregion
+        #endregion
 
-		/// <summary>
-		/// 回合结束回调
-		/// </summary>
-		public override void onRoundEnd(int round) {
-			base.onRoundEnd(round);
-			cardGroup.onRoundEnd();
-		}
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        public override void onRoundEnd(int round) {
+            base.onRoundEnd(round);
+            cardGroup.onRoundEnd();
+        }
 
         /// <summary>
         /// 战斗结束回调
@@ -4389,14 +4399,14 @@ namespace ExerPro.EnglishModule.Data {
             slotItem = player.getExerSlotItem(EnglishSubjectId);
         }
 
-		/// <summary>
-		/// 配置药水槽
-		/// </summary>
-		void createPotionSlot() {
-			potionSlot = new ExerProPotionSlot(this);
-		}
+        /// <summary>
+        /// 配置药水槽
+        /// </summary>
+        void createPotionSlot() {
+            potionSlot = new ExerProPotionSlot(this);
+        }
 
-		#endregion
+        #endregion
 
         /// <summary>
         /// 读取自定义属性
@@ -4407,18 +4417,18 @@ namespace ExerPro.EnglishModule.Data {
             potionSlot.actor = this;
         }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		/// <param name="player"></param>
-		public RuntimeActor() { }
-		public RuntimeActor(ExerProRecord racord, Player player) {
-			this.racord = racord;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="player"></param>
+        public RuntimeActor() { }
+        public RuntimeActor(ExerProRecord racord, Player player) {
+            this.racord = racord;
 
-			setupPlayer(player);
-			createPotionSlot();
-			reset();
-		}
+            setupPlayer(player);
+            createPotionSlot();
+            reset();
+        }
     }
 
     /// <summary>
@@ -4457,19 +4467,19 @@ namespace ExerPro.EnglishModule.Data {
             return enemy.battle;
         }
 
-		/// <summary>
-		/// 当前性格/性质
-		/// </summary>
-		/// <returns></returns>
-		public override string currentCharacter() {
-			return enemy()._character;
-		}
+        /// <summary>
+        /// 当前性格/性质
+        /// </summary>
+        /// <returns></returns>
+        public override string currentCharacter() {
+            return enemy()._character;
+        }
 
-		/// <summary>
-		/// 是否玩家
-		/// </summary>
-		/// <returns></returns>
-		public override bool isEnemy() { return true; }
+        /// <summary>
+        /// 是否玩家
+        /// </summary>
+        /// <returns></returns>
+        public override bool isEnemy() { return true; }
 
         #region 属性控制
 
@@ -4525,32 +4535,32 @@ namespace ExerPro.EnglishModule.Data {
             }
         }
 
-		/// <summary>
-		/// 当前行动类型
-		/// </summary>
-		/// <returns></returns>
-		public int currentActionType() {
-			if (_currentEnemyAction == null) return 0;
-			return _currentEnemyAction.type;
-		}
+        /// <summary>
+        /// 当前行动类型
+        /// </summary>
+        /// <returns></returns>
+        public int currentActionType() {
+            if (_currentEnemyAction == null) return 0;
+            return _currentEnemyAction.type;
+        }
 
-		/// <summary>
-		/// 当前行动类型枚举
-		/// </summary>
-		/// <returns></returns>
-		public ExerProEnemy.Action.Type currentActionTypeEnum() {
-			if (_currentEnemyAction == null) return ExerProEnemy.Action.Type.Unset;
-			return _currentEnemyAction.typeEnum();
-		}
+        /// <summary>
+        /// 当前行动类型枚举
+        /// </summary>
+        /// <returns></returns>
+        public ExerProEnemy.Action.Type currentActionTypeEnum() {
+            if (_currentEnemyAction == null) return ExerProEnemy.Action.Type.Unset;
+            return _currentEnemyAction.typeEnum();
+        }
 
-		/// <summary>
-		/// 当前行动参数
-		/// </summary>
-		/// <returns></returns>
-		public JsonData currentActionParams() {
-			if (_currentEnemyAction == null) return new JsonData();
-			return _currentEnemyAction.params_;
-		}
+        /// <summary>
+        /// 当前行动参数
+        /// </summary>
+        /// <returns></returns>
+        public JsonData currentActionParams() {
+            if (_currentEnemyAction == null) return new JsonData();
+            return _currentEnemyAction.params_;
+        }
 
         /// <summary>
         /// 当前行动
@@ -4561,10 +4571,10 @@ namespace ExerPro.EnglishModule.Data {
             return base.currentAction();
         }
 
-		/// <summary>
-		/// 更新行动
-		/// </summary>
-		public bool updateAction() {
+        /// <summary>
+        /// 更新行动
+        /// </summary>
+        public bool updateAction() {
             if (!isMovableState()) return isActionEnd = true;
             processEnemyAction(); return isActionEnd;
         }
@@ -4573,11 +4583,11 @@ namespace ExerPro.EnglishModule.Data {
         /// 计算下一步
         /// </summary>
         public void calcNext(int round) {
-			RuntimeAction action;
-			var actor = BattleService.get().actor();
+            RuntimeAction action;
+            var actor = BattleService.get().actor();
             CalcService.EnemyNextCalc.calc(round, this, actor,
                 out _currentEnemyAction, out action);
-			if (action != null) addAction(action);
+            if (action != null) addAction(action);
         }
 
         /// <summary>
@@ -4585,47 +4595,47 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public void processEnemyAction() {
             if (!isActionStarted && (_currentEnemyAction == null ||
-				_currentEnemyAction.isUnset())) isActionEnd = true;
-			isActionStarted = true;
-		}
+                _currentEnemyAction.isUnset())) isActionEnd = true;
+            isActionStarted = true;
+        }
 
-		#endregion
+        #endregion
 
-		#region 回调控制
+        #region 回调控制
 
-		/// <summary>
-		/// 战斗开始回调
-		/// </summary>
-		public override void onBattleStart() {
-			base.onBattleStart();
-			reset();
-		}
+        /// <summary>
+        /// 战斗开始回调
+        /// </summary>
+        public override void onBattleStart() {
+            base.onBattleStart();
+            reset();
+        }
 
-		/// <summary>
-		/// 回合开始回调
-		/// </summary>
-		/// <param name="round"></param>
-		public override void onRoundStart(int round) {
-			base.onRoundStart(round);
-			isActionStarted = isActionEnd = false;
-			calcNext(round);
-		}
+        /// <summary>
+        /// 回合开始回调
+        /// </summary>
+        /// <param name="round"></param>
+        public override void onRoundStart(int round) {
+            base.onRoundStart(round);
+            isActionStarted = isActionEnd = false;
+            calcNext(round);
+        }
 
-		/// <summary>
-		/// 行动结束回调
-		/// </summary>
-		public override void onActionEnd(RuntimeAction action) {
-			base.onActionEnd(action);
-			isActionEnd = true;
-		}
+        /// <summary>
+        /// 行动结束回调
+        /// </summary>
+        public override void onActionEnd(RuntimeAction action) {
+            base.onActionEnd(action);
+            isActionEnd = true;
+        }
 
-		/// <summary>
-		/// 回合结束回调
-		/// </summary>
-		public override void onRoundEnd(int round) {
-			base.onRoundEnd(round);
-			_currentEnemyAction = null;
-		}
+        /// <summary>
+        /// 回合结束回调
+        /// </summary>
+        public override void onRoundEnd(int round) {
+            base.onRoundEnd(round);
+            _currentEnemyAction = null;
+        }
 
         #endregion
 
@@ -4660,32 +4670,32 @@ namespace ExerPro.EnglishModule.Data {
         /// </summary>
         public RuntimeActionResult[] results { get; protected set; } = null;
 
-		/// <summary>
-		/// 起手动画/目标动画
-		/// </summary>
-		public AnimationClip startAni { get; protected set; } = null;
-		public AnimationClip targetAni { get; protected set; } = null;
+        /// <summary>
+        /// 起手动画/目标动画
+        /// </summary>
+        public AnimationClip startAni { get; protected set; } = null;
+        public AnimationClip targetAni { get; protected set; } = null;
 
-		/// <summary>
-		/// 是否需要移动到对方位置
-		/// </summary>
-		public bool moveToTarget { get; set; } = false;
+        /// <summary>
+        /// 是否需要移动到对方位置
+        /// </summary>
+        public bool moveToTarget { get; set; } = false;
 
-		/// <summary>
-		/// 获取对应战斗者的结果
-		/// </summary>
-		/// <param name="battler">战斗者</param>
-		/// <returns></returns>
-		public RuntimeActionResult result(RuntimeBattler battler) {
-			foreach (var result in results)
-				if (result.object_ == battler) return result;
-			return null;
-		}
+        /// <summary>
+        /// 获取对应战斗者的结果
+        /// </summary>
+        /// <param name="battler">战斗者</param>
+        /// <returns></returns>
+        public RuntimeActionResult result(RuntimeBattler battler) {
+            foreach (var result in results)
+                if (result.object_ == battler) return result;
+            return null;
+        }
 
-		/// <summary>
-		/// 生成结果
-		/// </summary>
-		public void generateResults() {
+        /// <summary>
+        /// 生成结果
+        /// </summary>
+        public void generateResults() {
             // TODO: 结果生成
             results = CalcService.ExerProActionResultGenerator.generate(this);
         }
@@ -4694,35 +4704,35 @@ namespace ExerPro.EnglishModule.Data {
         /// 构造函数
         /// </summary>
         public RuntimeAction() { }
-		public RuntimeAction(RuntimeBattler subject,
-			RuntimeBattler[] object_, ExerProEffectData[] effects = null,
-			AnimationClip startAni = null, AnimationClip targetAni = null,
-			bool moveToTarget = false) {
+        public RuntimeAction(RuntimeBattler subject,
+            RuntimeBattler[] object_, ExerProEffectData[] effects = null,
+            AnimationClip startAni = null, AnimationClip targetAni = null,
+            bool moveToTarget = false) {
 
-			this.subject = subject; this.objects = object_;
-			this.startAni = startAni; this.targetAni = targetAni;
-			this.effects = effects ?? new ExerProEffectData[0];
-			this.moveToTarget = moveToTarget;
-		}
-		public RuntimeAction(RuntimeBattler subject,
-			RuntimeBattler object_, ExerProEffectData[] effects = null,
-			AnimationClip startAni = null, AnimationClip targetAni = null,
+            this.subject = subject; this.objects = object_;
+            this.startAni = startAni; this.targetAni = targetAni;
+            this.effects = effects ?? new ExerProEffectData[0];
+            this.moveToTarget = moveToTarget;
+        }
+        public RuntimeAction(RuntimeBattler subject,
+            RuntimeBattler object_, ExerProEffectData[] effects = null,
+            AnimationClip startAni = null, AnimationClip targetAni = null,
             bool moveToTarget = false) : this(subject,
                 new RuntimeBattler[] { object_ }, effects,
-				startAni, targetAni, moveToTarget) { }
-		public RuntimeAction(RuntimeBattler subject,
+                startAni, targetAni, moveToTarget) { }
+        public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler[] object_, BaseExerProItem item) :
             this(subject, object_, item.effects,
-				item.startAni, item.targetAni) { }
-		public RuntimeAction(RuntimeBattler subject,
+                item.startAni, item.targetAni) { }
+        public RuntimeAction(RuntimeBattler subject,
             RuntimeBattler object_, BaseExerProItem item) :
-			this(subject, new RuntimeBattler[] { object_ }, item) { }
-	}
+            this(subject, new RuntimeBattler[] { object_ }, item) { }
+    }
 
-	/// <summary>
-	/// 运行时行动结果
-	/// </summary>
-	public class RuntimeActionResult : BaseData {
+    /// <summary>
+    /// 运行时行动结果
+    /// </summary>
+    public class RuntimeActionResult : BaseData {
 
         /// <summary>
         /// 状态改变
@@ -4754,11 +4764,11 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public int hpDrain { get; set; }
 
-		/// <summary>
-		/// 能量获得
-		/// </summary>
-		[AutoConvert]
-		public int energyGain { get; set; }
+        /// <summary>
+        /// 能量获得
+        /// </summary>
+        [AutoConvert]
+        public int energyGain { get; set; }
 
         /// <summary>
         /// 状态/Buff变更
@@ -4778,43 +4788,43 @@ namespace ExerPro.EnglishModule.Data {
         [AutoConvert]
         public bool consumeSelect { get; set; } // 消耗是否可选
 
-		/// <summary>
-		/// 剧情数据
-		/// </summary>
-		[AutoConvert]
-		public int gainGold { get; set; } // 获得卡牌
-		[AutoConvert]
-		public int gainCard { get; set; } // 获得卡牌
-		[AutoConvert]
-		public int dropCard { get; set; } // 去除卡牌
-		[AutoConvert]
-		public int copyCard { get; set; } // 复制卡牌
-		[AutoConvert]
-		public int gainItem { get; set; } // 获得道具
-		[AutoConvert]
-		public int gainPotion { get; set; } // 获得药水
-		[AutoConvert]
-		public int loseItem { get; set; } // 失去道具
-		[AutoConvert]
-		public int losePotion { get; set; } // 失去药水
+        /// <summary>
+        /// 剧情数据
+        /// </summary>
+        [AutoConvert]
+        public int gainGold { get; set; } // 获得卡牌
+        [AutoConvert]
+        public int gainCard { get; set; } // 获得卡牌
+        [AutoConvert]
+        public int dropCard { get; set; } // 去除卡牌
+        [AutoConvert]
+        public int copyCard { get; set; } // 复制卡牌
+        [AutoConvert]
+        public int gainItem { get; set; } // 获得道具
+        [AutoConvert]
+        public int gainPotion { get; set; } // 获得药水
+        [AutoConvert]
+        public int loseItem { get; set; } // 失去道具
+        [AutoConvert]
+        public int losePotion { get; set; } // 失去药水
 
-		/// <summary>
-		/// 行动
-		/// </summary>
-		public RuntimeAction action { get; protected set; }
+        /// <summary>
+        /// 行动
+        /// </summary>
+        public RuntimeAction action { get; protected set; }
 
-		/// <summary>
-		/// 所属目标
-		/// </summary>
-		public RuntimeBattler object_ { get; protected set; }
+        /// <summary>
+        /// 所属目标
+        /// </summary>
+        public RuntimeBattler object_ { get; protected set; }
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		public RuntimeActionResult() { }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RuntimeActionResult() { }
         public RuntimeActionResult(RuntimeBattler object_, RuntimeAction action) {
-			this.object_ = object_; this.action = action;
-		}
+            this.object_ = object_; this.action = action;
+        }
     }
 
     #endregion

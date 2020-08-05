@@ -10,13 +10,14 @@ using ExerPro.EnglishModule.Data;
 
 using FrontendWrongItem = ExerPro.EnglishModule.Data.
 	CorrectionQuestion.FrontendWrongItem;
+using Assets.Scripts.Core.UI;
 
 namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
     /// <summary>
     /// 改错题目显示
     /// </summary
-    public class ArticleDisplay : ContainerDisplay<string>,
+    public class ArticleDisplay : SelectableContainerDisplay<string>,
         IItemDisplay<CorrectionQuestion> {
 
 		/// <summary>
@@ -29,11 +30,13 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// 外部变量定义
 		/// </summary>
 		public float scrollDelta = 64;
+        public CorrectionLayout correctionLayout;
+        public CorrectionScene scene;
 
-		/// <summary>
-		/// 内部变量定义
-		/// </summary>
-		public Dictionary<WordDisplay, FrontendWrongItem> answers { get; set; }
+        /// <summary>
+        /// 内部变量定义
+        /// </summary>
+        public Dictionary<WordDisplay, FrontendWrongItem> answers { get; set; }
 			= new Dictionary<WordDisplay, FrontendWrongItem>();
 		public Dictionary<WordDisplay, FrontendWrongItem> tmpAnswers { get; set; }
 			= new Dictionary<WordDisplay, FrontendWrongItem>();
@@ -73,7 +76,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
         /// <param name="force">强制</param>
         /// <returns>null</returns>
         public void setItem(CorrectionQuestion item, bool force = false) {
-            question = item; setItems(item.sentences());
+            question = item; setItems(item.words());
         }
 
         /// <summary>
@@ -82,6 +85,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
         /// <param name="item"></param>
         public void startView(CorrectionQuestion item) {
             startView(); setItem(item, true);
+
+            Invoke("layout", 0.1f);
+            return;
+        }
+        public void layout() {
+            correctionLayout.initialize();
         }
 
 		#endregion
@@ -215,32 +224,40 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <returns></returns>
 		public WordDisplay getWordDisplay(int sid, int wid) {
 			if (sid <= 0 || wid <= 0) return null;
-			if (sid > subViews.Count) {
-				Debug.LogWarning("Article.getWordDisplay sid warnning: " + 
-					sid + " for: " + subViews.Count);
-				return null;
-			}
+            //if (sid > subViews.Count) {
+            //	Debug.LogWarning("Article.getWordDisplay sid warnning: " + 
+            //		sid + " for: " + subViews.Count);
+            //	return null;
+            //}
 
-			var sentence = subViews[sid - 1] as SentenceDisplay;
-			var res = sentence?.container?.getWordDisplay(wid);
-			if (res == null) 
+            //var sentence = subViews[sid - 1] as SentenceDisplay;
+            //var res = sentence?.container?.getWordDisplay(wid);
+            //lfw
+            int index = 0;
+            for(int i = 1;i < sid; i++) {
+                index += question.words(i).Length;
+            }
+            index += wid;
+            var res = subViews[index - 1] as WordDisplay;
+
+            if (res == null) 
 				Debug.LogWarning("Article.getWordDisplay " +
 					"sid, wid warnning: " + sid + ", " + wid);
 			return res;
 		}
+        //lfw
+		///// <summary>
+		///// 全部取消选择
+		///// </summary>
+		///// <param name="expect">排除项</param>
+		//public void deselectAll(WordsContainer expect = null) {
+		//	foreach (var sub in subViews) {
+		//		var display = sub as SentenceDisplay;
+		//		if (display?.container == container) continue;
 
-		/// <summary>
-		/// 全部取消选择
-		/// </summary>
-		/// <param name="expect">排除项</param>
-		public void deselectAll(WordsContainer expect = null) {
-			foreach (var sub in subViews) {
-				var display = sub as SentenceDisplay;
-				if (display?.container == container) continue;
-
-				display?.container?.deselect();
-			}
-		}
+		//		display?.container?.deselect();
+		//	}
+		//}
 
 		/// <summary>
 		/// 返回所有错误项
@@ -265,23 +282,38 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 			return res;
 		}
 
-		#endregion
+        #endregion
 
-		#region 界面绘制
+        #region 回调控制
 
-		/// <summary>
-		/// 子视图创建回调
-		/// </summary>
-		/// <param name="sub"></param>
-		/// <param name="index"></param>
-		protected override void onSubViewCreated(ItemDisplay<string> sub, int index) {
+        /// <summary>
+        /// 点击回调
+        /// </summary>
+        /// <param name="index"></param>
+        public override void onClick(int index) {
+            base.onClick(index);
+            scene.onWordSelected(subViews[index] as WordDisplay);
+        }
+
+        #endregion
+
+        #region 界面绘制
+
+        /// <summary>
+        /// 子视图创建回调
+        /// </summary>
+        /// <param name="sub"></param>
+        /// <param name="index"></param>
+        protected override void onSubViewCreated(SelectableItemDisplay<string> sub, int index) {
 			base.onSubViewCreated(sub, index);
 
-			var display = sub as SentenceDisplay;
-			if (display == null) return;
-			display.sid = index + 1;
-			display.articleDisplay = this;
-		}
+            var display = sub as WordDisplay;
+            if (display == null) return;
+            display.articleDisplay = this;
+            display.originalWord = items[index];
+            Debug.Log("aaa" + display.getSid());
+            Debug.Log("aaa" + display.getWid());
+        }
 
 		/// <summary>
 		/// 向上移动
@@ -317,12 +349,12 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 				word?.requestRefresh();
 			}
-
-			// 对句子横线进行刷新
-			foreach (var sub in subViews) {
-				var display = sub as SentenceDisplay;
-				display?.refreshLineColor();
-			}
+            //lfw
+			//// 对句子横线进行刷新
+			//foreach (var sub in subViews) {
+			//	var display = sub as SentenceDisplay;
+			//	display?.refreshLineColor();
+			//}
 		}
 
 		/// <summary>

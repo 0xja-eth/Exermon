@@ -97,7 +97,7 @@ namespace Core.UI {
         /// </summary>
         /// <returns></returns>
         public void checkFirstScene() {
-            var first = SceneSystem.Scene.CorrectTestScene;
+            var first = SceneSystem.Scene.TitleScene;
             if (gameSys.isConnectable() && sceneIndex() != first)
                 sceneSys.gotoScene(first);
         }
