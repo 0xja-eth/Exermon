@@ -560,6 +560,7 @@ class BaseQuesRecord(models.Model):
 
 	# 题目
 	question: BaseQuestion = None
+	question_id: int = None
 	# question = models.ForeignKey('question_module.models.GeneralQuestion', null=False,
 	# 	on_delete=models.CASCADE, verbose_name="题目")
 
@@ -578,6 +579,21 @@ class BaseQuesRecord(models.Model):
 
 	# 初次做题日期
 	first_date = models.DateTimeField(null=True, verbose_name="初次做题日期")
+
+	# 初次用时（毫秒数）
+	first_time = models.PositiveIntegerField(default=0, verbose_name="初次用时")
+
+	# 平均用时（毫秒数）
+	avg_time = models.PositiveIntegerField(default=0, verbose_name="平均用时")
+
+	# 首次正确用时（毫秒数）
+	corr_time = models.PositiveIntegerField(null=True, verbose_name="首次正确用时")
+
+	# 累计获得经验
+	sum_exp = models.PositiveSmallIntegerField(default=0, verbose_name="上次得分")
+
+	# 累计获得金币
+	sum_gold = models.PositiveSmallIntegerField(default=0, verbose_name="平均得分")
 
 	# 记录来源（初次）
 	source = models.PositiveSmallIntegerField(default=RecordSource.Others.value,
@@ -608,18 +624,22 @@ class BaseQuesRecord(models.Model):
 		last_date = ModelUtils.timeToStr(self.last_date)
 		first_date = ModelUtils.timeToStr(self.first_date)
 
-		question_id = ModelUtils.objectToId(self.question)
-		question_type = self.questionType().value
-
 		return {
 			'id': self.id,
-			'question_id': question_id,
-			'question_type': question_type,
+			'question_type': self.questionType().value,
+			'question_id': self.question_id,
 
 			'count': self.count,
 			'correct': self.correct,
 			'first_date': first_date,
 			'last_date': last_date,
+
+			'first_time': self.first_time,
+			'avg_time': self.avg_time,
+			'corr_time': self.corr_time,
+			'sum_exp': self.sum_exp,
+			'sum_gold': self.sum_gold,
+
 			'source': self.source,
 			'collected': self.collected,
 			'wrong': self.wrong,
@@ -629,7 +649,9 @@ class BaseQuesRecord(models.Model):
 	# 创建新记录
 	@classmethod
 	def create(cls, player, question_id):
-		record = player.questionRecord(question_id)
+
+		# 判断记录是否存在
+		record = player.questionRecord(cls, question_id)
 
 		if record is None:
 			record = cls()
@@ -640,25 +662,39 @@ class BaseQuesRecord(models.Model):
 		return record
 
 	# 更新已有记录
-	def updateRecord(self, player_ques):
+	def updateRecord(self, player_ques: 'BasePlayerQuestion'):
 
 		self._updateRecord(player_ques)
 
 		self.save()
 
-	def _updateRecord(self, player_ques):
+	def _updateRecord(self, player_ques: 'BasePlayerQuestion'):
+		# from record_module.models import BasePlayerQuestion
+		#
+		# player_ques: BasePlayerQuestion = player_ques
+
+		timespan = player_ques.timespan
 
 		if player_ques.correct():
 			self.correct += 1
+			if self.corr_time is None:
+				self.corr_time = timespan
 		else:
 			self.wrong = True
 
 		if self.count <= 0:
 			self.source = player_ques.source().value
-
 			self.first_date = datetime.datetime.now()
+			self.first_time = timespan
 
 		self.last_date = datetime.datetime.now()
+
+		sum_time = self.avg_time * self.count + timespan
+		self.avg_time = round(sum_time / (self.count + 1))
+
+		self.sum_exp += player_ques.exp_incr
+		self.sum_gold += player_ques.gold_incr
+
 		self.count += 1
 
 	# 正确率
@@ -734,6 +770,7 @@ class BaseQuesReport(models.Model):
 
 	# 题目
 	question: BaseQuestion = None
+	question_id: int = None
 	# question = models.ForeignKey('GeneralQuestion', on_delete=models.CASCADE, verbose_name="题目")
 
 	# 反馈类型
@@ -777,13 +814,10 @@ class BaseQuesReport(models.Model):
 		create_time = ModelUtils.timeToStr(self.create_time)
 		result_time = ModelUtils.timeToStr(self.result_time)
 
-		question_id = ModelUtils.objectToId(self.question)
-		question_type = self.questionType().value
-
 		return {
 			'id': self.id,
-			'question_id': question_id,
-			'question_type': question_type,
+			'question_type': self.questionType().value,
+			'question_id': self.question_id,
 
 			'type': self.type,
 			'description': self.description,

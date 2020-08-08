@@ -92,8 +92,7 @@ class BaseQuestionGenerator:
 	@classmethod
 	def generate(cls, configure: BaseQuestionGenerateConfigure,
 				 return_id=False):
-		generator = cls(configure, return_id)
-		return generator
+		return cls(configure, return_id)
 
 	def __init__(self, configure: BaseQuestionGenerateConfigure,
 				 return_id=False):

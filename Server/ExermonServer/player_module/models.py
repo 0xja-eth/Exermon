@@ -1240,7 +1240,7 @@ class Player(CacheableModel):
 		"""
 		exerslot = self.exerSlot()
 		if exerslot is None: return set()
-		question_set		slot_items = exerslot.contItems()
+		slot_items = exerslot.contItems()
 		return set(ModelUtils.query(slot_items, lambda item: item.subject))
 
 	# endregion

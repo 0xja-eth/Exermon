@@ -16,15 +16,13 @@ class RecordManager:
 	@classmethod
 	def registerQuestionSet(cls, verbose_name,
 							ques_gen_cla: BaseQuestionGenerator,
-							reward_calc: QuestionSetResultRewardCalc = None,
-							reward_cla: QuestionSetReward = None):
+							reward_calc: QuestionSetResultRewardCalc):
 		"""
-		注册题目
+		注册题目集
 		Args:
 			verbose_name (str): 别名
 			ques_gen_cla (BaseQuestionGenerator): 题目生成类
 			reward_calc (QuestionSetResultRewardCalc): 奖励生成类
-			reward_cla (QuestionSetReward): 奖励类
 			# cont_item_cla (type): 容器项类
 		"""
 		def wrapper(cla: QuestionSetRecord):
@@ -38,10 +36,35 @@ class RecordManager:
 			cla.TYPE = eval("QuestionSetType.%s" % name)
 
 			cla.REWARD_CALC = reward_calc
-			cla.REWARD_CLASS = reward_cla
 			cla.QUES_GEN_CLASS = ques_gen_cla
 
 			EnumMapper.registerClass(cla)
+
+			return cla
+
+		return wrapper
+
+	@classmethod
+	def registerQuestionSetReward(cls, question_set_cla: QuestionSetRecord):
+		"""
+		注册题目集奖励
+		Args:
+			question_set_cla (QuestionSetRecord): 题目集类
+		"""
+		def wrapper(cla: QuestionSetReward):
+			question_set_name = question_set_cla._meta.verbose_name
+
+			verbose_name = question_set_name + "奖励"
+
+			cla._meta.verbose_name = \
+				cla._meta.verbose_name_plural = verbose_name
+
+			question_set_cla.REWARD_CLASS = cla
+
+			record = models.ForeignKey(question_set_cla,
+				on_delete=models.CASCADE, verbose_name=question_set_name)
+
+			cla.add_to_class('record', record)
 
 			return cla
 

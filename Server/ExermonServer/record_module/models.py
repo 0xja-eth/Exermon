@@ -1,4 +1,3 @@
-from django.db import models
 from django.db.models.query import QuerySet
 
 from item_module.models import BaseItem, BaseContainer
@@ -8,11 +7,9 @@ from .types import *
 
 # from player_module.models import Player
 from utils.calc_utils import *
-from utils.model_utils import CacheableModel, Common as ModelUtils
-from utils.exception import ErrorType, GameException
+from utils.model_utils import CacheableModel
 
-from enum import Enum
-import jsonfield, datetime
+import jsonfield
 
 # Create your models here.
 
@@ -83,11 +80,69 @@ class BasePlayerQuestion(CacheableModel):
 	def __str__(self):
 		return "%s %s" % (self.question_set, self.question)
 
+	# region 配置项
+
 	@classmethod
 	def questionClass(cls): return cls.QUESTION_CLASS
 
 	@classmethod
 	def questionType(cls): return cls.questionClass().TYPE
+
+	@classmethod
+	def questionRecordClass(cls):
+		return cls.questionClass().recordClass()
+
+	@classmethod
+	def rewardCalculator(cls) -> QuestionSetSingleRewardCalc:
+		"""
+		获取对应的奖励计算类
+		Returns:
+			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
+		"""
+		return cls.REWARD_CALC
+
+	@classmethod
+	def source(cls) -> RecordSource:
+		"""
+		题目来源
+		Returns:
+			题目来源枚举成员
+		"""
+		return cls.SOURCE
+
+	# endregion
+
+	@classmethod
+	def create(cls, question_set: 'QuestionSetRecord',
+			   question_id: int, **kwargs) -> 'SelectingPlayerQuestion':
+		"""
+		创建对象
+		Args:
+			question_set (QuestionSetRecord): 题目集记录
+			question_id (int): 题目ID
+			**kwargs (**dict): 子类重载参数
+		Returns:
+			创建的玩家题目关系对象
+		"""
+		ques = cls()
+		ques.question_id = question_id
+		ques.question_set = question_set
+		ques._updateIsNew(question_set)
+		ques._create(**kwargs)
+
+		ques.save()
+
+		return ques
+
+	def _create(self, **kwargs):
+		"""
+		内部创建函数（用于子类重载）
+		Args:
+			**kwargs (**dict): 子类重载参数
+		"""
+		pass
+
+	# region 转化
 
 	def convert(self, type: str = None) -> dict:
 		"""
@@ -131,53 +186,7 @@ class BasePlayerQuestion(CacheableModel):
 		res['correct'] = self.correct()
 		res['score'] = self.score()
 
-	@classmethod
-	def create(cls, question_set: 'QuestionSetRecord',
-			   question_id: int, **kwargs) -> 'SelectingPlayerQuestion':
-		"""
-		创建对象
-		Args:
-			question_set (QuestionSetRecord): 题目集记录
-			question_id (int): 题目ID
-			**kwargs (**dict): 子类重载参数
-		Returns:
-			创建的玩家题目关系对象
-		"""
-		ques = cls()
-		ques.question_id = question_id
-		ques.question_set = question_set
-		ques._updateIsNew(question_set)
-		ques._create(**kwargs)
-
-		ques.save()
-
-		return ques
-
-	@classmethod
-	def rewardCalculator(cls) -> QuestionSetSingleRewardCalc:
-		"""
-		获取对应的奖励计算类
-		Returns:
-			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
-		"""
-		return cls.REWARD_CALC
-
-	@classmethod
-	def source(cls) -> RecordSource:
-		"""
-		题目来源
-		Returns:
-			题目来源枚举成员
-		"""
-		return cls.SOURCE
-
-	def _create(self, **kwargs):
-		"""
-		内部创建函数（用于子类重载）
-		Args:
-			**kwargs (**dict): 子类重载参数
-		"""
-		pass
+	# endregion
 
 	def _updateIsNew(self, question_set: 'QuestionSetRecord'):
 		"""
@@ -187,8 +196,20 @@ class BasePlayerQuestion(CacheableModel):
 		"""
 		player = question_set.player
 
-		rec = player.questionRecord(self.question_id)
+		rec = player.questionRecord(
+			self.questionRecordClass(), self.question_id)
+
 		self.is_new = rec is None
+
+	def _answerDict(self) -> dict:
+		"""
+		作答字典
+		Returns:
+			返回作答结果（字典形式）
+		"""
+		return {}
+
+	# region 统计
 
 	def correct(self) -> bool:
 		"""
@@ -210,13 +231,9 @@ class BasePlayerQuestion(CacheableModel):
 		return self._getOrSetCache(self.SCORE_CACHE_KEY,
 			lambda: self.question.calcScore(**self._answerDict()))
 
-	def _answerDict(self) -> dict:
-		"""
-		作答字典
-		Returns:
-			返回作答结果（字典形式）
-		"""
-		return {}
+	# endregion
+
+	# region 操作
 
 	def start(self):
 		"""
@@ -292,6 +309,8 @@ class BasePlayerQuestion(CacheableModel):
 		self.slot_exp_incr = calc.slot_exp_incr
 		self.gold_incr = calc.gold_incr
 
+	# endregion
+
 	def save(self, judge=True, **kwargs):
 		if judge and self.question_set is None:
 			self.delete_save = False
@@ -343,15 +362,6 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 
 	def _processAnswer(self, selection):
 		self.selection = selection
-
-
-# ===================================================
-#  刷题题目关系表
-# ===================================================
-@RecordManager.registerPlayerQuestion(
-	GeneralQuestion, ExerciseRecord,
-	ExerciseSingleRewardCalc, RecordSource.Exercise)
-class ExerciseQuestion(SelectingPlayerQuestion): pass
 
 
 # ===================================================
@@ -428,18 +438,6 @@ class QuestionSetReward(models.Model):
 			容器类型
 		"""
 		return self.item().containerClass()
-
-
-# ===================================================
-#  刷题奖励表
-# ===================================================
-class ExerciseReward(models.Model):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "刷题奖励"
-
-	# 刷题记录
-	record = models.ForeignKey("ExerciseRecord", on_delete=models.CASCADE, verbose_name="刷题记录")
 
 
 # ===================================================
@@ -603,6 +601,8 @@ class QuestionSetRecord(CacheableModel):
 
 	# endregion
 
+	# region 创建和转化
+
 	# 创建一个题目集
 	@classmethod
 	def create(cls, player: 'Player', **kwargs) -> 'QuestionSetRecord':
@@ -647,27 +647,36 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			转化后的字典数据
 		"""
+		res = {}
+
+		self._convertBaseInfo(res, type)
+
+		if type == 'result':
+			self._convertResultInfo(res)
+
+		return res
+
+	def _convertBaseInfo(self, res, type):
+
 		create_time = ModelUtils.timeToStr(self.create_time)
 		player_questions = ModelUtils.objectsToDict(
 			self.playerQuestions(), type=type)
 
-		base = {
-			'id': self.id,
-			'name': self.generateName(),
-			'questions': player_questions,
-			'create_time': create_time,
-			'finished': self.finished,
-		}
+		res['id'] = self.id
+		res['name'] = self.generateName()
+		res['questions'] = player_questions
+		res['create_time'] = create_time
+		res['finished'] = self.finished
 
-		if type == 'result':
-			rewards = ModelUtils.objectsToDict(self.rewards())
+	def _convertResultInfo(self, res):
+		rewards = ModelUtils.objectsToDict(self.rewards())
 
-			base['exer_exp_incrs'] = self.exer_exp_incrs
-			base['slot_exp_incrs'] = self.slot_exp_incrs
-			base['gold_incr'] = self.gold_incr
-			base['rewards'] = rewards
+		res['exer_exp_incrs'] = self.exer_exp_incrs
+		res['slot_exp_incrs'] = self.slot_exp_incrs
+		res['gold_incr'] = self.gold_incr
+		res['rewards'] = rewards
 
-		return base
+	# endregion
 
 	def exactlyPlayer(self):  # -> Player:
 		"""
@@ -952,13 +961,15 @@ class QuestionSetRecord(CacheableModel):
 		Args:
 			calc (QuestionSetResultRewardCalc): 结果
 		"""
+		from item_module.models import PackContainer
+
 		for reward in calc.item_rewards: self.addReward(**reward)
 
 		player = self.exactlyPlayer()
 
 		for reward in self.rewards():
 			cla = reward.containerType()
-			container = player.getContainer(cla)
+			container: PackContainer = player.getContainer(cla)
 			container.gainItems(reward.item(), reward.count)
 
 	# endregion
@@ -1036,17 +1047,6 @@ class QuestionSetRecord(CacheableModel):
 
 		return res
 
-	def selections(self, player_queses: QuerySet = None) -> list:
-		"""
-		获取每道题目的选择情况
-		Args:
-			player_queses (QuerySet): 玩家题目关系集合，默认情况下为所有题目关系
-		Returns:
-			题目选择情况列表
-		"""
-		return self._totalData('selections',
-							   lambda d: d.selection, player_queses)
-
 	def timespans(self, player_queses: QuerySet = None) -> list:
 		"""
 		获取每道题目的用时
@@ -1095,7 +1095,7 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			题目集总标准用时
 		"""
-		return self._sumData('std_time', lambda d: d.question.star.std_time,
+		return self._sumData('std_time', lambda d: d.question.stdTime(),
 							 player_queses)
 
 	def sumScore(self, player_queses: QuerySet = None) -> int:
@@ -1137,113 +1137,7 @@ class QuestionSetRecord(CacheableModel):
 	# endregion
 
 	"""占位符"""
+	
 
-
-# ===================================================
-#  刷题记录表
-# ===================================================
-class ExerciseRecord(QuestionSetRecord):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "刷题记录"
-
-	TYPE = QuestionSetType.Exercise
-
-	# 最大刷题数
-	MAX_COUNT = 10
-
-	GEN_TYPES = [
-		(QuestionGenerateType.Normal.value, '普通模式'),
-		(QuestionGenerateType.OccurFirst.value, '已做优先'),
-		(QuestionGenerateType.NotOccurFirst.value, '未做优先'),
-		(QuestionGenerateType.WrongFirst.value, '错题优先'),
-		(QuestionGenerateType.CollectedFirst.value, '收藏优先'),
-		(QuestionGenerateType.SimpleFirst.value, '简单题优先'),
-		(QuestionGenerateType.MiddleFirst.value, '中等题优先'),
-		(QuestionGenerateType.DifficultFirst.value, '难题优先'),
-	]
-
-	# 常量定义
-	NAME_STRING_FMT = "%s\n%s 刷题记录"
-
-	# 科目
-	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE,
-								verbose_name="科目")
-
-	# 题量（用于生成题目）
-	count = models.PositiveSmallIntegerField(default=1, verbose_name="题量")
-
-	# 题目分配模式
-	gen_type = models.PositiveSmallIntegerField(choices=GEN_TYPES, default=0,
-												verbose_name="生成模式")
-
-	# 所属赛季
-	season = models.ForeignKey('season_module.CompSeason', on_delete=models.CASCADE,
-							   verbose_name="所属赛季")
-
-	# 奖励计算类
-	@classmethod
-	def rewardCalculator(cls):
-		from utils.calc_utils import ExerciseResultRewardCalc
-		return ExerciseResultRewardCalc
-
-	# 玩家题目关系类
-	@classmethod
-	def playerQuesClass(cls): return ExerciseQuestion
-
-	# 奖励记录类
-	@classmethod
-	def rewardClass(cls): return ExerciseReward
-
-	# 生成名字
-	def generateName(self) -> str:
-
-		return self.NAME_STRING_FMT % (self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
-									   self.subject.name)
-
-	def convert(self, type=None):
-
-		res = super().convert(type)
-
-		res['season_id'] = self.season_id
-		res['subject_id'] = self.subject_id
-		res['count'] = self.count
-		res['gen_type'] = self.gen_type
-
-		return res
-
-	def _rewards(self): return self.exercisereward_set
-
-	# 开始刷题
-	def _create(self, subject, count, gen_type):
-		from season_module.runtimes import SeasonManager
-
-		self.season_id = SeasonManager.getCurrentSeason().id
-
-		self.subject = subject
-		self.count = count
-		self.gen_type = gen_type
-
-	# 生成题目生成配置信息
-	def _makeGenerateConfigure(self, **kwargs):
-		from utils.calc_utils import BaseQuestionGenerateConfigure
-
-		return BaseQuestionGenerateConfigure(self, self.exactlyPlayer(), self.subject,
-											 gen_type=self.gen_type, count=self.count)
-
-	def _shrinkQuestions(self):
-		"""
-		压缩题目，用于排除未作答的题目，通过移除缓存题目的方式实现
-		"""
-
-		player_queses = self.playerQuestions()
-		player_queses = list(player_queses).copy()
-
-		for player_ques in player_queses:
-			if not player_ques.answered:
-				self._removeQuestion(player_ques)
-
-	# 终止答题
-	def terminate(self, **kwargs):
-		self._shrinkQuestions()
-		super().terminate(**kwargs)
+from .question_system.question_sets import *
+from .question_system.player_questions import *

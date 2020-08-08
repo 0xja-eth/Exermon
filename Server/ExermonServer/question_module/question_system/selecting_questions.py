@@ -98,77 +98,7 @@ class GeneralQuesPicture(Models.BaseQuesPicture): pass
 #  一般题目记录表
 # ===================================================
 @QuesManager.registerQuesRecord(GeneralQuestion)
-class GeneralQuesRecord(Models.BaseQuesRecord):
-
-	# 初次用时（毫秒数）
-	first_time = models.PositiveIntegerField(default=0, verbose_name="初次用时")
-
-	# 平均用时（毫秒数）
-	avg_time = models.PositiveIntegerField(default=0, verbose_name="平均用时")
-
-	# 首次正确用时（毫秒数）
-	corr_time = models.PositiveIntegerField(null=True, verbose_name="首次正确用时")
-
-	# 累计获得经验
-	sum_exp = models.PositiveSmallIntegerField(default=0, verbose_name="上次得分")
-
-	# 累计获得金币
-	sum_gold = models.PositiveSmallIntegerField(default=0, verbose_name="平均得分")
-
-	# 转化为字符串
-	def __str__(self):
-		return '%s (%s)' % (self.question.number(), self.player)
-
-	# 转化为字典
-	def convert(self):
-		res = super().convert()
-
-		res['first_time'] = self.first_time
-		res['avg_time'] = self.avg_time
-		res['corr_time'] = self.corr_time
-		res['sum_exp'] = self.sum_exp
-		res['sum_gold'] = self.sum_gold
-
-		return res
-
-	# 创建新记录
-	@classmethod
-	def create(cls, player, question_id):
-		record = player.questionRecord(question_id)
-
-		if record is None:
-			record = cls()
-			record.player = player
-			record.question_id = question_id
-			record.save()
-
-		return record
-
-	# 更新已有记录
-	def _updateRecord(self, player_ques):
-
-		super()._updateRecord(player_ques)
-
-		timespan = player_ques.timespan
-
-		if player_ques.correct():
-			if self.corr_time is None:
-				self.corr_time = timespan
-
-		if self.count <= 0:
-			self.first_time = timespan
-
-		sum_time = self.avg_time*self.count+timespan
-		self.avg_time = round(sum_time/(self.count+1))
-
-		self.sum_exp += player_ques.exp_incr
-		self.sum_gold += player_ques.gold_incr
-
-	# 正确率
-	def corrRate(self):
-		if self.count is None or self.count == 0:
-			return 0
-		return self.correct / self.count
+class GeneralQuesRecord(Models.BaseQuesRecord): pass
 
 
 # ===================================================
@@ -259,5 +189,3 @@ class PlotChoiceEffect(BaseEffect):
 	# 选项
 	choice = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
 							 verbose_name="选项")
-
-
