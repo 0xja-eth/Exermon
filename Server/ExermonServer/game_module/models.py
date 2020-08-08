@@ -980,8 +980,8 @@ class GameConfigure(models.Model):
 		from item_module.models import UsableItem
 		from player_module.models import Character, Player
 		from exermon_module.models import Exermon, ExerSkill
-		from question_module.models import Question, QuesReport
-		from record_module.models import QuestionRecord, ExerciseRecord
+		from question_module.models import GeneralQuestion, BaseQuesReport
+		from record_module.models import GeneralQuesRecord, ExerciseRecord
 		from battle_module.models import BattleRecord, BattlePlayer, BattleRoundResult
 		from english_pro_module.models import WrongItem, ExerProCard, ExerProEnemy
 
@@ -997,7 +997,7 @@ class GameConfigure(models.Model):
 			# 配置量
 			'max_subject': Subject.MAX_SELECTED,
 			'max_exercise_count': ExerciseRecord.MAX_COUNT,
-			'report_desc_len': QuesReport.MAX_DESC_LEN,
+			'report_desc_len': BaseQuesReport.MAX_DESC_LEN,
 			'min_birth': min_birth,
 
 			# player_module
@@ -1015,13 +1015,13 @@ class GameConfigure(models.Model):
 			'exerskill_hit_types': ExerSkill.HIT_TYPES,
 
 			# question_module
-			'question_types': Question.TYPES,
-			'question_statuses': Question.STATUSES,
-			'ques_report_types': QuesReport.TYPES,
-			'ques_report_type_descs': QuesReport.TYPES_WITH_DESC,
+			'question_types': GeneralQuestion.TYPES,
+			'question_statuses': GeneralQuestion.STATUSES,
+			'ques_report_types': BaseQuesReport.TYPES,
+			'ques_report_type_descs': BaseQuesReport.TYPES_WITH_DESC,
 
 			# record_module
-			'record_sources': QuestionRecord.SOURCES,
+			'record_sources': GeneralQuesRecord.SOURCES,
 			'exercise_gen_types': ExerciseRecord.GEN_TYPES,
 
 			# battle_module

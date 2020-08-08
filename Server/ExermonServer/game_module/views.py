@@ -69,8 +69,8 @@ class Service:
 	# 生成资源数据
 	@classmethod
 	def _generateResourceData(cls):
-		from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, ExerEquip
-		from player_module.models import Character, HumanItem, HumanEquip
+		from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, GameEquip
+		from player_module.models import Character, GameItem, HumanEquip
 		from question_module.models import QuesSugar
 
 		# eng_pro
@@ -81,8 +81,8 @@ class Service:
 		exer_skills = ModelUtils.objectsToDict(ExerSkill.objects.all())
 		exer_gifts = ModelUtils.objectsToDict(ExerGift.objects.all())
 		exer_items = ModelUtils.objectsToDict(ExerItem.objects.all())
-		exer_equips = ModelUtils.objectsToDict(ExerEquip.objects.all())
-		human_items = ModelUtils.objectsToDict(HumanItem.objects.all())
+		exer_equips = ModelUtils.objectsToDict(GameEquip.objects.all())
+		human_items = ModelUtils.objectsToDict(GameItem.objects.all())
 		human_equips = ModelUtils.objectsToDict(HumanEquip.objects.all())
 		ques_sugars = ModelUtils.objectsToDict(QuesSugar.objects.all())
 		characters = ModelUtils.objectsToDict(Character.objects.all())

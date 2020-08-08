@@ -14,20 +14,20 @@ class BaseQuesChoicesInline(object):
 	style = "table"
 
 
-@AdminXHelper.registerBaseInline(BaseQuestion)
+@AdminXHelper.registerBaseInline(SelectingQuestion)
 class BaseQuestionsInline(object):
 
 	style = "accordion"
 
 
-@AdminXHelper.registerBaseInline(QuesPicture)
+@AdminXHelper.registerBaseInline(GeneralQuesPicture)
 class QuesPicturesInline(object):
 
-	model = QuesPicture
+	model = GeneralQuesPicture
 	style = "table"
 
 
-@AdminXHelper.relatedModel(BaseQuestion)
+@AdminXHelper.relatedModel(SelectingQuestion)
 class BaseQuestionAdmin(object): pass
 
 
@@ -35,24 +35,9 @@ class BaseQuestionAdmin(object): pass
 class GroupQuestionAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(Question)
+@AdminXHelper.relatedModel(GeneralQuestion)
 class QuestionAdmin(BaseQuestionAdmin): pass
 
 
-@AdminXHelper.relatedModel(QuesReport)
+@AdminXHelper.relatedModel(BaseQuesReport)
 class QuesReportAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(QuesSugar)
-class QuesSugarAdmin(BaseItemAdmin): pass
-
-
-@AdminXHelper.relatedModel(QuesSugarPack)
-class QuesSugarPackAdmin(PackContainerAdmin): pass
-
-
-@AdminXHelper.relatedModel(QuesSugarPackItem)
-class QuesSugarPackItemAdmin(PackContItemAdmin): pass
-
-
-xadmin.site.register(QuesSugarPrice, CurrencyAdmin)

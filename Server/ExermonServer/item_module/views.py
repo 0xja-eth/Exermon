@@ -4,6 +4,8 @@ from player_module.models import *
 from exermon_module.models import *
 from battle_module.models import *
 from question_module.models import *
+
+from utils.view_utils import Common as ViewUtils
 from utils.interface_manager import Common as InterfaceCommon
 from utils.exception import ErrorType, GameException
 
@@ -339,8 +341,8 @@ class Service:
 
 		from .raw_data.upload import upload
 
-		if type == 1: upload(HumanItem)
-		if type == 2: upload(ExerEquip)
+		if type == 1: upload(GameItem)
+		if type == 2: upload(GameEquip)
 
 
 # =======================
@@ -438,7 +440,7 @@ class Common:
 		"""
 		if cla is None:
 			Check.ensureItemType(type_)
-			cla = eval(ItemType(type_).name)
+			cla = EnumMapper.get(ItemType(type_))
 
 		return ViewUtils.getObject(cla, error, **kwargs)
 
@@ -488,7 +490,7 @@ class Common:
 
 			if cla is None:
 				Check.ensureContItemType(type_)
-				cla = eval(ContItemType(type_).name)
+				cla = EnumMapper.get(ContItemType(type_))
 
 			if player is None:
 				return ViewUtils.getObject(cla, error, **kwargs)

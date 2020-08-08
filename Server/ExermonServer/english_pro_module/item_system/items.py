@@ -1,4 +1,6 @@
 from item_module.models import *
+from item_module.manager import *
+
 from game_module.models import GroupConfigure
 
 

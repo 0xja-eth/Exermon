@@ -2,12 +2,15 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 from item_module.models import BaseItem, BaseContainer
+from question_module.models import *
+
+from .types import *
+
 # from player_module.models import Player
+from utils.calc_utils import *
 from utils.model_utils import CacheableModel, Common as ModelUtils
-from utils.calc_utils import QuestionGenerateType, QuestionGenerateConfigure, \
-	QuestionSetResultRewardCalc, QuestionSetSingleRewardCalc, \
-	ExerciseSingleRewardCalc
 from utils.exception import ErrorType, GameException
+
 from enum import Enum
 import jsonfield, datetime
 
@@ -15,167 +18,12 @@ import jsonfield, datetime
 
 
 # ===================================================
-#  记录来源
+#  基本玩家题目关系表
 # ===================================================
-class RecordSource(Enum):
-	Exercise = 1  # 刷题
-	Exam = 2  # 考核
-	Battle = 3  # 对战
-	Adventure = 4  # 冒险
-	Others = 0  # 其他
-
-
-# ===================================================
-#  题目记录表
-# ===================================================
-class QuestionRecord(models.Model):
-
-	class Meta:
-
-		verbose_name = verbose_name_plural = "做题记录"
-
-	SOURCES = [
-		(RecordSource.Exercise.value, '刷题'),
-		(RecordSource.Exam.value, '考核'),
-		(RecordSource.Battle.value, '对战'),
-		(RecordSource.Adventure.value, '冒险'),
-		(RecordSource.Others.value, '其他'),
-	]
-
-	MAX_NOTE_LEN = 128
-
-	# 题目
-	question = models.ForeignKey('question_module.Question', null=False,
-								 on_delete=models.CASCADE, verbose_name="题目")
-
-	# 玩家
-	player = models.ForeignKey('player_module.Player', null=False,
-							   on_delete=models.CASCADE, verbose_name="玩家")
-
-	# 做题次数
-	count = models.PositiveSmallIntegerField(default=0, verbose_name="次数")
-
-	# 正确次数
-	correct = models.PositiveSmallIntegerField(default=0, verbose_name="正确数")
-
-	# 上次做题日期
-	last_date = models.DateTimeField(null=True, verbose_name="上次做题日期")
-
-	# 初次做题日期
-	first_date = models.DateTimeField(null=True, verbose_name="初次做题日期")
-
-	# 初次用时（毫秒数）
-	first_time = models.PositiveIntegerField(default=0, verbose_name="初次用时")
-
-	# 平均用时（毫秒数）
-	avg_time = models.PositiveIntegerField(default=0, verbose_name="平均用时")
-
-	# 首次正确用时（毫秒数）
-	corr_time = models.PositiveIntegerField(null=True, verbose_name="首次正确用时")
-
-	# 累计获得经验
-	sum_exp = models.PositiveSmallIntegerField(default=0, verbose_name="上次得分")
-
-	# 累计获得金币
-	sum_gold = models.PositiveSmallIntegerField(default=0, verbose_name="平均得分")
-
-	# 记录来源（初次）
-	source = models.PositiveSmallIntegerField(default=RecordSource.Others.value,
-											  choices=SOURCES, verbose_name="记录来源")
-
-	# 收藏标志
-	collected = models.BooleanField(default=False, verbose_name="收藏标志")
-
-	# 错题标志
-	wrong = models.BooleanField(default=False, verbose_name="错题标志")
-
-	# 备注
-	note = models.CharField(blank=True, null=True, max_length=MAX_NOTE_LEN, verbose_name="备注")
-
-	# 转化为字符串
-	def __str__(self):
-		return '%s (%s)' % (self.question.number(), self.player)
-
-	# 转化为字典
-	def convert(self, type=None):
-
-		last_date = ModelUtils.timeToStr(self.last_date)
-		first_date = ModelUtils.timeToStr(self.first_date)
-
-		return {
-			'id': self.id,
-			'question_id': self.question_id,
-			'count': self.count,
-			'correct': self.correct,
-			'first_date': first_date,
-			'last_date': last_date,
-			'first_time': self.first_time,
-			'avg_time': self.avg_time,
-			'corr_time': self.corr_time,
-			'sum_exp': self.sum_exp,
-			'sum_gold': self.sum_gold,
-			'source': self.source,
-			'collected': self.collected,
-			'wrong': self.wrong,
-			'note': self.note
-		}
-
-	# 创建新记录
-	@classmethod
-	def create(cls, player, question_id):
-		record = player.questionRecord(question_id)
-
-		if record is None:
-			record = cls()
-			record.player = player
-			record.question_id = question_id
-			record.save()
-
-		return record
-
-	# 更新已有记录
-	def updateRecord(self, player_ques):
-
-		timespan = player_ques.timespan
-
-		if player_ques.correct():
-			if self.corr_time is None:
-				self.corr_time = timespan
-			self.correct += 1
-		else:
-			self.wrong = True
-
-		if self.count <= 0:
-			self.source = player_ques.source().value
-
-			self.first_date = datetime.datetime.now()
-			self.first_time = timespan
-
-		sum_time = self.avg_time*self.count+timespan
-		self.avg_time = round(sum_time/(self.count+1))
-
-		self.sum_exp += player_ques.exp_incr
-		self.sum_gold += player_ques.gold_incr
-
-		self.last_date = datetime.datetime.now()
-		self.count += 1
-
-		self.save()
-
-	# 正确率
-	def corrRate(self):
-		if self.count is None or self.count == 0:
-			return 0
-		return self.correct / self.count
-
-
-# ===================================================
-#  玩家题目关系表
-# ===================================================
-class PlayerQuestion(CacheableModel):
+class BasePlayerQuestion(CacheableModel):
 	class Meta:
 		abstract = True
-		verbose_name = verbose_name_plural = "玩家题目关系"
+		verbose_name = verbose_name_plural = "基本玩家题目关系"
 
 	# 前后端时间差最大值（毫秒）
 	MAX_DELTATIME = 10*1000
@@ -185,20 +33,32 @@ class PlayerQuestion(CacheableModel):
 	CORRECT_CACHE_KEY = 'correct'
 	SCORE_CACHE_KEY = 'score'
 
-	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
+	# 类设定
+	QUESTION_CLASS: BaseQuestion = None
+	QUESTION_SET_CLASS: 'QuestionSetRecord' = None
+
+	# 奖励计算类
+	REWARD_CALC = QuestionSetSingleRewardCalc
+
+	# 来源
+	SOURCE = RecordSource.Others
 
 	# 题目
-	question = models.ForeignKey('question_module.Question',
-								 on_delete=models.CASCADE, verbose_name="题目")
+	question: BaseQuestion = None
+	question_id: int = None
 
-	# 选择情况
-	selection = jsonfield.JSONField(default=[], verbose_name="选择情况")
+	# 题目集
+	question_set: 'QuestionSetRecord' = None
+	question_set_id: int = None
 
 	# 是否作答
 	answered = models.BooleanField(default=False, verbose_name="作答标志")
 
 	# 用时（毫秒数，0为未作答）
 	timespan = models.PositiveIntegerField(default=0, verbose_name="用时")
+
+	# # 得分
+	# score = models.PositiveSmallIntegerField(null=True, verbose_name="得分")
 
 	# 经验增加
 	exp_incr = models.SmallIntegerField(null=True, verbose_name="经验增加")
@@ -221,24 +81,13 @@ class PlayerQuestion(CacheableModel):
 		self._setupCachePool()
 
 	def __str__(self):
-		return "%s %s" % (self.questionSet(), self.question)
+		return "%s %s" % (self.question_set, self.question)
 
-	# 用于admin显示
-	def adminSelection(self):
+	@classmethod
+	def questionClass(cls): return cls.QUESTION_CLASS
 
-		result = ''
-		for s in self.selection:
-			result += chr(ord('A')+s)
-
-		return result
-
-	adminSelection.short_description = "选择情况"
-
-	# 用于admin显示
-	def adminAnswer(self):
-		return self.question.adminCorrectAnswer()
-
-	adminAnswer.short_description = "正确答案"
+	@classmethod
+	def questionType(cls): return cls.questionClass().TYPE
 
 	def convert(self, type: str = None) -> dict:
 		"""
@@ -248,29 +97,43 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			转化后的字典数据
 		"""
-		base = {
-			'id': self.id,
-			'question_id': self.question.id,
-			'selection': self.selection,
-			'timespan': self.timespan,
-			'answered': self.answered,
-			'correct': self.correct(),
-			'is_new': self.is_new,
-		}
+		res = {}
+
+		self._convertBaseInfo(res, type)
 
 		if type == 'result':
+			self._convertResultInfo(res, type)
 
-			base['exp_incr'] = self.exp_incr
-			base['slot_exp_incr'] = self.slot_exp_incr
-			base['gold_incr'] = self.gold_incr
-			base['score'] = self.score()
-			base['correct_selection'] = self.question.correctAnswer()
+		return res
 
-		return base
+	def _convertBaseInfo(self, res, type):
+		"""
+		转化基本信息
+		Args:
+			res (dict): 转化结果
+			type (str): 转化类型
+		"""
+		question_type = self.questionType().value
+
+		res['id'] = self.id
+		res['question_type'] = question_type
+		res['question_id'] = self.question_id
+
+		res['timespan'] = self.timespan
+		res['answered'] = self.answered
+		res['is_new'] = self.is_new
+
+	def _convertResultInfo(self, res, type):
+
+		res['exp_incr'] = self.exp_incr
+		res['slot_exp_incr'] = self.slot_exp_incr
+		res['gold_incr'] = self.gold_incr
+		res['correct'] = self.correct()
+		res['score'] = self.score()
 
 	@classmethod
 	def create(cls, question_set: 'QuestionSetRecord',
-			   question_id: int, **kwargs) -> 'PlayerQuestion':
+			   question_id: int, **kwargs) -> 'SelectingPlayerQuestion':
 		"""
 		创建对象
 		Args:
@@ -282,7 +145,7 @@ class PlayerQuestion(CacheableModel):
 		"""
 		ques = cls()
 		ques.question_id = question_id
-		ques.setQuestionSet(question_set)
+		ques.question_set = question_set
 		ques._updateIsNew(question_set)
 		ques._create(**kwargs)
 
@@ -297,7 +160,7 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
 		"""
-		return QuestionSetSingleRewardCalc
+		return cls.REWARD_CALC
 
 	@classmethod
 	def source(cls) -> RecordSource:
@@ -306,7 +169,7 @@ class PlayerQuestion(CacheableModel):
 		Returns:
 			题目来源枚举成员
 		"""
-		return RecordSource.Others
+		return cls.SOURCE
 
 	def _create(self, **kwargs):
 		"""
@@ -323,34 +186,9 @@ class PlayerQuestion(CacheableModel):
 			question_set (QuestionSetRecord): 题目集记录
 		"""
 		player = question_set.player
+
 		rec = player.questionRecord(self.question_id)
 		self.is_new = rec is None
-
-	# 设置题目集
-	def setQuestionSet(self, question_set: 'QuestionSetRecord'):
-		"""
-		设置题目集
-		Args:
-			question_set (QuestionSetRecord): 题目集记录
-		"""
-		raise NotImplementedError
-		# self.question_set = question_set
-
-	# 获取题目集
-	def questionSet(self):
-		"""
-		返回题目集
-		Returns:
-			返回该题目关系对应的题目集
-		"""
-		raise NotImplementedError
-		# return self.question_set
-
-	def clearQuestionSet(self):
-		"""
-		清除题目集（删除用）
-		"""
-		self.setQuestionSet(None)
 
 	def correct(self) -> bool:
 		"""
@@ -360,7 +198,7 @@ class PlayerQuestion(CacheableModel):
 		"""
 		if not self.answered: return False
 		return self._getOrSetCache(self.CORRECT_CACHE_KEY,
-								   lambda: self.question.calcCorrect(self.selection))
+			lambda: self.question.calcCorrect(**self._answerDict()))
 
 	def score(self) -> int:
 		"""
@@ -370,7 +208,15 @@ class PlayerQuestion(CacheableModel):
 		"""
 		if not self.answered: return 0
 		return self._getOrSetCache(self.SCORE_CACHE_KEY,
-								   lambda: self.question.calcScore(self.selection))
+			lambda: self.question.calcScore(**self._answerDict()))
+
+	def _answerDict(self) -> dict:
+		"""
+		作答字典
+		Returns:
+			返回作答结果（字典形式）
+		"""
+		return {}
 
 	def start(self):
 		"""
@@ -378,13 +224,13 @@ class PlayerQuestion(CacheableModel):
 		"""
 		self._setCache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
-	def answer(self, selection: list, timespan: int, record: 'QuestionSetRecord'):
+	def answer(self, timespan: int, record: 'QuestionSetRecord', **kwargs):
 		"""
 		作答题目
 		Args:
-			selection (list): 选择情况
 			timespan (int): 用时
 			record (QuestionSetRecord): 题目集记录
+			**kwargs (**dict): 作答参数
 		"""
 		start_time = self._getCache(self.STARTTIME_CACHE_KEY)
 
@@ -401,14 +247,22 @@ class PlayerQuestion(CacheableModel):
 		if timespan >= 0:
 			self.timespan = self._realTimespan(timespan, backend_timespan)
 		else:
-			self.timespan = self.question.star.std_time*1000
+			self.timespan = self.question.stdTime()*1000
 
-		self.selection = selection
 		self.answered = True
 
+		self._processAnswer(**kwargs)
 		self._calcRewards(record)
 
 		# self.save()
+
+	def _processAnswer(self, **kwargs):
+		"""
+		处理题目回答
+		Args:
+			**kwargs (**dict): 作答参数
+		"""
+		raise NotImplementedError
 
 	def _realTimespan(self, frontend: int, backend: int) -> int:
 		"""
@@ -429,61 +283,75 @@ class PlayerQuestion(CacheableModel):
 		Args:
 			record (QuestionSetRecord): 题目集记录
 		"""
-		calc = self.rewardCalculator().calc(self, record)
+		calc = self.rewardCalculator()
+		if calc is None: return
+
+		calc = calc.calc(self, record)
 
 		self.exp_incr = calc.exer_exp_incr
 		self.slot_exp_incr = calc.slot_exp_incr
 		self.gold_incr = calc.gold_incr
 
 	def save(self, judge=True, **kwargs):
-		if judge and self.questionSet() is None:
+		if judge and self.question_set is None:
 			self.delete_save = False
 			if self.id is not None: self.delete()
 		else: super().save(**kwargs)
 
 
 # ===================================================
+#  选择题目关系表
+# ===================================================
+class SelectingPlayerQuestion(BasePlayerQuestion):
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "选择题目关系"
+
+	# 前后端时间差最大值（毫秒）
+	MAX_DELTATIME = 10*1000
+
+	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
+
+	# 选择情况
+	selection = jsonfield.JSONField(default=[], verbose_name="选择情况")
+
+	# 用于admin显示
+	def adminSelection(self):
+
+		result = ''
+		for s in self.selection:
+			result += chr(ord('A')+s)
+
+		return result
+
+	adminSelection.short_description = "选择情况"
+
+	# 用于admin显示
+	def adminAnswer(self):
+		question: SelectingQuestion = self.question
+		return question.adminCorrectAnswer()
+
+	adminAnswer.short_description = "正确答案"
+
+	def _convertBaseInfo(self, res, type):
+		super()._convertBaseInfo(res, type)
+
+		res['selection'] = self.selection
+
+	def _answerDict(self):
+		return {'selection': self.selection}
+
+	def _processAnswer(self, selection):
+		self.selection = selection
+
+
+# ===================================================
 #  刷题题目关系表
 # ===================================================
-class ExerciseQuestion(PlayerQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "刷题题目关系"
-
-	# 刷题记录
-	exercise = models.ForeignKey('ExerciseRecord', null=True,
-								 on_delete=models.CASCADE, verbose_name="刷题记录")
-
-	@classmethod
-	def rewardCalculator(cls) -> QuestionSetSingleRewardCalc:
-		"""
-		获取对应的奖励计算类
-		Returns:
-			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
-		"""
-		return ExerciseSingleRewardCalc
-
-	@classmethod
-	def source(cls):
-		return RecordSource.Exercise
-
-	# 设置题目集
-	def setQuestionSet(self, question_set):
-		self.exercise = question_set
-
-	# 获取题目集
-	def questionSet(self):
-		return self.exercise
-
-
-# ===================================================
-#  题目集类型枚举
-# ===================================================
-class QuestionSetType(Enum):
-	Exercise = 1  # 刷题
-	Exam = 2  # 考核
-	Battle = 3  # 对战
-
-	Unset = 0  # 未设置
+@RecordManager.registerPlayerQuestion(
+	GeneralQuestion, ExerciseRecord,
+	ExerciseSingleRewardCalc, RecordSource.Exercise)
+class ExerciseQuestion(SelectingPlayerQuestion): pass
 
 
 # ===================================================
@@ -585,6 +453,16 @@ class QuestionSetRecord(CacheableModel):
 
 	TYPE = QuestionSetType.Unset
 
+	# 可接受的题目玩家关系类
+	ACCEPT_PLAYER_QUES_CLASSES: list = []
+
+	# 题目生成类
+	QUES_GEN_CLASS: BaseQuestionGenerator = None
+
+	# 奖励
+	REWARD_CALC: QuestionSetResultRewardCalc = None
+	REWARD_CLASS: QuestionSetReward = None
+
 	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
 						   'adminSlotExpIncrs', 'adminExpIncrs']
 
@@ -680,16 +558,28 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			奖励计算类或其子类本身
 		"""
-		return NotImplementedError  # QuestionSetResultRewardCalc
+		return cls.REWARD_CALC
 
 	@classmethod
-	def playerQuesClass(cls) -> 'PlayerQuestion':
+	def playerQuesClasses(cls) -> list:
+		"""
+		该类对应的玩家题目关系类集合，用于 addQuestion 中创建一个题目关系
+		Returns:
+			返回一个 PlayerQuestion 子类列表
+		"""
+		return cls.ACCEPT_PLAYER_QUES_CLASSES
+
+	@classmethod
+	def playerQuesClass(cls) -> 'SelectingPlayerQuestion':
 		"""
 		该类对应的玩家题目关系类，用于 addQuestion 中创建一个题目关系
 		Returns:
 			返回一个 PlayerQuestion 子类本身
 		"""
-		raise NotImplementedError
+		clas = cls.playerQuesClasses()
+		if len(clas) <= 0: return None
+
+		return clas[0]
 
 	@classmethod
 	def rewardClass(cls) -> 'QuestionSetReward':
@@ -698,11 +588,18 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			返回某个 QuestionSetReward 子类本身
 		"""
-		raise NotImplementedError
+		return cls.REWARD_CLASS
+
+	@classmethod
+	def _questionGenerator(cls):
+		return cls.QUES_GEN_CLASS
 
 	@classmethod
 	def _cacheForeignKeyModels(cls):
-		return [cls.playerQuesClass(), cls.rewardClass()]
+		res = cls.playerQuesClasses().copy()
+		res.append(cls.rewardClass())
+
+		return res
 
 	# endregion
 
@@ -788,47 +685,64 @@ class QuestionSetRecord(CacheableModel):
 
 	# region 题目操作
 
-	def playerQuestions(self) -> QuerySet or list:
+	def playerQuestions(self, cla: BasePlayerQuestion = None) -> list:
 		"""
 		获取所有题目关系（缓存）
 		执行该函数后，对应缓存项将改变为 QuerySet 类型，故需要在题目集结束后调用
+		Args:
+			cla (BasePlayerQuestion): 类型
 		Returns:
-			题目关系 QuerySet 或 list 对象
+			题目关系 list 对象
 		"""
-		return self._queryModelCache(self.playerQuesClass())
+		if cla is not None:
+			return self._queryModelCache(cla, listed=True)
 
-	def playerQuestion(self, question_id: int) -> PlayerQuestion:
+		player_queses = []
+
+		for cla in self.playerQuesClasses():
+			player_queses += self._queryModelCache(cla, listed=True)
+
+		return player_queses
+
+	def playerQuestion(self, question_id: int,
+					   cla: BasePlayerQuestion = None) -> BasePlayerQuestion:
 		"""
 		获取单个题目关系（缓存/数据库）
 		Args:
 			question_id (int): 题目ID
+			cla (BasePlayerQuestion): 类型
 		Returns:
 			对应ID的题目关系对象
 		"""
-		return self._getModelCache(self.playerQuesClass(),
-								   question_id=question_id)
+		if cla is None: cla = self.playerQuesClass()
+
+		if cla is not None:
+			return self._getModelCache(cla, question_id=question_id)
+
+		return None
 
 	def _initQuestionCache(self):
 		"""
 		初始化题目缓存
 		"""
-		self._clearModelCache(self.playerQuesClass())
+		for cla in self.playerQuesClasses():
+			self._clearModelCache(cla)
 
-	def _addQuestion(self, player_ques: PlayerQuestion):
+	def _addQuestion(self, player_ques: BasePlayerQuestion):
 		"""
 		往缓存中添加题目
 		Args:
-			player_ques (PlayerQuestion): 题目关系
+			player_ques (BasePlayerQuestion): 题目关系
 		"""
-		self._appendModelCache(self.playerQuesClass(), player_ques)
+		self._appendModelCache(type(player_ques), player_ques)
 
-	def _removeQuestion(self, player_ques: PlayerQuestion):
+	def _removeQuestion(self, player_ques: BasePlayerQuestion):
 		"""
 		往缓存中移除题目
 		Args:
-			player_ques (PlayerQuestion): 题目关系
+			player_ques (BasePlayerQuestion): 题目关系
 		"""
-		self._removeModelCache(self.playerQuesClass(), player_ques)
+		self._removeModelCache(type(player_ques), player_ques)
 
 	# endregion
 
@@ -887,17 +801,15 @@ class QuestionSetRecord(CacheableModel):
 		Args:
 			**kwargs (**dict): 子类重载参数
 		"""
-		from utils.calc_utils import QuestionGenerator
-
 		configure = self._makeGenerateConfigure(**kwargs)
 
 		if configure is None: return
+		
+		gen = self._questionGenerator().generate(configure, True)
 
-		gen = QuestionGenerator.generate(configure, True)
+		for q in gen.result: self.addQuestion(*q)
 
-		for qid in gen.result: self.addQuestion(qid)
-
-	def _makeGenerateConfigure(self, **kwargs) -> QuestionGenerateConfigure:
+	def _makeGenerateConfigure(self, **kwargs) -> BaseQuestionGenerateConfigure:
 		"""
 		获取题目生成配置信息，用于 _generateQuestions() 中进行题目生成
 		Args:
@@ -907,18 +819,17 @@ class QuestionSetRecord(CacheableModel):
 		"""
 		return None
 
-	def addQuestion(self, question_id: int, **kwargs) -> PlayerQuestion:
+	def addQuestion(self, cla: BasePlayerQuestion, 
+					question_id: int, **kwargs) -> BasePlayerQuestion:
 		"""
 		增加题目（临时加入到内存）
 		Args:
+			cla (BasePlayerQuestion): 题目关系类型
 			question_id (int): 题目ID
 			**kwargs (**dict): 子类重载参数
 		Returns:
 			新增的玩家题目关系对象
 		"""
-
-		cla = self.playerQuesClass()
-
 		player_ques = cla.create(self, question_id, **kwargs)
 
 		self._addQuestion(player_ques)
@@ -929,41 +840,45 @@ class QuestionSetRecord(CacheableModel):
 
 	# region 题目集过程
 
-	def startQuestion(self, question_id: int = None, player_ques: PlayerQuestion = None):
+	def startQuestion(self, cla: BasePlayerQuestion = None, question_id: int = None, 
+					  player_ques: BasePlayerQuestion = None):
 		"""
 		开始作答题目
 		Args:
 			question_id (int): 题目ID
-			player_ques (PlayerQuestion): 玩家题目关系对象
+			player_ques (SelectingPlayerQuestion): 玩家题目关系对象
 		"""
 
 		# 从缓存中读取
 		if player_ques is None:
-			player_ques = self.playerQuestion(question_id)
+			player_ques = self.playerQuestion(cla, question_id)
 
 		player_ques.start()
 
-	def answerQuestion(self, selection: list, timespan: int,
-					   question_id: int = None, player_ques: PlayerQuestion = None):
+	def answerQuestion(self, timespan: int,
+					   cla: BasePlayerQuestion = None, question_id: int = None,
+					   player_ques: SelectingPlayerQuestion = None, **kwargs):
 		"""
 		回答指定题目
 		Args:
-			question_id (int): 题目ID
-			player_ques (PlayerQuestion): 玩家题目关系对象
-			selection (list): 选择情况
 			timespan (int): 用时
+			cla (BasePlayerQuestion): 题目关系类型
+			question_id (int): 题目ID
+			player_ques (SelectingPlayerQuestion): 玩家题目关系对象
+			**kwargs (**dict): 作答参数
 		"""
 
 		# 从缓存中读取
 		if player_ques is None:
-			player_ques = self.playerQuestion(question_id)
+			player_ques = self.playerQuestion(cla, question_id)
 
 		if question_id is None:
 			question_id = player_ques.question_id
 
-		rec = QuestionRecord.create(self.player, question_id)
+		record_cla = cla.questionClass().recordClass()
+		rec = record_cla.create(self.player, question_id)
 
-		player_ques.answer(selection, timespan, rec)
+		player_ques.answer(timespan, rec, **kwargs)
 
 		rec.updateRecord(player_ques)
 
@@ -1311,10 +1226,10 @@ class ExerciseRecord(QuestionSetRecord):
 
 	# 生成题目生成配置信息
 	def _makeGenerateConfigure(self, **kwargs):
-		from utils.calc_utils import QuestionGenerateConfigure
+		from utils.calc_utils import BaseQuestionGenerateConfigure
 
-		return QuestionGenerateConfigure(self, self.exactlyPlayer(), self.subject,
-										 gen_type=self.gen_type, count=self.count)
+		return BaseQuestionGenerateConfigure(self, self.exactlyPlayer(), self.subject,
+											 gen_type=self.gen_type, count=self.count)
 
 	def _shrinkQuestions(self):
 		"""

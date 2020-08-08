@@ -1,7 +1,8 @@
 from item_module.models import *
+from item_module.manager import *
 
-from player_module.item_system.cont_items import HumanPackItem
-from player_module.item_system.containers import HumanPack
+from player_module.item_system.cont_items import ItemPackItem
+from player_module.item_system.containers import ItemPack
 
 
 # ===================================================
@@ -21,7 +22,7 @@ class BattleItemSlot(SlotContainer):
 	@classmethod
 	def defaultCapacity(cls): return cls.MAX_ITEM_COUNT
 
-	def _equipContainer(self, index: int) -> HumanPack:
+	def _equipContainer(self, index: int) -> ItemPack:
 		"""
 		获取指定装备ID的所属容器
 		Args:
@@ -48,11 +49,11 @@ class BattleItemSlot(SlotContainer):
 		"""
 		return self.player
 
-	def ensureItemEquipable(self, equip_item: HumanPackItem):
+	def ensureItemEquipable(self, equip_item: ItemPackItem):
 		"""
 		保证物品可以装备（战斗中使用）
 		Args:
-			equip_item (HumanPackItem): 装备项
+			equip_item (ItemPackItem): 装备项
 		Raises:
 			ErrorType.IncorrectItemType: 不正确的物品类型
 		"""
@@ -62,12 +63,12 @@ class BattleItemSlot(SlotContainer):
 		if not equip_item.item.battle_use:
 			raise GameException(ErrorType.IncorrectItemType)
 
-	def ensureEquipCondition(self, slot_item, equip_item: HumanPackItem):
+	def ensureEquipCondition(self, slot_item, equip_item: ItemPackItem):
 		"""
 		确保满足装备条件
 		Args:
 			slot_item (BattleItemSlotItem): 装备槽项
-			equip_item (HumanPackItem): 装备项
+			equip_item (ItemPackItem): 装备项
 		"""
 		super().ensureEquipCondition(slot_item, equip_item)
 
@@ -75,12 +76,12 @@ class BattleItemSlot(SlotContainer):
 
 		return True
 
-	def setPackItem(self, pack_item: HumanPackItem = None,
+	def setPackItem(self, pack_item: ItemPackItem = None,
 					index: int = None, force: bool = False):
 		"""
 		设置物资槽物品
 		Args:
-			pack_item (HumanPackItem): 人类物品容器项
+			pack_item (ItemPackItem): 人类物品容器项
 			index (int): 槽编号
 			force (bool): 是否强制设置（不损失背包物品）
 		"""

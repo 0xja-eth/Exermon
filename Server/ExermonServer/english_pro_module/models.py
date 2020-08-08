@@ -4,7 +4,7 @@ from django.conf import settings
 from .item_system.items import *
 
 from game_module.models import GroupConfigure
-from question_module.models import BaseQuestion, BaseQuesChoice, GroupQuestion
+from question_module.models import SelectingQuestion, BaseQuesChoice, GroupQuestion
 
 from utils.model_utils import QuestionAudioUpload, PlotQuestionImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
@@ -84,403 +84,134 @@ class FirstCardGroup(GroupConfigure):
 
 # region 题目
 
-
-# ===================================================
-#  英语题目类型枚举
-# ===================================================
-class QuestionType(Enum):
-	Listening = 1  # 听力题
-	Phrase = 2  # 不定式题
-	Correction = 3  # 改错题
-	Plot = 4  # 剧情题
-
-
-# ===================================================
-#  听力题目选项表
-# ===================================================
-class ListeningQuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "听力题目选项"
-
-	# 所属问题
-	question = models.ForeignKey('ListeningSubQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
-
-
-# ===================================================
-#  听力小题
-# ===================================================
-class ListeningSubQuestion(BaseQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "听力小题"
-
-	# 听力题目
-	question = models.ForeignKey('ListeningQuestion', on_delete=models.CASCADE,
-								 verbose_name="听力题目")
-
-	def choices(self):
-		return self.listeningqueschoice_set.all()
-
-
-# ===================================================
-#  听力题
-# ===================================================
-class ListeningQuestion(GroupQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "听力题"
-
-	TYPE = QuestionType.Listening
-
-	# 重复次数
-	times = models.PositiveSmallIntegerField(default=2, verbose_name="重复次数")
-
-	# 音频文件
-	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
-
-	# 获取完整路径
-	def getExactlyPath(self):
-		base = settings.STATIC_URL
-		path = os.path.join(base, str(self.audio))
-		if os.path.exists(path):
-			return path
-		else:
-			raise GameException(ErrorType.PictureFileNotFound)
-
-	# 获取视频base64编码
-	def convertToBase64(self):
-
-		with open(self.getExactlyPath(), 'rb') as f:
-			data = base64.b64encode(f.read())
-
-		return data.decode()
-
-	def convert(self):
-		res = super().convert()
-
-		res['times'] = self.times
-		res['audio'] = self.convertToBase64()
-
-		return res
-
-	def subQuestions(self) -> QuerySet:
-		"""
-		子题目
-		Returns:
-			返回该听力题目的子题目
-		"""
-		return self.listeningsubquestion_set.all()
-
-
-# ===================================================
-#  阅读题目选项表
-# ===================================================
-class ReadingQuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "阅读题目选项"
-
-	# 所属问题
-	question = models.ForeignKey('ReadingSubQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
-
-
-# ===================================================
-#  阅读小题
-# ===================================================
-class ReadingSubQuestion(BaseQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "阅读小题"
-
-	# 阅读题目
-	question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
-								 verbose_name="阅读题目")
-
-	def choices(self):
-		return self.readingqueschoice_set.all()
-
-
-# ===================================================
-#  阅读题
-# ===================================================
-class ReadingQuestion(GroupQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "阅读题"
-
-	def subQuestions(self) -> QuerySet:
-		"""
-		子题目
-		Returns:
-			返回该听力题目的子题目
-		"""
-		return self.readingsubquestion_set.all()
-
-
-# ===================================================
-#  剧情题目
-# ===================================================
-class PlotQuestion(BaseQuestion):
-	class Meta:
-		verbose_name = verbose_name_plural = "剧情题目"
-
-	TYPE = QuestionType.Plot
-
-	# 剧情事件名称
-	event_name = models.CharField(max_length=64, verbose_name="剧情事件名称")
-
-	# 剧情图标
-	picture = models.ImageField(null=True, blank=True,
-								upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
-
-	def __str__(self):
-		return self.picture.url
-
-	# 获取剧情图片完整路径
-	def getExactlyPath(self):
-		base = settings.STATIC_URL
-		path = os.path.join(base, str(self.picture))
-		if os.path.exists(path):
-			return path
-		else:
-			raise GameException(ErrorType.PictureFileNotFound)
-
-	# 获取base64编码
-	def convertToBase64(self):
-
-		with open(self.getExactlyPath(), 'rb') as f:
-			data = base64.b64encode(f.read())
-
-		return data.decode()
-
-	def choices(self):
-		return self.plotqueschoice_set.all()
-
-	def convert(self, type=None):
-		res = super().convert(type)
-
-		res['event_name'] = self.event_name
-		res['picture'] = self.convertToBase64()
-
-		return res
-
-
-# ===================================================
-#  剧情题目选项表
-# ===================================================
-class PlotQuesChoice(BaseQuesChoice):
-	class Meta:
-		verbose_name = verbose_name_plural = "剧情题目选项"
-
-	# 所需金币
-	gold = models.PositiveSmallIntegerField(default=0, verbose_name="所需金币")
-
-	# 选项对应的结果文本
-	result_text = models.TextField(verbose_name="选项对应的结果文本")
-
-	# 所属问题
-	question = models.ForeignKey('PlotQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
-
-	def effects(self):
-		return self.exerproploteffect_set.all()
-
-	def convert(self):
-		res = super().convert()
-
-		plot_effects = ModelUtils.objectsToDict(self.effects())
-
-		res['gold'] = self.gold
-		res['result_text'] = self.result_text
-		res['effects'] = plot_effects
-
-		return res
-
-
-# ===================================================
-#  剧情题目效果表
-# ===================================================
-class ExerProPlotEffect(ExerProEffect):
-	class Meta:
-		verbose_name = verbose_name_plural = "剧情题目效果"
-
-	# 选项
-	choice = models.ForeignKey('PlotQuesChoice', on_delete=models.CASCADE,
-							 verbose_name="选项")
-
-
-# ===================================================
-#  短语题目类型枚举
-# ===================================================
-class PhraseType(Enum):
-	SB = 1  # [sb. sth. 开头的短语选项]
-	Do = 2  # [to do, doing 开头的短语选项]
-	Prep = 3  # [介词短语选项]
-
-
-# ===================================================
-#  短语题
-# ===================================================
-class PhraseQuestion(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "短语题"
-
-	TYPES = [
-		(PhraseType.SB.value, '[包含 sb. 的短语选项]'),
-		(PhraseType.Do.value, '[do 形式的短语选项]'),
-		(PhraseType.Prep.value, '[介词短语选项]'),
-	]
-
-	TYPE = QuestionType.Phrase
-
-	# 单词
-	word = models.CharField(max_length=64, verbose_name="单词")
-
-	# 中文翻译
-	chinese = models.CharField(max_length=64, verbose_name="中文")
-
-	# 不定式项
-	phrase = models.CharField(max_length=64, verbose_name="不定式项")
-
-	# 不定式项的类型
-	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
-											choices=TYPES, verbose_name="修改类型")
-
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		return {
-			'id': self.id,
-			'word': self.word,
-			'chinese': self.chinese,
-			'phrase': self.phrase,
-			'type': self.type
-		}
-
-
-# ===================================================
-#  改错题
-# ===================================================
-class CorrectionQuestion(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "改错题"
-
-	TYPE = QuestionType.Correction
-
-	# 文章
-	article = models.TextField(verbose_name="文章")
-
-	# 解析
-	description = models.TextField(null=True, blank=True, verbose_name="解析")
-
-	def convert(self):
-		wrong_items = ModelUtils.objectsToDict(self.wrongItems())
-
-		return {
-			'id': self.id,
-			'article': self.article,
-			'description': self.description,
-
-			'wrong_items': wrong_items
-		}
-
-	def wrongItems(self) -> QuerySet:
-		"""
-		错误项
-		Returns:
-			返回该改错题目的错误项
-		"""
-		return self.wrongitem_set.all()
-
-
-# ===================================================
-#  纠正类型
-# ===================================================
-class CorrectType(Enum):
-	Add = 1  # 增加
-	Edit = 2  # 修改
-	Delete = 3  # 删除
-
-
-# ===================================================
-#  改错题错误项
-# ===================================================
-class WrongItem(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "改错题错误项"
-
-	TYPES = [
-		(CorrectType.Add.value, '增加'),
-		(CorrectType.Edit.value, '修改'),
-		(CorrectType.Delete.value, '删除'),
-	]
-
-	# 句子编号
-	sentence_index = models.PositiveSmallIntegerField(verbose_name="句子编号")
-
-	# 单词编号
-	word_index = models.PositiveSmallIntegerField(verbose_name="单词编号")
-
-	# 修改类型
-	type = models.PositiveSmallIntegerField(default=CorrectType.Edit.value,
-											choices=TYPES, verbose_name="修改类型")
-
-	# 正确单词
-	word = models.TextField(verbose_name="正确单词", null=True, blank=True)
-
-	# 对应题目
-	question = models.ForeignKey('CorrectionQuestion', on_delete=models.CASCADE,
-								 verbose_name="改错题目")
-
-	def convert(self):
-		return {
-			'id': self.id,
-			'sentence_index': self.sentence_index,
-			'word_index': self.word_index,
-			'type': self.type,
-			'word': self.word,
-		}
-
-
-# ===================================================
-#  单词
-# ===================================================
-class Word(models.Model):
-	class Meta:
-		verbose_name = verbose_name_plural = "单词"
-
-	# 英文
-	english = models.CharField(unique=True, max_length=64, verbose_name="英文")
-
-	# 中文
-	chinese = models.CharField(max_length=256, verbose_name="中文")
-
-	# 词性
-	type = models.CharField(max_length=64, verbose_name="词性", null=True, blank=True)
-
-	# 等级
-	level = models.PositiveSmallIntegerField(default=1, verbose_name="等级")
-
-	# 是否初中题目
-	is_middle = models.BooleanField(default=True, verbose_name="是否初中题目")
-
-	# 是否高中题目
-	is_high = models.BooleanField(default=True, verbose_name="是否高中题目")
-
-	def __str__(self):
-		return "%d. %s" % (self.id, self.english)
-
-	def convert(self):
-		return {
-			'id': self.id,
-			'english': self.english,
-			'chinese': self.chinese,
-			'type': self.type,
-			'level': self.level,
-
-			'is_middle': self.is_middle,
-			'is_high': self.is_high,
-		}
+#
+# # ===================================================
+# #  英语题目类型枚举
+# # ===================================================
+# class QuestionType(Enum):
+# 	Listening = 1  # 听力题
+# 	Phrase = 2  # 不定式题
+# 	Correction = 3  # 改错题
+# 	Plot = 4  # 剧情题
+#
+#
+# # ===================================================
+# #  听力题目选项表
+# # ===================================================
+# class ListeningQuesChoice(BaseQuesChoice):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "听力题目选项"
+#
+# 	# 所属问题
+# 	question = models.ForeignKey('ListeningSubQuestion', null=False, on_delete=models.CASCADE,
+# 								 verbose_name="所属问题")
+#
+#
+# # ===================================================
+# #  听力小题
+# # ===================================================
+# class ListeningSubQuestion(SelectingQuestion):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "听力小题"
+#
+# 	# 听力题目
+# 	question = models.ForeignKey('ListeningQuestion', on_delete=models.CASCADE,
+# 								 verbose_name="听力题目")
+#
+# 	def choices(self):
+# 		return self.listeningqueschoice_set.all()
+#
+#
+# # ===================================================
+# #  听力题
+# # ===================================================
+# class ListeningQuestion(GroupQuestion):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "听力题"
+#
+# 	TYPE = QuestionType.Listening
+#
+# 	# 重复次数
+# 	times = models.PositiveSmallIntegerField(default=2, verbose_name="重复次数")
+#
+# 	# 音频文件
+# 	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
+#
+# 	# 获取完整路径
+# 	def getExactlyPath(self):
+# 		base = settings.STATIC_URL
+# 		path = os.path.join(base, str(self.audio))
+# 		if os.path.exists(path):
+# 			return path
+# 		else:
+# 			raise GameException(ErrorType.PictureFileNotFound)
+#
+# 	# 获取视频base64编码
+# 	def convertToBase64(self):
+#
+# 		with open(self.getExactlyPath(), 'rb') as f:
+# 			data = base64.b64encode(f.read())
+#
+# 		return data.decode()
+#
+# 	def convert(self):
+# 		res = super().convert()
+#
+# 		res['times'] = self.times
+# 		res['audio'] = self.convertToBase64()
+#
+# 		return res
+#
+# 	def subQuestions(self) -> QuerySet:
+# 		"""
+# 		子题目
+# 		Returns:
+# 			返回该听力题目的子题目
+# 		"""
+# 		return self.listeningsubquestion_set.all()
+#
+#
+# # ===================================================
+# #  阅读题目选项表
+# # ===================================================
+# class ReadingQuesChoice(BaseQuesChoice):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "阅读题目选项"
+#
+# 	# 所属问题
+# 	question = models.ForeignKey('ReadingSubQuestion', null=False, on_delete=models.CASCADE,
+# 								 verbose_name="所属问题")
+#
+#
+# # ===================================================
+# #  阅读小题
+# # ===================================================
+# class ReadingSubQuestion(SelectingQuestion):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "阅读小题"
+#
+# 	# 阅读题目
+# 	question = models.ForeignKey('ReadingQuestion', on_delete=models.CASCADE,
+# 								 verbose_name="阅读题目")
+#
+# 	def choices(self):
+# 		return self.readingqueschoice_set.all()
+#
+#
+# # ===================================================
+# #  阅读题
+# # ===================================================
+# class ReadingQuestion(GroupQuestion):
+# 	class Meta:
+# 		verbose_name = verbose_name_plural = "阅读题"
+#
+# 	def subQuestions(self) -> QuerySet:
+# 		"""
+# 		子题目
+# 		Returns:
+# 			返回该听力题目的子题目
+# 		"""
+# 		return self.readingsubquestion_set.all()
 
 
 # ===================================================

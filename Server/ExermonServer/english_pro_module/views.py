@@ -310,7 +310,7 @@ class Common:
         elif type_ == QuestionType.Phrase.value:
             return PhraseQuestion
         elif type_ == QuestionType.Correction.value:
-            return CorrectionQuestion
+            return CorrectingQuestion
         elif type_ == QuestionType.Plot.value:
             return PlotQuestion
 
@@ -595,7 +595,7 @@ class Common:
             qid (int): 改错题目ID
             answers (list): 回答集
         """
-        question = cls.getQuestion(id=qid, cla=CorrectionQuestion)
+        question = cls.getQuestion(id=qid, cla=CorrectingQuestion)
 
         wrong_item_frontend = answers
         wrong_item_backend = question.wrongItems()

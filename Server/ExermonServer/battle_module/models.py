@@ -8,7 +8,7 @@ from game_module.models import GroupConfigure, Subject, QuestionStar
 
 from player_module.models import Player
 from exermon_module.models import ExerSkill, HitType, TargetType
-from record_module.models import QuestionSetRecord, PlayerQuestion, RecordSource
+from record_module.models import QuestionSetRecord, SelectingPlayerQuestion, RecordSource
 
 from utils.calc_utils import ExerciseSingleRewardCalc, BattleResultRewardCalc
 from utils.model_utils import CacheableModel, Common as ModelUtils
@@ -395,7 +395,7 @@ class BattleRound(models.Model):
 	record = models.ForeignKey('BattleRecord', on_delete=models.CASCADE, verbose_name="对战记录")
 
 	# 题目
-	question = models.ForeignKey('question_module.Question', null=True, on_delete=models.CASCADE, verbose_name="题目")
+	question = models.ForeignKey('question_module.models.GeneralQuestion', null=True, on_delete=models.CASCADE, verbose_name="题目")
 
 	def __str__(self):
 		return str(self.record)+" 回合 "+str(self.order)
@@ -462,15 +462,15 @@ class BattleRound(models.Model):
 		生成题目，赋值到 question 中
 		"""
 
-		from utils.calc_utils import QuestionGenerateConfigure, QuestionGenerateType, QuestionGenerator
+		from utils.calc_utils import BaseQuestionGenerateConfigure, QuestionGenerateType, GeneralQuestionGenerator
 
 		player = self._generateConfigurePlayer()
 		subject, star = self._generateSubjectAndStar()
 
-		configure = QuestionGenerateConfigure(self, player, subject, ques_star=star, count=1,
-											  gen_type=QuestionGenerateType.NotOccurFirst.value)
+		configure = BaseQuestionGenerateConfigure(self, player, subject, ques_star=star, count=1,
+												  gen_type=QuestionGenerateType.NotOccurFirst.value)
 
-		gen = QuestionGenerator.generate(configure, True)
+		gen = GeneralQuestionGenerator.generate(configure, True)
 		result = gen.result
 
 		if len(result) > 0: self.question_id = result[0]
@@ -802,7 +802,7 @@ class HitResultType(Enum):
 # ===================================================
 #  对战回合结果表
 # ===================================================
-class BattleRoundResult(PlayerQuestion):
+class BattleRoundResult(SelectingPlayerQuestion):
 	class Meta:
 		verbose_name = verbose_name_plural = "对战回合结果"
 
@@ -897,21 +897,21 @@ class BattleRoundResult(PlayerQuestion):
 		"""
 		self.round = round
 
-	def setQuestionSet(self, question_set: BattlePlayer):
-		"""
-		设置题目集（对战玩家）
-		Args:
-			question_set (BattlePlayer): 对战玩家
-		"""
-		self.battle_player = question_set
-
-	def questionSet(self) -> BattlePlayer:
-		"""
-		获取题目集记录（对战玩家）
-		Returns:
-			对战玩家
-		"""
-		return self.battle_player
+	# def setQuestionSet(self, question_set: BattlePlayer):
+	# 	"""
+	# 	设置题目集（对战玩家）
+	# 	Args:
+	# 		question_set (BattlePlayer): 对战玩家
+	# 	"""
+	# 	self.battle_player = question_set
+	#
+	# def questionSet(self) -> BattlePlayer:
+	# 	"""
+	# 	获取题目集记录（对战玩家）
+	# 	Returns:
+	# 		对战玩家
+	# 	"""
+	# 	return self.battle_player
 
 	def start(self):
 		super().start()

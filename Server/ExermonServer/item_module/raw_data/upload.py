@@ -8,8 +8,8 @@ import csv, os
 PATH_ROOT = "item_module/raw_data/"
 
 FILENAMES = {
-	HumanItem: "human_item.csv",
-	ExerEquip: "exer_equip.csv"
+	GameItem: "human_item.csv",
+	GameEquip: "exer_equip.csv"
 }
 
 
@@ -42,8 +42,8 @@ def processRow(keys, row):
 # 保存一项数据
 def saveData(type_, data: dict):
 
-	if type_ == HumanItem: return _saveHumanItem(data)
-	if type_ == ExerEquip: return _saveExerEquip(data)
+	if type_ == GameItem: return _saveHumanItem(data)
+	if type_ == GameEquip: return _saveExerEquip(data)
 
 	return None
 
@@ -63,11 +63,11 @@ def _saveHumanItem(d: dict):
 
 	print("Processing HumanItem "+id)
 
-	item = HumanItem.objects.filter(id=id)
+	item = GameItem.objects.filter(id=id)
 	flag = item.exists()
 
 	if not flag:
-		item = HumanItem()
+		item = GameItem()
 		print("[Created new]")
 	else:
 		item = item.first()
@@ -94,7 +94,7 @@ def _saveHumanItem(d: dict):
 	item.save()
 
 	if flag: price = item.buyPrice()
-	else: price = HumanItemPrice()
+	else: price = GameItemPrice()
 
 	price.gold = load(d, 'gold_price', 0)
 	price.ticket = load(d, 'ticket_price', 0)
@@ -105,7 +105,7 @@ def _saveHumanItem(d: dict):
 	__saveHumanItemEffects(item, flag, d)
 
 
-def __saveHumanItemEffects(item: HumanItem, flag, d: list):
+def __saveHumanItemEffects(item: GameItem, flag, d: list):
 
 	index = 1
 	code_key_format = "code%d"
@@ -119,7 +119,7 @@ def __saveHumanItemEffects(item: HumanItem, flag, d: list):
 	effects = []
 
 	while code_key in d and params_key in d:
-		effect = HumanItemEffect()
+		effect = GameItemEffect()
 		effect.code = eval(code_value_format % d[code_key])
 		effect.params = eval(params_format % d[params_key])
 
@@ -165,11 +165,11 @@ def _saveExerEquip(d: dict):
 
 	print("Processing ExerEquip "+id)
 
-	item = ExerEquip.objects.filter(id=id)
+	item = GameEquip.objects.filter(id=id)
 	flag = item.exists()
 
 	if not flag:
-		item = ExerEquip()
+		item = GameEquip()
 		print("[Created new]")
 	else:
 		item = item.first()
@@ -189,7 +189,7 @@ def _saveExerEquip(d: dict):
 	item.save()
 
 	if flag: price = item.buyPrice()
-	else: price = ExerEquipPrice()
+	else: price = GameEquipPrice()
 
 	price.gold = load(d, 'gold_price', 0)
 	price.ticket = load(d, 'ticket_price', 0)
@@ -200,7 +200,7 @@ def _saveExerEquip(d: dict):
 	__saveExerEquipParams(item, flag, d)
 
 
-def __saveExerEquipParams(item: ExerEquip, flag, d: dict):
+def __saveExerEquipParams(item: GameEquip, flag, d: dict):
 
 	level_param_format = "level_param%d"
 	base_param_format = "base_param%d"
@@ -217,13 +217,13 @@ def __saveExerEquipParams(item: ExerEquip, flag, d: dict):
 		base_param_key = base_param_format % id
 
 		if level_param_key in d:
-			p = ExerEquipLevelParam(param_id=id)
+			p = GameEquipLevelParam(param_id=id)
 			p.setValue(float(d[level_param_key]))
 
 			level_params.append(p)
 
 		if base_param_key in d:
-			p = ExerEquipBaseParam(param_id=id)
+			p = GameEquipBaseParam(param_id=id)
 			val = float(d[base_param_key])
 			if id == 5 or id == 6: val /= 100
 			p.setValue(val)

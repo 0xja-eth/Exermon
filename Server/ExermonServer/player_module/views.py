@@ -521,7 +521,7 @@ class Common:
 		return ViewUtils.getObject(Character, error, **kwargs)
 
 	@classmethod
-	def getHumanPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanPack:
+	def getHumanPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ItemPack:
 		"""
 		获取人类背包
 		Args:
@@ -530,7 +530,7 @@ class Common:
 		Returns:
 			返回对应玩家的人类背包对象
 		"""
-		return ItemCommon.getContainer(cla=HumanPack, player=player, error=error)
+		return ItemCommon.getContainer(cla=ItemPack, player=player, error=error)
 
 	@classmethod
 	def getHumanEquipSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanEquipSlot:
@@ -546,7 +546,7 @@ class Common:
 
 	@classmethod
 	def getPackItem(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> HumanPackItem:
+					 **kwargs) -> ItemPackItem:
 		"""
 		获取玩家持有物品
 		Args:
@@ -556,7 +556,7 @@ class Common:
 		Returns:
 			返回一定条件下的玩家持有物品，如果有多个符合条件，返回第一个
 		"""
-		return ItemCommon.getContItem(cla=HumanPackItem, player=player, error=error, **kwargs)
+		return ItemCommon.getContItem(cla=ItemPackItem, player=player, error=error, **kwargs)
 
 	@classmethod
 	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,

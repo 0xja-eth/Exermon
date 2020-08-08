@@ -55,7 +55,7 @@ class Service:
 
 		equip_slot = Common.getExerEquipSlot(player, subject_id=sid)
 
-		return ItemService.slotContainerEquip(equip_slot, None, type_=ExerPackEquip, e_type_id=type)
+		return ItemService.slotContainerEquip(equip_slot, None, type_=EquipPackItem, e_type_id=type)
 
 	# 艾瑟萌改名
 	@classmethod
@@ -122,7 +122,7 @@ class Common:
 
 	# 获取艾瑟萌背包
 	@classmethod
-	def getExerPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> ExerPack:
+	def getExerPack(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> EquipPack:
 		"""
 		获取艾瑟萌背包
 		Args:
@@ -131,7 +131,7 @@ class Common:
 		Returns:
 			返回对应玩家的艾瑟萌背包对象
 		"""
-		return ItemCommon.getContainer(cla=ExerPack, player=player, error=error)
+		return ItemCommon.getContainer(cla=EquipPack, player=player, error=error)
 
 	# 获取艾瑟萌仓库
 	@classmethod
@@ -193,8 +193,8 @@ class Common:
 	# 获取玩家持有艾瑟萌装备
 	@classmethod
 	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> ExerPackEquip:
-		return ItemCommon.getContItem(cla=ExerPackEquip, player=player, error=error, **kwargs)
+					 **kwargs) -> EquipPackItem:
+		return ItemCommon.getContItem(cla=EquipPackItem, player=player, error=error, **kwargs)
 
 	# 获取多个艾瑟萌
 	@classmethod

@@ -27,6 +27,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='battleitemslotitem',
             name='pack_item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='player_module.HumanPackItem', verbose_name='人类背包物品'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='player_module.item_system.cont_items.ItemPackItem', verbose_name='人类背包物品'),
         ),
     ]

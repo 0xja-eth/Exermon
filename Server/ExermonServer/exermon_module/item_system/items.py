@@ -1,5 +1,7 @@
-from game_module.models import ParamValue, ParamRate, \
+from game_module.models import ParamRate, \
 	EquipParamValue, EquipParamRate
+
+from item_module.manager import *
 from item_module.models import *
 
 # from utils.cache_utils import CacheHelper
@@ -134,7 +136,7 @@ class ExerGiftType(Enum):
 # ===================================================
 #  艾瑟萌天赋表
 # ===================================================
-@ItemManager.registerItem("艾瑟萌天赋")  #, ContItems.PlayerExerGift)
+@ItemManager.registerItem("艾瑟萌天赋")
 class ExerGift(BaseItem, ParamsObject):
 
 	LIST_DISPLAY_APPEND = ['adminParamRates']
@@ -188,7 +190,7 @@ class ExerGift(BaseItem, ParamsObject):
 # ===================================================
 #  艾瑟萌碎片表
 # ===================================================
-@ItemManager.registerItem("艾瑟萌碎片")  #, ContItems.ExerFragPackItem)
+@ItemManager.registerItem("艾瑟萌碎片")
 class ExerFrag(BaseItem):
 
 	# 所属艾瑟萌
@@ -254,7 +256,7 @@ class HitType(Enum):
 # ===================================================
 #  艾瑟萌技能表
 # ===================================================
-@ItemManager.registerItem("艾瑟萌技能")  #, ContItems.ExerSkillSlotItem)
+@ItemManager.registerItem("艾瑟萌技能")
 class ExerSkill(BaseItem):
 
 	TARGET_TYPES = [
@@ -332,18 +334,6 @@ class ExerSkill(BaseItem):
 	# 说明：a, b 分别为 攻击方, 目标的 TempParam 对象
 	plus_formula = models.CharField(default="0", max_length=256, null=True, blank=True, verbose_name="附加公式")
 
-	# # 技能图标
-	# icon = models.ImageField(upload_to=SkillImageUpload('icon'),
-	# 						 null=True, blank=True, verbose_name="图标")
-	#
-	# # 技能动画
-	# ani = models.ImageField(upload_to=SkillImageUpload('ani'),
-	# 						 null=True, blank=True, verbose_name="技能动画")
-	#
-	# # 击中动画
-	# target_ani = models.ImageField(upload_to=SkillImageUpload('target'),
-	# 						 null=True, blank=True, verbose_name="击中动画")
-
 	# 后台管理：显示使用效果
 	def adminEffects(self):
 		from django.utils.html import format_html
@@ -390,84 +380,27 @@ class ExerSkill(BaseItem):
 
 
 # ===================================================
-#  艾瑟萌物品使用效果表
-# ===================================================
-class ExerItemEffect(BaseEffect):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌物品使用效果"
-
-	# 物品
-	item = models.ForeignKey('ExerItem', on_delete=models.CASCADE,
-							 verbose_name="物品")
-
-
-# ===================================================
-#  艾瑟萌物品价格
-# ===================================================
-class ExerItemPrice(Currency):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "艾瑟萌物品价格"
-
-	LIST_DISPLAY_APPEND = ['item']
-
-	# 物品
-	item = models.OneToOneField('ExerItem', on_delete=models.CASCADE,
-							 verbose_name="物品")
-
-
-# ===================================================
-#  艾瑟萌物品表
-# ===================================================
-@ItemManager.registerItem("艾瑟萌物品")  #, ContItems.ExerPackItem)
-class ExerItem(UsableItem):
-
-	# 使用几率（*100）
-	rate = models.PositiveSmallIntegerField(default=0, verbose_name="使用几率")
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['rate'] = self.rate
-
-		return res
-
-	# 获取所有的效果
-	@CacheHelper.staticCache
-	def effects(self):
-		return self.exeritemeffect_set.all()
-
-	# 购买价格
-	@CacheHelper.staticCache
-	def buyPrice(self):
-		try: return self.exeritemprice
-		except ExerItemPrice.DoesNotExist: return None
-
-
-# ===================================================
 #  艾瑟萌装备等级属性值表
 # ===================================================
-class ExerEquipLevelParam(EquipParamRate):
+class GameEquipLevelParam(EquipParamRate):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备等级属性值"
 
 	# 装备
-	equip = models.ForeignKey("ExerEquip", on_delete=models.CASCADE, verbose_name="装备")
+	equip = models.ForeignKey("exermon_module.GameEquip", on_delete=models.CASCADE, verbose_name="装备")
 
 
 # ===================================================
 #  艾瑟萌装备属性值表
 # ===================================================
-class ExerEquipBaseParam(EquipParamValue):
+class GameEquipBaseParam(EquipParamValue):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备基础属性值"
 
 	# 装备
-	equip = models.ForeignKey("ExerEquip", on_delete=models.CASCADE, verbose_name="装备")
+	equip = models.ForeignKey("exermon_module.GameEquip", on_delete=models.CASCADE, verbose_name="装备")
 
 	# 最大值
 	def maxVal(self):
@@ -481,7 +414,7 @@ class ExerEquipBaseParam(EquipParamValue):
 # ===================================================
 #  艾瑟萌装备价格
 # ===================================================
-class ExerEquipPrice(Currency):
+class GameEquipPrice(Currency):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备价格"
@@ -489,15 +422,15 @@ class ExerEquipPrice(Currency):
 	LIST_DISPLAY_APPEND = ['item']
 
 	# 物品
-	item = models.OneToOneField('ExerEquip', on_delete=models.CASCADE,
-							 verbose_name="物品")
+	item = models.OneToOneField('exermon_module.GameEquip', on_delete=models.CASCADE,
+								verbose_name="物品")
 
 
 # ===================================================
 #  艾瑟萌装备
 # ===================================================
-@ItemManager.registerItem("艾瑟萌装备")  #, ContItems.ExerPackEquip)
-class ExerEquip(EquipableItem):
+@ItemManager.registerItem("一般装备")
+class GameEquip(EquipableItem):
 
 	# 装备类型
 	e_type = models.ForeignKey("game_module.ExerEquipType",
@@ -513,24 +446,24 @@ class ExerEquip(EquipableItem):
 
 	@classmethod
 	def levelParamClass(cls):
-		return ExerEquipLevelParam
+		return GameEquipLevelParam
 
 	@classmethod
 	def baseParamClass(cls):
-		return ExerEquipBaseParam
+		return GameEquipBaseParam
 
 	# 获取所有的属性基本值
 	@CacheHelper.staticCache
 	def _levelParams(self):
-		return self.exerequiplevelparam_set.all()
+		return self.gameequiplevelparam_set.all()
 
 	# 获取所有的属性基本值
 	@CacheHelper.staticCache
 	def _baseParams(self):
-		return self.exerequipbaseparam_set.all()
+		return self.gameequipbaseparam_set.all()
 
 	# 购买价格
 	@CacheHelper.staticCache
 	def buyPrice(self):
-		try: return self.exerequipprice
-		except ExerEquipPrice.DoesNotExist: return None
+		try: return self.gameequipprice
+		except GameEquipPrice.DoesNotExist: return None

@@ -1,5 +1,7 @@
 from item_module.models import *
-from game_module.models import Subject, ExerEquipType
+from item_module.manager import *
+
+from game_module.models import ExerEquipType
 
 
 # ===================================================
@@ -69,17 +71,13 @@ class ExerSlot(SlotContainer):
 
 	# 默认容器容量（0为无限）
 	@classmethod
-	def defaultCapacity(cls): return Subject.MAX_SELECTED
+	def defaultCapacity(cls): return 1  # Subject.MAX_SELECTED
 
 	# 创建一个艾瑟萌槽（选择艾瑟萌时候执行）
 	def _create(self, player, player_exers):
 		self.player = player
 		self.init_exers = player_exers
 		super()._create()
-
-	def _equipContainer(self, index):
-		if index == 0: return self.exactlyPlayer().exerHub()
-		if index == 1: return self.exactlyPlayer().exerGiftPool()
 
 	# 创建一个槽
 	def _createSlot(self, cla, index, **kwargs):
@@ -105,27 +103,20 @@ class ExerSlot(SlotContainer):
 			self.ensureSubject(slot_item, equip_item)
 
 	# 设置艾瑟萌
-	def setPlayerExer(self, slot_item: SlotContItem = None,
-					  player_exer=None, subject_id=None, force=False):
+	def setPlayerExer(self, player_exer=None, force=False):
 
-		if player_exer is not None:
-			subject_id = player_exer.exermon().subject_id
+		slot_item = self.contItem()
 
-		self.setEquip(slot_item=slot_item, equip_index=0, equip_item=player_exer, subject_id=subject_id, force=force)
+		self.setEquip(slot_item=slot_item, equip_index=0,
+					  equip_item=player_exer, force=force)
 
 	# 设置艾瑟萌天赋
-	def setPlayerGift(self, slot_item: SlotContItem = None,
-					  player_gift=None, subject_id=None, slot_index=None, force=False):
+	def setPlayerGift(self, player_gift=None, force=False):
 
-		if slot_index is not None:
-			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
-						  index=slot_index, force=force)
-		elif subject_id is not None:
-			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
-						  subject_id=subject_id, force=force)
-		else:
-			self.setEquip(slot_item=slot_item, equip_index=1, equip_item=player_gift,
-						  force=force)
+		slot_item = self.contItem()
+
+		self.setEquip(slot_item=slot_item, equip_index=1,
+					  equip_item=player_gift, force=force)
 
 	def gainExp(self, slot_exps: dict, exer_exps: dict):
 		"""
@@ -201,8 +192,8 @@ class ExerSkillSlot(SlotContainer):
 # ===================================================
 #  艾瑟萌背包
 # ===================================================
-@ItemManager.registerPackContainer("艾瑟萌背包")  # ContItems.ExerPackItem, ContItems.ExerPackEquip)
-class ExerPack(PackContainer):
+@ItemManager.registerPackContainer("装备背包")  # ContItems.ExerPackItem, ContItems.ExerPackEquip)
+class EquipPack(PackContainer):
 
 	# 默认容量
 	DEFAULT_CAPACITY = 0

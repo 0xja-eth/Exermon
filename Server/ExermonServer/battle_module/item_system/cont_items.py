@@ -1,6 +1,7 @@
 from item_module.models import *
+from item_module.manager import *
 
-from player_module.item_system.cont_items import HumanPackItem
+from player_module.item_system.cont_items import ItemPackItem
 
 import battle_module.item_system.containers as Containers
 
@@ -9,7 +10,7 @@ import battle_module.item_system.containers as Containers
 #  对战物资槽项
 # ===================================================
 @ItemManager.registerSlotContItem("对战物资槽项",
-	Containers.BattleItemSlot, pack_item=HumanPackItem)
+								  Containers.BattleItemSlot, pack_item=ItemPackItem)
 class BattleItemSlotItem(SlotContItem):
 
 	def isUsable(self) -> bool:

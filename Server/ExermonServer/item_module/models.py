@@ -1,572 +1,16 @@
 from django.db import models
-from django.db.models.query import QuerySet
 
-from game_module.models import GameConfigure, \
-	BaseParam, ParamValue
+from game_module.models import GameConfigure
 
-from utils.cache_utils import CachePool, CacheHelper
-from utils.view_utils import Common as ViewUtils
-from utils.model_utils import EnumMapper, \
-	CacheableModel, CoreModel, Common as ModelUtils
+from .types import *
+from .params import *
+
+from utils.model_utils import CacheableModel, CoreModel, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 
 from enum import Enum
 
 import jsonfield, math
-
-
-# region 枚举设定
-
-# ===================================================
-#  物品类型枚举
-# ===================================================
-class ItemType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# LimitedItem 1~100
-	# UsableItem
-	HumanItem = 1  # 人类物品
-	ExerItem = 2  # 艾瑟萌物品
-
-	# EquipableItem
-	HumanEquip = 11  # 人类装备
-	ExerEquip = 12  # 艾瑟萌装备
-
-	# InfiniteItem 101+
-	QuesSugar = 101  # 题目糖
-
-	Exermon = 201  # 艾瑟萌
-	ExerSkill = 202  # 艾瑟萌技能
-	ExerGift = 203  # 艾瑟萌天赋
-	ExerFrag = 204  # 艾瑟萌碎片
-
-	# ExerProItem 301+
-	ExerProItem = 301  # 特训物品
-	ExerProPotion = 302  # 特训药水
-	ExerProCard = 303  # 特训卡片
-
-	ExerProEnemy = 310  # 特训敌人
-	ExerProState = 311  # 特训状态
-
-
-# ===================================================
-#  容器类型枚举
-# ===================================================
-class ContainerType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# Pack 1~100
-	# 可转移
-	HumanPack = 1  # 人类背包
-	ExerPack = 2  # 艾瑟萌背包
-
-	# 可转移，可叠加
-	ExerFragPack = 11  # 艾瑟萌碎片背包
-
-	# 可转移，可叠加
-	QuesSugarPack = 21  # 题目糖背包
-
-	# Slot 101~200
-	# 可转移
-	HumanEquipSlot = 101  # 人类装备槽
-	ExerEquipSlot = 102  # 艾瑟萌装备槽
-
-	# 可转移
-	ExerSlot = 111  # 艾瑟萌槽
-
-	# 可转移
-	ExerSkillSlot = 121  # 艾瑟萌技能槽
-
-	# Others 201+
-	# 可转移
-	ExerGiftPool = 201  # 艾瑟萌天赋池
-	# 可转移
-	ExerHub = 202  # 艾瑟萌仓库
-
-	# 对战物资槽
-	BattleItemSlot = 301  # 对战物资槽
-
-
-# ===================================================
-#  容器物品枚举
-# ===================================================
-class ContItemType(Enum):
-	Unset = 0  # 未设置
-
-	# ===！！！！不能轻易修改序号！！！！===
-	# Pack 1~100
-	HumanPackItem = 1  # 人类背包物品
-	ExerPackItem = 2  # 艾瑟萌背包物品
-	HumanPackEquip = 3  # 人类背包装备
-	ExerPackEquip = 4  # 艾瑟萌背包装备
-
-	# 可叠加
-	ExerFragPackItem = 11  # 艾瑟萌碎片背包物品
-
-	# 可叠加
-	QuesSugarPackItem = 21  # 题目糖背包物品
-
-	# Slot 101~200
-	HumanEquipSlotItem = 101  # 人类装备槽项
-	ExerEquipSlotItem = 102  # 艾瑟萌装备槽项
-
-	ExerSlotItem = 111  # 艾瑟萌槽项
-
-	ExerSkillSlotItem = 121  # 艾瑟萌技能槽物品
-
-	# Others 201+
-	PlayerExerGift = 201  # 玩家艾瑟萌天赋关系
-
-	PlayerExermon = 202  # 玩家艾瑟萌关系
-
-	# 对战物资槽
-	BattleItemSlotItem = 301  # 对战物资槽项
-
-
-# endregion
-
-# region 物品系统管理类
-
-
-class ItemManager:
-	"""
-	物品管理类
-	"""
-
-	@classmethod
-	def registerItem(cls, verbose_name):
-		# cont_item_cla: 'PackContItem' = None):
-		"""
-		注册物品
-		Args:
-			verbose_name (str): 别名
-			# cont_item_cla (type): 容器项类
-		"""
-		def wrapper(cla: BaseItem):
-			print("registerItem: %s" % cla)
-
-			cla._meta.verbose_name = \
-				cla._meta.verbose_name_plural = verbose_name
-
-			cla.TYPE = eval("ItemType.%s" % cla.__name__)
-
-			# cla.CONTITEM_CLASS = cont_item_cla
-
-			EnumMapper.registerClass(cla)
-
-			return cla
-
-		return wrapper
-
-	@classmethod
-	def registerPackContainer(cls, verbose_name):
-		"""
-		注册容器
-		Args:
-			verbose_name (str): 别名
-		"""
-		def wrapper(cla: PackContainer):
-			cla._meta.verbose_name = \
-				cla._meta.verbose_name_plural = verbose_name
-
-			cla.TYPE = eval("ContainerType.%s" % cla.__name__)
-
-			EnumMapper.registerClass(cla)
-
-			return cla
-
-		return wrapper
-
-	@classmethod
-	def registerSlotContainer(cls, verbose_name):
-		"""
-		注册容器
-		Args:
-			verbose_name (str): 别名
-		"""
-		def wrapper(cla: SlotContainer):
-			cla._meta.verbose_name = \
-				cla._meta.verbose_name_plural = verbose_name
-
-			cla.TYPE = eval("ContainerType.%s" % cla.__name__)
-
-			EnumMapper.registerClass(cla)
-
-			return cla
-
-		return wrapper
-
-	@classmethod
-	def registerPackContItem(cls, verbose_name,
-							 container_cla: 'PackContainer',
-							 accepted_item_cla: 'BaseItem'):
-		"""
-		注册背包容器
-		Args:
-			verbose_name (str): 别名
-			container_cla (type): 背包容器类
-			accepted_item_cla (type): 接受物品类
-		"""
-		def wrapper(cla: PackContItem):
-			cla._meta.verbose_name = \
-				cla._meta.verbose_name_plural = verbose_name
-
-			cla.TYPE = eval("ContItemType.%s" % cla.__name__)
-
-			cla.CONTAINER_CLA = container_cla
-			cla.ACCEPTED_ITEM_CLASS = accepted_item_cla
-
-			container = models.ForeignKey(
-				container_cla, on_delete=models.CASCADE,
-				null=True, blank=True, verbose_name="容器")
-
-			item = models.ForeignKey(
-				accepted_item_cla, on_delete=models.CASCADE,
-				null=True, blank=True, verbose_name="物品")
-
-			cla.add_to_class('container', container)
-			cla.add_to_class('item', item)
-
-			setupItem()
-			setupContainer(cla)
-
-			EnumMapper.registerClass(cla)
-
-			return cla
-
-		def setupContainer(cla: PackContItem):
-
-			if container_cla.ACCEPTED_CONTITEM_CLASSES is None:
-				container_cla.ACCEPTED_CONTITEM_CLASSES = []
-
-			container_cla.ACCEPTED_CONTITEM_CLASSES.append(cla)
-
-			base_cont_item_cla = cls._getCommonSuperClass(
-				*container_cla.ACCEPTED_CONTITEM_CLASSES)
-
-			container_cla.BASE_CONTITEM_CLASS = base_cont_item_cla
-
-		def setupItem():
-
-			accepted_item_cla.CONTAINER_CLASS = container_cla
-
-		return wrapper
-
-	@classmethod
-	def registerSlotContItem(cls, verbose_name,
-							 container_cla: 'SlotContainer',
-							 **equip_item_args):
-		"""
-		注册槽容器
-		Args:
-			verbose_name (str): 别名
-			container_cla (type): 容器类
-			**equip_item_args (**dict): 装备项参数（键：装备项键名，值：装备项类型）
-		"""
-		def wrapper(cla: SlotContItem):
-
-			cla._meta.verbose_name = \
-				cla._meta.verbose_name_plural = verbose_name
-
-			cla.TYPE = eval("ContItemType.%s" % cla.__name__)
-			cla.CONTAINER_CLA = container_cla
-
-			cla.ACCEPTED_EQUIP_ITEM_ATTRS = []
-			cla.ACCEPTED_EQUIP_ITEM_CLASSES = []
-
-			container = models.ForeignKey(
-				container_cla, on_delete=models.CASCADE, verbose_name="容器")
-
-			cla.add_to_class('container', container)
-
-			for key in equip_item_args:
-				equip_item_cla: PackContItem = equip_item_args[key]
-				cla.ACCEPTED_EQUIP_ITEM_ATTRS.append(key)
-				cla.ACCEPTED_EQUIP_ITEM_CLASSES.append(equip_item_cla)
-
-				field = models.ForeignKey(equip_item_cla,
-					null=True, blank=True, on_delete=models.SET_NULL,
-					verbose_name=equip_item_cla._meta.verbose_name)
-
-				cla.add_to_class(key, field)
-
-			setupContainer(cla)
-
-			EnumMapper.registerClass(cla)
-
-			return cla
-
-		def setupContainer(cla: SlotContItem):
-
-			pack_item_clas = []
-
-			for key in equip_item_args:
-				pack_item_clas.append(equip_item_args[key])
-
-			base_cont_item_cla = cls.\
-				_getCommonSuperClass(*pack_item_clas)
-
-			container_cla.BASE_CONTITEM_CLASS = base_cont_item_cla
-			container_cla.ACCEPTED_CONTITEM_CLASSES = pack_item_clas
-			container_cla.ACCEPTED_SLOTITEM_CLASS = cla
-
-		return wrapper
-
-	@classmethod
-	def _getCommonSuperClass(cls, *clas) -> type:
-		# 极端情况
-		if len(clas) == 0: return None
-		if len(clas) == 1: return clas[0]
-		# 两个的情况
-		if len(clas) == 2:
-			mro1, mro2 = clas[0].mro(), clas[1].mro()
-
-			for cla_i in mro1:
-				for cla_j in mro2:
-					if cla_i == cla_j: return cla_i
-
-			return object
-
-		# 其他情况
-		cla: type = clas[0]
-		for i in range(len(clas)-1):
-			cla = cls._getCommonSuperClass(cla, clas[i+1])
-
-		return cla
-
-
-# endregion
-
-# region 属性对象
-
-class BaseParamsObject:
-	"""
-	基本属性对象
-	"""
-	# 管理界面显示属性
-	def _adminParams(self, params):
-		from django.utils.html import format_html
-
-		res = ''
-		for p in params:
-			res += str(p) + "<br>"
-
-		return format_html(res)
-
-	def _getVals(self, db_vals, val_func,
-				 param_cla, clamp=True) -> QuerySet or list:
-
-		if param_cla is None: return []
-
-		# 尝试获取数据库值（如果有的话）
-		if db_vals is not None: return db_vals
-
-		vals = []
-		params = BaseParam.objs()
-
-		for param in params:
-			val = param_cla(param=param)
-			val.setValue(val_func(param_id=param.id), clamp)
-			vals.append(val)
-
-		return vals
-
-	def _getVal(self, params, **kwargs):
-
-		if isinstance(params, QuerySet):
-			params = params.filter(**kwargs)
-
-			if not params.exists(): return 0
-			param: ParamValue = params.first()
-
-		else:
-			param: ParamValue = ModelUtils.get(params, **kwargs)
-
-		return 0 if param is None else param.getValue()
-
-
-class ParamsObject(BaseParamsObject):
-	"""
-	拥有属性计算的对象
-	术语：Val：实际值，Base：基础值，Rate：成长率
-	"""
-
-	# 管理界面用：显示属性基础值
-	def adminParamVals(self):
-		return self._adminParams(self.paramVals())
-
-	adminParamVals.short_description = "属性实际值"
-
-	# 管理界面用：显示属性基础值
-	def adminParamBases(self):
-		return self._adminParams(self.paramBases())
-
-	adminParamBases.short_description = "属性基础值"
-
-	# 管理界面用：显示属性成长率
-	def adminParamRates(self):
-		return self._adminParams(self.paramRates())
-
-	adminParamRates.short_description = "属性成长率"
-
-	# 管理界面用：显示属性成长率
-	def adminBattlePoint(self):
-		return self.battlePoint()
-
-	adminBattlePoint.short_description = "战斗力"
-
-	# 类型配置
-	@classmethod
-	def paramValueClass(cls):
-		return cls.paramBaseClass()
-
-	@classmethod
-	def paramBaseClass(cls): return None
-
-	@classmethod
-	def paramRateClass(cls): return None
-
-	# 数据库值获取（默认为 None 表示无）
-	def _paramVals(self) -> QuerySet:
-		return self._paramBases()
-
-	def _paramBases(self) -> QuerySet:
-		return None
-
-	def _paramRates(self) -> QuerySet:
-		return None
-
-	# 值计算（用于无法从数据库直接获取的属性，一般用于计算）
-	def _paramVal(self, **kwargs) -> float:
-		return self._paramBase(**kwargs)
-
-	def _paramBase(self, **kwargs) -> float:
-		return 0
-
-	def _paramRate(self, **kwargs) -> float:
-		return 0
-
-	# 最终值数组（缓存）
-	@CacheHelper.normalCache
-	def paramVals(self) -> QuerySet or list:
-		"""
-		获取所有实际属性数组
-		Returns:
-			返回所有实际属性的数组（元素类型为 ExerParamBase）
-		"""
-		return self._getVals(self._paramVals(), self._paramVal,
-							 self.paramValueClass())
-
-		# # 尝试获取数据库值（如果有的话）
-		# vals = self._paramVals()
-		# if vals is not None: return vals
-		#
-		# vals = []
-		# params = BaseParam.objs()
-		#
-		# for param in params:
-		# 	val = self.paramValueClass()(param=param)
-		# 	val.setValue(self._paramVal(param_id=param.id), False)
-		# 	vals.append(val)
-		#
-		# return vals
-
-	@CacheHelper.normalCache
-	def paramBases(self) -> QuerySet or list:
-		return self._getVals(self._paramBases(), self._paramBase,
-							 self.paramBaseClass())
-
-	@CacheHelper.normalCache
-	def paramRates(self) -> QuerySet or list:
-		return self._getVals(self._paramRates(), self._paramRate,
-							 self.paramRateClass())
-
-	# 单个值获取（通过缓存）
-	def paramVal(self, **kwargs):
-		return self._getVal(self.paramVals(), **kwargs)
-
-	def paramBase(self, **kwargs):
-		return self._getVal(self.paramBases(), **kwargs)
-
-	def paramRate(self, **kwargs):
-		return self._getVal(self.paramRates(), **kwargs)
-
-	# 清除属性缓存
-	def _clearParamsCache(self):
-		CacheHelper.clearCache(self,
-			self.paramVals, self.paramBases, self.paramRates)
-
-	# 战斗力
-	def battlePoint(self):
-		from utils.calc_utils import BattlePointCalc
-		return BattlePointCalc.calc(self.paramVal)
-
-
-class EquipParamsObject(BaseParamsObject):
-	"""
-	装备属性计算的对象
-	术语：Level：等级加成值，Base：基础值
-	"""
-
-	# 管理界面用：显示属性基础值
-	def adminLevelParams(self):
-		return self._adminParams(self.levelParams())
-
-	adminLevelParams.short_description = "等级属性值"
-
-	# 管理界面用：显示属性基础值
-	def adminBaseParams(self):
-		return self._adminParams(self.baseParams())
-
-	adminBaseParams.short_description = "基础属性值"
-
-	# 类型配置
-	@classmethod
-	def levelParamClass(cls): return None
-
-	@classmethod
-	def baseParamClass(cls): return None
-
-	# 数据库值获取或者间接获取（默认为 None 表示无）
-	def _levelParams(self) -> QuerySet or list:
-		return None
-
-	def _baseParams(self) -> QuerySet or list:
-		return None
-
-	# 值计算（用于无法从数据库直接获取的属性，一般用于计算）
-	def _levelParam(self, **kwargs) -> float:
-		return 0
-
-	def _baseParam(self, **kwargs) -> float:
-		return 0
-
-	# 最终值数组（缓存）
-	@CacheHelper.normalCache
-	def levelParams(self) -> QuerySet or list:
-		return self._getVals(self._levelParams(), self._levelParam,
-							 self.levelParamClass(), False)
-
-	@CacheHelper.normalCache
-	def baseParams(self) -> QuerySet or list:
-		return self._getVals(self._baseParams(), self._baseParam,
-							 self.baseParamClass(), False)
-
-	# 单个值获取（通过缓存）
-	def levelParam(self, **kwargs):
-		return self._getVal(self.levelParams(), **kwargs)
-
-	def baseParam(self, **kwargs):
-		return self._getVal(self.baseParams(), **kwargs)
-
-	# 清除属性缓存
-	def _clearParamsCache(self):
-		CacheHelper.clearCache(self,
-			self.levelParams, self.baseParams)
-
-# endregion
 
 # region 物品系统
 
@@ -679,34 +123,7 @@ class BaseItem(CoreModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "基础物品"
 
-	TYPES = [
-		(ItemType.Unset.value, '未知物品'),
-
-		# LimitedItem
-		# UsableItem
-		(ItemType.HumanItem.value, '人类物品'),
-		(ItemType.ExerItem.value, '艾瑟萌物品'),
-
-		# EquipableItem
-		(ItemType.HumanEquip.value, '人类装备'),
-		(ItemType.ExerEquip.value, '艾瑟萌装备'),
-
-		# InfiniteItem
-		(ItemType.QuesSugar.value, '题目糖'),
-
-		(ItemType.Exermon.value, '艾瑟萌'),
-		(ItemType.ExerSkill.value, '艾瑟萌技能'),
-		(ItemType.ExerGift.value, '艾瑟萌天赋'),
-		(ItemType.ExerFrag.value, '艾瑟萌碎片'),
-
-		# ExerProItem
-		(ItemType.ExerProItem.value, '特训物品'),
-		(ItemType.ExerProPotion.value, '特训药水'),
-		(ItemType.ExerProCard.value, '特训卡片'),
-
-		(ItemType.ExerProEnemy.value, '特训敌人'),
-		(ItemType.ExerProState.value, '特训状态'),
-	]
+	TYPES = ITEM_TYPES
 
 	# 道具类型
 	TYPE = ItemType.Unset
@@ -746,7 +163,7 @@ class BaseItem(CoreModel):
 	# 	raise AttributeError(item)
 
 	# 可否被购买
-	def isBoughtable(self):
+	def isBoughtable(self, *args, **kwargs):
 		return False
 
 	# 转化为 dict
@@ -789,6 +206,9 @@ class LimitedItem(BaseItem):
 
 	LIST_DISPLAY_APPEND = ['adminBuyPrice']
 
+	# 高级商品星级阈值
+	SENIOR_STAR_THRESHOLD = 5
+
 	# 物品星级
 	star = models.ForeignKey("game_module.ItemStar", on_delete=models.CASCADE, verbose_name="星级")
 
@@ -808,6 +228,9 @@ class LimitedItem(BaseItem):
 	# 能否交易
 	tradable = models.BooleanField(default=True, verbose_name="可交易")
 
+	# 高级标志
+	senior_flag = models.BooleanField(null=True, blank=True, verbose_name="高级标志")
+
 	# 物品图标
 	# icon = models.ImageField(upload_to=ItemIconUpload(),
 	# 						 null=True, blank=True, verbose_name="图标")
@@ -818,36 +241,34 @@ class LimitedItem(BaseItem):
 
 	adminBuyPrice.short_description = "购入价格"
 
-	# 可否被购买
-	def isBoughtable(self):
+	def isBoughtable(self, *args, **kwargs):
+		"""
+		物品能否购买，可以购买的物品会直接出现在相应的商店中
+		Returns:
+			返回该物品能否购买
+		"""
 		buy_price: Currency = self.buyPrice()
 		if buy_price is None: return False
 		return not buy_price.isEmpty()
 
-	# 获取购买价格
+	def isSeniorShop(self):
+		"""
+		是否高级商品
+		Returns:
+			返回该物品是否为高级商品
+		"""
+		if self.senior_flag is not None:
+			return self.senior_flag
+
+		return self.star_id >= self.SENIOR_STAR_THRESHOLD
+
 	def buyPrice(self):
+		"""
+		固定的购买价格，返回None则无法购买
+		Returns:
+			返回固定的购买价格
+		"""
 		raise NotImplementedError
-
-	# try: return self.itemprice
-	# except ItemPrice.DoesNotExist: return None
-
-	# # 获取完整路径
-	# def getExactlyIconPath(self):
-	# 	base = settings.STATIC_URL
-	# 	path = os.path.join(base, str(self.icon))
-	# 	if os.path.exists(path):
-	# 		return path
-	# 	else:
-	# 		raise ErrorException(ErrorType.PictureFileNotFound)
-	#
-	# # 获取图标base64编码
-	# def convertIconToBase64(self):
-	# 	import base64
-	#
-	# 	with open(self.getExactlyIconPath(), 'rb') as f:
-	# 		data = base64.b64encode(f.read())
-	#
-	# 	return data.decode()
 
 	# 转化为 dict
 	def convert(self, type=None, **kwargs):
@@ -1155,29 +576,7 @@ class BaseContainer(CacheableModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "基本容器"
 
-	TYPES = [
-		(ContainerType.Unset.value, '未知容器'),
-
-		# Pack
-		(ContainerType.HumanPack.value, '人类背包'),
-		(ContainerType.ExerPack.value, '艾瑟萌背包'),
-
-		(ContainerType.ExerFragPack.value, '艾瑟萌碎片背包'),
-
-		(ContainerType.QuesSugarPack.value, '题目糖背包'),
-
-		# Slot
-		(ContainerType.HumanEquipSlot.value, '人类装备槽'),
-		(ContainerType.ExerEquipSlot.value, '艾瑟萌装备槽'),
-
-		(ContainerType.ExerSlot.value, '艾瑟萌槽'),
-
-		(ContainerType.ExerSkillSlot.value, '艾瑟萌技能槽'),
-
-		# Others
-		(ContainerType.ExerGiftPool.value, '艾瑟萌天赋池'),
-		(ContainerType.ExerHub.value, '艾瑟萌仓库'),
-	]
+	TYPES = CONTAINER_TYPES
 
 	# 容器类型
 	TYPE = ContainerType.Unset
@@ -1422,13 +821,13 @@ class BaseContainer(CacheableModel):
 		"""
 		if cla is not None:
 			# 根据 cache_pool 中储存类型返回 list or QuerySet
-			return list(self._queryModelCache(cla, cond, True, **kwargs))
+			return self._queryModelCache(cla, cond, True, **kwargs)
 
 		# 只返回 list，且只读
 		cont_items = []
 		for _cla in self.acceptedContItemClasses():
-			cont_items += list(self._queryModelCache(
-				_cla, cond, True, **kwargs))
+			cont_items += self._queryModelCache(
+				_cla, cond, True, **kwargs)
 
 		return cont_items
 
@@ -2789,31 +2188,7 @@ class BaseContItem(CacheableModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "基本容器项"
 
-	TYPES = [
-		(ContItemType.Unset.value, '未知容器物品'),
-
-		# Pack
-		(ContItemType.HumanPackItem.value, '人类背包物品项'),
-		(ContItemType.ExerPackItem.value, '艾瑟萌背包物品项'),
-		(ContItemType.HumanPackEquip.value, '人类背包装备项'),
-		(ContItemType.ExerPackEquip.value, '艾瑟萌背包装备项'),
-
-		(ContItemType.ExerFragPackItem.value, '艾瑟萌碎片背包项'),
-
-		(ContItemType.QuesSugarPackItem.value, '题目糖背包项'),
-
-		# Slot
-		(ContItemType.HumanEquipSlotItem.value, '人类装备槽项'),
-		(ContItemType.ExerEquipSlotItem.value, '艾瑟萌装备槽项'),
-
-		(ContItemType.ExerSlotItem.value, '艾瑟萌槽项'),
-
-		(ContItemType.ExerSkillSlotItem.value, '艾瑟萌技能槽项'),
-
-		# Others
-		(ContItemType.PlayerExerGift.value, '艾瑟萌天赋池项'),
-		(ContItemType.PlayerExermon.value, '艾瑟萌仓库项'),
-	]
+	TYPES = CONT_ITEM_TYPES
 
 	# 容器项类型
 	TYPE = ContItemType.Unset

@@ -26,35 +26,18 @@ class PlayerMoneyAdmin(object): pass
 class PlayerAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(HumanItem)
+@AdminXHelper.relatedModel(GameItem)
 class HumanItemAdmin(UsableItemAdmin): pass
 
 
-@AdminXHelper.relatedModel(HumanEquip)
-class HumanEquipAdmin(EquipableItemAdmin): pass
-
-
-@AdminXHelper.relatedModel(HumanPack)
+@AdminXHelper.relatedModel(ItemPack)
 class HumanPackAdmin(PackContainerAdmin): pass
 
 
-@AdminXHelper.relatedModel(HumanEquipSlot)
-class HumanEquipSlotAdmin(SlotContainerAdmin): pass
-
-
-@AdminXHelper.relatedModel(HumanPackItem)
+@AdminXHelper.relatedModel(ItemPackItem)
 class HumanPackItemAdmin(PackContItemAdmin): pass
 
 
-@AdminXHelper.relatedModel(HumanPackEquip)
-class HumanPackEquipAdmin(PackContItemAdmin): pass
+xadmin.site.register(GameItemEffect, BaseEffectAdmin)
 
-
-@AdminXHelper.relatedModel(HumanEquipSlotItem)
-class HumanEquipSlotItemAdmin(SlotContItemAdmin): pass
-
-
-xadmin.site.register(HumanItemEffect, BaseEffectAdmin)
-
-xadmin.site.register(HumanItemPrice, CurrencyAdmin)
-xadmin.site.register(HumanEquipPrice, CurrencyAdmin)
+xadmin.site.register(GameItemPrice, CurrencyAdmin)

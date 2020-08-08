@@ -1,4 +1,6 @@
 from item_module.models import *
+from item_module.manager import *
+
 from game_module.models import ParamValue, ParamRate
 
 import exermon_module.item_system.items as Items
@@ -440,7 +442,7 @@ class ExerSlotItem(SlotContItem, ParamsObject):
 	player = models.ForeignKey('player_module.Player', on_delete=models.CASCADE, verbose_name="玩家")
 
 	# 科目
-	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE, verbose_name="科目")
+	# subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE, verbose_name="科目")
 
 	# 经验值（累计）
 	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
@@ -469,7 +471,7 @@ class ExerSlotItem(SlotContItem, ParamsObject):
 
 		exer_equip_slot = ModelUtils.objectToDict(self.exerEquipSlot(), type="items")
 
-		res['subject_id'] = self.subject_id
+		# res['subject_id'] = self.subject_id
 		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
@@ -479,10 +481,10 @@ class ExerSlotItem(SlotContItem, ParamsObject):
 
 		return res
 
-	def playerExer(self):
+	def playerExer(self) -> PlayerExermon:
 		return self.equipItem(0)
 
-	def playerGift(self):
+	def playerGift(self) -> PlayerExerGift:
 		return self.equipItem(1)
 
 	# region 容器相关
@@ -641,19 +643,11 @@ class ExerSkillSlotItem(SlotContItem):
 
 
 # ===================================================
-#  艾瑟萌背包物品
-# ===================================================
-@ItemManager.registerPackContItem("艾瑟萌背包物品",
-	Containers.ExerPack, Items.ExerItem)
-class ExerPackItem(PackContItem): pass
-
-
-# ===================================================
 #  艾瑟萌背包装备
 # ===================================================
-@ItemManager.registerPackContItem("艾瑟萌背包装备",
-	Containers.ExerPack, Items.ExerEquip)
-class ExerPackEquip(PackContItem, EquipParamsObject):
+@ItemManager.registerPackContItem("装备背包项",
+								  Containers.EquipPack, Items.GameEquip)
+class EquipPackItem(PackContItem, EquipParamsObject):
 
 	@classmethod
 	def levelParamClass(cls):
@@ -680,7 +674,7 @@ class ExerPackEquip(PackContItem, EquipParamsObject):
 #  艾瑟萌装备槽项
 # ===================================================
 @ItemManager.registerSlotContItem("艾瑟萌装备槽项",
-	Containers.ExerEquipSlot, pack_equip=ExerPackEquip)
+								  Containers.ExerEquipSlot, pack_equip=EquipPackItem)
 class ExerEquipSlotItem(SlotContItem, ParamsObject):
 
 	# 装备槽类型
@@ -701,7 +695,7 @@ class ExerEquipSlotItem(SlotContItem, ParamsObject):
 		return res
 
 	# 装备
-	def packEquip(self) -> ExerPackEquip:
+	def packEquip(self) -> EquipPackItem:
 		return self.equipItem(0)
 
 	# 配置索引

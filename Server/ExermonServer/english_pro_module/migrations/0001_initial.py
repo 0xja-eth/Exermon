@@ -147,7 +147,7 @@ class Migration(migrations.Migration):
                 ('word_index', models.PositiveSmallIntegerField(verbose_name='单词编号')),
                 ('type', models.PositiveSmallIntegerField(choices=[(1, '增加'), (2, '修改'), (3, '删除')], default=2, verbose_name='修改类型')),
                 ('word', models.TextField(verbose_name='正确单词')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='english_pro_module.CorrectionQuestion', verbose_name='改错题目')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='english_pro_module.models.CorrectingQuestion', verbose_name='改错题目')),
             ],
             options={
                 'verbose_name': '改错题错误项',

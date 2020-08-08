@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from .models import *
+
 from player_module.models import Player
+
 from utils.view_utils import Common as ViewUtils
+from utils.model_utils import EnumMapper
 from utils.exception import ErrorType, GameException
 
 # Create your views here.
@@ -54,7 +57,7 @@ class Service:
 		# 检验描述是否超过字数限制
 		Check.ensureFeedbackFormat(description)
 
-		QuesReport.create(player, qid, type, description)
+		BaseQuesReport.create(player, qid, type, description)
 
 	# 上传题目
 	@classmethod
@@ -78,7 +81,7 @@ class Service:
 	def _upload(cls, q):
 		print(q)
 
-		question = Question()
+		question = GeneralQuestion()
 		question.title = q['title']
 		question.score = q['score']
 		question.star_id = q['star'] + 1
@@ -99,7 +102,7 @@ class Service:
 
 	@classmethod
 	def __uploadChoice(cls, c, index, question):
-		choice = QuesChoice()
+		choice = GeneralQuesChoice()
 		choice.order = index
 		choice.text = c['text']
 		choice.answer = c['ans']
@@ -108,7 +111,7 @@ class Service:
 
 	@classmethod
 	def __uploadPicture(cls, p, index, question):
-		picture = QuesPicture()
+		picture = GeneralQuesPicture()
 		picture.number = index
 		picture.file = p
 		picture.question = question
@@ -120,10 +123,17 @@ class Service:
 # ====================
 class Check:
 
+	# 校验题目类型
+	@classmethod
+	def ensureQuestionType(cls, val: int):
+		if val == 0:
+			raise GameException(ErrorType.IncorrectQuestionType)
+		ViewUtils.ensureEnumData(val, QuestionType, ErrorType.IncorrectQuestionType, True)
+
 	# 校验题目反馈的长度-lgy
 	@classmethod
 	def ensureFeedbackFormat(cls, val: str):
-		if len(val) > QuesReport.MAX_DESC_LEN:
+		if len(val) > BaseQuesReport.MAX_DESC_LEN:
 			raise GameException(ErrorType.QuesReportTooLong)
 
 	# 校验题目反馈的长度-lgy
@@ -139,18 +149,35 @@ class Common:
 
 	# 获取题目
 	@classmethod
-	def getQuestion(cls, error: ErrorType = ErrorType.QuestionNotExist,
-					**kwargs) -> Question:
+	def getQuestion(cls, type_: int = None, cla: BaseQuestion = None,
+					error: ErrorType = ErrorType.QuestionNotExist,
+					**kwargs) -> GeneralQuestion:
+		"""
+		获取题目
+		Args:
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
+			error (ErrorType): 不存在时抛出异常类型
+			**kwargs (**dict): 查询参数
+		Returns:
+			返回符合条件的题目（若有多个返回第一个）
+		"""
+		if cla is None:
+			Check.ensureQuestionType(type_)
+			cla = EnumMapper.get(QuestionType(type_))
 
-		return ViewUtils.getObject(Question, error, **kwargs)
+		return ViewUtils.getObject(cla, error, **kwargs)
 
 	# 获取多个题目
 	@classmethod
-	def getQuestions(cls, ids=None, error: ErrorType = ErrorType.QuestionNotExist,
+	def getQuestions(cls, type_: int = None, cla: BaseQuestion = None,
+					 ids=None, error: ErrorType = ErrorType.QuestionNotExist,
 					 **kwargs) -> list:
 		"""
 		获取多个题目
 		Args:
+			type_ (int): 类型（枚举值）
+			cla (type): 类型（类）
 			ids (list): 题目ID集
 			error (ErrorType): 抛出异常
 			**kwargs (**dict): 查询参数
@@ -158,36 +185,33 @@ class Common:
 			当 ids 不为 None 时，返回指定 ID 的题目
 			否则只返回满足条件的题目
 		"""
+		if cla is None:
+			Check.ensureQuestionType(type_)
+			cla = EnumMapper.get(QuestionType(type_))
+
 		if ids is None:
-			return ViewUtils.getObjects(Question, **kwargs)
+			return ViewUtils.getObjects(cla, **kwargs)
 
 		unique_ids = list(set(ids))
 
-		res = ViewUtils.getObjects(Question, id__in=ids)
+		res = ViewUtils.getObjects(cla, id__in=ids)
 
 		# 数量不一致，说明获取出现问题
 		if res.count() != len(unique_ids): raise GameException(error)
 
 		return res
 
-	# 获取题目糖
-	@classmethod
-	def getQuesSugar(cls, error: ErrorType = ErrorType.QuesSugarNotExist,
-					 **kwargs) -> QuesSugar:
-
-		return ViewUtils.getObject(QuesSugar, error, **kwargs)
-
 	# 确保题目存在
 	@classmethod
-	def ensureQuestionExist(cls, error: ErrorType = ErrorType.QuestionNotExist, **kwargs):
-		return ViewUtils.ensureObjectExist(Question, error, **kwargs)
+	def ensureQuestionExist(cls, type_: int = None, cla: BaseQuestion = None,
+							error: ErrorType = ErrorType.QuestionNotExist, **kwargs):
+		if cla is None:
+			Check.ensureQuestionType(type_)
+			cla = EnumMapper.get(QuestionType(type_))
 
-	# 确保题目糖存在
-	@classmethod
-	def ensureQuesSugarExist(cls, error: ErrorType = ErrorType.QuesSugarNotExist, **kwargs):
-		return ViewUtils.ensureObjectExist(QuesSugar, error, **kwargs)
+		ViewUtils.ensureObjectExist(cla, error, **kwargs)
 
 	# 确保反馈类型是枚举类型-lgy
-	@classmethod
-	def ensureQuesReportExist(cls, val:int):
-		return ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidQuesReportType )
+	# @classmethod
+	# def ensureQuesReportExist(cls, val: int):
+	# 	return ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.InvalidQuesReportType )

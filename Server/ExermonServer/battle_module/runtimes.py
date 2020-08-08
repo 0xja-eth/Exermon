@@ -1649,7 +1649,7 @@ class RuntimeBattle(RuntimeData):
 		"""
 		准备状态改变回调（开始答题）
 		"""
-		from question_module.models import Question
+		from question_module.models import GeneralQuestion
 
 		self._emit(EmitType.PrepareCompleted,
 				   None, self.PREPARE_END_WAIT_TIME)
@@ -1658,7 +1658,7 @@ class RuntimeBattle(RuntimeData):
 		# 开始答题
 		self.record.startCurrentRound()
 
-		question: Question = self.cur_round.question
+		question: GeneralQuestion = self.cur_round.question
 		time = question.star.std_time
 		self.setTimer(time*self.QUESTION_TIME_RATE)
 

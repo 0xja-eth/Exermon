@@ -1,5 +1,3 @@
-#-*-coding:GBK -*-
-
 from question_module.adminx import *
 from item_module.adminx import *
 from .models import *
@@ -41,11 +39,11 @@ class PlotQuesChoiceAdmin(object): pass
 class ListeningQuestionAdmin(GroupQuestionAdmin): pass
 
 
-@AdminXHelper.relatedModel(PhraseQuestion)
+@AdminXHelper.relatedModel(Phrase)
 class PhraseQuestionAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(CorrectionQuestion)
+@AdminXHelper.relatedModel(CorrectingQuestion)
 class CorrectionQuestionAdmin(object): pass
 
 

@@ -34,11 +34,7 @@ class ExerGiftAdmin(BaseItemAdmin): pass
 class ExerSkillAdmin(BaseItemAdmin): pass
 
 
-@AdminXHelper.relatedModel(ExerItem)
-class ExerItemAdmin(UsableItemAdmin): pass
-
-
-@AdminXHelper.relatedModel(ExerEquip)
+@AdminXHelper.relatedModel(GameEquip)
 class ExerEquipAdmin(EquipableItemAdmin): pass
 
 
@@ -46,7 +42,7 @@ class ExerEquipAdmin(EquipableItemAdmin): pass
 class ExerHubAdmin(PackContainerAdmin): pass
 
 
-@AdminXHelper.relatedModel(ExerPack)
+@AdminXHelper.relatedModel(EquipPack)
 class ExerPackAdmin(PackContainerAdmin): pass
 
 
@@ -74,11 +70,7 @@ class PlayerExermonAdmin(PackContItemAdmin): pass
 class ExerSkillSlotAdmin(SlotContainerAdmin): pass
 
 
-@AdminXHelper.relatedModel(ExerPackItem)
-class ExerPackItemAdmin(PackContItemAdmin): pass
-
-
-@AdminXHelper.relatedModel(ExerPackEquip)
+@AdminXHelper.relatedModel(EquipPackItem)
 class ExerPackEquipAdmin(PackContItemAdmin): pass
 
 
@@ -102,8 +94,6 @@ class ExerFragPackItemAdmin(PackContItemAdmin): pass
 class PlayerExerGiftAdmin(PackContItemAdmin): pass
 
 
-xadmin.site.register(ExerItemEffect, BaseEffectAdmin)
+xadmin.site.register(GameEquipPrice, CurrencyAdmin)
 xadmin.site.register(ExerSkillEffect, BaseEffectAdmin)
 
-xadmin.site.register(ExerItemPrice, CurrencyAdmin)
-xadmin.site.register(ExerEquipPrice, CurrencyAdmin)

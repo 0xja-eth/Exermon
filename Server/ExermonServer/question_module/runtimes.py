@@ -1,5 +1,5 @@
-from question_module.models import Question
-from record_module.models import QuestionRecord
+from question_module.models import GeneralQuestion
+from record_module.models import GeneralQuesRecord
 import datetime
 from utils.model_utils import Common as ModelUtils
 
@@ -58,7 +58,7 @@ class QuestionDetail:
 
 		# TODO: 使用 ViewUtils.getObjects 来代替 QuestionRecord.object.filter(...)
 		# TODO: 至于为什么，可以看看 ViewUtils.getObjects 的实现，其他函数也同理
-		records = ViewUtils.getObjects(QuestionRecord,
+		records = ViewUtils.getObjects(GeneralQuesRecord,
 									   question_id=self.question_id)
 
 		self.sum_player = len(records)
@@ -118,7 +118,7 @@ class QuestionDetail:
 		# TODO: 另外，以后要有类似的功能，也需要封装成一个函数来调用
 		# TODO: 除非是复杂的查询操作，否则一般不要直接使用 Django 的 API
 		# record = QuestionRecord.objects.filter(Q(question=self.ques_id) | Q(player=player))
-		record: QuestionRecord = player.questionRecord(self.question_id)
+		record: GeneralQuesRecord = player.questionRecord(self.question_id)
 
 		if record is not None:
 			first_date = ModelUtils.timeToStr(record.first_date)

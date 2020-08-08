@@ -834,13 +834,13 @@ class Player(CacheableModel):
 		return container.contItem(**kwargs)
 
 	# 获取人类背包
-	def humanPack(self) -> 'HumanPack':
-		return self.getContainer(HumanPack)
+	def humanPack(self) -> 'ItemPack':
+		return self.getContainer(ItemPack)
 
 	# 获取艾瑟萌背包
 	def exerPack(self) -> 'ExerPack':
-		from exermon_module.models import ExerPack
-		return self.getContainer(ExerPack)
+		from exermon_module.models import EquipPack
+		return self.getContainer(EquipPack)
 
 	# 获取艾瑟萌碎片背包
 	def exerFragPack(self) -> 'ExerFragPack':
@@ -1102,15 +1102,15 @@ class Player(CacheableModel):
 		"""
 		检查相关容器
 		"""
-		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, ExerPack
+		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, EquipPack
 		from question_module.models import QuesSugarPack
 		from battle_module.models import BattleItemSlot
 
 		if self.humanPack() is None:
-			HumanPack.create(player=self)
+			ItemPack.create(player=self)
 
 		if self.exerPack() is None:
-			ExerPack.create(player=self)
+			EquipPack.create(player=self)
 
 		if self.exerHub() is None:
 			ExerHub.create(player=self)
@@ -1240,30 +1240,34 @@ class Player(CacheableModel):
 		"""
 		exerslot = self.exerSlot()
 		if exerslot is None: return set()
-		slot_items = exerslot.contItems()
+		question_set		slot_items = exerslot.contItems()
 		return set(ModelUtils.query(slot_items, lambda item: item.subject))
 
 	# endregion
 
 	# region 纪录操作
 
-	def questionRecords(self) -> QuerySet:
+	def questionRecords(self, cla: 'BaseQuesRecord') -> QuerySet:
 		"""
 		获取所有题目记录
 		Returns:
 			所有与该玩家相关的题目记录 QuerySet 对象
 		"""
-		return self.questionrecord_set.all()
+		name = cla.__name__ + '_set'
+		try: return getattr(self, name).all()
+		except AttributeError: return None
 
-	def questionRecord(self, question_id: int) -> 'QuestionRecord':
+	def questionRecord(self, cla: 'BaseQuesRecord',
+					   question_id: int) -> 'BaseQuesRecord':
 		"""
 		通过题目ID查找题目记录
 		Args:
+			cla (type): 题目记录类型
 			question_id (int): 题目ID
 		Returns:
 			若存在题目记录，返回之，否则返回 None
 		"""
-		res = self.questionRecords().filter(question_id=question_id)
+		res = self.questionRecords(cla).filter(question_id=question_id)
 		if res.exists(): return res.first()
 		return None
 

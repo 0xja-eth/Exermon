@@ -36,7 +36,7 @@ class Service:
 
 		item_slot = Common.getBattleItemSlot(player)
 
-		return ItemService.slotContainerEquip(item_slot, None, type_=HumanPackItem, index=index)
+		return ItemService.slotContainerEquip(item_slot, None, type_=ItemPackItem, index=index)
 
 	# 对战开始匹配
 	@classmethod

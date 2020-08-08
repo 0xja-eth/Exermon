@@ -173,8 +173,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('count', models.PositiveSmallIntegerField(default=0, verbose_name='叠加数量')),
                 ('equiped', models.BooleanField(default=False, verbose_name='是否装备中')),
-                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanPack', verbose_name='容器')),
-                ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanItem', verbose_name='物品')),
+                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.containers.ItemPack', verbose_name='容器')),
+                ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.items.GameItem', verbose_name='物品')),
             ],
             options={
                 'verbose_name': '人类背包物品',
@@ -187,7 +187,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('count', models.PositiveSmallIntegerField(default=0, verbose_name='叠加数量')),
                 ('equiped', models.BooleanField(default=False, verbose_name='是否装备中')),
-                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanPack', verbose_name='容器')),
+                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.containers.ItemPack', verbose_name='容器')),
                 ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanEquip', verbose_name='物品')),
             ],
             options={
@@ -207,7 +207,7 @@ class Migration(migrations.Migration):
                 ('gold', models.PositiveIntegerField(default=0, verbose_name='金币')),
                 ('ticket', models.PositiveIntegerField(default=0, verbose_name='点券')),
                 ('bound_ticket', models.PositiveIntegerField(default=0, verbose_name='金币')),
-                ('item', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanItem', verbose_name='物品')),
+                ('item', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.items.GameItem', verbose_name='物品')),
             ],
             options={
                 'verbose_name': '人类物品价格',
@@ -220,7 +220,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('code', models.PositiveSmallIntegerField(choices=[(0, '空'), (10, '回复体力值'), (11, '回复精力值'), (20, '增加能力值'), (21, '临时增加能力值'), (22, '战斗中增加能力值'), (30, '获得物品'), (31, '获得金币'), (32, '获得绑定点券'), (40, '指定艾瑟萌获得经验'), (41, '指定艾瑟萌槽项获得经验'), (42, '玩家获得经验'), (99, '执行程序')], default=0, verbose_name='效果编号')),
                 ('params', jsonfield.fields.JSONField(default=[], verbose_name='效果参数')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='player_module.HumanItem', verbose_name='物品')),
+                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.items.GameItem', verbose_name='物品')),
             ],
             options={
                 'verbose_name': '人类物品使用效果',

@@ -29,7 +29,7 @@ class Service:
 
 		QuestionCommon.ensureQuestionExist(id=qid)
 
-		rec = QuestionRecord.create(player, qid)
+		rec = GeneralQuesRecord.create(player, qid)
 
 		rec.collected = not rec.collected
 		rec.save()
@@ -43,7 +43,7 @@ class Service:
 
 		QuestionCommon.ensureQuestionExist(id=qid)
 
-		rec = QuestionRecord.create(player, qid)
+		rec = GeneralQuesRecord.create(player, qid)
 
 		rec.wrong = False
 		rec.save()
@@ -57,7 +57,7 @@ class Service:
 
 		QuestionCommon.ensureQuestionExist(id=qid)
 
-		rec = QuestionRecord.create(player, qid)
+		rec = GeneralQuesRecord.create(player, qid)
 
 		rec.note = note
 		rec.save()
@@ -81,7 +81,7 @@ class Service:
 
 	# 开始刷题
 	@classmethod
-	async def exerciseStart(cls, consumer, player: Player, qid: int):
+	async def exerciseStart(cls, consumer, player: Player, q_type: int, qid: int):
 		# 返回数据：无
 
 		exercise = player.currentQuestionSet()
@@ -111,7 +111,7 @@ class Check:
 	# 校验备注格式
 	@classmethod
 	def ensureNoteFormat(cls, val: str):
-		if len(val) != QuestionRecord.MAX_NOTE_LEN:
+		if len(val) != GeneralQuesRecord.MAX_NOTE_LEN:
 			raise GameException(ErrorType.InvalidNote)
 
 
@@ -123,9 +123,9 @@ class Common:
 	# 获取题目记录
 	@classmethod
 	def getQuestionRecord(cls, error: ErrorType = ErrorType.QuestionNotExist,
-						  **kwargs) -> QuestionRecord:
+						  **kwargs) -> GeneralQuesRecord:
 
-		return ViewUtils.getObject(QuestionRecord, error, **kwargs)
+		return ViewUtils.getObject(GeneralQuesRecord, error, **kwargs)
 
 	# 获取刷题记录
 	@classmethod
