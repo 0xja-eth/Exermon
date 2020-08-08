@@ -42,6 +42,8 @@ class Word(Models.ElementQuestion):
 
 		res['chinese'] = self.chinese
 
+	def answer(self): return self.chinese
+
 
 # ===================================================
 #  短语题目类型枚举
@@ -91,3 +93,5 @@ class Phrase(Models.ElementQuestion):
 		super()._convertAnswerInfo(res)
 
 		res['phrase'] = self.phrase
+
+	def answer(self): return self.phrase

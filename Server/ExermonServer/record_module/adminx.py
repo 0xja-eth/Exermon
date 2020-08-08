@@ -27,7 +27,7 @@ class PlayerQuestionAdmin(object): pass
 class ExerciseQuestionAdmin(PlayerQuestionAdmin): pass
 
 
-@AdminXHelper.relatedModel(QuestionSetRecord)
+@AdminXHelper.relatedModel(QuesSetRecord)
 class QuestionSetRecordAdmin(object): pass
 
 

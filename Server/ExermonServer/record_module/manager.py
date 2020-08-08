@@ -16,16 +16,16 @@ class RecordManager:
 	@classmethod
 	def registerQuestionSet(cls, verbose_name,
 							ques_gen_cla: BaseQuestionGenerator,
-							reward_calc: QuestionSetResultRewardCalc):
+							reward_calc: QuesSetResultRewardCalc = None):
 		"""
 		注册题目集
 		Args:
 			verbose_name (str): 别名
 			ques_gen_cla (BaseQuestionGenerator): 题目生成类
-			reward_calc (QuestionSetResultRewardCalc): 奖励生成类
+			reward_calc (QuesSetResultRewardCalc): 奖励生成类
 			# cont_item_cla (type): 容器项类
 		"""
-		def wrapper(cla: QuestionSetRecord):
+		def wrapper(cla: QuesSetRecord):
 			print("registerQuestionSet: %s" % cla)
 
 			cla._meta.verbose_name = \
@@ -35,8 +35,8 @@ class RecordManager:
 
 			cla.TYPE = eval("QuestionSetType.%s" % name)
 
-			cla.REWARD_CALC = reward_calc
 			cla.QUES_GEN_CLASS = ques_gen_cla
+			cla.REWARD_CALC = reward_calc
 
 			EnumMapper.registerClass(cla)
 
@@ -45,13 +45,13 @@ class RecordManager:
 		return wrapper
 
 	@classmethod
-	def registerQuestionSetReward(cls, question_set_cla: QuestionSetRecord):
+	def registerQuestionSetReward(cls, question_set_cla: QuesSetRecord):
 		"""
 		注册题目集奖励
 		Args:
-			question_set_cla (QuestionSetRecord): 题目集类
+			question_set_cla (QuesSetRecord): 题目集类
 		"""
-		def wrapper(cla: QuestionSetReward):
+		def wrapper(cla: QuesSetReward):
 			question_set_name = question_set_cla._meta.verbose_name
 
 			verbose_name = question_set_name + "奖励"
@@ -72,15 +72,15 @@ class RecordManager:
 
 	@classmethod
 	def registerPlayerQuestion(cls, question_cla: BaseQuestion,
-							   question_set_cla: QuestionSetRecord,
-							   reward_calc=QuestionSetSingleRewardCalc,
+							   question_set_cla: QuesSetRecord,
+							   reward_calc=QuesSetSingleRewardCalc,
 							   source=RecordSource.Others):
 		"""
 		注册题目图片
 		Args:
 			question_cla (BaseQuestion): 题目类型
-			question_set_cla (QuestionSetRecord): 题目集类型
-			reward_calc (QuestionSetSingleRewardCalc): 奖励计算类
+			question_set_cla (QuesSetRecord): 题目集类型
+			reward_calc (QuesSetSingleRewardCalc): 奖励计算类
 			source (RecordSource): 来源
 		"""
 		def wrapper(cla: BasePlayerQuestion):

@@ -160,7 +160,7 @@ class BaseQuestion(models.Model):
 
 	# 计算分数
 	def calcScore(self, **kwargs):
-		raise NotImplementedError
+		return self.quesScore() if self.calcCorrect(**kwargs) else 0
 
 
 # ===================================================
@@ -473,6 +473,10 @@ class ElementQuestion(BaseQuestion):
 
 	TYPE = QuestionType.Element
 
+	def answer(self): raise NotImplementedError
+
+	def calcCorrect(self, answer: str):
+		return answer == self.answer()
 
 # endregion
 
@@ -515,6 +519,37 @@ class GroupQuestion(BaseQuestion):
 
 		return getattr(self, attr_name).all()
 
+	def quesScore(self):
+		if self.score is not None: return self.score
+		
+		res = 0
+		
+		for sub in self.subQuestions():
+			res += sub.quesScore()
+			
+		return res
+
+	def calcCorrect(self, answers: list):
+		res = True
+		subs = self.subQuestions()
+				
+		for i in range(len(subs)):
+			answer = answers[i]
+			sub: BaseQuestion = subs[i]
+			res = res and sub.calcCorrect(**answer)
+
+		return res
+
+	def calcScore(self, answers: list):
+		res = 0
+		subs = self.subQuestions()
+
+		for i in range(len(subs)):
+			answer = answers[i]
+			sub: BaseQuestion = subs[i]
+			res += sub.calcScore(**answer)
+
+		return res
 
 # endregion
 
@@ -651,7 +686,7 @@ class BaseQuesRecord(models.Model):
 	def create(cls, player, question_id):
 
 		# 判断记录是否存在
-		record = player.questionRecord(cls, question_id)
+		record = player.quesRecord(cls, question_id)
 
 		if record is None:
 			record = cls()

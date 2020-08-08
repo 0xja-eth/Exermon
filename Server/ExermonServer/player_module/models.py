@@ -5,6 +5,8 @@ from .item_system.items import *
 from .item_system.containers import *
 from .item_system.cont_items import *
 
+from question_module.models import *
+
 from season_module.models import SeasonRecord
 from season_module.runtimes import SeasonManager
 
@@ -601,7 +603,7 @@ class Player(CacheableModel):
 	# 做题信息
 	def _questionInfo(self):
 
-		question_records = self.questionRecords()
+		question_records = self.quesRecords(GeneralQuesRecord)
 
 		cnt = count = corr_cnt = corr_rate = 0
 		sum_timespan = avg_timespan = 0  # corr_timespan = 0
@@ -652,8 +654,10 @@ class Player(CacheableModel):
 		level, next = self.level(True)
 
 		if type == "records":
-			question_records = ModelUtils.objectsToDict(self.questionRecords())
-			exercise_records = ModelUtils.objectsToDict(self.exerciseRecords())
+			question_records = ModelUtils.objectsToDict(
+				self.quesRecords(GeneralQuesRecord))
+			exercise_records = ModelUtils.objectsToDict(
+				self.exerciseRecords())
 
 			return {
 				'question_records': question_records,
@@ -857,19 +861,10 @@ class Player(CacheableModel):
 		from exermon_module.models import ExerHub
 		return self.getContainer(ExerHub)
 
-	# 获取题目糖背包
-	def quesSugarPack(self) -> 'QuesSugarPack':
-		from question_module.models import QuesSugarPack
-		return self.getContainer(QuesSugarPack)
-
 	# 获取艾瑟萌槽
 	def exerSlot(self) -> 'ExerSlot':
 		from exermon_module.models import ExerSlot
 		return self.getContainer(ExerSlot)
-
-	# 获取装备槽
-	def humanEquipSlot(self) -> 'HumanEquipSlot':
-		return self.getContainer(HumanEquipSlot)
 
 	# 获取对战物资槽
 	def battleItemSlot(self) -> 'BattleItemSlot':
@@ -1103,7 +1098,6 @@ class Player(CacheableModel):
 		检查相关容器
 		"""
 		from exermon_module.models import ExerHub, ExerFragPack, ExerGiftPool, EquipPack
-		from question_module.models import QuesSugarPack
 		from battle_module.models import BattleItemSlot
 
 		if self.humanPack() is None:
@@ -1120,12 +1114,6 @@ class Player(CacheableModel):
 
 		if self.exerGiftPool() is None:
 			ExerGiftPool.create(player=self)
-
-		if self.humanEquipSlot() is None:
-			HumanEquipSlot.create(player=self)
-
-		if self.quesSugarPack() is None:
-			QuesSugarPack.create(player=self)
 
 		if self.battleItemSlot() is None:
 			BattleItemSlot.create(player=self)
@@ -1247,27 +1235,45 @@ class Player(CacheableModel):
 
 	# region 纪录操作
 
-	def questionRecords(self, cla: 'BaseQuesRecord') -> QuerySet:
+	def quesRecords(self, cla: BaseQuesRecord = None,
+					question_cla: BaseQuestion = None) -> QuerySet:
 		"""
 		获取所有题目记录
+		Args:
+			cla (type): 题目记录类型
+			question_cla (type): 题目类型
 		Returns:
 			所有与该玩家相关的题目记录 QuerySet 对象
 		"""
+		if cla is None:
+			cla = question_cla.RECORD_CLASS
+
 		name = cla.__name__ + '_set'
 		try: return getattr(self, name).all()
 		except AttributeError: return None
 
-	def questionRecord(self, cla: 'BaseQuesRecord',
-					   question_id: int) -> 'BaseQuesRecord':
+	def quesRecord(self, cla: BaseQuesRecord = None,
+				   question_id: int = None,
+				   question_cla: BaseQuestion = None,
+				   question: BaseQuestion = None) -> 'BaseQuesRecord':
 		"""
 		通过题目ID查找题目记录
 		Args:
 			cla (type): 题目记录类型
 			question_id (int): 题目ID
+			question_cla (type): 题目类型
+			question (BaseQuestion): 题目实例
 		Returns:
 			若存在题目记录，返回之，否则返回 None
 		"""
-		res = self.questionRecords(cla).filter(question_id=question_id)
+		if question is not None:
+			question_id = question.id
+			question_cla = type(question)
+
+		if cla is None:
+			cla = question_cla.RECORD_CLASS
+
+		res = self.quesRecords(cla).filter(question_id=question_id)
 		if res.exists(): return res.first()
 		return None
 

@@ -32,13 +32,13 @@ class BaseQuestionGenerateConfigure:
 	def __init__(self, question_set, player, subject,
 				 count=None, questions=None):
 
-		from record_module.models import QuestionSetRecord
+		from record_module.models import QuesSetRecord
 		from player_module.models import Player
 		from game_module.models import Subject
 
 		self.player: Player = player
 		self.subject: Subject = subject
-		self.question_set: QuestionSetRecord = question_set
+		self.question_set: QuesSetRecord = question_set
 
 		self.questions = questions  # 指定的题目集（QuerySet）
 
@@ -212,9 +212,9 @@ class BaseQuestionGenerator:
 class GeneralQuestionGenerator(BaseQuestionGenerator):
 
 	@classmethod
-	def questionClasses(cls):
+	def questionClasses(cls) -> list:
 		from question_module.models import GeneralQuestion
-		return GeneralQuestion
+		return [GeneralQuestion]
 
 	def _customFilter(self, questions):
 		questions = super()._customFilter(questions)
@@ -244,6 +244,7 @@ class GeneralQuestionGenerator(BaseQuestionGenerator):
 		gen_type = configure.gen_type
 
 		sub = questions
+		question_cla = self.questionClasses()[0]
 
 		print("==== processConditions ====")
 
@@ -295,7 +296,8 @@ class GeneralQuestionGenerator(BaseQuestionGenerator):
 			# id 限制
 			print("limiting id")
 
-			occur_questions = player.questionRecords()
+			occur_questions = player.quesRecords(
+				question_cla=question_cla)
 			occur_qids = ModelUtils.getObjectRelatedForAll(
 				occur_questions, 'question', 'question_id')
 
@@ -381,7 +383,7 @@ class MaxStarCalc:
 # ================================
 # 刷题（单题）收益计算类
 # ================================
-class QuestionSetSingleRewardCalc:
+class QuesSetSingleRewardCalc:
 
 	@classmethod
 	def calc(cls, player_ques, ques_rec, **kwargs):
@@ -420,9 +422,12 @@ class QuestionSetSingleRewardCalc:
 		self.exer_exp_incr, self.slot_exp_incr = self._calcExerExpIncr()
 		self.gold_incr = self._calcGoldIncr()
 
-		self.exer_exp_incr = max(0, round(self.exer_exp_incr))
-		self.slot_exp_incr = max(0, round(self.slot_exp_incr))
-		self.gold_incr = max(0, round(self.gold_incr))
+		self.exer_exp_incr = self._adjust(self.exer_exp_incr)
+		self.slot_exp_incr = self._adjust(self.slot_exp_incr)
+		self.gold_incr = self._adjust(self.gold_incr)
+
+	def _adjust(self, val):
+		return max(0, round(val))
 
 	# 计算艾瑟萌经验值收益
 	def _calcExerExpIncr(self):
@@ -436,7 +441,7 @@ class QuestionSetSingleRewardCalc:
 # ================================
 # 刷题（单题）收益计算类
 # ================================
-class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
+class ExerciseSingleRewardCalc(QuesSetSingleRewardCalc):
 	# 单道题目奖励计算公式
 	# 艾瑟萌经验奖励(EER)
 	# round(基础经验奖励 * 次数修正 * 艾瑟萌等级修正 * 经验结果修正 * 经验波动修正)
@@ -568,7 +573,7 @@ class ExerciseSingleRewardCalc(QuestionSetSingleRewardCalc):
 # ================================
 # 题目集（结算）收益计算类
 # ================================
-class QuestionSetResultRewardCalc:
+class QuesSetResultRewardCalc:
 
 	@classmethod
 	def calc(cls, question_set, player_queses, **kwargs):
@@ -591,19 +596,24 @@ class QuestionSetResultRewardCalc:
 		self.player_queses = player_queses
 
 		self.exer_exp_incrs, self.slot_exp_incrs, \
-		self.exer_exp_incr, self.slot_exp_incr, \
-		self.gold_incr = self._calcSumReward()
+			self.exer_exp_incr, self.slot_exp_incr, \
+			self.gold_incr = self._calcSumReward()
 
 		for sid in self.exer_exp_incrs:
-			self.exer_exp_incrs[sid] = max(0, round(self.exer_exp_incrs[sid]))
+			self.exer_exp_incrs[sid] = \
+				self._adjust(self.exer_exp_incrs[sid])
 		for sid in self.slot_exp_incrs:
-			self.slot_exp_incrs[sid] = max(0, round(self.slot_exp_incrs[sid]))
+			self.slot_exp_incrs[sid] = \
+				self._adjust(self.slot_exp_incrs[sid])
 
-		self.exer_exp_incr = max(0, round(self.exer_exp_incr))
-		self.slot_exp_incr = max(0, round(self.slot_exp_incr))
-		self.gold_incr = max(0, round(self.gold_incr))
+		self.exer_exp_incr = self._adjust(self.exer_exp_incr)
+		self.slot_exp_incr = self._adjust(self.slot_exp_incr)
+		self.gold_incr = self._adjust(self.gold_incr)
 
 		self.item_rewards = self._calcItemReward()
+
+	def _adjust(self, val):
+		return max(0, round(val))
 
 	# 计算总收益
 	def _calcSumReward(self) -> (dict, dict, int, int, int):
@@ -618,7 +628,7 @@ class QuestionSetResultRewardCalc:
 # ================================
 # 刷题（结算）收益计算类
 # ================================
-class ExerciseResultRewardCalc(QuestionSetResultRewardCalc):
+class ExerciseResultRewardCalc(QuesSetResultRewardCalc):
 	# 刷题结算奖励计算公式
 	# 艾瑟萌经验奖励(EER)
 	# round(∑单道题目艾瑟萌经验奖励 * 艾瑟萌经验奖励加成)

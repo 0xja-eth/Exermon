@@ -32,10 +32,10 @@ class BasePlayerQuestion(CacheableModel):
 
 	# 类设定
 	QUESTION_CLASS: BaseQuestion = None
-	QUESTION_SET_CLASS: 'QuestionSetRecord' = None
+	QUESTION_SET_CLASS: 'QuesSetRecord' = None
 
 	# 奖励计算类
-	REWARD_CALC = QuestionSetSingleRewardCalc
+	REWARD_CALC = QuesSetSingleRewardCalc
 
 	# 来源
 	SOURCE = RecordSource.Others
@@ -45,7 +45,7 @@ class BasePlayerQuestion(CacheableModel):
 	question_id: int = None
 
 	# 题目集
-	question_set: 'QuestionSetRecord' = None
+	question_set: 'QuesSetRecord' = None
 	question_set_id: int = None
 
 	# 是否作答
@@ -89,11 +89,11 @@ class BasePlayerQuestion(CacheableModel):
 	def questionType(cls): return cls.questionClass().TYPE
 
 	@classmethod
-	def questionRecordClass(cls):
+	def quesRecordClass(cls):
 		return cls.questionClass().recordClass()
 
 	@classmethod
-	def rewardCalculator(cls) -> QuestionSetSingleRewardCalc:
+	def rewardCalculator(cls) -> QuesSetSingleRewardCalc:
 		"""
 		获取对应的奖励计算类
 		Returns:
@@ -113,12 +113,12 @@ class BasePlayerQuestion(CacheableModel):
 	# endregion
 
 	@classmethod
-	def create(cls, question_set: 'QuestionSetRecord',
+	def create(cls, question_set: 'QuesSetRecord',
 			   question_id: int, **kwargs) -> 'SelectingPlayerQuestion':
 		"""
 		创建对象
 		Args:
-			question_set (QuestionSetRecord): 题目集记录
+			question_set (QuesSetRecord): 题目集记录
 			question_id (int): 题目ID
 			**kwargs (**dict): 子类重载参数
 		Returns:
@@ -188,16 +188,16 @@ class BasePlayerQuestion(CacheableModel):
 
 	# endregion
 
-	def _updateIsNew(self, question_set: 'QuestionSetRecord'):
+	def _updateIsNew(self, question_set: 'QuesSetRecord'):
 		"""
 		检测并设置题目是否新题目
 		Args:
-			question_set (QuestionSetRecord): 题目集记录
+			question_set (QuesSetRecord): 题目集记录
 		"""
 		player = question_set.player
 
-		rec = player.questionRecord(
-			self.questionRecordClass(), self.question_id)
+		rec = player.quesRecord(
+			self.quesRecordClass(), self.question_id)
 
 		self.is_new = rec is None
 
@@ -241,12 +241,12 @@ class BasePlayerQuestion(CacheableModel):
 		"""
 		self._setCache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
-	def answer(self, timespan: int, record: 'QuestionSetRecord', **kwargs):
+	def answer(self, timespan: int, record: 'QuesSetRecord', **kwargs):
 		"""
 		作答题目
 		Args:
 			timespan (int): 用时
-			record (QuestionSetRecord): 题目集记录
+			record (QuesSetRecord): 题目集记录
 			**kwargs (**dict): 作答参数
 		"""
 		start_time = self._getCache(self.STARTTIME_CACHE_KEY)
@@ -294,11 +294,11 @@ class BasePlayerQuestion(CacheableModel):
 		if delta > self.MAX_DELTATIME: return backend
 		return min(frontend, backend)
 
-	def _calcRewards(self, record: 'QuestionSetRecord'):
+	def _calcRewards(self, record: 'QuesSetRecord'):
 		"""
 		计算奖励
 		Args:
-			record (QuestionSetRecord): 题目集记录
+			record (QuesSetRecord): 题目集记录
 		"""
 		calc = self.rewardCalculator()
 		if calc is None: return
@@ -367,7 +367,7 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 # ===================================================
 #  题目集奖励表
 # ===================================================
-class QuestionSetReward(models.Model):
+class QuesSetReward(models.Model):
 
 	class Meta:
 		abstract = True
@@ -389,11 +389,11 @@ class QuestionSetReward(models.Model):
 		return "%s *%d" % (self.item(), self.count)
 
 	@classmethod
-	def create(cls, record: 'QuestionSetRecord', item: BaseItem, count: int) -> 'QuestionSetReward':
+	def create(cls, record: 'QuesSetRecord', item: BaseItem, count: int) -> 'QuesSetReward':
 		"""
 		创建实例
 		Args:
-			record (QuestionSetRecord): 题目集记录
+			record (QuesSetRecord): 题目集记录
 			item (BaseItem): 物品
 			count (int): 数目
 		Returns:
@@ -443,7 +443,7 @@ class QuestionSetReward(models.Model):
 # ===================================================
 #  题目集记录表
 # ===================================================
-class QuestionSetRecord(CacheableModel):
+class QuesSetRecord(CacheableModel):
 
 	class Meta:
 		abstract = True
@@ -458,8 +458,11 @@ class QuestionSetRecord(CacheableModel):
 	QUES_GEN_CLASS: BaseQuestionGenerator = None
 
 	# 奖励
-	REWARD_CALC: QuestionSetResultRewardCalc = None
-	REWARD_CLASS: QuestionSetReward = None
+	REWARD_CALC: QuesSetResultRewardCalc = None
+	REWARD_CLASS: QuesSetReward = None
+
+	# 名称格式
+	NAME_STRING_FMT = "%s\n%s"
 
 	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
 						   'adminSlotExpIncrs', 'adminExpIncrs']
@@ -550,7 +553,7 @@ class QuestionSetRecord(CacheableModel):
 
 	# 奖励计算类
 	@classmethod
-	def rewardCalculator(cls) -> 'QuestionSetResultRewardCalc':
+	def rewardCalculator(cls) -> 'QuesSetResultRewardCalc':
 		"""
 		获取奖励计算的类
 		Returns:
@@ -580,7 +583,7 @@ class QuestionSetRecord(CacheableModel):
 		return clas[0]
 
 	@classmethod
-	def rewardClass(cls) -> 'QuestionSetReward':
+	def rewardClass(cls) -> 'QuesSetReward':
 		"""
 		该类对应的奖励记录类
 		Returns:
@@ -605,7 +608,7 @@ class QuestionSetRecord(CacheableModel):
 
 	# 创建一个题目集
 	@classmethod
-	def create(cls, player: 'Player', **kwargs) -> 'QuestionSetRecord':
+	def create(cls, player: 'Player', **kwargs) -> 'QuesSetRecord':
 		"""
 		创建一个题目集记录
 		Args:
@@ -637,7 +640,13 @@ class QuestionSetRecord(CacheableModel):
 		Returns:
 			生成的名字
 		"""
-		return '题目集记录'
+		return self.NAME_STRING_FMT % self._nameParams()
+
+	def _nameParams(self):
+		create_time = ModelUtils.timeToStr(self.create_time)
+		verbose_name = type(self)._meta.verbose_name
+
+		return create_time, verbose_name
 
 	def convert(self, type: str = None) -> dict:
 		"""
@@ -779,11 +788,11 @@ class QuestionSetRecord(CacheableModel):
 
 		self._addReward(reward)
 
-	def _addReward(self, reward: QuestionSetReward):
+	def _addReward(self, reward: QuesSetReward):
 		"""
 		添加奖励到缓存中
 		Args:
-			reward (QuestionSetReward): 奖励对象
+			reward (QuesSetReward): 奖励对象
 		"""
 		self._appendModelCache(self.rewardClass(), reward)
 
@@ -909,7 +918,7 @@ class QuestionSetRecord(CacheableModel):
 		# 会自动保存
 		self.exactlyPlayer().clearCurrentQuestionSet()
 
-	def _calcResult(self, **kwargs) -> QuestionSetResultRewardCalc:
+	def _calcResult(self, **kwargs) -> QuesSetResultRewardCalc:
 		"""
 		计算题目集结果
 		Returns:
@@ -921,11 +930,11 @@ class QuestionSetRecord(CacheableModel):
 
 		return calc.calc(self, self.playerQuestions(), **kwargs)
 
-	def _applyResult(self, calc: QuestionSetResultRewardCalc):
+	def _applyResult(self, calc: QuesSetResultRewardCalc):
 		"""
 		应用题目集结果
 		Args:
-			calc (QuestionSetResultRewardCalc): 结果
+			calc (QuesSetResultRewardCalc): 结果
 		"""
 		if calc is None: return
 
@@ -933,21 +942,21 @@ class QuestionSetRecord(CacheableModel):
 		self._applyPlayerResult(calc)
 		self._applyRewardsResult(calc)
 
-	def _applyBaseResult(self, calc: QuestionSetResultRewardCalc):
+	def _applyBaseResult(self, calc: QuesSetResultRewardCalc):
 		"""
 		应用基本结果
 		Args:
-			calc (QuestionSetResultRewardCalc): 结果
+			calc (QuesSetResultRewardCalc): 结果
 		"""
 		self.exer_exp_incrs = calc.exer_exp_incrs
 		self.slot_exp_incrs = calc.slot_exp_incrs
 		self.gold_incr = calc.gold_incr
 
-	def _applyPlayerResult(self, calc: QuestionSetResultRewardCalc):
+	def _applyPlayerResult(self, calc: QuesSetResultRewardCalc):
 		"""
 		应用玩家结果
 		Args:
-			calc (QuestionSetResultRewardCalc): 结果
+			calc (QuesSetResultRewardCalc): 结果
 		"""
 		player = self.exactlyPlayer()
 
@@ -955,11 +964,11 @@ class QuestionSetRecord(CacheableModel):
 		player.gainExp(calc.slot_exp_incr, calc.exer_exp_incrs,
 					   calc.slot_exp_incrs)
 
-	def _applyRewardsResult(self, calc: QuestionSetResultRewardCalc):
+	def _applyRewardsResult(self, calc: QuesSetResultRewardCalc):
 		"""
 		应用物品奖励结果
 		Args:
-			calc (QuestionSetResultRewardCalc): 结果
+			calc (QuesSetResultRewardCalc): 结果
 		"""
 		from item_module.models import PackContainer
 

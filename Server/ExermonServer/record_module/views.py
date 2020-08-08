@@ -143,6 +143,6 @@ class Common:
 
 	# 确保题目集记录所属玩家
 	@classmethod
-	def ensureQuestionSetPlayer(cls, ques_set_rec: QuestionSetRecord, player):
+	def ensureQuestionSetPlayer(cls, ques_set_rec: QuesSetRecord, player):
 		if ques_set_rec.player != player:
 			raise GameException(ErrorType.ExerciseRecordNotExist)

@@ -8,17 +8,14 @@ import record_module.models as Models
 from utils.calc_utils.question_calc import *
 
 
+# region 刷题
+
 # ===================================================
 #  刷题记录表
 # ===================================================
-@RecordManager.registerQuestionSet(
-	"刷题记录", GeneralQuestionGenerator, ExerciseResultRewardCalc)
-class ExerciseRecord(Models.QuestionSetRecord):
-
-	class Meta:
-		verbose_name = verbose_name_plural = "刷题记录"
-
-	TYPE = QuestionSetType.Exercise
+@RecordManager.registerQuestionSet("刷题记录",
+	GeneralQuestionGenerator, ExerciseResultRewardCalc)
+class ExerciseRecord(Models.QuesSetRecord):
 
 	# 最大刷题数
 	MAX_COUNT = 10
@@ -35,7 +32,7 @@ class ExerciseRecord(Models.QuestionSetRecord):
 	]
 
 	# 常量定义
-	NAME_STRING_FMT = "%s\n%s 刷题记录"
+	NAME_STRING_FMT = "%s\n%s %s"
 
 	# 科目
 	subject = models.ForeignKey('game_module.Subject', on_delete=models.CASCADE,
@@ -53,10 +50,11 @@ class ExerciseRecord(Models.QuestionSetRecord):
 							   verbose_name="所属赛季")
 
 	# 生成名字
-	def generateName(self) -> str:
+	def _nameParams(self):
+		create_time = ModelUtils.timeToStr(self.create_time)
+		verbose_name = type(self)._meta.verbose_name
 
-		return self.NAME_STRING_FMT % (self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
-									   self.subject.name)
+		return create_time, self.subject.name, verbose_name
 
 	def _convertBaseInfo(self, res, type):
 		super()._convertBaseInfo(res, type)
@@ -115,4 +113,19 @@ class ExerciseRecord(Models.QuestionSetRecord):
 #  刷题奖励表
 # ===================================================
 @RecordManager.registerQuestionSetReward(ExerciseRecord)
-class ExerciseReward(Models.QuestionSetReward): pass
+class ExerciseReward(Models.QuesSetReward): pass
+
+# endregion
+
+# region 听力题
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSet("听力题记录",
+	GeneralQuestionGenerator)
+class ListeningQuesRecord(Models.QuesSetRecord): pass
+
+
+# endregion

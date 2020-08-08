@@ -8,7 +8,7 @@ from game_module.models import GroupConfigure, Subject, QuestionStar
 
 from player_module.models import Player
 from exermon_module.models import ExerSkill, HitType, TargetType
-from record_module.models import QuestionSetRecord, SelectingPlayerQuestion, RecordSource
+from record_module.models import QuesSetRecord, SelectingPlayerQuestion, RecordSource
 
 from utils.calc_utils import ExerciseSingleRewardCalc, BattleResultRewardCalc
 from utils.model_utils import CacheableModel, Common as ModelUtils
@@ -499,7 +499,7 @@ class BattlePlayerResult(Enum):
 # ===================================================
 #  对战玩家表
 # ===================================================
-class BattlePlayer(QuestionSetRecord):
+class BattlePlayer(QuesSetRecord):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "对战玩家"

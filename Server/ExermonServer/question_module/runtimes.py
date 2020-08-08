@@ -118,7 +118,7 @@ class QuestionDetail:
 		# TODO: 另外，以后要有类似的功能，也需要封装成一个函数来调用
 		# TODO: 除非是复杂的查询操作，否则一般不要直接使用 Django 的 API
 		# record = QuestionRecord.objects.filter(Q(question=self.ques_id) | Q(player=player))
-		record: GeneralQuesRecord = player.questionRecord(self.question_id)
+		record: GeneralQuesRecord = player.quesRecord(question=self.question)
 
 		if record is not None:
 			first_date = ModelUtils.timeToStr(record.first_date)
