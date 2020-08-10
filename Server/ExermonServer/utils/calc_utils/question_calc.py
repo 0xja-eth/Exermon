@@ -44,6 +44,16 @@ class BaseQuestionGenerateConfigure:
 
 		self.count = count
 
+	def questionClasses(self):
+
+		player_ques_clas = self.question_set.ACCEPT_PLAYER_QUES_CLASSES
+		question_clas = []
+
+		for cla in player_ques_clas:
+			question_clas.append(cla.QUESTION_CLASS)
+
+		return question_clas
+
 	# 调试用
 	def convertToDictForDebug(self):
 		res = {}
@@ -56,28 +66,6 @@ class BaseQuestionGenerateConfigure:
 
 
 # ================================
-# 常规题目生成配置
-# ================================
-class GeneralQuestionGenerateConfigure(BaseQuestionGenerateConfigure):
-
-	def __init__(self, *args, gen_type=QuestionGenerateType.Normal.value,
-				 sel_type=None, star_dtb=None, ques_star=None, **kwargs):
-		super().__init__(*args, **kwargs)
-
-		from question_module.models import SelectingQuestionType
-		from record_module.models import QuestionSetType
-		from game_module.models import QuestionStar
-
-		self.gen_type: QuestionGenerateType = gen_type  # 生成类型
-		self.sel_type: SelectingQuestionType = sel_type  # 限制题目类型
-		self.ques_star: QuestionStar = ques_star  # 限制题目星级
-		self.star_dtb = star_dtb
-
-		self.ignore_star = self.ques_star is not None or \
-						   self.question_set.TYPE == QuestionSetType.Exam
-
-
-# ================================
 # 题目生成器基类
 # ================================
 class BaseQuestionGenerator:
@@ -85,8 +73,7 @@ class BaseQuestionGenerator:
 	# 生成次数上限
 	GENERATE_TIMES_LIMIT = 1024
 
-	@classmethod
-	def questionClasses(cls) -> list:
+	def questionClasses(self) -> list:
 		raise NotImplementedError
 
 	@classmethod
@@ -159,14 +146,14 @@ class BaseQuestionGenerator:
 
 		ques_len = questions.count()
 
-		sub = self.shuffleQuestions(satisfaction)
-		sub_len = len(sub)
+		sat = self._shuffleQuestions(satisfaction)
+		sat_len = len(sat)
 
-		print("sub_len: %d, ques_len: %d" % (sub_len, ques_len))
+		print("sub_len: %d, ques_len: %d" % (sat_len, ques_len))
 
 		for i in range(count):
-			if i < sub_len:
-				question = sub[i]
+			if i < sat_len:
+				question = sat[i]
 
 				print("in-condition: %d" % question.id)
 
@@ -196,7 +183,7 @@ class BaseQuestionGenerator:
 
 	# 乱序题目
 	@classmethod
-	def shuffleQuestions(cls, questions):
+	def _shuffleQuestions(cls, questions):
 
 		result = []
 		for question in questions:
@@ -207,12 +194,50 @@ class BaseQuestionGenerator:
 
 
 # ================================
+# 随机题目生成器
+# ================================
+class RandomQuestionGenerator(BaseQuestionGenerator):
+
+	def questionClasses(self) -> list:
+		return self.configure.questionClasses()
+
+	def _generateSatisfaction(self, questions):
+		questions = list(questions)
+
+		if len(questions) >= self.configure.count:
+			return questions
+
+		return random.sample(questions, self.configure.count)
+
+
+# ================================
+# 常规题目生成配置
+# ================================
+class GeneralQuestionGenerateConfigure(BaseQuestionGenerateConfigure):
+
+	def __init__(self, *args, gen_type=QuestionGenerateType.Normal.value,
+				 sel_type=None, star_dtb=None, ques_star=None, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		from question_module.models import SelectingQuestionType
+		from record_module.models import QuestionSetType
+		from game_module.models import QuestionStar
+
+		self.gen_type: QuestionGenerateType = gen_type  # 生成类型
+		self.sel_type: SelectingQuestionType = sel_type  # 限制题目类型
+		self.ques_star: QuestionStar = ques_star  # 限制题目星级
+		self.star_dtb = star_dtb
+
+		self.ignore_star = self.ques_star is not None or \
+						   self.question_set.TYPE == QuestionSetType.Exam
+
+
+# ================================
 # 题目生成器类
 # ================================
 class GeneralQuestionGenerator(BaseQuestionGenerator):
 
-	@classmethod
-	def questionClasses(cls) -> list:
+	def questionClasses(self) -> list:
 		from question_module.models import GeneralQuestion
 		return [GeneralQuestion]
 
@@ -296,8 +321,7 @@ class GeneralQuestionGenerator(BaseQuestionGenerator):
 			# id 限制
 			print("limiting id")
 
-			occur_questions = player.quesRecords(
-				question_cla=question_cla)
+			occur_questions = player.quesRecords(question_cla=question_cla)
 			occur_qids = ModelUtils.getObjectRelatedForAll(
 				occur_questions, 'question', 'question_id')
 

@@ -74,8 +74,8 @@ class Service:
 
 		PlayerCommon.ensureSubjectSelected(player, subject)
 
-		rec = ExerciseRecord.create(player, subject=subject,
-									gen_type=gen_type, count=count)
+		rec = GeneralExerciseRecord.create(player, subject=subject,
+										   gen_type=gen_type, count=count)
 
 		return {'record': rec.convert()}
 
@@ -130,16 +130,16 @@ class Common:
 	# 获取刷题记录
 	@classmethod
 	def getExerciseRecord(cls, error: ErrorType = ErrorType.ExerciseRecordNotExist,
-						  **kwargs) -> ExerciseRecord:
+						  **kwargs) -> GeneralExerciseRecord:
 
-		return ViewUtils.getObject(ExerciseRecord, error, **kwargs)
+		return ViewUtils.getObject(GeneralExerciseRecord, error, **kwargs)
 
 	# 获取刷题题目
 	@classmethod
 	def getExerciseQuestion(cls, error: ErrorType = ErrorType.ExerciseQuestionNotExist,
-							**kwargs) -> ExerciseQuestion:
+							**kwargs) -> GeneralExerciseQuestion:
 
-		return ViewUtils.getObject(ExerciseQuestion, error, **kwargs)
+		return ViewUtils.getObject(GeneralExerciseQuestion, error, **kwargs)
 
 	# 确保题目集记录所属玩家
 	@classmethod

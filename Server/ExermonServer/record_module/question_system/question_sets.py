@@ -8,28 +8,10 @@ import record_module.models as Models
 from utils.calc_utils.question_calc import *
 
 
-# region 刷题
-
 # ===================================================
 #  刷题记录表
 # ===================================================
-@RecordManager.registerQuestionSet("刷题记录",
-	GeneralQuestionGenerator, ExerciseResultRewardCalc)
-class ExerciseRecord(Models.QuesSetRecord):
-
-	# 最大刷题数
-	MAX_COUNT = 10
-
-	GEN_TYPES = [
-		(QuestionGenerateType.Normal.value, '普通模式'),
-		(QuestionGenerateType.OccurFirst.value, '已做优先'),
-		(QuestionGenerateType.NotOccurFirst.value, '未做优先'),
-		(QuestionGenerateType.WrongFirst.value, '错题优先'),
-		(QuestionGenerateType.CollectedFirst.value, '收藏优先'),
-		(QuestionGenerateType.SimpleFirst.value, '简单题优先'),
-		(QuestionGenerateType.MiddleFirst.value, '中等题优先'),
-		(QuestionGenerateType.DifficultFirst.value, '难题优先'),
-	]
+class BaseExerciseRecord(Models.QuesSetRecord):
 
 	# 常量定义
 	NAME_STRING_FMT = "%s\n%s %s"
@@ -40,10 +22,6 @@ class ExerciseRecord(Models.QuesSetRecord):
 
 	# 题量（用于生成题目）
 	count = models.PositiveSmallIntegerField(default=1, verbose_name="题量")
-
-	# 题目分配模式
-	gen_type = models.PositiveSmallIntegerField(choices=GEN_TYPES, default=0,
-												verbose_name="生成模式")
 
 	# 所属赛季
 	season = models.ForeignKey('season_module.CompSeason', on_delete=models.CASCADE,
@@ -62,23 +40,21 @@ class ExerciseRecord(Models.QuesSetRecord):
 		res['season_id'] = self.season_id
 		res['subject_id'] = self.subject_id
 		res['count'] = self.count
-		res['gen_type'] = self.gen_type
 
 	# 开始刷题
-	def _create(self, subject, count, gen_type):
+	def _create(self, subject, count):
+		super()._create()
+
 		from season_module.runtimes import SeasonManager
 
 		self.season_id = SeasonManager.getCurrentSeason().id
-
 		self.subject = subject
 		self.count = count
-		self.gen_type = gen_type
 
 	# 生成题目生成配置信息
 	def _makeGenerateConfigure(self, **kwargs):
-		return GeneralQuestionGenerateConfigure(
-			self, self.exactlyPlayer(), self.subject,
-			gen_type=self.gen_type, count=self.count)
+		return BaseQuestionGenerateConfigure(
+			self, self.exactlyPlayer(), self.subject, self.count)
 
 	def _shrinkQuestions(self):
 		"""
@@ -97,7 +73,53 @@ class ExerciseRecord(Models.QuesSetRecord):
 		self._shrinkQuestions()
 		super().terminate(**kwargs)
 
-	def selections(self, player_queses = None) -> list:
+
+# region 刷题
+
+# ===================================================
+#  刷题记录表
+# ===================================================
+@RecordManager.registerQuestionSet("刷题记录",
+	GeneralQuestionGenerator, ExerciseResultRewardCalc)
+class GeneralExerciseRecord(BaseExerciseRecord):
+
+	# 最大刷题数
+	MAX_COUNT = 10
+
+	GEN_TYPES = [
+		(QuestionGenerateType.Normal.value, '普通模式'),
+		(QuestionGenerateType.OccurFirst.value, '已做优先'),
+		(QuestionGenerateType.NotOccurFirst.value, '未做优先'),
+		(QuestionGenerateType.WrongFirst.value, '错题优先'),
+		(QuestionGenerateType.CollectedFirst.value, '收藏优先'),
+		(QuestionGenerateType.SimpleFirst.value, '简单题优先'),
+		(QuestionGenerateType.MiddleFirst.value, '中等题优先'),
+		(QuestionGenerateType.DifficultFirst.value, '难题优先'),
+	]
+
+	# 题目分配模式
+	gen_type = models.PositiveSmallIntegerField(choices=GEN_TYPES,
+												default=QuestionGenerateType.Normal.value,
+												verbose_name="生成模式")
+
+	def _convertBaseInfo(self, res, type):
+		super()._convertBaseInfo(res, type)
+
+		res['gen_type'] = self.gen_type
+
+	# 开始刷题
+	def _create(self, subject, count, gen_type=QuestionGenerateType.Normal.value):
+		super()._create(subject, count)
+
+		self.gen_type = gen_type
+
+	# 生成题目生成配置信息
+	def _makeGenerateConfigure(self, **kwargs):
+		return GeneralQuestionGenerateConfigure(
+			self, self.exactlyPlayer(), self.subject,
+			gen_type=self.gen_type, count=self.count)
+
+	def selections(self, player_queses=None) -> list:
 		"""
 		获取每道题目的选择情况
 		Args:
@@ -112,7 +134,7 @@ class ExerciseRecord(Models.QuesSetRecord):
 # ===================================================
 #  刷题奖励表
 # ===================================================
-@RecordManager.registerQuestionSetReward(ExerciseRecord)
+@RecordManager.registerQuestionSetReward(GeneralExerciseRecord)
 class ExerciseReward(Models.QuesSetReward): pass
 
 # endregion
@@ -124,8 +146,107 @@ class ExerciseReward(Models.QuesSetReward): pass
 #  听力题目记录表
 # ===================================================
 @RecordManager.registerQuestionSet("听力题记录",
-	GeneralQuestionGenerator)
-class ListeningQuesRecord(Models.QuesSetRecord): pass
+	RandomQuestionGenerator)
+class ListeningExerciseRecord(BaseExerciseRecord): pass
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+class ListeningExerciseReward(Models.QuesSetReward): pass
+
+
+# endregion
+
+# region 阅读题
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSet("阅读题记录",
+	RandomQuestionGenerator)
+class ReadingExerciseRecord(BaseExerciseRecord): pass
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+class ReadingExerciseReward(Models.QuesSetReward): pass
+
+
+# endregion
+
+# region 单词题
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSet("单词题记录",
+	RandomQuestionGenerator)
+class WordExerciseRecord(Models.QuesSetRecord):
+
+	DEFAULT_COUNT = 50
+
+	# 题量（用于生成题目）
+	count = models.PositiveSmallIntegerField(
+		default=DEFAULT_COUNT, verbose_name="题量")
+
+	def _convertBaseInfo(self, res, type):
+		super()._convertBaseInfo(res, type)
+
+		res['count'] = self.count
+
+	# 开始刷题
+	def _create(self, count=DEFAULT_COUNT, **kwargs):
+		super()._create()
+		self.count = count
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+class WordExerciseReward(Models.QuesSetReward): pass
+
+
+# endregion
+
+# region 短语题
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSet("短语题记录",
+	RandomQuestionGenerator)
+class PhraseExerciseRecord(Models.QuesSetRecord):
+
+	DEFAULT_COUNT = 10
+
+	# 题量（用于生成题目）
+	count = models.PositiveSmallIntegerField(
+		default=DEFAULT_COUNT, verbose_name="题量")
+
+	def _convertBaseInfo(self, res, type):
+		super()._convertBaseInfo(res, type)
+
+		res['count'] = self.count
+
+	# 开始刷题
+	def _create(self, count=DEFAULT_COUNT, **kwargs):
+		super()._create()
+		self.count = count
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+class PhraseExerciseReward(Models.QuesSetReward): pass
 
 
 # endregion

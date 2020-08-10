@@ -73,8 +73,8 @@ class RecordManager:
 	@classmethod
 	def registerPlayerQuestion(cls, question_cla: BaseQuestion,
 							   question_set_cla: QuesSetRecord,
-							   reward_calc=QuesSetSingleRewardCalc,
-							   source=RecordSource.Others):
+							   source=RecordSource.Others,
+							   reward_calc=None):
 		"""
 		注册题目图片
 		Args:

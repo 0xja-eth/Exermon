@@ -405,6 +405,19 @@ class CorrectingQuestion(BaseQuestion):
 		"""
 		return self.wrongitem_set.all()
 
+	def quesScore(self):
+		if self.score: return self.score
+
+		return self.wrongItems().count()
+
+	def calcCorrect(self, **kwargs):
+		return self.calcScore(**kwargs) == self.quesScore()
+
+	def calcScore(self, **kwargs):
+		# TODO: 完善分值计算函数
+		pass
+
+
 
 # ===================================================
 #  纠正类型
@@ -473,10 +486,12 @@ class ElementQuestion(BaseQuestion):
 
 	TYPE = QuestionType.Element
 
-	def answer(self): raise NotImplementedError
+	def title(self, **kwargs): raise NotImplementedError
 
-	def calcCorrect(self, answer: str):
-		return answer == self.answer()
+	def answer(self, **kwargs): raise NotImplementedError
+
+	def calcCorrect(self, answer: str, **kwargs):
+		return answer == self.answer(**kwargs)
 
 # endregion
 

@@ -61,6 +61,13 @@ class ListeningQuesChoice(Models.BaseQuesChoice): pass
 
 
 # ===================================================
+#  听力题目记录表
+# ===================================================
+@QuesManager.registerQuesRecord(ListeningQuestion)
+class ListeningQuesRecord(Models.BaseQuesRecord): pass
+
+
+# ===================================================
 #  阅读题
 # ===================================================
 @QuesManager.registerQuestion("阅读题")
@@ -79,3 +86,10 @@ class ReadingSubQuestion(Models.SelectingQuestion): pass
 # ===================================================
 @QuesManager.registerQuesChoice(ReadingSubQuestion)
 class ReadingQuesChoice(Models.BaseQuesChoice): pass
+
+
+# ===================================================
+#  阅读题目记录表
+# ===================================================
+@QuesManager.registerQuesRecord(ReadingQuestion)
+class ReadingQuesRecord(Models.BaseQuesRecord): pass

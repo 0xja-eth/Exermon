@@ -8,10 +8,10 @@ import xadmin
 # Register your models here.
 
 
-@AdminXHelper.registerBaseInline(ExerciseQuestion)
+@AdminXHelper.registerBaseInline(GeneralExerciseQuestion)
 class ExerciseQuestionsInline(object):
 
-	model = ExerciseQuestion
+	model = GeneralExerciseQuestion
 	style = "table"
 
 
@@ -23,7 +23,7 @@ class QuestionRecordAdmin(object): pass
 class PlayerQuestionAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(ExerciseQuestion)
+@AdminXHelper.relatedModel(GeneralExerciseQuestion)
 class ExerciseQuestionAdmin(PlayerQuestionAdmin): pass
 
 
@@ -31,6 +31,6 @@ class ExerciseQuestionAdmin(PlayerQuestionAdmin): pass
 class QuestionSetRecordAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(ExerciseRecord)
+@AdminXHelper.relatedModel(GeneralExerciseRecord)
 class ExerciseRecordAdmin(QuestionSetRecordAdmin): pass
 

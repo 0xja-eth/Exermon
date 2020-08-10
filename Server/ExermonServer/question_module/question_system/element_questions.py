@@ -16,7 +16,7 @@ class Word(Models.ElementQuestion):
 	STD_TIME = 15
 
 	# 英文
-	english = models.CharField(unique=True, max_length=64, verbose_name="英文")
+	english = models.CharField(max_length=64, verbose_name="英文")
 
 	# 中文
 	chinese = models.CharField(max_length=256, verbose_name="中文")
@@ -42,7 +42,11 @@ class Word(Models.ElementQuestion):
 
 		res['chinese'] = self.chinese
 
-	def answer(self): return self.chinese
+	def title(self, dictation=False):
+		return self.chinese if dictation else self.english
+
+	def answer(self, dictation=False):
+		return self.english if dictation else self.chinese
 
 
 # ===================================================
@@ -93,5 +97,8 @@ class Phrase(Models.ElementQuestion):
 		super()._convertAnswerInfo(res)
 
 		res['phrase'] = self.phrase
+
+	def title(self):
+		return [self.word, self.chinese]
 
 	def answer(self): return self.phrase

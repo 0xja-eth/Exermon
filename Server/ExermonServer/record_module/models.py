@@ -326,9 +326,6 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 		abstract = True
 		verbose_name = verbose_name_plural = "选择题目关系"
 
-	# 前后端时间差最大值（毫秒）
-	MAX_DELTATIME = 10*1000
-
 	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
 
 	# 选择情况
@@ -362,6 +359,74 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 
 	def _processAnswer(self, selection):
 		self.selection = selection
+
+
+# ===================================================
+#  选择组合题目关系表
+# ===================================================
+class GroupPlayerQuestion(BasePlayerQuestion):
+
+	class Meta:
+		abstract = True
+		verbose_name = verbose_name_plural = "选择组合题目关系"
+
+	# 选择情况
+	answers = jsonfield.JSONField(default=[], verbose_name="选择情况")
+
+	def _answerDict(self) -> dict:
+		return {'answers': self.answers}
+
+	def _processAnswer(self, answers):
+		self.answers = answers
+
+
+# ===================================================
+#  元素题目关系表
+# ===================================================
+class ElementExerciseQuestion(BasePlayerQuestion):
+
+	# 回答
+	answer = models.CharField(null=True, empty=True,
+							  max_length=64, verbose_name="回答")
+
+	# 选项（字符串数组）
+	choices = jsonfield.JSONField(default=[], verbose_name="选项")
+
+	def _convertBaseInfo(self, res, type):
+		super()._convertBaseInfo(res, type)
+
+		res['title'] = self.title()
+		res['choices'] = self.choices
+
+	def _convertResultInfo(self, res, type):
+		super()._convertResultInfo(res, type)
+
+		res['answer'] = self.answer
+		res['correct_answer'] = self.correctAnswer()
+
+	def _create(self):
+		super()._create()
+
+		self._generateChoices()
+
+	def _generateChoices(self):
+		raise NotImplementedError
+
+	def title(self):
+		question: ElementQuestion = self.question
+
+		return question.title()
+
+	def correctAnswer(self):
+		question: ElementQuestion = self.question
+
+		return question.answer()
+
+	def _answerDict(self) -> dict:
+		return {'answer': self.answer}
+
+	def _processAnswer(self, answer):
+		self.answer = answer
 
 
 # ===================================================

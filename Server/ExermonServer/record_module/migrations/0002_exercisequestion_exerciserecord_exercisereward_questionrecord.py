@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             name='ExerciseReward',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record_module.ExerciseRecord', verbose_name='刷题记录')),
+                ('record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record_module.question_system.question_sets.GeneralExerciseRecord', verbose_name='刷题记录')),
             ],
             options={
                 'verbose_name': '刷题奖励',
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                 ('slot_exp_incr', models.SmallIntegerField(null=True, verbose_name='槽经验增加')),
                 ('gold_incr', models.SmallIntegerField(null=True, verbose_name='金币增加')),
                 ('is_new', models.BooleanField(default=False, verbose_name='新题标志')),
-                ('exercise', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record_module.ExerciseRecord', verbose_name='刷题记录')),
+                ('exercise', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record_module.question_system.question_sets.GeneralExerciseRecord', verbose_name='刷题记录')),
                 ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='题目')),
             ],
             options={
