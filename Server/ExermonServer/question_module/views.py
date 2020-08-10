@@ -27,6 +27,56 @@ class Service:
 
 		return {'questions': questions}
 
+	# 收藏/解除收藏题目
+	@classmethod
+	async def collect(cls, consumer, player: Player,
+					  q_type: int, qid: int):
+		# 返回数据：
+		# collected: bool => 是否收藏（处理后）
+
+		Common.ensureQuestionExist(type_=q_type, id=qid)
+
+		cla = Common.getQuesRecordClass(q_type)
+
+		rec: BaseQuesRecord = cla.create(player, qid)
+
+		rec.collected = not rec.collected
+		rec.save()
+
+		return {'collected': rec.collected}
+
+	# 解除错题
+	@classmethod
+	async def unwrong(cls, consumer, player: Player,
+					  q_type: int, qid: int):
+		# 返回数据：无
+
+		Common.ensureQuestionExist(type_=q_type, id=qid)
+
+		cla = Common.getQuesRecordClass(q_type)
+
+		rec: BaseQuesRecord = cla.create(player, qid)
+
+		rec.wrong = False
+		rec.save()
+
+	# 添加备注
+	@classmethod
+	async def note(cls, consumer, player: Player,
+				   q_type: int, qid: int, note: str):
+		# 返回数据：无
+
+		Check.ensureNoteFormat(note)
+
+		Common.ensureQuestionExist(type_=q_type, id=qid)
+
+		cla = Common.getQuesRecordClass(q_type)
+
+		rec: BaseQuesRecord = cla.create(player, qid)
+
+		rec.note = note
+		rec.save()
+
 	# 查询题目详情
 	@classmethod
 	async def getDetail(cls, consumer, player: Player, qid: int, ):
@@ -58,6 +108,8 @@ class Service:
 		Check.ensureFeedbackFormat(description)
 
 		BaseQuesReport.create(player, qid, type, description)
+
+	# region 上传
 
 	# 上传题目
 	@classmethod
@@ -117,11 +169,21 @@ class Service:
 		picture.question = question
 		picture.save()
 
+	# endregion
+
+	"""占位符"""
+
 
 # ====================
 # 题目校验类，封装管理题目模块的参数格式是否正确-lgy
 # ====================
 class Check:
+
+	# 校验备注格式
+	@classmethod
+	def ensureNoteFormat(cls, val: str):
+		if len(val) != GeneralQuesRecord.MAX_NOTE_LEN:
+			raise GameException(ErrorType.InvalidNote)
 
 	# 校验题目类型
 	@classmethod
@@ -129,6 +191,13 @@ class Check:
 		if val == 0:
 			raise GameException(ErrorType.IncorrectQuestionType)
 		ViewUtils.ensureEnumData(val, QuestionType, ErrorType.IncorrectQuestionType, True)
+
+	# 校验题目类型
+	@classmethod
+	def ensureQuesReportType(cls, val: int):
+		if val == 0:
+			raise GameException(ErrorType.IncorrectQuesReportType)
+		ViewUtils.ensureEnumData(val, QuesReportType, ErrorType.IncorrectQuesReportType, True)
 
 	# 校验题目反馈的长度-lgy
 	@classmethod
@@ -163,8 +232,7 @@ class Common:
 			返回符合条件的题目（若有多个返回第一个）
 		"""
 		if cla is None:
-			Check.ensureQuestionType(type_)
-			cla = EnumMapper.get(QuestionType(type_))
+			cla = cls.getQuestionClass(type_)
 
 		return ViewUtils.getObject(cla, error, **kwargs)
 
@@ -186,8 +254,7 @@ class Common:
 			否则只返回满足条件的题目
 		"""
 		if cla is None:
-			Check.ensureQuestionType(type_)
-			cla = EnumMapper.get(QuestionType(type_))
+			cla = cls.getQuestionClass(type_)
 
 		if ids is None:
 			return ViewUtils.getObjects(cla, **kwargs)
@@ -201,13 +268,81 @@ class Common:
 
 		return res
 
+	@classmethod
+	def getQuestionClass(cls, type_: int):
+		"""
+		获取题目类
+		Args:
+			type_ (int): 类型（枚举值）
+		Returns:
+			返回相应类型的题目类
+		"""
+
+		Check.ensureQuestionType(type_)
+		return EnumMapper.get(QuestionType(type_))
+
+	@classmethod
+	def getQuesRecordClass(cls, type_: int):
+		"""
+		获取题目记录类
+		Args:
+			type_ (int): 题目类型（枚举值）
+		Returns:
+			返回相应类型的题目记录类
+		"""
+
+		cla: BaseQuestion = cls.getQuestionClass(type_)
+		rec_cla = cla.recordClass()
+
+		if rec_cla is None:
+			raise GameException(ErrorType.IncorrectQuesRecordType)
+
+		return rec_cla
+
+	@classmethod
+	def getQuesReportClass(cls, type_: int):
+		"""
+		获取题目反馈类
+		Args:
+			type_ (int): 题目类型（枚举值）
+		Returns:
+			返回相应类型的题目反馈类
+		"""
+
+		cla: BaseQuestion = cls.getQuestionClass(type_)
+		rep_cla = cla.reportClass()
+
+		if rep_cla is None:
+			raise GameException(ErrorType.IncorrectQuesReportType)
+
+		return rep_cla
+
+	# 获取题目记录
+	@classmethod
+	def getQuestionRecord(cls, type_: int = None, cla: BaseQuesRecord = None,
+						  error: ErrorType = ErrorType.QuestionRecordNotExist,
+						  **kwargs) -> BaseQuesRecord:
+		if cla is None:
+			cla = cls.getQuesRecordClass(type_)
+
+		return ViewUtils.getObject(cla, error, **kwargs)
+
+	# 获取题目反馈
+	@classmethod
+	def getQuestionReport(cls, type_: int = None, cla: BaseQuesRecord = None,
+						  error: ErrorType = ErrorType.QuestionRecordNotExist,
+						  **kwargs) -> BaseQuesReport:
+		if cla is None:
+			cla = cls.getQuesReportClass(type_)
+
+		return ViewUtils.getObject(cla, error, **kwargs)
+
 	# 确保题目存在
 	@classmethod
 	def ensureQuestionExist(cls, type_: int = None, cla: BaseQuestion = None,
 							error: ErrorType = ErrorType.QuestionNotExist, **kwargs):
 		if cla is None:
-			Check.ensureQuestionType(type_)
-			cla = EnumMapper.get(QuestionType(type_))
+			cla = cls.getQuestionClass(type_)
 
 		ViewUtils.ensureObjectExist(cla, error, **kwargs)
 

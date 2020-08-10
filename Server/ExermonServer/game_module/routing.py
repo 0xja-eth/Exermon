@@ -371,42 +371,18 @@ WEBSOCKET_METHOD_ROUTER = {
     ],
     # 查询记录
     'record/record/get': [[
-        ['uid', 'int']
+        ['uid', 'int'],
     ],
         Record.get,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-    # 收藏/解除收藏题目
-    'record/question/collect': [[
-        ['uid', 'int'],
-        ['qid', 'int']
-    ],
-        Record.collect,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-    # 解除错题
-    'record/question/unwrong': [[
-        ['uid', 'int'],
-        ['qid', 'int']
-    ],
-        Record.unwrong,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-    # 添加备注
-    'record/question/note': [[
-        ['uid', 'int'],
-        ['qid', 'int'],
-        ['note', 'str']
-    ],
-        Record.note,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 生成刷题
     'record/exercise/generate': [[
         ['uid', 'int'],
-        ['sid', 'int'],
-        ['gen_type', 'int'],
-        ['count', 'int'],
+        ['type', 'int'],
+        ['sid', 'var'],
+        ['gen_type', 'var'],
+        ['count', 'var'],
     ],
         Record.exerciseGenerate,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
@@ -414,6 +390,7 @@ WEBSOCKET_METHOD_ROUTER = {
     # 开始答题
     'record/exercise/start': [[
         ['uid', 'int'],
+        ['q_type', 'int'],
         ['qid', 'int'],
     ],
         Record.exerciseStart,  # 处理函数
@@ -422,10 +399,11 @@ WEBSOCKET_METHOD_ROUTER = {
     # 作答刷题题目
     'record/exercise/answer': [[
         ['uid', 'int'],
+        ['q_type', 'int'],
         ['qid', 'int'],
         ['selection', 'int[]'],
         ['timespan', 'int'],
-        ['terminate', 'bool']
+        ['terminate', 'bool'],
     ],
         Record.exerciseAnswer,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
@@ -433,7 +411,8 @@ WEBSOCKET_METHOD_ROUTER = {
     # 查询题目
     'question/question/get': [[
         ['uid', 'int'],
-        ['qids', 'int[]']
+        ['q_type', 'int'],
+        ['qids', 'int[]'],
     ],
         Question.get,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
@@ -441,9 +420,57 @@ WEBSOCKET_METHOD_ROUTER = {
     # 查询题目详情
     'question/detail/get': [[
         ['uid', 'int'],
+        ['q_type', 'int'],
         ['qid', 'int'],
     ],
         Question.getDetail,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 收藏/解除收藏题目
+    'question/record/collect': [[
+        ['uid', 'int'],
+        ['q_type', 'int'],
+        ['qid', 'int'],
+    ],
+        Question.collect,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 解除错题
+    'question/record/unwrong': [[
+        ['uid', 'int'],
+        ['q_type', 'int'],
+        ['qid', 'int'],
+    ],
+        Question.unwrong,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 添加备注
+    'question/record/note': [[
+        ['uid', 'int'],
+        ['q_type', 'int'],
+        ['qid', 'int'],
+        ['note', 'str'],
+    ],
+        Question.note,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 查询玩家题目反馈
+    'question/report/get': [[
+        ['uid', 'int'],
+        ['q_type', 'int'],
+    ],
+        Question.getReports,  # 处理函数
+        ChannelLayerTag.Self  # 是否需要响应
+    ],
+    # 提交题目反馈
+    'question/report/push': [[
+        ['uid', 'int'],
+        ['q_type', 'int'],
+        ['qid', 'int'],
+        ['type', 'int'],
+        ['description', 'str'],
+    ],
+        Question.pushReport,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 装备对战物资槽
@@ -527,26 +554,6 @@ WEBSOCKET_METHOD_ROUTER = {
         Battle.resultComplete,  # 处理函数
         ChannelLayerTag.NoLayer  # 是否需要响应
     ],
-
-    # 查询玩家题目反馈
-    'question/report/get': [[
-        ['uid', 'int'],
-    ],
-        Question.getReports,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-
-    # 提交题目反馈
-    'question/report/push': [[
-        ['uid', 'int'],
-        ['qid', 'int'],
-        ['type', 'int'],
-        ['description', 'str'],
-    ],
-        Question.pushReport,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-
     # 查询赛季记录
     'season/record/get': [[
         ['uid', 'int'],

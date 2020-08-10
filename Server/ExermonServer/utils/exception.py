@@ -131,32 +131,32 @@ class ErrorType(Enum):
 
 	# QuestionCommon
 	QuestionNotExist = 400  # 题目不存在
-	QuestionLinkNotExist = 401  # 题目关系不存在
-	PictureNotFound = 402  # 图片不存在
-	IncorrectQuestionType = 403  # 题目类型不正确
+	PictureNotFound = 401  # 图片不存在
+	IncorrectQuestionType = 402  # 题目类型不正确
 
-	# QuestionGenerate
-	InvalidGenerateConfigure = 410  # 非法的题目生成配置
-
-	# RecordCommon
-	QuestionRecordNotExist = 500  # 题目记录不存在
-	ExerciseRecordNotExist = 501  # 刷题记录不存在
-	ExerciseQuestionNotExist = 502  # 刷题题目不存在
-
-	# QuestionRecord
-	InvalidNote = 510  # 无效的备注格式
-
-	# QuestionSetRecord
-	QuestionNotStarted = 520  # 本题还没开始作答
-	InvalidTimeSpan = 521  # 作答时间有误
-
-	# QuestionGenerate
-	GenerateError = 530  # 题目生成有误
+	# QuesRecord
+	InvalidNote = 410  # 无效的备注格式
+	QuesRecordNotExist = 411  # 题目记录不存在
+	IncorrectQuesRecordType = 412  # 题目记录类型不正确
 
 	# QuesReport
-	QuesReportTooLong = 540  # 题目反馈太长
-	InvalidQuesReportType = 541  # 题目反馈类型不对
-	QuesReportNotExist = 542  # 查找不到反馈记录
+	QuesReportTooLong = 420  # 题目反馈太长
+	InvalidQuesReportType = 421  # 题目反馈类型不对
+	QuesReportNotExist = 422  # 查找不到反馈记录
+	IncorrectQuesReportType = 423  # 题目反馈类型不正确
+
+	# RecordCommon
+	ExerciseRecordNotExist = 500  # 刷题记录不存在
+	ExerciseQuestionNotExist = 501  # 刷题题目不存在
+	IncorrectQuestionSetType = 502  # 题目集类型不正确
+
+	# QuestionSetRecord
+	QuestionNotStarted = 510  # 本题还没开始作答
+	InvalidTimeSpan = 511  # 作答时间有误
+
+	# QuestionGenerate
+	InvalidGenerateConfigure = 520  # 非法的题目生成配置
+	GenerateError = 521  # 题目生成有误
 
 	# BattleCommon
 	BattleNotExist = 600  # 对战不存在
@@ -342,32 +342,32 @@ class GameException(Exception):
 
 		# QuestionCommon
 		ErrorType.QuestionNotExist: "题目不存在！",
-		ErrorType.QuestionLinkNotExist: "题目不存在！",
 		ErrorType.PictureNotFound: "找不到图片文件！",
 		ErrorType.IncorrectQuestionType: "题目类型不正确！",
 
-		# QuestionGenerate
-		ErrorType.InvalidGenerateConfigure: "非法的题目生成配置！",
+		# QuesRecord
+		ErrorType.InvalidNote: "无效的备注格式",
+		ErrorType.QuesRecordNotExist: "题目记录不存在！",
+		ErrorType.IncorrectQuesRecordType: "题目记录类型不正确！",
+
+		# QuesReport
+		ErrorType.QuesReportTooLong: "题目反馈太长！",
+		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
+		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
+		ErrorType.IncorrectQuesReportType: "题目反馈类型不正确！",
 
 		# RecordCommon
-		ErrorType.QuestionRecordNotExist: "题目记录不存在！",
 		ErrorType.ExerciseRecordNotExist: "刷题记录不存在！",
 		ErrorType.ExerciseQuestionNotExist: "刷题题目不存在！",
-
-		# QuestionRecord
-		ErrorType.InvalidNote: "无效的备注格式",
+		ErrorType.IncorrectQuestionSetType: "题目集类型不正确！",
 
 		# QuestionSetRecord
 		ErrorType.QuestionNotStarted: "本题还没开始作答！",
 		ErrorType.InvalidTimeSpan: "作答时间有误！",
 
 		# QuestionGenerate
+		ErrorType.InvalidGenerateConfigure: "非法的题目生成配置！",
 		ErrorType.GenerateError: "题目生成有误！",
-
-		# QuesReport
-		ErrorType.QuesReportTooLong: "题目反馈太长！",
-		ErrorType.InvalidQuesReportType: "题目反馈类型不对！",
-		ErrorType.QuesReportNotExist: "查找不到反馈记录！",
 
 		# BattleCommon
 		ErrorType.BattleNotExist: "对战不存在！",

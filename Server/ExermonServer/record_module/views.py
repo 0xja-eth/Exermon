@@ -21,47 +21,6 @@ class Service:
 		# battle_records: 对战记录数据（数组） => 所有对战记录
 		return player.convert("records")
 
-	# 收藏/解除收藏题目
-	@classmethod
-	async def collect(cls, consumer, player: Player, qid: int):
-		# 返回数据：
-		# collected: bool => 是否收藏（处理后）
-
-		QuestionCommon.ensureQuestionExist(id=qid)
-
-		rec = GeneralQuesRecord.create(player, qid)
-
-		rec.collected = not rec.collected
-		rec.save()
-
-		return {'collected': rec.collected}
-
-	# 解除错题
-	@classmethod
-	async def unwrong(cls, consumer, player: Player, qid: int):
-		# 返回数据：无
-
-		QuestionCommon.ensureQuestionExist(id=qid)
-
-		rec = GeneralQuesRecord.create(player, qid)
-
-		rec.wrong = False
-		rec.save()
-
-	# 添加备注
-	@classmethod
-	async def note(cls, consumer, player: Player, qid: int, note: str):
-		# 返回数据：无
-
-		Check.ensureNoteFormat(note)
-
-		QuestionCommon.ensureQuestionExist(id=qid)
-
-		rec = GeneralQuesRecord.create(player, qid)
-
-		rec.note = note
-		rec.save()
-
 	# 开始刷题
 	@classmethod
 	async def exerciseGenerate(cls, consumer, player: Player, sid: int, gen_type: int, count: int):
@@ -107,25 +66,13 @@ class Service:
 # 记录校验类，封装记录业务数据格式校验的函数
 # =======================
 class Check:
-
-	# 校验备注格式
-	@classmethod
-	def ensureNoteFormat(cls, val: str):
-		if len(val) != GeneralQuesRecord.MAX_NOTE_LEN:
-			raise GameException(ErrorType.InvalidNote)
+	pass
 
 
 # =======================
 # 记录公用类，封装关于物品模块的公用函数
 # =======================
 class Common:
-
-	# 获取题目记录
-	@classmethod
-	def getQuestionRecord(cls, error: ErrorType = ErrorType.QuestionNotExist,
-						  **kwargs) -> GeneralQuesRecord:
-
-		return ViewUtils.getObject(GeneralQuesRecord, error, **kwargs)
 
 	# 获取刷题记录
 	@classmethod
