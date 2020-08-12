@@ -4,7 +4,7 @@ from enum import Enum
 # ===================================================
 #  题目集类型枚举
 # ===================================================
-class QuestionSetType(Enum):
+class QuesSetType(Enum):
 	GeneralExercise = 100  # 常规刷题
 	ListeningExercise = 101  # 听力刷题
 	ReadingExercise = 102  # 阅读刷题
@@ -19,8 +19,8 @@ class QuestionSetType(Enum):
 
 
 QUES_SET_TYPES = [
-	(QuestionSetType.Unset.value, '未设置'),
-	(QuestionSetType.Exercise.value, '刷题'),
-	(QuestionSetType.Exam.value, '考试'),
-	(QuestionSetType.Battle.value, '对战'),
+	(QuesSetType.Unset.value, '未设置'),
+	(QuesSetType.Exercise.value, '刷题'),
+	(QuesSetType.Exam.value, '考试'),
+	(QuesSetType.Battle.value, '对战'),
 ]

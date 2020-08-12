@@ -1,7 +1,8 @@
-from question_module.models import GeneralQuestion
-from record_module.models import GeneralQuesRecord
-import datetime
+from .models import *
+
 from utils.model_utils import Common as ModelUtils
+
+import datetime
 
 
 # =======================================
@@ -27,27 +28,43 @@ class QuestionDetail:
 	all_corr_rate = 0
 
 	@classmethod
-	def getData(cls, question_id, type=None, player=None):
+	def getData(cls, q_type, qid, type=None, player=None):
 		"""
 		获得该题目的做题信息
 		Args:
-			question_id (int): 题目ID
+			q_type (int): 题目类型（枚举值）
+			qid (int): 题目ID
 			type (str): 获取数据类型
 			player (Player): 玩家
 		Returns:
 			返回指定玩家的题目详情
 		"""
-		if question_id in cls.RecordDict:
-			detail = cls.RecordDict[question_id]
+		key = cls._generateKey(q_type, qid)
+		
+		if key in cls.RecordDict:
+			detail = cls.RecordDict[key]
 			if detail.isUpdateRequired(): detail.update()
 
 		else:
-			detail = cls.RecordDict[question_id] = QuestionDetail(question_id)
+			detail = cls.RecordDict[key] = QuestionDetail(q_type, qid)
 
 		return detail.convert(type, player)
 
-	def __init__(self, question_id):
-		self.question_id = question_id
+	@classmethod
+	def _generateKey(cls, q_type, qid):
+		"""
+		生成键
+		Args:
+			q_type (int): 题目类型（枚举值）
+			qid (int): 题目ID
+		Returns:
+			返回记录字典中的键
+		"""
+		return "%d-%d" % (q_type, qid)
+
+	def __init__(self, q_type, qid):
+		self.question_type = q_type
+		self.question_id = qid
 		self.update()
 
 	def update(self):
@@ -55,11 +72,13 @@ class QuestionDetail:
 		更新当前题目详情
 		"""
 		from utils.view_utils import Common as ViewUtils
+		from .views import Common as QuestionCommon
 
 		# TODO: 使用 ViewUtils.getObjects 来代替 QuestionRecord.object.filter(...)
 		# TODO: 至于为什么，可以看看 ViewUtils.getObjects 的实现，其他函数也同理
-		records = ViewUtils.getObjects(GeneralQuesRecord,
-									   question_id=self.question_id)
+		cla: BaseQuesRecord = QuestionCommon.getQuesRecordClass(self.question_type)
+
+		records = ViewUtils.getObjects(cla, question_id=self.question_id)
 
 		self.sum_player = len(records)
 		self.sum_count = sum(r.count for r in records)

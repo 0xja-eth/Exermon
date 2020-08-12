@@ -50,6 +50,47 @@ class Word(Models.ElementQuestion):
 
 
 # ===================================================
+#  单词记录表
+# ===================================================
+@QuesManager.registerQuesRecord(Word)
+class WordRecord(Models.BaseQuesRecord):
+
+	LIST_EDITABLE_EXCLUDE = ['word', 'record', 'count']
+
+	# 当前轮单词
+	current = models.BooleanField(default=False, verbose_name="是否是当前轮")
+
+	# 当前轮是否答对
+	current_correct = models.BooleanField(default=None, null=True, verbose_name="当前轮是否答对")
+
+	# 转化为字符串
+	def __str__(self):
+		return '%s (%s)' % (self.word, self.record)
+
+	# 转化为字典
+	def convert(self):
+
+		res = super().convert()
+
+		res['current'] = self.current
+		res['current_correct'] = self.current_correct
+		res['current_done'] = self.current_correct is not None
+
+		return res
+
+	def _create(self):
+		super(WordRecord, self)._create()
+		self.current = True
+
+
+# ===================================================
+#  单词记录表
+# ===================================================
+@QuesManager.registerQuesReport(Word)
+class WordReport(Models.BaseQuesReport): pass
+
+
+# ===================================================
 #  短语题目类型枚举
 # ===================================================
 class PhraseType(Enum):
@@ -102,3 +143,17 @@ class Phrase(Models.ElementQuestion):
 		return [self.word, self.chinese]
 
 	def answer(self): return self.phrase
+
+
+# ===================================================
+#  单词记录表
+# ===================================================
+@QuesManager.registerQuesRecord(Phrase)
+class PhraseRecord(Models.BaseQuesRecord): pass
+
+
+# ===================================================
+#  单词记录表
+# ===================================================
+@QuesManager.registerQuesReport(Phrase)
+class PhraseReport(Models.BaseQuesReport): pass

@@ -16,7 +16,7 @@ from utils.exception import ErrorType, GameException
 
 from enum import Enum
 
-import os, base64, datetime
+import os, base64, datetime, jsonfield
 
 # Create your models here.
 
@@ -389,6 +389,9 @@ class Player(CacheableModel):
 	type = models.PositiveSmallIntegerField(default=PlayerStatus.Normal.value,
 											choices=TYPES, verbose_name="账号类型")
 
+	# 选科ID数组
+	subject_selection = jsonfield.JSONField(default=[], verbose_name="选科")
+
 	# 在线
 	online = models.BooleanField(default=False, verbose_name="在线")
 
@@ -465,28 +468,22 @@ class Player(CacheableModel):
 
 		exer_hub = ModelUtils.objectToDict(self.exerHub())
 
-		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack())
-
 		return {
 			'human_pack': human_pack,
 			'exer_pack': exer_pack,
 			'exer_frag_pack': exer_frag_pack,
 			'exer_gift_pool': exer_gift_pool,
 			'exer_hub': exer_hub,
-			'ques_sugar_pack': ques_sugar_pack,
 		}
 
 	def _slotContainerIndices(self):
 
 		exer_slot = ModelUtils.objectToDict(self.exerSlot())
 
-		human_equip_slot = ModelUtils.objectToDict(self.humanEquipSlot())
-
 		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
 
 		return {
 			'exer_slot': exer_slot,
-			'human_equip_slot': human_equip_slot,
 			'battle_item_slot': battle_item_slot,
 		}
 
@@ -502,28 +499,22 @@ class Player(CacheableModel):
 
 		exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
 
-		ques_sugar_pack = ModelUtils.objectToDict(self.quesSugarPack(), type='items')
-
 		return {
 			'human_pack': human_pack,
 			'exer_pack': exer_pack,
 			'exer_frag_pack': exer_frag_pack,
 			'exer_gift_pool': exer_gift_pool,
 			'exer_hub': exer_hub,
-			'ques_sugar_pack': ques_sugar_pack,
 		}
 
 	def _slotContainerItems(self):
 
 		exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
 
-		humanequipslot = ModelUtils.objectToDict(self.humanEquipSlot(), type='items')
-
 		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
 
 		return {
 			'exer_slot': exerslot,
-			'human_equip_slot': humanequipslot,
 			'battle_item_slot': battle_item_slot,
 		}
 
@@ -647,6 +638,8 @@ class Player(CacheableModel):
 		Returns:
 			转化后的字典数据
 		"""
+		from record_module.models import GeneralExerciseRecord
+
 		create_time = ModelUtils.timeToStr(self.create_time)
 		birth = ModelUtils.dateToStr(self.birth)
 		money = ModelUtils.objectToDict(self.playerMoney())
@@ -657,7 +650,7 @@ class Player(CacheableModel):
 			question_records = ModelUtils.objectsToDict(
 				self.quesRecords(GeneralQuesRecord))
 			exercise_records = ModelUtils.objectsToDict(
-				self.exerciseRecords())
+				self.quesSetRecords(GeneralExerciseRecord))
 
 			return {
 				'question_records': question_records,
@@ -675,6 +668,7 @@ class Player(CacheableModel):
 			'id': self.id,
 			'name': self.name,
 			'character_id': self.character_id,
+			'subject_selection': self.subject_selection,
 			'level': level,
 			'status': self.status,
 			'type': self.type,
@@ -1226,10 +1220,15 @@ class Player(CacheableModel):
 		Returns:
 			玩家所选科目数组
 		"""
-		exerslot = self.exerSlot()
-		if exerslot is None: return set()
-		slot_items = exerslot.contItems()
-		return set(ModelUtils.query(slot_items, lambda item: item.subject))
+		from game_module.models import Subject
+
+		res = []
+
+		for sbj in self.subject_selection:
+			sbj = Subject.get(id=sbj)
+			if sbj is not None: res.append(sbj)
+
+		return res
 
 	# endregion
 
@@ -1277,15 +1276,50 @@ class Player(CacheableModel):
 		if res.exists(): return res.first()
 		return None
 
-	def exerciseRecords(self) -> QuerySet:
+	def quesReports(self, cla: BaseQuesRecord = None,
+					question_cla: BaseQuestion = None) -> QuerySet:
 		"""
-		获取所有刷题记录
+		获取所有题目反馈
+		Args:
+			cla (type): 题目记录类型
+			question_cla (type): 题目类型
 		Returns:
-			所有与该玩家相关的刷题记录 QuerySet 对象
+			所有与该玩家相关的题目反馈 QuerySet 对象
 		"""
-		return self.exerciserecord_set.all()
+		if cla is None:
+			cla = question_cla.REPORT_CLASS
 
-	def setCurrentQuestionSet(self, ques_set: 'QuestionSetRecord'):
+		name = cla.__name__ + '_set'
+		try: return getattr(self, name).all()
+		except AttributeError: return None
+
+	def quesSetRecords(self, cla: 'QuesSetRecord') -> QuerySet:
+		"""
+		获取所有题目集记录
+		Args:
+			cla (type): 题目记录类型
+		Returns:
+			所有与该玩家相关的题目集记录 QuerySet 对象
+		"""
+		name = cla.__name__ + '_set'
+		try: return getattr(self, name).all()
+		except AttributeError: return None
+
+	def quesSetRecord(self, cla: 'QuesSetRecord',
+					  ques_set_id: int) -> 'QuesSetRecord':
+		"""
+		获取所有题目集记录
+		Args:
+			cla (type): 题目记录类型
+			ques_set_id (int): 题目集ID
+ 		Returns:
+			所有与该玩家相关的题目集记录 QuerySet 对象
+		"""
+		res = self.quesSetRecords(cla).filter(id=ques_set_id)
+		if res.exists(): return res.first()
+		return None
+
+	def setCurrentQuestionSet(self, ques_set: 'QuestSetRecord'):
 		"""
 		设置当前题目集
 		Args:
@@ -1294,7 +1328,7 @@ class Player(CacheableModel):
 		self._setModelCache(key=self.CUR_QUES_SET_CACHE_KEY,
 							objects=[ques_set])
 
-	def currentQuestionSet(self) -> 'QuestionRecord':
+	def currentQuestionSet(self) -> 'QuesRecord':
 		"""
 		获取当前题目集记录
 		Returns:

@@ -1,7 +1,11 @@
 from .models import *
+
 from player_module.models import Player
+
 from question_module.views import Common as QuestionCommon
+
 from utils.view_utils import Common as ViewUtils
+from utils.model_utils import EnumMapper
 from utils.exception import ErrorType, GameException
 
 # Create your views here.
@@ -23,56 +27,98 @@ class Service:
 
 	# 开始刷题
 	@classmethod
-	async def exerciseGenerate(cls, consumer, player: Player, sid: int, gen_type: int, count: int):
+	async def generate(cls, consumer, player: Player, type: int,
+					   sid: int = None, count: int = None, gen_type: int = None):
 		# 返回数据：
 		# record: 刷题记录数据 => 刷题记录
-		from game_module.models import Subject
-		from player_module.views import Common as PlayerCommon
+		from utils.interface_manager import Common as InterfaceCommon
 
-		subject = Subject.get(id=sid)
+		cla = Common.getQuesSetClass(type)
 
-		PlayerCommon.ensureSubjectSelected(player, subject)
+		kwargs = {}
 
-		rec = GeneralExerciseRecord.create(player, subject=subject,
-										   gen_type=gen_type, count=count)
+		if BaseExerciseRecord in cla.mro():
 
-		return {'record': rec.convert()}
+			from game_module.models import Subject
+			from player_module.views import Common as PlayerCommon
+
+			sid = InterfaceCommon.convertDataType(sid, 'int')
+			count = InterfaceCommon.convertDataType(count, 'int')
+
+			subject = Subject.get(id=sid)
+
+			PlayerCommon.ensureSubjectSelected(player, subject)
+
+			kwargs['subject'] = subject
+			kwargs['count'] = count
+
+			if cla == GeneralExerciseRecord:
+				gen_type = InterfaceCommon.convertDataType(gen_type, 'int')
+
+				kwargs['gen_type'] = gen_type
+
+		ques_set: QuesSetRecord = cla.create(player, **kwargs)
+
+		return {'record': ques_set.convert()}
 
 	# 开始刷题
 	@classmethod
-	async def exerciseStart(cls, consumer, player: Player, q_type: int, qid: int):
+	async def startQuestion(cls, consumer, player: Player,
+							q_type: int, qid: int):
 		# 返回数据：无
+		cla = QuestionCommon.getQuestionClass(q_type)
 
-		exercise = player.currentQuestionSet()
-		exercise.startQuestion(qid)
+		ques_set: QuesSetRecord = player.currentQuestionSet()
+		ques_set.startQuestion(cla, qid)
 
 	# 作答刷题题目
 	@classmethod
-	async def exerciseAnswer(cls, consumer, player: Player, qid: int,
-							 selection: list, timespan: int, terminate: bool):
+	async def answerQuestion(cls, consumer, player: Player,
+							 q_type: int, qid: int, answer: dict,
+							 timespan: int, terminate: bool):
 		# 返回数据：
 		# result: 刷题结果数据 => 刷题结果（可选）
+		cla = QuestionCommon.getQuestionClass(q_type)
 
-		exercise = player.currentQuestionSet()
-		exercise.answerQuestion(selection, timespan, question_id=qid)
+		ques_set: QuesSetRecord = player.currentQuestionSet()
+		ques_set.answerQuestion(answer, timespan, cla, qid)
 
 		if terminate:
-			exercise.terminate()
+			ques_set.terminate()
 
-			return {'result': exercise.convert('result')}
+			return {'result': ques_set.convert('result')}
 
 
 # =======================
 # 记录校验类，封装记录业务数据格式校验的函数
 # =======================
 class Check:
-	pass
+
+	# 校验题目类型
+	@classmethod
+	def ensureQuesSetType(cls, val: int):
+		if val == 0:
+			raise GameException(ErrorType.IncorrectQuestionSetType)
+		ViewUtils.ensureEnumData(val, QuesSetType,
+								 ErrorType.IncorrectQuestionSetType, True)
 
 
 # =======================
 # 记录公用类，封装关于物品模块的公用函数
 # =======================
 class Common:
+
+	@classmethod
+	def getQuesSetClass(cls, type_: int):
+		"""
+		获取题目集类
+		Args:
+			type_ (int): 类型（枚举值）
+		Returns:
+			返回相应类型的题目集类
+		"""
+		Check.ensureQuesSetType(type_)
+		return EnumMapper.get(QuesSetType(type_))
 
 	# 获取刷题记录
 	@classmethod
@@ -91,5 +137,5 @@ class Common:
 	# 确保题目集记录所属玩家
 	@classmethod
 	def ensureQuestionSetPlayer(cls, ques_set_rec: QuesSetRecord, player):
-		if ques_set_rec.player != player:
+		if ques_set_rec.player_id != player.id:
 			raise GameException(ErrorType.ExerciseRecordNotExist)

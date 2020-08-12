@@ -220,7 +220,7 @@ class GeneralQuestionGenerateConfigure(BaseQuestionGenerateConfigure):
 		super().__init__(*args, **kwargs)
 
 		from question_module.models import SelectingQuestionType
-		from record_module.models import QuestionSetType
+		from record_module.models import QuesSetType
 		from game_module.models import QuestionStar
 
 		self.gen_type: QuestionGenerateType = gen_type  # 生成类型
@@ -229,7 +229,7 @@ class GeneralQuestionGenerateConfigure(BaseQuestionGenerateConfigure):
 		self.star_dtb = star_dtb
 
 		self.ignore_star = self.ques_star is not None or \
-						   self.question_set.TYPE == QuestionSetType.Exam
+						   self.question_set.TYPE == QuesSetType.Exam
 
 
 # ================================

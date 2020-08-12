@@ -241,13 +241,13 @@ class BasePlayerQuestion(CacheableModel):
 		"""
 		self._setCache(self.STARTTIME_CACHE_KEY, datetime.datetime.now())
 
-	def answer(self, timespan: int, record: 'QuesSetRecord', **kwargs):
+	def answer(self, answer: dict, timespan: int, record: 'QuesSetRecord'):
 		"""
 		作答题目
 		Args:
+			answer (dict): 作答内容
 			timespan (int): 用时
 			record (QuesSetRecord): 题目集记录
-			**kwargs (**dict): 作答参数
 		"""
 		start_time = self._getCache(self.STARTTIME_CACHE_KEY)
 
@@ -268,16 +268,16 @@ class BasePlayerQuestion(CacheableModel):
 
 		self.answered = True
 
-		self._processAnswer(**kwargs)
+		self._processAnswer(answer)
 		self._calcRewards(record)
 
 		# self.save()
 
-	def _processAnswer(self, **kwargs):
+	def _processAnswer(self, answer):
 		"""
 		处理题目回答
 		Args:
-			**kwargs (**dict): 作答参数
+			answer (dict): 作答内容
 		"""
 		raise NotImplementedError
 
@@ -357,8 +357,8 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 	def _answerDict(self):
 		return {'selection': self.selection}
 
-	def _processAnswer(self, selection):
-		self.selection = selection
+	def _processAnswer(self, answer):
+		self.selection = answer
 
 
 # ===================================================
@@ -376,14 +376,14 @@ class GroupPlayerQuestion(BasePlayerQuestion):
 	def _answerDict(self) -> dict:
 		return {'answers': self.answers}
 
-	def _processAnswer(self, answers):
-		self.answers = answers
+	def _processAnswer(self, answer):
+		self.answers = answer
 
 
 # ===================================================
 #  元素题目关系表
 # ===================================================
-class ElementExerciseQuestion(BasePlayerQuestion):
+class ElementPlayerQuestion(BasePlayerQuestion):
 
 	# 回答
 	answer = models.CharField(null=True, empty=True,
@@ -514,7 +514,7 @@ class QuesSetRecord(CacheableModel):
 		abstract = True
 		verbose_name = verbose_name_plural = "题目集记录"
 
-	TYPE = QuestionSetType.Unset
+	TYPE = QuesSetType.Unset
 
 	# 可接受的题目玩家关系类
 	ACCEPT_PLAYER_QUES_CLASSES: list = []
@@ -928,6 +928,7 @@ class QuesSetRecord(CacheableModel):
 		"""
 		开始作答题目
 		Args:
+			cla (type): 题目类
 			question_id (int): 题目ID
 			player_ques (SelectingPlayerQuestion): 玩家题目关系对象
 		"""
@@ -938,17 +939,17 @@ class QuesSetRecord(CacheableModel):
 
 		player_ques.start()
 
-	def answerQuestion(self, timespan: int,
+	def answerQuestion(self, answer: dict, timespan: int,
 					   cla: BasePlayerQuestion = None, question_id: int = None,
-					   player_ques: SelectingPlayerQuestion = None, **kwargs):
+					   player_ques: SelectingPlayerQuestion = None):
 		"""
 		回答指定题目
 		Args:
+			answer (dict): 作答内容
 			timespan (int): 用时
 			cla (BasePlayerQuestion): 题目关系类型
 			question_id (int): 题目ID
 			player_ques (SelectingPlayerQuestion): 玩家题目关系对象
-			**kwargs (**dict): 作答参数
 		"""
 
 		# 从缓存中读取
@@ -961,7 +962,7 @@ class QuesSetRecord(CacheableModel):
 		record_cla = cla.questionClass().recordClass()
 		rec = record_cla.create(self.player, question_id)
 
-		player_ques.answer(timespan, rec, **kwargs)
+		player_ques.answer(answer, timespan, rec)
 
 		rec.updateRecord(player_ques)
 

@@ -17,11 +17,11 @@ class Service:
 
 	# 查询题目
 	@classmethod
-	async def get(cls, consumer, player, qids: list):
+	async def get(cls, consumer, player, q_type: int, qids: list):
 		# 返回数据：
 		# questions: 题目数据（数组） => 题目数据集
 
-		questions = Common.getQuestions(qids)
+		questions = Common.getQuestions(q_type, ids=qids)
 
 		questions = ModelUtils.objectsToDict(questions)
 
@@ -79,35 +79,41 @@ class Service:
 
 	# 查询题目详情
 	@classmethod
-	async def getDetail(cls, consumer, player: Player, qid: int, ):
+	async def getDetail(cls, consumer, player: Player, q_type: int, qid: int, ):
 		# 返回数据：
 		# detail: 题目详情数据 => 题目详情数据
+		Common.ensureQuestionExist(q_type, id=qid)
+
 		from .runtimes import QuestionDetail
 
 		return {'detail': QuestionDetail.getData(qid, player=player)}
 
 	# 查询玩家题目反馈-lgy
 	@classmethod
-	async def getReports(cls, consumer, player: Player):
+	async def getReports(cls, consumer, player: Player, q_type: int):
 
-		reports = player.questionrecord_set.all()
+		cla = Common.getQuesReportClass(q_type)
+
+		reports = player.quesReports(cla)
 
 		return {"reports": ModelUtils.objectsToDict(reports)}
 
 	# 提交题目反馈-lgy
 	@classmethod
-	async def pushReport(cls, consumer, player: Player, qid: int, type: int, description: str ):
+	async def pushReport(cls, consumer, player: Player,
+						 q_type: int, qid: int, type: int, description: str ):
 
 		# 检验题目是否存在
-		Common.ensureQuestionExist(qid)
+		Common.ensureQuestionExist(q_type, id=qid)
 
 		# 检验类型是否在枚举类型里面
 		Check.ensureQuestionTypeExist(type)
 
 		# 检验描述是否超过字数限制
-		Check.ensureFeedbackFormat(description)
+		Check.ensureReportFormat(description)
 
-		BaseQuesReport.create(player, qid, type, description)
+		cla: BaseQuesReport = Common.getQuesReportClass(q_type)
+		cla.create(player, qid, type, description)
 
 	# region 上传
 
@@ -201,7 +207,7 @@ class Check:
 
 	# 校验题目反馈的长度-lgy
 	@classmethod
-	def ensureFeedbackFormat(cls, val: str):
+	def ensureReportFormat(cls, val: str):
 		if len(val) > BaseQuesReport.MAX_DESC_LEN:
 			raise GameException(ErrorType.QuesReportTooLong)
 
@@ -215,6 +221,55 @@ class Check:
 # 题目公用类，封装关于物品模块的公用函数
 # =======================
 class Common:
+
+	@classmethod
+	def getQuestionClass(cls, type_: int):
+		"""
+		获取题目类
+		Args:
+			type_ (int): 类型（枚举值）
+		Returns:
+			返回相应类型的题目类
+		"""
+
+		Check.ensureQuestionType(type_)
+		return EnumMapper.get(QuestionType(type_))
+
+	@classmethod
+	def getQuesRecordClass(cls, type_: int):
+		"""
+		获取题目记录类
+		Args:
+			type_ (int): 题目类型（枚举值）
+		Returns:
+			返回相应类型的题目记录类
+		"""
+
+		cla: BaseQuestion = cls.getQuestionClass(type_)
+		rec_cla = cla.recordClass()
+
+		if rec_cla is None:
+			raise GameException(ErrorType.IncorrectQuesRecordType)
+
+		return rec_cla
+
+	@classmethod
+	def getQuesReportClass(cls, type_: int):
+		"""
+		获取题目反馈类
+		Args:
+			type_ (int): 题目类型（枚举值）
+		Returns:
+			返回相应类型的题目反馈类
+		"""
+
+		cla: BaseQuestion = cls.getQuestionClass(type_)
+		rep_cla = cla.reportClass()
+
+		if rep_cla is None:
+			raise GameException(ErrorType.IncorrectQuesReportType)
+
+		return rep_cla
 
 	# 获取题目
 	@classmethod
@@ -267,55 +322,6 @@ class Common:
 		if res.count() != len(unique_ids): raise GameException(error)
 
 		return res
-
-	@classmethod
-	def getQuestionClass(cls, type_: int):
-		"""
-		获取题目类
-		Args:
-			type_ (int): 类型（枚举值）
-		Returns:
-			返回相应类型的题目类
-		"""
-
-		Check.ensureQuestionType(type_)
-		return EnumMapper.get(QuestionType(type_))
-
-	@classmethod
-	def getQuesRecordClass(cls, type_: int):
-		"""
-		获取题目记录类
-		Args:
-			type_ (int): 题目类型（枚举值）
-		Returns:
-			返回相应类型的题目记录类
-		"""
-
-		cla: BaseQuestion = cls.getQuestionClass(type_)
-		rec_cla = cla.recordClass()
-
-		if rec_cla is None:
-			raise GameException(ErrorType.IncorrectQuesRecordType)
-
-		return rec_cla
-
-	@classmethod
-	def getQuesReportClass(cls, type_: int):
-		"""
-		获取题目反馈类
-		Args:
-			type_ (int): 题目类型（枚举值）
-		Returns:
-			返回相应类型的题目反馈类
-		"""
-
-		cla: BaseQuestion = cls.getQuestionClass(type_)
-		rep_cla = cla.reportClass()
-
-		if rep_cla is None:
-			raise GameException(ErrorType.IncorrectQuesReportType)
-
-		return rep_cla
 
 	# 获取题目记录
 	@classmethod

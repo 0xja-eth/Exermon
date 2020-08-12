@@ -384,7 +384,7 @@ WEBSOCKET_METHOD_ROUTER = {
         ['gen_type', 'var'],
         ['count', 'var'],
     ],
-        Record.exerciseGenerate,  # 处理函数
+        Record.generate,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 开始答题
@@ -393,7 +393,7 @@ WEBSOCKET_METHOD_ROUTER = {
         ['q_type', 'int'],
         ['qid', 'int'],
     ],
-        Record.exerciseStart,  # 处理函数
+        Record.startQuestion,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 作答刷题题目
@@ -401,11 +401,11 @@ WEBSOCKET_METHOD_ROUTER = {
         ['uid', 'int'],
         ['q_type', 'int'],
         ['qid', 'int'],
-        ['selection', 'int[]'],
+        ['answer', 'dict'],
         ['timespan', 'int'],
         ['terminate', 'bool'],
     ],
-        Record.exerciseAnswer,  # 处理函数
+        Record.answerQuestion,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
     # 查询题目

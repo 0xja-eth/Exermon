@@ -707,9 +707,14 @@ class BaseQuesRecord(models.Model):
 			record = cls()
 			record.player = player
 			record.question_id = question_id
+
+			record._create()
+
 			record.save()
 
 		return record
+
+	def _create(self): pass
 
 	# 更新已有记录
 	def updateRecord(self, player_ques: 'BasePlayerQuestion'):

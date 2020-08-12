@@ -401,28 +401,6 @@ class Service:
 
 		player.editInfo(grade, birth, school, city, contact, description)
 
-	# 人类装备槽装备
-	@classmethod
-	async def equipSlotEquip(cls, consumer, player: Player, heid: int):
-		# 返回数据：无
-		from item_module.views import Service as ItemService
-
-		equip_slot = Common.getHumanEquipSlot(player)
-
-		pack_equip = Common.getPackEquip(player, id=heid)
-
-		return ItemService.slotContainerEquip(equip_slot, pack_equip, e_type_id=pack_equip.item.e_type_id)
-
-	# 人类装备槽卸下
-	@classmethod
-	async def equipSlotDequip(cls, consumer, player: Player, type: int):
-		# 返回数据：无
-		from item_module.views import Service as ItemService
-
-		equip_slot = Common.getHumanEquipSlot(player)
-
-		return ItemService.slotContainerEquip(equip_slot, None, type_=HumanPackEquip, e_type_id=type)
-
 
 # =======================
 # 用户校验类，封装用户业务数据格式校验的函数
@@ -533,18 +511,6 @@ class Common:
 		return ItemCommon.getContainer(cla=ItemPack, player=player, error=error)
 
 	@classmethod
-	def getHumanEquipSlot(cls, player: Player, error: ErrorType = ErrorType.ContainerNotExist) -> HumanEquipSlot:
-		"""
-		获取人类装备槽
-		Args:
-			player (PLayer): 所属玩家
-			error (ErrorType): 错误时抛出的异常类型
-		Returns:
-			返回对应玩家的人类装备槽对象
-		"""
-		return ItemCommon.getContainer(cla=HumanEquipSlot, player=player, error=error)
-
-	@classmethod
 	def getPackItem(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
 					 **kwargs) -> ItemPackItem:
 		"""
@@ -557,20 +523,6 @@ class Common:
 			返回一定条件下的玩家持有物品，如果有多个符合条件，返回第一个
 		"""
 		return ItemCommon.getContItem(cla=ItemPackItem, player=player, error=error, **kwargs)
-
-	@classmethod
-	def getPackEquip(cls, player: Player, error: ErrorType = ErrorType.ContItemNotExist,
-					 **kwargs) -> HumanPackEquip:
-		"""
-		获取玩家持有装备
-		Args:
-			player (Player): 所属玩家
-			error (ErrorType): 错误时抛出的异常类型
-			**kwargs (**dict): 查询条件
-		Returns:
-			返回一定条件下的玩家持有装备，如果有多个符合条件，返回第一个
-		"""
-		return ItemCommon.getContItem(cla=HumanPackEquip, player=player, error=error, **kwargs)
 
 	@classmethod
 	def ensurePlayerExist(cls, error: ErrorType = ErrorType.PlayerNotExist, **kwargs):

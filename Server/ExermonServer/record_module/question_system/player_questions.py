@@ -43,7 +43,7 @@ class ReadingExerciseQuestion(Models.GroupPlayerQuestion): pass
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	Word, WordExerciseRecord, RecordSource.Exercise)
-class WordExerciseQuestion(Models.ElementExerciseQuestion):
+class WordExerciseQuestion(Models.ElementPlayerQuestion):
 
 	# 是否默写
 	dictation = models.BooleanField(default=False, verbose_name="默写")
@@ -85,7 +85,7 @@ class WordExerciseQuestion(Models.ElementExerciseQuestion):
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	Phrase, PhraseExerciseRecord, RecordSource.Exercise)
-class PhraseExerciseQuestion(Models.ElementExerciseQuestion):
+class PhraseExerciseQuestion(Models.ElementPlayerQuestion):
 
 	def _generateChoices(self):
 		pass

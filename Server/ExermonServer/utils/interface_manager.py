@@ -278,7 +278,8 @@ class Common:
 
 			if key in request_data:
 				# 如果该接口所需参数在 request_data 中，进行数据类型转换
-				data[key] = Common.convertDataType(request_data[key], type)
+				data[key] = Common.convertDataType(
+					request_data[key], type, True)
 			elif type != 'var':
 				# 否则且如果该参数不是可选的，抛出异常
 				raise GameException(ErrorType.ParameterError)
@@ -287,7 +288,10 @@ class Common:
 
 	# 转换数据类型
 	@classmethod
-	def convertDataType(cls, value, type='str'):
+	def convertDataType(cls, value, type='str', accept_none=False):
+		if value is None and not accept_none:
+			raise GameException(ErrorType.ParameterError)
+
 		try:
 			if type == 'int':
 				value = int(value)
