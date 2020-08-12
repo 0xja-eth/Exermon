@@ -2,8 +2,9 @@ from django.db import models
 
 from ..types import *
 from ..manager import RecordManager
+from ..models import *
 
-import record_module.models as Models
+# import record_module.models as Models
 
 from utils.calc_utils.question_calc import *
 
@@ -11,7 +12,7 @@ from utils.calc_utils.question_calc import *
 # ===================================================
 #  刷题记录表
 # ===================================================
-class BaseExerciseRecord(Models.QuesSetRecord):
+class BaseExerciseRecord(QuesSetRecord):
 
 	# 常量定义
 	NAME_STRING_FMT = "%s\n%s %s"
@@ -135,7 +136,7 @@ class GeneralExerciseRecord(BaseExerciseRecord):
 #  刷题奖励表
 # ===================================================
 @RecordManager.registerQuestionSetReward(GeneralExerciseRecord)
-class ExerciseReward(Models.QuesSetReward): pass
+class ExerciseReward(QuesSetReward): pass
 
 # endregion
 
@@ -154,7 +155,7 @@ class ListeningExerciseRecord(BaseExerciseRecord): pass
 #  听力题目记录表
 # ===================================================
 @RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
-class ListeningExerciseReward(Models.QuesSetReward): pass
+class ListeningExerciseReward(QuesSetReward): pass
 
 
 # endregion
@@ -174,7 +175,7 @@ class ReadingExerciseRecord(BaseExerciseRecord): pass
 #  听力题目记录表
 # ===================================================
 @RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
-class ReadingExerciseReward(Models.QuesSetReward): pass
+class ReadingExerciseReward(QuesSetReward): pass
 
 
 # endregion
@@ -187,7 +188,7 @@ class ReadingExerciseReward(Models.QuesSetReward): pass
 # ===================================================
 @RecordManager.registerQuestionSet("单词题记录",
 	RandomQuestionGenerator)
-class WordExerciseRecord(Models.QuesSetRecord):
+class WordExerciseRecord(QuesSetRecord):
 
 	DEFAULT_COUNT = 50
 
@@ -210,7 +211,7 @@ class WordExerciseRecord(Models.QuesSetRecord):
 #  听力题目记录表
 # ===================================================
 @RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
-class WordExerciseReward(Models.QuesSetReward): pass
+class WordExerciseReward(QuesSetReward): pass
 
 
 # endregion
@@ -223,7 +224,7 @@ class WordExerciseReward(Models.QuesSetReward): pass
 # ===================================================
 @RecordManager.registerQuestionSet("短语题记录",
 	RandomQuestionGenerator)
-class PhraseExerciseRecord(Models.QuesSetRecord):
+class PhraseExerciseRecord(QuesSetRecord):
 
 	DEFAULT_COUNT = 10
 
@@ -246,7 +247,7 @@ class PhraseExerciseRecord(Models.QuesSetRecord):
 #  听力题目记录表
 # ===================================================
 @RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
-class PhraseExerciseReward(Models.QuesSetReward): pass
+class PhraseExerciseReward(QuesSetReward): pass
 
 
 # endregion

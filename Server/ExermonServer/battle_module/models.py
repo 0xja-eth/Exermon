@@ -395,7 +395,8 @@ class BattleRound(models.Model):
 	record = models.ForeignKey('BattleRecord', on_delete=models.CASCADE, verbose_name="对战记录")
 
 	# 题目
-	question = models.ForeignKey('question_module.models.GeneralQuestion', null=True, on_delete=models.CASCADE, verbose_name="题目")
+	question = models.ForeignKey('question_module.GeneralQuestion',
+								 null=True, on_delete=models.CASCADE, verbose_name="题目")
 
 	def __str__(self):
 		return str(self.record)+" 回合 "+str(self.order)

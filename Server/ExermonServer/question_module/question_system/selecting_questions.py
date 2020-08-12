@@ -4,11 +4,11 @@ from django.conf import settings
 from item_module.models import BaseEffect
 
 from ..manager import QuesManager
-import question_module.models as Models
+from ..models import *
+# import question_module.models as Models
 
 from utils.cache_utils import CacheHelper
-from utils.model_utils import QuestionImageUpload, \
-	PlotQuestionImageUpload, Common as ModelUtils
+from utils.model_utils import PlotQuestionImageUpload, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 
 import os, base64
@@ -20,7 +20,7 @@ import os, base64
 #  一般题目表
 # ===================================================
 @QuesManager.registerQuestion("一般题目")
-class GeneralQuestion(Models.SelectingQuestion):
+class GeneralQuestion(SelectingQuestion):
 
 	# 常量声明
 	DEFAULT_SCORE = 6
@@ -84,28 +84,28 @@ class GeneralQuestion(Models.SelectingQuestion):
 #  题目选项表
 # ===================================================
 @QuesManager.registerQuesChoice(GeneralQuestion)
-class GeneralQuesChoice(Models.BaseQuesChoice): pass
+class GeneralQuesChoice(BaseQuesChoice): pass
 
 
 # ===================================================
 #  题目图片表
 # ===================================================
 @QuesManager.registerQuesPicture(GeneralQuestion)
-class GeneralQuesPicture(Models.BaseQuesPicture): pass
+class GeneralQuesPicture(BaseQuesPicture): pass
 
 
 # ===================================================
 #  一般题目记录表
 # ===================================================
 @QuesManager.registerQuesRecord(GeneralQuestion)
-class GeneralQuesRecord(Models.BaseQuesRecord): pass
+class GeneralQuesRecord(BaseQuesRecord): pass
 
 
 # ===================================================
 #  一般题目反馈表
 # ===================================================
 @QuesManager.registerQuesReport(GeneralQuestion)
-class GeneralQuesReport(Models.BaseQuesReport): pass
+class GeneralQuesReport(BaseQuesReport): pass
 
 # endregion
 
@@ -114,7 +114,7 @@ class GeneralQuesReport(Models.BaseQuesReport): pass
 #  剧情题目
 # ===================================================
 @QuesManager.registerQuestion("剧情题目")
-class PlotQuestion(Models.SelectingQuestion):
+class PlotQuestion(SelectingQuestion):
 
 	# 剧情内容
 	plot = models.TextField(verbose_name="剧情内容")
@@ -151,7 +151,7 @@ class PlotQuestion(Models.SelectingQuestion):
 #  剧情题目选项表
 # ===================================================
 @QuesManager.registerQuesChoice(PlotQuestion)
-class PlotQuesChoice(Models.BaseQuesChoice):
+class PlotQuesChoice(BaseQuesChoice):
 
 	# 所需金币
 	gold = models.PositiveSmallIntegerField(default=0, verbose_name="所需金币")

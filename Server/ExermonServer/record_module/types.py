@@ -20,7 +20,13 @@ class QuesSetType(Enum):
 
 QUES_SET_TYPES = [
 	(QuesSetType.Unset.value, '未设置'),
-	(QuesSetType.Exercise.value, '刷题'),
+
+	(QuesSetType.GeneralExercise.value, '常规刷题'),
+	(QuesSetType.ListeningExercise.value, '听力刷题'),
+	(QuesSetType.ReadingExercise.value, '阅读刷题'),
+	(QuesSetType.WordExercise.value, '单词联系'),
+	(QuesSetType.PhraseExercise.value, '短语练习'),
+
 	(QuesSetType.Exam.value, '考试'),
 	(QuesSetType.Battle.value, '对战'),
 ]

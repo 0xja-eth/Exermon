@@ -1,6 +1,6 @@
 import random, time, re
 
-from english_pro_module.models import CorrectType
+from question_module.models import Word, CorrectType
 
 from ..exception import GameException, ErrorType
 from ..view_utils import Common as ViewUtils
@@ -26,7 +26,6 @@ class NewWordsGenerator:
         Returns:
             返回生成的单词ID数组
         """
-        from english_pro_module.models import Word
         random.seed(int(time.time()))
 
         # all_words 为空则自动生成

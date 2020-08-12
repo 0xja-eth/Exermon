@@ -33,7 +33,7 @@ class RecordManager:
 
 			name = cla.__name__.replace('Record', '')
 
-			cla.TYPE = eval("QuestionSetType.%s" % name)
+			cla.TYPE = eval("QuesSetType.%s" % name)
 
 			cla.QUES_GEN_CLASS = ques_gen_cla
 			cla.REWARD_CALC = reward_calc

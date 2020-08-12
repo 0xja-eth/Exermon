@@ -58,7 +58,7 @@ class AdminXHelper:
 			exclude_key = const_key+"_EXCLUDE"
 			if hasattr(model, exclude_key):
 				for key in getattr(model, exclude_key):
-					tmp_val.remove(key)
+					if key in tmp_val: tmp_val.remove(key)
 
 			cls._inhertAttr(adminx_cla, adminx_key, tmp_val)
 

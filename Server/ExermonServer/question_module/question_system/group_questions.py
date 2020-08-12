@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 
 from ..manager import QuesManager
-import question_module.models as Models
+from ..models import *
+# import question_module.models as Models
 
 from utils.model_utils import QuestionAudioUpload
 from utils.exception import ErrorType, GameException
@@ -14,7 +15,7 @@ import os, base64
 #  听力题
 # ===================================================
 @QuesManager.registerQuestion("听力题")
-class ListeningQuestion(Models.GroupQuestion):
+class ListeningQuestion(GroupQuestion):
 
 	# 重复次数
 	times = models.PositiveSmallIntegerField(default=2, verbose_name="重复次数")
@@ -50,60 +51,60 @@ class ListeningQuestion(Models.GroupQuestion):
 #  听力小题
 # ===================================================
 @QuesManager.registerSubQuestion(ListeningQuestion)
-class ListeningSubQuestion(Models.SelectingQuestion): pass
+class ListeningSubQuestion(SelectingQuestion): pass
 
 
 # ===================================================
 #  听力题目选项表
 # ===================================================
 @QuesManager.registerQuesChoice(ListeningSubQuestion)
-class ListeningQuesChoice(Models.BaseQuesChoice): pass
+class ListeningQuesChoice(BaseQuesChoice): pass
 
 
 # ===================================================
 #  听力题目记录表
 # ===================================================
 @QuesManager.registerQuesRecord(ListeningQuestion)
-class ListeningQuesRecord(Models.BaseQuesRecord): pass
+class ListeningQuesRecord(BaseQuesRecord): pass
 
 
 # ===================================================
 #  听力题目反馈表
 # ===================================================
 @QuesManager.registerQuesReport(ListeningQuestion)
-class ListeningQuesReport(Models.BaseQuesReport): pass
+class ListeningQuesReport(BaseQuesReport): pass
 
 
 # ===================================================
 #  阅读题
 # ===================================================
 @QuesManager.registerQuestion("阅读题")
-class ReadingQuestion(Models.GroupQuestion): pass
+class ReadingQuestion(GroupQuestion): pass
 
 
 # ===================================================
 #  阅读小题
 # ===================================================
 @QuesManager.registerSubQuestion(ReadingQuestion)
-class ReadingSubQuestion(Models.SelectingQuestion): pass
+class ReadingSubQuestion(SelectingQuestion): pass
 
 
 # ===================================================
 #  阅读题目选项表
 # ===================================================
 @QuesManager.registerQuesChoice(ReadingSubQuestion)
-class ReadingQuesChoice(Models.BaseQuesChoice): pass
+class ReadingQuesChoice(BaseQuesChoice): pass
 
 
 # ===================================================
 #  阅读题目记录表
 # ===================================================
 @QuesManager.registerQuesRecord(ReadingQuestion)
-class ReadingQuesRecord(Models.BaseQuesRecord): pass
+class ReadingQuesRecord(BaseQuesRecord): pass
 
 
 # ===================================================
 #  阅读题目反馈表
 # ===================================================
 @QuesManager.registerQuesReport(ReadingQuestion)
-class ReadingQuesReport(Models.BaseQuesReport): pass
+class ReadingQuesReport(BaseQuesReport): pass

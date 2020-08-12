@@ -1,7 +1,8 @@
 from django.db import models
 
 from ..manager import QuesManager
-import question_module.models as Models
+from ..models import *
+# import question_module.models as Models
 
 from enum import Enum
 
@@ -10,7 +11,7 @@ from enum import Enum
 #  单词
 # ===================================================
 @QuesManager.registerQuestion("单词")
-class Word(Models.ElementQuestion):
+class Word(ElementQuestion):
 
 	# 标准用时（秒）
 	STD_TIME = 15
@@ -53,7 +54,7 @@ class Word(Models.ElementQuestion):
 #  单词记录表
 # ===================================================
 @QuesManager.registerQuesRecord(Word)
-class WordRecord(Models.BaseQuesRecord):
+class WordRecord(BaseQuesRecord):
 
 	LIST_EDITABLE_EXCLUDE = ['word', 'record', 'count']
 
@@ -87,7 +88,7 @@ class WordRecord(Models.BaseQuesRecord):
 #  单词记录表
 # ===================================================
 @QuesManager.registerQuesReport(Word)
-class WordReport(Models.BaseQuesReport): pass
+class WordReport(BaseQuesReport): pass
 
 
 # ===================================================
@@ -103,7 +104,7 @@ class PhraseType(Enum):
 #  短语
 # ===================================================
 @QuesManager.registerQuestion("短语")
-class Phrase(Models.ElementQuestion):
+class Phrase(ElementQuestion):
 
 	PHRASE_TYPES = [
 		(PhraseType.SB.value, '包含 sb. 的短语选项'),
@@ -149,11 +150,11 @@ class Phrase(Models.ElementQuestion):
 #  单词记录表
 # ===================================================
 @QuesManager.registerQuesRecord(Phrase)
-class PhraseRecord(Models.BaseQuesRecord): pass
+class PhraseRecord(BaseQuesRecord): pass
 
 
 # ===================================================
 #  单词记录表
 # ===================================================
 @QuesManager.registerQuesReport(Phrase)
-class PhraseReport(Models.BaseQuesReport): pass
+class PhraseReport(BaseQuesReport): pass

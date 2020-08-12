@@ -15,10 +15,6 @@ class ExerciseQuestionsInline(object):
 	style = "table"
 
 
-@AdminXHelper.relatedModel(GeneralQuesRecord)
-class QuestionRecordAdmin(object): pass
-
-
 @AdminXHelper.relatedModel(SelectingPlayerQuestion)
 class PlayerQuestionAdmin(object): pass
 

@@ -4,13 +4,11 @@ from django.conf import settings
 from .item_system.items import *
 
 from game_module.models import GroupConfigure
-from question_module.models import SelectingQuestion, BaseQuesChoice, GroupQuestion
+from question_module.models import WordRecord
 
-from utils.model_utils import QuestionAudioUpload, PlotQuestionImageUpload, Common as ModelUtils
-from utils.exception import ErrorType, GameException
+from utils.model_utils import Common as ModelUtils
 
-import os, base64, datetime, jsonfield, random
-from enum import Enum
+import jsonfield, random
 
 # region 配置
 

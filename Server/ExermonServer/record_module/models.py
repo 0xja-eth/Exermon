@@ -386,7 +386,7 @@ class GroupPlayerQuestion(BasePlayerQuestion):
 class ElementPlayerQuestion(BasePlayerQuestion):
 
 	# 回答
-	answer = models.CharField(null=True, empty=True,
+	answer = models.CharField(null=True, blank=True,
 							  max_length=64, verbose_name="回答")
 
 	# 选项（字符串数组）

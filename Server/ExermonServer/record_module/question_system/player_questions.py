@@ -6,7 +6,9 @@ from ..manager import RecordManager
 
 from question_module.models import *
 
-import record_module.models as Models
+from ..models import *
+
+# import record_module.models as Models
 
 from utils.calc_utils.question_calc import *
 
@@ -19,7 +21,7 @@ import jsonfield
 @RecordManager.registerPlayerQuestion(
 	GeneralQuestion, GeneralExerciseRecord,
 	RecordSource.Exercise, ExerciseSingleRewardCalc)
-class GeneralExerciseQuestion(Models.SelectingPlayerQuestion): pass
+class GeneralExerciseQuestion(SelectingPlayerQuestion): pass
 
 
 # ===================================================
@@ -27,7 +29,7 @@ class GeneralExerciseQuestion(Models.SelectingPlayerQuestion): pass
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	ListeningQuestion, ListeningExerciseRecord, RecordSource.Exercise)
-class ListeningExerciseQuestion(Models.GroupPlayerQuestion): pass
+class ListeningExerciseQuestion(GroupPlayerQuestion): pass
 
 
 # ===================================================
@@ -35,7 +37,7 @@ class ListeningExerciseQuestion(Models.GroupPlayerQuestion): pass
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	ReadingQuestion, ReadingExerciseRecord, RecordSource.Exercise)
-class ReadingExerciseQuestion(Models.GroupPlayerQuestion): pass
+class ReadingExerciseQuestion(GroupPlayerQuestion): pass
 
 
 # ===================================================
@@ -43,7 +45,7 @@ class ReadingExerciseQuestion(Models.GroupPlayerQuestion): pass
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	Word, WordExerciseRecord, RecordSource.Exercise)
-class WordExerciseQuestion(Models.ElementPlayerQuestion):
+class WordExerciseQuestion(ElementPlayerQuestion):
 
 	# 是否默写
 	dictation = models.BooleanField(default=False, verbose_name="默写")
@@ -85,7 +87,7 @@ class WordExerciseQuestion(Models.ElementPlayerQuestion):
 # ===================================================
 @RecordManager.registerPlayerQuestion(
 	Phrase, PhraseExerciseRecord, RecordSource.Exercise)
-class PhraseExerciseQuestion(Models.ElementPlayerQuestion):
+class PhraseExerciseQuestion(ElementPlayerQuestion):
 
 	def _generateChoices(self):
 		pass
