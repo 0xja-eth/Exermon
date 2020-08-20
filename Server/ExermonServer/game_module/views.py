@@ -20,7 +20,8 @@ class Service:
 
 	# 获取静态数据
 	@classmethod
-	async def getStaticData(cls, consumer, main_version: str, sub_version: str, cached: bool):
+	async def getStaticData(cls, consumer, main_version: str,
+							sub_version: str, cached: bool):
 		# 返回数据：
 		# data: 静态数据 => 系统的静态配置数据
 
@@ -41,6 +42,7 @@ class Service:
 	def _generateStaticData(cls, updated):
 
 		cur_version = Common.getCurVersion()
+
 		data = cls._generateVersionsData(cur_version)
 
 		if updated:
@@ -51,8 +53,8 @@ class Service:
 	# 生成动态数据
 	@classmethod
 	def _generateDynamicData(cls):
-		configure = GameConfigure.get()
-		return configure.convert("dynamic")
+
+		return GameConfigure.get().convert("dynamic")
 
 	# 生成版本数据
 	@classmethod
@@ -66,65 +68,65 @@ class Service:
 			'last_versions': last_versions,
 		}
 
-	# 生成资源数据
-	@classmethod
-	def _generateResourceData(cls):
-		from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, GameEquip
-		from player_module.models import Character, GameItem, HumanEquip
-		from question_module.models import QuesSugar
-
-		# eng_pro
-		from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy, ExerProState, ExerProMap
-
-		exermons = ModelUtils.objectsToDict(Exermon.objects.all())
-		exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
-		exer_skills = ModelUtils.objectsToDict(ExerSkill.objects.all())
-		exer_gifts = ModelUtils.objectsToDict(ExerGift.objects.all())
-		exer_items = ModelUtils.objectsToDict(ExerItem.objects.all())
-		exer_equips = ModelUtils.objectsToDict(GameEquip.objects.all())
-		human_items = ModelUtils.objectsToDict(GameItem.objects.all())
-		human_equips = ModelUtils.objectsToDict(HumanEquip.objects.all())
-		ques_sugars = ModelUtils.objectsToDict(QuesSugar.objects.all())
-		characters = ModelUtils.objectsToDict(Character.objects.all())
-
-		# eng_pro
-		exer_pro_items = ModelUtils.objectsToDict(ExerProItem.objects.all())
-		exer_pro_potions = ModelUtils.objectsToDict(ExerProPotion.objects.all())
-		exer_pro_cards = ModelUtils.objectsToDict(ExerProCard.objects.all())
-		exer_pro_enemies = ModelUtils.objectsToDict(ExerProEnemy.objects.all())
-		exer_pro_states = ModelUtils.objectsToDict(ExerProState.objects.all())
-
-		exer_pro_maps = ModelUtils.objectsToDict(ExerProMap.objects.all())
-
-		return {
-			'exermons': exermons,
-			'exer_frags': exer_frags,
-			'exer_skills': exer_skills,
-			'exer_gifts': exer_gifts,
-			'exer_items': exer_items,
-			'exer_equips': exer_equips,
-			'human_items': human_items,
-			'human_equips': human_equips,
-			'ques_sugars': ques_sugars,
-			'characters': characters,
-
-			# eng_pro
-			'exer_pro_items': exer_pro_items,
-			'exer_pro_potions': exer_pro_potions,
-			'exer_pro_cards': exer_pro_cards,
-			'exer_pro_enemies': exer_pro_enemies,
-			'exer_pro_states': exer_pro_states,
-
-			'exer_pro_maps': exer_pro_maps,
-		}
+	# # 生成资源数据
+	# @classmethod
+	# def _generateResourceData(cls):
+	# 	from exermon_module.models import Exermon, ExerFrag, ExerGift, ExerSkill, ExerItem, GameEquip
+	# 	from player_module.models import Character, GameItem
+	#
+	# 	# eng_pro
+	# 	from english_pro_module.models import ExerProItem, ExerProPotion, ExerProCard, ExerProEnemy, ExerProState, ExerProMap
+	#
+	# 	exermons = ModelUtils.objectsToDict(Exermon.objects.all())
+	# 	exer_frags = ModelUtils.objectsToDict(ExerFrag.objects.all())
+	# 	exer_skills = ModelUtils.objectsToDict(ExerSkill.objects.all())
+	# 	exer_gifts = ModelUtils.objectsToDict(ExerGift.objects.all())
+	# 	exer_items = ModelUtils.objectsToDict(ExerItem.objects.all())
+	# 	exer_equips = ModelUtils.objectsToDict(GameEquip.objects.all())
+	# 	human_items = ModelUtils.objectsToDict(GameItem.objects.all())
+	# 	human_equips = ModelUtils.objectsToDict(HumanEquip.objects.all())
+	# 	ques_sugars = ModelUtils.objectsToDict(QuesSugar.objects.all())
+	# 	characters = ModelUtils.objectsToDict(Character.objects.all())
+	#
+	# 	# eng_pro
+	# 	exer_pro_items = ModelUtils.objectsToDict(ExerProItem.objects.all())
+	# 	exer_pro_potions = ModelUtils.objectsToDict(ExerProPotion.objects.all())
+	# 	exer_pro_cards = ModelUtils.objectsToDict(ExerProCard.objects.all())
+	# 	exer_pro_enemies = ModelUtils.objectsToDict(ExerProEnemy.objects.all())
+	# 	exer_pro_states = ModelUtils.objectsToDict(ExerProState.objects.all())
+	#
+	# 	exer_pro_maps = ModelUtils.objectsToDict(ExerProMap.objects.all())
+	#
+	# 	return {
+	# 		'exermons': exermons,
+	# 		'exer_frags': exer_frags,
+	# 		'exer_skills': exer_skills,
+	# 		'exer_gifts': exer_gifts,
+	# 		'exer_items': exer_items,
+	# 		'exer_equips': exer_equips,
+	# 		'human_items': human_items,
+	# 		'human_equips': human_equips,
+	# 		'ques_sugars': ques_sugars,
+	# 		'characters': characters,
+	#
+	# 		# eng_pro
+	# 		'exer_pro_items': exer_pro_items,
+	# 		'exer_pro_potions': exer_pro_potions,
+	# 		'exer_pro_cards': exer_pro_cards,
+	# 		'exer_pro_enemies': exer_pro_enemies,
+	# 		'exer_pro_states': exer_pro_states,
+	#
+	# 		'exer_pro_maps': exer_pro_maps,
+	# 	}
 
 	# 生成主体数据
+
 	@classmethod
 	def _generateMainData(cls, data, cur_version: GameVersion):
-		configure = cur_version.configure
+		configure: GameConfigure = cur_version.configure
 
 		data['configure'] = configure.convert("static")
-		data['data'] = cls._generateResourceData()
+		data['data'] = configure.convert("game")
 
 		return data
 

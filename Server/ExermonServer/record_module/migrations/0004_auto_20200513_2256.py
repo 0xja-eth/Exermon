@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='exercisequestion',
             name='exercise',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='record_module.question_system.question_sets.GeneralExerciseRecord', verbose_name='刷题记录'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='record_module.GeneralExerciseRecord', verbose_name='刷题记录'),
         ),
     ]

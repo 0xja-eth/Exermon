@@ -2,9 +2,9 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 from utils.exception import ErrorType
-from utils.model_utils import Common as ModelUtils
-from game_module.models import GroupConfigure
+from utils.model_utils import BaseModel, StaticData, DynamicData, Common as ModelUtils
 from utils.calc_utils import NewSeasonStarNumCalc
+
 import datetime
 
 # Create your models here.
@@ -13,7 +13,7 @@ import datetime
 # =======================
 # 赛季记录表
 # =======================
-class SeasonRecord(models.Model):
+class SeasonRecord(BaseModel):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "赛季记录"
@@ -228,7 +228,7 @@ class SeasonRecord(models.Model):
 # =======================
 # 禁赛记录表
 # =======================
-class SuspensionRecord(models.Model):
+class SuspensionRecord(BaseModel):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "禁赛记录"
@@ -268,7 +268,7 @@ class SuspensionRecord(models.Model):
 # =======================
 # 赛季配置表
 # =======================
-class CompSeason(GroupConfigure):
+class CompSeason(DynamicData):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "赛季信息"
@@ -297,21 +297,6 @@ class CompSeason(GroupConfigure):
 
 		return rank_list.convert(player, count)
 
-	def convert(self, type=None, player=None, count=None):
-
-		if type == "ranks":
-			return self._convertRanksData(player, count)
-
-		res = super().convert()
-
-		start_time = ModelUtils.timeToStr(self.start_time)
-		end_time = ModelUtils.timeToStr(self.end_time)
-
-		res['start_time'] = start_time
-		res['end_time'] = end_time
-
-		return res
-
 	def seasonRecords(self) -> QuerySet:
 		"""
 		获取赛季的所有玩家记录
@@ -334,7 +319,7 @@ class CompSeason(GroupConfigure):
 # =======================
 # 段位配置表
 # =======================
-class CompRank(GroupConfigure):
+class CompRank(StaticData):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "段位信息"
@@ -368,16 +353,6 @@ class CompRank(GroupConfigure):
 		return format_html(res)
 
 	adminColor.short_description = "星级颜色"
-
-	def convert(self):
-		res = super().convert()
-
-		res['color'] = self.color
-		res['sub_rank_num'] = self.sub_rank_num
-		res['score_factor'] = self.score_factor
-		res['offset_factor'] = self.offset_factor
-
-		return res
 
 	# 计算每个段位需要的星星数量
 	def rankStars(self):

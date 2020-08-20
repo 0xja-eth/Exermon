@@ -292,6 +292,8 @@ class Common:
 		if value is None and not accept_none:
 			raise GameException(ErrorType.ParameterError)
 
+		from .data_manager import DataLoader
+
 		try:
 			if type == 'int':
 				value = int(value)
@@ -317,10 +319,10 @@ class Common:
 				value = bool(value)
 
 			elif type == 'date':
-				value = datetime.datetime.strptime(value, '%Y-%m-%d')
+				value = DataLoader.loadDate(value)
 
 			elif type == 'datetime':
-				value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+				value = DataLoader.loadDateTime(value)
 
 			# 其他类型判断
 			return value

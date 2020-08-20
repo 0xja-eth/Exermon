@@ -326,7 +326,7 @@ class Common:
 	# 获取题目记录
 	@classmethod
 	def getQuestionRecord(cls, type_: int = None, cla: BaseQuesRecord = None,
-						  error: ErrorType = ErrorType.QuestionRecordNotExist,
+						  error: ErrorType = ErrorType.QuesRecordNotExist,
 						  **kwargs) -> BaseQuesRecord:
 		if cla is None:
 			cla = cls.getQuesRecordClass(type_)
@@ -336,7 +336,7 @@ class Common:
 	# 获取题目反馈
 	@classmethod
 	def getQuestionReport(cls, type_: int = None, cla: BaseQuesRecord = None,
-						  error: ErrorType = ErrorType.QuestionRecordNotExist,
+						  error: ErrorType = ErrorType.QuesRecordNotExist,
 						  **kwargs) -> BaseQuesReport:
 		if cla is None:
 			cla = cls.getQuesReportClass(type_)

@@ -14,7 +14,7 @@ class RecordManager:
 	"""
 
 	@classmethod
-	def registerQuestionSet(cls, verbose_name,
+	def registerQuesSet(cls, verbose_name,
 							ques_gen_cla: BaseQuestionGenerator,
 							reward_calc: QuesSetResultRewardCalc = None):
 		"""
@@ -26,7 +26,7 @@ class RecordManager:
 			# cont_item_cla (type): 容器项类
 		"""
 		def wrapper(cla: QuesSetRecord):
-			print("registerQuestionSet: %s" % cla)
+			print("registerQuesSet: %s" % cla)
 
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name
@@ -45,7 +45,7 @@ class RecordManager:
 		return wrapper
 
 	@classmethod
-	def registerQuestionSetReward(cls, question_set_cla: QuesSetRecord):
+	def registerQuesSetReward(cls, question_set_cla: QuesSetRecord):
 		"""
 		注册题目集奖励
 		Args:

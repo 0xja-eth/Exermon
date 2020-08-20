@@ -123,7 +123,7 @@ class Service:
 
         pro_record = Common.getExerProRecord(player)
 
-        return {'word_records': pro_record.convert("records")}
+        return pro_record.convert("records")
 
     # 回答当前轮单词
     @classmethod

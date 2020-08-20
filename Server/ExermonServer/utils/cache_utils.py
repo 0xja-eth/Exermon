@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models.query import QuerySet
+
+from .model_utils import BaseModel
 from .exception import *
 
 
@@ -193,7 +195,7 @@ class CacheItem:
 		"""
 		加入数据
 		Args:
-			obj (models.Model): 数据
+			obj (BaseModel): 数据
 		"""
 		self._genData()
 
@@ -206,7 +208,7 @@ class CacheItem:
 		"""
 		移除数据
 		Args:
-			obj (models.Model): 数据
+			obj (BaseModel): 数据
 		"""
 		if self._isReloadEmpty(): return
 
@@ -800,7 +802,7 @@ class CacheableObject:
 # ===================================================
 #  缓存机制模型
 # ===================================================
-class CacheableModel(models.Model, CacheableObject):
+class CacheableModel(BaseModel, CacheableObject):
 
 	class Meta:
 		abstract = True
@@ -847,23 +849,6 @@ class CacheableModel(models.Model, CacheableObject):
 	# 需要缓存的模型类列表（必须为 外键）
 	@classmethod
 	def _cacheForeignKeyModels(cls): return []
-
-	# 从数据库获取
-	def _getOneToOneModelInDb(self, cla):
-		name = cla.__name__.lower()
-		try:
-			return getattr(self, name)
-		# 捕捉到异常就跳过
-		except cla.DoesNotExist: return None
-		except AttributeError: return None
-
-	# 从数据库获取
-	def _getForeignKeyModelInDb(self, cla) -> QuerySet:
-		name = cla.__name__.lower() + '_set'
-		try:
-			return getattr(self, name).all()
-		except AttributeError:
-			return None
 
 	def _getOneToOneCache(self, key) -> models.Model:
 		if key in self._cacheOneToOneModels():

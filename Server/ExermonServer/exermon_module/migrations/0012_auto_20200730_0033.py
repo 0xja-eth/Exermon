@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='exerequipslotitem',
             name='pack_equip',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='exermon_module.item_system.cont_items.EquipPackItem', verbose_name='艾瑟萌背包装备'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='exermon_module.EquipPackItem', verbose_name='艾瑟萌背包装备'),
         ),
         migrations.AlterField(
             model_name='exerfragpackitem',
@@ -147,17 +147,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='exerpackequip',
             name='container',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.containers.EquipPack', verbose_name='容器'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.EquipPack', verbose_name='容器'),
         ),
         migrations.AlterField(
             model_name='exerpackequip',
             name='item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.items.GameEquip', verbose_name='物品'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.GameEquip', verbose_name='物品'),
         ),
         migrations.AlterField(
             model_name='exerpackitem',
             name='container',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.containers.EquipPack', verbose_name='容器'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.EquipPack', verbose_name='容器'),
         ),
         migrations.AlterField(
             model_name='exerpackitem',

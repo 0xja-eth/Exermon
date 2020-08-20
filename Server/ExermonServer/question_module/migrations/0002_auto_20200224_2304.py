@@ -123,7 +123,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='quessugar',
             name='question',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='对应题目'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='对应题目'),
         ),
         migrations.CreateModel(
             name='QuesReport',
@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
                 ('type', models.PositiveSmallIntegerField(choices=[(1, '题目错误'), (2, '图片错误'), (3, '答案错误'), (4, '科目错误'), (5, '难度分配错误'), (0, '其他')], verbose_name='类型')),
                 ('description', models.CharField(max_length=256, verbose_name='描述')),
                 ('player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='player_module.Player', verbose_name='玩家')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='题目')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='题目')),
             ],
             options={
                 'verbose_name': '题目反馈',
@@ -145,7 +145,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('number', models.PositiveSmallIntegerField(verbose_name='序号')),
                 ('file', models.ImageField(upload_to=utils.model_utils.QuestionImageUpload(), verbose_name='图片文件')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='所属题目')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='所属题目')),
             ],
             options={
                 'verbose_name': '题目图片',
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
                 ('order', models.PositiveSmallIntegerField(verbose_name='编号')),
                 ('text', models.TextField(verbose_name='文本')),
                 ('answer', models.BooleanField(default=False, verbose_name='正误')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='所属问题')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='所属问题')),
             ],
             options={
                 'verbose_name': '题目选项',

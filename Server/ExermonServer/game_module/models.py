@@ -1,7 +1,8 @@
 from django.db import models
 from django.db.models.query import QuerySet
 
-from utils.model_utils import CoreModel, Common as ModelUtils
+from utils.model_utils import BaseModel, StaticData, \
+	DynamicData, CoreDataManager, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import GameException, ErrorType
 
@@ -14,7 +15,7 @@ import jsonfield
 # ===================================================
 # 游戏版本记录表
 # ===================================================
-class GameVersion(models.Model):
+class GameVersion(BaseModel):
 
 	class Meta:
 
@@ -83,27 +84,17 @@ class GameVersion(models.Model):
 		self.is_used = True
 		self.save()
 
-	def convert(self):
-
-		update_time = ModelUtils.timeToStr(self.update_time)
-
-		return {
-			'main_version': self.main_version,
-			'sub_version': self.sub_version,
-			'update_time': update_time,
-			'update_note': self.update_note,
-			'description': self.description
-		}
-
 
 # ===================================================
 #  属性值表（用于艾瑟萌属性以及属性增减等）
 # ===================================================
-class ParamValue(models.Model):
+class ParamValue(BaseModel):
 
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "属性值"
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['value']
 
 	# 属性类型
 	param = models.ForeignKey("game_module.BaseParam",
@@ -249,11 +240,10 @@ class ParamValue(models.Model):
 	def isPercent(self):
 		return self.param.isPercent()
 
-	def convert(self):
-		return {
-			'param_id': self.param_id,
-			'value': self.getValue(),
-		}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['value'] = self.getValue()
 
 
 # ===================================================
@@ -291,6 +281,8 @@ class EquipParamValue(ParamValue):
 		abstract = True
 		verbose_name = verbose_name_plural = "装备属性值"
 
+	KEY_NAME = 'base_params'
+
 
 # ===================================================
 #  装备属性率
@@ -300,6 +292,8 @@ class EquipParamRate(EquipParamValue):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "装备属性率"
+
+	KEY_NAME = 'level_params'
 
 	# 比例
 	def scale(self):
@@ -321,11 +315,13 @@ class EquipParamRate(EquipParamValue):
 # ===================================================
 #  属性值区间表
 # ===================================================
-class ParamValueRange(models.Model):
+class ParamValueRange(BaseModel):
 
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "属性值区间"
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['min_value', 'max_value']
 
 	# 属性类型
 	param = models.ForeignKey("game_module.BaseParam",
@@ -354,13 +350,12 @@ class ParamValueRange(models.Model):
 	def getValue(self):
 		return self.min_value/self.scale(), self.max_value/self.scale()
 
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 		values = self.getValue()
-		return {
-			'param_id': self.param_id,
-			'min_value': values[0],
-			'max_value': values[1],
-		}
+
+		res['min_value'] = values[0]
+		res['max_value'] = values[1]
 
 
 # ===================================================
@@ -378,46 +373,6 @@ class ParamRateRange(ParamValueRange):
 
 
 # ===================================================
-# 集合型配置
-# ===================================================
-class GroupConfigure(CoreModel):
-
-	class Meta:
-		abstract = True
-
-	# 所属配置
-	configure = models.ForeignKey('game_module.GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
-
-	# 名称
-	name = models.CharField(max_length=8, verbose_name="名称")
-
-	# 描述
-	description = models.CharField(max_length=64, blank=True, verbose_name="描述")
-
-	def __str__(self):
-		return self.name
-
-	def convert(self) -> dict:
-		"""
-		将数据转化为字典
-		Returns:
-			转化后的字典
-		"""
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description
-		}
-
-	# 读取参数
-	@classmethod
-	def _setupKwargs(cls):
-		configure: GameConfigure = GameConfigure.get()
-
-		return {"configure": configure}
-
-
-# ===================================================
 # 小贴士类型枚举
 # ===================================================
 class TipType(Enum):
@@ -430,7 +385,7 @@ class TipType(Enum):
 # ===================================================
 # 游戏小贴士
 # ===================================================
-class GameTip(GroupConfigure):
+class GameTip(DynamicData):
 
 	class Meta:
 
@@ -448,18 +403,11 @@ class GameTip(GroupConfigure):
 	type = models.PositiveSmallIntegerField(default=TipType.Study.value,
 											choices=TYPES, verbose_name="小贴士类型")
 
-	def convert(self, type: str = None, **kwargs):
-		res = super().convert()
-
-		res['type'] = self.type
-
-		return res
-
 
 # ===================================================
 #  科目表
 # ===================================================
-class Subject(GroupConfigure):
+class Subject(StaticData):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "科目"
@@ -490,20 +438,11 @@ class Subject(GroupConfigure):
 
 	adminColor.short_description = "科目颜色"
 
-	def convert(self):
-		res = super().convert()
-
-		res['color'] = self.color
-		res['max_score'] = self.max_score
-		res['force'] = self.force
-
-		return res
-
 
 # ===================================================
 # 基本属性表
 # ===================================================
-class BaseParam(GroupConfigure):
+class BaseParam(StaticData):
 
 	# MHP = 1  # 体力值
 	# MMP = 2  # 精力值
@@ -548,18 +487,6 @@ class BaseParam(GroupConfigure):
 
 	adminColor.short_description = "属性颜色"
 
-	def convert(self):
-		res = super().convert()
-
-		res['color'] = self.color
-		res['attr'] = self.attr
-		res['max_value'] = self.max_value
-		res['min_value'] = self.min_value
-		res['default'] = self.default
-		res['scale'] = self.scale
-
-		return res
-
 	# clamp 属性值
 	def clamp(self, val):
 
@@ -582,7 +509,7 @@ class BaseParam(GroupConfigure):
 # ===================================================
 # 可用物品类型
 # ===================================================
-class UsableItemType(GroupConfigure):
+class GameItemType(StaticData):
 
 	# Supply = 1  # 补给道具
 	# Reinforce = 2  # 强化道具
@@ -594,25 +521,7 @@ class UsableItemType(GroupConfigure):
 
 	class Meta:
 
-		verbose_name = verbose_name_plural = "可用物品类型"
-
-	NOT_EXIST_ERROR = ErrorType.TypeNotExist
-
-
-# ===================================================
-# 人类装备类型
-# ===================================================
-class HumanEquipType(GroupConfigure):
-
-	# Weapon = 1  # 武器
-	# Head = 2  # 头部
-	# Body = 3  # 身体
-	# Foot = 4  # 腿部
-	# Other = 5  # 其他
-
-	class Meta:
-
-		verbose_name = verbose_name_plural = "人类装备类型"
+		verbose_name = verbose_name_plural = "物品类型"
 
 	NOT_EXIST_ERROR = ErrorType.TypeNotExist
 
@@ -620,7 +529,7 @@ class HumanEquipType(GroupConfigure):
 # ===================================================
 # 艾瑟萌装备类型
 # ===================================================
-class ExerEquipType(GroupConfigure):
+class GameEquipType(StaticData):
 
 	# Weapon = 1  # 武器
 	# Head = 2  # 头部
@@ -630,7 +539,7 @@ class ExerEquipType(GroupConfigure):
 
 	class Meta:
 
-		verbose_name = verbose_name_plural = "艾瑟萌装备类型"
+		verbose_name = verbose_name_plural = "装备类型"
 
 	NOT_EXIST_ERROR = ErrorType.TypeNotExist
 
@@ -662,7 +571,7 @@ class ExerParamRateRange(ParamRateRange):
 # ===================================================
 #  艾瑟萌星级表
 # ===================================================
-class ExerStar(GroupConfigure):
+class ExerStar(StaticData):
 
 	class Meta:
 
@@ -743,22 +652,17 @@ class ExerStar(GroupConfigure):
 		res['base_ranges'] = ModelUtils.objectsToDict(self.paramBaseRanges())
 		res['rate_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
 
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		level_exp_factors: dict = self.level_exp_factors
-		level_exp_factors = list(level_exp_factors.values())
+		if type is None:
 
-		res = {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-			'max_level': self.max_level,
-			'level_exp_factors': level_exp_factors
-		}
+			level_exp_factors: dict = self.level_exp_factors
+			level_exp_factors = list(level_exp_factors.values())
+
+			res['level_exp_factors'] = level_exp_factors
 
 		self._convertParamsToDict(res)
-
-		return res
 
 	# 获取所有的属性基本值
 	def paramBaseRanges(self):
@@ -784,7 +688,7 @@ class ExerGiftParamRateRange(ParamRateRange):
 # ===================================================
 #  艾瑟萌天赋星级表
 # ===================================================
-class ExerGiftStar(GroupConfigure):
+class ExerGiftStar(StaticData):
 
 	class Meta:
 
@@ -810,14 +714,10 @@ class ExerGiftStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-			'param_ranges': ModelUtils.objectsToDict(self.paramRateRanges()),
-		}
+		res['param_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
 
 	# 获取所有的属性成长率
 	def paramRateRanges(self):
@@ -827,7 +727,7 @@ class ExerGiftStar(GroupConfigure):
 # ===================================================
 #  物品星级表
 # ===================================================
-class ItemStar(GroupConfigure):
+class ItemStar(StaticData):
 
 	class Meta:
 
@@ -851,19 +751,11 @@ class ItemStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convert(self):
-
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-		}
-
 
 # ===================================================
 #  题目星级表
 # ===================================================
-class QuestionStar(GroupConfigure):
+class QuestionStar(StaticData):
 	class Meta:
 		verbose_name = verbose_name_plural = "题目星级"
 
@@ -902,24 +794,11 @@ class QuestionStar(GroupConfigure):
 
 	adminColor.short_description = "星级颜色"
 
-	def convert(self):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-			'level': self.level,
-			'weight': self.weight,
-			'exp_incr': self.exp_incr,
-			'gold_incr': self.gold_incr,
-			'std_time': self.std_time,
-			'min_time': self.min_time
-		}
-
 
 # ===================================================
 # 游戏配置表
 # ===================================================
-class GameConfigure(models.Model):
+class GameConfigure(BaseModel):
 
 	class Meta:
 
@@ -949,45 +828,20 @@ class GameConfigure(models.Model):
 	def __str__(self):
 		return "%d. %s 配置" % (self.id, self.name)
 
-	def convert(self, type="static"):
+	# region Static Data
 
-		if type == 'static': return self._convertStaticDataToDict()
-		if type == 'dynamic': return self._convertDynamicDataToDict()
-
-	@classmethod
-	def groupConfigures(cls):
-		from utils.model_utils import AdminXHelper
-
-		return AdminXHelper.allRelatedModels(cls)
-
-	def _convertGroupConfigureToDict(self, data):
-		from utils.data_manager import DataManager
-		group_configure_clas = self.groupConfigures()
-
-		for cla in group_configure_clas:
-
-			if GroupConfigure not in cla.mro(): continue
-
-			cla_name = cla.__name__
-			key_name = DataManager.hump2Underline(cla_name) + 's'
-			attr_name = cla_name.lower() + '_set'
-
-			objs = getattr(self, attr_name).all()
-
-			data[key_name] = ModelUtils.objectsToDict(objs)
-
-	def _convertStaticDataToDict(self):
+	def __convertStaticValues(self):
 		from item_module.models import UsableItem
 		from player_module.models import Character, Player
 		from exermon_module.models import Exermon, ExerSkill
-		from question_module.models import GeneralQuestion, BaseQuesReport
+		from question_module.models import GeneralQuestion, BaseQuesReport, WrongItem
 		from record_module.models import GeneralQuesRecord, GeneralExerciseRecord
 		from battle_module.models import BattleRecord, BattlePlayer, BattleRoundResult
-		from english_pro_module.models import WrongItem, ExerProCard, ExerProEnemy
+		from english_pro_module.models import ExerProCard, ExerProEnemy
 
 		min_birth = ModelUtils.dateToStr(Player.MIN_BIRTH)
 
-		data = {
+		return {
 			'name': self.name,
 			'eng_name': self.eng_name,
 			'gold': self.gold,
@@ -1036,23 +890,94 @@ class GameConfigure(models.Model):
 			'enemy_types': ExerProEnemy.ENEMY_TYPES,
 		}
 
-		self._convertGroupConfigureToDict(data)
+	def __convertStaticModel(self, data):
+		from utils.data_manager import DataManager
+
+		static_clas = CoreDataManager.getStaticData()
+
+		for cla in static_clas:
+
+			cla_name = cla.__name__
+			key_name = DataManager.hump2Underline(cla_name) + 's'
+			attr_name = cla_name.lower() + '_set'
+
+			objs = getattr(self, attr_name).all()
+
+			data[key_name] = ModelUtils.objectsToDict(objs)
 
 		return data
 
-	def _convertDynamicDataToDict(self):
+	def _convertStaticData(self):
+
+		data = self.__convertStaticValues()
+
+		return self.__convertStaticModel(data)
+
+	# endregion
+
+	# region Dynamic Data
+
+	@classmethod
+	def __convertDynamicModel(cls, data):
+		from utils.data_manager import DataManager
+
+		dynamic_clas = CoreDataManager.getDynamicData()
+
+		for cla in dynamic_clas:
+
+			cla_name = cla.__name__
+			key_name = DataManager.hump2Underline(cla_name) + 's'
+
+			objs = cla.objects.all()
+
+			data[key_name] = ModelUtils.objectsToDict(objs)
+
+		return data
+
+	@classmethod
+	def __convertDynamicValues(cls):
+
 		from season_module.runtimes import SeasonManager
 
-		seasons = ModelUtils.objectsToDict(self.compseason_set.all())
 		cur_season_id = SeasonManager.getCurrentSeason().id
 
 		return {
-			'seasons': seasons,
 			'cur_season_id': cur_season_id
 		}
 
 	@classmethod
-	def load(cls):
+	def _convertDynamicData(cls):
+
+		data = cls.__convertDynamicValues()
+
+		return cls.__convertDynamicModel(data)
+
+	# endregion
+
+	# region Game Data
+
+	@classmethod
+	def _convertGameData(cls):
+		from utils.data_manager import DataManager
+
+		data = {}
+		data_clas = CoreDataManager.getGameData()
+
+		for cla in data_clas:
+
+			cla_name = cla.__name__
+			key_name = DataManager.hump2Underline(cla_name) + 's'
+
+			objs = cla.objects.all()
+
+			data[key_name] = ModelUtils.objectsToDict(objs)
+
+		return data
+
+	# endregion
+
+	@classmethod
+	def setup(cls):
 
 		# 获取当前版本
 		version: GameVersion = GameVersion.get()
@@ -1062,12 +987,13 @@ class GameConfigure(models.Model):
 
 		cls.Configure = version.configure
 
-		for conf in cls.groupConfigures():
-			if isinstance(conf, GroupConfigure): conf.setup()
+		static_clas = CoreDataManager.getStaticData()
+
+		for cla in static_clas: cla.setup()
 
 	@classmethod
 	def get(cls):
 
-		if cls.Configure is None: cls.load()
+		if cls.Configure is None: cls.setup()
 
 		return cls.Configure

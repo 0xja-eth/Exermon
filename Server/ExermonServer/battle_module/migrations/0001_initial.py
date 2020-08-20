@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('order', models.PositiveSmallIntegerField(default=0, verbose_name='回合号')),
-                ('question', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='题目')),
+                ('question', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='题目')),
                 ('record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='battle_module.BattleRecord', verbose_name='对战记录')),
             ],
             options={
@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
                 ('damage', models.SmallIntegerField(default=0, verbose_name='承伤点数')),
                 ('recover', models.PositiveSmallIntegerField(default=0, verbose_name='回复点数')),
                 ('battle_player', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='battle_module.BattlePlayer', verbose_name='对战玩家')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.models.GeneralQuestion', verbose_name='题目')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='question_module.GeneralQuestion', verbose_name='题目')),
                 ('round', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='battle_module.BattleRound', verbose_name='回合')),
                 ('skill', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='exermon_module.ExerSkill', verbose_name='使用技能')),
             ],
@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('index', models.PositiveSmallIntegerField(default=0, verbose_name='槽编号')),
                 ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='battle_module.BattleItemSlot', verbose_name='容器')),
-                ('pack_item', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='player_module.item_system.cont_items.ItemPackItem', verbose_name='装备')),
+                ('pack_item', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='player_module.ItemPackItem', verbose_name='装备')),
             ],
             options={
                 'verbose_name': '人类装备槽项',

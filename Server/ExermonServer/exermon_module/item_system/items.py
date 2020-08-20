@@ -79,23 +79,14 @@ class Exermon(BaseItem, ParamsObject):
 	def paramRateClass(cls):
 		return ExerParamRate
 
-	# 转换属性为 dict
-	def _convertParamsToDict(self, res):
-		res['base_params'] = ModelUtils.objectsToDict(self.paramBases())
-		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
-
-	# 转化为 dict
-	def convert(self):
-		res = super().convert()
-
-		res['animal'] = self.animal
-		res['star_id'] = self.star_id
-		res['subject_id'] = self.subject_id
-		res['e_type'] = self.e_type
-
-		self._convertParamsToDict(res)
-
-		return res
+	# # 转换属性为 dict
+	# def _convertParamsToDict(self, res):
+	# 	res['base_params'] = ModelUtils.objectsToDict(self.paramBases())
+	# 	res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
+	#
+	# def _convertCustomAttrs(self, res, type=None, **kwargs):
+	# 	super()._convertCustomAttrs(res, type, **kwargs)
+	# 	self._convertParamsToDict(res)
 
 	# 获取艾瑟萌的技能
 	@CacheHelper.staticCache
@@ -170,16 +161,10 @@ class ExerGift(BaseItem, ParamsObject):
 
 	adminColor.short_description = "天赋颜色"
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		res['star_id'] = self.star_id
-		res['color'] = self.color
-		res['g_type'] = self.g_type
 		res['params'] = ModelUtils.objectsToDict(self.paramRates())
-
-		return res
 
 	# 获取所有的属性成长加成率
 	@CacheHelper.staticCache
@@ -193,6 +178,8 @@ class ExerGift(BaseItem, ParamsObject):
 @ItemManager.registerItem("艾瑟萌碎片")
 class ExerFrag(BaseItem):
 
+	AUTO_FIELDS_KEY_NAMES = {'o_exermon_id': 'eid'}
+
 	# 所属艾瑟萌
 	o_exermon = models.ForeignKey('Exermon', on_delete=models.CASCADE,
 								 verbose_name="所属艾瑟萌")
@@ -202,17 +189,6 @@ class ExerFrag(BaseItem):
 
 	# 出售价格（出售固定为金币，为0则不可出售）
 	sell_price = models.PositiveIntegerField(default=0, verbose_name="出售价格")
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-
-		res = super().convert(**kwargs)
-
-		res['eid'] = self.o_exermon_id
-		res['sell_price'] = self.sell_price
-		res['count'] = self.count
-
-		return res
 
 	# 最大叠加数量（为0则不限）
 	def maxCount(self): return 0
@@ -348,30 +324,12 @@ class ExerSkill(BaseItem):
 
 	adminEffects.short_description = "使用效果"
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		effects = ModelUtils.objectsToDict(self.effects())
 
-		res['eid'] = self.o_exermon_id
-		res['passive'] = self.passive
-		res['next_skill_id'] = self.next_skill_id
-		res['need_count'] = self.need_count
-		res['mp_cost'] = self.mp_cost
-		res['rate'] = self.rate
-		# res['timing'] = self.timing
-		res['freeze'] = self.freeze
-		res['max_use_count'] = self.max_use_count
-		res['target'] = self.target_type
-		res['hit_type'] = self.hit_type
-		res['drain_rate'] = self.drain_rate
-		res['atk_rate'] = self.atk_rate
-		res['def_rate'] = self.def_rate
-		res['plus_formula'] = self.plus_formula
 		res['effects'] = effects
-
-		return res
 
 	# 获取所有的效果
 	@CacheHelper.staticCache
@@ -388,7 +346,7 @@ class GameEquipLevelParam(EquipParamRate):
 		verbose_name = verbose_name_plural = "艾瑟萌装备等级属性值"
 
 	# 装备
-	equip = models.ForeignKey("exermon_module.GameEquip", on_delete=models.CASCADE, verbose_name="装备")
+	equip = models.ForeignKey('GameEquip', on_delete=models.CASCADE, verbose_name="装备")
 
 
 # ===================================================
@@ -400,7 +358,7 @@ class GameEquipBaseParam(EquipParamValue):
 		verbose_name = verbose_name_plural = "艾瑟萌装备基础属性值"
 
 	# 装备
-	equip = models.ForeignKey("exermon_module.GameEquip", on_delete=models.CASCADE, verbose_name="装备")
+	equip = models.ForeignKey('GameEquip', on_delete=models.CASCADE, verbose_name="装备")
 
 	# 最大值
 	def maxVal(self):
@@ -422,7 +380,7 @@ class GameEquipPrice(Currency):
 	LIST_DISPLAY_APPEND = ['item']
 
 	# 物品
-	item = models.OneToOneField('exermon_module.GameEquip', on_delete=models.CASCADE,
+	item = models.OneToOneField('GameEquip', on_delete=models.CASCADE,
 								verbose_name="物品")
 
 
@@ -432,17 +390,11 @@ class GameEquipPrice(Currency):
 @ItemManager.registerItem("一般装备")
 class GameEquip(EquipableItem):
 
+	AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
+
 	# 装备类型
-	e_type = models.ForeignKey("game_module.ExerEquipType",
+	e_type = models.ForeignKey("game_module.GameEquipType",
 							   on_delete=models.CASCADE, verbose_name="装备类型")
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['e_type'] = self.e_type_id
-
-		return res
 
 	@classmethod
 	def levelParamClass(cls):

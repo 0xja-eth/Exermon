@@ -1,7 +1,6 @@
-import xadmin
-
 from item_module.adminx import *
 from record_module.adminx import *
+from utils.admin_utils import AdminXHelper
 from .models import *
 
 
@@ -29,8 +28,8 @@ class BattleRoundAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(BattlePlayer)
-class BattlePlayerAdmin(QuestionSetRecordAdmin): pass
+class BattlePlayerAdmin(QuesSetRecordAdmin): pass
 
 
 @AdminXHelper.relatedModel(BattleRoundResult)
-class BattleRoundResultAdmin(PlayerQuestionAdmin): pass
+class BattleRoundResultAdmin(BasePlayerQuestionAdmin): pass

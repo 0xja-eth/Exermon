@@ -34,7 +34,7 @@ class CharacterGenders(Enum):
 # ===================================================
 #  人物表
 # ===================================================
-class Character(models.Model):
+class Character(BaseModel):
 
 	class Meta:
 
@@ -105,25 +105,11 @@ class Character(models.Model):
 
 		return bust_data, face_data, battle_data
 
-	def convert(self, type=None):
-
-		# bust_data, face_data, battle_data = self.convertToBase64()
-
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description,
-			'gender': self.gender,
-			# 'bust': bust_data,
-			# 'face': face_data,
-			# 'battle': battle_data,
-		}
-
 
 # ===================================================
 #  登陆信息表
 # ===================================================
-class LoginInfo(models.Model):
+class LoginInfo(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "登录记录"
 
@@ -155,7 +141,7 @@ class LoginInfo(models.Model):
 # ===================================================
 #  密码更改记录表
 # ===================================================
-class PasswordRecord(models.Model):
+class PasswordRecord(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "改密记录"
 
@@ -345,6 +331,8 @@ class Player(CacheableModel):
 
 	LIST_EDITABLE_EXCLUDE = ['password', 'create_time', 'last_refresh_time']
 
+	DO_NOT_AUTO_CONVERT_FIELDS = ['password']
+
 	# 登录信息缓存键
 	LOGININFO_CACHE_KEY = 'login_info'
 
@@ -443,11 +431,11 @@ class Player(CacheableModel):
 	@CacheHelper.staticCache
 	def _cacheOneToOneModels(cls):
 		from english_pro_module.models import ExerProRecord
-		from utils.model_utils import AdminXHelper
+		from utils.admin_utils import ModelHelper
 
 		res = [PlayerMoney, ExerProRecord]
 
-		relateds = AdminXHelper.allRelatedModels(cls)
+		relateds = ModelHelper.allRelatedModels(cls)
 
 		for cla in relateds:
 			if BaseContainer in cla.mro(): res.append(cla)
@@ -628,126 +616,191 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def convert(self, type: str = None, online_player=None, battle_player=None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-			online_player (OnlinePlayer); 在线玩家信息
-			battle_player (RuntimeBattlePlayer); 在线玩家信息
-		Returns:
-			转化后的字典数据
-		"""
+	def _convertRecordsData(self, res, **kwargs):
 		from record_module.models import GeneralExerciseRecord
 
-		create_time = ModelUtils.timeToStr(self.create_time)
-		birth = ModelUtils.dateToStr(self.birth)
+		question_records = ModelUtils.objectsToDict(
+			self.quesRecords(GeneralQuesRecord))
+		exercise_records = ModelUtils.objectsToDict(
+			self.quesSetRecords(GeneralExerciseRecord))
+
+		res['question_records'] = question_records
+		res['exercise_records'] = exercise_records
+
+	def _convertPackData(self, res, **kwargs):
+
 		money = ModelUtils.objectToDict(self.playerMoney())
 
-		level, next = self.level(True)
+		res['money'] = money
+		res['pack_containers'] = self._packContainerItems()
+		res['slot_containers'] = self._slotContainerItems()
 
-		if type == "records":
-			question_records = ModelUtils.objectsToDict(
-				self.quesRecords(GeneralQuesRecord))
-			exercise_records = ModelUtils.objectsToDict(
-				self.quesSetRecords(GeneralExerciseRecord))
+	def _convertBaseData(self, res, online_player=None, **kwargs):
+		level = self.level()
+		create_time = ModelUtils.timeToStr(self.create_time)
 
-			return {
-				'question_records': question_records,
-				'exercise_records': exercise_records
-			}
+		self._convertCustomFields(res, 'id', 'name', 'character_id',
+						 'subject_selection', 'status', 'type')
 
-		if type == "pack":
-			return {
-				'money': money,
-				'pack_containers': self._packContainerItems(),
-				'slot_containers': self._slotContainerItems(),
-			}
-
-		base = {
-			'id': self.id,
-			'name': self.name,
-			'character_id': self.character_id,
-			'subject_selection': self.subject_selection,
-			'level': level,
-			'status': self.status,
-			'type': self.type,
-			'create_time': create_time,
-		}
+		res['level'] = level
+		res['create_time'] = create_time
 
 		if online_player is not None:
-			base["channel_name"] = online_player.consumer.channel_name
+			res["channel_name"] = online_player.consumer.channel_name
 
-		if type == "matched":
-			season_record = self.currentSeasonRecord()
+	def _convertMatchedData(self, res, battle_player=None, **kwargs):
 
-			rank, sub_rank, _ = season_record.rank()
+		self._convertBaseData(res, **kwargs)
 
-			# exer_slot = ModelUtils.objectToDict(self.exerSlot(), type="items")
-			# battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+		season_record = self.currentSeasonRecord()
+		rank, sub_rank, _ = season_record.rank()
 
-			base["rank_id"] = rank.id
-			base['sub_rank'] = sub_rank
-			base['star_num'] = season_record.star_num
-			# base['exer_slot'] = exer_slot
-			# base['battle_item_slot'] = battle_item_slot
+		res["rank_id"] = rank.id
+		res['sub_rank'] = sub_rank
+		res['star_num'] = season_record.star_num
 
-			# 运行时数据
-			battle_player.convert(base)
+		# 运行时数据
+		battle_player.convert(res)
 
-			return base
+	def _convertOthersData(self, res, **kwargs):
 
-		base["pack_containers"] = self._packContainerIndices()
-		base["slot_containers"] = self._slotContainerIndices()
+		self._convertBaseData(res, **kwargs)
 
-		# 其他玩家
-		if type == "others":
-			base['online'] = self.online
+		self._convertCustomFields(res, 'online')
 
-		# 当前玩家
-		if type == "current":
-			base['username'] = self.username
-			base['phone'] = self.phone
-			base['email'] = self.email
-			base['exp'] = self.exp
-			base['next'] = next
-			base['money'] = money
+	def _convertCurrentData(self, res, **kwargs):
 
-		# 当前玩家
-		if type == "status":
-			base['exp'] = self.exp
-			base['next'] = next
+		self._convertBaseData(res, **kwargs)
 
-			base['grade'] = self.grade
-			base['birth'] = birth
-			base['school'] = self.school
-			base['city'] = self.city
-			base['contact'] = self.contact
-			base['description'] = self.description
+		money = ModelUtils.objectToDict(self.playerMoney())
+		level, next = self.level(True)
 
-			base['money'] = money
+		self._convertCustomFields(res, 'username', 'phone', 'email', 'exp')
 
-			base['battle_info'] = self._battleInfo()
-			base['question_info'] = self._questionInfo()
+		res['money'] = money
+		res['next'] = next
 
-			base['pack_containers'] = self._packContainerItems()
-			base['slot_containers'] = self._slotContainerItems()
+	def _convertStatusData(self, res, **kwargs):
 
-		# 当前玩家
-		if type == "battle":
-			season_record = ModelUtils.objectToDict(self.currentSeasonRecord())
+		self._convertBaseData(res, **kwargs)
 
-			base['exp'] = self.exp
-			base['next'] = next
+		self._convertCustomFields(res, 'exp', 'grade', 'school',
+						 'city', 'contact', 'description')
 
-			base['season_record'] = season_record
+		money = ModelUtils.objectToDict(self.playerMoney())
+		birth = ModelUtils.dateToStr(self.birth)
+		level, next = self.level(True)
 
-			base['battle_info'] = self._battleInfo()
+		res['next'] = next
+		res['birth'] = birth
+		res['money'] = money
 
-			base['pack_containers'] = self._packContainerItems()
-			base['slot_containers'] = self._slotContainerItems()
+		res['battle_info'] = self._battleInfo()
+		res['question_info'] = self._questionInfo()
 
-		return base
+		res['pack_containers'] = self._packContainerItems()
+		res['slot_containers'] = self._slotContainerItems()
+
+	def _convertBattleData(self, res, **kwargs):
+
+		self._convertBaseData(res, **kwargs)
+
+		self._convertCustomFields(res, 'exp')
+
+		level, next = self.level(True)
+		season_record = ModelUtils.objectToDict(self.currentSeasonRecord())
+
+		res['next'] = next
+		res['season_record'] = season_record
+
+		res['battle_info'] = self._battleInfo()
+
+		res['pack_containers'] = self._packContainerItems()
+		res['slot_containers'] = self._slotContainerItems()
+
+	# def convert(self, type: str = None, online_player=None, battle_player=None) -> dict:
+	# 	"""
+	# 	转化为字典
+	# 	Args:
+	# 		type (str): 转化类型
+	# 		online_player (OnlinePlayer); 在线玩家信息
+	# 		battle_player (RuntimeBattlePlayer); 在线玩家信息
+	# 	Returns:
+	# 		转化后的字典数据
+	# 	"""
+	# 	from record_module.models import GeneralExerciseRecord
+	#
+	# 	create_time = ModelUtils.timeToStr(self.create_time)
+	# 	birth = ModelUtils.dateToStr(self.birth)
+	# 	money = ModelUtils.objectToDict(self.playerMoney())
+	#
+	# 	level, next = self.level(True)
+	#
+	# 	base = {
+	# 		'id': self.id,
+	# 		'name': self.name,
+	# 		'character_id': self.character_id,
+	# 		'subject_selection': self.subject_selection,
+	# 		'level': level,
+	# 		'status': self.status,
+	# 		'type': self.type,
+	# 		'create_time': create_time,
+	# 	}
+	#
+	# 	if online_player is not None:
+	# 		base["channel_name"] = online_player.consumer.channel_name
+	#
+	# 	base["pack_containers"] = self._packContainerIndices()
+	# 	base["slot_containers"] = self._slotContainerIndices()
+	#
+	# 	# 其他玩家
+	# 	if type == "others":
+	# 		base['online'] = self.online
+	#
+	# 	# 当前玩家
+	# 	if type == "current":
+	# 		base['username'] = self.username
+	# 		base['phone'] = self.phone
+	# 		base['email'] = self.email
+	# 		base['exp'] = self.exp
+	# 		base['next'] = next
+	# 		base['money'] = money
+	#
+	# 	# 当前玩家
+	# 	if type == "status":
+	# 		base['exp'] = self.exp
+	# 		base['next'] = next
+	#
+	# 		base['grade'] = self.grade
+	# 		base['birth'] = birth
+	# 		base['school'] = self.school
+	# 		base['city'] = self.city
+	# 		base['contact'] = self.contact
+	# 		base['description'] = self.description
+	#
+	# 		base['money'] = money
+	#
+	# 		base['battle_info'] = self._battleInfo()
+	# 		base['question_info'] = self._questionInfo()
+	#
+	# 		base['pack_containers'] = self._packContainerItems()
+	# 		base['slot_containers'] = self._slotContainerItems()
+	#
+	# 	# 当前玩家
+	# 	if type == "battle":
+	# 		season_record = ModelUtils.objectToDict(self.currentSeasonRecord())
+	#
+	# 		base['exp'] = self.exp
+	# 		base['next'] = next
+	#
+	# 		base['season_record'] = season_record
+	#
+	# 		base['battle_info'] = self._battleInfo()
+	#
+	# 		base['pack_containers'] = self._packContainerItems()
+	# 		base['slot_containers'] = self._slotContainerItems()
+	#
+	# 	return base
 
 	# endregion
 
@@ -1319,16 +1372,16 @@ class Player(CacheableModel):
 		if res.exists(): return res.first()
 		return None
 
-	def setCurrentQuestionSet(self, ques_set: 'QuestSetRecord'):
+	def setCurrentQuesSet(self, ques_set: 'QuesSetRecord'):
 		"""
 		设置当前题目集
 		Args:
-			ques_set (QuestionSetRecord): 题目集
+			ques_set (QuesSetRecord): 题目集
 		"""
 		self._setModelCache(key=self.CUR_QUES_SET_CACHE_KEY,
 							objects=[ques_set])
 
-	def currentQuestionSet(self) -> 'QuesRecord':
+	def currentQuesSet(self) -> 'QuesRecord':
 		"""
 		获取当前题目集记录
 		Returns:
@@ -1336,7 +1389,7 @@ class Player(CacheableModel):
 		"""
 		return self._firstModelCache(self.CUR_QUES_SET_CACHE_KEY)
 
-	def clearCurrentQuestionSet(self):
+	def clearCurrentQuesSet(self):
 		"""
 		清除当前题目集记录
 		"""

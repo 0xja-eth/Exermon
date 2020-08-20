@@ -5,7 +5,7 @@ from game_module.models import GameConfigure
 from .types import *
 from .params import *
 
-from utils.model_utils import CacheableModel, CoreModel, Common as ModelUtils
+from utils.model_utils import BaseModel, CacheableModel, GameData, Common as ModelUtils
 from utils.exception import ErrorType, GameException
 
 from enum import Enum
@@ -18,7 +18,7 @@ import jsonfield, math
 # ===================================================
 #  货币表
 # ===================================================
-class Currency(models.Model):
+class Currency(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "货币"
@@ -38,13 +38,6 @@ class Currency(models.Model):
 			term.gold, self.gold,
 			term.ticket, self.ticket,
 			term.bound_ticket, self.bound_ticket)
-
-	def convert(self):
-		return {
-			'gold': self.gold,
-			'ticket': self.ticket,
-			'bound_ticket': self.bound_ticket
-		}
 
 	def __add__(self, val) -> 'Currency':
 		res = self
@@ -118,7 +111,7 @@ class Currency(models.Model):
 # ===================================================
 #  基础物品表
 # ===================================================
-class BaseItem(CoreModel):
+class BaseItem(GameData):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "基础物品"
@@ -166,14 +159,10 @@ class BaseItem(CoreModel):
 	def isBoughtable(self, *args, **kwargs):
 		return False
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description,
-			'type': self.TYPE.value
-		}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['type'] = self.TYPE.value
 
 	# endregion
 
@@ -270,28 +259,18 @@ class LimitedItem(BaseItem):
 		"""
 		raise NotImplementedError
 
-	# 转化为 dict
-	def convert(self, type=None, **kwargs):
-		buy_price = ModelUtils.objectToDict(self.buyPrice())
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		if type == "shop":
-			return {
-				'id': self.id,
-				'type': self.TYPE.value,
-				'price': buy_price
-			}
+		if type is None:
+			buy_price = ModelUtils.objectToDict(self.buyPrice())
+			res['buy_price'] = buy_price
 
-		res = super().convert(**kwargs)
+	def _convertShopData(self, res, **kwargs):
+		price = ModelUtils.objectToDict(self.buyPrice())
 
-		res['star_id'] = self.star_id
-		res['icon_index'] = self.icon_index
-		res['buy_price'] = buy_price
-		res['sell_price'] = self.sell_price
-		res['discardable'] = self.discardable
-		res['tradable'] = self.tradable
-		# res['icon'] = self.convertIconToBase64()
-
-		return res
+		res['id'] = self.id
+		res['price'] = price
 
 
 # ===================================================
@@ -355,7 +334,7 @@ class UsableItem(LimitedItem):
 	freeze = models.PositiveSmallIntegerField(default=0, verbose_name="冻结回合")
 
 	# 物品类型
-	i_type = models.ForeignKey("game_module.UsableItemType",
+	i_type = models.ForeignKey("game_module.GameItemType",
 							   on_delete=models.CASCADE, verbose_name="物品类型")
 
 	# 后台管理：显示使用效果
@@ -371,25 +350,6 @@ class UsableItem(LimitedItem):
 		return format_html(res)
 
 	adminEffects.short_description = "使用效果"
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		effects = ModelUtils.objectsToDict(self.effects())
-
-		res['max_count'] = self.max_count
-		res['consumable'] = self.consumable
-		res['battle_use'] = self.battle_use
-		res['menu_use'] = self.menu_use
-		res['adventure_use'] = self.adventure_use
-		res['target'] = self.target
-		res['freeze'] = self.freeze
-		res['batch_count'] = self.batch_count
-		res['i_type'] = self.i_type_id
-		res['effects'] = effects
-
-		return res
 
 	def _isTargetUsable(self, target=None):
 		from exermon_module.models import PlayerExermon
@@ -539,17 +499,11 @@ class EquipableItem(LimitedItem, EquipParamsObject):
 
 	adminBaseParams.short_description = "基础属性值"
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['min_level'] = self.min_level
-		# res['param_type'] = self.param_type
-		# res['param_rate'] = self.param_rate
-		res['level_params'] = ModelUtils.objectsToDict(self.levelParams())
-		res['base_params'] = ModelUtils.objectsToDict(self.baseParams())
-
-		return res
+	# def _convertCustomAttrs(self, res, type=None, **kwargs):
+	# 	super()._convertCustomAttrs(res, type, **kwargs)
+	#
+	# 	res['level_params'] = ModelUtils.objectsToDict(self.levelParams())
+	# 	res['base_params'] = ModelUtils.objectsToDict(self.baseParams())
 
 	# 获取所有的等级属性值
 	def _levelParams(self):
@@ -719,30 +673,14 @@ class BaseContainer(CacheableModel):
 	# 	return ViewUtils.getObject(target, ErrorType.ContainerNotExist,
 	# 							   return_type='object', id=self.id)
 
-	# 转化容器项为 dict
-	def _convertItemsToDict(self):
-		return ModelUtils.objectsToDict(self.contItems())
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-	# 转化为 dict
-	def convert(self, type: str = None, **kwargs) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-			**kwargs (**dict): 子类重载参数
-		Returns:
-			转化后的字典数据
-		"""
-		res = {
-			'id': self.id,
-			'type': self.TYPE.value,
-			'capacity': self.getCapacity(),
-		}
+		res['type'] = self.TYPE.value
+		res['capactiy'] = self.getCapacity()
 
-		if type == 'items':
-			res['items'] = self._convertItemsToDict()
-
-		return res
+	def _convertItemsData(self, res, **kwargs):
+		res['items'] = ModelUtils.objectsToDict(self.contItems())
 
 	# endregion
 
@@ -2218,12 +2156,10 @@ class BaseContItem(CacheableModel):
 		super().__init__(*args, **kwargs)
 		self._setupCachePool()
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		return {
-			'id': self.id,
-			'type': self.TYPE.value
-		}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['type'] = self.TYPE.value
 
 	# endregion
 
@@ -2452,6 +2388,7 @@ class PackContItem(BaseContItem):
 
 	# 物品
 	item = None  # models.ForeignKey('BaseItem', on_delete=models.CASCADE, verbose_name="物品")
+	item_id = None
 
 	# 叠加数量
 	count = models.PositiveSmallIntegerField(default=0, verbose_name="叠加数量")
@@ -2471,18 +2408,6 @@ class PackContItem(BaseContItem):
 	def __str__(self):
 		return '%s (%s :%d)' % (
 			super().__str__(), self.item, self.count)
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		item_id = ModelUtils.objectToId(self.item)
-
-		res['item_id'] = item_id
-		res['count'] = self.count
-		res['equiped'] = self.equiped
-
-		return res
 
 	# region 创建容器项
 
@@ -2804,15 +2729,10 @@ class SlotContItem(BaseContItem):
 		for i in range(equip_cnt):
 			res[attrs[i] + '_id'] = self._equipItemId(i)
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['index'] = self.index
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		self._convertEquipToDict(res)
-
-		return res
 
 	def _setupCustomCacheItems(self):
 		super()._setupCustomCacheItems()
@@ -3144,7 +3064,7 @@ class TraitCode(Enum):
 # ===================================================
 #  特性表
 # ===================================================
-class BaseTrait(models.Model):
+class BaseTrait(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特性"
@@ -3152,6 +3072,8 @@ class BaseTrait(models.Model):
 	CODES = [
 		(TraitCode.Unset.value, '无特性'),
 	]
+
+	KEY_NAME = 'traits'
 
 	# 所属物品
 	# item = models.ForeignKey('BaseItem', on_delete=models.CASCADE, verbose_name="物品")
@@ -3161,13 +3083,6 @@ class BaseTrait(models.Model):
 
 	# 特性参数
 	params = jsonfield.JSONField(default=[], verbose_name="特性参数")
-
-	# 转化为字典
-	def convert(self):
-		return {
-			'code': self.code,
-			'params': self.params
-		}
 
 
 # ===================================================
@@ -3322,7 +3237,7 @@ class EffectDescriptionFormat:
 # ===================================================
 #  使用效果表
 # ===================================================
-class BaseEffect(models.Model):
+class BaseEffect(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "使用效果"
@@ -3347,6 +3262,8 @@ class BaseEffect(models.Model):
 
 		(ItemEffectCode.Eval.value, '执行程序'),
 	]
+
+	KEY_NAME = 'effects'
 
 	# 效果编号
 	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
@@ -3494,15 +3411,11 @@ class BaseEffect(models.Model):
 
 		return t / 86400, format.day
 
-	# 转化为字典
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		return {
-			'code': self.code,
-			'params': self.params,
-			'description': self.describe(),
-			'short_description': self.describe(
-				EffectDescriptionFormat.shortFormat()),
-		}
+		res['description'] = self.describe()
+		res['short_description'] = self.describe(
+				EffectDescriptionFormat.shortFormat())
 
 # endregion

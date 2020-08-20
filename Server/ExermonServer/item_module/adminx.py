@@ -2,7 +2,7 @@ from xadmin.layout import Fieldset
 
 from .models import *
 
-from utils.model_utils import AdminXHelper
+from utils.admin_utils import AdminXHelper
 
 # Register your models here.
 

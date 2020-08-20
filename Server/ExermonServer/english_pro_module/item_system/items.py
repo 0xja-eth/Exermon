@@ -1,7 +1,7 @@
 from item_module.models import *
 from item_module.manager import *
 
-from game_module.models import GroupConfigure
+from game_module.models import StaticData
 
 
 # ===================================================
@@ -57,7 +57,7 @@ class ExerProEffectCode(Enum):
 # ===================================================
 #  特训使用效果表
 # ===================================================
-class ExerProEffect(models.Model):
+class ExerProEffect(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特训使用效果"
@@ -109,18 +109,13 @@ class ExerProEffect(models.Model):
 		(ExerProEffectCode.LosePotion.value, '失去药水'),
 	]
 
+	KEY_NAME = 'effects'
+
 	# 效果编号
 	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
 
 	# 效果参数
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
-
-	# 转化为字典
-	def convert(self):
-		return {
-			'code': self.code,
-			'params': self.params,
-		}
 
 
 # ===================================================
@@ -151,7 +146,7 @@ class ExerProTraitCode(Enum):
 # ===================================================
 #  特训特性表
 # ===================================================
-class ExerProTraits(models.Model):
+class ExerProTrait(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "特训使用效果"
@@ -178,24 +173,19 @@ class ExerProTraits(models.Model):
 		(ExerProTraitCode.BattleDrawCards.value, '战斗开始抽牌数加成'),
 	]
 
+	KEY_NAME = 'traits'
+
 	# 效果编号
 	code = models.PositiveSmallIntegerField(default=0, choices=CODES, verbose_name="效果编号")
 
 	# 效果参数
 	params = jsonfield.JSONField(default=[], verbose_name="效果参数")
 
-	# 转化为字典
-	def convert(self):
-		return {
-			'code': self.code,
-			'params': self.params,
-		}
-
 
 # ===================================================
 #  特训物品星级表
 # ===================================================
-class ExerProItemStar(GroupConfigure):
+class ExerProItemStar(StaticData):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训物品星级"
 
@@ -216,13 +206,6 @@ class ExerProItemStar(GroupConfigure):
 		return format_html(res)
 
 	adminColor.short_description = "星级颜色"
-
-	def convert(self):
-		return {
-			'id': self.id,
-			'name': self.name,
-			'color': self.color,
-		}
 
 
 # ===================================================
@@ -248,28 +231,6 @@ class BaseExerProItem(BaseItem):
 	# 金币（0表示不可购买）
 	# gold = models.PositiveSmallIntegerField(default=0, verbose_name="金币")
 
-	def convert(self, **kwargs):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert(**kwargs)
-
-		res['icon_index'] = self.icon_index
-		res['start_ani_index'] = self.start_ani_index
-		res['target_ani_index'] = self.target_ani_index
-
-		res['star_id'] = self.star_id
-
-		# res['gold'] = self.gold
-
-		effects = self.effects()
-		if effects is not None:
-			res['effects'] = ModelUtils.objectsToDict(effects)
-
-		return res
-
 	def effects(self):
 		raise NotImplementedError
 
@@ -277,7 +238,7 @@ class BaseExerProItem(BaseItem):
 # ===================================================
 #  特训物品特性表
 # ===================================================
-class ExerProItemTrait(ExerProEffect):
+class ExerProItemTrait(ExerProTrait):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训物品特性"
 
@@ -291,21 +252,6 @@ class ExerProItemTrait(ExerProEffect):
 # ===================================================
 @ItemManager.registerItem("特训物品")
 class ExerProItem(BaseExerProItem):
-
-	# 道具类型 self.exerproitemeffect_set.all()
-	def convert(self, type: str = None, **kwargs):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		traits = ModelUtils.objectsToDict(self.traits())
-
-		res['traits'] = traits
-
-		return res
 
 	def effects(self):
 		return None
@@ -426,23 +372,6 @@ class ExerProCard(BaseExerProItem):
 	target = models.PositiveSmallIntegerField(default=ExerProCardTarget.Default.value,
 											  choices=TARGETS, verbose_name="目标")
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		res['cost'] = self.cost
-		res['card_type'] = self.card_type
-		res['inherent'] = self.inherent
-		res['disposable'] = self.disposable
-		res['character'] = self.character
-		res['target'] = self.target
-
-		return res
-
 	@CacheHelper.staticCache
 	def effects(self):
 		return self.exerprocardeffect_set.all()
@@ -484,7 +413,7 @@ class EnemyActionType(Enum):
 # ===================================================
 #  敌人行动表
 # ===================================================
-class EnemyAction(models.Model):
+class EnemyAction(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "敌人行动"
 
@@ -497,6 +426,8 @@ class EnemyAction(models.Model):
 		(EnemyActionType.Escape.value, '逃跑'),
 		(EnemyActionType.Unset.value, '无'),
 	]
+
+	KEY_NAME = 'actions'
 
 	# 回合
 	rounds = jsonfield.JSONField(default=[], verbose_name="回合")
@@ -513,19 +444,6 @@ class EnemyAction(models.Model):
 
 	# 敌人
 	enemy = models.ForeignKey("ExerProEnemy", on_delete=models.CASCADE, verbose_name="敌人")
-
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		return {
-			'rounds': self.rounds,
-			'type': self.type,
-			'params': self.params,
-			'rate': self.rate,
-		}
 
 
 # ===================================================
@@ -549,6 +467,8 @@ class ExerProEnemy(BaseItem):
 		(ExerProEnemyType.Boss.value, 'BOSS'),
 	]
 
+	AUTO_FIELDS_KEY_NAMES = {'type': 'type_'}
+
 	# 等级
 	type = models.PositiveSmallIntegerField(default=ExerProEnemyType.Normal.value,
 											choices=ENEMY_TYPES, verbose_name="等级")
@@ -564,30 +484,6 @@ class ExerProEnemy(BaseItem):
 
 	# 格挡
 	character = models.CharField(default="", blank=True, max_length=32, verbose_name="性格")
-
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		actions = ModelUtils.objectsToDict(self.actions())
-		effects = ModelUtils.objectsToDict(self.effects())
-
-		res['mhp'] = self.mhp
-		res['power'] = self.power
-		res['mhp'] = self.mhp
-		res['power'] = self.power
-		res['defense'] = self.defense
-		res['character'] = self.character
-		res['type_'] = self.type
-
-		res['actions'] = actions
-		res['effects'] = effects
-
-		return res
 
 	@CacheHelper.staticCache
 	def actions(self):
@@ -611,7 +507,7 @@ class ExerProEnemy(BaseItem):
 # ===================================================
 #  特训状态特性表
 # ===================================================
-class ExerProStateTrait(ExerProEffect):
+class ExerProStateTrait(ExerProTrait):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训状态特性"
 
@@ -634,24 +530,6 @@ class ExerProState(BaseItem):
 
 	# 是否负面状态
 	is_nega = models.BooleanField(default=False, verbose_name="是否负面状态")
-
-	def convert(self):
-		"""
-		转化为字典
-		"""
-		res = super().convert()
-
-		res['max_turns'] = self.max_turns
-		res['is_nega'] = self.is_nega
-
-		traits = ModelUtils.objectsToDict(self.traits())
-
-		res['icon_index'] = self.icon_index
-		res['max_turns'] = self.max_turns
-		res['is_nega'] = self.is_nega
-		res['traits'] = traits
-
-		return res
 
 	@CacheHelper.staticCache
 	def traits(self):

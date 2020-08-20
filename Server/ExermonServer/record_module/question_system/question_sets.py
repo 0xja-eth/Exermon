@@ -80,7 +80,7 @@ class BaseExerciseRecord(QuesSetRecord):
 # ===================================================
 #  刷题记录表
 # ===================================================
-@RecordManager.registerQuestionSet("刷题记录",
+@RecordManager.registerQuesSet("刷题记录",
 	GeneralQuestionGenerator, ExerciseResultRewardCalc)
 class GeneralExerciseRecord(BaseExerciseRecord):
 
@@ -135,7 +135,7 @@ class GeneralExerciseRecord(BaseExerciseRecord):
 # ===================================================
 #  刷题奖励表
 # ===================================================
-@RecordManager.registerQuestionSetReward(GeneralExerciseRecord)
+@RecordManager.registerQuesSetReward(GeneralExerciseRecord)
 class ExerciseReward(QuesSetReward): pass
 
 # endregion
@@ -146,7 +146,7 @@ class ExerciseReward(QuesSetReward): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSet("听力题记录",
+@RecordManager.registerQuesSet("听力题记录",
 	RandomQuestionGenerator)
 class ListeningExerciseRecord(BaseExerciseRecord): pass
 
@@ -154,7 +154,7 @@ class ListeningExerciseRecord(BaseExerciseRecord): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+@RecordManager.registerQuesSetReward(ListeningExerciseRecord)
 class ListeningExerciseReward(QuesSetReward): pass
 
 
@@ -166,7 +166,7 @@ class ListeningExerciseReward(QuesSetReward): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSet("阅读题记录",
+@RecordManager.registerQuesSet("阅读题记录",
 	RandomQuestionGenerator)
 class ReadingExerciseRecord(BaseExerciseRecord): pass
 
@@ -174,8 +174,28 @@ class ReadingExerciseRecord(BaseExerciseRecord): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+@RecordManager.registerQuesSetReward(ReadingExerciseRecord)
 class ReadingExerciseReward(QuesSetReward): pass
+
+
+# endregion
+
+# region 改错题
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuesSet("改错题记录",
+	RandomQuestionGenerator)
+class CollectingExerciseRecord(BaseExerciseRecord): pass
+
+
+# ===================================================
+#  听力题目记录表
+# ===================================================
+@RecordManager.registerQuesSetReward(CollectingExerciseRecord)
+class CollectingExerciseReward(QuesSetReward): pass
 
 
 # endregion
@@ -186,7 +206,7 @@ class ReadingExerciseReward(QuesSetReward): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSet("单词题记录",
+@RecordManager.registerQuesSet("单词题记录",
 	RandomQuestionGenerator)
 class WordExerciseRecord(QuesSetRecord):
 
@@ -210,7 +230,7 @@ class WordExerciseRecord(QuesSetRecord):
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+@RecordManager.registerQuesSetReward(WordExerciseRecord)
 class WordExerciseReward(QuesSetReward): pass
 
 
@@ -222,7 +242,7 @@ class WordExerciseReward(QuesSetReward): pass
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSet("短语题记录",
+@RecordManager.registerQuesSet("短语题记录",
 	RandomQuestionGenerator)
 class PhraseExerciseRecord(QuesSetRecord):
 
@@ -246,7 +266,7 @@ class PhraseExerciseRecord(QuesSetRecord):
 # ===================================================
 #  听力题目记录表
 # ===================================================
-@RecordManager.registerQuestionSetReward(ListeningExerciseRecord)
+@RecordManager.registerQuesSetReward(PhraseExerciseRecord)
 class PhraseExerciseReward(QuesSetReward): pass
 
 

@@ -1,7 +1,7 @@
 from item_module.models import *
 from item_module.manager import *
 
-from game_module.models import ExerEquipType
+from game_module.models import GameEquipType
 
 
 # ===================================================
@@ -228,7 +228,7 @@ class ExerEquipSlot(SlotContainer, ParamsObject):
 	# 默认容器容量（0为无限）
 	@classmethod
 	def defaultCapacity(cls):
-		return ExerEquipType.count()
+		return GameEquipType.count()
 
 	@classmethod
 	def paramValueClass(cls):

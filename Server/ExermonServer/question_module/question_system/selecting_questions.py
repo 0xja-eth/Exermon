@@ -159,10 +159,6 @@ class PlotQuesChoice(BaseQuesChoice):
 	# 选项对应的结果文本
 	result_text = models.TextField(verbose_name="选项对应的结果文本")
 
-	# 所属问题
-	question = models.ForeignKey('PlotQuestion', null=False, on_delete=models.CASCADE,
-								 verbose_name="所属问题")
-
 	@CacheHelper.staticCache
 	def effects(self):
 		return self.plotchoiceeffect_set.all()

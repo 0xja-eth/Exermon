@@ -69,7 +69,7 @@ def load(d: dict, key, empty=None, choices=None):
 			return type_(val)
 
 		elif isinstance(choices, type) and \
-			GroupConfigure in choices.__bases__:
+			StaticData in choices.__bases__:
 			choices = choices.objs()
 
 			for choice in choices:

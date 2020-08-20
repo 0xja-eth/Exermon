@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('discardable', models.BooleanField(default=True, verbose_name='可丢弃')),
                 ('tradable', models.BooleanField(default=True, verbose_name='可交易')),
                 ('icon', models.ImageField(blank=True, null=True, upload_to=utils.model_utils.ItemIconUpload(), verbose_name='图标')),
-                ('e_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.ExerEquipType', verbose_name='装备类型')),
+                ('e_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.models.GameEquipType', verbose_name='装备类型')),
                 ('star', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.ItemStar', verbose_name='星级')),
             ],
             options={
@@ -141,7 +141,7 @@ class Migration(migrations.Migration):
                 ('consumable', models.BooleanField(default=False, verbose_name='消耗品')),
                 ('freeze', models.PositiveSmallIntegerField(default=0, verbose_name='冻结回合')),
                 ('rate', models.PositiveSmallIntegerField(default=0, verbose_name='使用几率')),
-                ('i_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.UsableItemType', verbose_name='物品类型')),
+                ('i_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.models.GameItemType', verbose_name='物品类型')),
                 ('star', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.ItemStar', verbose_name='星级')),
             ],
             options={
@@ -368,7 +368,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('count', models.PositiveSmallIntegerField(default=0, verbose_name='叠加数量')),
                 ('equiped', models.BooleanField(default=False, verbose_name='是否装备中')),
-                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.containers.EquipPack', verbose_name='容器')),
+                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.EquipPack', verbose_name='容器')),
                 ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.ExerItem', verbose_name='物品')),
             ],
             options={
@@ -382,8 +382,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('count', models.PositiveSmallIntegerField(default=0, verbose_name='叠加数量')),
                 ('equiped', models.BooleanField(default=False, verbose_name='是否装备中')),
-                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.containers.EquipPack', verbose_name='容器')),
-                ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.items.GameEquip', verbose_name='物品')),
+                ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.EquipPack', verbose_name='容器')),
+                ('item', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.GameEquip', verbose_name='物品')),
             ],
             options={
                 'verbose_name': '艾瑟萌背包装备',
@@ -442,8 +442,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('index', models.PositiveSmallIntegerField(default=0, verbose_name='槽编号')),
                 ('container', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='exermon_module.ExerEquipSlot', verbose_name='容器')),
-                ('e_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.ExerEquipType', verbose_name='装备槽类型')),
-                ('pack_equip', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='exermon_module.item_system.cont_items.EquipPackItem', verbose_name='装备')),
+                ('e_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.models.GameEquipType', verbose_name='装备槽类型')),
+                ('pack_equip', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='exermon_module.EquipPackItem', verbose_name='装备')),
             ],
             options={
                 'verbose_name': '艾瑟萌装备槽项',
@@ -462,7 +462,7 @@ class Migration(migrations.Migration):
                 ('gold', models.PositiveIntegerField(default=0, verbose_name='金币')),
                 ('ticket', models.PositiveIntegerField(default=0, verbose_name='点券')),
                 ('bound_ticket', models.PositiveIntegerField(default=0, verbose_name='金币')),
-                ('item', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.items.GameEquip', verbose_name='物品')),
+                ('item', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.GameEquip', verbose_name='物品')),
             ],
             options={
                 'verbose_name': '艾瑟萌装备价格',
@@ -474,7 +474,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('value', models.IntegerField(default=0, verbose_name='属性值')),
-                ('equip', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.items.GameEquip', verbose_name='装备')),
+                ('equip', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.GameEquip', verbose_name='装备')),
                 ('param', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.BaseParam', verbose_name='属性类型')),
             ],
             options={

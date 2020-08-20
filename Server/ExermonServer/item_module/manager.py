@@ -22,7 +22,7 @@ class ItemManager:
 			# cont_item_cla (type): 容器项类
 		"""
 		def wrapper(cla: BaseItem):
-			print("registerItem: %s" % cla)
+			print("registerItem: %s (%s)" % (cla, cla._meta.app_label))
 
 			cla._meta.verbose_name = \
 				cla._meta.verbose_name_plural = verbose_name

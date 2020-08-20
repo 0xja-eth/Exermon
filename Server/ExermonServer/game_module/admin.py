@@ -42,7 +42,7 @@ class BaseParamAdmin(admin.ModelAdmin):
 	list_editable = ['configure', 'name', 'description', 'attr']
 
 
-@admin.register(UsableItemType)
+@admin.register(GameItemType)
 class UsableItemTypeAdmin(admin.ModelAdmin):
 	list_display = ['id', 'configure', 'name', 'description']
 
@@ -56,7 +56,7 @@ class HumanEquipTypeAdmin(admin.ModelAdmin):
 	list_editable = ['configure', 'name', 'description']
 
 
-@admin.register(ExerEquipType)
+@admin.register(GameEquipType)
 class ExerEquipTypeAdmin(admin.ModelAdmin):
 	list_display = ['id', 'configure', 'name', 'description']
 

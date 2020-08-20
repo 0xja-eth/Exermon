@@ -1,9 +1,6 @@
-from xadmin.layout import Fieldset
 # from xadmin.plugins.inline import Inline
-from game_module.adminx import ParamsInline
-from item_module.adminx import *
+from utils.admin_utils import AdminXHelper
 from .models import *
-import xadmin
 
 # Register your models here.
 
@@ -24,6 +21,13 @@ class QuesPicturesInline(object):
 class BaseQuestionsInline(object):
 
 	style = "accordion"
+
+
+@AdminXHelper.registerBaseInline(WrongItem)
+class WrongItemsInline(object):
+
+	model = WrongItem
+	style = "table"
 
 
 @AdminXHelper.relatedModel(BaseQuestion)

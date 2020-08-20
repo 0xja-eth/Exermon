@@ -7,7 +7,7 @@ from .types import *
 
 # from player_module.models import Player
 from utils.calc_utils import *
-from utils.model_utils import CacheableModel
+from utils.model_utils import BaseModel, CacheableModel
 
 import jsonfield
 
@@ -39,6 +39,8 @@ class BasePlayerQuestion(CacheableModel):
 
 	# 来源
 	SOURCE = RecordSource.Others
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['question_set_id', 'exp_incr', 'slot_exp_incr', 'gold_incr']
 
 	# 题目
 	question: BaseQuestion = None
@@ -97,7 +99,7 @@ class BasePlayerQuestion(CacheableModel):
 		"""
 		获取对应的奖励计算类
 		Returns:
-			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
+			对应奖励计算类本身（继承自 QuesSetSingleRewardCalc）
 		"""
 		return cls.REWARD_CALC
 
@@ -144,47 +146,64 @@ class BasePlayerQuestion(CacheableModel):
 
 	# region 转化
 
-	def convert(self, type: str = None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-		Returns:
-			转化后的字典数据
-		"""
-		res = {}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		self._convertBaseInfo(res, type)
-
-		if type == 'result':
-			self._convertResultInfo(res, type)
-
-		return res
-
-	def _convertBaseInfo(self, res, type):
-		"""
-		转化基本信息
-		Args:
-			res (dict): 转化结果
-			type (str): 转化类型
-		"""
 		question_type = self.questionType().value
 
-		res['id'] = self.id
 		res['question_type'] = question_type
-		res['question_id'] = self.question_id
 
-		res['timespan'] = self.timespan
-		res['answered'] = self.answered
-		res['is_new'] = self.is_new
+	def _convertResultData(self, res, **kwargs):
 
-	def _convertResultInfo(self, res, type):
+		self._convertAutoAttrs(res)
 
-		res['exp_incr'] = self.exp_incr
-		res['slot_exp_incr'] = self.slot_exp_incr
-		res['gold_incr'] = self.gold_incr
+		self._convertCustomFields(res, 'exp_incr',
+						 'slot_exp_incr', 'gold_incr')
+
 		res['correct'] = self.correct()
 		res['score'] = self.score()
+
+	# def convert(self, type: str = None) -> dict:
+	# 	"""
+	# 	转化为字典
+	# 	Args:
+	# 		type (str): 转化类型
+	# 	Returns:
+	# 		转化后的字典数据
+	# 	"""
+	# 	res = {}
+	#
+	# 	self._convertBaseInfo(res, type)
+	#
+	# 	if type == 'result':
+	# 		self._convertResultInfo(res, type)
+	#
+	# 	return res
+	#
+	# def _convertBaseInfo(self, res, type):
+	# 	"""
+	# 	转化基本信息
+	# 	Args:
+	# 		res (dict): 转化结果
+	# 		type (str): 转化类型
+	# 	"""
+	# 	question_type = self.questionType().value
+	#
+	# 	res['id'] = self.id
+	# 	res['question_type'] = question_type
+	# 	res['question_id'] = self.question_id
+	#
+	# 	res['timespan'] = self.timespan
+	# 	res['answered'] = self.answered
+	# 	res['is_new'] = self.is_new
+	#
+	# def _convertResultInfo(self, res, type):
+	#
+	# 	res['exp_incr'] = self.exp_incr
+	# 	res['slot_exp_incr'] = self.slot_exp_incr
+	# 	res['gold_incr'] = self.gold_incr
+	# 	res['correct'] = self.correct()
+	# 	res['score'] = self.score()
 
 	# endregion
 
@@ -370,8 +389,8 @@ class GroupPlayerQuestion(BasePlayerQuestion):
 		abstract = True
 		verbose_name = verbose_name_plural = "选择组合题目关系"
 
-	# 选择情况
-	answers = jsonfield.JSONField(default=[], verbose_name="选择情况")
+	# 回答情况
+	answers = jsonfield.JSONField(default=[], verbose_name="回答情况")
 
 	def _answerDict(self) -> dict:
 		return {'answers': self.answers}
@@ -432,7 +451,7 @@ class ElementPlayerQuestion(BasePlayerQuestion):
 # ===================================================
 #  题目集奖励表
 # ===================================================
-class QuesSetReward(models.Model):
+class QuesSetReward(BaseModel):
 
 	class Meta:
 		abstract = True
@@ -471,19 +490,6 @@ class QuesSetReward(models.Model):
 		reward.count = count
 
 		return reward
-
-	# 转化为字典
-	def convert(self) -> dict:
-		"""
-		转化为字典
-		Returns:
-			转化后的字典数据
-		"""
-		return {
-			'type': self.type,
-			'item_id': self.item_id,
-			'count': self.count
-		}
 
 	# 获取物品
 	def item(self) -> BaseItem:
@@ -531,6 +537,10 @@ class QuesSetRecord(CacheableModel):
 
 	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
 						   'adminSlotExpIncrs', 'adminExpIncrs']
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['exer_exp_incrs',
+								  'slot_exp_incrs',
+								  'gold_incr']
 
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
@@ -652,7 +662,7 @@ class QuesSetRecord(CacheableModel):
 		"""
 		该类对应的奖励记录类
 		Returns:
-			返回某个 QuestionSetReward 子类本身
+			返回某个 QuesSetReward 子类本身
 		"""
 		return cls.REWARD_CLASS
 
@@ -713,42 +723,61 @@ class QuesSetRecord(CacheableModel):
 
 		return create_time, verbose_name
 
-	def convert(self, type: str = None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-		Returns:
-			转化后的字典数据
-		"""
-		res = {}
-
-		self._convertBaseInfo(res, type)
-
-		if type == 'result':
-			self._convertResultInfo(res)
-
-		return res
-
-	def _convertBaseInfo(self, res, type):
-
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+		
 		create_time = ModelUtils.timeToStr(self.create_time)
 		player_questions = ModelUtils.objectsToDict(
 			self.playerQuestions(), type=type)
 
-		res['id'] = self.id
 		res['name'] = self.generateName()
 		res['questions'] = player_questions
 		res['create_time'] = create_time
-		res['finished'] = self.finished
 
-	def _convertResultInfo(self, res):
+	def _convertResultData(self, res, **kwargs):
 		rewards = ModelUtils.objectsToDict(self.rewards())
+	
+		self._convertCustomFields(res, 'exer_exp_incrs',
+						 'slot_exp_incrs', 'gold_incr')
 
-		res['exer_exp_incrs'] = self.exer_exp_incrs
-		res['slot_exp_incrs'] = self.slot_exp_incrs
-		res['gold_incr'] = self.gold_incr
 		res['rewards'] = rewards
+
+	# def convert(self, type: str = None) -> dict:
+	# 	"""
+	# 	转化为字典
+	# 	Args:
+	# 		type (str): 转化类型
+	# 	Returns:
+	# 		转化后的字典数据
+	# 	"""
+	# 	res = {}
+	#
+	# 	self._convertBaseInfo(res, type)
+	#
+	# 	if type == 'result':
+	# 		self._convertResultInfo(res)
+	#
+	# 	return res
+	#
+	# def _convertBaseInfo(self, res, type):
+	#
+	# 	create_time = ModelUtils.timeToStr(self.create_time)
+	# 	player_questions = ModelUtils.objectsToDict(
+	# 		self.playerQuestions(), type=type)
+	#
+	# 	res['id'] = self.id
+	# 	res['name'] = self.generateName()
+	# 	res['questions'] = player_questions
+	# 	res['create_time'] = create_time
+	# 	res['finished'] = self.finished
+	#
+	# def _convertResultInfo(self, res):
+	# 	rewards = ModelUtils.objectsToDict(self.rewards())
+	#
+	# 	res['exer_exp_incrs'] = self.exer_exp_incrs
+	# 	res['slot_exp_incrs'] = self.slot_exp_incrs
+	# 	res['gold_incr'] = self.gold_incr
+	# 	res['rewards'] = rewards
 
 	# endregion
 
@@ -874,7 +903,7 @@ class QuesSetRecord(CacheableModel):
 		self._initQuestionCache()
 
 		# 设置当前的题目集
-		self.exactlyPlayer().setCurrentQuestionSet(self)
+		self.exactlyPlayer().setCurrentQuesSet(self)
 
 		self._generateQuestions(**kwargs)
 
@@ -982,7 +1011,7 @@ class QuesSetRecord(CacheableModel):
 		self._applyResult(self._calcResult(**kwargs))
 
 		# 会自动保存
-		self.exactlyPlayer().clearCurrentQuestionSet()
+		self.exactlyPlayer().clearCurrentQuesSet()
 
 	def _calcResult(self, **kwargs) -> QuesSetResultRewardCalc:
 		"""

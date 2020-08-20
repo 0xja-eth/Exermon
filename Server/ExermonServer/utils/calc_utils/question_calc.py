@@ -401,7 +401,7 @@ class MaxStarCalc:
 
 # endregion
 
-# region QuestionSetCalc
+# region QuesSetCalc
 
 
 # ================================

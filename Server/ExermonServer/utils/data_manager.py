@@ -1,173 +1,40 @@
 from .cache_utils import *
-from .runtime_manager import *
-import json, datetime
+import datetime
 
 
-# class DataLoader:
-# 	"""
-# 	数据加载类
-# 	"""
-# 	DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-# 	DATE_FORMAT = '%Y-%m-%d'
-#
-# 	@classmethod
-# 	def preventNone(cls, judge, value=None, obj=None, func=None, empty=None):
-# 		if judge is None: return empty
-# 		if value is not None: return value
-# 		if obj is None: obj = judge
-# 		return func(obj)
-#
-# 	@classmethod
-# 	def load(cls, type_: str or type, data: dict or list or str,
-# 			 error: ErrorType = ErrorType.UnknownError):
-# 		"""
-# 		从 json 读取实际数据
-# 		Args:
-# 			type_ (str or type): 类型
-# 			data (dict or list or str): 数据
-# 			error (ErrorType): 抛出异常
-# 		Returns:
-# 			返回转化后的数据
-# 		"""
-#
-# 		try:
-# 			if data is None: return None
-#
-# 			# 如果是一个类型，直接转化
-# 			if isinstance(type_, type):
-# 				if RuntimeModel in type_.mro():
-# 					return type_().load(data)
-#
-# 				return type(data)
-#
-# 			if type_ == 'int':
-# 				value = int(data)
-#
-# 			elif type_ == 'int[]':
-#
-# 				if not isinstance(data, list):
-# 					data = json.loads(data)
-#
-# 				value = []
-# 				for i in range(len(data)):
-# 					value.append(int(data[i]))
-#
-# 			elif type_ == 'int[][]':
-#
-# 				if not isinstance(data, list):
-# 					data = json.loads(data)
-#
-# 				value = []
-# 				for i in range(len(data)):
-# 					value.append([])
-# 					for j in range(len(data[i])):
-# 						value[i].append(int(data[i][j]))
-#
-# 			elif type_ == 'bool':
-# 				value = bool(data)
-#
-# 			elif type_ == 'date':
-# 				value = cls.loadDate(data)
-#
-# 			elif type_ == 'datetime':
-# 				value = cls.loadDateTime(data)
-#
-# 			else:
-# 				value = data
-#
-# 			# 其他类型判断
-# 			return value
-#
-# 		except:
-# 			raise GameException(error)
-#
-# 	# if hasattr(data, '__iter__'):
-# 	# 	res = list()
-# 	# 	for d in data:
-# 	# 		res.append(cls.load(type, d))
-# 	# 	return res
-#
-# 	@classmethod
-# 	def loadDate(cls, data, empty=None):
-# 		return cls.preventNone(data, func=lambda d:
-# 			datetime.datetime.strptime(d, cls.DATE_FORMAT), empty=empty)
-#
-# 	# return datetime.datetime.strptime(data, cls.DATE_FORMAT)
-#
-# 	@classmethod
-# 	def loadDateTime(cls, data, empty=None):
-# 		return cls.preventNone(data, func=lambda d:
-# 			datetime.datetime.strptime(d, cls.DATE_TIME_FORMAT), empty=empty)
-#
-# 	# return datetime.datetime.strptime(data, cls.DATE_TIME_FORMAT)
-#
-# 	@classmethod
-# 	def convert(cls, type_: str or type, data,
-# 				error: ErrorType = ErrorType.UnknownError) -> object:
-# 		"""
-# 		数据转化为 json 数据
-# 		Args:
-# 			type_ (str or type): 类型
-# 			data (object): 数据
-# 			error (ErrorType): 异常
-# 		Returns:
-# 			返回转化后的 json 字典 或 值
-# 		"""
-#
-# 		try:
-#
-# 			if isinstance(type_, type):
-# 				if isinstance(data, RuntimeModel):
-# 					return data.convert()
-#
-# 				return data
-#
-# 			if type_ == 'date':
-# 				value = cls.convertDate(data)
-#
-# 			elif type_ == 'datetime':
-# 				value = cls.convertDateTime(data)
-#
-# 			else:
-# 				value = data
-#
-# 			# 其他类型判断
-# 			return value
-#
-# 		except:
-# 			raise GameException(error)
-#
-# 	# if hasattr(data, '__iter__'):
-# 	# 	res = list()
-# 	# 	for d in data:
-# 	# 		res.append(cls.convert(type, d))
-# 	# 	return res
-#
-# 	@classmethod
-# 	def convertDate(cls, time: datetime, empty=None):
-# 		# if time is None: return empty
-# 		# return time.strftime('%Y-%m-%d')
-# 		return cls.preventNone(time, func=lambda t:
-# 			t.strftime(cls.DATE_FORMAT), empty=empty)
-#
-# 	@classmethod
-# 	def convertDateTime(cls, time: datetime, empty=None):
-# 		# if time is None: return empty
-# 		# return time.strftime('%Y-%m-%d %H:%M:%S')
-# 		return cls.preventNone(time, func=lambda t:
-# 			t.strftime(cls.DATE_TIME_FORMAT), empty=empty)
-#
-# 	@classmethod
-# 	def equals(cls, data, json_data):
-# 		"""
-# 		判断数据和JSON是否相等
-# 		Args:
-# 			data (object): 数据
-# 			json_data (str): JSON字符串
-# 		Returns:
-# 			返回两者是否相等
-# 		"""
-# 		return data == cls.load(type(data), json_data)
+class DataLoader:
+	"""
+	数据加载类
+	"""
+	DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+	DATE_FORMAT = '%Y-%m-%d'
+
+	@classmethod
+	def preventNone(cls, judge, value=None, obj=None, func=None, empty=None):
+		if judge is None: return empty
+		if value is not None: return value
+		if obj is None: obj = judge
+		return func(obj)
+
+	@classmethod
+	def loadDate(cls, data, empty=None):
+		return cls.preventNone(data, func=lambda d:
+			datetime.datetime.strptime(d, cls.DATE_FORMAT), empty=empty)
+
+	@classmethod
+	def loadDateTime(cls, data, empty=None):
+		return cls.preventNone(data, func=lambda d:
+			datetime.datetime.strptime(d, cls.DATE_TIME_FORMAT), empty=empty)
+
+	@classmethod
+	def convertDate(cls, time: datetime, empty=None):
+		return cls.preventNone(time, func=lambda t:
+			t.strftime(cls.DATE_FORMAT), empty=empty)
+
+	@classmethod
+	def convertDateTime(cls, time: datetime, empty=None):
+		return cls.preventNone(time, func=lambda t:
+			t.strftime(cls.DATE_TIME_FORMAT), empty=empty)
 
 
 class DataManager:
@@ -314,6 +181,28 @@ class DataManager:
 			返回转化结果
 		"""
 		res, flag = "", False
+		for char in val:
+			if char == spliter:
+				flag = True
+			elif flag:
+				res += char.upper()
+				flag = False
+			else:
+				res += char
+
+		return res
+
+	@staticmethod
+	def underline2UpperHump(val, spliter="_"):
+		"""
+		下划线命名法转化为大驼峰命名法
+		Args:
+			val (str): 原字符串
+			spliter (str): 分隔符
+		Returns:
+			返回转化结果
+		"""
+		res, flag = "", True
 		for char in val:
 			if char == spliter:
 				flag = True

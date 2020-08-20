@@ -8,8 +8,9 @@ class QuesSetType(Enum):
 	GeneralExercise = 100  # 常规刷题
 	ListeningExercise = 101  # 听力刷题
 	ReadingExercise = 102  # 阅读刷题
-	WordExercise = 103  # 单词训练
-	PhraseExercise = 104  # 短语训练
+	CollectingExercise = 103  # 改错刷题
+	WordExercise = 104  # 单词训练
+	PhraseExercise = 105  # 短语训练
 
 	Exam = 200  # 考核
 
@@ -24,6 +25,7 @@ QUES_SET_TYPES = [
 	(QuesSetType.GeneralExercise.value, '常规刷题'),
 	(QuesSetType.ListeningExercise.value, '听力刷题'),
 	(QuesSetType.ReadingExercise.value, '阅读刷题'),
+	(QuesSetType.CollectingExercise.value, '改错刷题'),
 	(QuesSetType.WordExercise.value, '单词联系'),
 	(QuesSetType.PhraseExercise.value, '短语练习'),
 

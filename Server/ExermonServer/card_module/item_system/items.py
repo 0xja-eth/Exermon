@@ -1,4 +1,4 @@
-from item_module.models import *
+from item_module.manager import *
 
 # import player_module.item_system.cont_items as ContItems
 # from . import *

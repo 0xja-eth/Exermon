@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from .types import *
 
 from utils.cache_utils import CacheHelper
-from utils.model_utils import QuestionImageUpload
+from utils.model_utils import BaseModel, QuestionImageUpload
 
 from enum import Enum
 import datetime
@@ -24,7 +24,7 @@ class QuestionStatus(Enum):
 # ===================================================
 #  基本题目表
 # ===================================================
-class BaseQuestion(models.Model):
+class BaseQuestion(BaseModel):
 
 	class Meta:
 		abstract = True
@@ -52,6 +52,8 @@ class BaseQuestion(models.Model):
 
 	LIST_EDITABLE_EXCLUDE = ['create_time']
 
+	DO_NOT_AUTO_CONVERT_FIELDS = ['score']
+
 	# 科目
 	subject = models.ForeignKey('game_module.Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
 
@@ -65,6 +67,7 @@ class BaseQuestion(models.Model):
 	# 分值
 	score = models.PositiveSmallIntegerField(default=None, null=True,
 											 blank=True, verbose_name="分值")
+	score.
 
 	# 来源
 	source = models.TextField(null=True, blank=True, verbose_name="来源")
@@ -95,20 +98,35 @@ class BaseQuestion(models.Model):
 	# 生成随机编号
 	def number(self): return self.id
 
-	def convert(self, type=None):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		res = {}
+		if type != 'info':
+			res['number'] = self.number()
+			res['score'] = self.quesScore()
 
-		self._convertIndexInfo(res, type)
+	@BaseModel.convertFields('id, subject_id', not_convert=False)
+	def _convertInfoData(self, res, **kwargs):
 
-		if type == 'info': return res
+		res['type'] = self.TYPE.value
 
-		self._convertBaseInfo(res, type)
+	@BaseModel.convertFields('source, description')
+	def _convertAnswerData(self, res, **kwargs): pass
 
-		if type == 'answer':
-			self._convertAnswerInfo(res)
-
-		return res
+	# def convert(self, type=None):
+	#
+	# 	res = {}
+	#
+	# 	self._convertIndexInfo(res, type)
+	#
+	# 	if type == 'info': return res
+	#
+	# 	self._convertBaseInfo(res, type)
+	#
+	# 	if type == 'answer':
+	# 		self._convertAnswerInfo(res)
+	#
+	# 	return res
 
 	# 转化索引信息
 	def _convertIndexInfo(self, res, type):
@@ -166,7 +184,7 @@ class BaseQuestion(models.Model):
 # ===================================================
 #  基本题目图片表
 # ===================================================
-class BaseQuesPicture(models.Model):
+class BaseQuesPicture(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "题目图片"
@@ -335,7 +353,7 @@ class SelectingQuestion(BaseQuestion):
 # ===================================================
 #  题目选项表
 # ===================================================
-class BaseQuesChoice(models.Model):
+class BaseQuesChoice(BaseModel):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "题目选项"
@@ -413,7 +431,7 @@ class CorrectingQuestion(BaseQuestion):
 	def calcCorrect(self, **kwargs):
 		return self.calcScore(**kwargs) == self.quesScore()
 
-	def calcScore(self, **kwargs):
+	def calcScore(self, wrong_items):
 		# TODO: 完善分值计算函数
 		pass
 
@@ -430,7 +448,7 @@ class CorrectType(Enum):
 # ===================================================
 #  改错题错误项
 # ===================================================
-class WrongItem(models.Model):
+class WrongItem(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "改错题错误项"
 
@@ -588,7 +606,7 @@ class RecordSource(Enum):
 # ===================================================
 #  基本题目记录表
 # ===================================================
-class BaseQuesRecord(models.Model):
+class BaseQuesRecord(BaseModel):
 
 	class Meta:
 		abstract = True
@@ -610,7 +628,7 @@ class BaseQuesRecord(models.Model):
 	# 题目
 	question: BaseQuestion = None
 	question_id: int = None
-	# question = models.ForeignKey('question_module.models.GeneralQuestion', null=False,
+	# question = models.ForeignKey('question_module.GeneralQuestion', null=False,
 	# 	on_delete=models.CASCADE, verbose_name="题目")
 
 	# 玩家
@@ -782,7 +800,7 @@ class QuesReportType(Enum):
 # ===================================================
 #  题目反馈表
 # ===================================================
-class BaseQuesReport(models.Model):
+class BaseQuesReport(BaseModel):
 
 	class Meta:
 		abstract = True

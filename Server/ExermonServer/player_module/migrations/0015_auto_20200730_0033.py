@@ -52,21 +52,21 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='humanpackequip',
             name='container',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.containers.ItemPack', verbose_name='容器'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.ItemPack', verbose_name='容器'),
         ),
         migrations.AlterField(
             model_name='humanpackequip',
             name='item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.items.GameItem', verbose_name='物品'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.GameItem', verbose_name='物品'),
         ),
         migrations.AlterField(
             model_name='humanpackitem',
             name='container',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.containers.ItemPack', verbose_name='容器'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.ItemPack', verbose_name='容器'),
         ),
         migrations.AlterField(
             model_name='humanpackitem',
             name='item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.item_system.items.GameItem', verbose_name='物品'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='player_module.GameItem', verbose_name='物品'),
         ),
     ]

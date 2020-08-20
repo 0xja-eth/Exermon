@@ -68,7 +68,7 @@ class Service:
 		# 返回数据：无
 		cla = QuestionCommon.getQuestionClass(q_type)
 
-		ques_set: QuesSetRecord = player.currentQuestionSet()
+		ques_set: QuesSetRecord = player.currentQuesSet()
 		ques_set.startQuestion(cla, qid)
 
 	# 作答刷题题目
@@ -80,7 +80,7 @@ class Service:
 		# result: 刷题结果数据 => 刷题结果（可选）
 		cla = QuestionCommon.getQuestionClass(q_type)
 
-		ques_set: QuesSetRecord = player.currentQuestionSet()
+		ques_set: QuesSetRecord = player.currentQuesSet()
 		ques_set.answerQuestion(answer, timespan, cla, qid)
 
 		if terminate:
@@ -98,9 +98,9 @@ class Check:
 	@classmethod
 	def ensureQuesSetType(cls, val: int):
 		if val == 0:
-			raise GameException(ErrorType.IncorrectQuestionSetType)
+			raise GameException(ErrorType.IncorrectQuesSetType)
 		ViewUtils.ensureEnumData(val, QuesSetType,
-								 ErrorType.IncorrectQuestionSetType, True)
+								 ErrorType.IncorrectQuesSetType, True)
 
 
 # =======================
@@ -136,6 +136,6 @@ class Common:
 
 	# 确保题目集记录所属玩家
 	@classmethod
-	def ensureQuestionSetPlayer(cls, ques_set_rec: QuesSetRecord, player):
+	def ensureQuesSetPlayer(cls, ques_set_rec: QuesSetRecord, player):
 		if ques_set_rec.player_id != player.id:
 			raise GameException(ErrorType.ExerciseRecordNotExist)

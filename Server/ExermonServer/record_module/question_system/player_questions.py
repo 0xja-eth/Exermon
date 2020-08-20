@@ -41,6 +41,23 @@ class ReadingExerciseQuestion(GroupPlayerQuestion): pass
 
 
 # ===================================================
+#  刷题题目关系表
+# ===================================================
+@RecordManager.registerPlayerQuestion(
+	CorrectingQuestion, CollectingExerciseRecord, RecordSource.Exercise)
+class CorrectingExerciseQuestion(BasePlayerQuestion):
+
+	# 回答错误项
+	wrong_items = jsonfield.JSONField(default=[], verbose_name="回答错误项")
+
+	def _answerDict(self) -> dict:
+		return {'wrong_items': self.wrong_items}
+
+	def _processAnswer(self, answer):
+		self.wrong_items = answer
+
+
+# ===================================================
 #  单词题目关系表
 # ===================================================
 @RecordManager.registerPlayerQuestion(
@@ -62,6 +79,7 @@ class WordExerciseQuestion(ElementPlayerQuestion):
 
 	def _generateChoices(self):
 		if self.dictation: return
+		# TODO: 生成单词题目
 		pass
 
 	def title(self):
@@ -90,4 +108,5 @@ class WordExerciseQuestion(ElementPlayerQuestion):
 class PhraseExerciseQuestion(ElementPlayerQuestion):
 
 	def _generateChoices(self):
+		# TODO: 生成短语题目
 		pass

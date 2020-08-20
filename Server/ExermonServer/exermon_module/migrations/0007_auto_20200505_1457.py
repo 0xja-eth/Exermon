@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('value', models.IntegerField(default=0, verbose_name='属性值')),
-                ('equip', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.item_system.items.GameEquip', verbose_name='装备')),
+                ('equip', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exermon_module.GameEquip', verbose_name='装备')),
                 ('param', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='game_module.BaseParam', verbose_name='属性类型')),
             ],
             options={

@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from .item_system.containers import *
 from .item_system.cont_items import *
 
-from game_module.models import GroupConfigure, Subject, QuestionStar
+from game_module.models import StaticData, Subject, QuestionStar
 
 from player_module.models import Player
 from exermon_module.models import ExerSkill, HitType, TargetType
@@ -23,7 +23,7 @@ import random, datetime
 # =======================
 # 对战评价表，记录对战评价所需分数以及增加/扣除星星数的关系
 # =======================
-class BattleResultJudge(GroupConfigure):
+class BattleResultJudge(StaticData):
 	"""
 	对战评价表，记录对战评价所需分数以及增加/扣除星星数的关系
 	"""
@@ -41,23 +41,6 @@ class BattleResultJudge(GroupConfigure):
 
 	# 失败增加星星（负数为减少）
 	lose = models.SmallIntegerField(default=0, verbose_name="失败增星数")
-
-	def convert(self, type: str = None, **kwargs) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-			**kwargs (**dict): 子类重载参数
-		Returns:
-			转化后的字典数据
-		"""
-		res = super().convert()
-
-		res['score'] = self.score
-		res['win'] = self.win
-		res['lose'] = self.lose
-
-		return res
 
 
 # ===================================================
@@ -154,35 +137,21 @@ class BattleRecord(CacheableModel):
 
 		return rec
 
-	def convert(self, type: str = None, **kwargs) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-			**kwargs (**dict): 子类重载参数
-		Returns:
-			转化后的字典数据
-		"""
-		create_time = ModelUtils.timeToStr(self.create_time)
-		result_time = ModelUtils.timeToStr(self.result_time)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		players = ModelUtils.objectsToDict(self.battlePlayers(), type=type)
+		res['players'] = players
+
+	def _convertRecordData(self, res, **kwargs):
+
 		rounds = ModelUtils.objectsToDict(self.battleRounds(), type=type)
+		res['rounds'] = rounds
 
-		res = {
-			'id': self.id,
-			'mode': self.mode,
-			'season_id': self.season_id,
-			'create_time': create_time,
-			'result_time': result_time,
+	def _convertResultData(self, res, **kwargs):
 
-			'players': players,
-		}
-
-		if type == "record" or type == "result":
-			res['rounds'] = rounds
-
-		return res
+		rounds = ModelUtils.objectsToDict(self.battleRounds(), type=type)
+		res['rounds'] = rounds
 
 	def start(self, player1: Player, player2: Player):
 		"""
@@ -382,7 +351,7 @@ class BattleRecord(CacheableModel):
 # ===================================================
 #  对战回合
 # ===================================================
-class BattleRound(models.Model):
+class BattleRound(BaseModel):
 
 	class Meta:
 
@@ -401,20 +370,11 @@ class BattleRound(models.Model):
 	def __str__(self):
 		return str(self.record)+" 回合 "+str(self.order)
 
-	def convert(self, type: str = None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-		Returns:
-			转化后的字典数据
-		"""
-		return {
-			'order': self.order,
-			'subject_id': self.question.subject_id,
-			'star_id': self.question.star_id,
-			'question_id': self.question_id
-		}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['subject_id'] = self.question.subject_id
+		res['star_id'] = self.question.star_id
 
 	# 创建对象
 	@classmethod
@@ -463,13 +423,13 @@ class BattleRound(models.Model):
 		生成题目，赋值到 question 中
 		"""
 
-		from utils.calc_utils import BaseQuestionGenerateConfigure, QuestionGenerateType, GeneralQuestionGenerator
+		from utils.calc_utils import GeneralQuestionGenerateConfigure, QuestionGenerateType, GeneralQuestionGenerator
 
 		player = self._generateConfigurePlayer()
 		subject, star = self._generateSubjectAndStar()
 
-		configure = BaseQuestionGenerateConfigure(self, player, subject, ques_star=star, count=1,
-												  gen_type=QuestionGenerateType.NotOccurFirst.value)
+		configure = GeneralQuestionGenerateConfigure(self, player, subject,
+			ques_star=star, count=1, gen_type=QuestionGenerateType.NotOccurFirst.value)
 
 		gen = GeneralQuestionGenerator.generate(configure, True)
 		result = gen.result
@@ -518,6 +478,10 @@ class BattlePlayer(QuesSetRecord):
 	]
 
 	LIST_DISPLAY_APPEND = ['adminScores']
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['time_score', 'hurt_score',
+								  'damage_score', 'recovery_score',
+								  'correct_score', 'plus_score']
 
 	# 关联的记录
 	record = models.ForeignKey('BattleRecord', on_delete=models.CASCADE, verbose_name="对战记录")
@@ -629,22 +593,8 @@ class BattlePlayer(QuesSetRecord):
 		"""
 		self.record = record
 
-	def convert(self, type: str = None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-		Returns:
-			转化后的字典数据
-		"""
-		res = super().convert(type)
-
-		res['pid'] = self.player_id
-		res['score_incr'] = self.score_incr
-
-		# res['sum_hurt'] = self.sumHurt()
-		# res['sum_damage'] = self.sumDamage()
-		# res['sum_recover'] = self.sumRecover()
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		res['time_score'] = self.time_score/100
 		res['hurt_score'] = self.hurt_score/100
@@ -652,11 +602,6 @@ class BattlePlayer(QuesSetRecord):
 		res['recovery_score'] = self.recovery_score/100
 		res['correct_score'] = self.correct_score/100
 		res['plus_score'] = self.plus_score/100
-
-		res['result'] = self.result
-		res['status'] = self.status
-
-		return res
 
 	def battleScore(self) -> int:
 		"""
@@ -851,7 +796,7 @@ class BattleRoundResult(SelectingPlayerQuestion):
 		"""
 		获取对应的奖励计算类
 		Returns:
-			对应奖励计算类本身（继承自 QuestionSetSingleRewardCalc）
+			对应奖励计算类本身（继承自 QuesSetSingleRewardCalc）
 		"""
 		return ExerciseSingleRewardCalc
 
@@ -864,31 +809,14 @@ class BattleRoundResult(SelectingPlayerQuestion):
 		"""
 		return RecordSource.Battle
 
-	def convert(self, type: str = None,
-					  runtime_battler: 'RuntimeBattlePlayer' = None) -> dict:
-		"""
-		转化为字典
-		Args:
-			type (str): 转化类型
-			runtime_battler (RuntimeBattlePlayer): 运行时对战玩家对象
-		Returns:
-			转化后的字典数据
-		"""
-		res = super().convert(type)
+	def _convertCustomAttrs(self, res, type=None,
+							runtime_battler=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		res['order'] = self.round.order
-		res['attack'] = self.attack
-		res['skill_id'] = self.skill_id
-		res['target_type'] = self.target_type
-		res['result_type'] = self.result_type
-		res['hurt'] = self.hurt
-		res['damage'] = self.damage
-		res['recovery'] = self.recovery
 
 		if runtime_battler is not None:
 			runtime_battler.convert(res)
-
-		return res
 
 	def _create(self, round: BattleRound):
 		"""
@@ -898,7 +826,7 @@ class BattleRoundResult(SelectingPlayerQuestion):
 		"""
 		self.round = round
 
-	# def setQuestionSet(self, question_set: BattlePlayer):
+	# def setQuesSet(self, question_set: BattlePlayer):
 	# 	"""
 	# 	设置题目集（对战玩家）
 	# 	Args:

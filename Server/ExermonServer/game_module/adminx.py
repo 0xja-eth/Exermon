@@ -1,6 +1,6 @@
 
 from .models import *
-from utils.model_utils import AdminXHelper
+from utils.admin_utils import AdminXHelper
 
 # Register your models here.
 
@@ -36,7 +36,7 @@ class SubjectAdmin(object): pass
 class BaseParamAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(UsableItemType)
+@AdminXHelper.relatedModel(GameItemType)
 class UsableItemTypeAdmin(object): pass
 
 
@@ -44,7 +44,7 @@ class UsableItemTypeAdmin(object): pass
 class HumanEquipTypeAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(ExerEquipType)
+@AdminXHelper.relatedModel(GameEquipType)
 class ExerEquipTypeAdmin(object): pass
 
 

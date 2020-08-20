@@ -3,10 +3,10 @@ from django.conf import settings
 
 from .item_system.items import *
 
-from game_module.models import GroupConfigure
+from game_module.models import StaticData
 from question_module.models import WordRecord
 
-from utils.model_utils import Common as ModelUtils
+from utils.model_utils import BaseModel, Common as ModelUtils
 
 import jsonfield, random
 
@@ -16,7 +16,7 @@ import jsonfield, random
 # ===================================================
 #  反义词表
 # ===================================================
-class Antonym(GroupConfigure):
+class Antonym(GameData):
 	class Meta:
 		verbose_name = verbose_name_plural = "反义词"
 
@@ -29,23 +29,11 @@ class Antonym(GroupConfigure):
 	# 伤害比率（*100）
 	hurt_rate = models.SmallIntegerField(default=100, verbose_name="伤害比率")
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		return {
-			'card_word': self.card_word,
-			'enemy_word': self.enemy_word,
-			'hurt_rate': self.hurt_rate / 100,
-		}
-
 
 # ===================================================
 #  初始卡组表
 # ===================================================
-class FirstCardGroup(GroupConfigure):
+class FirstCardGroup(StaticData):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "初始卡组"
@@ -54,18 +42,6 @@ class FirstCardGroup(GroupConfigure):
 
 	# 卡组ID集
 	cards = jsonfield.JSONField(default=[], verbose_name="卡组ID集")
-
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		res["cards"] = self.cards
-
-		return res
 
 	def adminCards(self):
 		res = ""
@@ -231,7 +207,7 @@ class FirstCardGroup(GroupConfigure):
 # # ===================================================
 # #  英语单词来源表
 # # ===================================================
-# class EnglishWordSource(models.Model):
+# class EnglishWordSource(BaseModel):
 #
 # 	class Meta:
 # 		verbose_name = verbose_name_plural = "英语单词来源"
@@ -266,30 +242,18 @@ class FirstCardGroup(GroupConfigure):
 # ===================================================
 #  据点类型表
 # ===================================================
-class NodeType(GroupConfigure):
+class NodeType(StaticData):
 	class Meta:
 		verbose_name = verbose_name_plural = "据点类型"
 
 	# 题型
 	ques_types = models.CharField(max_length=32, verbose_name="题型")
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		res['ques_types'] = self.ques_types
-
-		return res
-
 
 # ===================================================
 #  地图表
 # ===================================================
-class ExerProMap(models.Model):
+class ExerProMap(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "特训地图"
 
@@ -308,24 +272,14 @@ class ExerProMap(models.Model):
 	def __str__(self):
 		return "%d. %s" % (self.id, self.name)
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
 		stages = ModelUtils.objectsToDict(self.stages())
 
-		return {
-			'id': self.id,
-			'name': self.name,
-			'description': self.description,
-			'level': self.level,
-			'min_level': self.min_level,
+		res['stages'] = stages
 
-			'stages': stages
-		}
-
+	@CacheHelper.staticCache
 	def stages(self):
 		"""
 		获取所有关卡
@@ -365,11 +319,13 @@ class ExerProMap(models.Model):
 # ===================================================
 #  地图关卡表
 # ===================================================
-class ExerProMapStage(models.Model):
+class ExerProMapStage(BaseModel):
 	class Meta:
 		verbose_name = verbose_name_plural = "地图关卡"
 
 	LIST_EDITABLE_EXCLUDE = ['map']
+
+	DO_NOT_AUTO_CONVERT_FIELDS = ['enemies']
 
 	# 序号
 	order = models.PositiveSmallIntegerField(default=1, verbose_name="序号")
@@ -398,24 +354,12 @@ class ExerProMapStage(models.Model):
 	def __str__(self):
 		return "%s 第 %s 关" % (self.map, self.order)
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
 		enemies = list(e.id for e in self.enemies.all())
 
-		return {
-			'order': self.order,
-			'max_battle_enemies': self.max_battle_enemies,
-			'steps': self.steps,
-			'max_fork_node': self.max_fork_node,
-			'max_fork': self.max_fork,
-			'node_rate': self.node_rate,
-
-			'enemies': enemies,
-		}
+		res['enemies'] = enemies
 
 
 # ===================================================
@@ -495,67 +439,27 @@ class ExerProRecord(CacheableModel):
 
 		return record
 
-	def convert(self, type: str = None, **kwargs):
-		"""
-		转化为字典
-		Args:
-			type (str): 类型
-			**kwargs (**dict): 拓展参数
-		Returns:
-			返回转化后的字典
-		"""
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		if type == "records":
-			return ModelUtils.objectsToDict(self.wordRecords())
+		if type is None:
+			res['map_id'] = self.stage.map_id
+			res['order'] = self.stage.order
 
-		word_records = self.currentWordRecords()
-		words = [record.word for record in word_records]
+		if type is None or type == 'records':
+			word_records = self.currentWordRecords()
+			words = [record.word for record in word_records]
 
-		if type == "words":
-			return {
-				'word_level': self.word_level,
-				'words': ModelUtils.objectsToDict(words),
-				'word_records': ModelUtils.objectsToDict(word_records),
-			}
+			res['words'] = ModelUtils.objectsToDict(words)
+			res['word_records'] = ModelUtils.objectsToDict(word_records)
 
-		# if type == "status":
-		# 	records = self.currentWordRecords()
-		#
-		# 	corr_recs = [record for record in records
-		# 				 if record.current_correct is True]
-		# 	wrong_recs = [record for record in records
-		# 				  if record.current_correct is False]
-		#
-		# 	sum = len(records)
-		# 	correct = len(corr_recs)
-		# 	wrong = len(wrong_recs)
-		#
-		# 	return {
-		# 		'level': self.word_level,
-		# 		'sum': sum,
-		# 		'correct': correct,
-		# 		'wrong': wrong
-		# 	}
+	def _convertRecordsData(self, res, **kwargs):
 
-		cur_index = self.cur_index
-		if cur_index is None: cur_index = -1
+		res['word_records'] = ModelUtils.objectsToDict(self.wordRecords())
 
-		return {
-			'id': self.id,
-			'map_id': self.stage.map_id,
-			'stage_order': self.stage.order,
-			'started': self.started,
-			'generated': self.generated,
-			'cur_index': cur_index,
-			'word_level': self.word_level,
+	def _convertWordsData(self, res, **kwargs):
 
-			'gold': self.gold,
-			'nodes': self.nodes,
-			'actor': self.actor,
-
-			'words': ModelUtils.objectsToDict(words),
-			'word_records': ModelUtils.objectsToDict(word_records),
-		}
+		res['word_level'] = self.word_level
 
 	def loadFromDict(self, data: dict):
 		"""
@@ -737,7 +641,7 @@ class ExerProRecord(CacheableModel):
 # # ===================================================
 # #  特训积分表
 # # ===================================================
-# class ExerProScore(models.Model):
+# class ExerProScore(BaseModel):
 # 	class Meta:
 #
 # 		verbose_name = verbose_name_plural = "特训积分"

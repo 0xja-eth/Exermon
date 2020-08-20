@@ -23,20 +23,6 @@ class PlayerExerParamBase(ParamValue):
 	# 过期时间
 	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
 
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		expires_time = ModelUtils.timeToStr(self.expires_time)
-
-		res['expires_time'] = expires_time
-
-		return res
-
 	# 是否过期
 	def isOutOfDate(self):
 		if self.expires_time is None: return False
@@ -68,20 +54,6 @@ class PlayerExerParamRate(ParamRate):
 
 	# 过期时间
 	expires_time = models.DateTimeField(null=True, verbose_name="过期时间")
-
-	def convert(self):
-		"""
-		转化为字典
-		Returns:
-			返回转化后的字典
-		"""
-		res = super().convert()
-
-		expires_time = ModelUtils.timeToStr(self.expires_time)
-
-		res['expires_time'] = expires_time
-
-		return res
 
 	# 是否过期
 	def isOutOfDate(self):
@@ -167,26 +139,21 @@ class PlayerExermon(PackContItem, ParamsObject):
 		res['plus_param_values'] = ModelUtils.objectsToDict(self.plusParamVals())
 		res['plus_param_rates'] = ModelUtils.objectsToDict(self.plusParamRates())
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		from utils.calc_utils import ExermonLevelCalc
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		res = super().convert(**kwargs)
+		from utils.calc_utils import ExermonLevelCalc
 
 		star = self.item.star
 		next = ExermonLevelCalc.getDetlaExp(star, self.level)
 
-		exerskillslot = ModelUtils.objectToDict(self.exerSkillSlot(), type="items")
+		exer_skill_slot = ModelUtils.objectToDict(
+			self.exerSkillSlot(), type="items")
 
-		res['nickname'] = self.nickname
-		res['exp'] = self.exp
 		res['next'] = int(next)
-		res['level'] = self.level
-		res['exer_skill_slot'] = exerskillslot
+		res['exer_skill_slot'] = exer_skill_slot
 
 		self._convertParamsToDict(res)
-
-		return res
 
 	# 获取属性当前值（计算）
 	def _paramVal(self, **kwargs):
@@ -463,23 +430,18 @@ class ExerSlotItem(SlotContItem, ParamsObject):
 		res['param_values'] = ModelUtils.objectsToDict(self.paramVals())
 		res['rate_params'] = ModelUtils.objectsToDict(self.paramRates())
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		level, next = self.slotLevel(True)
 
 		exer_equip_slot = ModelUtils.objectToDict(self.exerEquipSlot(), type="items")
 
-		# res['subject_id'] = self.subject_id
-		res['exp'] = self.exp
 		res['level'] = level
 		res['next'] = next
 		res['exer_equip_slot'] = exer_equip_slot
 
 		self._convertParamsToDict(res)
-
-		return res
 
 	def playerExer(self) -> PlayerExermon:
 		return self.equipItem(0)
@@ -591,15 +553,6 @@ class ExerSkillSlotItem(SlotContItem):
 	# 使用次数
 	use_count = models.PositiveIntegerField(default=0, verbose_name="使用次数")
 
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['skill_id'] = self.skill_id
-		res['use_count'] = self.use_count
-
-		return res
-
 	def isContItemUsable(self, occasion: ItemUseOccasion, **kwargs) -> bool:
 		"""
 		配置当前物品是否可用
@@ -677,22 +630,16 @@ class EquipPackItem(PackContItem, EquipParamsObject):
 								  Containers.ExerEquipSlot, pack_equip=EquipPackItem)
 class ExerEquipSlotItem(SlotContItem, ParamsObject):
 
+	AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
+
 	# 装备槽类型
-	e_type = models.ForeignKey('game_module.ExerEquipType', on_delete=models.CASCADE,
+	e_type = models.ForeignKey('game_module.models.GameEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
 
 	@classmethod
 	def paramValueClass(cls):
 		cla = cls.acceptedEquipItemClasses()[0]
 		return cla.baseParamClass()
-
-	# 转化为 dict
-	def convert(self, **kwargs):
-		res = super().convert(**kwargs)
-
-		res['e_type'] = self.e_type_id
-
-		return res
 
 	# 装备
 	def packEquip(self) -> EquipPackItem:

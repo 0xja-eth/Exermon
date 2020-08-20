@@ -148,9 +148,9 @@ class ErrorType(Enum):
 	# RecordCommon
 	ExerciseRecordNotExist = 500  # 刷题记录不存在
 	ExerciseQuestionNotExist = 501  # 刷题题目不存在
-	IncorrectQuestionSetType = 502  # 题目集类型不正确
+	IncorrectQuesSetType = 502  # 题目集类型不正确
 
-	# QuestionSetRecord
+	# QuesSetRecord
 	QuestionNotStarted = 510  # 本题还没开始作答
 	InvalidTimeSpan = 511  # 作答时间有误
 
@@ -359,9 +359,9 @@ class GameException(Exception):
 		# RecordCommon
 		ErrorType.ExerciseRecordNotExist: "刷题记录不存在！",
 		ErrorType.ExerciseQuestionNotExist: "刷题题目不存在！",
-		ErrorType.IncorrectQuestionSetType: "题目集类型不正确！",
+		ErrorType.IncorrectQuesSetType: "题目集类型不正确！",
 
-		# QuestionSetRecord
+		# QuesSetRecord
 		ErrorType.QuestionNotStarted: "本题还没开始作答！",
 		ErrorType.InvalidTimeSpan: "作答时间有误！",
 

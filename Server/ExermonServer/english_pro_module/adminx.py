@@ -1,15 +1,8 @@
-from question_module.adminx import *
 from item_module.adminx import *
+from utils.admin_utils import AdminXHelper
 from .models import *
 
 # Register your models here.
-
-
-@AdminXHelper.registerBaseInline(WrongItem)
-class WrongItemsInline(object):
-
-	model = WrongItem
-	style = "table"
 
 
 @AdminXHelper.registerBaseInline(ExerProMapStage)
@@ -17,46 +10,6 @@ class MapStagesInline(object):
 
 	model = ExerProMapStage
 	style = "accordion"
-
-
-@AdminXHelper.relatedModel(ListeningQuesChoice)
-class ListeningQuesChoiceAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(ListeningSubQuestion)
-class ListeningSubQuestionAdmin(BaseQuestionAdmin): pass
-
-
-@AdminXHelper.relatedModel(PlotQuestion)
-class PlotQuestionAdmin(BaseQuestionAdmin): pass
-
-
-@AdminXHelper.relatedModel(PlotQuesChoice)
-class PlotQuesChoiceAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(ListeningQuestion)
-class ListeningQuestionAdmin(GroupQuestionAdmin): pass
-
-
-@AdminXHelper.relatedModel(Phrase)
-class PhraseQuestionAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(CorrectingQuestion)
-class CorrectionQuestionAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(WrongItem)
-class WrongItemAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(Word)
-class WordAdmin(object): pass
-
-
-@AdminXHelper.relatedModel(WordRecord)
-class WordRecordAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(Antonym)
