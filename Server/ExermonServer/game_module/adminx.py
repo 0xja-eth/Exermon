@@ -37,39 +37,39 @@ class DynamicDataAdmin(object): pass
 
 
 @AdminXHelper.relatedModel(GameTip)
-class GameTipAdmin(object): pass
+class GameTipAdmin(DynamicDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(Subject)
-class SubjectAdmin(object): pass
+class SubjectAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(BaseParam)
-class BaseParamAdmin(object): pass
+class BaseParamAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(GameItemType)
-class UsableItemTypeAdmin(object): pass
+class UsableItemTypeAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(GameEquipType)
-class ExerEquipTypeAdmin(object): pass
+class ExerEquipTypeAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(ExerStar)
-class ExerStarAdmin(object): pass
+class ExerStarAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(ExerGiftStar)
-class ExerGiftStarAdmin(object): pass
+class ExerGiftStarAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(ItemStar)
-class ItemStarAdmin(object): pass
+class ItemStarAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(QuestionStar)
-class QuestionStarAdmin(object): pass
+class QuestionStarAdmin(StaticDataAdmin): pass
 
 
 @AdminXHelper.relatedModel(GameVersion)

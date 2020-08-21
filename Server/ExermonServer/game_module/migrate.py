@@ -4,15 +4,20 @@
 
 from utils.model_utils import CoreDataManager, DataManager
 
+from .models import *
+
 import json
 
 base_path = './game_module/raw_data/'
 
 
 def export():
-	models = CoreDataManager.getStaticData()
+	
+	for model in CoreDataManager.getCoreData():
+		exportModel(model)
 
-	for model in models: exportModel(model)
+	exportModel(GameVersion)
+	exportModel(GameConfigure)
 
 
 def exportModel(model):
@@ -32,9 +37,12 @@ def exportModel(model):
 
 
 def import_():
-	models = CoreDataManager.getStaticData()
 
-	for model in models: importModel(model)
+	for model in CoreDataManager.getCoreData():
+		importModel(model)
+
+	importModel(GameVersion)
+	importModel(GameConfigure)
 
 
 def importModel(model):

@@ -971,7 +971,7 @@ class BaseModel(models.Model):
 # ===================================================
 class CoreDataManager:
 
-	# 获取所有游戏资料数据类
+	# 获取所有游戏核心数据类
 	@classmethod
 	def getCoreData(cls):
 		return cls._getSubModels(CoreData)
@@ -981,15 +981,21 @@ class CoreDataManager:
 	def getGameData(cls):
 		return cls._getSubModels(GameData)
 
-	# 获取所有游戏资料数据类
+	# 获取所有游戏静态数据类
 	@classmethod
 	def getStaticData(cls):
 		return cls._getSubModels(StaticData)
 
-	# 获取所有游戏资料数据类
+	# 获取所有游戏动态数据类
 	@classmethod
 	def getDynamicData(cls):
 		return cls._getSubModels(DynamicData)
+
+	# 获取所有游戏题目数据类
+	@classmethod
+	def getQuestionData(cls):
+		from question_module.models import BaseQuestion
+		return cls._getSubModels(BaseQuestion)
 
 	# 递归地获取一个模型类的所有子类
 	@classmethod
