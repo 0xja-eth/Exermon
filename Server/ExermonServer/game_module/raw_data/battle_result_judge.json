@@ -1,0 +1,58 @@
+[
+  {
+    "configure_id": 1,
+    "name": "D",
+    "description": "",
+    "score": 0,
+    "win": 0,
+    "lose": -2
+  },
+  {
+    "configure_id": 1,
+    "name": "C",
+    "description": "",
+    "score": 60,
+    "win": 1,
+    "lose": -1
+  },
+  {
+    "configure_id": 1,
+    "name": "B",
+    "description": "",
+    "score": 70,
+    "win": 1,
+    "lose": -1
+  },
+  {
+    "configure_id": 1,
+    "name": "A",
+    "description": "",
+    "score": 80,
+    "win": 1,
+    "lose": -1
+  },
+  {
+    "configure_id": 1,
+    "name": "S",
+    "description": "",
+    "score": 90,
+    "win": 1,
+    "lose": 0
+  },
+  {
+    "configure_id": 1,
+    "name": "SS",
+    "description": "",
+    "score": 95,
+    "win": 2,
+    "lose": 0
+  },
+  {
+    "configure_id": 1,
+    "name": "SSS",
+    "description": "",
+    "score": 100,
+    "win": 3,
+    "lose": 1
+  }
+]

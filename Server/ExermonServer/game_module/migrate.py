@@ -6,11 +6,11 @@ from utils.model_utils import CoreDataManager, DataManager
 
 import json
 
-base_path = './raw_data/'
+base_path = './game_module/raw_data/'
 
 
 def export():
-	models = CoreDataManager.getCoreData()
+	models = CoreDataManager.getStaticData()
 
 	for model in models: exportModel(model)
 
@@ -27,12 +27,12 @@ def exportModel(model):
 
 	res = [object.export() for object in objects]
 
-	with open(path, 'w', encoding='utf-8') as f:
+	with open(path, 'w+', encoding='utf-8') as f:
 		json.dump(res, f)
 
 
 def import_():
-	models = CoreDataManager.getCoreData()
+	models = CoreDataManager.getStaticData()
 
 	for model in models: importModel(model)
 
@@ -45,7 +45,7 @@ def importModel(model):
 
 	print("Importing model %s from %s" % (model.__name__, path))
 
-	with open(path, 'w', encoding='utf-8') as f:
+	with open(path, 'r', encoding='utf-8') as f:
 		data = json.load(f)
 
 	objects = model.objects.all()
@@ -61,5 +61,5 @@ def importModel(model):
 			old_obj.load(data[i])
 
 	for i in range(old_len, new_len):
-		model(data_=data[i])
+		model(_data=data[i])
 

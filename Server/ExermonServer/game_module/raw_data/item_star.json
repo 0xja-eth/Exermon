@@ -1,0 +1,38 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u7c97\u7cd9",
+    "description": "",
+    "color": "#FFFFFF"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u666e\u901a",
+    "description": "",
+    "color": "#80FF80"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4f18\u826f",
+    "description": "",
+    "color": "#80FFFF"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5b8c\u7f8e",
+    "description": "",
+    "color": "#FFC480"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u6781\u54c1",
+    "description": "",
+    "color": "#FF80FF"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4f20\u8bf4",
+    "description": "",
+    "color": "#FF8080"
+  }
+]

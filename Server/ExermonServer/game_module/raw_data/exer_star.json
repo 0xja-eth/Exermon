@@ -1,0 +1,530 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u4e00\u661f",
+    "description": "",
+    "color": "#FFFFFF",
+    "max_level": 40,
+    "level_exp_factors": {
+      "a": 1.4,
+      "b": -3,
+      "c": 300
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 50,
+        "max_value": 100,
+        "star_id": 1
+      },
+      {
+        "param_id": 2,
+        "min_value": 25,
+        "max_value": 50,
+        "star_id": 1
+      },
+      {
+        "param_id": 3,
+        "min_value": 35,
+        "max_value": 60,
+        "star_id": 1
+      },
+      {
+        "param_id": 4,
+        "min_value": 20,
+        "max_value": 30,
+        "star_id": 1
+      },
+      {
+        "param_id": 5,
+        "min_value": 0,
+        "max_value": 250,
+        "star_id": 1
+      },
+      {
+        "param_id": 6,
+        "min_value": 0,
+        "max_value": 200,
+        "star_id": 1
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 200,
+        "max_value": 300,
+        "star_id": 1
+      },
+      {
+        "param_id": 2,
+        "min_value": 200,
+        "max_value": 300,
+        "star_id": 1
+      },
+      {
+        "param_id": 3,
+        "min_value": 200,
+        "max_value": 300,
+        "star_id": 1
+      },
+      {
+        "param_id": 4,
+        "min_value": 200,
+        "max_value": 300,
+        "star_id": 1
+      },
+      {
+        "param_id": 5,
+        "min_value": 50,
+        "max_value": 75,
+        "star_id": 1
+      },
+      {
+        "param_id": 6,
+        "min_value": 50,
+        "max_value": 75,
+        "star_id": 1
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e8c\u661f",
+    "description": "",
+    "color": "#80FF80",
+    "max_level": 50,
+    "level_exp_factors": {
+      "a": 1.84,
+      "b": -2,
+      "c": 315
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 80,
+        "max_value": 140,
+        "star_id": 2
+      },
+      {
+        "param_id": 2,
+        "min_value": 40,
+        "max_value": 75,
+        "star_id": 2
+      },
+      {
+        "param_id": 3,
+        "min_value": 50,
+        "max_value": 75,
+        "star_id": 2
+      },
+      {
+        "param_id": 4,
+        "min_value": 25,
+        "max_value": 40,
+        "star_id": 2
+      },
+      {
+        "param_id": 5,
+        "min_value": 0,
+        "max_value": 350,
+        "star_id": 2
+      },
+      {
+        "param_id": 6,
+        "min_value": 0,
+        "max_value": 300,
+        "star_id": 2
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 250,
+        "max_value": 350,
+        "star_id": 2
+      },
+      {
+        "param_id": 2,
+        "min_value": 250,
+        "max_value": 350,
+        "star_id": 2
+      },
+      {
+        "param_id": 3,
+        "min_value": 250,
+        "max_value": 350,
+        "star_id": 2
+      },
+      {
+        "param_id": 4,
+        "min_value": 250,
+        "max_value": 350,
+        "star_id": 2
+      },
+      {
+        "param_id": 5,
+        "min_value": 60,
+        "max_value": 90,
+        "star_id": 2
+      },
+      {
+        "param_id": 6,
+        "min_value": 60,
+        "max_value": 90,
+        "star_id": 2
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e09\u661f",
+    "description": "",
+    "color": "#80FFFF",
+    "max_level": 60,
+    "level_exp_factors": {
+      "a": 2.33,
+      "b": -1,
+      "c": 340
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 125,
+        "max_value": 185,
+        "star_id": 3
+      },
+      {
+        "param_id": 2,
+        "min_value": 60,
+        "max_value": 100,
+        "star_id": 3
+      },
+      {
+        "param_id": 3,
+        "min_value": 70,
+        "max_value": 100,
+        "star_id": 3
+      },
+      {
+        "param_id": 4,
+        "min_value": 30,
+        "max_value": 50,
+        "star_id": 3
+      },
+      {
+        "param_id": 5,
+        "min_value": 100,
+        "max_value": 400,
+        "star_id": 3
+      },
+      {
+        "param_id": 6,
+        "min_value": 100,
+        "max_value": 350,
+        "star_id": 3
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 300,
+        "max_value": 400,
+        "star_id": 3
+      },
+      {
+        "param_id": 2,
+        "min_value": 300,
+        "max_value": 400,
+        "star_id": 3
+      },
+      {
+        "param_id": 3,
+        "min_value": 300,
+        "max_value": 400,
+        "star_id": 3
+      },
+      {
+        "param_id": 4,
+        "min_value": 300,
+        "max_value": 400,
+        "star_id": 3
+      },
+      {
+        "param_id": 5,
+        "min_value": 80,
+        "max_value": 120,
+        "star_id": 3
+      },
+      {
+        "param_id": 6,
+        "min_value": 80,
+        "max_value": 120,
+        "star_id": 3
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u56db\u661f",
+    "description": "",
+    "color": "#FFC480",
+    "max_level": 70,
+    "level_exp_factors": {
+      "a": 2.88,
+      "b": 0,
+      "c": 375
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 150,
+        "max_value": 225,
+        "star_id": 4
+      },
+      {
+        "param_id": 2,
+        "min_value": 75,
+        "max_value": 125,
+        "star_id": 4
+      },
+      {
+        "param_id": 3,
+        "min_value": 85,
+        "max_value": 125,
+        "star_id": 4
+      },
+      {
+        "param_id": 4,
+        "min_value": 40,
+        "max_value": 70,
+        "star_id": 4
+      },
+      {
+        "param_id": 5,
+        "min_value": 125,
+        "max_value": 500,
+        "star_id": 4
+      },
+      {
+        "param_id": 6,
+        "min_value": 125,
+        "max_value": 50,
+        "star_id": 4
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 350,
+        "max_value": 450,
+        "star_id": 4
+      },
+      {
+        "param_id": 2,
+        "min_value": 350,
+        "max_value": 450,
+        "star_id": 4
+      },
+      {
+        "param_id": 3,
+        "min_value": 350,
+        "max_value": 450,
+        "star_id": 4
+      },
+      {
+        "param_id": 4,
+        "min_value": 350,
+        "max_value": 450,
+        "star_id": 4
+      },
+      {
+        "param_id": 5,
+        "min_value": 100,
+        "max_value": 150,
+        "star_id": 4
+      },
+      {
+        "param_id": 6,
+        "min_value": 100,
+        "max_value": 150,
+        "star_id": 4
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e94\u661f",
+    "description": "",
+    "color": "#FF80FF",
+    "max_level": 80,
+    "level_exp_factors": {
+      "a": 3.6,
+      "b": 1,
+      "c": 420
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 180,
+        "max_value": 250,
+        "star_id": 5
+      },
+      {
+        "param_id": 2,
+        "min_value": 100,
+        "max_value": 160,
+        "star_id": 5
+      },
+      {
+        "param_id": 3,
+        "min_value": 120,
+        "max_value": 160,
+        "star_id": 5
+      },
+      {
+        "param_id": 4,
+        "min_value": 60,
+        "max_value": 100,
+        "star_id": 5
+      },
+      {
+        "param_id": 5,
+        "min_value": 150,
+        "max_value": 550,
+        "star_id": 5
+      },
+      {
+        "param_id": 6,
+        "min_value": 150,
+        "max_value": 500,
+        "star_id": 5
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 400,
+        "max_value": 520,
+        "star_id": 5
+      },
+      {
+        "param_id": 2,
+        "min_value": 400,
+        "max_value": 520,
+        "star_id": 5
+      },
+      {
+        "param_id": 3,
+        "min_value": 400,
+        "max_value": 520,
+        "star_id": 5
+      },
+      {
+        "param_id": 4,
+        "min_value": 400,
+        "max_value": 520,
+        "star_id": 5
+      },
+      {
+        "param_id": 5,
+        "min_value": 130,
+        "max_value": 160,
+        "star_id": 5
+      },
+      {
+        "param_id": 6,
+        "min_value": 130,
+        "max_value": 160,
+        "star_id": 5
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u516d\u661f",
+    "description": "",
+    "color": "#FF8080",
+    "max_level": 100,
+    "level_exp_factors": {
+      "a": 4.5,
+      "b": 2,
+      "c": 500
+    },
+    "base_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 250,
+        "max_value": 350,
+        "star_id": 6
+      },
+      {
+        "param_id": 2,
+        "min_value": 135,
+        "max_value": 200,
+        "star_id": 6
+      },
+      {
+        "param_id": 3,
+        "min_value": 140,
+        "max_value": 200,
+        "star_id": 6
+      },
+      {
+        "param_id": 4,
+        "min_value": 85,
+        "max_value": 135,
+        "star_id": 6
+      },
+      {
+        "param_id": 5,
+        "min_value": 200,
+        "max_value": 600,
+        "star_id": 6
+      },
+      {
+        "param_id": 6,
+        "min_value": 200,
+        "max_value": 600,
+        "star_id": 6
+      }
+    ],
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 450,
+        "max_value": 600,
+        "star_id": 6
+      },
+      {
+        "param_id": 2,
+        "min_value": 450,
+        "max_value": 600,
+        "star_id": 6
+      },
+      {
+        "param_id": 3,
+        "min_value": 450,
+        "max_value": 600,
+        "star_id": 6
+      },
+      {
+        "param_id": 4,
+        "min_value": 450,
+        "max_value": 600,
+        "star_id": 6
+      },
+      {
+        "param_id": 5,
+        "min_value": 150,
+        "max_value": 185,
+        "star_id": 6
+      },
+      {
+        "param_id": 6,
+        "min_value": 150,
+        "max_value": 185,
+        "star_id": 6
+      }
+    ]
+  }
+]

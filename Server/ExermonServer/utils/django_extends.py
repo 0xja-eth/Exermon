@@ -38,7 +38,7 @@ FileField.type_exclude = ['any']
 
 def registerConvertFunc(field):
 	def wrapper(func):
-		field.convert = func
+		field.std_convert = func
 		return func
 
 	return wrapper
@@ -46,7 +46,7 @@ def registerConvertFunc(field):
 
 def registerLoadFunc(field):
 	def wrapper(func):
-		field.load = func
+		field.std_load = func
 		return func
 
 	return wrapper

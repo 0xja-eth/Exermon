@@ -1,0 +1,74 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u4e00\u661f",
+    "description": "",
+    "color": "#80FF80",
+    "level": 1,
+    "weight": 0,
+    "exp_incr": 16,
+    "gold_incr": 26,
+    "std_time": 60,
+    "min_time": 3
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e8c\u661f",
+    "description": "",
+    "color": "#80FFFF",
+    "level": 1,
+    "weight": 0,
+    "exp_incr": 25,
+    "gold_incr": 30,
+    "std_time": 120,
+    "min_time": 4
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e09\u661f",
+    "description": "",
+    "color": "#FFFF80",
+    "level": 3,
+    "weight": 0,
+    "exp_incr": 50,
+    "gold_incr": 35,
+    "std_time": 180,
+    "min_time": 5
+  },
+  {
+    "configure_id": 1,
+    "name": "\u56db\u661f",
+    "description": "",
+    "color": "#FFC400",
+    "level": 6,
+    "weight": 0,
+    "exp_incr": 92,
+    "gold_incr": 42,
+    "std_time": 256,
+    "min_time": 6
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e94\u661f",
+    "description": "",
+    "color": "#FF80FF",
+    "level": 10,
+    "weight": 0,
+    "exp_incr": 160,
+    "gold_incr": 50,
+    "std_time": 384,
+    "min_time": 7
+  },
+  {
+    "configure_id": 1,
+    "name": "\u516d\u661f",
+    "description": "",
+    "color": "#FF8080",
+    "level": 15,
+    "weight": 0,
+    "exp_incr": 256,
+    "gold_incr": 60,
+    "std_time": 480,
+    "min_time": 8
+  }
+]

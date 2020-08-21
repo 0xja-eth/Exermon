@@ -1,0 +1,56 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u5b66\u6e23",
+    "description": "",
+    "color": "#FFFFFF",
+    "sub_rank_num": 3,
+    "score_factor": 80,
+    "offset_factor": 90
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5b66\u9165",
+    "description": "",
+    "color": "#FAFAD2",
+    "sub_rank_num": 3,
+    "score_factor": 80,
+    "offset_factor": 120
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5b66\u6c11",
+    "description": "",
+    "color": "#98FB98",
+    "sub_rank_num": 4,
+    "score_factor": 80,
+    "offset_factor": 150
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5b66\u9738",
+    "description": "",
+    "color": "#FFD700",
+    "sub_rank_num": 4,
+    "score_factor": 80,
+    "offset_factor": 180
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5b66\u795e",
+    "description": "",
+    "color": "#FF7F50",
+    "sub_rank_num": 5,
+    "score_factor": 80,
+    "offset_factor": 210
+  },
+  {
+    "configure_id": 1,
+    "name": "\u65e0\u53cc",
+    "description": "",
+    "color": "#FF00FF",
+    "sub_rank_num": 0,
+    "score_factor": 80,
+    "offset_factor": 250
+  }
+]

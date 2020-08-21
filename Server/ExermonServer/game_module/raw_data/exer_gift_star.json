@@ -1,0 +1,134 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u4e00\u661f",
+    "description": "",
+    "color": "#FFFFFF",
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      },
+      {
+        "param_id": 2,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      },
+      {
+        "param_id": 3,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      },
+      {
+        "param_id": 4,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      },
+      {
+        "param_id": 5,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      },
+      {
+        "param_id": 6,
+        "min_value": 90,
+        "max_value": 110,
+        "star_id": 1
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e8c\u661f",
+    "description": "",
+    "color": "#FFFF80",
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      },
+      {
+        "param_id": 2,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      },
+      {
+        "param_id": 3,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      },
+      {
+        "param_id": 4,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      },
+      {
+        "param_id": 5,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      },
+      {
+        "param_id": 6,
+        "min_value": 90,
+        "max_value": 120,
+        "star_id": 2
+      }
+    ]
+  },
+  {
+    "configure_id": 1,
+    "name": "\u4e09\u661f",
+    "description": "",
+    "color": "#FF80FF",
+    "rate_ranges": [
+      {
+        "param_id": 1,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      },
+      {
+        "param_id": 2,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      },
+      {
+        "param_id": 3,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      },
+      {
+        "param_id": 4,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      },
+      {
+        "param_id": 5,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      },
+      {
+        "param_id": 6,
+        "min_value": 90,
+        "max_value": 130,
+        "star_id": 3
+      }
+    ]
+  }
+]

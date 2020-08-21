@@ -9,23 +9,30 @@ class CacheHelper:
 	缓存帮助类
 	"""
 	@classmethod
-	def cacheValName(cls, func):
-		return "_cached_%s" % func.__name__
+	def cacheValName(cls, func, self=None):
+		if self is None: return "_cached_%s" % func.__name__
+
+		cla = self if isinstance(self, type) else type(self)
+
+		return "_cached_%s_%s" % (cla.__name__, func.__name__)
 
 	@classmethod
 	def staticCache(cls, func):
 		"""
 		静态缓存，无法进行缓存清除处理
 		"""
-		cache_val_name = cls.cacheValName(func)
-
 		def wrapper(self):
+
+			cache_val_name = cls.cacheValName(func, self)
 
 			# 如果缓存属性不存在，或者缓存值为None
 			if not hasattr(self, cache_val_name) or \
 					getattr(self, cache_val_name) is None:
 
-				setattr(self, cache_val_name, func(self))
+				value = func(self)
+				print("set cache: %s.%s = %s" %
+					  (self.__name__, func.__name__, value))
+				setattr(self, cache_val_name, value)
 
 			return getattr(self, cache_val_name)
 

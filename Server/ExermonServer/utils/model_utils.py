@@ -290,6 +290,7 @@ class ModelHelper:
 
 # region 公用模型
 
+
 # ===================================================
 #  Model封装拓展
 # ===================================================
@@ -326,12 +327,16 @@ class BaseModel(models.Model):
 	TYPE_RELATED_FILTER_MAP = {}
 	TYPE_RELATED_EXCLUDE_MAP = {}
 
+	# 不会自动转化的关系模型（force情况下也不会转化）
+	CAN_AUTO_RELATED_MODELS = ['any']
+	NOT_AUTO_RELATED_MODELS = []
+
 	# endregion
 
 	@classmethod
 	@CacheHelper.staticCache
 	def _getFields(cls):
-		return ModelHelper.allKeys(cls, return_name=False)
+		return ModelHelper.allKeys(cls, True, return_name=False)
 
 	@classmethod
 	def _getField(cls, name):
@@ -379,7 +384,7 @@ class BaseModel(models.Model):
 	def _getFilterMap(cls, key_name, func_name):
 		base_classes = cls.__bases__
 
-		res = getattr(cls, key_name, {})
+		res = getattr(cls, key_name, {}).copy()
 
 		for cla in base_classes:
 			if hasattr(cla, func_name):
@@ -388,6 +393,34 @@ class BaseModel(models.Model):
 				for key in base_res:
 					if key not in res: res[key] = base_res[key]
 					else: res[key] += base_res[key]
+
+		return res
+
+	@classmethod
+	@CacheHelper.staticCache
+	def notAutoRelatedModels(cls):
+		base_classes = cls.__bases__
+
+		res = cls.NOT_AUTO_RELATED_MODELS.copy()
+
+		for cla in base_classes:
+			if hasattr(cla, 'notAutoRelatedModels'):
+				tmp = cla.notAutoRelatedModels()
+				if 'any' not in tmp: res += tmp
+
+		return res
+
+	@classmethod
+	@CacheHelper.staticCache
+	def canAutoRelatedModels(cls):
+		base_classes = cls.__bases__
+
+		res = cls.CAN_AUTO_RELATED_MODELS.copy()
+
+		for cla in base_classes:
+			if hasattr(cla, 'canAutoRelatedModels'):
+				tmp = cla.canAutoRelatedModels()
+				if 'any' not in tmp: res += tmp
 
 		return res
 
@@ -467,7 +500,7 @@ class BaseModel(models.Model):
 		key_name = getattr(field, 'key_name', None)
 		if key_name is None: key_name = field_name
 
-		process_func = '__%sGeneralField' % mode
+		process_func = '_%sGeneralField' % mode
 		process_func = getattr(self, process_func, None)
 
 		return process_func, field_name, key_name
@@ -480,7 +513,7 @@ class BaseModel(models.Model):
 		process_func = attr_name = key_name = None
 
 		if isinstance(object, ManyToOneRel):
-			process_func = "__%sManyToOneRelatedObject" % mode
+			process_func = "_%sManyToOneRelatedObject" % mode
 
 			attr_name = "%s_set" % name.lower()
 
@@ -489,7 +522,7 @@ class BaseModel(models.Model):
 				key_name = "%ss" % DataManager.hump2Underline(name)
 
 		elif isinstance(object, OneToOneRel):
-			process_func = "__%sOneToOneRelatedObject" % mode
+			process_func = "_%sOneToOneRelatedObject" % mode
 
 			attr_name = name.lower()
 
@@ -504,6 +537,27 @@ class BaseModel(models.Model):
 		process_func = getattr(self, process_func, None)
 
 		return process_func, attr_name, key_name
+
+	def __filterRelatedObjectWithoutForce(self, object):
+
+		model = object.related_model
+
+		base_clas = model.mro()
+
+		can_auto = self.canAutoRelatedModels()
+		not_auto = self.notAutoRelatedModels()
+		can_auto = self.__getFieldNameList(can_auto)
+		not_auto = self.__getFieldNameList(not_auto)
+
+		# 有一个父类在 not_auto 列表中
+		if any(cla.__name__ in not_auto
+			for cla in base_clas): return False
+		# 'any' 不在 且 所有父类都不在 can_auto 列表中
+		if 'any' not in can_auto and all(
+			cla.__name__ not in can_auto for cla in base_clas):
+			return False
+
+		return True
 
 	def __getFieldNameList(self, ori_list):
 		from django.db.models import Field
@@ -628,7 +682,7 @@ class BaseModel(models.Model):
 		process_func(res, field, field_name, key_name, force)
 
 	# 转化常规字段
-	def __convertGeneralField(self, res, field, field_name, key_name, force):
+	def _convertGeneralField(self, res, field, field_name, key_name, force):
 
 		value = getattr(self, field_name)
 
@@ -654,7 +708,11 @@ class BaseModel(models.Model):
 	# 转换所有关联对象
 	def _convertRelatedObjects(self, res, type=None, force=False):
 
-		for object in self._getRelatedModels():
+		if 'any' in self.notAutoRelatedModels(): return
+
+		for object in self._getRelatedObjects():
+
+			if not self.__filterRelatedObjectWithoutForce(object): continue
 
 			if force or self.__filterRelatedObject(type, object):
 
@@ -719,13 +777,13 @@ class BaseModel(models.Model):
 
 		process_func(res, attr_name, key_name, model, type, force)
 
-	def __convertManyToOneRelatedObject(
+	def _convertManyToOneRelatedObject(
 			self, res, attr_name, key_name, model, type=None, force=False):
 
 		objects = getattr(self, attr_name).all()
 		res[key_name] = Common.objectsToDict(objects, type=type, force=force)
 
-	def __convertOneToOneRelatedObject(
+	def _convertOneToOneRelatedObject(
 			self, res, attr_name, key_name, model, type=None, force=False):
 
 		object = self._getOneToOneModelInDb(model)
@@ -788,14 +846,16 @@ class BaseModel(models.Model):
 	# 读取字段
 	def _loadFields(self, data):
 
-		for field in self._getFields(): self._loadField(data, field)
+		for field in self._getFields():
+
+			self._loadField(data, field)
 
 	def _loadField(self, data, field=None, field_name=None):
 
 		if field is None: field = self._getField(field_name)
 
 		process_func, field_name, key_name = \
-			self.__getFieldAndKeyName(field, field_name, 'convert')
+			self.__getFieldAndKeyName(field, field_name, 'load')
 		if process_func is None: return
 
 		# 判断
@@ -804,7 +864,7 @@ class BaseModel(models.Model):
 
 		process_func(data, field, field_name, key_name)
 
-	def __loadGeneralField(self, data, field, field_name, key_name):
+	def _loadGeneralField(self, data, field, field_name, key_name):
 
 		value = data[key_name]
 
@@ -829,9 +889,12 @@ class BaseModel(models.Model):
 
 	def _loadRelatedObjects(self, data):
 
-		related_objects = self._getRelatedModels()
+		self.save()
 
-		for object in related_objects:
+		for object in self._getRelatedObjects():
+
+			if not self.__filterRelatedObjectWithoutForce(object): continue
+
 			self._loadRelatedObject(data, object)
 
 	def _loadRelatedObject(self, data, object=None, model=None):
@@ -852,7 +915,7 @@ class BaseModel(models.Model):
 
 		process_func(data, attr_name, key_name, model)
 
-	def __loadManyToOneRelatedObject(
+	def _loadManyToOneRelatedObject(
 			self, data, attr_name, key_name, model):
 
 		# 获取新旧数据
@@ -875,10 +938,10 @@ class BaseModel(models.Model):
 		# 对剩下的新数据进行遍历
 		if new_cnt > ori_cnt:
 			for i in range(ori_cnt, new_cnt):
-				new_obj = model(_data=data[key_name])
+				new_obj = model(_data=new_data[i])
 				set_manager.add(new_obj)
 
-	def __loadOneToOneRelatedObject(
+	def _loadOneToOneRelatedObject(
 			self, data, attr_name, key_name, model):
 
 		obj = model(_data=data[key_name])
@@ -1075,13 +1138,16 @@ class StaticData(CoreData):
 		abstract = True
 
 	# 所属配置
-	configure = models.ForeignKey('game_module.GameConfigure', on_delete=models.CASCADE, verbose_name="所属配置")
+	configure = models.ForeignKey('game_module.GameConfigure',
+								  on_delete=models.CASCADE, verbose_name="所属配置")
 
 	# 名称
 	name = models.CharField(max_length=8, verbose_name="名称")
 
 	# 描述
 	description = models.CharField(max_length=64, blank=True, verbose_name="描述")
+
+	CAN_AUTO_RELATED_MODELS = []
 
 	def __str__(self):
 		return self.name

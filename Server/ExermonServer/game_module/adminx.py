@@ -24,6 +24,18 @@ class EquipParamsInline(ParamsInline):
 	validate_min = 0
 
 
+@AdminXHelper.relatedModel(GameData)
+class GameDataAdmin(object): pass
+
+
+@AdminXHelper.relatedModel(StaticData)
+class StaticDataAdmin(object): pass
+
+
+@AdminXHelper.relatedModel(DynamicData)
+class DynamicDataAdmin(object): pass
+
+
 @AdminXHelper.relatedModel(GameTip)
 class GameTipAdmin(object): pass
 

@@ -172,22 +172,6 @@ WEBSOCKET_METHOD_ROUTER = {
         Player.editName,  # 处理函数
         ChannelLayerTag.Self  # 是否需要响应
     ],
-    # 人类装备槽装备
-    'player/equipslot/equip': [[
-        ['uid', 'int'],
-        ['heid', 'int'],
-    ],
-        Player.equipSlotEquip,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
-    # 人类装备槽卸下
-    'player/equipslot/dequip': [[
-        ['uid', 'int'],
-        ['type', 'int'],
-    ],
-        Player.equipSlotDequip,  # 处理函数
-        ChannelLayerTag.Self  # 是否需要响应
-    ],
     # 玩家修改个人信息
     'player/edit/info': [[
         ['uid', 'int'],

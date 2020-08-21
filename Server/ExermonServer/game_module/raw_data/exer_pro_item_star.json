@@ -1,0 +1,26 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u666e\u901a",
+    "description": "",
+    "color": "#FFFFFF"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u7a00\u6709",
+    "description": "",
+    "color": "#ff97f0"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u53f2\u8bd7",
+    "description": "",
+    "color": "#FF8080"
+  },
+  {
+    "configure_id": 1,
+    "name": "\u65e0",
+    "description": "",
+    "color": "#000000"
+  }
+]

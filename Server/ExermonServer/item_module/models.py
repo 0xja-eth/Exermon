@@ -560,6 +560,25 @@ class BaseContainer(CacheableModel):
 	# type = models.PositiveSmallIntegerField(default=ContainerType.Unset.value,
 	# 										choices=TYPES, verbose_name="容器类型")
 
+	# region 转化读取配置
+
+	NOT_AUTO_RELATED_MODELS = ['BaseContItem']
+
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['type'] = self.TYPE.value
+		res['capactiy'] = self.getCapacity()
+
+	def _convertItemsData(self, res, **kwargs):
+		res['items'] = ModelUtils.objectsToDict(self.contItems())
+
+	# endregion
+
+	# region AdminX配置
+
+	# endregion
+
 	# region 配置项
 
 	@classmethod
@@ -683,15 +702,6 @@ class BaseContainer(CacheableModel):
 	#
 	# 	return ViewUtils.getObject(target, ErrorType.ContainerNotExist,
 	# 							   return_type='object', id=self.id)
-
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		res['type'] = self.TYPE.value
-		res['capactiy'] = self.getCapacity()
-
-	def _convertItemsData(self, res, **kwargs):
-		res['items'] = ModelUtils.objectsToDict(self.contItems())
 
 	# endregion
 
@@ -1021,6 +1031,9 @@ class PackContainer(BaseContainer):
 	# 容量（为0则不限）
 	capacity = models.PositiveSmallIntegerField(default=0, verbose_name="容量")
 
+	def _convertItemsData(self, res, **kwargs):
+		res['items'] = ModelUtils.objectsToDict(self.contItems(include_equipped=True))
+
 	# 所接受的容器项类（单个，基类）
 	@classmethod
 	def baseContItemClass(cls) -> 'PackContItem':
@@ -1050,10 +1063,6 @@ class PackContainer(BaseContainer):
 				if item == item_cla or isinstance(item, item_cla): return cla
 
 		return super().contItemClass(**kwargs)
-
-	# 转化容器项为 dict
-	def _convertItemsToDict(self):
-		return ModelUtils.objectsToDict(self.contItems(include_equipped=True))
 
 	def _create(self, **kwargs):
 		"""

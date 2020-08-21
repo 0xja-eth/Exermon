@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models.query import QuerySet
 
-from utils.model_utils import BaseModel, StaticData, \
-	DynamicData, CoreDataManager, Common as ModelUtils
+from utils.model_utils import BaseModel, GameData, \
+	StaticData, DynamicData, CoreDataManager, Common as ModelUtils
 from utils.view_utils import Common as ViewUtils
 from utils.exception import GameException, ErrorType
 
@@ -65,14 +65,14 @@ class GameVersion(BaseModel):
 		cls.Version = version
 
 	@classmethod
-	def load(cls):
+	def setup(cls):
 
 		cls.Version: GameVersion = ViewUtils.getObject(
 			GameVersion, ErrorType.NoCurVersion, is_used=True)
 
 	@classmethod
 	def get(cls):
-		if cls.Version is None: cls.load()
+		if cls.Version is None: cls.setup()
 
 		return cls.Version
 
@@ -324,6 +324,8 @@ class ParamValueRange(BaseModel):
 
 	# DO_NOT_AUTO_CONVERT_FIELDS = ['min_value', 'max_value']
 
+	KEY_NAME = 'base_ranges'
+
 	# 属性类型
 	param = models.ForeignKey("game_module.BaseParam",
 							   on_delete=models.CASCADE, verbose_name="属性类型")
@@ -377,6 +379,8 @@ class ParamRateRange(ParamValueRange):
 	class Meta:
 		abstract = True
 		verbose_name = verbose_name_plural = "属性率区间"
+
+	KEY_NAME = 'rate_ranges'
 
 	# 比例
 	def scale(self):
@@ -599,6 +603,9 @@ class ExerStar(StaticData):
 	# 等级经验计算因子
 	# {'a', 'b', 'c'}
 	level_exp_factors = jsonfield.JSONField(default={}, verbose_name="等级经验计算因子")
+	level_exp_factors.convert = lambda model, value: list(value.values())
+
+	CAN_AUTO_RELATED_MODELS = [ExerParamBaseRange, ExerParamRateRange]
 
 	def __str__(self):
 		return self.name
@@ -662,23 +669,6 @@ class ExerStar(StaticData):
 
 	# endregion
 
-	# 转换属性为 dict
-	def _convertParamsToDict(self, res):
-		res['base_ranges'] = ModelUtils.objectsToDict(self.paramBaseRanges())
-		res['rate_ranges'] = ModelUtils.objectsToDict(self.paramRateRanges())
-
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		if type is None:
-
-			level_exp_factors: dict = self.level_exp_factors
-			level_exp_factors = list(level_exp_factors.values())
-
-			res['level_exp_factors'] = level_exp_factors
-
-		self._convertParamsToDict(res)
-
 	# 获取所有的属性基本值
 	def paramBaseRanges(self):
 		return self.exerparambaserange_set.all()
@@ -710,6 +700,8 @@ class ExerGiftStar(StaticData):
 		verbose_name = verbose_name_plural = "艾瑟萌天赋星级"
 
 	NOT_EXIST_ERROR = ErrorType.StarNotExist
+
+	CAN_AUTO_RELATED_MODELS = [ExerGiftParamRateRange]
 
 	LIST_DISPLAY_APPEND = ['adminColor']
 

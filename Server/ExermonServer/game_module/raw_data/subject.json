@@ -1,0 +1,74 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u8bed\u6587",
+    "description": "",
+    "color": "#FF4CB0",
+    "max_score": 150,
+    "force": true
+  },
+  {
+    "configure_id": 1,
+    "name": "\u6570\u5b66",
+    "description": "",
+    "color": "#B0B0FF",
+    "max_score": 150,
+    "force": true
+  },
+  {
+    "configure_id": 1,
+    "name": "\u82f1\u8bed",
+    "description": "",
+    "color": "#FFB0FF",
+    "max_score": 150,
+    "force": true
+  },
+  {
+    "configure_id": 1,
+    "name": "\u7269\u7406",
+    "description": "",
+    "color": "#B0B0B0",
+    "max_score": 100,
+    "force": false
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5316\u5b66",
+    "description": "",
+    "color": "#FFB04C",
+    "max_score": 100,
+    "force": false
+  },
+  {
+    "configure_id": 1,
+    "name": "\u751f\u7269",
+    "description": "",
+    "color": "#B0FFB0",
+    "max_score": 100,
+    "force": false
+  },
+  {
+    "configure_id": 1,
+    "name": "\u653f\u6cbb",
+    "description": "",
+    "color": "#FFB0B0",
+    "max_score": 100,
+    "force": false
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5386\u53f2",
+    "description": "",
+    "color": "#FFFFB0",
+    "max_score": 100,
+    "force": false
+  },
+  {
+    "configure_id": 1,
+    "name": "\u5730\u7406",
+    "description": "",
+    "color": "#B0FFFF",
+    "max_score": 100,
+    "force": false
+  }
+]

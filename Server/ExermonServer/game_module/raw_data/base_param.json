@@ -1,0 +1,68 @@
+[
+  {
+    "configure_id": 1,
+    "name": "\u4f53\u529b\u503c",
+    "description": "\u5bf9\u6218\u65f6\u4f5c\u4e3a\u603b\u548c\u9644\u52a0\u5230\u4eba\u7269\u8eab\u4e0a\uff0c\u4eba\u7269\u7684\u4f53\u529b\u503c\u4e3a0\u65f6\u5c06\u65e0\u6cd5\u884c\u52a8",
+    "color": "#9cca90",
+    "attr": "mhp",
+    "max_value": null,
+    "min_value": 1,
+    "default": 1,
+    "scale": 1
+  },
+  {
+    "configure_id": 1,
+    "name": "\u7cbe\u529b\u503c",
+    "description": "\u7528\u4e8e\u6280\u80fd\u53d1\u52a8\uff0c\u6280\u80fd\u53d1\u52a8\u65f6\u6263\u9664\u4e00\u5b9a\u7cbe\u529b\u503c",
+    "color": "#96aaff",
+    "attr": "mmp",
+    "max_value": null,
+    "min_value": 0,
+    "default": 0,
+    "scale": 1
+  },
+  {
+    "configure_id": 1,
+    "name": "\u653b\u51fb\u529b",
+    "description": "\u51b3\u5b9a\u5bf9\u654c\u4eba\u7684\u57fa\u7840\u4f24\u5bb3",
+    "color": "#fba088",
+    "attr": "atk",
+    "max_value": null,
+    "min_value": 0,
+    "default": 0,
+    "scale": 1
+  },
+  {
+    "configure_id": 1,
+    "name": "\u9632\u5fa1\u529b",
+    "description": "\u51b3\u5b9a\u88ab\u653b\u51fb\u65f6\u80fd\u591f\u62b5\u6d88\u7684\u4f24\u5bb3",
+    "color": "#bf97ff",
+    "attr": "def",
+    "max_value": null,
+    "min_value": 0,
+    "default": 0,
+    "scale": 1
+  },
+  {
+    "configure_id": 1,
+    "name": "\u95ea\u907f\u7387",
+    "description": "\u51b3\u5b9a\u88ab\u653b\u51fb\u65f6\u5b8c\u5168\u56de\u907f\u653b\u51fb\u7684\u6982\u7387",
+    "color": "#ff97f0",
+    "attr": "eva",
+    "max_value": 1,
+    "min_value": 0,
+    "default": 0,
+    "scale": 10000
+  },
+  {
+    "configure_id": 1,
+    "name": "\u66b4\u51fb\u7387",
+    "description": "\u51b3\u5b9a\u653b\u51fb\u65f6\u51fa\u73b0\u4f1a\u5fc3\u4e00\u51fb\u7684\u6982\u7387",
+    "color": "#ddc76c",
+    "attr": "cri",
+    "max_value": 1,
+    "min_value": 0,
+    "default": 0,
+    "scale": 10000
+  }
+]

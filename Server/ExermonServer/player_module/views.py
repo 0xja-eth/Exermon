@@ -251,7 +251,8 @@ class Service:
 
 	# 选择玩家形象
 	@classmethod
-	async def createCharacter(cls, consumer, player: Player, grade: int, name: str, cid: int):
+	async def createCharacter(cls, consumer, player: Player,
+							  grade: int, name: str, cid: int):
 		# 返回数据：无
 
 		Check.ensureNameFormat(name)
