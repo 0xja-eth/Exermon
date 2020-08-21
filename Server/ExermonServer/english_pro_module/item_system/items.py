@@ -467,11 +467,12 @@ class ExerProEnemy(BaseItem):
 		(ExerProEnemyType.Boss.value, 'BOSS'),
 	]
 
-	AUTO_FIELDS_KEY_NAMES = {'type': 'type_'}
+	# AUTO_FIELDS_KEY_NAMES = {'type': 'type_'}
 
 	# 等级
 	type = models.PositiveSmallIntegerField(default=ExerProEnemyType.Normal.value,
 											choices=ENEMY_TYPES, verbose_name="等级")
+	type.key_name = '_type'
 
 	# 最大体力值
 	mhp = models.PositiveSmallIntegerField(default=100, verbose_name="最大体力值")

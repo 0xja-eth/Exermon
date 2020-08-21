@@ -32,6 +32,47 @@ class SeasonRecord(BaseModel):
 	# 段位星星（初始有一个，不可小于0）
 	star_num = models.PositiveSmallIntegerField(default=1, verbose_name="段位星星")
 
+	# region 转化读取配置
+
+	TYPE_FIELD_FILTER_MAP = {
+		'rank': [star_num]
+	}
+
+	TYPE_RELATED_FILTER_MAP = {
+		'rank': []
+	}
+
+	def _convertRankData(self, res, order=None, **kwargs):
+
+		res['order'] = order
+		res['id'] = self.player_id
+		res['name'] = self.player.name
+		res['battle_point'] = self.player.battlePoint()
+
+	# def convert(self, type=None, order=None):
+	#
+	# 	if type == "rank":
+	# 		return {
+	# 			'id': self.player_id,
+	# 			'order': order,
+	# 			'name': self.player.name,
+	# 			'battle_point': self.player.battlePoint(),
+	# 			'star_num': self.star_num
+	# 		}
+	#
+	# 	suspensions = ModelUtils.objectsToDict(self.suspensions())
+	#
+	# 	return {
+	# 		'id': self.id,
+	# 		'season_id': self.season_id,
+	# 		'star_num': self.star_num,
+	# 		'point': self.point,
+	#
+	# 		'suspensions': suspensions,
+	# 	}
+
+	# endregion
+
 	@classmethod
 	def create(cls, player: 'Player', season: 'CompSeason') -> 'SeasonRecord':
 		"""
@@ -72,28 +113,6 @@ class SeasonRecord(BaseModel):
 		#  具体参考 utils.calc_utils 里面的其他算法
 
 		return new_rec
-
-	def convert(self, type=None, order=None):
-
-		if type == "rank":
-			return {
-				'id': self.player_id,
-				'order': order,
-				'name': self.player.name,
-				'battle_point': self.player.battlePoint(),
-				'star_num': self.star_num
-			}
-
-		suspensions = ModelUtils.objectsToDict(self.suspensions())
-
-		return {
-			'id': self.id,
-			'season_id': self.season_id,
-			'star_num': self.star_num,
-			'point': self.point,
-
-			'suspensions': suspensions,
-		}
 
 	def rank(self) -> ('CompRank', int, int):
 		"""
@@ -254,15 +273,6 @@ class SuspensionRecord(BaseModel):
 		record.save()
 
 		return record
-
-	def convert(self):
-		start_time = ModelUtils.timeToStr(self.start_time)
-		end_time = ModelUtils.timeToStr(self.end_time)
-
-		return {
-			'start_time': start_time,
-			'end_time': end_time
-		}
 
 
 # =======================

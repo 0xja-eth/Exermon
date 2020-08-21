@@ -36,16 +36,24 @@ class GeneralQuestion(SelectingQuestion):
 	# 题目附加等级（计算用）
 	level = models.SmallIntegerField(default=0, verbose_name="附加等级")
 
-	# 转化索引信息
-	def _convertIndexInfo(self, res, type):
-		super()._convertIndexInfo(res, type)
+	# region 转化读取配置
 
-		res['star_id'] = self.star_id
+	TYPE_FIELD_FILTER_MAP = {
+		'info': [star],
+	}
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
+	# # 转化索引信息
+	# def _convertIndexInfo(self, res, type):
+	# 	super()._convertIndexInfo(res, type)
+	#
+	# 	res['star_id'] = self.star_id
+	#
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['level'] = self.level
 
-		res['level'] = self.level
+	# endregion
 
 	def stdTime(self):
 		return self.star.std_time
@@ -123,6 +131,11 @@ class PlotQuestion(SelectingQuestion):
 	picture = models.ImageField(null=True, blank=True,
 								upload_to=PlotQuestionImageUpload(), verbose_name="剧情图标")
 
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['picture'] = self.convertToBase64()
+
 	# 获取剧情图片完整路径
 	def getExactlyPath(self):
 		base = settings.STATIC_URL
@@ -139,12 +152,6 @@ class PlotQuestion(SelectingQuestion):
 			data = base64.b64encode(f.read())
 
 		return data.decode()
-
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['plot'] = self.plot
-		res['picture'] = self.convertToBase64()
 
 
 # ===================================================
@@ -163,16 +170,16 @@ class PlotQuesChoice(BaseQuesChoice):
 	def effects(self):
 		return self.plotchoiceeffect_set.all()
 
-	def convert(self):
-		res = super().convert()
-
-		plot_effects = ModelUtils.objectsToDict(self.effects())
-
-		res['gold'] = self.gold
-		res['result_text'] = self.result_text
-		res['effects'] = plot_effects
-
-		return res
+	# def convert(self):
+	# 	res = super().convert()
+	#
+	# 	plot_effects = ModelUtils.objectsToDict(self.effects())
+	#
+	# 	res['gold'] = self.gold
+	# 	res['result_text'] = self.result_text
+	# 	res['effects'] = plot_effects
+	#
+	# 	return res
 
 
 # ===================================================

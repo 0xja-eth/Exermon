@@ -6,15 +6,34 @@
 
 from django.db.models.fields import *
 from django.db.models.fields.related import *
-
-from .data_manager import DataLoader
+from django.db.models.fields.files import FileField
 
 # 新增属性声明
 Field.convert = Field.load = None
-# 转换类型过滤，为空则所有类型，形如：类型1|类型2...
-Field.type_filter = ''
-# 转换类型过滤（取反），为空则忽略
-Field.type_exclude = ''
+Field.std_convert = Field.std_load = None
+
+
+def getConverter(self, force=False):
+	if force: return self.std_convert
+	return self.convert or self.std_convert
+
+
+def getLoader(self, force=False):
+	if force: return self.std_load
+	return self.load or self.std_load
+
+
+Field.getConverter = getConverter
+Field.getLoader = getLoader
+
+# 转换类型过滤，为 any 则所有类型，为 None 则为 None 类型
+Field.type_filter = ['any']
+# 转换类型过滤（取反）
+Field.type_exclude = []
+
+Field.key_name = None
+
+FileField.type_exclude = ['any']
 
 
 def registerConvertFunc(field):
@@ -34,53 +53,59 @@ def registerLoadFunc(field):
 
 
 @registerConvertFunc(Field)
-def convert(obj, value): return value
+def convert(self, model, value): return value
 
 
 @registerConvertFunc(DateField)
-def convert(obj, value):
+def convert(self, model, value):
+	from .data_manager import DataLoader
 	return DataLoader.convertDate(value)
 
 
 @registerConvertFunc(TimeField)
-def convert(obj, value):
+def convert(self, model, value):
+	from .data_manager import DataLoader
 	return DataLoader.convertDateTime(value)
 
 
 @registerConvertFunc(DateTimeField)
-def convert(obj, value):
+def convert(self, model, value):
+	from .data_manager import DataLoader
 	return DataLoader.convertDateTime(value)
 
 
 @registerConvertFunc(ManyToManyField)
-def convert(obj, value):
+def convert(self, model, value):
 	return [item.id for item in value]
 
 
 @registerLoadFunc(Field)
-def load(obj, value, self): return value
+def load(self, model, value, ori_val): return value
 
 
 @registerLoadFunc(DateField)
-def load(obj, value, self):
+def load(self, model, value, ori_val):
+	from .data_manager import DataLoader
 	return DataLoader.loadDate(value)
 
 
 @registerLoadFunc(TimeField)
-def load(obj, value, self):
+def load(self, model, value, ori_val):
+	from .data_manager import DataLoader
 	return DataLoader.loadDateTime(value)
 
 
 @registerLoadFunc(DateTimeField)
-def load(obj, value, self):
+def load(self, model, value, ori_val):
+	from .data_manager import DataLoader
 	return DataLoader.loadDateTime(value)
 
 
 @registerLoadFunc(ManyToManyField)
-def load(obj, value, self):
-	if self is None: return None
-	self.clear()
-	self.add(*value)
-	return self
+def load(self, model, value, ori_val):
+	if ori_val is None: return None
+	ori_val.clear()
+	ori_val.add(*value)
+	return ori_val
 
 # endregion

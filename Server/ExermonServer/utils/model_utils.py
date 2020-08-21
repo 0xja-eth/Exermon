@@ -297,6 +297,8 @@ class BaseModel(models.Model):
 	class Meta:
 		abstract = True
 
+	# region Adminx 配置
+
 	LIST_DISPLAY = None
 	LIST_DISPLAY_APPEND = []
 	LIST_DISPLAY_EXCLUDE = []
@@ -308,15 +310,22 @@ class BaseModel(models.Model):
 	INLINE_MODELS = None
 	EXCLUDE_INLINES = []
 
-	# 自动字段配置更改
-	AUTO_FIELDS_KEY_NAMES = {}
+	# endregion
 
-	# 非自动字段
-	DO_NOT_AUTO_CONVERT_FIELDS = []
-	DO_NOT_AUTO_LOAD_FIELDS = []
+	# region 转换/读取配置
 
 	# 键名（关联对象）
 	KEY_NAME = None
+
+	# 转化类型与字段设定
+	TYPE_FIELD_FILTER_MAP = {}
+	TYPE_FIELD_EXCLUDE_MAP = {}
+
+	# 转化类型与关系设定
+	TYPE_RELATED_FILTER_MAP = {}
+	TYPE_RELATED_EXCLUDE_MAP = {}
+
+	# endregion
 
 	@classmethod
 	@CacheHelper.staticCache
@@ -343,43 +352,83 @@ class BaseModel(models.Model):
 
 	@classmethod
 	@CacheHelper.staticCache
-	def doNotAutoConvertFields(cls):
-		base_classes = cls.__bases__
-
-		res = cls.DO_NOT_AUTO_CONVERT_FIELDS
-
-		for cla in base_classes:
-			if hasattr(cla, 'doNotAutoConvertFields'):
-				res += cla.doNotAutoConvertFields()
-
-		return res
+	def typeFieldFilterMap(cls):
+		return cls._getFilterMap(
+			'TYPE_FIELD_FILTER_MAP', 'typeFieldFilterMap')
 
 	@classmethod
 	@CacheHelper.staticCache
-	def doNotAutoLoadFields(cls):
-		base_classes = cls.__bases__
-
-		res = cls.DO_NOT_AUTO_LOAD_FIELDS
-
-		for cla in base_classes:
-			if hasattr(cla, 'doNotAutoLoadFields'):
-				res += cla.doNotAutoLoadFields()
-
-		return res
+	def typeFieldExcludeMap(cls):
+		return cls._getFilterMap(
+			'TYPE_FIELD_EXCLUDE_MAP', 'typeFieldExcludeMap')
 
 	@classmethod
 	@CacheHelper.staticCache
-	def autoFieldKeyNames(cls):
+	def typeRelatedFilterMap(cls):
+		return cls._getFilterMap(
+			'TYPE_RELATED_FILTER_MAP', 'typeRelatedFilterMap')
+
+	@classmethod
+	@CacheHelper.staticCache
+	def typeRelatedExcludeMap(cls):
+		return cls._getFilterMap(
+			'TYPE_RELATED_EXCLUDE_MAP', 'typeRelatedExcludeMap')
+
+	@classmethod
+	def _getFilterMap(cls, key_name, func_name):
 		base_classes = cls.__bases__
 
-		res = cls.AUTO_FIELDS_KEY_NAMES
+		res = getattr(cls, key_name, {})
 
 		for cla in base_classes:
-			if hasattr(cla, 'autoFieldKeyNames'):
-				tmp = cla.autoFieldKeyNames()
-				res = {**res, **tmp}
+			if hasattr(cla, func_name):
+				base_res = getattr(cla, func_name)()
+
+				for key in base_res:
+					if key not in res: res[key] = base_res[key]
+					else: res[key] += base_res[key]
 
 		return res
+
+	# @classmethod
+	# @CacheHelper.staticCache
+	# def doNotAutoConvertFields(cls):
+	# 	base_classes = cls.__bases__
+	#
+	# 	res = cls.DO_NOT_AUTO_CONVERT_FIELDS
+	#
+	# 	for cla in base_classes:
+	# 		if hasattr(cla, 'doNotAutoConvertFields'):
+	# 			res += cla.doNotAutoConvertFields()
+	#
+	# 	return res
+	#
+	# @classmethod
+	# @CacheHelper.staticCache
+	# def doNotAutoLoadFields(cls):
+	# 	base_classes = cls.__bases__
+	#
+	# 	res = cls.DO_NOT_AUTO_LOAD_FIELDS
+	#
+	# 	for cla in base_classes:
+	# 		if hasattr(cla, 'doNotAutoLoadFields'):
+	# 			res += cla.doNotAutoLoadFields()
+	#
+	# 	return res
+	#
+	# @classmethod
+	# @CacheHelper.staticCache
+	# def autoFieldKeyNames(cls):
+	# 	base_classes = cls.__bases__
+	#
+	# 	res = cls.AUTO_FIELDS_KEY_NAMES
+	#
+	# 	for cla in base_classes:
+	# 		if hasattr(cla, 'autoFieldKeyNames'):
+	# 			tmp = cla.autoFieldKeyNames()
+	# 			res = {**res, **tmp}
+	#
+	# 	return res
 
 	def __init__(self, *args, _data=None, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -403,37 +452,6 @@ class BaseModel(models.Model):
 		except AttributeError:
 			return None
 
-	# region 转化
-
-	@classmethod
-	def convertFields(cls, keys, *key_list, not_convert=True):
-
-		key_list = list(key_list)
-		key_list += keys.split(',')
-		key_list = [key.strip() for key in key_list]
-
-		def wrapper(func):
-
-			if not_convert:
-				cla: BaseModel = ModelHelper.getFuncClass(func)
-				cla.DO_NOT_AUTO_CONVERT_FIELDS += key_list
-
-			def funcWrapper(self: BaseModel, res, **kwargs):
-
-				self._convertCustomFields(res, *key_list)
-
-				func(self, res, **kwargs)
-
-			return funcWrapper
-
-		return wrapper
-
-	# 转化自动属性
-	def _convertAutoAttrs(self, res, force=False):
-
-		self._convertFields(res, force)
-		self._convertRelatedObjects(res, force)
-
 	def __getFieldAndKeyName(self, field=None, field_name=None, mode='convert'):
 
 		from django.db.models.fields.related import ForeignKey
@@ -445,14 +463,8 @@ class BaseModel(models.Model):
 			field_name = field_name + '_id'
 
 		# 获取键名
-		key_name = field_name
-		key_names = self.autoFieldKeyNames()
-		if key_name in key_names:
-			key_name = key_names[key_name]
-
-		# if isinstance(field, ManyToManyField):
-		# 	process_func = '__%sManyToManyField' % mode
-		# else:
+		key_name = getattr(field, 'key_name', None)
+		if key_name is None: key_name = field_name
 
 		process_func = '__%sGeneralField' % mode
 		process_func = getattr(self, process_func, None)
@@ -480,23 +492,122 @@ class BaseModel(models.Model):
 
 			attr_name = name.lower()
 
-			key_name = DataManager.hump2Underline(name)
+			key_name = getattr(model, 'KEY_NAME', None)
+			if key_name is None:
+				key_name = DataManager.hump2Underline(name)
 
-		key_names = self.autoFieldKeyNames()
-		if key_name in key_names:
-			key_name = key_names[key_name]
+		# key_names = self.autoFieldKeyNames()
+		# if key_name in key_names:
+		# 	key_name = key_names[key_name]
 
 		process_func = getattr(self, process_func, None)
 
 		return process_func, attr_name, key_name
 
+	def __getFieldNameList(self, ori_list):
+		from django.db.models import Field
+
+		res = []
+
+		for item in ori_list:
+			if isinstance(item, Field):
+				res.append(item.name)
+			elif isinstance(item, type):
+				res.append(item.__name__)
+			elif isinstance(item, str):
+				res.append(item)
+
+		return res
+
+	# region 转化
+
+	@classmethod
+	def convertFields(cls, keys, *key_list):
+
+		key_list = list(key_list)
+		key_list += keys.split(',')
+		key_list = [key.strip() for key in key_list]
+
+		def wrapper(func):
+
+			# if not_convert:
+			# 	cla: BaseModel = ModelHelper.getFuncClass(func)
+			# 	cla.DO_NOT_AUTO_CONVERT_FIELDS += key_list
+
+			def funcWrapper(self: BaseModel, res, **kwargs):
+
+				self._convertCustomFields(res, *key_list)
+
+				func(self, res, **kwargs)
+
+			return funcWrapper
+
+		return wrapper
+
+	# 转化自动属性
+	def _convertAutoAttrs(self, res, type=None, force=False):
+
+		self._convertFields(res, type, force)
+		self._convertRelatedObjects(res, type, force)
+
 	# region 字段
 
 	# 转换所有字段
-	def _convertFields(self, res, force=False):
+	def _convertFields(self, res, type=None, force=False):
 
 		for field in self._getFields():
-			self._convertField(res, field, force=force)
+
+			if force or self.__filterField(type, field):
+
+				self._convertField(res, field, force=force)
+
+	def __filterField(self, type, field):
+
+		# 处理字段中的 exclude，若有则返回 False
+		type_exclude = getattr(field, 'type_exclude', [])
+		if 'any' in type_exclude or type in type_exclude:
+			return False
+
+		# 处理字段中的 filter，若找不到返回 False
+		type_filter = getattr(field, 'type_filter', ['any'])
+		if 'any' not in type_filter and type not in type_filter:
+			return False
+
+		# 处理映射 filter
+		filter, filter_flag = [], False
+		filter_map = self.typeFieldFilterMap()
+
+		# 生成 filter 列表
+		if type in filter_map:
+			filter += filter_map[type]
+			filter_flag = True
+
+		if 'any' in filter_map:
+			filter += filter_map['any']
+			filter_flag = True
+
+		if filter_flag:
+			filter = self.__getFieldNameList(filter)
+			if field.name not in filter: return False
+
+		# 处理映射 exclude
+		exclude, exclude_flag = [], False
+		exclude_map = self.typeFieldExcludeMap()
+
+		# 生成 exclude 列表
+		if 'any' in exclude_map:
+			exclude += exclude_map['any']
+			exclude_flag = True
+
+		if type in exclude_map:
+			exclude += exclude_map[type]
+			exclude_flag = True
+
+		if exclude_flag:
+			exclude = self.__getFieldNameList(exclude)
+			if field.name not in exclude: return False
+
+		return True
 
 	# 转换单个字段
 	def _convertField(self, res, field=None, field_name=None, force=False):
@@ -510,18 +621,18 @@ class BaseModel(models.Model):
 		if process_func is None: return
 
 		# 判断
-		if not force and field_name in self.doNotAutoConvertFields(): return
+		# if not force and field_name in self.doNotAutoConvertFields(): return
 		if not hasattr(self, field_name): return
 
-		process_func(res, field, field_name, key_name)
+		process_func(res, field, field_name, key_name, force)
 
 	# 转化常规字段
-	def __convertGeneralField(self, res, field, field_name, key_name):
+	def __convertGeneralField(self, res, field, field_name, key_name, force):
 
 		value = getattr(self, field_name)
 
-		if hasattr(field, 'convert'):
-			value = field.convert(self, value)
+		if hasattr(field, 'getConverter'):
+			value = field.getConverter(force)(self, value)
 
 		res[key_name] = value
 
@@ -540,15 +651,56 @@ class BaseModel(models.Model):
 	# region 关系
 
 	# 转换所有关联对象
-	def _convertRelatedObjects(self, res, force=False):
+	def _convertRelatedObjects(self, res, type=None, force=False):
 
-		related_objects = self._getRelatedModels()
+		for object in self._getRelatedModels():
 
-		for object in related_objects:
-			self._convertRelatedObject(res, object, force=force)
+			if force or self.__filterRelatedObject(type, object):
+
+				self._convertRelatedObject(res, object, type=type, force=force)
+
+	def __filterRelatedObject(self, type, object):
+
+		base_clas = object.related_model.mro()
+
+		filter, exclude = [], []
+		filter_flag = exclude_flag = False
+
+		filter_map = self.typeRelatedFilterMap()
+
+		if type in filter_map:
+			filter += filter_map[type]
+			filter_flag = True
+
+		if 'any' in filter_map:
+			filter += filter_map['any']
+			filter_flag = True
+
+		if filter_flag:
+			filter = self.__getFieldNameList(filter)
+			if all(cla.__name__ not in filter
+				   for cla in base_clas): return False
+
+		exclude_map = self.typeRelatedExcludeMap()
+
+		if 'any' in exclude_map:
+			exclude += exclude_map['any']
+			exclude_flag = True
+
+		if type in exclude_map:
+			exclude += exclude_map[type]
+			exclude_flag = True
+
+		if exclude_flag:
+			exclude = self.__getFieldNameList(exclude)
+			if all(cla.__name__ not in exclude
+				   for cla in base_clas): return False
+
+		return True
 
 	# 转化单个关联对象
-	def _convertRelatedObject(self, res, object=None, model=None, force=False):
+	def _convertRelatedObject(self, res, object=None, model=None,
+							  type=None, force=False):
 
 		if object is None: object = self._getRelatedObject(model)
 
@@ -561,22 +713,22 @@ class BaseModel(models.Model):
 		if process_func is None: return
 
 		# 判断
-		if not force and attr_name in self.doNotAutoConvertFields(): return
+		# if not force and attr_name in self.doNotAutoConvertFields(): return
 		if not hasattr(self, attr_name): return
 
-		process_func(res, attr_name, key_name, model, force)
+		process_func(res, attr_name, key_name, model, type, force)
 
 	def __convertManyToOneRelatedObject(
-			self, res, attr_name, key_name, model, force=False):
+			self, res, attr_name, key_name, model, type=None, force=False):
 
 		objects = getattr(self, attr_name).all()
-		res[key_name] = Common.objectsToDict(objects, force=force)
+		res[key_name] = Common.objectsToDict(objects, type=type, force=force)
 
 	def __convertOneToOneRelatedObject(
-			self, res, attr_name, key_name, model, force=False):
+			self, res, attr_name, key_name, model, type=None, force=False):
 
 		object = self._getOneToOneModelInDb(model)
-		res[key_name] = object.convert(force=force)
+		res[key_name] = object.convert(type=type, force=force)
 
 	# endregion
 
@@ -598,7 +750,7 @@ class BaseModel(models.Model):
 		res = {}
 
 		if force:
-			self._convertAutoAttrs(res, True)
+			self._convertAutoAttrs(res, force=True)
 		else:
 			self._convert(res, type, **kwargs)
 
@@ -606,19 +758,17 @@ class BaseModel(models.Model):
 
 	def _convert(self, res, type=None, **kwargs):
 
-		# 如果传入了 type 参数，则不会自动转化属性
-		# 需要定义 _convert...Data 函数，或者在 _convertCustomAttrs 中编写
-		if type is None:
-			self._convertAutoAttrs(res)
+		# 如果传入了 type 参数，且定义了 _convert...Data 函数
+		# 则不会自动转化属性（默认方式）
+		# _convertCustomAttrs 函数中可以继续进行自定义处理
+		self._convertAutoAttrs(res, type)
 
-		else:
+		if type is not None:
 			type_name = DataManager.underline2UpperHump(type)
 			method_name = "_convert%sData" % type_name
 
-			try:
-				getattr(self, method_name)(res, **kwargs)
-			except:
-				pass  # 任意错误
+			func = getattr(self, method_name, None)
+			if func is not None: func(res, **kwargs)
 
 		self._convertCustomAttrs(res, type, **kwargs)
 
@@ -657,9 +807,9 @@ class BaseModel(models.Model):
 
 		value = data[key_name]
 
-		if hasattr(field, 'load'):
+		if hasattr(field, 'getLoader'):
 			ori_obj = getattr(self, field_name, None)
-			value = field.load(self, value, ori_obj)
+			value = field.getLoader()(self, value, ori_obj)
 
 		setattr(self, field_name, value)
 
@@ -696,7 +846,7 @@ class BaseModel(models.Model):
 		if process_func is None: return
 
 		# 判断
-		if attr_name in self.doNotAutoLoadFields(): return
+		# if attr_name in self.doNotAutoLoadFields(): return
 		if key_name not in data: return
 
 		process_func(data, attr_name, key_name, model)
@@ -756,6 +906,11 @@ class BaseModel(models.Model):
 #  核心数据管理类
 # ===================================================
 class CoreDataManager:
+
+	# 获取所有游戏资料数据类
+	@classmethod
+	def getCoreData(cls):
+		return cls._getSubModels(CoreData)
 
 	# 获取所有游戏资料数据类
 	@classmethod
@@ -892,22 +1047,9 @@ class CoreData(BaseModel):
 
 	# region 数据迁移
 
-	def _convertExportData(self, res, **kwargs):
-		self._convertAutoAttrs(res, True)
-
 	# 导出数据
-	def export(self, path):
-		data = self.convert(type="export")
-
-		with open(path, 'w', encoding='utf-8') as f:
-			json.dump(data, f)
-
-	# 导入数据
-	def import_(self, path):
-		with open(path, 'w', encoding='utf-8') as f:
-			data = json.load(f)
-
-		self.load(data)
+	def export(self):
+		return self.convert(force=True)
 
 	# endregion
 

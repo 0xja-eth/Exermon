@@ -23,6 +23,11 @@ class ListeningQuestion(GroupQuestion):
 	# 音频文件
 	audio = models.FileField(upload_to=QuestionAudioUpload(), verbose_name="音频文件")
 
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['audio'] = self.convertToBase64()
+
 	# 获取完整路径
 	def getExactlyPath(self):
 		base = settings.STATIC_URL
@@ -39,12 +44,6 @@ class ListeningQuestion(GroupQuestion):
 			data = base64.b64encode(f.read())
 
 		return data.decode()
-
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['times'] = self.times
-		res['audio'] = self.convertToBase64()
 
 
 # ===================================================

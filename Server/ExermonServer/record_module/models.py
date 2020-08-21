@@ -40,7 +40,7 @@ class BasePlayerQuestion(CacheableModel):
 	# 来源
 	SOURCE = RecordSource.Others
 
-	DO_NOT_AUTO_CONVERT_FIELDS = ['question_set_id', 'exp_incr', 'slot_exp_incr', 'gold_incr']
+	# DO_NOT_AUTO_CONVERT_FIELDS = ['question_set_id', 'exp_incr', 'slot_exp_incr', 'gold_incr']
 
 	# 题目
 	question: BaseQuestion = None
@@ -61,15 +61,26 @@ class BasePlayerQuestion(CacheableModel):
 
 	# 经验增加
 	exp_incr = models.SmallIntegerField(null=True, verbose_name="经验增加")
+	exp_incr.type_filter = ['result']
 
 	# 槽经验增加
 	slot_exp_incr = models.SmallIntegerField(null=True, verbose_name="槽经验增加")
+	slot_exp_incr.type_filter = ['result']
 
 	# 金币增加
 	gold_incr = models.SmallIntegerField(null=True, verbose_name="金币增加")
+	gold_incr.type_filter = ['result']
 
 	# 是否新题
 	is_new = models.BooleanField(default=False, verbose_name="新题标志")
+
+	# region 读取转换配置
+
+	# TYPE_FIELD_EXCLUDE_MAP = {
+	# 	'any': ['question_set']
+	# }
+
+	# endregion
 
 	# 所属题目集（用于子类继承）
 	# question_set = None
@@ -154,12 +165,6 @@ class BasePlayerQuestion(CacheableModel):
 		res['question_type'] = question_type
 
 	def _convertResultData(self, res, **kwargs):
-
-		self._convertAutoAttrs(res)
-
-		self._convertCustomFields(res, 'exp_incr',
-						 'slot_exp_incr', 'gold_incr')
-
 		res['correct'] = self.correct()
 		res['score'] = self.score()
 
@@ -345,10 +350,10 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 		abstract = True
 		verbose_name = verbose_name_plural = "选择题目关系"
 
-	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
-
 	# 选择情况
 	selection = jsonfield.JSONField(default=[], verbose_name="选择情况")
+
+	# region Adminx 配置
 
 	# 用于admin显示
 	def adminSelection(self):
@@ -368,10 +373,9 @@ class SelectingPlayerQuestion(BasePlayerQuestion):
 
 	adminAnswer.short_description = "正确答案"
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
+	LIST_DISPLAY_APPEND = ['adminSelection', 'adminAnswer']
 
-		res['selection'] = self.selection
+	# endregion
 
 	def _answerDict(self):
 		return {'selection': self.selection}
@@ -407,20 +411,19 @@ class ElementPlayerQuestion(BasePlayerQuestion):
 	# 回答
 	answer = models.CharField(null=True, blank=True,
 							  max_length=64, verbose_name="回答")
+	answer.type_filter = ['result']
 
 	# 选项（字符串数组）
 	choices = jsonfield.JSONField(default=[], verbose_name="选项")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
 		res['title'] = self.title()
-		res['choices'] = self.choices
 
-	def _convertResultInfo(self, res, type):
-		super()._convertResultInfo(res, type)
+	def _convertResultData(self, res, **kwargs):
+		super()._convertResultData(res, **kwargs)
 
-		res['answer'] = self.answer
 		res['correct_answer'] = self.correctAnswer()
 
 	def _create(self):
@@ -535,12 +538,9 @@ class QuesSetRecord(CacheableModel):
 	# 名称格式
 	NAME_STRING_FMT = "%s\n%s"
 
-	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
-						   'adminSlotExpIncrs', 'adminExpIncrs']
-
-	DO_NOT_AUTO_CONVERT_FIELDS = ['exer_exp_incrs',
-								  'slot_exp_incrs',
-								  'gold_incr']
+	# DO_NOT_AUTO_CONVERT_FIELDS = ['exer_exp_incrs',
+	# 							  'slot_exp_incrs',
+	# 							  'gold_incr']
 
 	# 玩家
 	player = models.ForeignKey("player_module.Player", on_delete=models.CASCADE,
@@ -551,23 +551,80 @@ class QuesSetRecord(CacheableModel):
 
 	# 艾瑟萌经验增加（{subject_id: value}）
 	exer_exp_incrs = jsonfield.JSONField(default={}, null=True, verbose_name="经验增加")
+	exer_exp_incrs.type_filter = ['result']
 
 	# 槽经验增加（{subject_id: value}）
 	slot_exp_incrs = jsonfield.JSONField(default={}, null=True, verbose_name="槽经验增加")
+	slot_exp_incrs.type_filter = ['result']
 
 	# 金币增加（总）
 	gold_incr = models.SmallIntegerField(null=True, verbose_name="金币增加")
+	gold_incr.type_filter = ['result']
 
 	# 是否完成
 	finished = models.BooleanField(default=False, verbose_name="完成标志")
 
-	def __str__(self):
-		return "%s %s" % (self.player, self.generateName())
+	# region 读取转化配置
+	
+	TYPE_RELATED_FILTER_MAP = {
+		'any': [BasePlayerQuestion],
+		'result': [QuesSetReward]
+	}
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		self._setupCachePool()
+		res['name'] = self.generateName()
+
+	def _convertResultData(self, res, **kwargs): pass
+
+	# 	rewards = ModelUtils.objectsToDict(self.rewards())
+	#
+	# 	self._convertCustomFields(res, 'exer_exp_incrs',
+	# 					 'slot_exp_incrs', 'gold_incr')
+	#
+	# 	res['rewards'] = rewards
+
+	# def convert(self, type: str = None) -> dict:
+	# 	"""
+	# 	转化为字典
+	# 	Args:
+	# 		type (str): 转化类型
+	# 	Returns:
+	# 		转化后的字典数据
+	# 	"""
+	# 	res = {}
+	#
+	# 	self._convertBaseInfo(res, type)
+	#
+	# 	if type == 'result':
+	# 		self._convertResultInfo(res)
+	#
+	# 	return res
+	#
+	# def _convertBaseInfo(self, res, type):
+	#
+	# 	create_time = ModelUtils.timeToStr(self.create_time)
+	# 	player_questions = ModelUtils.objectsToDict(
+	# 		self.playerQuestions(), type=type)
+	#
+	# 	res['id'] = self.id
+	# 	res['name'] = self.generateName()
+	# 	res['questions'] = player_questions
+	# 	res['create_time'] = create_time
+	# 	res['finished'] = self.finished
+	#
+	# def _convertResultInfo(self, res):
+	# 	rewards = ModelUtils.objectsToDict(self.rewards())
+	#
+	# 	res['exer_exp_incrs'] = self.exer_exp_incrs
+	# 	res['slot_exp_incrs'] = self.slot_exp_incrs
+	# 	res['gold_incr'] = self.gold_incr
+	# 	res['rewards'] = rewards
+
+	# endregion
+
+	# region Admin 配置
 
 	# region 管理显示
 
@@ -624,6 +681,19 @@ class QuesSetRecord(CacheableModel):
 
 	# endregion
 
+	LIST_DISPLAY_APPEND = ['adminExerExpIncrs',
+						   'adminSlotExpIncrs', 'adminExpIncrs']
+
+	# endregion
+
+	def __str__(self):
+		return "%s %s" % (self.player, self.generateName())
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self._setupCachePool()
+	
 	# region 配置项
 
 	# 奖励计算类
@@ -722,62 +792,6 @@ class QuesSetRecord(CacheableModel):
 		verbose_name = type(self)._meta.verbose_name
 
 		return create_time, verbose_name
-
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-		
-		create_time = ModelUtils.timeToStr(self.create_time)
-		player_questions = ModelUtils.objectsToDict(
-			self.playerQuestions(), type=type)
-
-		res['name'] = self.generateName()
-		res['questions'] = player_questions
-		res['create_time'] = create_time
-
-	def _convertResultData(self, res, **kwargs):
-		rewards = ModelUtils.objectsToDict(self.rewards())
-	
-		self._convertCustomFields(res, 'exer_exp_incrs',
-						 'slot_exp_incrs', 'gold_incr')
-
-		res['rewards'] = rewards
-
-	# def convert(self, type: str = None) -> dict:
-	# 	"""
-	# 	转化为字典
-	# 	Args:
-	# 		type (str): 转化类型
-	# 	Returns:
-	# 		转化后的字典数据
-	# 	"""
-	# 	res = {}
-	#
-	# 	self._convertBaseInfo(res, type)
-	#
-	# 	if type == 'result':
-	# 		self._convertResultInfo(res)
-	#
-	# 	return res
-	#
-	# def _convertBaseInfo(self, res, type):
-	#
-	# 	create_time = ModelUtils.timeToStr(self.create_time)
-	# 	player_questions = ModelUtils.objectsToDict(
-	# 		self.playerQuestions(), type=type)
-	#
-	# 	res['id'] = self.id
-	# 	res['name'] = self.generateName()
-	# 	res['questions'] = player_questions
-	# 	res['create_time'] = create_time
-	# 	res['finished'] = self.finished
-	#
-	# def _convertResultInfo(self, res):
-	# 	rewards = ModelUtils.objectsToDict(self.rewards())
-	#
-	# 	res['exer_exp_incrs'] = self.exer_exp_incrs
-	# 	res['slot_exp_incrs'] = self.slot_exp_incrs
-	# 	res['gold_incr'] = self.gold_incr
-	# 	res['rewards'] = rewards
 
 	# endregion
 

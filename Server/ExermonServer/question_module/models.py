@@ -50,10 +50,6 @@ class BaseQuestion(BaseModel):
 	RECORD_CLASS: 'BaseQuesRecord' = None
 	PICTURE_CLASS: 'BaseQuesPicture' = None
 
-	LIST_EDITABLE_EXCLUDE = ['create_time']
-
-	DO_NOT_AUTO_CONVERT_FIELDS = ['score']
-
 	# 科目
 	subject = models.ForeignKey('game_module.Subject', default=1, on_delete=models.CASCADE, verbose_name="科目")
 
@@ -67,13 +63,15 @@ class BaseQuestion(BaseModel):
 	# 分值
 	score = models.PositiveSmallIntegerField(default=None, null=True,
 											 blank=True, verbose_name="分值")
-	score.
+	score.convert = lambda model, value: model.quesScore()
 
 	# 来源
 	source = models.TextField(null=True, blank=True, verbose_name="来源")
+	source.type_filter = ['answer']
 
 	# 题解
 	description = models.TextField(null=True, blank=True, verbose_name="题解")
+	description.type_filter = ['answer']
 
 	# 是否小学题目
 	is_primary = models.BooleanField(default=True, verbose_name="是否小学题目")
@@ -87,31 +85,25 @@ class BaseQuestion(BaseModel):
 	# 测试题目
 	for_test = models.BooleanField(default=False, verbose_name="测试")
 
-	@classmethod
-	def reportClass(cls): return cls.REPORT_CLASS
+	# region 转化读取配置
 
-	@classmethod
-	def recordClass(cls): return cls.RECORD_CLASS
+	TYPE_FIELD_FILTER_MAP = {
+		'info': ['id', subject],
+	}
 
-	def stdTime(self): return self.STD_TIME
+	TYPE_RELATED_FILTER_MAP = {
+		'info': []
+	}
 
-	# 生成随机编号
-	def number(self): return self.id
+	TYPE_RELATED_EXCLUDE_MAP = {
+		'any': ['BaseQuesRecord', 'BaseQuesReport']
+	}
 
 	def _convertCustomAttrs(self, res, type=None, **kwargs):
 		super()._convertCustomAttrs(res, type, **kwargs)
 
-		if type != 'info':
-			res['number'] = self.number()
-			res['score'] = self.quesScore()
-
-	@BaseModel.convertFields('id, subject_id', not_convert=False)
-	def _convertInfoData(self, res, **kwargs):
-
 		res['type'] = self.TYPE.value
-
-	@BaseModel.convertFields('source, description')
-	def _convertAnswerData(self, res, **kwargs): pass
+		res['number'] = self.number()
 
 	# def convert(self, type=None):
 	#
@@ -127,40 +119,57 @@ class BaseQuestion(BaseModel):
 	# 		self._convertAnswerInfo(res)
 	#
 	# 	return res
+	#
+	# # 转化索引信息
+	# def _convertIndexInfo(self, res, type):
+	#
+	# 	res['id'] = self.id
+	# 	res['type'] = self.TYPE.value
+	# 	res['subject_id'] = self.subject_id
+	#
+	# # 转化基本信息
+	# def _convertBaseInfo(self, res, type):
+	#
+	# 	create_time = ModelUtils.timeToStr(self.create_time)
+	#
+	# 	pictures = ModelUtils.objectsToDict(self.pictures())
+	#
+	# 	res['number'] = self.number()
+	# 	res['score'] = self.quesScore()
+	# 	res['create_time'] = create_time
+	# 	res['status'] = self.status
+	#
+	# 	res['pictures'] = pictures
+	#
+	# 	res['is_primary'] = self.is_primary
+	# 	res['is_middle'] = self.is_middle
+	# 	res['is_high'] = self.is_high
+	#
+	# # 转化答案信息
+	# def _convertAnswerInfo(self, res):
+	#
+	# 	res['source'] = self.source
+	# 	res['description'] = self.description
+	# endregion
 
-	# 转化索引信息
-	def _convertIndexInfo(self, res, type):
+	# region Admin 配置
 
-		res['id'] = self.id
-		res['type'] = self.TYPE.value
-		res['subject_id'] = self.subject_id
+	LIST_EDITABLE_EXCLUDE = ['create_time']
 
-	# 转化基本信息
-	def _convertBaseInfo(self, res, type):
+	# endregion
 
-		create_time = ModelUtils.timeToStr(self.create_time)
+	@classmethod
+	def reportClass(cls): return cls.REPORT_CLASS
 
-		pictures = ModelUtils.objectsToDict(self.pictures())
+	@classmethod
+	def recordClass(cls): return cls.RECORD_CLASS
 
-		res['number'] = self.number()
-		res['score'] = self.quesScore()
-		res['create_time'] = create_time
-		res['status'] = self.status
+	# 生成随机编号
+	def number(self): return self.id
 
-		res['pictures'] = pictures
+	def stdTime(self): return self.STD_TIME
 
-		res['is_primary'] = self.is_primary
-		res['is_middle'] = self.is_middle
-		res['is_high'] = self.is_high
-
-	# 转化答案信息
-	def _convertAnswerInfo(self, res):
-
-		res['source'] = self.source
-		res['description'] = self.description
-
-	def quesScore(self):
-		return self.score or self.DEFAULT_SCORE
+	def quesScore(self): return self.score or self.DEFAULT_SCORE
 
 	# 选项
 	@CacheHelper.staticCache
@@ -226,12 +235,10 @@ class BaseQuesPicture(BaseModel):
 
 		return data.decode()
 
-	def convert(self):
-		return {
-			'number': self.number,
-			'desc_pic': self.desc_pic,
-			'data': self.convertToBase64()
-		}
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
+
+		res['data'] = self.convertToBase64()
 
 
 # region 选择题
@@ -272,12 +279,20 @@ class SelectingQuestion(BaseQuestion):
 		default=SelectingQuestionType.Single.value,
 		choices=SEL_TYPES, verbose_name="类型")
 
-	def __str__(self):
+	# region 转化读取配置
 
-		return self.title[:32]
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	choices = ModelUtils.objectsToDict(self.choices(), type=type)
+	#
+	# 	res['title'] = self.title
+	# 	res['choices'] = choices
+	# 	res['sel_type'] = self.sel_type
 
-	# 生成随机编号
-	def number(self): return self.id
+	# endregion
+
+	# region AdminX配置
 
 	# 正确答案（编号）文本
 	def adminCorrectAnswer(self):
@@ -292,14 +307,16 @@ class SelectingQuestion(BaseQuestion):
 
 	adminCorrectAnswer.short_description = "正确选项"
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
+	LIST_DISPLAY_APPEND = ['adminCorrectAnswer']
 
-		choices = ModelUtils.objectsToDict(self.choices(), type=type)
+	# endregion
 
-		res['title'] = self.title
-		res['choices'] = choices
-		res['sel_type'] = self.sel_type
+	def __str__(self):
+
+		return self.title[:32]
+
+	# 生成随机编号
+	def number(self): return self.id
 
 	# 正确答案（编号）
 	def correctAnswer(self):
@@ -374,12 +391,6 @@ class BaseQuesChoice(BaseModel):
 	def __str__(self):
 		return self.text
 
-	def convert(self):
-		return {
-			'order': self.order,
-			'text': self.text,
-			'answer': self.answer
-		}
 
 # endregion
 
@@ -402,17 +413,25 @@ class CorrectingQuestion(BaseQuestion):
 	# 文章
 	article = models.TextField(verbose_name="文章")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
+	# region 转化读取配置
 
-		res['article'] = self.article
+	TYPE_RELATED_FILTER_MAP = {
+		'answer': ['WrongItem']
+	}
 
-	def _convertAnswerInfo(self, res):
-		super()._convertAnswerInfo(res)
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['article'] = self.article
+	#
+	# def _convertAnswerInfo(self, res):
+	# 	super()._convertAnswerInfo(res)
+	#
+	# 	wrong_items = ModelUtils.objectsToDict(self.wrongItems())
+	#
+	# 	res['wrong_items'] = wrong_items
 
-		wrong_items = ModelUtils.objectsToDict(self.wrongItems())
-
-		res['wrong_items'] = wrong_items
+	# endregion
 
 	@CacheHelper.staticCache
 	def wrongItems(self) -> QuerySet:
@@ -475,15 +494,6 @@ class WrongItem(BaseModel):
 	question = models.ForeignKey('CorrectingQuestion', on_delete=models.CASCADE,
 								 verbose_name="改错题目")
 
-	def convert(self):
-		return {
-			'id': self.id,
-			'sentence_index': self.sentence_index,
-			'word_index': self.word_index,
-			'type': self.type,
-			'word': self.word,
-		}
-
 # endregion
 
 # region 简答题
@@ -530,17 +540,21 @@ class GroupQuestion(BaseQuestion):
 	# 文章
 	article = models.TextField(null=True, blank=True, verbose_name="文章")
 
+	# # region 转化读取配置
+	#
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	sub_questions = ModelUtils.objectsToDict(
+	# 		self.subQuestions(), type=type)
+	#
+	# 	res['article'] = self.article
+	# 	res['sub_questions'] = sub_questions
+	#
+	# # endregion
+
 	def __str__(self):
 		return "%s. %s" % (self.id, self.article)
-
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		sub_questions = ModelUtils.objectsToDict(
-			self.subQuestions(), type=type)
-
-		res['article'] = self.article
-		res['sub_questions'] = sub_questions
 
 	@CacheHelper.staticCache
 	def subQuestions(self) -> QuerySet:
@@ -685,33 +699,10 @@ class BaseQuesRecord(BaseModel):
 	@classmethod
 	def questionType(cls): return cls.questionClass().TYPE
 
-	# 转化为字典
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		last_date = ModelUtils.timeToStr(self.last_date)
-		first_date = ModelUtils.timeToStr(self.first_date)
-
-		return {
-			'id': self.id,
-			'question_type': self.questionType().value,
-			'question_id': self.question_id,
-
-			'count': self.count,
-			'correct': self.correct,
-			'first_date': first_date,
-			'last_date': last_date,
-
-			'first_time': self.first_time,
-			'avg_time': self.avg_time,
-			'corr_time': self.corr_time,
-			'sum_exp': self.sum_exp,
-			'sum_gold': self.sum_gold,
-
-			'source': self.source,
-			'collected': self.collected,
-			'wrong': self.wrong,
-			'note': self.note
-		}
+		res['question_type'] = self.questionType().value
 
 	# 创建新记录
 	@classmethod
@@ -881,22 +872,27 @@ class BaseQuesReport(BaseModel):
 
 		return report
 
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		create_time = ModelUtils.timeToStr(self.create_time)
-		result_time = ModelUtils.timeToStr(self.result_time)
+		res['question_type'] = self.questionType().value
 
-		return {
-			'id': self.id,
-			'question_type': self.questionType().value,
-			'question_id': self.question_id,
-
-			'type': self.type,
-			'description': self.description,
-			'create_time': create_time,
-			'result': self.result,
-			'result_time': result_time,
-		}
+	# def convert(self):
+	#
+	# 	create_time = ModelUtils.timeToStr(self.create_time)
+	# 	result_time = ModelUtils.timeToStr(self.result_time)
+	#
+	# 	return {
+	# 		'id': self.id,
+	# 		'question_type': self.questionType().value,
+	# 		'question_id': self.question_id,
+	#
+	# 		'type': self.type,
+	# 		'description': self.description,
+	# 		'create_time': create_time,
+	# 		'result': self.result,
+	# 		'result_time': result_time,
+	# 	}
 
 # endregion
 

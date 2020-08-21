@@ -173,16 +173,16 @@ class BaseItem(GameData):
 # ===================================================
 #  物品价格表
 # ===================================================
-# class ItemPrice(Currency):
-# 	class Meta:
-# 		verbose_name = verbose_name_plural = "物品价格"
-#
-# 	# 对应物品
-# 	item = models.OneToOneField("LimitedItem", on_delete=models.CASCADE,
-# 									 null=True, verbose_name="物品")
-#
-# 	# def __str__(self):
-# 	# 	return '%s：%s' % (self.limiteditem, super().__str__())
+class ItemPrice(Currency):
+	class Meta:
+		verbose_name = verbose_name_plural = "物品价格"
+
+	KEY_NAME = 'buy_price'
+
+	LIST_DISPLAY_APPEND = ['item']
+
+	# def __str__(self):
+	# 	return '%s：%s' % (self.limiteditem, super().__str__())
 
 
 # ===================================================
@@ -230,6 +230,30 @@ class LimitedItem(BaseItem):
 
 	adminBuyPrice.short_description = "购入价格"
 
+	# region 转化读取配置
+
+	TYPE_FIELD_FILTER_MAP = {
+		'shop': ['id']
+	}
+
+	TYPE_RELATED_FILTER_MAP = {
+		'shop': [ItemPrice]
+	}
+
+	# def _convertCustomAttrs(self, res, type=None, **kwargs):
+	# 	super()._convertCustomAttrs(res, type, **kwargs)
+	#
+	# 	if type is None:
+	# 		buy_price = ModelUtils.objectToDict(self.buyPrice())
+	# 		res['buy_price'] = buy_price
+
+	def _convertShopData(self, res, **kwargs):
+
+		res['price'] = res['buy_price']
+		del res['buy_price']
+
+	# endregion
+
 	def isBoughtable(self, *args, **kwargs):
 		"""
 		物品能否购买，可以购买的物品会直接出现在相应的商店中
@@ -258,19 +282,6 @@ class LimitedItem(BaseItem):
 			返回固定的购买价格
 		"""
 		raise NotImplementedError
-
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		if type is None:
-			buy_price = ModelUtils.objectToDict(self.buyPrice())
-			res['buy_price'] = buy_price
-
-	def _convertShopData(self, res, **kwargs):
-		price = ModelUtils.objectToDict(self.buyPrice())
-
-		res['id'] = self.id
-		res['price'] = price
 
 
 # ===================================================

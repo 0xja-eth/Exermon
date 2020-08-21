@@ -35,12 +35,12 @@ class BaseExerciseRecord(QuesSetRecord):
 
 		return create_time, self.subject.name, verbose_name
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['season_id'] = self.season_id
-		res['subject_id'] = self.subject_id
-		res['count'] = self.count
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['season_id'] = self.season_id
+	# 	res['subject_id'] = self.subject_id
+	# 	res['count'] = self.count
 
 	# 开始刷题
 	def _create(self, subject, count):
@@ -103,10 +103,10 @@ class GeneralExerciseRecord(BaseExerciseRecord):
 												default=QuestionGenerateType.Normal.value,
 												verbose_name="生成模式")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['gen_type'] = self.gen_type
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['gen_type'] = self.gen_type
 
 	# 开始刷题
 	def _create(self, subject, count, gen_type=QuestionGenerateType.Normal.value):
@@ -216,10 +216,10 @@ class WordExerciseRecord(QuesSetRecord):
 	count = models.PositiveSmallIntegerField(
 		default=DEFAULT_COUNT, verbose_name="题量")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['count'] = self.count
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['count'] = self.count
 
 	# 开始刷题
 	def _create(self, count=DEFAULT_COUNT, **kwargs):
@@ -252,10 +252,10 @@ class PhraseExerciseRecord(QuesSetRecord):
 	count = models.PositiveSmallIntegerField(
 		default=DEFAULT_COUNT, verbose_name="题量")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['count'] = self.count
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['count'] = self.count
 
 	# 开始刷题
 	def _create(self, count=DEFAULT_COUNT, **kwargs):

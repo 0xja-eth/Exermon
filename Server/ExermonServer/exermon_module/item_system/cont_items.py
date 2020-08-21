@@ -630,11 +630,12 @@ class EquipPackItem(PackContItem, EquipParamsObject):
 								  Containers.ExerEquipSlot, pack_equip=EquipPackItem)
 class ExerEquipSlotItem(SlotContItem, ParamsObject):
 
-	AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
+	# AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
 
 	# 装备槽类型
 	e_type = models.ForeignKey('game_module.models.GameEquipType', on_delete=models.CASCADE,
 							   verbose_name="装备槽类型")
+	e_type.key_name = 'e_type'
 
 	@classmethod
 	def paramValueClass(cls):

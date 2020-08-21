@@ -479,9 +479,9 @@ class BattlePlayer(QuesSetRecord):
 
 	LIST_DISPLAY_APPEND = ['adminScores']
 
-	DO_NOT_AUTO_CONVERT_FIELDS = ['time_score', 'hurt_score',
-								  'damage_score', 'recovery_score',
-								  'correct_score', 'plus_score']
+	# DO_NOT_AUTO_CONVERT_FIELDS = ['time_score', 'hurt_score',
+	# 							  'damage_score', 'recovery_score',
+	# 							  'correct_score', 'plus_score']
 
 	# 关联的记录
 	record = models.ForeignKey('BattleRecord', on_delete=models.CASCADE, verbose_name="对战记录")
@@ -491,21 +491,27 @@ class BattlePlayer(QuesSetRecord):
 
 	# 用时评分（*100）
 	time_score = models.PositiveSmallIntegerField(null=True, verbose_name="用时评分")
+	time_score.convert = lambda obj, value: value/100
 
 	# 伤害评分（*100）
 	hurt_score = models.PositiveSmallIntegerField(null=True, verbose_name="伤害评分")
+	hurt_score.convert = lambda obj, value: value/100
 
 	# 承伤评分（*100）
 	damage_score = models.PositiveSmallIntegerField(null=True, verbose_name="承伤评分")
+	damage_score.convert = lambda obj, value: value/100
 
 	# 恢复评分（*100）
 	recovery_score = models.PositiveSmallIntegerField(null=True, verbose_name="恢复评分")
+	recovery_score.convert = lambda obj, value: value/100
 
 	# 正确评分（*100）
 	correct_score = models.PositiveSmallIntegerField(null=True, verbose_name="行动评分")
+	correct_score.convert = lambda obj, value: value/100
 
 	# 奖励分数（*100）
 	plus_score = models.PositiveSmallIntegerField(null=True, verbose_name="奖励分数")
+	plus_score.convert = lambda obj, value: value/100
 
 	# 战斗结果
 	result = models.PositiveSmallIntegerField(null=True, choices=RESULT_TYPES, verbose_name="战斗结果")
@@ -593,15 +599,15 @@ class BattlePlayer(QuesSetRecord):
 		"""
 		self.record = record
 
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		res['time_score'] = self.time_score/100
-		res['hurt_score'] = self.hurt_score/100
-		res['damage_score'] = self.damage_score/100
-		res['recovery_score'] = self.recovery_score/100
-		res['correct_score'] = self.correct_score/100
-		res['plus_score'] = self.plus_score/100
+	# def _convertCustomAttrs(self, res, type=None, **kwargs):
+	# 	super()._convertCustomAttrs(res, type, **kwargs)
+	#
+	# 	res['time_score'] = self.time_score/100
+	# 	res['hurt_score'] = self.hurt_score/100
+	# 	res['damage_score'] = self.damage_score/100
+	# 	res['recovery_score'] = self.recovery_score/100
+	# 	res['correct_score'] = self.correct_score/100
+	# 	res['plus_score'] = self.plus_score/100
 
 	def battleScore(self) -> int:
 		"""

@@ -39,12 +39,10 @@ class GameItemEffect(BaseEffect):
 # ===================================================
 #  人类物品价格
 # ===================================================
-class GameItemPrice(Currency):
+class GameItemPrice(ItemPrice):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "人类物品价格"
-
-	LIST_DISPLAY_APPEND = ['item']
 
 	# 物品
 	item = models.OneToOneField(GameItem, on_delete=models.CASCADE,

@@ -178,11 +178,12 @@ class ExerGift(BaseItem, ParamsObject):
 @ItemManager.registerItem("艾瑟萌碎片")
 class ExerFrag(BaseItem):
 
-	AUTO_FIELDS_KEY_NAMES = {'o_exermon_id': 'eid'}
+	# AUTO_FIELDS_KEY_NAMES = {'o_exermon_id': 'eid'}
 
 	# 所属艾瑟萌
 	o_exermon = models.ForeignKey('Exermon', on_delete=models.CASCADE,
 								 verbose_name="所属艾瑟萌")
+	o_exermon.key_name = 'eid'
 
 	# 所需碎片数目
 	count = models.PositiveSmallIntegerField(default=16, verbose_name="所需碎片数")
@@ -338,6 +339,44 @@ class ExerSkill(BaseItem):
 
 
 # ===================================================
+#  艾瑟萌装备
+# ===================================================
+@ItemManager.registerItem("一般装备")
+class GameEquip(EquipableItem):
+
+	# AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
+
+	# 装备类型
+	e_type = models.ForeignKey("game_module.GameEquipType",
+							   on_delete=models.CASCADE, verbose_name="装备类型")
+	e_type.key_name = 'e_type'
+
+	@classmethod
+	def levelParamClass(cls):
+		return GameEquipLevelParam
+
+	@classmethod
+	def baseParamClass(cls):
+		return GameEquipBaseParam
+
+	# 获取所有的属性基本值
+	@CacheHelper.staticCache
+	def _levelParams(self):
+		return self.gameequiplevelparam_set.all()
+
+	# 获取所有的属性基本值
+	@CacheHelper.staticCache
+	def _baseParams(self):
+		return self.gameequipbaseparam_set.all()
+
+	# 购买价格
+	@CacheHelper.staticCache
+	def buyPrice(self):
+		try: return self.gameequipprice
+		except GameEquipPrice.DoesNotExist: return None
+
+
+# ===================================================
 #  艾瑟萌装备等级属性值表
 # ===================================================
 class GameEquipLevelParam(EquipParamRate):
@@ -372,7 +411,7 @@ class GameEquipBaseParam(EquipParamValue):
 # ===================================================
 #  艾瑟萌装备价格
 # ===================================================
-class GameEquipPrice(Currency):
+class GameEquipPrice(ItemPrice):
 
 	class Meta:
 		verbose_name = verbose_name_plural = "艾瑟萌装备价格"
@@ -382,40 +421,3 @@ class GameEquipPrice(Currency):
 	# 物品
 	item = models.OneToOneField('GameEquip', on_delete=models.CASCADE,
 								verbose_name="物品")
-
-
-# ===================================================
-#  艾瑟萌装备
-# ===================================================
-@ItemManager.registerItem("一般装备")
-class GameEquip(EquipableItem):
-
-	AUTO_FIELDS_KEY_NAMES = {'e_type_id': 'e_type'}
-
-	# 装备类型
-	e_type = models.ForeignKey("game_module.GameEquipType",
-							   on_delete=models.CASCADE, verbose_name="装备类型")
-
-	@classmethod
-	def levelParamClass(cls):
-		return GameEquipLevelParam
-
-	@classmethod
-	def baseParamClass(cls):
-		return GameEquipBaseParam
-
-	# 获取所有的属性基本值
-	@CacheHelper.staticCache
-	def _levelParams(self):
-		return self.gameequiplevelparam_set.all()
-
-	# 获取所有的属性基本值
-	@CacheHelper.staticCache
-	def _baseParams(self):
-		return self.gameequipbaseparam_set.all()
-
-	# 购买价格
-	@CacheHelper.staticCache
-	def buyPrice(self):
-		try: return self.gameequipprice
-		except GameEquipPrice.DoesNotExist: return None

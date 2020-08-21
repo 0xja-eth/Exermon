@@ -2,6 +2,7 @@ from django.db import models
 
 from ..manager import QuesManager
 from ..models import *
+
 # import question_module.models as Models
 
 from enum import Enum
@@ -21,6 +22,7 @@ class Word(ElementQuestion):
 
 	# 中文
 	chinese = models.CharField(max_length=256, verbose_name="中文")
+	chinese.type_filter = ['answer']
 
 	# 词性
 	type = models.CharField(max_length=64, verbose_name="词性", null=True, blank=True)
@@ -30,18 +32,6 @@ class Word(ElementQuestion):
 
 	def __str__(self):
 		return "%d. %s" % (self.id, self.english)
-
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['english'] = self.english
-		res['type'] = self.type
-		res['level'] = self.level
-
-	def _convertAnswerInfo(self, res):
-		super()._convertAnswerInfo(res)
-
-		res['chinese'] = self.chinese
 
 	def title(self, dictation=False):
 		return self.chinese if dictation else self.english
@@ -56,8 +46,6 @@ class Word(ElementQuestion):
 @QuesManager.registerQuesRecord(Word)
 class WordRecord(BaseQuesRecord):
 
-	LIST_EDITABLE_EXCLUDE = ['word', 'record', 'count']
-
 	# 当前轮单词
 	current = models.BooleanField(default=False, verbose_name="是否是当前轮")
 
@@ -68,19 +56,14 @@ class WordRecord(BaseQuesRecord):
 	def __str__(self):
 		return '%s (%s)' % (self.word, self.record)
 
-	# 转化为字典
-	def convert(self):
+	def _convertCustomAttrs(self, res, type=None, **kwargs):
+		super()._convertCustomAttrs(res, type, **kwargs)
 
-		res = super().convert()
-
-		res['current'] = self.current
-		res['current_correct'] = self.current_correct
 		res['current_done'] = self.current_correct is not None
-
-		return res
 
 	def _create(self):
 		super(WordRecord, self)._create()
+
 		self.current = True
 
 
@@ -123,22 +106,11 @@ class Phrase(ElementQuestion):
 
 	# 不定式项
 	phrase = models.CharField(max_length=64, verbose_name="不定式项")
+	phrase.type_filter = ['answer']
 
 	# 不定式项的类型
 	type = models.PositiveSmallIntegerField(default=PhraseType.Do.value,
 											choices=PHRASE_TYPES, verbose_name="修改类型")
-
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['word'] = self.word
-		res['chinese'] = self.chinese
-		res['type'] = self.type
-
-	def _convertAnswerInfo(self, res):
-		super()._convertAnswerInfo(res)
-
-		res['phrase'] = self.phrase
 
 	def title(self):
 		return [self.word, self.chinese]

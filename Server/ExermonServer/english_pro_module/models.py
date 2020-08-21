@@ -272,13 +272,6 @@ class ExerProMap(BaseModel):
 	def __str__(self):
 		return "%d. %s" % (self.id, self.name)
 
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		stages = ModelUtils.objectsToDict(self.stages())
-
-		res['stages'] = stages
-
 	@CacheHelper.staticCache
 	def stages(self):
 		"""
@@ -325,7 +318,7 @@ class ExerProMapStage(BaseModel):
 
 	LIST_EDITABLE_EXCLUDE = ['map']
 
-	DO_NOT_AUTO_CONVERT_FIELDS = ['enemies']
+	# DO_NOT_AUTO_CONVERT_FIELDS = ['enemies']
 
 	# 序号
 	order = models.PositiveSmallIntegerField(default=1, verbose_name="序号")
@@ -354,12 +347,12 @@ class ExerProMapStage(BaseModel):
 	def __str__(self):
 		return "%s 第 %s 关" % (self.map, self.order)
 
-	def _convertCustomAttrs(self, res, type=None, **kwargs):
-		super()._convertCustomAttrs(res, type, **kwargs)
-
-		enemies = list(e.id for e in self.enemies.all())
-
-		res['enemies'] = enemies
+	# def _convertCustomAttrs(self, res, type=None, **kwargs):
+	# 	super()._convertCustomAttrs(res, type, **kwargs)
+	#
+	# 	enemies = list(e.id for e in self.enemies.all())
+	#
+	# 	res['enemies'] = enemies
 
 
 # ===================================================

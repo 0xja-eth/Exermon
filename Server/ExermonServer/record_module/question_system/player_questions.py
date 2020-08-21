@@ -67,10 +67,10 @@ class WordExerciseQuestion(ElementPlayerQuestion):
 	# 是否默写
 	dictation = models.BooleanField(default=False, verbose_name="默写")
 
-	def _convertBaseInfo(self, res, type):
-		super()._convertBaseInfo(res, type)
-
-		res['dictation'] = self.dictation
+	# def _convertBaseInfo(self, res, type):
+	# 	super()._convertBaseInfo(res, type)
+	#
+	# 	res['dictation'] = self.dictation
 
 	def _create(self, dictation=False):
 		self.dictation = dictation

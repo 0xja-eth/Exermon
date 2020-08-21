@@ -6,6 +6,7 @@ from .item_system.containers import *
 from .item_system.cont_items import *
 
 from question_module.models import *
+from record_module.models import QuesSetRecord
 
 from season_module.models import SeasonRecord
 from season_module.runtimes import SeasonManager
@@ -211,6 +212,8 @@ class PlayerMoney(Currency):
 
 	# 默认金币
 	DEFAULT_GOLD = 500
+	
+	KEY_NAME = 'money'
 
 	# 对应玩家
 	player = models.OneToOneField("Player", on_delete=models.CASCADE,
@@ -325,25 +328,20 @@ class Player(CacheableModel):
 		(PlayerType.Other.value, '其他')
 	]
 
-	LIST_DISPLAY_APPEND = ['adminLevel', 'adminMoney']
-
-	LIST_DISPLAY_EXCLUDE = ['password']
-
-	LIST_EDITABLE_EXCLUDE = ['password', 'create_time', 'last_refresh_time']
-
-	DO_NOT_AUTO_CONVERT_FIELDS = ['password']
-
 	# 登录信息缓存键
 	LOGININFO_CACHE_KEY = 'login_info'
 
 	# 当前题目集缓存键
 	CUR_QUES_SET_CACHE_KEY = 'question_set'
 
+	# region 字段
+
 	# 用户名（OPENID）
 	username = models.CharField(null=False, max_length=64, verbose_name="用户名")
 
 	# 密码（ACCESS TOKEN）
 	password = models.CharField(null=True, max_length=64, verbose_name="密码")
+	password.type_exclude = ['any']
 
 	# 手机号
 	phone = models.CharField(blank=True, null=True, max_length=11, verbose_name="手机号")
@@ -362,26 +360,8 @@ class Player(CacheableModel):
 	grade = models.PositiveSmallIntegerField(default=PlayerGrades.Unset.value,
 											 choices=GRADES, verbose_name="年级")
 
-	# 注册时间
-	create_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
-
-	# 刷新时间
-	last_refresh_time = models.DateTimeField(blank=True, null=True,
-											 verbose_name="刷新时间")
-
-	# 状态
-	status = models.PositiveSmallIntegerField(default=PlayerStatus.Uncreated.value,
-											  choices=STATUSES, verbose_name="账号状态")
-
-	# 账号类型
-	type = models.PositiveSmallIntegerField(default=PlayerStatus.Normal.value,
-											choices=TYPES, verbose_name="账号类型")
-
 	# 选科ID数组
 	subject_selection = jsonfield.JSONField(default=[], verbose_name="选科")
-
-	# 在线
-	online = models.BooleanField(default=False, verbose_name="在线")
 
 	# 经验
 	exp = models.PositiveIntegerField(default=0, verbose_name="经验值")
@@ -404,14 +384,49 @@ class Player(CacheableModel):
 	# 信誉积分
 	credit = models.PositiveSmallIntegerField(default=100, verbose_name="信誉积分")
 
-	# 删除标志
-	is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
+	# 注册时间
+	create_time = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
 
-	# 快捷访问容器
-	containers = {}
+	# 刷新时间
+	last_refresh_time = models.DateTimeField(blank=True, null=True,
+											 verbose_name="刷新时间")
+	last_refresh_time.type_exclude = ['any']
 
-	def __str__(self):
-		return "%d. %s(%s)" % (self.id, self.name, self.username)
+	# 状态
+	status = models.PositiveSmallIntegerField(default=PlayerStatus.Uncreated.value,
+											  choices=STATUSES, verbose_name="账号状态")
+
+	# 账号类型
+	type = models.PositiveSmallIntegerField(default=PlayerStatus.Normal.value,
+											choices=TYPES, verbose_name="账号类型")
+
+	# 在线
+	online = models.BooleanField(default=False, verbose_name="在线")
+
+	# # 删除标志
+	# is_deleted = models.BooleanField(default=False, verbose_name="删除标志")
+
+	# endregion
+
+	# region 转化读取配置
+
+	TYPE_FIELD_FILTER_MAP = {
+		'any': ['id', username, name, character, grade, subject_selection, online],
+		'status': [phone, email, exp, birth, school, city, contact,
+				   description, credit, create_time, status, type],
+	}
+
+	TYPE_RELATED_FILTER_MAP = {
+		'any': [],
+		'packs': [PlayerMoney, BaseContainer],
+		'status': [PlayerMoney, BaseContainer],
+		'battle': [PlayerMoney, BaseContainer],
+		'records': [QuesSetRecord]
+	}
+
+	# endregion
+
+	# region Admin 配置
 
 	# 管理界面用
 	def adminLevel(self):
@@ -426,6 +441,20 @@ class Player(CacheableModel):
 		return "无"
 
 	adminMoney.short_description = "持有金钱"
+
+	LIST_DISPLAY_APPEND = ['adminLevel', 'adminMoney']
+
+	LIST_DISPLAY_EXCLUDE = ['password']
+
+	LIST_EDITABLE_EXCLUDE = ['password', 'create_time', 'last_refresh_time']
+
+	# endregion
+
+	# 快捷访问容器
+	containers = {}
+
+	def __str__(self):
+		return "%d. %s(%s)" % (self.id, self.name, self.username)
 
 	@classmethod
 	@CacheHelper.staticCache
@@ -444,67 +473,67 @@ class Player(CacheableModel):
 
 	# region 字典生成
 
-	def _packContainerIndices(self):
-
-		human_pack = ModelUtils.objectToDict(self.humanPack())
-
-		exer_pack = ModelUtils.objectToDict(self.exerPack())
-
-		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack())
-
-		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool())
-
-		exer_hub = ModelUtils.objectToDict(self.exerHub())
-
-		return {
-			'human_pack': human_pack,
-			'exer_pack': exer_pack,
-			'exer_frag_pack': exer_frag_pack,
-			'exer_gift_pool': exer_gift_pool,
-			'exer_hub': exer_hub,
-		}
-
-	def _slotContainerIndices(self):
-
-		exer_slot = ModelUtils.objectToDict(self.exerSlot())
-
-		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
-
-		return {
-			'exer_slot': exer_slot,
-			'battle_item_slot': battle_item_slot,
-		}
-
-	def _packContainerItems(self):
-
-		human_pack = ModelUtils.objectToDict(self.humanPack(), type='items')
-
-		exer_pack = ModelUtils.objectToDict(self.exerPack(), type='items')
-
-		exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack(), type='items')
-
-		exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool(), type='items')
-
-		exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
-
-		return {
-			'human_pack': human_pack,
-			'exer_pack': exer_pack,
-			'exer_frag_pack': exer_frag_pack,
-			'exer_gift_pool': exer_gift_pool,
-			'exer_hub': exer_hub,
-		}
-
-	def _slotContainerItems(self):
-
-		exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
-
-		battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
-
-		return {
-			'exer_slot': exerslot,
-			'battle_item_slot': battle_item_slot,
-		}
+	# def _packContainerIndices(self):
+	#
+	# 	human_pack = ModelUtils.objectToDict(self.humanPack())
+	#
+	# 	exer_pack = ModelUtils.objectToDict(self.exerPack())
+	#
+	# 	exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack())
+	#
+	# 	exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool())
+	#
+	# 	exer_hub = ModelUtils.objectToDict(self.exerHub())
+	#
+	# 	return {
+	# 		'human_pack': human_pack,
+	# 		'exer_pack': exer_pack,
+	# 		'exer_frag_pack': exer_frag_pack,
+	# 		'exer_gift_pool': exer_gift_pool,
+	# 		'exer_hub': exer_hub,
+	# 	}
+	#
+	# def _slotContainerIndices(self):
+	#
+	# 	exer_slot = ModelUtils.objectToDict(self.exerSlot())
+	#
+	# 	battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot())
+	#
+	# 	return {
+	# 		'exer_slot': exer_slot,
+	# 		'battle_item_slot': battle_item_slot,
+	# 	}
+	#
+	# def _packContainerItems(self):
+	#
+	# 	human_pack = ModelUtils.objectToDict(self.humanPack(), type='items')
+	#
+	# 	exer_pack = ModelUtils.objectToDict(self.exerPack(), type='items')
+	#
+	# 	exer_frag_pack = ModelUtils.objectToDict(self.exerFragPack(), type='items')
+	#
+	# 	exer_gift_pool = ModelUtils.objectToDict(self.exerGiftPool(), type='items')
+	#
+	# 	exer_hub = ModelUtils.objectToDict(self.exerHub(), type='items')
+	#
+	# 	return {
+	# 		'human_pack': human_pack,
+	# 		'exer_pack': exer_pack,
+	# 		'exer_frag_pack': exer_frag_pack,
+	# 		'exer_gift_pool': exer_gift_pool,
+	# 		'exer_hub': exer_hub,
+	# 	}
+	#
+	# def _slotContainerItems(self):
+	#
+	# 	exerslot = ModelUtils.objectToDict(self.exerSlot(), type='items')
+	#
+	# 	battle_item_slot = ModelUtils.objectToDict(self.battleItemSlot(), type='items')
+	#
+	# 	return {
+	# 		'exer_slot': exerslot,
+	# 		'battle_item_slot': battle_item_slot,
+	# 	}
 
 	# 对战信息
 	def _battleInfo(self):
@@ -616,34 +645,34 @@ class Player(CacheableModel):
 			'sum_gold': sum_gold,
 		}
 
-	def _convertRecordsData(self, res, **kwargs):
-		from record_module.models import GeneralExerciseRecord
+	# def _convertRecordsData(self, res, **kwargs):
+	# 	from record_module.models import GeneralExerciseRecord
+	#
+	# 	question_records = ModelUtils.objectsToDict(
+	# 		self.quesRecords(GeneralQuesRecord))
+	# 	exercise_records = ModelUtils.objectsToDict(
+	# 		self.quesSetRecords(GeneralExerciseRecord))
+	#
+	# 	res['question_records'] = question_records
+	# 	res['exercise_records'] = exercise_records
 
-		question_records = ModelUtils.objectsToDict(
-			self.quesRecords(GeneralQuesRecord))
-		exercise_records = ModelUtils.objectsToDict(
-			self.quesSetRecords(GeneralExerciseRecord))
-
-		res['question_records'] = question_records
-		res['exercise_records'] = exercise_records
-
-	def _convertPackData(self, res, **kwargs):
-
-		money = ModelUtils.objectToDict(self.playerMoney())
-
-		res['money'] = money
-		res['pack_containers'] = self._packContainerItems()
-		res['slot_containers'] = self._slotContainerItems()
+	# def _convertPackData(self, res, **kwargs):
+	#
+	# 	money = ModelUtils.objectToDict(self.playerMoney())
+	#
+	# 	res['money'] = money
+	# 	res['pack_containers'] = self._packContainerItems()
+	# 	res['slot_containers'] = self._slotContainerItems()
 
 	def _convertBaseData(self, res, online_player=None, **kwargs):
-		level = self.level()
-		create_time = ModelUtils.timeToStr(self.create_time)
 
-		self._convertCustomFields(res, 'id', 'name', 'character_id',
-						 'subject_selection', 'status', 'type')
+		# self._convertCustomFields(res, 'id', 'name', 'character_id',
+		# 				 'subject_selection', 'status', 'type', 'create_time')
+
+		level, next = self.level(True)
 
 		res['level'] = level
-		res['create_time'] = create_time
+		res['mext'] = next
 
 		if online_player is not None:
 			res["channel_name"] = online_player.consumer.channel_name
@@ -662,61 +691,31 @@ class Player(CacheableModel):
 		# 运行时数据
 		battle_player.convert(res)
 
+	# 转化其他人的数据
 	def _convertOthersData(self, res, **kwargs):
 
 		self._convertBaseData(res, **kwargs)
 
-		self._convertCustomFields(res, 'online')
-
+	# 转化自己的数据
 	def _convertCurrentData(self, res, **kwargs):
 
 		self._convertBaseData(res, **kwargs)
-
-		money = ModelUtils.objectToDict(self.playerMoney())
-		level, next = self.level(True)
-
-		self._convertCustomFields(res, 'username', 'phone', 'email', 'exp')
-
-		res['money'] = money
-		res['next'] = next
 
 	def _convertStatusData(self, res, **kwargs):
 
 		self._convertBaseData(res, **kwargs)
 
-		self._convertCustomFields(res, 'exp', 'grade', 'school',
-						 'city', 'contact', 'description')
-
-		money = ModelUtils.objectToDict(self.playerMoney())
-		birth = ModelUtils.dateToStr(self.birth)
-		level, next = self.level(True)
-
-		res['next'] = next
-		res['birth'] = birth
-		res['money'] = money
-
 		res['battle_info'] = self._battleInfo()
 		res['question_info'] = self._questionInfo()
-
-		res['pack_containers'] = self._packContainerItems()
-		res['slot_containers'] = self._slotContainerItems()
 
 	def _convertBattleData(self, res, **kwargs):
 
 		self._convertBaseData(res, **kwargs)
 
-		self._convertCustomFields(res, 'exp')
-
-		level, next = self.level(True)
 		season_record = ModelUtils.objectToDict(self.currentSeasonRecord())
 
-		res['next'] = next
 		res['season_record'] = season_record
-
 		res['battle_info'] = self._battleInfo()
-
-		res['pack_containers'] = self._packContainerItems()
-		res['slot_containers'] = self._slotContainerItems()
 
 	# def convert(self, type: str = None, online_player=None, battle_player=None) -> dict:
 	# 	"""
