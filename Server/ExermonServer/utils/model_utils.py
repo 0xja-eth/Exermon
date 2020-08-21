@@ -1,12 +1,12 @@
+from django.db import models
 from django.conf import settings
 from django.db.models.query import QuerySet
 from django.utils.deconstruct import deconstructible
 
-from .exception import *
 from .data_manager import *
 
 from enum import Enum
-import os, random, json
+import os, random
 
 
 # ===================================================
@@ -288,6 +288,7 @@ class ModelHelper:
 
 	"""分隔符"""
 
+# region 公用模型
 
 # ===================================================
 #  Model封装拓展
@@ -1109,6 +1110,94 @@ class DynamicData(CoreData):
 	# 描述
 	description = models.CharField(max_length=64, blank=True, verbose_name="描述")
 
+
+# endregion
+
+# ===================================================
+#  缓存机制模型
+# ===================================================
+class CacheableModel(BaseModel, CacheableObject):
+
+	class Meta:
+		abstract = True
+
+	def __init__(self, *args, **kwargs):
+		self.saved = True
+		self.delete_save = False
+
+		self.cache_values = {}
+		self.cache_pool = CachePool()
+
+		# self._setupCachePool()
+
+		super().__init__(*args, **kwargs)
+
+	# 配置缓存池
+	def _setupCachePool(self):
+		super()._setupCachePool()
+
+		for cla in self._cacheOneToOneModels():
+			if cla is None: continue
+
+			def genReloadFunc():
+				_cla = cla
+
+				def reloadFunc():
+					return [self._getOneToOneModelInDb(_cla)]
+
+				return reloadFunc
+
+			self._setModelCache(key=cla, reload_func=genReloadFunc())
+
+		for cla in self._cacheForeignKeyModels():
+			if cla is None: continue
+			objs = self._getForeignKeyModelInDb(cla)
+			self._setModelCache(key=cla, objects=objs)
+
+	# region 关系操作
+
+	# 需要缓存的模型类列表（必须为 OneToOne）
+	@classmethod
+	def _cacheOneToOneModels(cls): return []
+
+	# 需要缓存的模型类列表（必须为 外键）
+	@classmethod
+	def _cacheForeignKeyModels(cls): return []
+
+	def _getOneToOneCache(self, key) -> models.Model:
+		if key in self._cacheOneToOneModels():
+			return self._firstModelCache(key)
+		return None
+
+	def _getForeignKeyCache(self, key, cond: callable = None, **kwargs) -> models.Model:
+		if key in self._cacheForeignKeyModels():
+			return self._getModelCache(key, cond, **kwargs)
+		return None
+
+	def _getForeignKeyCaches(self, key, cond: callable = None, **kwargs) -> models.Model:
+		if key in self._cacheForeignKeyModels():
+			return self._queryModelCache(key, cond, **kwargs)
+		return None
+
+	# endregion
+
+	def __del__(self):
+		if self.delete_save: self.save()
+
+	def __setattr__(self, key, value):
+		if key != 'saved': self.saved = False
+		super().__setattr__(key, value)
+
+	def save(self, *args, **kwargs):
+
+		if not self.saved:
+			super().save(*args, **kwargs)
+			# print(str(self) + " saved!")
+			self.saved = True
+
+		self.cache_pool.saveAll()
+
+	"""占位符"""
 
 # endregion
 
