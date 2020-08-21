@@ -40,10 +40,6 @@ class BaseParamAdmin(object): pass
 class UsableItemTypeAdmin(object): pass
 
 
-@AdminXHelper.relatedModel(HumanEquipType)
-class HumanEquipTypeAdmin(object): pass
-
-
 @AdminXHelper.relatedModel(GameEquipType)
 class ExerEquipTypeAdmin(object): pass
 

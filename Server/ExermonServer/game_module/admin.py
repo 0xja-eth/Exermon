@@ -49,13 +49,6 @@ class UsableItemTypeAdmin(admin.ModelAdmin):
 	list_editable = ['configure', 'name', 'description']
 
 
-@admin.register(HumanEquipType)
-class HumanEquipTypeAdmin(admin.ModelAdmin):
-	list_display = ['id', 'configure', 'name', 'description']
-
-	list_editable = ['configure', 'name', 'description']
-
-
 @admin.register(GameEquipType)
 class ExerEquipTypeAdmin(admin.ModelAdmin):
 	list_display = ['id', 'configure', 'name', 'description']
