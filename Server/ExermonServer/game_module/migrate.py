@@ -12,7 +12,7 @@ base_path = './game_module/raw_data/'
 
 
 def export():
-	
+
 	for model in CoreDataManager.getCoreData():
 		exportModel(model)
 

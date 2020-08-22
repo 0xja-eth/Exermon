@@ -36,31 +36,37 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 26214400  #上传文件大小，改成25M
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400	#上传数据大小，也改成了25M
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
 
-    'xadmin',
-    'crispy_forms',
-    'reversion',
+	'xadmin',
+	'crispy_forms',
+	'reversion',
 
-    'game_module',
-    'player_module',
-    'item_module',
-    'exermon_module',
-    'question_module',
-    'record_module',
-    'season_module',
-    'battle_module',
+	'game_module',
+
+	'item_module',
+
+	'player_module',
+	'exermon_module',
+	'card_module',
+
+	'question_module',
+	'record_module',
+
+	'season_module',
+
+	'battle_module',
 
 	'english_pro_module',
 
-    'werkzeug_debugger_runserver',
-    'django_extensions',
-    'channels',
+	'werkzeug_debugger_runserver',
+	'django_extensions',
+	'channels',
 ]
 
 MIDDLEWARE = [
