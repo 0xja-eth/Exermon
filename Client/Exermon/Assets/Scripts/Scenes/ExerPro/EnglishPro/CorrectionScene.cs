@@ -129,12 +129,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene {
 		/// </summary>
 		/// <param name="container">句子容器</param>
 		/// <param name="word">单词</param>
-		public void onWordSelected(WordsContainer container, WordDisplay word) {
+		//public void onWordSelected(WordsContainer container, WordDisplay word) {
+		public void onWordSelected(WordDisplay word) {
+            //lfw
+			//// 清除其他句子选择
+			//articleDisplay.deselectAll(container);
 
-			// 清除其他句子选择
-			articleDisplay.deselectAll(container);
-
-			if (!terminated) correctionWindow.startWindow(container, word);
+			//if (!terminated) correctionWindow.startWindow(container, word);
+			if (!terminated) correctionWindow.startWindow(word);
         }
 
 		/// <summary>

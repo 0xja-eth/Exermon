@@ -263,6 +263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   articledisplay: {fileID: 101941736}
+  content: {fileID: 1207526159}
 --- !u!222 &101941735
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -285,12 +286,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   container: {fileID: 1207526160}
   subViewNameFormat: 
-  subViewPrefab: {fileID: 6280922372201902125, guid: 83f5007ca3007df4f8ba6b9b50c81bb8,
+  subViewPrefab: {fileID: 4421015803614440390, guid: cb4374c9de942c44d9a5c27151863d3f,
     type: 3}
+  mask: {fileID: 0}
+  countText: {fileID: 0}
+  maxCheck: 0
   defaultCapacity: 0
+  defaultCountTextFormat: "\u5F53\u524D\u9009\u4E2D/\u603B\u6570\u76EE\uFF1A{0}/{1}"
+  _actived: 1
+  _selectable: 1
+  _deselectable: 1
+  _checkable: 1
+  _highlightable: 1
   correctionWindow: {fileID: 748181166}
   count: {fileID: 501298023}
   scrollDelta: 64
+  correctionLayout: {fileID: 101941732}
+  scene: {fileID: 1849089252}
 --- !u!1 &112693437
 GameObject:
   m_ObjectHideFlags: 0
@@ -1881,7 +1893,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1027013971}
   m_HandleRect: {fileID: 1027013970}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2898,11 +2910,11 @@ RectTransform:
   m_Father: {fileID: 83249829}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -24, y: 0}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -310, y: 300}
+  m_SizeDelta: {x: 620, y: 0}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &1207526161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2910,7 +2922,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1207526159}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
@@ -2949,7 +2961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
-  m_VerticalFit: 2
+  m_VerticalFit: 0
 --- !u!1 &1225037633
 GameObject:
   m_ObjectHideFlags: 0

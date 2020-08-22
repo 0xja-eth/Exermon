@@ -94,14 +94,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 		#region 回调控制
 
-		/// <summary>
-		/// 点击回调
-		/// </summary>
-		/// <param name="index"></param>
-		public override void onClick(int index) {
-			base.onClick(index);
-			scene.onWordSelected(this, subViews[index] as WordDisplay);
-		}
+		///// <summary>
+		///// 点击回调
+		///// </summary>
+		///// <param name="index"></param>
+		//public override void onClick(int index) {
+		//	base.onClick(index);
+		//	scene.onWordSelected(this, subViews[index] as WordDisplay);
+		//}
 
 		#endregion
 

@@ -1,4 +1,5 @@
-﻿using UI.Common.Controls.ItemDisplays;
+﻿using System.Collections.Generic;
+using UI.Common.Controls.ItemDisplays;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls;
 using UI.ExerPro.EnglishPro.CorrectionScene.Controls.Test;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.EventSystems;
 namespace Assets.Scripts.Core.UI {
     public class CorrectionLayout : UIBehaviour {
 
-        public ArticleTestDisplay articledisplay;
+        public ArticleDisplay articledisplay;
         public GameObject content;
 
         public void initialize() {
@@ -17,16 +18,18 @@ namespace Assets.Scripts.Core.UI {
             ItemDisplay<string>[] words = articledisplay.getSubViews();
             RectTransform start = content.GetComponent<RectTransform>();
             Debug.Log("aaa" + articledisplay.subViewsCount());
-            RectTransform transform = (words[0] as WordTestDisplay).gameObject.GetComponent<RectTransform>();
+            RectTransform transform = (words[0] as WordDisplay).gameObject.GetComponent<RectTransform>();
 
             Debug.Log("aaa" + start.rect.size);
             float x = 0.0f;
-            float y = 0.0f;
+            float y = -10.0f;
+            float width = 620.0f;
             float spacing = 10.0f;
-            for (int i = 0; i < articledisplay.subViewsCount(); i++) {
-                transform = (words[i] as WordTestDisplay).gameObject.GetComponent<RectTransform>();
 
-                if (x + transform.rect.size.x + spacing >= 620.0f) {
+            for (int i = 0; i < articledisplay.subViewsCount(); i++) {
+                transform = (words[i] as WordDisplay).gameObject.GetComponent<RectTransform>();
+
+                if (x + transform.rect.size.x >= width) {
                     x = 0.0f;
                     y -= 50.0f + spacing;
                 }
@@ -35,6 +38,8 @@ namespace Assets.Scripts.Core.UI {
                 Debug.Log("aaa" + i + "-" + x + "," + y);
 
             }
+
+            content.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 50.0f - y);
 
         }
         ///// <summary>

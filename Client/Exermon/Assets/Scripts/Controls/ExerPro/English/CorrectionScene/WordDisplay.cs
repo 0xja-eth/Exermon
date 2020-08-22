@@ -31,6 +31,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		public Color correctColor = new Color(72, 127, 74, 255) / 255f;
 		public Color wrongColor = new Color(150, 28, 70, 255) / 255f;
+        public ArticleDisplay articleDisplay { get; set; }
 
         /// <summary>
         /// 内部组件设置
@@ -56,8 +57,10 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 				_originalWord = value;
 				noPunWord = filterWord(value);
 			}
-		} 
+		}
 
+        public int sid { get; set; } = -1;
+        public int wid { get; set; } = -1;
         public string noPunWord { get; set; } // 去除标点后的word，用于判断，orginalWord用于展示
         public string correctWord { get; set; } = null; // 正确答案
 		
@@ -82,23 +85,31 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// </summary>
 		/// <returns></returns>
 		public int getWid() {
-			return index + 1;
+            if(wid == -1) {
+                wid = articleDisplay.getItem().wid(index);
+            }
+            return wid;
+            return index + 1;
 		}
-
+        //lfw
 		/// <summary>
 		/// 获取sid
 		/// </summary>
 		/// <returns></returns>
 		public int getSid() {
-			return getContainer().sentenceDisplay.sid;
+            if (sid == -1) {
+                sid = articleDisplay.getItem().sid(index);
+            }
+            return sid;
+			//return getContainer().sentenceDisplay.sid;
 		}
 
 		/// <summary>
 		/// 获取容器
 		/// </summary>
 		/// <returns></returns>
-		public new WordsContainer getContainer() {
-			return container as WordsContainer;
+		public new ArticleDisplay getContainer() {
+			return container as ArticleDisplay;
 		}
 
 		/// <summary>
@@ -107,7 +118,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 		/// <returns></returns>
 		public bool isChanged(string word = null) {
 			if (word == null) word = item;
-			return word != noPunWord;
+			return word != originalWord;
 		}
 		
 		/// <summary>
@@ -195,13 +206,14 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Controls {
 
 			return corrWords.Contains(changed);
 		}
-
+        //lfw
 		/// <summary>
 		/// 是否显示答案
 		/// </summary>
 		/// <returns></returns>
 		public bool isShowAnswer() {
-			return getContainer().sentenceDisplay.isShowAnswer();
+            return articleDisplay.showAnswer;
+			//return getContainer().sentenceDisplay.isShowAnswer();
 		}
 
 		/// <summary>

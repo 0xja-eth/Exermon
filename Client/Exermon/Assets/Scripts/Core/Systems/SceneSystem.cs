@@ -53,7 +53,6 @@ namespace Core.Systems {
             EnglishProPhraseScene,
             EnglishProBattleScene,
             EnglishProPackScene,
-            CorrectTestScene,
             HelpScene
         }
 

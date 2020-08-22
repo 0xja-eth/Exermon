@@ -79,9 +79,11 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// <summary>
 		/// 开启窗口
 		/// </summary>
-		public void startWindow(WordsContainer container, WordDisplay word) {
+		//public void startWindow(WordsContainer container, WordDisplay word) {
+		public void startWindow(WordDisplay word) {
 			startWindow();
-			setupCurrent(container, word);
+			//setupCurrent(container, word);
+			setupCurrent(word);
 		}
 
 		#endregion
@@ -91,7 +93,8 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// <summary>
 		/// 配置当前关联内容
 		/// </summary>
-		void setupCurrent(WordsContainer container, WordDisplay word) {
+		//void setupCurrent(WordsContainer container, WordDisplay word) {
+		void setupCurrent(WordDisplay word) {
 			currentWord = word;
 		}
 
@@ -193,6 +196,7 @@ namespace UI.ExerPro.EnglishPro.CorrectionScene.Windows {
 		/// </summary>
 		public void cancel() {
 			base.terminateWindow();
+            currentWord.deselect();
 			//currentSenContainer?.deselect();
 		}
 		/*

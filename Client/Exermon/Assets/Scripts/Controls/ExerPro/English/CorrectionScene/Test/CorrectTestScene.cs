@@ -10,17 +10,17 @@ using UI.ExerPro.EnglishPro.CorrectionScene.Controls.Test;
 
 //改错布局
 namespace Assets.Scripts.Controls.ExerPro.English.CorrectionScene.Test {
-    class CorrectTestScene : BaseScene {
-        public ArticleTestDisplay articleDisplay;
-        public override SceneSystem.Scene sceneIndex() {
-            return SceneSystem.Scene.CorrectTestScene;
-        }
+    class CorrectTestScene {
+        //public ArticleTestDisplay articleDisplay;
+        //public override SceneSystem.Scene sceneIndex() {
+        //    return SceneSystem.Scene.CorrectTestScene;
+        //}
 
-        protected override void start() {
-            base.start();
-            CorrectionQuestion a = new CorrectionQuestion();
-            articleDisplay.startView();
-            articleDisplay.setItems(a.sentences());
-        }
+        //protected override void start() {
+        //    base.start();
+        //    CorrectionQuestion a = new CorrectionQuestion();
+        //    articleDisplay.startView();
+        //    articleDisplay.setItems(a.sentences());
+        //}
     }
 }
